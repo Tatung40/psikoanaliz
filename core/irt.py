@@ -195,3 +195,76 @@ def approximate_q3(data, item_table, theta):
     names=(list(data.columns) if isinstance(data,pd.DataFrame)
            else [f"M{i+1}" for i in range(x.shape[1])])
     return pd.DataFrame(corr,index=names,columns=names)
+
+
+def approximate_parameter_uncertainty(data, item_table, model, points=31,
+                                      max_parameters=120):
+    """Exploratory OPG covariance based on marginal per-person score vectors.
+
+    Not an observed-Hessian or Louis information SE. Normal intervals can be
+    unreliable close to parameter boundaries; return unavailable in that case.
+    """
+    x=validate_binary(data)
+    n,k=x.shape
+    active={"1PL":["b"],"2PL":["a","b"],"3PL":["a","b","c"],
+            "4PL":["a","b","c","d"]}[model]
+    count=k*len(active)
+    result=pd.DataFrame({"Madde":list(item_table["Madde"])})
+    for name in ("a","b","c","d"):
+        result[f"SE({name})"]=np.nan
+        result[f"{name} %95 alt"]=np.nan
+        result[f"{name} %95 üst"]=np.nan
+    reason=""
+    if count>max_parameters or n <= 5*count:
+        reason="OPG için parametre sayısı fazla veya örneklem yetersiz."
+    else:
+        a,b,c,d=[np.asarray(item_table[name],dtype=float) for name in ("a","b","c","d")]
+        bounds={"a":(0.15,4.),"b":(-4.,4.),"c":(0.,.35),"d":(.65,1.)}
+        for name in active:
+            vv=locals()[name]
+            lo,hi=bounds[name]
+            if np.any((vv-lo)<1e-3) or np.any((hi-vv)<1e-3):
+                reason="Bir veya daha fazla parametre optimizasyon sınırında."
+                break
+    if not reason:
+        gh,w=hermgauss(points)
+        nodes=np.sqrt(2)*gh
+        z=expit(nodes[:,None]*a[None,:]-(a*b)[None,:])
+        probs=np.clip(c[None,:]+(d-c)[None,:]*z,1e-9,1-1e-9)
+        lpost=x@np.log(probs).T+(1-x)@np.log1p(-probs).T+np.log(w/np.sqrt(np.pi))[None,:]
+        posterior=np.exp(lpost-logsumexp(lpost,axis=1,keepdims=True))
+        scores=np.empty((n,count))
+        for j in range(k):
+            shared=z[:,j]*(1-z[:,j])*(d[j]-c[j])
+            derivatives={
+                "a":shared*(nodes-b[j]),
+                "b":-shared*a[j],
+                "c":1-z[:,j],
+                "d":z[:,j],
+            }
+            scale=(x[:,j,None]-probs[None,:,j]) / (
+                probs[None,:,j]*(1-probs[None,:,j]))
+            for h,name in enumerate(active):
+                scores[:,j*len(active)+h]=(
+                    posterior*(scale*derivatives[name][None,:])).sum(axis=1)
+        opg=scores.T@scores
+        try:
+            cond=np.linalg.cond(opg)
+            if not np.isfinite(cond) or cond>1e9:
+                reason="OPG bilgi matrisi kötü koşullanmış/tekil."
+            else:
+                covariance=np.linalg.inv(opg)
+                diag=np.diag(covariance)
+                if np.any(diag<=0) or not np.isfinite(diag).all():
+                    reason="Pozitif ve sonlu standart hata elde edilemedi."
+                else:
+                    ses=np.sqrt(diag).reshape(k,len(active))
+                    for h,name in enumerate(active):
+                        v=np.asarray(item_table[name],dtype=float)
+                        se=ses[:,h]
+                        result[f"SE({name})"]=se
+                        result[f"{name} %95 alt"]=v-1.96*se
+                        result[f"{name} %95 üst"]=v+1.96*se
+        except np.linalg.LinAlgError:
+            reason="OPG bilgi matrisi terslenemedi."
+    return result, reason
