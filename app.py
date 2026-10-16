@@ -973,9 +973,13 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "Yakınsamamış modellerin sıralaması güvenilir değildir; 3PL/4PL'de sınır kestirimleri "
                            "nedeniyle standart ki-kare LRT varsayımları sağlanmayabilir.")
             st.stop()
-        st.radio("İki kategorili MTK modeli", ["1PL","2PL","3PL","4PL"],
-                 index=("1PL","2PL","3PL","4PL").index(model),
-                 key=f"model_radio_{model}", horizontal=True, disabled=True)
+        selected_model = st.radio("İki kategorili MTK modeli",
+            ["1PL", "2PL", "3PL", "4PL"],
+            index=("1PL", "2PL", "3PL", "4PL").index(model),
+            key=f"model_radio_{model}", horizontal=True)
+        if selected_model != model:
+            st.session_state.nav_page = f"MTK: {selected_model}"
+            st.rerun()
         mc1, mc2 = st.columns(2)
         with mc1:
             qpoints = st.select_slider("Gauss-Hermite düğüm sayısı",
