@@ -104,7 +104,7 @@ def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0):
         other=_sumscore_lik(np.delete(probs,j,axis=1))
         expected=np.column_stack((
             other[:k]@((1-probs[:,j])*prior)/total_probs[:k],
-            other[:k]@(probs[:,j]*prior)/total_probs[1:k+1]
+            np.r_[0., (other[:k-1]@(probs[:,j]*prior))/total_probs[1:k]]
         ))
         expected=expected[1:k]
         obs=np.zeros((k+1,2),dtype=float)
