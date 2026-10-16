@@ -70,6 +70,7 @@ from core.irt import (fit_irt, estimate_ability, approximate_q3,
 import plotly.graph_objects as go
 from core.irt_itemfit import sx2_mirt_compatible
 from core.irt_hessian import observed_information_se
+from core.irt_se_diagnostics import hessian_boundary_diagnostics
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 
@@ -1479,6 +1480,23 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 d_lower=r.get("d_lower",0.65))
                         if hessian_reason:
                             st.warning("Hessian SH hesaplanamadı: "+hessian_reason)
+                            blocked=hessian_boundary_diagnostics(
+                                r["items"],model,
+                                a_upper=r.get("a_upper",4.0),
+                                d_lower=r.get("d_lower",0.65))
+                            if not blocked.empty:
+                                st.markdown("**Sınır nedeniyle sorunlu madde-parametreler**")
+                                st.dataframe(blocked.round(5),hide_index=True,
+                                             use_container_width=True)
+                                download_table_pair(
+                                    blocked,f"psikoanaliz_{model}_sh_sinir_tanisi",
+                                    "SH Sınır Tanıları",f"irt_se_diag_{model}")
+                            else:
+                                st.info("Doğrudan sınıra dayanan madde-parametre "
+                                        "bulunamadı. Bu uyarı, tekil veya kötü "
+                                        "koşullanmış **model düzeyi bilgi matrisi** "
+                                        "gibi toplu bir nedenden kaynaklanıyor olabilir; "
+                                        "tek bir maddeye bağlanamaz.")
                             st.caption("Sınırdaki parametreler, bilgi matrisi "
                                        "tekilliği veya sayısal kararsızlık "
                                        "nedeniyle güvenilir SH hesaplanamayabilir. "
