@@ -1081,7 +1081,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     "c": "c (Alt asimptot / şans)",
                     "d": "d (Üst asimptot)"
                 }
-                display_params = r["items"].rename(columns=param_names)
+                param_view = st.radio("Parametre gösterimi",
+                    ["MTK (a, b, c, d)", "Eğim–sabit (a, intercept, c, d)"],
+                    horizontal=True, key=f"irt_param_view_{model}")
+                display_params = r["items"].copy()
+                if param_view.startswith("Eğim"):
+                    display_params["intercept"] = -display_params["a"] * display_params["b"]
+                    display_params = display_params.drop(columns=["b"])
+                    param_names["intercept"] = "intercept (−a × b)"
+                display_params = display_params.rename(columns=param_names)
                 st.dataframe(display_params.round(4), hide_index=True,
                              use_container_width=True)
                 st.caption("a: Madde ayırt ediciliği; b: güçlük (konum) parametresi; "
