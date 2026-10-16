@@ -64,7 +64,7 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
-from core.irt import fit_irt
+from core.irt import fit_irt, estimate_ability
 import plotly.graph_objects as go
 
 
@@ -146,9 +146,16 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
-    st.button("🧪 MTK Model Kestirimi ve Grafikler",
-              use_container_width=True, on_click=navigate_to,
-              args=("13. MTK Analizleri",))
+    st.markdown("**İki Kategorili Modeller**")
+    for m in ("1PL", "2PL", "3PL", "4PL"):
+        st.button(f"📐 {m} Modeli", key=f"nav_irt_{m}",
+                  use_container_width=True, on_click=navigate_to,
+                  args=(f"MTK: {m}",))
+    st.markdown("**Çok Kategorili Modeller**")
+    st.button("🔒 GRM / GPCM / NRM — Yakında", disabled=True,
+              use_container_width=True)
+    st.button("📊 Model Karşılaştırması", use_container_width=True,
+              on_click=navigate_to, args=("MTK: Karşılaştırma",))
 
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
@@ -918,7 +925,7 @@ elif selected_page == "12. Kullanım Kılavuzu":
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
 # =============================================================================
-elif selected_page == "13. MTK Analizleri":
+elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma"):
     render_academic_header()
     st.subheader("🧪 Madde Tepki Kuramı — 1PL, 2PL, 3PL, 4PL")
     st.caption("Tek boyutlu ikili MTK | Marjinal maksimum olabilirlik (EM) | "
@@ -933,14 +940,49 @@ elif selected_page == "13. MTK Analizleri":
     elif not st.session_state.is_dichotomous:
         st.error("MTK ekranı yalnızca ikili (0/1) puanlı maddeleri destekler.")
     else:
-        model = st.selectbox("MTK modeli", ["1PL", "2PL", "3PL", "4PL"],
-                             index=1, key="irt_model_select")
+        model = selected_page.replace("MTK: ", "")
+        if model == "Karşılaştırma":
+            st.subheader("📊 İki Kategorili Model Karşılaştırması")
+            st.caption("Karşılaştırma için modelleri ilgili 1PL–4PL sayfalarında aynı veri üzerinde ayrı ayrı çalıştırın.")
+            history = st.session_state.get("irt_model_results", {})
+            data = target.loc[:, columns]
+            fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
+            usable = {m: entry["result"] for m,entry in history.items()
+                      if entry.get("fingerprint")==fingerprint}
+            rows = [
+                {"Model":m,"Log-olabilirlik":r["loglik"],"Parametre sayısı":r["param_count"],
+                 "AIC":r["aic"],"BIC":r["bic"],"Yakınsama":r["converged"]}
+                for m,r in usable.items()]
+            if not rows:
+                st.info("Henüz bu veri setinde kalibre edilmiş model bulunmuyor. Önce 1PL, 2PL, 3PL veya 4PL sayfalarından modelleri çalıştırın.")
+            else:
+                comparison = pd.DataFrame(rows).sort_values("AIC")
+                comparison["ΔAIC"] = comparison["AIC"] - comparison["AIC"].min()
+                comparison["ΔBIC"] = comparison["BIC"] - comparison["BIC"].min()
+                st.dataframe(comparison.round(3), use_container_width=True, hide_index=True)
+                st.download_button("⬇️ Model Karşılaştırmasını İndir",
+                    comparison.to_csv(index=False).encode("utf-8-sig"),
+                    file_name="psikoanaliz_mtk_model_karsilastirma.csv", mime="text/csv")
+                fig=go.Figure()
+                for metric in ("AIC","BIC"):
+                    fig.add_bar(name=metric,x=comparison["Model"],y=comparison[metric])
+                fig.update_layout(barmode="group",template="plotly_white",
+                    title="Model Karşılaştırması (AIC/BIC; düşük değer tercih edilir)")
+                st.plotly_chart(fig,use_container_width=True)
+                st.caption("AIC/BIC karşılaştırması aynı katılımcı ve madde seti ile yapılan kalibrasyonlar içindir. "
+                           "Yakınsamamış modellerin sıralaması güvenilir değildir; 3PL/4PL'de sınır kestirimleri "
+                           "nedeniyle standart ki-kare LRT varsayımları sağlanmayabilir.")
+            st.stop()
+        st.radio("İki kategorili MTK modeli", ["1PL","2PL","3PL","4PL"],
+                 index=("1PL","2PL","3PL","4PL").index(model),
+                 key=f"model_radio_{model}", horizontal=True, disabled=True)
         mc1, mc2 = st.columns(2)
         with mc1:
             qpoints = st.select_slider("Gauss-Hermite düğüm sayısı",
                          options=[15, 21, 31, 41], value=31)
         with mc2:
             iterations = st.slider("Azami EM yinelemesi", 20, 150, 70, 10)
+        st.caption("Madde parametreleri MML/EM ile kalibre edilir; kişi yeteneğinde EAP, MAP veya ML seçilebilir.")
         st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
                    "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
         if st.button("▶️ MTK Analizini Başlat", type="primary"):
@@ -948,12 +990,19 @@ elif selected_page == "13. MTK Analizleri":
                 data = target.loc[:, columns].copy()
                 with st.spinner(f"{model} kalibrasyonu hesaplanıyor…"):
                     result = fit_irt(data, model=model, points=qpoints, max_iter=iterations)
-                st.session_state.irt_results = result
-                st.success("MTK kestirimi tamamlandı.")
+                fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
+                if "irt_model_results" not in st.session_state:
+                    st.session_state.irt_model_results = {}
+                st.session_state.irt_model_results[model] = {"fingerprint": fingerprint, "result": result}
+                st.success(f"{model} kestirimi tamamlandı.")
             except Exception as exc:
-                st.session_state.pop("irt_results", None)
+                st.session_state.get("irt_model_results", {}).pop(model, None)
                 st.error(f"MTK analizi tamamlanamadı: {exc}")
-        r = st.session_state.get("irt_results")
+        data_for_check = target.loc[:, columns]
+        current_fingerprint = (tuple(columns), data_for_check.shape,
+            int(pd.util.hash_pandas_object(data_for_check, index=True).sum()))
+        saved = st.session_state.get("irt_model_results", {}).get(model, {})
+        r = saved.get("result") if saved.get("fingerprint") == current_fingerprint else None
         if r is not None:
             st.markdown(f"### {r['model']} — Kestirim Sonuçları")
             if not r["converged"]:
@@ -1017,14 +1066,25 @@ elif selected_page == "13. MTK Analizleri":
                     template="plotly_white")
                 st.plotly_chart(fig,use_container_width=True)
             with tabs[4]:
+                ability_method = st.radio("Yetenek kestirim yöntemi",
+                    ["EAP", "MAP", "ML"], horizontal=True, key=f"ability_method_{model}")
+                prior_sd = st.number_input("Önsel dağılım SS (EAP/MAP)",
+                    min_value=0.2,max_value=3.0,value=1.0,step=0.1,
+                    key=f"prior_sd_{model}", disabled=ability_method=="ML")
+                ability_table = estimate_ability(target.loc[:, columns],
+                    r["items"],method=ability_method,points=161,prior_sd=prior_sd)
+                if ability_table["Sınır Kestirimi"].any():
+                    st.warning("Bazı ML/MAP yetenek kestirimleri hesaplama aralığının sınırına ulaştı.")
                 fig=go.Figure()
-                fig.add_histogram(x=r["theta"],nbinsx=35,name="EAP θ")
-                fig.update_layout(title="EAP Yetenek Dağılımı",
+                fig.add_histogram(x=ability_table["Yetenek (theta)"],nbinsx=35,
+                    name=f"{ability_method} θ")
+                fig.update_layout(title=f"{ability_method} Yetenek Dağılımı",
                     xaxis_title="EAP θ",yaxis_title="Katılımcı",
                     template="plotly_white")
                 st.plotly_chart(fig,use_container_width=True)
-                scores=pd.DataFrame({"EAP_theta":r["theta"],
-                                     "Posterior_SD":r["theta_sd"]})
+                scores=ability_table
+                st.dataframe(scores.head(20).round(3),hide_index=True,
+                             use_container_width=True)
                 st.download_button("⬇️ Kişi Yeteneklerini CSV İndir",
                     scores.to_csv(index=False).encode("utf-8-sig"),
                     file_name="psikoanaliz_mtk_yetenek.csv",mime="text/csv")
