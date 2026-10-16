@@ -324,3 +324,65 @@ def item_fit_by_restscore(data, item_table, min_group=5):
                     "Kapsanan kişi":int(sum((rest==v).sum() for v in np.unique(rest)
                                       if (rest==v).sum()>=min_group))})
     return pd.DataFrame(out)
+
+
+def sx2_pilot(data, item_table, model, points=31, min_expected=5):
+    """Experimental Orlando–Thissen-style S-X2 grouped by observed total score.
+
+    Conditional P(Y_i=1|S=s) is calculated from the marginal IRT model,
+    integrating over standard normal theta by Gauss-Hermite quadrature and
+    Poisson-binomial recursion for the other items. Sparse score groups are
+    excluded; no p-value is reported when asymptotic criteria fail. This
+    implementation has not been benchmarked against mirt::itemfit.
+    """
+    from scipy.stats import chi2
+    x=validate_binary(data)
+    n,k=x.shape
+    a,b,c,d=[np.asarray(item_table[q],dtype=float) for q in ("a","b","c","d")]
+    gh,hw=hermgauss(points)
+    p=np.clip(probabilities(np.sqrt(2)*gh,a,b,c,d),1e-12,1-1e-12)
+    weights=hw/np.sqrt(np.pi)
+    totals=x.sum(axis=1).astype(int)
+    active={"1PL":1,"2PL":2,"3PL":3,"4PL":4}[model]
+    names=list(data.columns) if isinstance(data,pd.DataFrame) else list(item_table["Madde"])
+    out=[]
+    for j in range(k):
+        other=np.delete(p,j,axis=1)
+        distribution=np.ones((len(weights),1))
+        for h in range(k-1):
+            ph=other[:,h,None]
+            updated=np.zeros((len(weights),distribution.shape[1]+1))
+            updated[:,:-1]+=distribution*(1-ph)
+            updated[:,1:]+=distribution*ph
+            distribution=updated
+        # Model probability for full score s and item success at score s.
+        weighted_yes=(weights[:,None]*p[:,j,None]*distribution).sum(axis=0)
+        weighted_no=(weights[:,None]*(1-p[:,j,None])*distribution).sum(axis=0)
+        ps=np.r_[weighted_no,0.] + np.r_[0.,weighted_yes]
+        yes=np.r_[0.,weighted_yes]
+        cond=np.divide(yes,ps,out=np.zeros(k+1),where=ps>1e-12)
+        stat=0.
+        used=0
+        covered=0
+        for score in range(k+1):
+            indices=totals==score
+            m=int(indices.sum())
+            if not m:continue
+            expect=m*cond[score]
+            if expect<min_expected or m-expect<min_expected:
+                continue
+            obs=float(x[indices,j].sum())
+            stat+=(obs-expect)**2/expect + ((m-obs)-(m-expect))**2/(m-expect)
+            used+=1
+            covered+=m
+        df=used-active-1
+        valid=bool(df>0 and covered>=max(30,2*used) and
+                   not bool(item_table.iloc[j].get("Sınır uyarısı",False)))
+        out.append({"Madde":names[j],"S-X² (pilot)":stat if valid else np.nan,
+                    "sd (yaklaşık)":df if valid else np.nan,
+                    "p (yaklaşık)":float(chi2.sf(stat,df)) if valid else np.nan,
+                    "Kullanılan puan grubu":used,
+                    "Kapsanan kişi":covered,
+                    "Durum":"Pilot / bağımsız doğrulama gerekli" if valid
+                    else "Yetersiz grup veya sınır parametresi"})
+    return pd.DataFrame(out)
