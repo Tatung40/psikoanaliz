@@ -96,3 +96,22 @@ def test_opg_uncertainty_schema_and_safety(model):
         for p in estimated:
             assert np.isfinite(table[f"SE({p})"]).all()
             assert (table[f"SE({p})"]>0).all()
+
+
+def test_custom_bounds_and_initialization():
+    data=make_data(n=180,k=5,seed=49)
+    for model in ("3PL","4PL"):
+        result=fit_irt(data,model=model,points=15,max_iter=5,
+                       a_upper=10.,d_lower=.20,initial_shift=1.)
+        assert np.isfinite(result["loglik"])
+        assert (result["items"]["a"] <= 10.00001).all()
+        if model=="4PL":
+            assert (result["items"]["d"] >= .19999).all()
+
+
+def test_invalid_parameter_bounds():
+    data=make_data(n=180,k=5,seed=50)
+    with pytest.raises(ValueError):
+        fit_irt(data,model="3PL",a_upper=3.)
+    with pytest.raises(ValueError):
+        fit_irt(data,model="4PL",d_lower=.01)
