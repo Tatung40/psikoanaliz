@@ -65,7 +65,8 @@ from ui.charts import (
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
 from core.irt import (fit_irt, estimate_ability, approximate_q3,
-                      approximate_parameter_uncertainty, item_fit_by_restscore)
+                      approximate_parameter_uncertainty, item_fit_by_restscore,
+                      sx2_pilot)
 import plotly.graph_objects as go
 
 
@@ -1448,6 +1449,23 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                         f"psikoanaliz_{model}_rest_puan_uyum",
                                         "Madde–Kalan Puan Tanıları",
                                         f"irt_restscore_download_{model}")
+                st.markdown("#### S-X² (Pilot / Doğrulanmamış)")
+                st.caption("Toplam puan gruplarına göre beklenen yanıt olasılıkları "
+                           "normal dağılım altında sayısal integrasyonla hesaplanır. "
+                           "Seyrek gruplar dışlanır; serbestlik derecesi yaklaşık alınır. "
+                           "Bu yöntem henüz R mirt ile bağımsız karşılaştırılmadığı için "
+                           "akademik yayında kesin uyum testi olarak kullanılmamalıdır.")
+                if st.checkbox("Deneysel S-X² sonuçlarını hesapla",
+                               value=False, key=f"irt_sx2_pilot_{model}"):
+                    with st.spinner("Deneysel S-X² hesaplanıyor…"):
+                        sx2_table=sx2_pilot(
+                            target.loc[:, irt_columns],r["items"],model,
+                            points=qpoints)
+                    st.dataframe(sx2_table.round(4),hide_index=True,
+                                 use_container_width=True)
+                    download_table_pair(sx2_table,
+                                        f"psikoanaliz_{model}_sx2_pilot",
+                                        "Deneysel S-X²",f"irt_sx2_pilot_dl_{model}")
                 diagnostic=r["items"][["Madde","Gözlenen p","Model p",
                                        "Artık RMS","Sınır uyarısı"]]
                 st.dataframe(diagnostic.round(4),hide_index=True,
