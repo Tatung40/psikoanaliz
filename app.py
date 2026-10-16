@@ -147,41 +147,21 @@ with st.sidebar:
 if selected_page == "1. Ana Sayfa":
     render_academic_header()
 
-    col1, col2 = st.columns([3, 2])
-    with col1:
-        st.markdown("""
-        ### 🎯 Platform Hakkında ve Amaç
-        **PsikoAnaliz**, eğitim ve psikolojide ölçme ve değerlendirme uzmanları, psikometristler, öğretmenler,
-        akademisyenler ve lisansüstü araştırmacılar için geliştirilmiş **tamamen ücretsiz ve açık kaynaklı** bir Klasik Test Kuramı (KTK) analiz ortamıdır.
-        
-        Uluslararası standartlardaki **ShinyItemAnalysis** platformunun CTT modülleri referans alınarak tasarlanmış olup;
-        gelişmiş tanısal bayraklandırma, bağ (tie) duyarlı üst-alt grup ayırt ediciliği, seçenek düzeyinde çeldirici ayrıştırması,
-        Cronbach Alfa ile tam sayısal eşdeğerliği kanıtlanmış KR-20 formülasyonu ve APA 7 uyumlu akademik raporlama özelliklerine sahiptir.
-        
-        #### 💡 Temel Kabiliyetler
-        - **Sıfır Dış Bağımlılık & Yerel Güvenlik:** Katılımcı verileriniz hiçbir harici sunucuya veya yapay zeka API'sine gönderilmez.
-        - **Matematiksel Kesinlik:** Deterministik formülasyonlar, $ddof=1$ örneklem varyansı tutarlılığı ve $KR-20 \equiv \alpha$ doğrulaması.
-        - **Çoktan Seçmeli ve Derecelendirme Ölçekleri:** Hem 0/1 başarı testlerini hem de Likert tipi tutum/kişilik ölçeklerini tam destekler.
-        - **Yayın Kalitesinde Grafikler:** Plotly ile üretilen yüksek çözünürlüklü, interaktif bilimsel görselleştirmeler.
-        - **Akademik Raporlama:** Tek tıkla çok sayfalı stillendirilmiş Excel (.xlsx) ve APA 7 uyumlu Word (.docx) rapor ihracı.
-        """)
+    st.markdown("""
+    ### 🎯 Platform Hakkında ve Amaç
 
-    with col2:
-        st.markdown("""
-        ### 👨‍🏫 Akademik Liderlik
-        **Doç. Dr. Mehmet Taha Eser**  
-        *Eğitimde Ölçme ve Değerlendirme Anabilim Dalı*  
-        Klasik Test Kuramı, Psikometri, Madde ve Test Analizi, İstatistiksel Hesaplama
-        
-        ---
-        ### ⚡ Hızlı Başlangıç
-        1. **Veri Yükleme** sekmesinden kendi CSV / Excel dosyanızı yükleyin veya **Örnek Veri Setleri** butonlarını kullanın.
-        2. **Puanlama** sekmesinde cevap anahtarı veya ters kodlama ayarlarınızı doğrulayın.
-        3. **Test İstatistikleri, Madde Analizi ve Güvenirlik** sekmelerinde sonuçları interaktif olarak inceleyin.
-        4. **Raporlama** sekmesinden teziniz veya makaleniz için hazır Excel ve Word raporlarını indirin.
-        """)
+    **PsikoAnaliz**, eğitim ve psikolojide ölçme ve değerlendirme alanında çalışan
+    akademisyenler, araştırmacılar, öğretmenler, psikometristler ve lisansüstü öğrenciler
+    için geliştirilmiş web tabanlı bir Klasik Test Kuramı (KTK) analiz platformudur.
 
-        st.info("💡 **İpucu:** Uygulamayı hemen denemek için sol menüden 'Veri Yükleme' sekmesine gidip 'Örnek Çoktan Seçmeli Testi Yükle' butonuna tıklayabilirsiniz.")
+    Platform; madde ve test istatistiklerinin hesaplanmasını, çoktan seçmeli testlerde
+    çeldirici analizini, güvenirlik ve ölçme hatası kestirimlerini, grup bazlı
+    karşılaştırmaları ve bilimsel grafiklerle desteklenen akademik raporlamayı
+    tek bir ortamda sunmayı amaçlamaktadır.
+
+    **Doç. Dr. Mehmet Taha Eser**  
+    *Eğitimde Ölçme ve Değerlendirme Anabilim Dalı*
+    """)
 
 
 # =============================================================================
