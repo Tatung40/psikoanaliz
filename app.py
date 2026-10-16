@@ -989,36 +989,73 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     "Asıl veri dosyanız değiştirilmez.")
         model = selected_page.replace("MTK: ", "")
         if model == "Karşılaştırma":
-            st.subheader("📊 İki Kategorili Model Karşılaştırması")
-            st.caption("Karşılaştırma için modelleri ilgili 1PL–4PL sayfalarında aynı veri üzerinde ayrı ayrı çalıştırın.")
+            st.subheader("📊 MTK Model Karşılaştırması")
+            st.markdown(
+                "Aynı veri üzerinde kestirilen **1PL, 2PL, 3PL ve 4PL** modelleri "
+                "**AIC**, **BIC** ve **logLik** ölçütleriyle karşılaştırılır. "
+                "AIC ve BIC için küçük değer daha iyi uyumu–karmaşıklık dengesini gösterir. "
+                "LogLik için büyük değer daha yüksek olabilirlik anlamına gelir."
+            )
             history = st.session_state.get("irt_model_results", {})
             data = target.loc[:, irt_columns]
             fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
             usable = {m: entry["result"] for m,entry in history.items()
-                      if entry.get("fingerprint")==fingerprint}
-            rows = [
-                {"Model":m,"Log-olabilirlik":r["loglik"],"Parametre sayısı":r["param_count"],
-                 "AIC":r["aic"],"BIC":r["bic"],"Yakınsama":r["converged"]}
-                for m,r in usable.items()]
-            if not rows:
-                st.info("Henüz bu veri setinde kalibre edilmiş model bulunmuyor. Önce 1PL, 2PL, 3PL veya 4PL sayfalarından modelleri çalıştırın.")
+                      if entry.get("fingerprint") == fingerprint}
+            if not usable:
+                st.info("Bu veri setiyle henüz bir MTK modeli çalıştırılmadı. "
+                        "Önce ilgili 1PL–4PL sayfalarında kalibrasyon yapın.")
             else:
-                comparison = pd.DataFrame(rows).sort_values("AIC")
-                comparison["ΔAIC"] = comparison["AIC"] - comparison["AIC"].min()
-                comparison["ΔBIC"] = comparison["BIC"] - comparison["BIC"].min()
-                st.dataframe(comparison.round(3), use_container_width=True, hide_index=True)
-                st.download_button("⬇️ Model Karşılaştırmasını İndir",
-                    comparison.to_csv(index=False).encode("utf-8-sig"),
-                    file_name="psikoanaliz_mtk_model_karsilastirma.csv", mime="text/csv")
-                fig=go.Figure()
-                for metric in ("AIC","BIC"):
-                    fig.add_bar(name=metric,x=comparison["Model"],y=comparison[metric])
-                fig.update_layout(barmode="group",template="plotly_white",
-                    title="Model Karşılaştırması (AIC/BIC; düşük değer tercih edilir)")
-                st.plotly_chart(fig,use_container_width=True)
-                st.caption("AIC/BIC karşılaştırması aynı katılımcı ve madde seti ile yapılan kalibrasyonlar içindir. "
-                           "Yakınsamamış modellerin sıralaması güvenilir değildir; 3PL/4PL'de sınır kestirimleri "
-                           "nedeniyle standart ki-kare LRT varsayımları sağlanmayabilir.")
+                model_order = ["1PL", "2PL", "3PL", "4PL"]
+                comparison = pd.DataFrame([
+                    {"Model":m, "AIC":float(usable[m]["aic"]),
+                     "BIC":float(usable[m]["bic"]),
+                     "logLik":float(usable[m]["loglik"]),
+                     "Parametre sayısı":int(usable[m]["param_count"]),
+                     "Yakınsama":bool(usable[m]["converged"])}
+                    for m in model_order if m in usable
+                ])
+                valid = comparison[comparison["Yakınsama"]]
+                if valid.empty:
+                    st.error("Hiçbir model yakınsama sağlamadı. Güvenilir bir 'EN İYİ' seçimi yapılamaz.")
+                else:
+                    best_aic = valid.loc[valid["AIC"].idxmin(), "Model"]
+                    best_bic = valid.loc[valid["BIC"].idxmin(), "Model"]
+                    st.markdown("#### Model karşılaştırma istatistikleri")
+                    table_rows = []
+                    for m in model_order:
+                        if m in usable:
+                            rr = comparison.loc[comparison["Model"] == m].iloc[0]
+                            table_rows.append({"Model":m, "AIC":f'{rr["AIC"]:.3f}',
+                                               "BIC":f'{rr["BIC"]:.3f}',
+                                               "logLik":f'{rr["logLik"]:.3f}',
+                                               "Yakınsama":"Evet" if rr["Yakınsama"] else "Hayır"})
+                        else:
+                            table_rows.append({"Model":m, "AIC":"—", "BIC":"—",
+                                               "logLik":"—", "Yakınsama":"Çalıştırılmadı"})
+                    table_rows.append({"Model":"EN İYİ", "AIC":best_aic, "BIC":best_bic,
+                                       "logLik":"—", "Yakınsama":"Yalnızca yakınsayanlar"})
+                    st.dataframe(pd.DataFrame(table_rows), hide_index=True, use_container_width=True)
+                    ca, cb = st.columns(2)
+                    ca.metric("AIC'ye göre en iyi model", best_aic)
+                    cb.metric("BIC'ye göre en iyi model", best_bic)
+                    fig = go.Figure()
+                    for metric in ("AIC", "BIC"):
+                        fig.add_bar(name=metric, x=comparison["Model"], y=comparison[metric])
+                    fig.update_layout(barmode="group", template="plotly_white",
+                        title="Model Karşılaştırması (AIC / BIC)",
+                        xaxis_title="MTK modeli", yaxis_title="Bilgi ölçütü")
+                    st.plotly_chart(fig, use_container_width=True)
+                    st.download_button("⬇️ Karşılaştırma Tablosunu CSV İndir",
+                        pd.DataFrame(table_rows).to_csv(index=False).encode("utf-8-sig"),
+                        file_name="psikoanaliz_mtk_model_karsilastirma.csv", mime="text/csv")
+                if (~comparison["Yakınsama"]).any():
+                    st.warning("Yakınsamamış model(ler) bulunuyor. Bu modeller 'EN İYİ' "
+                               "seçiminde değerlendirilmedi.")
+                st.caption("AIC ve BIC farklı modelleri seçebilir; bu normaldir. "
+                           "Karşılaştırma yalnızca aynı veri ve aynı olabilirlik tanımıyla "
+                           "kestirilen modeller için geçerlidir. "
+                           "Standart olabilirlik oranı testi ancak düzenli iç içe modeller için "
+                           "uygundur; özellikle 3PL/4PL sınır parametreleri için dikkat gerekir.")
             st.stop()
         selected_model = st.radio("İki kategorili MTK modeli",
             ["1PL", "2PL", "3PL", "4PL"],
