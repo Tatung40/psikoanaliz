@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3
+from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3, approximate_parameter_uncertainty
 
 def make_data(n=180,k=5,seed=77):
     rng=np.random.default_rng(seed)
@@ -78,3 +78,21 @@ def test_irt_fit_loglik_consistency():
     direct=logsumexp(x@np.log(p).T+(1-x)@np.log1p(-p).T
                      +np.log(w/np.sqrt(np.pi))[None,:],axis=1).sum()
     assert np.isclose(direct,fitted["loglik"],rtol=1e-9,atol=1e-7)
+
+
+@pytest.mark.parametrize("model",["1PL","2PL","3PL","4PL"])
+def test_opg_uncertainty_schema_and_safety(model):
+    data=make_data(n=180,k=4,seed=91)
+    fitted=fit_irt(data,model=model,points=15,max_iter=8)
+    table, reason=approximate_parameter_uncertainty(
+        data,fitted["items"],model,points=15)
+    assert len(table)==4
+    assert all(f"SE({p})" in table.columns for p in ("a","b","c","d"))
+    if reason:
+        assert table.filter(regex=r"^SE\\(").isna().all().all()
+    else:
+        estimated={"1PL":{"b"},"2PL":{"a","b"},
+                   "3PL":{"a","b","c"},"4PL":{"a","b","c","d"}}[model]
+        for p in estimated:
+            assert np.isfinite(table[f"SE({p})"]).all()
+            assert (table[f"SE({p})"]>0).all()
