@@ -2,15 +2,16 @@
 
 **Proje:** PsikoAnaliz — Klasik Test Kuramı Analiz Platformu  
 **Yazar:** Doç. Dr. Mehmet Taha Eser  
-**Tarih:** 2026-10-15  
-**Test Özeti:** 30 / 30 Pytest Testi BAŞARILI (PASSED)
+**GitHub Deposu:** [https://github.com/Tatung40/psikoanaliz](https://github.com/Tatung40/psikoanaliz) (PRIVATE)  
+**Tarih:** 2026-10-16  
+**Test Özeti:** 31 / 31 Pytest Testi BAŞARILI (PASSED in 3.65s)
 
 ---
 
 | Modül | Gereksinim Kodu | Tanım / İstatistik | Durum | Doğrulama Kanıtı | İlgili Test Dosyası |
 |---|---|---|---|---|---|
 | **A** | A.1 | CSV, XLSX, SPSS SAV Dosya İçe Aktarma | Tamamlandı | Başarılı dosya okuma ve testler | `tests/test_scoring.py` |
-| **A** | A.2 | Otomatik Kodlama (Encoding) ve Ayırıcı Tespiti | Tamamlandı | UTF-8, Windows-1254, virgü/noktalı virgül | `tests/test_scoring.py` |
+| **A** | A.2 | Otomatik Kodlama (Encoding) ve Ayırıcı Tespiti | Tamamlandı | UTF-8, Windows-1254, virgül/noktalı virgül | `tests/test_scoring.py` |
 | **A** | A.3 | Katılımcı ID, Madde Seçimi ve Grup Değişkeni | Tamamlandı | Dinamik sütun haritalama | `tests/test_scoring.py` |
 | **A** | A.4 | Çoktan Seçmeli Cevap Anahtarı ile 0/1 Puanlama | Tamamlandı | Harf/boşluk duyarsız eşleştirme | `tests/test_scoring.py` |
 | **A** | A.5 | Önceden Puanlanmış (0/1) İkili Veri Desteği | Tamamlandı | Doğrudan analiz entegrasyonu | `tests/test_scoring.py` |
@@ -55,4 +56,5 @@
 | **H** | H.1 | Çok Sayfalı Stillendirilmiş Excel Raporu (.xlsx) | Tamamlandı | openpyxl, formül korumalı | `tests/test_reports.py` |
 | **H** | H.2 | APA 7 Formatında Akademik Word Raporu (.docx) | Tamamlandı | python-docx, APA 7 tablolar | `tests/test_reports.py` |
 | **H** | H.3 | CSV Dışa Aktarma Desteği | Tamamlandı | UTF-8-sig formatında | `app.py` |
-| **I** | I.1-12| 12 Sayfalı Türkçe Streamlit Kullanıcı Arayüzü | Tamamlandı | Canlıda çalışıyor: `localhost:8501` | `app.py` |
+| **I** | I.1-12| 12 Sayfalı Türkçe Streamlit Kullanıcı Arayüzü | Tamamlandı | Canlıda çalışıyor: `app.py` | `app.py` |
+| **E2E**| E2E.1 | Uçtan Uca Bulut Simülasyon Testi | Tamamlandı | 10 aşamalı tam boru hattı | `tests/test_e2e_cloud_simulation.py` |

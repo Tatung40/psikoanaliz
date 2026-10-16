@@ -134,18 +134,14 @@ Tarayıcınızda otomatik olarak `http://localhost:8501` adresi açılacaktır.
 
 Uygulamanın internet üzerinden her cihazdan (bilgisayar, tablet, telefon) 7/24 erişilebilir olması için Streamlit Community Cloud kullanılır:
 
-1. Projeyi GitHub hesabınızda **`psikoanaliz`** deposuna yükleyin:
-   ```bash
-   git remote add origin https://github.com/<KULLANICI_ADINIZ>/psikoanaliz.git
-   git branch -M main
-   git push -u origin main
-   ```
-2. **[share.streamlit.io](https://share.streamlit.io/)** adresine gidin ve GitHub hesabınızla giriş yapın.
-3. **"New app"** butonuna tıklayın:
-   - **Repository:** `<KULLANICI_ADINIZ>/psikoanaliz`
+1. **GitHub Deposu:** [https://github.com/Tatung40/psikoanaliz](https://github.com/Tatung40/psikoanaliz) (PRIVATE)
+2. **Tek Tıkla Dağıtım Bağlantısı:**
+   [https://share.streamlit.io/deploy?repository=Tatung40/psikoanaliz&branch=main&mainModule=app.py](https://share.streamlit.io/deploy?repository=Tatung40/psikoanaliz&branch=main&mainModule=app.py)
+3. **Ayarlar:**
+   - **Repository:** `Tatung40/psikoanaliz`
    - **Branch:** `main`
    - **Main file path:** `app.py`
-   - **App URL (Custom Subdomain):** `psikoanaliz.streamlit.app` (Müsaitse)
+   - **App URL (Custom Subdomain):** `psikoanaliz` (Hedef: `https://psikoanaliz.streamlit.app/`)
 4. **"Deploy!"** butonuna basın. Uygulama birkaç dakika içinde canlıya alınacaktır.
 5. **Otomatik Güncelleme:** `main` dalına yapacağınız her `git push`, Streamlit Cloud tarafından otomatik olarak algılanır ve uygulama canlıda güncellenir.
 
