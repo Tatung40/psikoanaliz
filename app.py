@@ -1465,8 +1465,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 "yayın amaçlı kullanılmamalıdır.")
                 with st.expander("🧪 Deneysel gözlenen bilgi matrisi SH (bağımsız doğrulanmadı)"):
                     st.caption("OPG'den farklı olarak marjinal log-olabilirliğin "
-                               "gözlenen bilgi matrisinin sayısal türevini kullanır. "
-                               "R mirt ile SH karşılaştırması henüz tamamlanmadı. "
+                               "gözlenen bilgi matrisi üzerinden sayısal türevini kullanır. "
+                               "1PL/2PL'de R mirt ile bağımsız kestirimlere dayalı "
+                               "ön karşılaştırma yapılmıştır; aynı sabit parametrelerle "
+                               "birebir eşdeğerlik ve 3PL/4PL doğrulaması henüz yoktur. "
                                "Özellikle 3PL/4PL için yayınlarda kullanılmamalıdır.")
                     if st.button("Deneysel Hessian SH hesapla",
                                  key=f"irt_hessian_{model}"):
