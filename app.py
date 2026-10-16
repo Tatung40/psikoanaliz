@@ -1203,7 +1203,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     xaxis_title=f"{ability_method} θ",yaxis_title="Katılımcı",
                     template="plotly_white")
                 st.plotly_chart(fig,use_container_width=True)
-                scores=ability_table
+                scores=ability_table.copy()
+                scores["Sınır Kestirimi"] = scores["Sınır Kestirimi"].map(
+                    {True: "Sınırda", False: "Sınırda değil"})
+                scores.insert(0, "Kişi", [f"{i}. Kişi" for i in range(1, len(scores)+1)])
                 st.dataframe(scores.head(20).round(3),hide_index=True,
                              use_container_width=True)
                 download_table_pair(scores, f"psikoanaliz_{model}_yetenek",
@@ -1253,6 +1256,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
 
                 st.markdown("#### Standart Puanlar ve Kişi Yetenekleri")
                 ability_report = pd.DataFrame({
+                    "Kişi":[f"{i}. Kişi" for i in range(1,len(total)+1)],
                     "Toplam puan":total, "Z puanı":z, "T puanı":50+10*z,
                     f"{ability_method} θ":ability_values,
                     "Yetenek SH":ability_table["Standart Hata"].to_numpy()})
