@@ -1141,7 +1141,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 fig.add_histogram(x=ability_table["Yetenek (theta)"],nbinsx=35,
                     name=f"{ability_method} θ")
                 fig.update_layout(title=f"{ability_method} Yetenek Dağılımı",
-                    xaxis_title="EAP θ",yaxis_title="Katılımcı",
+                    xaxis_title=f"{ability_method} θ",yaxis_title="Katılımcı",
                     template="plotly_white")
                 st.plotly_chart(fig,use_container_width=True)
                 scores=ability_table
@@ -1151,6 +1151,59 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     scores.to_csv(index=False).encode("utf-8-sig"),
                     file_name="psikoanaliz_mtk_yetenek.csv",mime="text/csv")
             with tabs[5]:
+                st.markdown("#### Test Karakteristik Eğrisi (TCC)")
+                tcc_fig = go.Figure()
+                tcc_fig.add_scatter(x=r["grid"], y=r["icc"].sum(axis=1),
+                                    mode="lines", name="Beklenen test puanı")
+                tcc_fig.update_layout(
+                    title="Test Karakteristik Eğrisi — Beklenen Toplam Puan",
+                    xaxis_title="Yetenek (θ)", yaxis_title="Beklenen doğru sayısı",
+                    template="plotly_white")
+                st.plotly_chart(tcc_fig, use_container_width=True)
+
+                st.markdown("#### Wright Haritası (Kişi–Madde Haritası)")
+                map_fig = go.Figure()
+                map_fig.add_histogram(x=ability_table["Yetenek (theta)"],
+                                      name="Kişiler", nbinsx=35, opacity=0.65)
+                for item_row in r["items"].itertuples(index=False):
+                    map_fig.add_scatter(
+                        x=[item_row.b], y=[0], mode="markers",
+                        marker=dict(symbol="diamond", size=9),
+                        name=str(item_row[0]), showlegend=False,
+                        hovertemplate=f"{item_row[0]}: b=%{{x:.2f}}<extra></extra>")
+                map_fig.update_layout(
+                    title="Kişi Yetenekleri ve Madde Güçlükleri (Ortak θ Ölçeği)",
+                    xaxis_title="Yetenek / madde güçlüğü (θ, b)",
+                    yaxis_title="Kişi frekansı (elmaslar: madde güçlükleri)",
+                    template="plotly_white")
+                st.plotly_chart(map_fig, use_container_width=True)
+
+                st.markdown("#### Toplam Puan ve MTK Yetenek Puanı İlişkisi")
+                total = target.loc[:, irt_columns].sum(axis=1).to_numpy(dtype=float)
+                z = (total-total.mean())/total.std(ddof=1) if total.std(ddof=1)>0 else np.zeros(len(total))
+                ability_values = ability_table["Yetenek (theta)"].to_numpy()
+                corr = float(np.corrcoef(z, ability_values)[0,1]) if np.std(z)>0 and np.std(ability_values)>0 else np.nan
+                scatter = go.Figure()
+                scatter.add_scatter(x=z,y=ability_values,mode="markers",
+                    marker=dict(size=5,opacity=.35),name="Katılımcılar")
+                scatter.update_layout(title="Standartlaştırılmış Test Puanı ve Yetenek Kestirimi",
+                    xaxis_title="Toplam puan Z",yaxis_title=f"{ability_method} θ",
+                    template="plotly_white")
+                st.plotly_chart(scatter,use_container_width=True)
+                st.caption(f"Pearson r = {corr:.4f}" if np.isfinite(corr) else
+                           "Korelasyon hesaplanamadı (sabit puanlar).")
+
+                st.markdown("#### Standart Puanlar ve Kişi Yetenekleri")
+                ability_report = pd.DataFrame({
+                    "Toplam puan":total, "Z puanı":z, "T puanı":50+10*z,
+                    f"{ability_method} θ":ability_values,
+                    "Yetenek SH":ability_table["Standart Hata"].to_numpy()})
+                st.dataframe(ability_report.head(20).round(3), hide_index=True,
+                             use_container_width=True)
+                st.download_button("⬇️ Tüm Kişi Puanları ve Yetenekleri (CSV)",
+                    ability_report.to_csv(index=False).encode("utf-8-sig"),
+                    file_name=f"psikoanaliz_{model}_kisi_puanlari.csv",mime="text/csv")
+
                 fig=go.Figure()
                 fig.add_scatter(x=list(range(1,len(r["history"])+1)),
                                 y=r["history"],mode="lines+markers")
