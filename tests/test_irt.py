@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3, approximate_parameter_uncertainty
+from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3, approximate_parameter_uncertainty, item_fit_by_restscore
 
 def make_data(n=180,k=5,seed=77):
     rng=np.random.default_rng(seed)
@@ -115,3 +115,16 @@ def test_invalid_parameter_bounds():
         fit_irt(data,model="3PL",a_upper=3.)
     with pytest.raises(ValueError):
         fit_irt(data,model="4PL",d_lower=.01)
+
+
+def test_item_restscore_fit_exploratory_shape():
+    data=make_data(n=200,k=5,seed=33)
+    fitted=fit_irt(data,model="2PL",points=15,max_iter=8)
+    tab=item_fit_by_restscore(data,fitted["items"],min_group=5)
+    assert list(tab["Madde"])==list(data.columns)
+    assert (tab["Kullanılan grup"]>=0).all()
+    assert (tab["Kapsanan kişi"]<=len(data)).all()
+    valid=tab["Rest-puan Pearson"].dropna()
+    assert np.isfinite(valid).all()
+    assert (valid>=0).all()
+    assert not any(c.lower() in ("p-value","sx2","p-değeri") for c in tab.columns)
