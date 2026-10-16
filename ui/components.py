@@ -138,13 +138,12 @@ def render_academic_header():
     st.markdown("""
     <div class="academic-header">
         <h1>PsikoAnaliz</h1>
-        <h3>Klasik Test Kuramı Analiz Platformu (Classical Test Theory Platform)</h3>
+        <h3>Psikometrik Analiz Platformu</h3>
         <p style="margin: 0; font-size: 0.95rem; opacity: 0.92;">
-            Bilimsel Ölçme ve Değerlendirme, Psikometrik Madde ve Test Analizi, Çeldirici İncelemesi ve Akademik Raporlama
+            Klasik Test Kuramı (KTK) ve Madde Tepki Kuramı (MTK) Temelli Ölçme ve Değerlendirme Uygulamaları
         </p>
         <div class="badge-container">
             <span class="academic-badge">👨‍🏫 Doç. Dr. Mehmet Taha Eser</span>
-            <span class="academic-badge">📐 Klasik Test Kuramı (KTK / CTT)</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
