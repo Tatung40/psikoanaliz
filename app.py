@@ -933,12 +933,22 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
     st.info("1PL: Sabit a=1 (Rasch benzeri). 2PL: a,b; 3PL: a,b,c; "
             "4PL: a,b,c,d. MTK analizi için yalnızca 0/1 puanlı, "
             "eksiksiz madde yanıtları kullanılmalıdır.")
-    target = st.session_state.scored_df
-    columns = st.session_state.item_cols
-    if target is None or not columns:
-        st.warning("Önce Veri Yükleme ve Puanlama bölümünden 0/1 puanlı veri hazırlayın.")
-    elif not st.session_state.is_dichotomous:
-        st.error("MTK ekranı yalnızca ikili (0/1) puanlı maddeleri destekler.")
+    # Hazır 0/1 veride puanlama adımını zorunlu tutma.
+    scored = st.session_state.scored_df
+    raw = st.session_state.raw_df
+    target = scored if scored is not None else raw
+    columns = [c for c in st.session_state.item_cols
+               if c not in (st.session_state.id_col, st.session_state.group_col)]
+    if target is not None and not columns:
+        columns = [c for c in target.columns if c not in
+                   (st.session_state.id_col, st.session_state.group_col)
+                   and pd.to_numeric(target[c], errors="coerce").notna().all()
+                   and pd.to_numeric(target[c], errors="coerce").isin([0, 1]).all()]
+    if target is None:
+        st.warning("Önce Veri Yükleme bölümünden bir veri dosyası yükleyin. "
+                   "0/1 olarak puanlanmış veriler için ayrıca puanlama gerekmez.")
+    elif not columns:
+        st.warning("MTK için madde sütunu seçilmemiş. Veri Yükleme bölümünden maddeleri seçin.")
     else:
         # Tüm ikili MTK modelleri aynı veri ön kontrolünü kullanır.
         # ID/grup sütunları ve uç güçlükteki maddeler, kullanıcıya gösterilerek ayıklanır.
