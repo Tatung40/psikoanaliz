@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability
+from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3
 
 def make_data(n=180,k=5,seed=77):
     rng=np.random.default_rng(seed)
@@ -52,3 +52,29 @@ def test_ability_methods(method):
     assert np.isfinite(scored["Yetenek (theta)"]).all()
     assert np.isfinite(scored["Standart Hata"]).all()
     assert (scored["Standart Hata"]>=0).all()
+
+
+def test_approximate_q3_matrix_properties():
+    data=make_data(n=200,k=5,seed=18)
+    fit=fit_irt(data,model="2PL",points=15,max_iter=8)
+    q3=approximate_q3(data,fit["items"],fit["theta"])
+    assert q3.shape==(5,5)
+    assert list(q3.columns)==list(data.columns)
+    assert np.isnan(np.diag(q3)).all()
+    assert np.allclose(q3.to_numpy(),q3.to_numpy().T,equal_nan=True)
+    assert np.isfinite(q3.to_numpy()[~np.eye(5,dtype=bool)]).all()
+
+
+def test_irt_fit_loglik_consistency():
+    from scipy.special import logsumexp
+    from numpy.polynomial.hermite import hermgauss
+    data=make_data(n=140,k=4,seed=23)
+    fitted=fit_irt(data,model="2PL",points=15,max_iter=10)
+    a,b,c,d=(fitted["items"][key].to_numpy()
+             for key in ("a","b","c","d"))
+    gh,w=hermgauss(15)
+    p=np.clip(probabilities(np.sqrt(2)*gh,a,b,c,d),1e-9,1-1e-9)
+    x=data.to_numpy()
+    direct=logsumexp(x@np.log(p).T+(1-x)@np.log1p(-p).T
+                     +np.log(w/np.sqrt(np.pi))[None,:],axis=1).sum()
+    assert np.isclose(direct,fitted["loglik"],rtol=1e-9,atol=1e-7)
