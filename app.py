@@ -1175,11 +1175,39 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         st.caption("Madde parametreleri MML/EM ile kalibre edilir; kişi yeteneğinde EAP, MAP veya ML seçilebilir.")
         st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
                    "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
+        if model in ("3PL", "4PL"):
+            with st.expander("⚙️ İleri kalibrasyon: sınırlar ve çoklu başlangıç"):
+                a_upper = st.select_slider("a üst sınırı", options=[4.0, 6.0, 10.0, 20.0, 30.0],
+                                           value=4.0, key=f"a_upper_{model}")
+                d_lower = (st.select_slider("d alt sınırı",options=[0.05,0.20,0.40,0.65],
+                            value=0.65,key="d_lower_4PL") if model=="4PL" else 0.65)
+                starts = st.select_slider("Bağımsız başlangıç sayısı", options=[1,2,3],
+                                           value=1,key=f"starts_{model}")
+                st.caption("Başlangıçlar farklı ilk parametre değerlerinden yürütülür; "
+                           "en yüksek logLik değerli çözüm sunulur. Geniş sınırlar "
+                           "kararsız veya gerçekçi olmayan kestirimlere yol açabilir.")
+        else:
+            a_upper,d_lower,starts=4.0,0.65,1
         if st.button("▶️ MTK Analizini Başlat", type="primary"):
             try:
                 data = target.loc[:, irt_columns].copy()
                 with st.spinner(f"{model} kalibrasyonu hesaplanıyor…"):
-                    result = fit_irt(data, model=model, points=qpoints, max_iter=iterations)
+                    candidates = []
+                    for shift in ([0.0, -1.0, 1.0][:starts]):
+                        try:
+                            candidate = fit_irt(data, model=model, points=qpoints,
+                                                max_iter=iterations,a_upper=a_upper,
+                                                d_lower=d_lower,initial_shift=shift)
+                            candidates.append(candidate)
+                        except (RuntimeError, ValueError) as start_error:
+                            st.warning(f"Başlangıç {shift:+.0f} başarısız: {start_error}")
+                    if not candidates:
+                        raise RuntimeError("Bütün kalibrasyon başlangıçları başarısız.")
+                    converged_candidates = [c for c in candidates if c["converged"]]
+                    pool = converged_candidates if converged_candidates else candidates
+                    result = max(pool, key=lambda c: c["loglik"])
+                    result["start_logliks"] = [c["loglik"] for c in candidates]
+                    result["start_convergences"] = [c["converged"] for c in candidates]
                 fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
                 if "irt_model_results" not in st.session_state:
                     st.session_state.irt_model_results = {}
@@ -1210,6 +1238,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             st.caption(f"Log-olabilirlik: {r['loglik']:.3f} | "
                        f"EM yineleme: {r['iterations']} | "
                        f"Yakınsama: {'Evet' if r['converged'] else 'Hayır'}")
+            st.caption(f"Başlangıç sonuçları (logLik): {', '.join(f'{x:.3f}' for x in r.get('start_logliks', [r['loglik']]))} | "
+                       f"a üst sınırı: {r.get('a_upper', 4.0)} | d alt sınırı: {r.get('d_lower', 0.65)}")
             tabs = st.tabs(["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
                             "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
                             "👤 Yetenek Kestirimi", "🔎 Model Tanıları"])
