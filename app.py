@@ -64,6 +64,8 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
+from core.irt import fit_irt
+import plotly.graph_objects as go
 
 
 # =============================================================================
@@ -144,9 +146,9 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
-    st.button("🔒 MTK Analizleri — Yakında", disabled=True,
-              use_container_width=True)
-    st.caption("MTK modülleri henüz kullanıma sunulmamıştır.")
+    st.button("🧪 MTK Model Kestirimi ve Grafikler",
+              use_container_width=True, on_click=navigate_to,
+              args=("13. MTK Analizleri",))
 
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
@@ -911,3 +913,133 @@ elif selected_page == "12. Kullanım Kılavuzu":
     *Eğitimde Ölçme ve Değerlendirme Anabilim Dalı*  
     *PsikoAnaliz — Klasik Test Kuramı Analiz Platformu*
     """)
+
+
+# =============================================================================
+# SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
+# =============================================================================
+elif selected_page == "13. MTK Analizleri":
+    render_academic_header()
+    st.subheader("🧪 Madde Tepki Kuramı — 1PL, 2PL, 3PL, 4PL")
+    st.caption("Tek boyutlu ikili MTK | Marjinal maksimum olabilirlik (EM) | "
+               "N(0,1) örtük özellik dağılımı | EAP yetenek kestirimi")
+    st.info("1PL: Sabit a=1 (Rasch benzeri). 2PL: a,b; 3PL: a,b,c; "
+            "4PL: a,b,c,d. MTK analizi için yalnızca 0/1 puanlı, "
+            "eksiksiz madde yanıtları kullanılmalıdır.")
+    target = st.session_state.scored_df
+    columns = st.session_state.item_cols
+    if target is None or not columns:
+        st.warning("Önce Veri Yükleme ve Puanlama bölümünden 0/1 puanlı veri hazırlayın.")
+    elif not st.session_state.is_dichotomous:
+        st.error("MTK ekranı yalnızca ikili (0/1) puanlı maddeleri destekler.")
+    else:
+        model = st.selectbox("MTK modeli", ["1PL", "2PL", "3PL", "4PL"],
+                             index=1, key="irt_model_select")
+        mc1, mc2 = st.columns(2)
+        with mc1:
+            qpoints = st.select_slider("Gauss-Hermite düğüm sayısı",
+                         options=[15, 21, 31, 41], value=31)
+        with mc2:
+            iterations = st.slider("Azami EM yinelemesi", 20, 150, 70, 10)
+        st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
+                   "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
+        if st.button("▶️ MTK Analizini Başlat", type="primary"):
+            try:
+                data = target.loc[:, columns].copy()
+                with st.spinner(f"{model} kalibrasyonu hesaplanıyor…"):
+                    result = fit_irt(data, model=model, points=qpoints, max_iter=iterations)
+                st.session_state.irt_results = result
+                st.success("MTK kestirimi tamamlandı.")
+            except Exception as exc:
+                st.session_state.pop("irt_results", None)
+                st.error(f"MTK analizi tamamlanamadı: {exc}")
+        r = st.session_state.get("irt_results")
+        if r is not None:
+            st.markdown(f"### {r['model']} — Kestirim Sonuçları")
+            if not r["converged"]:
+                st.warning("EM yakınsama ölçütü sağlanmadı; sonuçlar geçicidir. "
+                           "Düğüm/yineleme sayısını artırın veya daha yalın model kullanın.")
+            if r["warning"]:
+                st.warning(r["warning"])
+            if r["items"]["Sınır uyarısı"].any():
+                st.warning("Bazı madde parametreleri sınırda; 'Sınır uyarısı' sütununu inceleyin.")
+            c1,c2,c3,c4 = st.columns(4)
+            c1.metric("Katılımcı (N)", r["n"])
+            c2.metric("Madde (k)", r["k"])
+            c3.metric("AIC", f"{r['aic']:,.1f}")
+            c4.metric("BIC", f"{r['bic']:,.1f}")
+            st.caption(f"Log-olabilirlik: {r['loglik']:.3f} | "
+                       f"EM yineleme: {r['iterations']} | "
+                       f"Yakınsama: {'Evet' if r['converged'] else 'Hayır'}")
+            tabs = st.tabs(["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
+                            "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
+                            "👤 Yetenek Kestirimi", "🔎 Model Tanıları"])
+            with tabs[0]:
+                st.dataframe(r["items"].round(4), hide_index=True, use_container_width=True)
+                st.download_button("⬇️ Parametreleri CSV İndir",
+                    r["items"].to_csv(index=False).encode("utf-8-sig"),
+                    file_name=f"psikoanaliz_{r['model']}_parametreler.csv",
+                    mime="text/csv")
+            with tabs[1]:
+                chosen = st.multiselect("ICC için maddeler",
+                    options=r["items"]["Madde"].tolist(),
+                    default=r["items"]["Madde"].head(8).tolist(), key="irt_icc_items")
+                fig = go.Figure()
+                for label in chosen:
+                    i = r["items"].index[r["items"]["Madde"]==label][0]
+                    fig.add_scatter(x=r["grid"], y=r["icc"][:,i],
+                                    name=label, mode="lines")
+                fig.update_layout(title="Madde Karakteristik Eğrileri (ICC)",
+                    xaxis_title="Yetenek (θ)", yaxis_title="P(X=1 | θ)",
+                    yaxis_range=[0,1], template="plotly_white")
+                st.plotly_chart(fig, use_container_width=True)
+            with tabs[2]:
+                chosen_iif = st.multiselect("IIF için maddeler",
+                    options=r["items"]["Madde"].tolist(),
+                    default=r["items"]["Madde"].head(8).tolist(),key="irt_iif_items")
+                fig = go.Figure()
+                for label in chosen_iif:
+                    i = r["items"].index[r["items"]["Madde"]==label][0]
+                    fig.add_scatter(x=r["grid"],y=r["iif"][:,i],
+                                    mode="lines",name=label)
+                fig.update_layout(title="Madde Bilgi Fonksiyonları (IIF)",
+                    xaxis_title="Yetenek (θ)", yaxis_title="Bilgi",template="plotly_white")
+                st.plotly_chart(fig,use_container_width=True)
+            with tabs[3]:
+                fig=go.Figure()
+                fig.add_scatter(x=r["grid"],y=r["tif"],name="Test bilgisi")
+                fig.add_scatter(x=r["grid"],
+                    y=1/np.sqrt(np.maximum(r["tif"],1e-12)),
+                    name="Koşullu SEM",yaxis="y2")
+                fig.update_layout(title="Test Bilgi Fonksiyonu ve Koşullu SEM",
+                    xaxis_title="Yetenek (θ)",yaxis_title="Test bilgisi",
+                    yaxis2=dict(title="SEM",overlaying="y",side="right"),
+                    template="plotly_white")
+                st.plotly_chart(fig,use_container_width=True)
+            with tabs[4]:
+                fig=go.Figure()
+                fig.add_histogram(x=r["theta"],nbinsx=35,name="EAP θ")
+                fig.update_layout(title="EAP Yetenek Dağılımı",
+                    xaxis_title="EAP θ",yaxis_title="Katılımcı",
+                    template="plotly_white")
+                st.plotly_chart(fig,use_container_width=True)
+                scores=pd.DataFrame({"EAP_theta":r["theta"],
+                                     "Posterior_SD":r["theta_sd"]})
+                st.download_button("⬇️ Kişi Yeteneklerini CSV İndir",
+                    scores.to_csv(index=False).encode("utf-8-sig"),
+                    file_name="psikoanaliz_mtk_yetenek.csv",mime="text/csv")
+            with tabs[5]:
+                fig=go.Figure()
+                fig.add_scatter(x=list(range(1,len(r["history"])+1)),
+                                y=r["history"],mode="lines+markers")
+                fig.update_layout(title="EM Log-Olabilirlik İzleği",
+                    xaxis_title="Yineleme",yaxis_title="Log-olabilirlik",
+                    template="plotly_white")
+                st.plotly_chart(fig,use_container_width=True)
+                diagnostic=r["items"][["Madde","Gözlenen p","Model p",
+                                       "Artık RMS","Sınır uyarısı"]]
+                st.dataframe(diagnostic.round(4),hide_index=True,
+                             use_container_width=True)
+                st.caption("Artık RMS betimsel bir tanıdır; formal madde uyum "
+                           "testi değildir. AIC/BIC yalnızca aynı veri "
+                           "üzerindeki modeller arasında karşılaştırılmalıdır.")
