@@ -48,7 +48,8 @@ def _initial(prob, model):
     if model=="3PL": return np.array([1., b, .1])
     return np.array([1., b, .1, .95])
 
-def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4):
+def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
+            a_upper=4.0, d_lower=0.65, initial_shift=0.0):
     """MML EM, N(0,1) özdeşleme; 1PL için a=1 (Rasch benzeri sabit eğim).
     Returns item params, EAP theta, posterior SD, diagnostic/log-likelihood.
     """
@@ -60,11 +61,20 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4):
     nodes = np.sqrt(2)*gh
     logprior = np.log(hw/np.sqrt(np.pi))
     pop = x.mean(0)
+    if not (4.0 <= a_upper <= 30.0 and 0.05 <= d_lower <= 0.65):
+        raise ValueError("Parametre sınırları geçersiz.")
     params = [_initial(p,model) for p in pop]
     bounds = [(-4,4)] if model=="1PL" else _bounds(model)
-    if model in ("3PL","4PL"):
-        # Önceki model çözümünden başlatma, 3PL/4PL yerel maksimumlarına karşı.
-        pass
+    if model != "1PL":
+        bounds[0] = (0.15, a_upper)
+    if model == "4PL":
+        bounds[-1] = (d_lower, 1.0)
+    if initial_shift and model in ("3PL","4PL"):
+        for par in params:
+            par[0] = float(np.clip(1+initial_shift*.4, 0.16, a_upper-.01))
+            par[2] = float(np.clip(.1+initial_shift*.08, .001, .34))
+            if model=="4PL":
+                par[3] = float(np.clip(.95-initial_shift*.15, d_lower+.01, .99))
     history=[]
     converged=False
     for step in range(max_iter):
@@ -123,9 +133,9 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4):
                        "a":a,"b":b,"c":c,"d":d,"Gözlenen p":pop,
                        "Model p":expected.mean(0),
                        "Artık RMS":np.sqrt(np.mean(residual**2,axis=0)),
-                       "Sınır uyarısı":[bool((model!="1PL" and (a[i]<.17 or a[i]>3.95)) or
+                       "Sınır uyarısı":[bool((model!="1PL" and (a[i]<.17 or a[i]>a_upper-.05)) or
                            abs(b[i])>3.95 or (model in ("3PL","4PL") and c[i]>.345) or
-                           (model=="4PL" and d[i]<.655)) for i in range(k)]})
+                           (model=="4PL" and d[i]<d_lower+.005)) for i in range(k)]})
     return {"model":model,"items":table,"theta":eap,"theta_sd":psd,
             "grid":theta,"icc":probabilities(theta,a,b,c,d),
             "iif":iteminfo,"tif":iteminfo.sum(axis=1),
@@ -133,6 +143,7 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4):
             "bic":np.log(n)*numpar-2*ll,
             "iterations":len(history),"converged":converged,
             "history":history,"n":n,"k":k,"param_count":numpar,
+            "a_upper":a_upper,"d_lower":d_lower,"initial_shift":initial_shift,
             "warning":("4PL modelindeki c ve d parametreleri yüksek örneklem büyüklüğü "
                        "ve güçlü madde bilgisi gerektirir; sınır kestirimlerini inceleyin."
                        if model=="4PL" else "")}
