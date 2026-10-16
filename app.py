@@ -69,6 +69,7 @@ from core.irt import (fit_irt, estimate_ability, approximate_q3,
                       sx2_pilot)
 import plotly.graph_objects as go
 from core.irt_itemfit import sx2_mirt_compatible
+from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 
 
@@ -1331,10 +1332,30 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             if not r["converged"]:
                 st.warning("EM yakınsama ölçütü sağlanmadı; sonuçlar geçicidir. "
                            "Düğüm/yineleme sayısını artırın veya daha yalın model kullanın.")
+                with st.expander("Yakınsama uyarısı: açıklama ve öneriler"):
+                    st.markdown(GUIDE["yakinsama"])
             if r["warning"]:
                 st.warning(r["warning"])
-            if r["items"]["Sınır uyarısı"].any():
-                st.warning("Bazı madde parametreleri sınırda; 'Sınır uyarısı' sütununu inceleyin.")
+                with st.expander("4PL modelinde bu uyarı ne demek?"):
+                    st.markdown(GUIDE["dortpl"])
+            boundary = boundary_report(
+                r["items"], model, a_upper=r.get("a_upper", 4.0),
+                d_lower=r.get("d_lower", 0.65))
+            if not boundary.empty:
+                st.warning(f"{len(boundary)} madde-parametre kestirimi optimizasyon sınırına yakın.")
+                with st.expander("Hangi madde, hangi parametre, hangi sınır? Ne yapmalıyım?",
+                                 expanded=True):
+                    st.dataframe(boundary.round(4), hide_index=True,
+                                 use_container_width=True)
+                    st.markdown("**Ne anlama gelir?** Parametre kestirimi, programın "
+                                "izin verdiği alt/üst sınıra yaklaşmıştır. "
+                                "Bu, maddenin mutlaka hatalı olduğu anlamına gelmez. "
+                                "Kestirim kararsız olabilir; farklı başlangıçları, "
+                                "örneklem çeşitliliğini ve daha yalın modelleri "
+                                "inceleyin. Sınırı yalnızca uyarıyı kaldırmak "
+                                "amacıyla genişletmeyin.")
+                    download_table_pair(boundary, f"psikoanaliz_{model}_sinir_tanilari",
+                                        "Sınır Parametreleri", f"irt_bounds_{model}")
             c1,c2,c3,c4 = st.columns(4)
             c1.metric("Katılımcı (N)", r["n"])
             c2.metric("Madde (k)", r["k"])
@@ -1373,6 +1394,12 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             d_lower=r.get("d_lower",0.65))
                     if unavailable:
                         st.warning(f"Yaklaşık SH hesaplanamadı: {unavailable}")
+                        with st.expander("Bu uyarı neden çıktı? Sonuçlara etkisi nedir?",
+                                         expanded=True):
+                            st.markdown(opg_explanation(
+                                unavailable, r["n"], r["k"], model,
+                                a_upper=r.get("a_upper",4.0),
+                                d_lower=r.get("d_lower",0.65)))
                     else:
                         extra = uncertainty.drop(columns=["Madde"])
                         extra.index = display_params.index
@@ -1435,6 +1462,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     r["items"],method=ability_method,points=161,prior_sd=prior_sd)
                 if ability_table["Sınır Kestirimi"].any():
                     st.warning("Bazı ML/MAP yetenek kestirimleri hesaplama aralığının sınırına ulaştı.")
+                    with st.expander("Kişi yeteneğinin sınırda olması ne demek?"):
+                        st.markdown(GUIDE["yetenek"])
                 fig=go.Figure()
                 fig.add_histogram(x=ability_table["Yetenek (theta)"],nbinsx=35,
                     name=f"{ability_method} θ")
@@ -1562,6 +1591,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 if not r["converged"]:
                     st.warning("Model yakınsamamış; S-X² p değerleri kesin "
                                "uyum kanıtı olarak yorumlanmamalıdır.")
+                    with st.expander("S-X² ve yakınsama uyarısı hakkında"):
+                        st.markdown(GUIDE["sx2"])
                 if st.checkbox("S-X² madde uyumunu hesapla",
                                value=False,key=f"irt_sx2_{model}"):
                     try:
