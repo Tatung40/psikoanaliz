@@ -89,8 +89,20 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4):
                             options={"maxiter":85,"ftol":1e-9})
             nextparams.append(result.x if np.isfinite(result.fun) else params[j])
         params=nextparams
-        if len(history)>1 and abs(history[-1]-history[-2]) < tolerance*(1+abs(history[-2])):
+        # Yakınsama kararını yeni M-adımı parametrelerinde hesaplanan
+        # marjinal log-olabilirliğe göre ver; önceki E-adımlarını kıyaslama.
+        a1,b1,c1,d1=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+        updated_probs=np.clip(probabilities(nodes,a1,b1,c1,d1),1e-9,1-1e-9)
+        updated_logpost=(x@np.log(updated_probs).T
+                         +(1-x)@np.log1p(-updated_probs).T+logprior[None,:])
+        updated_ll=float(logsumexp(updated_logpost,axis=1).sum())
+        if updated_ll < ll - 1e-5 * (1+abs(ll)):
+            # M-adımı beklenen fonksiyonu artırdığı için büyük düşüş olası
+            # sayısal hata veya yetersiz optimizasyona işaret edebilir.
+            raise RuntimeError("EM log-olabilirliği azaldı; sayısal yakınsama güvenilir değil.")
+        if abs(updated_ll-ll) < tolerance:
             converged=True
+            history.append(updated_ll)
             break
     a,b,c,d=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
     probs=np.clip(probabilities(nodes,a,b,c,d),1e-9,1-1e-9)
@@ -163,3 +175,23 @@ def estimate_ability(data, item_table, method="EAP", points=81, prior_sd=1.0):
     return pd.DataFrame({"Yetenek (theta)":ability,
                          "Standart Hata":se,
                          "Sınır Kestirimi":bounds})
+
+
+def approximate_q3(data, item_table, theta):
+    """Yen's Q3-like residual correlations conditional on point theta estimates.
+
+    Exploratory diagnostic, not a calibrated hypothesis test. Estimating theta
+    from the same responses typically induces negative residual dependence.
+    """
+    x = validate_binary(data)
+    theta = np.asarray(theta, dtype=float).ravel()
+    if len(theta) != len(x):
+        raise ValueError("Yetenek sayısı kişi sayısıyla uyuşmuyor.")
+    a,b,c,d=(np.asarray(item_table[k],dtype=float) for k in ("a","b","c","d"))
+    expected=probabilities(theta,a,b,c,d)
+    residual=x-expected
+    corr=np.corrcoef(residual,rowvar=False)
+    np.fill_diagonal(corr,np.nan)
+    names=(list(data.columns) if isinstance(data,pd.DataFrame)
+           else [f"M{i+1}" for i in range(x.shape[1])])
+    return pd.DataFrame(corr,index=names,columns=names)
