@@ -68,6 +68,7 @@ from core.irt import (fit_irt, estimate_ability, approximate_q3,
                       approximate_parameter_uncertainty, item_fit_by_restscore,
                       sx2_pilot)
 import plotly.graph_objects as go
+from core.descriptives import describe_items, describe_total
 
 
 # =============================================================================
@@ -156,6 +157,9 @@ with st.sidebar:
               on_click=navigate_to, args=("2. Veri Yükleme",))
     st.button("⚙️ Puanlama ve Veri Hazırlama", use_container_width=True,
               on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
+
+    st.button("📋 Betimsel İstatistikler", use_container_width=True,
+              on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
 
     st.markdown("---")
     st.markdown("### I. Klasik Test Kuramı (KTK)")
@@ -482,6 +486,104 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
             download_table_pair(st.session_state.scored_df,
                                 "psikoanaliz_puanlanmis_veri",
                                 "Puanlanmış Veri Seti", "scored")
+
+
+# =============================================================================
+# BETİMSEL İSTATİSTİKLER — ANALİZDEN ÖNCE VERİ KONTROLÜ
+# =============================================================================
+elif selected_page == "3B. Betimsel İstatistikler":
+    render_academic_header()
+    st.subheader("📋 Betimsel İstatistikler")
+    st.caption("KTK veya MTK analizi seçmeden önce veriyi inceleyebilirsiniz. "
+               "Bu ekran model kestirimi yapmaz.")
+    raw=st.session_state.raw_df
+    scored=st.session_state.scored_df
+    if raw is None and scored is None:
+        st.warning("Önce Veri Yükleme bölümünden veri seti yükleyin.")
+    else:
+        choices={}
+        if scored is not None:
+            choices["Puanlanmış / hazırlanmış veri"]=scored
+        if raw is not None:
+            choices["Ham veri"]=raw
+        selected=st.radio("İncelenecek veri",list(choices),horizontal=True)
+        df=choices[selected]
+        defaults=[c for c in st.session_state.item_cols if c in df.columns]
+        if not defaults:
+            defaults=[c for c in df.columns
+                      if c not in (st.session_state.id_col,st.session_state.group_col)]
+        selected_cols=st.multiselect("İncelenecek madde/değişken sütunları",
+                                     list(df.columns),default=defaults)
+        if not selected_cols:
+            st.info("İstatistikleri hesaplamak için en az bir sütun seçin.")
+        else:
+            subset=df.loc[:,selected_cols]
+            numeric=subset.apply(pd.to_numeric,errors="coerce")
+            invalid=[c for c in selected_cols
+                     if numeric[c].notna().sum()<subset[c].notna().sum()]
+            if invalid:
+                st.warning("Sayısal olmayan yanıtlar istatistik hesabına alınmaz: "
+                           +", ".join(str(c) for c in invalid[:20])
+                           +". Ham kategorik cevaplara ait frekansları "
+                           "aşağıdaki dağılım sekmesinden inceleyin.")
+            total_nonempty=int(subset.notna().sum().sum())
+            a,b,c,d=st.columns(4)
+            a.metric("Katılımcı",len(df))
+            b.metric("Seçili sütun",len(selected_cols))
+            c.metric("Eksik hücre",int(subset.isna().sum().sum()))
+            d.metric("Doluluk %",f"{100*total_nonempty/subset.size:.1f}" if subset.size else "—")
+            tab1,tab2,tab3,tab4=st.tabs([
+                "Madde İstatistikleri","Toplam Puan","Dağılımlar","Eksik Veri"])
+            with tab1:
+                item_summary=describe_items(numeric)
+                st.dataframe(item_summary.round(3),hide_index=True,
+                             use_container_width=True)
+                st.caption("SS ve varyans örneklem esaslıdır (ddof=1). "
+                           "0/1 sütunlarında ortalama madde doğru yanıt oranıdır. "
+                           "Çarpıklık ve basıklık tanımlayıcıdır.")
+                download_table_pair(item_summary,"psikoanaliz_betimsel_maddeler",
+                                    "Madde Betimsel İstatistikleri","desc_item")
+            with tab2:
+                complete,stats=describe_total(numeric)
+                if stats is None:
+                    st.info("Eksiksiz sayısal satır bulunamadı; toplam puan üretilemedi.")
+                else:
+                    complete_binary=bool(numeric.notna().all().all() and
+                                          numeric.isin([0,1]).all().all())
+                    if not complete_binary:
+                        st.warning("Toplam, seçili sayısal sütunların aritmetik toplamıdır; "
+                                   "ham seçenek kodları, farklı ölçekler veya henüz "
+                                   "puanlanmamış maddeler için psikometrik test puanı "
+                                   "olarak yorumlanmamalıdır.")
+                    st.caption("Herhangi bir seçili maddesi eksik/sayısal olmayan "
+                               "katılımcı toplam puandan dışlanır; eksikler sıfır yapılmaz.")
+                    total_table=pd.DataFrame([stats])
+                    st.dataframe(total_table.round(3),hide_index=True,
+                                 use_container_width=True)
+                    st.bar_chart(complete.value_counts().sort_index().rename("Frekans"))
+                    download_table_pair(total_table,"psikoanaliz_betimsel_toplam",
+                                        "Toplam Puan Özeti","desc_total")
+            with tab3:
+                variable=st.selectbox("Dağılımı görüntülenecek değişken",
+                                      selected_cols,key="desc_variable")
+                counts=subset[variable].astype("string").fillna("(Eksik)").value_counts(
+                    dropna=False).rename_axis("Değer").reset_index(name="Frekans")
+                counts["Yüzde"]=100*counts["Frekans"]/len(df)
+                st.dataframe(counts,hide_index=True,use_container_width=True)
+                st.bar_chart(counts.set_index("Değer")["Frekans"])
+                download_table_pair(counts,"psikoanaliz_betimsel_frekans",
+                                    "Frekans Dağılımı","desc_freq")
+            with tab4:
+                missing=pd.DataFrame({"Değişken":selected_cols,
+                                      "Eksik N":subset.isna().sum().values,
+                                      "Eksik %":(100*subset.isna().mean()).values,
+                                      "Geçerli N":subset.notna().sum().values})
+                st.dataframe(missing.round(2),hide_index=True,use_container_width=True)
+                st.caption("Eksik değerler ham veri üzerinden sayılmıştır. "
+                           "Sayısal olmayan yanıtların sayısala dönüştürülmesi "
+                           "sırasında oluşan eksikler madde istatistiğinde ayrıca dışlanır.")
+                download_table_pair(missing,"psikoanaliz_betimsel_eksik",
+                                    "Eksik Veri Özeti","desc_missing")
 
 
 # =============================================================================
