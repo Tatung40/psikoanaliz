@@ -64,7 +64,8 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
-from core.irt import fit_irt, estimate_ability, approximate_q3, approximate_parameter_uncertainty
+from core.irt import (fit_irt, estimate_ability, approximate_q3,
+                      approximate_parameter_uncertainty, item_fit_by_restscore)
 import plotly.graph_objects as go
 
 
@@ -1429,6 +1430,23 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     download_table_pair(q3.reset_index().rename(columns={"index":"Madde"}),
                                         f"psikoanaliz_{model}_q3",
                                         "Yaklaşık Q3 Matrisi", f"irt_q3_{model}")
+                st.markdown("#### Madde–Kalan Puan Uyum Tanısı (Keşifsel)")
+                st.caption("Her madde için, diğer maddelerden elde edilen toplam "
+                           "puana göre gözlenen ve beklenen doğru yanıt sayıları "
+                           "karşılaştırılır. Bu Pearson tipi keşifsel bir ölçüdür; "
+                           "Orlando–Thissen S-X² testi değildir. Serbestlik derecesi "
+                           "ve p değeri hesaplanmaz.")
+                if st.checkbox("Madde–kalan puan uyum tablosunu hesapla",
+                               key=f"irt_restscore_{model}", value=False):
+                    with st.spinner("Madde uyum tanıları hesaplanıyor…"):
+                        fit_table=item_fit_by_restscore(
+                            target.loc[:, irt_columns],r["items"])
+                    st.dataframe(fit_table.round(3),hide_index=True,
+                                 use_container_width=True)
+                    download_table_pair(fit_table,
+                                        f"psikoanaliz_{model}_rest_puan_uyum",
+                                        "Madde–Kalan Puan Tanıları",
+                                        f"irt_restscore_download_{model}")
                 diagnostic=r["items"][["Madde","Gözlenen p","Model p",
                                        "Artık RMS","Sınır uyarısı"]]
                 st.dataframe(diagnostic.round(4),hide_index=True,
