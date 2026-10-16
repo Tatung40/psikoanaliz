@@ -1265,7 +1265,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     with st.spinner("Yaklaşık belirsizlik hesaplanıyor…"):
                         uncertainty, unavailable = approximate_parameter_uncertainty(
                             target.loc[:, irt_columns], r["items"], model,
-                            points=qpoints)
+                            points=qpoints, a_upper=r.get("a_upper",4.0),
+                            d_lower=r.get("d_lower",0.65))
                     if unavailable:
                         st.warning(f"Yaklaşık SH hesaplanamadı: {unavailable}")
                     else:
