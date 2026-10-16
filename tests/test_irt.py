@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3, approximate_parameter_uncertainty, item_fit_by_restscore
+from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability, approximate_q3, approximate_parameter_uncertainty, item_fit_by_restscore, sx2_pilot
 
 def make_data(n=180,k=5,seed=77):
     rng=np.random.default_rng(seed)
@@ -128,3 +128,15 @@ def test_item_restscore_fit_exploratory_shape():
     assert np.isfinite(valid).all()
     assert (valid>=0).all()
     assert not any(c.lower() in ("p-value","sx2","p-değeri") for c in tab.columns)
+
+
+@pytest.mark.parametrize("model",["1PL","2PL","3PL","4PL"])
+def test_sx2_pilot_never_invents_invalid_p_values(model):
+    data=make_data(n=180,k=5,seed=13)
+    fitted=fit_irt(data,model=model,points=15,max_iter=6)
+    tab=sx2_pilot(data,fitted["items"],model,points=15,min_expected=5)
+    assert len(tab)==5
+    assert (tab["Kapsanan kişi"]<=len(data)).all()
+    valid=tab["p (yaklaşık)"].dropna()
+    assert ((valid>=0)&(valid<=1)).all()
+    assert ((tab["sd (yaklaşık)"].dropna()>0)).all()
