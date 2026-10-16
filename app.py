@@ -1075,9 +1075,20 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
                             "👤 Yetenek Kestirimi", "🔎 Model Tanıları"])
             with tabs[0]:
-                st.dataframe(r["items"].round(4), hide_index=True, use_container_width=True)
+                param_names = {
+                    "a": "a (Ayırt edicilik)",
+                    "b": "b (Güçlük / konum)",
+                    "c": "c (Alt asimptot / şans)",
+                    "d": "d (Üst asimptot)"
+                }
+                display_params = r["items"].rename(columns=param_names)
+                st.dataframe(display_params.round(4), hide_index=True,
+                             use_container_width=True)
+                st.caption("a: Madde ayırt ediciliği; b: güçlük (konum) parametresi; "
+                           "c: alt asimptot (tahmin/şans); d: üst asimptot (azami doğru yanıt olasılığı). "
+                           "Modelde kestirilmeyen parametreler sabit tutulur.")
                 st.download_button("⬇️ Parametreleri CSV İndir",
-                    r["items"].to_csv(index=False).encode("utf-8-sig"),
+                    display_params.to_csv(index=False).encode("utf-8-sig"),
                     file_name=f"psikoanaliz_{r['model']}_parametreler.csv",
                     mime="text/csv")
             with tabs[1]:
