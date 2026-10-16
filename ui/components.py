@@ -59,6 +59,47 @@ def inject_custom_css():
         font-weight: 500;
     }
     
+    /* Kurumsal marka kimliği: başlık ve sol navigasyon */
+    .academic-header {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: linear-gradient(115deg, #142C58 0%, #1E3A8A 58%, #2556A8 100%);
+        box-shadow: 0 8px 25px rgba(22,46,91,0.16);
+    }
+    .academic-header h1 {
+        font-size: clamp(2.65rem, 4.4vw, 3.65rem);
+        font-weight: 800;
+        letter-spacing: -1.6px;
+        line-height: 1.12;
+        margin-bottom: 0.55rem;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+    .psiko-sidebar-brand {
+        padding: 1rem 0.35rem 1.15rem;
+        margin-bottom: 0.2rem;
+        border-bottom: 2px solid #D8E4F7;
+        text-align: center;
+    }
+    .psiko-sidebar-brand-name {
+        color: #18356B;
+        font-size: clamp(1.9rem, 2.6vw, 2.35rem);
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -1.05px;
+    }
+    .psiko-sidebar-brand-sub {
+        color: #42669C;
+        font-size: 0.63rem;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        margin-top: 0.38rem;
+    }
+    .psiko-sidebar-brand-author {
+        color: #64748B;
+        font-size: 0.81rem;
+        margin-top: 0.7rem;
+    }
     /* Metrik Kartları */
     .metric-card {
         background: #FFFFFF;
