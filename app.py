@@ -70,7 +70,7 @@ from reports.word_export import create_word_report
 # SAYFA VE DURUM YAPILANDIRMASI
 # =============================================================================
 st.set_page_config(
-    page_title="PsikoAnaliz — Klasik Test Kuramı Analiz Platformu",
+    page_title="PsikoAnaliz — Psikometrik Analiz Platformu",
     page_icon="📐",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -150,16 +150,26 @@ if selected_page == "1. Ana Sayfa":
     st.markdown("""
     ### 🎯 Platform Hakkında ve Amaç
 
-    **PsikoAnaliz**, eğitim ve psikolojide ölçme ve değerlendirme alanında çalışan
-    akademisyenler, araştırmacılar, öğretmenler, psikometristler ve lisansüstü öğrenciler
-    için geliştirilmiş web tabanlı bir Klasik Test Kuramı (KTK) analiz platformudur.
+    **PsikoAnaliz**, eğitim ve psikoloji alanlarında kullanılan ölçme araçlarının
+    geliştirilmesi, analizi ve psikometrik özelliklerinin değerlendirilmesi amacıyla
+    tasarlanmış web tabanlı bir psikometrik analiz platformudur.
 
-    Platform; madde ve test istatistiklerinin hesaplanmasını, çoktan seçmeli testlerde
-    çeldirici analizini, güvenirlik ve ölçme hatası kestirimlerini, grup bazlı
-    karşılaştırmaları ve bilimsel grafiklerle desteklenen akademik raporlamayı
-    tek bir ortamda sunmayı amaçlamaktadır.
+    Platform, **Klasik Test Kuramı (KTK)** kapsamında madde ve test istatistikleri,
+    madde güçlüğü ve ayırt ediciliği, çeldirici analizi, güvenirlik ve ölçme hatası
+    kestirimleri ile grup bazlı karşılaştırmaları sunmaktadır. Analiz sonuçları,
+    bilimsel görselleştirmeler ve akademik raporlarla desteklenmektedir.
+
+    **Madde Tepki Kuramı (MTK)** kapsamındaki 1PL/Rasch, 2PL ve 3PL modelleri,
+    madde karakteristik eğrileri, test bilgi fonksiyonları, yetenek kestirimi ve
+    model uyum analizlerinin ilerleyen sürümlerde geliştirilmesi hedeflenmektedir.
+    Bu analizler mevcut sürümde henüz kullanıma sunulmamıştır.
+
+    PsikoAnaliz, psikometrik analiz süreçlerinin anlaşılır, bütünleşik ve
+    yeniden üretilebilir bir ortamda yürütülmesini amaçlamaktadır.
 
     **Doç. Dr. Mehmet Taha Eser**  
+    Aydın Adnan Menderes Üniversitesi  
+    Eğitim Fakültesi  
     *Eğitimde Ölçme ve Değerlendirme Anabilim Dalı*
     """)
 
