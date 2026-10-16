@@ -89,7 +89,7 @@ def test_opg_uncertainty_schema_and_safety(model):
     assert len(table)==4
     assert all(f"SE({p})" in table.columns for p in ("a","b","c","d"))
     if reason:
-        assert table.filter(regex=r"^SE\\(").isna().all().all()
+        assert table[[f"SE({p})" for p in ("a","b","c","d")]].isna().all().all()
     else:
         estimated={"1PL":{"b"},"2PL":{"a","b"},
                    "3PL":{"a","b","c"},"4PL":{"a","b","c","d"}}[model]
