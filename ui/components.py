@@ -145,9 +145,6 @@ def render_academic_header():
         <div class="badge-container">
             <span class="academic-badge">👨‍🏫 Doç. Dr. Mehmet Taha Eser</span>
             <span class="academic-badge">📐 Klasik Test Kuramı (KTK / CTT)</span>
-            <span class="academic-badge">🆓 Açık Kaynak & 0 TL Bütçe</span>
-            <span class="academic-badge">📊 ShinyItemAnalysis Eşdeğeri</span>
-            <span class="academic-badge">🔒 Yerel & Güvenli</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
