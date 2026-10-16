@@ -64,7 +64,7 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
-from core.irt import fit_irt, estimate_ability
+from core.irt import fit_irt, estimate_ability, approximate_q3
 import plotly.graph_objects as go
 
 
@@ -1360,6 +1360,29 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     xaxis_title="Yineleme",yaxis_title="Log-olabilirlik",
                     template="plotly_white")
                 st.plotly_chart(fig,use_container_width=True)
+                st.markdown("#### Yerel Bağımsızlık — Yaklaşık Q3")
+                st.caption("Yetenek kestirimlerine koşullu madde artıkları arasındaki "
+                           "korelasyonlar. Bu, keşifsel bir Yen Q3 benzeri tanıdır; "
+                           "kritik değer veya anlamlılık testi değildir. Kişi puanlarının "
+                           "aynı yanıtlarla kestirilmesi yanlılığa neden olabilir.")
+                q3 = approximate_q3(target.loc[:, irt_columns],
+                                    r["items"], ability_table["Yetenek (theta)"])
+                if q3.shape[0] > 1:
+                    fig_q3 = go.Figure(go.Heatmap(
+                        z=q3.to_numpy(), x=q3.columns.tolist(),
+                        y=q3.index.tolist(), zmid=0, colorscale="RdBu",
+                        colorbar=dict(title="Artık r")))
+                    fig_q3.update_layout(title="Madde Artıkları Korelasyon Matrisi (Q3 benzeri)",
+                                         template="plotly_white")
+                    st.plotly_chart(fig_q3, use_container_width=True)
+                    upper = q3.to_numpy()[np.triu_indices(len(q3), k=1)]
+                    finite = upper[np.isfinite(upper)]
+                    if len(finite):
+                        st.metric("En yüksek mutlak artık korelasyonu",
+                                  f"{np.max(np.abs(finite)):.3f}")
+                    download_table_pair(q3.reset_index().rename(columns={"index":"Madde"}),
+                                        f"psikoanaliz_{model}_q3",
+                                        "Yaklaşık Q3 Matrisi", f"irt_q3_{model}")
                 diagnostic=r["items"][["Madde","Gözlenen p","Model p",
                                        "Artık RMS","Sınır uyarısı"]]
                 st.dataframe(diagnostic.round(4),hide_index=True,
