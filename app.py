@@ -69,6 +69,7 @@ from core.irt import (fit_irt, estimate_ability, approximate_q3,
                       sx2_pilot)
 import plotly.graph_objects as go
 from core.irt_itemfit import sx2_mirt_compatible
+from core.irt_hessian import observed_information_se
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 
@@ -1462,6 +1463,33 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 "Gözlenen Hessian/Louis bilgi matrisi veya bootstrap değildir. "
                                 "Özellikle 3PL/4PL için bağımsız doğrulama olmadan "
                                 "yayın amaçlı kullanılmamalıdır.")
+                with st.expander("🧪 Deneysel gözlenen bilgi matrisi SH (bağımsız doğrulanmadı)"):
+                    st.caption("OPG'den farklı olarak marjinal log-olabilirliğin "
+                               "gözlenen bilgi matrisinin sayısal türevini kullanır. "
+                               "R mirt ile SH karşılaştırması henüz tamamlanmadı. "
+                               "Özellikle 3PL/4PL için yayınlarda kullanılmamalıdır.")
+                    if st.button("Deneysel Hessian SH hesapla",
+                                 key=f"irt_hessian_{model}"):
+                        with st.spinner("Bilgi matrisi hesaplanıyor…"):
+                            hessian_result,hessian_reason=observed_information_se(
+                                target.loc[:,irt_columns],r["items"],model,
+                                points=qpoints,a_upper=r.get("a_upper",4.0),
+                                d_lower=r.get("d_lower",0.65))
+                        if hessian_reason:
+                            st.warning("Hessian SH hesaplanamadı: "+hessian_reason)
+                            st.caption("Sınırdaki parametreler, bilgi matrisi "
+                                       "tekilliği veya sayısal kararsızlık "
+                                       "nedeniyle güvenilir SH hesaplanamayabilir. "
+                                       "Bu durum tek başına maddeyi geçersiz kılmaz.")
+                        else:
+                            st.warning("Bu SH değerleri deneysel olup henüz "
+                                       "R mirt ile bağımsız doğrulanmamıştır.")
+                            st.dataframe(hessian_result.round(4),
+                                         hide_index=True,use_container_width=True)
+                            download_table_pair(hessian_result,
+                                                f"psikoanaliz_{model}_hessian_deneysel",
+                                                "Deneysel Hessian SH",
+                                                f"irt_hessian_dl_{model}")
                 st.dataframe(display_params.round(4), hide_index=True,
                              use_container_width=True)
                 st.caption("a: Madde ayırt ediciliği; b: güçlük (konum) parametresi; "
