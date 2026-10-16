@@ -114,21 +114,51 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    menu_options = [
-        "1. Ana Sayfa",
-        "2. Veri Yükleme",
-        "3. Puanlama & Veri Hazırlama",
-        "4. Test İstatistikleri",
-        "5. Madde Analizi",
-        "6. Çeldirici Analizi",
-        "7. Güvenirlik & Ölçme Hatası",
-        "8. Grup Bazlı Analizler",
-        "9. Bilimsel Grafikler",
-        "10. Raporlama",
-        "11. Formüller ve Yöntemler",
-        "12. Kullanım Kılavuzu"
-    ]
-    selected_page = st.radio("Menü Gezintisi", menu_options, index=0)
+    # Kategori bazlı gezinme: seçili sayfa oturum boyunca korunur.
+    if "nav_page" not in st.session_state:
+        st.session_state.nav_page = "1. Ana Sayfa"
+
+    def navigate_to(page):
+        st.session_state.nav_page = page
+
+    st.markdown("### Genel")
+    st.button("🏠 Ana Sayfa", use_container_width=True,
+              on_click=navigate_to, args=("1. Ana Sayfa",))
+    st.button("📁 Veri Yükleme", use_container_width=True,
+              on_click=navigate_to, args=("2. Veri Yükleme",))
+    st.button("⚙️ Puanlama ve Veri Hazırlama", use_container_width=True,
+              on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
+
+    st.markdown("---")
+    st.markdown("### I. Klasik Test Kuramı (KTK)")
+    for label, page in [
+        ("📊 Test İstatistikleri", "4. Test İstatistikleri"),
+        ("🔍 Madde Analizi", "5. Madde Analizi"),
+        ("🎯 Çeldirici Analizi", "6. Çeldirici Analizi"),
+        ("📐 Güvenirlik ve Ölçme Hatası", "7. Güvenirlik & Ölçme Hatası"),
+        ("👥 Grup Bazlı Analizler", "8. Grup Bazlı Analizler"),
+        ("📈 Bilimsel Grafikler", "9. Bilimsel Grafikler"),
+    ]:
+        st.button(label, key=f"nav_{page}", use_container_width=True,
+                  on_click=navigate_to, args=(page,))
+
+    st.markdown("---")
+    st.markdown("### II. Madde Tepki Kuramı (MTK)")
+    st.button("🔒 MTK Analizleri — Yakında", disabled=True,
+              use_container_width=True)
+    st.caption("MTK modülleri henüz kullanıma sunulmamıştır.")
+
+    st.markdown("---")
+    st.markdown("### Ortak Araçlar")
+    for label, page in [
+        ("📄 Raporlama", "10. Raporlama"),
+        ("📚 Formüller ve Yöntemler", "11. Formüller ve Yöntemler"),
+        ("❔ Kullanım Kılavuzu", "12. Kullanım Kılavuzu"),
+    ]:
+        st.button(label, key=f"nav_{page}", use_container_width=True,
+                  on_click=navigate_to, args=(page,))
+
+    selected_page = st.session_state.nav_page
 
     st.markdown("---")
     st.markdown("### 📊 Mevcut Veri Durumu")
