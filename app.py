@@ -64,7 +64,7 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
-from core.irt import fit_irt, estimate_ability, approximate_q3
+from core.irt import fit_irt, estimate_ability, approximate_q3, approximate_parameter_uncertainty
 import plotly.graph_objects as go
 
 
@@ -1229,6 +1229,22 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     display_params = display_params.drop(columns=["b"])
                     param_names["intercept"] = "intercept (−a × b)"
                 display_params = display_params.rename(columns=param_names)
+                if st.checkbox("Yaklaşık parametre standart hataları ve %95 güven aralıkları (OPG)",
+                               value=False, key=f"irt_opg_{model}"):
+                    with st.spinner("Yaklaşık belirsizlik hesaplanıyor…"):
+                        uncertainty, unavailable = approximate_parameter_uncertainty(
+                            target.loc[:, irt_columns], r["items"], model,
+                            points=qpoints)
+                    if unavailable:
+                        st.warning(f"Yaklaşık SH hesaplanamadı: {unavailable}")
+                    else:
+                        extra = uncertainty.drop(columns=["Madde"])
+                        extra.index = display_params.index
+                        display_params = pd.concat([display_params, extra], axis=1)
+                        st.info("OPG tabanlı yaklaşık standart hatalar ve normal %95 aralıklarıdır. "
+                                "Gözlenen Hessian/Louis bilgi matrisi veya bootstrap değildir. "
+                                "Özellikle 3PL/4PL için bağımsız doğrulama olmadan "
+                                "yayın amaçlı kullanılmamalıdır.")
                 st.dataframe(display_params.round(4), hide_index=True,
                              use_container_width=True)
                 st.caption("a: Madde ayırt ediciliği; b: güçlük (konum) parametresi; "
