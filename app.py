@@ -1180,6 +1180,28 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                        "Aşağıdaki tabloda gerekçeleri gösterilmektedir.")
             st.dataframe(diagnostics[diagnostics["Madde"].isin(problematic)].round(4),
                          hide_index=True, use_container_width=True)
+            with st.expander("Neden dışlanıyor? Her uyarı ne demek ve nasıl düzeltilir?"):
+                st.markdown(
+                    "**Ortalama (p) ≤ 0,01 veya ≥ 0,99:** Maddeyi neredeyse "
+                    "herkes yanlış ya da doğru yanıtlamış. Bu uç oranlar "
+                    "özellikle ayırt edicilik ve asimptot kestirimlerini "
+                    "kararsızlaştırabilir. **Öneri:** Kodlamayı, cevap anahtarını, "
+                    "örneklem düzeyini ve maddenin içeriğini kontrol edin. "
+                    "0,01–0,99 aralığı burada kullanılan yazılım filtresidir; "
+                    "evrensel madde silme kuralı değildir.\n\n"
+                    "**Eksik / sayısal olmayan:** Seçili bir sütunda boş hücre "
+                    "veya sayıya dönüştürülemeyen yanıt vardır. MTK modeli "
+                    "eksiksiz 0/1 matrisi bekler. **Öneri:** Veri Hazırlama'da "
+                    "eksik veri politikasını bilinçli biçimde seçin; ham A/B/C/D "
+                    "yanıtları için önce cevap anahtarıyla puanlama yapın.\n\n"
+                    "**0/1 dışında:** Sayısal ama ikili olmayan değerler "
+                    "(örneğin 2, 3, 4, 5) bulunuyor. **Öneri:** Likert verisine "
+                    "ikili model uygulamayın; uygun veri türünü ve modelini "
+                    "seçin.\n\n"
+                    "**Dışlama neyi değiştirir?** Analizde madde sayısı ve "
+                    "toplam puan tanımı değişir; diğer modellerle karşılaştırma "
+                    "yaparken aynı madde matrisini kullanın. Kaynak dosyanız "
+                    "değiştirilmez.")
         if len(candidate_columns) != len(columns):
             st.info("Kimlik ve grup değişkenleri MTK madde matrisinden çıkarıldı.")
         use_valid_only = st.checkbox(
