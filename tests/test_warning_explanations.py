@@ -6,7 +6,7 @@ from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 def test_boundary_report_names_and_limits():
     table=pd.DataFrame({
         "Madde":["M1","M2"], "a":[3.99,1.2], "b":[0.0,3.98],
-        "c":[.34,.1], "d":[.66,.99]})
+        "c":[.349,.1], "d":[.652,.99]})
     report=boundary_report(table,"4PL",a_upper=4.,d_lower=.65)
     rows={(r["Madde"],r["Parametre"],r["Yaklaşılan sınır"])
           for _,r in report.iterrows()}
