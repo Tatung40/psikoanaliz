@@ -78,6 +78,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
+def download_table_pair(frame, basename, label, key):
+    """Present consistent CSV and Excel exports for a tabular result."""
+    table = pd.DataFrame(frame)
+    left, right = st.columns(2)
+    with left:
+        st.download_button(
+            f"⬇️ {label} — CSV",
+            data=table.to_csv(index=False).encode("utf-8-sig"),
+            file_name=f"{basename}.csv", mime="text/csv",
+            key=f"{key}_csv", use_container_width=True)
+    with right:
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+            table.to_excel(writer, index=False, sheet_name="Sonuclar")
+        st.download_button(
+            f"⬇️ {label} — Excel (.xlsx)",
+            data=buffer.getvalue(),
+            file_name=f"{basename}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key=f"{key}_xlsx", use_container_width=True)
+
+
 inject_custom_css()
 
 # Session State Başlatma
@@ -453,13 +476,9 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
             st.subheader("📋 Puanlanmış Veri Matrisi")
             st.dataframe(st.session_state.scored_df.head(10), use_container_width=True)
 
-            csv_data = st.session_state.scored_df.to_csv(index=False).encode("utf-8-sig")
-            st.download_button(
-                "📥 Puanlanmış Veri Setini İndir (CSV)",
-                data=csv_data,
-                file_name="psikoanaliz_puanlanmis_veri.csv",
-                mime="text/csv"
-            )
+            download_table_pair(st.session_state.scored_df,
+                                "psikoanaliz_puanlanmis_veri",
+                                "Puanlanmış Veri Seti", "scored")
 
 
 # =============================================================================
@@ -577,13 +596,8 @@ elif selected_page == "5. Madde Analizi":
             "D (%27): Kelley üst-alt %27 grup ayırt ediciliği."
         )
 
-        csv_item = summary_df.to_csv(index=False).encode("utf-8-sig")
-        st.download_button(
-            "📥 Madde Analizi Tablosunu İndir (CSV)",
-            data=csv_item,
-            file_name="madde_istatistikleri.csv",
-            mime="text/csv"
-        )
+        download_table_pair(summary_df, "madde_istatistikleri",
+                            "Madde Analizi Tablosu", "item_stats")
 
 
 # =============================================================================
@@ -1046,9 +1060,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         title="Model Karşılaştırması (AIC / BIC)",
                         xaxis_title="MTK modeli", yaxis_title="Bilgi ölçütü")
                     st.plotly_chart(fig, use_container_width=True)
-                    st.download_button("⬇️ Karşılaştırma Tablosunu CSV İndir",
-                        pd.DataFrame(table_rows).to_csv(index=False).encode("utf-8-sig"),
-                        file_name="psikoanaliz_mtk_model_karsilastirma.csv", mime="text/csv")
+                    download_table_pair(pd.DataFrame(table_rows),
+                                        "psikoanaliz_mtk_model_karsilastirma",
+                                        "Model Karşılaştırması", "irt_comparison")
                 if (~comparison["Yakınsama"]).any():
                     st.warning("Yakınsamamış model(ler) bulunuyor. Bu modeller 'EN İYİ' "
                                "seçiminde değerlendirilmedi.")
@@ -1133,10 +1147,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.caption("a: Madde ayırt ediciliği; b: güçlük (konum) parametresi; "
                            "c: alt asimptot (tahmin/şans); d: üst asimptot (azami doğru yanıt olasılığı). "
                            "Modelde kestirilmeyen parametreler sabit tutulur.")
-                st.download_button("⬇️ Parametreleri CSV İndir",
-                    display_params.to_csv(index=False).encode("utf-8-sig"),
-                    file_name=f"psikoanaliz_{r['model']}_parametreler.csv",
-                    mime="text/csv")
+                download_table_pair(display_params,
+                                    f"psikoanaliz_{r['model']}_parametreler",
+                                    "Madde Parametreleri", f"irt_params_{model}")
             with tabs[1]:
                 chosen = st.multiselect("ICC için maddeler",
                     options=r["items"]["Madde"].tolist(),
@@ -1193,9 +1206,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 scores=ability_table
                 st.dataframe(scores.head(20).round(3),hide_index=True,
                              use_container_width=True)
-                st.download_button("⬇️ Kişi Yeteneklerini CSV İndir",
-                    scores.to_csv(index=False).encode("utf-8-sig"),
-                    file_name="psikoanaliz_mtk_yetenek.csv",mime="text/csv")
+                download_table_pair(scores, f"psikoanaliz_{model}_yetenek",
+                                    "Kişi Yetenekleri", f"irt_ability_{model}")
             with tabs[5]:
                 st.markdown("#### Test Karakteristik Eğrisi (TCC)")
                 tcc_fig = go.Figure()
@@ -1246,9 +1258,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     "Yetenek SH":ability_table["Standart Hata"].to_numpy()})
                 st.dataframe(ability_report.head(20).round(3), hide_index=True,
                              use_container_width=True)
-                st.download_button("⬇️ Tüm Kişi Puanları ve Yetenekleri (CSV)",
-                    ability_report.to_csv(index=False).encode("utf-8-sig"),
-                    file_name=f"psikoanaliz_{model}_kisi_puanlari.csv",mime="text/csv")
+                download_table_pair(ability_report,
+                                    f"psikoanaliz_{model}_kisi_puanlari",
+                                    "Tüm Kişi Puanları", f"irt_full_scores_{model}")
 
                 fig=go.Figure()
                 fig.add_scatter(x=list(range(1,len(r["history"])+1)),
