@@ -68,6 +68,7 @@ from core.irt import (fit_irt, estimate_ability, approximate_q3,
                       approximate_parameter_uncertainty, item_fit_by_restscore,
                       sx2_pilot)
 import plotly.graph_objects as go
+from core.irt_itemfit import sx2_mirt_compatible
 from core.descriptives import describe_items, describe_total
 
 
@@ -1551,12 +1552,32 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                         f"psikoanaliz_{model}_rest_puan_uyum",
                                         "Madde–Kalan Puan Tanıları",
                                         f"irt_restscore_download_{model}")
-                st.warning("S-X² pilot doğrulaması: Ornek.xlsx (N=200, k=25) "
-                           "verisinde R mirt::itemfit sonuçları ile sayısal "
-                           "uyumsuzluk tespit edildi. Bu nedenle pilot S-X² "
-                           "istatistiği, sd ve p değerleri kullanıma kapatıldı. "
-                           "Doğrulanmış uygulama geliştirilene kadar yalnızca "
-                           "keşifsel madde–kalan puan tanılarını inceleyin.")
+                st.markdown("#### S-X² Madde Uyum Testi (mirt algoritması)")
+                st.caption("Toplam puana koşullu madde uyumu; 61 eşit aralıklı "
+                           "[-6,6] theta noktası, beklenen hücre eşiği 1 ve "
+                           "komşu grup birleştirme kullanılır. Sabit N(0,1) "
+                           "gizil dağılımı ve model başına madde parametre "
+                           "sayısı varsayılır. Parametre kestirimleri ayrıca "
+                           "bağımsız doğrulama gerektirir.")
+                if not r["converged"]:
+                    st.warning("Model yakınsamamış; S-X² p değerleri kesin "
+                               "uyum kanıtı olarak yorumlanmamalıdır.")
+                if st.checkbox("S-X² madde uyumunu hesapla",
+                               value=False,key=f"irt_sx2_{model}"):
+                    try:
+                        sx2_table=sx2_mirt_compatible(
+                            target.loc[:,irt_columns],r["items"],model)
+                        st.dataframe(sx2_table.round(5),hide_index=True,
+                                     use_container_width=True)
+                        st.caption("p < .05 olası uyumsuzluğa işaret eder; "
+                                   "25 madde için çoklu test düzeltmesi "
+                                   "uygulanmamıştır. Sınır kestirimlerini "
+                                   "ve örneklem yeterliğini ayrıca inceleyin.")
+                        download_table_pair(sx2_table,
+                                            f"psikoanaliz_{model}_sx2",
+                                            "S-X² Madde Uyumu",f"irt_sx2_dl_{model}")
+                    except (ValueError,RuntimeError) as sx_error:
+                        st.warning(f"S-X² hesaplanamadı: {sx_error}")
                 diagnostic=r["items"][["Madde","Gözlenen p","Model p",
                                        "Artık RMS","Sınır uyarısı"]]
                 st.dataframe(diagnostic.round(4),hide_index=True,
