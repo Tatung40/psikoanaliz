@@ -933,7 +933,93 @@ elif selected_page == "12. Kullanım Kılavuzu":
     ### 👨‍🏫 Hazırlayan ve İletişim
     **Doç. Dr. Mehmet Taha Eser**  
     *Eğitimde Ölçme ve Değerlendirme Anabilim Dalı*  
-    *PsikoAnaliz — Klasik Test Kuramı Analiz Platformu*
+    *PsikoAnaliz — Psikometrik Analiz Platformu*
+    """)
+
+    st.markdown(r"""
+    ---
+    ### 💻 Teknik Altyapı, Hesaplama Yöntemleri ve Yazılım Kaynakçası
+
+    **PsikoAnaliz'in hesaplama altyapısı Python tabanlıdır.**
+    Uygulamanın mevcut sürümünde arka planda R yorumlayıcısı, R oturumu
+    veya `mirt`, `ltm`, `ShinyItemAnalysis` gibi R paketleri
+    çalıştırılmamaktadır. Bu paketler yöntemsel karşılaştırma için
+    incelenebilir; fakat mevcut uygulamanın yürütme bağımlılıkları değildir.
+
+    #### Kullanılan Python bileşenleri
+
+    | Bileşen | Uygulamadaki temel görevi |
+    |---|---|
+    | **Python** | Uygulama ve istatistiksel hesaplama dili |
+    | **Streamlit** | Web arayüzü, seçimler ve etkileşimli analiz sayfaları |
+    | **pandas** | CSV/Excel veri okuma, veri çerçeveleri, tablo ve dışa aktarma |
+    | **NumPy** | Matris işlemleri, varyans, korelasyon ve sayısal hesaplamalar |
+    | **SciPy** | İstatistiksel işlevler, optimizasyon ve MTK sayısal integrasyonu |
+    | **statsmodels** | Projenin bağımlılık listesinde yer alan istatistik paketi |
+    | **Plotly** | Etkileşimli psikometrik grafikler |
+    | **openpyxl** | Excel (.xlsx) çalışma kitapları ve biçimlendirme |
+    | **python-docx** | Word (.docx) akademik raporlar |
+    | **pytest** | Otomatik birim ve regresyon testleri |
+
+    **KTK hesaplamaları:** Madde güçlüğü ve ayırt ediciliği,
+    test betimsel istatistikleri, Cronbach alfa, KR-20/KR-21,
+    diğer güvenirlik göstergeleri ve çeldirici analizleri proje içindeki
+    Python modülleriyle hesaplanır.
+
+    **MTK hesaplamaları:** İki kategorili 1PL, 2PL, 3PL ve 4PL modelleri için
+    Python'daki özel `core/irt.py` modülü kullanılır. Madde parametreleri
+    standart normal örtük özellik varsayımı altında marjinal maksimum
+    olabilirlik (MML), EM yinelemesi, Gauss–Hermite quadrature ve
+    SciPy optimizasyonu ile kestirilir. Kişi yeteneği için EAP, MAP
+    ve ML kestirimleri sunulur. ICC, IIF, TIF, koşullu standart hata,
+    test karakteristik eğrisi ve kişi–madde görselleri bu çıktılardan üretilir.
+
+    **Bilimsel sınırlar:** 1PL uygulamasında ortak ayırt edicilik
+    `a = 1` olarak sabittir. Çok kategorili MTK modelleri henüz
+    kullanıma sunulmamıştır. MTK parametrelerinin standart hataları ve
+    S-X² madde uyum testi mevcut uygulamada henüz hesaplanmaz.
+    Otomatik yazılım testleri, bağımsız psikometrik doğrulamanın yerini tutmaz.
+
+    #### Kaynakça (APA 7)
+
+    Harris, C. R., Millman, K. J., van der Walt, S. J., Gommers, R.,
+    Virtanen, P., Cournapeau, D., Wieser, E., Taylor, J., Berg, S.,
+    Smith, N. J., Kern, R., Picus, M., Hoyer, S., van Kerkwijk, M. H.,
+    Brett, M., Haldane, A., del Río, J. F., Wiebe, M., Peterson, P.,
+    ... Oliphant, T. E. (2020). Array programming with NumPy.
+    *Nature, 585*, 357–362. https://doi.org/10.1038/s41586-020-2649-2
+
+    McKinney, W. (2010). Data structures for statistical computing in Python.
+    In S. van der Walt & J. Millman (Eds.),
+    *Proceedings of the 9th Python in Science Conference* (pp. 56–61).
+    https://doi.org/10.25080/Majora-92bf1922-00a
+
+    Seabold, S., & Perktold, J. (2010). Statsmodels: Econometric and
+    statistical modeling with Python. In S. van der Walt & J. Millman (Eds.),
+    *Proceedings of the 9th Python in Science Conference* (pp. 92–96).
+    https://doi.org/10.25080/Majora-92bf1922-011
+
+    Sievert, C. (2020). *Interactive web-based data visualization with R,
+    plotly, and shiny*. Chapman & Hall/CRC.
+    https://doi.org/10.1201/9780429447273
+
+    Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T.,
+    Cournapeau, D., Burovski, E., Peterson, P., Weckesser, W.,
+    Bright, J., van der Walt, S. J., Brett, M., Wilson, J.,
+    Millman, K. J., Mayorov, N., Nelson, A. R. J., Jones, E.,
+    Kern, R., Larson, E., ... SciPy 1.0 Contributors. (2020).
+    SciPy 1.0: Fundamental algorithms for scientific computing in Python.
+    *Nature Methods, 17*, 261–272.
+    https://doi.org/10.1038/s41592-019-0686-2
+
+    **Çevrim içi teknik belgeler:** [Streamlit](https://docs.streamlit.io/),
+    [pandas](https://pandas.pydata.org/docs/),
+    [Plotly Python](https://plotly.com/python/),
+    [openpyxl](https://openpyxl.readthedocs.io/),
+    [python-docx](https://python-docx.readthedocs.io/) ve
+    [pytest](https://docs.pytest.org/) resmî belgeleridir.
+
+    **Kaynak kodu:** https://github.com/Tatung40/psikoanaliz
     """)
 
 
