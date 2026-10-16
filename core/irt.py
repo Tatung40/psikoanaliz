@@ -209,7 +209,8 @@ def approximate_q3(data, item_table, theta):
 
 
 def approximate_parameter_uncertainty(data, item_table, model, points=31,
-                                      max_parameters=120):
+                                      max_parameters=120, a_upper=4.0,
+                                      d_lower=0.65):
     """Exploratory OPG covariance based on marginal per-person score vectors.
 
     Not an observed-Hessian or Louis information SE. Normal intervals can be
@@ -230,7 +231,7 @@ def approximate_parameter_uncertainty(data, item_table, model, points=31,
         reason="OPG için parametre sayısı fazla veya örneklem yetersiz."
     else:
         a,b,c,d=[np.asarray(item_table[name],dtype=float) for name in ("a","b","c","d")]
-        bounds={"a":(0.15,4.),"b":(-4.,4.),"c":(0.,.35),"d":(.65,1.)}
+        bounds={"a":(0.15,a_upper),"b":(-4.,4.),"c":(0.,.35),"d":(d_lower,1.)}
         for name in active:
             vv=locals()[name]
             lo,hi=bounds[name]
