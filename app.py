@@ -133,9 +133,10 @@ if "distractor_data" not in st.session_state:
 # =============================================================================
 with st.sidebar:
     st.markdown("""
-    <div style="text-align: center; padding-bottom: 1rem;">
-        <h2 style="color: #1E3A8A; margin-bottom: 0;">PsikoAnaliz</h2>
-        <span style="font-size: 0.85rem; color: #64748B;">Doç. Dr. Mehmet Taha Eser</span>
+    <div class="psiko-sidebar-brand">
+        <div class="psiko-sidebar-brand-name">PsikoAnaliz</div>
+        <div class="psiko-sidebar-brand-sub">PSİKOMETRİK ANALİZ PLATFORMU</div>
+        <div class="psiko-sidebar-brand-author">Doç. Dr. Mehmet Taha Eser</div>
     </div>
     """, unsafe_allow_html=True)
 
