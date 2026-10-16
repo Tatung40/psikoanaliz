@@ -940,12 +940,49 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
     elif not st.session_state.is_dichotomous:
         st.error("MTK ekranı yalnızca ikili (0/1) puanlı maddeleri destekler.")
     else:
+        # Tüm ikili MTK modelleri aynı veri ön kontrolünü kullanır.
+        # ID/grup sütunları ve uç güçlükteki maddeler, kullanıcıya gösterilerek ayıklanır.
+        candidate_columns = [col for col in columns
+                             if col not in (st.session_state.id_col, st.session_state.group_col)]
+        raw_irt = target.loc[:, candidate_columns].apply(pd.to_numeric, errors="coerce")
+        diagnostics = pd.DataFrame({
+            "Madde": candidate_columns,
+            "Ortalama (p)": raw_irt.mean(axis=0).to_numpy(),
+            "Eksik / sayısal olmayan": raw_irt.isna().sum(axis=0).to_numpy(),
+            "0/1 dışında": (~raw_irt.isin([0, 1]) & raw_irt.notna()).sum(axis=0).to_numpy()
+        })
+        problematic = diagnostics[
+            (diagnostics["Ortalama (p)"] <= .01) |
+            (diagnostics["Ortalama (p)"] >= .99) |
+            (diagnostics["Eksik / sayısal olmayan"] > 0) |
+            (diagnostics["0/1 dışında"] > 0)
+        ]["Madde"].tolist()
+        if problematic:
+            st.warning(f"MTK için uygun olmayan {len(problematic)} sütun tespit edildi. "
+                       "Aşağıdaki tabloda gerekçeleri gösterilmektedir.")
+            st.dataframe(diagnostics[diagnostics["Madde"].isin(problematic)].round(4),
+                         hide_index=True, use_container_width=True)
+        if len(candidate_columns) != len(columns):
+            st.info("Kimlik ve grup değişkenleri MTK madde matrisinden çıkarıldı.")
+        use_valid_only = st.checkbox(
+            "MTK için uygun olmayan maddeleri yalnızca bu analizde otomatik dışla",
+            value=True, key="irt_filter_bad_items")
+        irt_columns = [col for col in candidate_columns if col not in problematic
+                       ] if use_valid_only else candidate_columns
+        if len(irt_columns) < 3:
+            st.error("MTK analizi için en az 3 uygun ikili madde gerekli. "
+                     "Veri Yükleme bölümünde madde sütunlarını kontrol edin.")
+            st.stop()
+        if problematic and use_valid_only:
+            st.info(f"MTK analizine {len(irt_columns)} madde alınacak; "
+                    f"{len(problematic)} sütun dışarıda bırakılacak. "
+                    "Asıl veri dosyanız değiştirilmez.")
         model = selected_page.replace("MTK: ", "")
         if model == "Karşılaştırma":
             st.subheader("📊 İki Kategorili Model Karşılaştırması")
             st.caption("Karşılaştırma için modelleri ilgili 1PL–4PL sayfalarında aynı veri üzerinde ayrı ayrı çalıştırın.")
             history = st.session_state.get("irt_model_results", {})
-            data = target.loc[:, columns]
+            data = target.loc[:, irt_columns]
             fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
             usable = {m: entry["result"] for m,entry in history.items()
                       if entry.get("fingerprint")==fingerprint}
@@ -991,7 +1028,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                    "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
         if st.button("▶️ MTK Analizini Başlat", type="primary"):
             try:
-                data = target.loc[:, columns].copy()
+                data = target.loc[:, irt_columns].copy()
                 with st.spinner(f"{model} kalibrasyonu hesaplanıyor…"):
                     result = fit_irt(data, model=model, points=qpoints, max_iter=iterations)
                 fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
@@ -1002,7 +1039,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             except Exception as exc:
                 st.session_state.get("irt_model_results", {}).pop(model, None)
                 st.error(f"MTK analizi tamamlanamadı: {exc}")
-        data_for_check = target.loc[:, columns]
+        data_for_check = target.loc[:, irt_columns]
         current_fingerprint = (tuple(columns), data_for_check.shape,
             int(pd.util.hash_pandas_object(data_for_check, index=True).sum()))
         saved = st.session_state.get("irt_model_results", {}).get(model, {})
@@ -1075,7 +1112,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 prior_sd = st.number_input("Önsel dağılım SS (EAP/MAP)",
                     min_value=0.2,max_value=3.0,value=1.0,step=0.1,
                     key=f"prior_sd_{model}", disabled=ability_method=="ML")
-                ability_table = estimate_ability(target.loc[:, columns],
+                ability_table = estimate_ability(target.loc[:, irt_columns],
                     r["items"],method=ability_method,points=161,prior_sd=prior_sd)
                 if ability_table["Sınır Kestirimi"].any():
                     st.warning("Bazı ML/MAP yetenek kestirimleri hesaplama aralığının sınırına ulaştı.")
