@@ -124,3 +124,42 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4):
             "warning":("4PL modelindeki c ve d parametreleri yüksek örneklem büyüklüğü "
                        "ve güçlü madde bilgisi gerektirir; sınır kestirimlerini inceleyin."
                        if model=="4PL" else "")}
+
+
+def estimate_ability(data, item_table, method="EAP", points=81, prior_sd=1.0):
+    """Estimate person ability under fixed item params. EAP/MAP use N(0, prior_sd²);
+    ML uses likelihood only and flags boundary estimates.
+    Scores are conditional on fitted item parameters; SE is posterior SD (EAP),
+    local curvature approximation (MAP/ML).
+    """
+    from scipy.special import logsumexp
+    x = validate_binary(data)
+    k = x.shape[1]
+    if len(item_table) != k:
+        raise ValueError("Madde sayısı parametre tablosuyla uyuşmuyor.")
+    if method not in ("EAP","MAP","ML"):
+        raise ValueError("Yetenek kestirim yöntemi EAP, MAP veya ML olmalıdır.")
+    if method != "ML" and (prior_sd <= 0 or not np.isfinite(prior_sd)):
+        raise ValueError("Önsel standart sapma pozitif olmalıdır.")
+    a,b,c,d = [np.asarray(item_table[col], dtype=float) for col in ("a","b","c","d")]
+    theta = np.linspace(-5.,5.,int(points))
+    p = np.clip(probabilities(theta,a,b,c,d),1e-10,1-1e-10)
+    loglike = x@np.log(p).T+(1-x)@np.log1p(-p).T
+    logprior = -.5*(theta/prior_sd)**2 if method in ("EAP","MAP") else np.zeros_like(theta)
+    lp = loglike + logprior[None,:]
+    if method=="EAP":
+        weights = np.exp(lp-logsumexp(lp,axis=1,keepdims=True))
+        ability=weights@theta
+        se=np.sqrt(np.maximum(weights@(theta**2)-ability**2,0))
+        bounds=np.zeros(len(x),dtype=bool)
+    else:
+        index=np.argmax(lp,axis=1)
+        ability=theta[index]
+        bounds=(index==0)|(index==len(theta)-1)
+        # Approximate conditional SE from Fisher information and prior precision.
+        iif=information(ability,a,b,c,d).sum(axis=1)
+        prior_precision=(1/prior_sd**2) if method=="MAP" else 0.
+        se=1/np.sqrt(np.maximum(iif+prior_precision,1e-10))
+    return pd.DataFrame({"Yetenek (theta)":ability,
+                         "Standart Hata":se,
+                         "Sınır Kestirimi":bounds})
