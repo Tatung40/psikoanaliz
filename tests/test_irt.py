@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from core.irt import probabilities, information, fit_irt, validate_binary
+from core.irt import probabilities, information, fit_irt, validate_binary, estimate_ability
 
 def make_data(n=180,k=5,seed=77):
     rng=np.random.default_rng(seed)
@@ -42,3 +42,13 @@ def test_invalid_input():
         validate_binary(pd.DataFrame(np.ones((100,4))))
     with pytest.raises(ValueError):
         fit_irt(np.zeros((10,2)))
+
+@pytest.mark.parametrize("method",["EAP","MAP","ML"])
+def test_ability_methods(method):
+    data=make_data()
+    fitted=fit_irt(data,model="2PL",points=15,max_iter=3)
+    scored=estimate_ability(data,fitted["items"],method=method,points=61)
+    assert len(scored)==len(data)
+    assert np.isfinite(scored["Yetenek (theta)"]).all()
+    assert np.isfinite(scored["Standart Hata"]).all()
+    assert (scored["Standart Hata"]>=0).all()
