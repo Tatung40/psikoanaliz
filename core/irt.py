@@ -279,3 +279,47 @@ def approximate_parameter_uncertainty(data, item_table, model, points=31,
         except np.linalg.LinAlgError:
             reason="OPG bilgi matrisi terslenemedi."
     return result, reason
+
+
+def item_fit_by_restscore(data, item_table, min_group=5):
+    """Exploratory item-rest-score Pearson fit diagnostic; NOT Orlando-Thissen S-X2.
+
+    For each item, group examinees by their observed rest score, compute
+    model-expected correct responses averaged over EAP posterior conditional
+    on the rest items alone, then calculate Pearson discrepancies. No
+    inferential p-value is provided because parameters and groups are fitted.
+    """
+    x=validate_binary(data)
+    n,k=x.shape
+    a,b,c,d=[np.asarray(item_table[key],dtype=float) for key in ("a","b","c","d")]
+    gh,w=hermgauss(31)
+    theta=np.sqrt(2)*gh
+    prior=np.log(w/np.sqrt(np.pi))
+    p=np.clip(probabilities(theta,a,b,c,d),1e-9,1-1e-9)
+    names=list(data.columns) if isinstance(data,pd.DataFrame) else [f"M{i+1}" for i in range(k)]
+    out=[]
+    total=x.sum(axis=1)
+    for j in range(k):
+        rest=total-x[:,j]
+        other=np.arange(k)!=j
+        logpost=(x[:,other]@np.log(p[:,other]).T+
+                 (1-x[:,other])@np.log1p(-p[:,other]).T+prior[None,:])
+        weights=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
+        expected=weights@p[:,j]
+        chi=0.
+        groups=0
+        for score in np.unique(rest):
+            take=rest==score
+            size=int(take.sum())
+            if size<min_group:
+                continue
+            obs=float(x[take,j].sum())
+            exp=float(expected[take].sum())
+            variance=max(exp*(1-exp/size),1e-8)
+            chi+=(obs-exp)**2/variance
+            groups+=1
+        out.append({"Madde":names[j],"Rest-puan Pearson":chi if groups>=2 else np.nan,
+                    "Kullanılan grup":groups,
+                    "Kapsanan kişi":int(sum((rest==v).sum() for v in np.unique(rest)
+                                      if (rest==v).sum()>=min_group))})
+    return pd.DataFrame(out)
