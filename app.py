@@ -151,11 +151,12 @@ with st.sidebar:
         st.button(f"📐 {m} Modeli", key=f"nav_irt_{m}",
                   use_container_width=True, on_click=navigate_to,
                   args=(f"MTK: {m}",))
+    st.button("📊 Model Karşılaştırması", key="nav_irt_comparison",
+              use_container_width=True, on_click=navigate_to,
+              args=("MTK: Karşılaştırma",))
     st.markdown("**Çok Kategorili Modeller**")
     st.button("🔒 GRM / GPCM / NRM — Yakında", disabled=True,
               use_container_width=True)
-    st.button("📊 Model Karşılaştırması", use_container_width=True,
-              on_click=navigate_to, args=("MTK: Karşılaştırma",))
 
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
