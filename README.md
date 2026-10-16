@@ -117,11 +117,37 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Uygulamayı Başlatın
+### 4. Uygulamayı Başlatın (İki Yöntem)
+
+#### Yöntem A: Tek Tıkla Başlatma (Windows)
+Klasör içindeki **`START_PSIKOANALIZ.bat`** dosyasına çift tıklayarak uygulamayı terminal açmadan doğrudan başlatabilirsiniz.
+
+#### Yöntem B: Terminal Üzerinden Başlatma
 ```bash
 streamlit run app.py
 ```
 Tarayıcınızda otomatik olarak `http://localhost:8501` adresi açılacaktır.
+
+---
+
+## 🌐 Streamlit Community Cloud Ücretsiz Dağıtım (Deployment)
+
+Uygulamanın internet üzerinden her cihazdan (bilgisayar, tablet, telefon) 7/24 erişilebilir olması için Streamlit Community Cloud kullanılır:
+
+1. Projeyi GitHub hesabınızda **`psikoanaliz`** deposuna yükleyin:
+   ```bash
+   git remote add origin https://github.com/<KULLANICI_ADINIZ>/psikoanaliz.git
+   git branch -M main
+   git push -u origin main
+   ```
+2. **[share.streamlit.io](https://share.streamlit.io/)** adresine gidin ve GitHub hesabınızla giriş yapın.
+3. **"New app"** butonuna tıklayın:
+   - **Repository:** `<KULLANICI_ADINIZ>/psikoanaliz`
+   - **Branch:** `main`
+   - **Main file path:** `app.py`
+   - **App URL (Custom Subdomain):** `psikoanaliz.streamlit.app` (Müsaitse)
+4. **"Deploy!"** butonuna basın. Uygulama birkaç dakika içinde canlıya alınacaktır.
+5. **Otomatik Güncelleme:** `main` dalına yapacağınız her `git push`, Streamlit Cloud tarafından otomatik olarak algılanır ve uygulama canlıda güncellenir.
 
 ---
 

@@ -1,33 +1,24 @@
-# NEXT_STEPS.md — Tamamlanan İşler ve Gelecek Geliştirme Önerileri
+# NEXT_STEPS.md — Öncelikli Görevler ve Dağıtım Adımları
 
-**Tarih:** 2026-10-15  
-**Mevcut Durum:** PsikoAnaliz v1.0.0 başarıyla inşa edildi, doğrulandı ve `http://localhost:8501` üzerinde yayında.
-
----
-
-## Tamamlanan Temel Görevler
-
-1. [x] Python 3.11 ve bağımsız sanal ortam (`.venv`) kurulumu.
-2. [x] Tüm açık kaynaklı, sıfır maliyetli kütüphanelerin (`requirements.txt`) yüklenmesi.
-3. [x] Kapsamlı CTT istatistik çekirdeğinin (`core/`) yazılması ve test edilmesi:
-   - Veri okuma, kayıp veri ve otomatik ayırıcı tespiti.
-   - İkili ve Likert puanlama, kuramsal ters puanlama.
-   - Test düzeyi istatistikler ve standart $z/T$ puanları.
-   - Madde güçlüğü, $r_{it}$, düzeltilmiş $r_{ir}$, $r_{pbis}$, $r_{bis}$ (normal ordinat bazlı), Kelley %27 $D$.
-   - Çeldirici analizi, çalışan/çalışmayan/ters çeldirici taraması.
-   - Güvenirlik: Cronbach Alfa, KR-20 (Alfa ile kesin eşitlik kanıtı), KR-21, İki-yarı, Omega, SEM, Feldt GA.
-   - Grup karşılaştırmaları: $t$-testi, Welch $t$, Cohen's $d$, ANOVA, KTK madde adillik $\Delta p$ taraması.
-4. [x] 4 adet sentetik bilimsel örnek veri setinin üretilmesi (`sample_data/`).
-5. [x] 12 adet interaktif Plotly grafiğinin (`ui/charts.py`) hazırlanması.
-6. [x] Çok sayfalı Excel (.xlsx) ve APA 7 uyumlu Word (.docx) raporlama motorunun inşası.
-7. [x] 30 / 30 birim ve psikometrik doğrulama testinin (`pytest`) hatasız geçmesi.
-8. [x] 12 sekmeli tam Türkçe Streamlit arayüzünün (`app.py`) başlatılması ve canlı doğrulanması.
+**Tarih:** 2026-10-16  
+**Mevcut Durum:** Yerel hazırlık, testler, `.gitignore`, `.python-version`, `START_PSIKOANALIZ.bat` ve Git taahhüdü tamamlandı.
 
 ---
 
-## Gelecek Sürümler İçin Opsiyonel Geliştirmeler
+## Bulut Dağıtımı İçin Sıradaki Adımlar (Kullanıcı Onayı Gerektirenler)
 
-- [ ] Madde Tepki Kuramı (MTK / IRT) 1PL (Rasch), 2PL ve 3PL modellerinin eklenmesi.
-- [ ] Yetenek düzeyine göre koşullu Mantel-Haenszel ve Lojistik Regresyon DIF (Değişen Madde Fonksiyonlaşması) modülü.
-- [ ] Çok Boyutlu Açımlayıcı ve Doğrulayıcı Faktör Analizi (AFA / DFA) raporlama sayfası.
-- [ ] Kullanıcı isteği doğrultusunda GitHub ve Streamlit Community Cloud üzerine canlı dağıtım (Deployment).
+1. [x] Loop 1: Proje denetimi ve Linux uyumluluk kontrolü.
+2. [x] Loop 2: 30/30 Pytest bilimsel ve fonksiyonel doğrulama testlerinin yürütülmesi.
+3. [x] Loop 3: Bulut hazırlığı (`.gitignore`, `.python-version`, relative paths, bellek içi veri akışı).
+4. [x] Loop 7: Windows için tek tıkla başlatıcı (`START_PSIKOANALIZ.bat`) oluşturulması.
+5. [ ] **Kullanıcı Onayı & Yetkilendirme:**
+   - GitHub deposunun oluşturulması: `https://github.com/<kullanici>/psikoanaliz`
+   - Depo görünürlük tercihi (Public vs. Private):
+     - *Public (Önerilen):* Dünyadaki tüm kullanıcılar bağlantı üzerinden giriş yapmadan erişebilir.
+     - *Private:* Yalnızca davet edilen Google/e-posta hesapları giriş yaparak erişebilir.
+   - Kodların GitHub'a push edilmesi için onay/kimlik doğrulama.
+6. [ ] **Streamlit Community Cloud Dağıtımı:**
+   - [share.streamlit.io](https://share.streamlit.io/) üzerinden uygulamanın bağlanması.
+   - `psikoanaliz.streamlit.app` alan adının tanımlanması.
+7. [ ] **Canlı Doğrulama:**
+   - Canlı URL'nin açılması, test veri setiyle uçtan uca kontrolü ve mobil uyumluluğunun doğrulanması.
