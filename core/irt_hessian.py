@@ -12,6 +12,34 @@ from numpy.polynomial.hermite import hermgauss
 from core.irt import validate_binary
 
 
+def _analytic_marginal_score(x,full,active,theta,logprior):
+    """Exact marginal score at supplied quadrature grid and item parameters."""
+    a,b,c,d=full.T
+    z=expit(theta[:,None]*a[None,:]-a[None,:]*b[None,:])
+    p=np.clip(c[None,:]+(d-c)[None,:]*z,1e-10,1-1e-10)
+    logpost=x@np.log(p).T+(1-x)@np.log1p(-p).T+logprior[None,:]
+    posterior=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
+    weighted=posterior.T@x
+    total=posterior.sum(axis=0)[:,None]
+    scale=(weighted-total*p)/(p*(1-p))
+    common=(d-c)[None,:]*z*(1-z)
+    deriv={"a":common*(theta[:,None]-b[None,:]),
+           "b":-common*a[None,:],"c":1-z,"d":z}
+    return np.stack([(scale*deriv[q]).sum(axis=0) for q in active],
+                    axis=1).reshape(-1)
+
+
+def marginal_score(data,items,model,points=31):
+    """Analytic marginal log-likelihood score for independent derivative tests."""
+    active={"1PL":("b",),"2PL":("a","b"),
+            "3PL":("a","b","c"),"4PL":("a","b","c","d")}[model]
+    x=validate_binary(data)
+    full=np.array([items[q].to_numpy(float) for q in ("a","b","c","d")]).T
+    gh,w=hermgauss(points)
+    return _analytic_marginal_score(
+        x,full,active,np.sqrt(2)*gh,np.log(w/np.sqrt(np.pi)))
+
+
 def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
                             max_parameters=110):
     x=validate_binary(data)
@@ -37,20 +65,7 @@ def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
     def score(v):
         full=original.copy()
         full[:,indices]=v.reshape(k,m)
-        a,b,c,d=full.T
-        z=expit(theta[:,None]*a[None,:]-a[None,:]*b[None,:])
-        p=np.clip(c[None,:]+(d-c)[None,:]*z,1e-10,1-1e-10)
-        logpost=x@np.log(p).T+(1-x)@np.log1p(-p).T+lp[None,:]
-        posterior=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
-        weighted=posterior.T@x
-        total=posterior.sum(axis=0)[:,None]
-        scale=(weighted-total*p)/(p*(1-p))
-        common=(d-c)[None,:]*z*(1-z)
-        derivatives={"a":common*(theta[:,None]-b[None,:]),
-                     "b":-common*a[None,:],
-                     "c":1-z,"d":z}
-        return np.stack([(scale*derivatives[q]).sum(axis=0)
-                         for q in active],axis=1).reshape(-1)
+        return _analytic_marginal_score(x,full,active,theta,lp)
     hessian=np.zeros((count,count))
     for col in range(count):
         q=active[col%m]
