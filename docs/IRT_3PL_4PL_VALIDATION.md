@@ -138,3 +138,38 @@ numerical identities are passed, but neither an external real-data
 calibration comparison nor broad SE interval coverage studies have been
 completed. This is an implementation validation stage, not a claim that
 3PL/4PL are fully scientifically validated.
+
+## External comparison with R mirt 1.48 (B3, fixed-parameter and 3PL estimation)
+
+Reproduce: `python scripts/make_mirt_fixtures.py`, then
+`Rscript scripts/mirt_reference_3pl4pl.R` (writes `tests/fixtures/mirt/mirt_results.csv`
+and `mirt_session.txt`; R 4.3.3, mirt 1.48 built from source commit
+a955235, SimDesign 2.24, Deriv 4.2.0). Checked by `tests/test_irt_mirt_reference.py`.
+
+Matched conditions: mirt `P=g+(u-g)/(1+exp(-(a1*theta+d)))` with `a=a1`, `b=-d/a1`,
+`c=g`, `d=u`; g and u are stored on the logit scale inside mirt, so derivatives are
+mapped with the Jacobian including its second-order term. Integration uses the same
+21-node Gauss-Hermite grid (`customTheta`, `customPriorFun`). Fixtures: 3PL k=4 and
+4PL k=5 (N=400 and 2000), and a 3PL k=8, N=3000 free-estimation case.
+
+| Quantity | Max. relative difference | Status |
+|---|---:|---|
+| Item response function (absolute) | 5.6e-16 | verified |
+| Marginal log-likelihood (GH-21) | 2.6e-15 | verified (3PL, 4PL) |
+| Analytic score vs mirt numerical gradient | 2.7e-9 | verified (3PL, 4PL) |
+| Observed information vs Hessian of mirt logLik | 6.6e-8 | verified (3PL, 4PL; also indefinite cases) |
+| Hessian SE vs mirt (3PL, positive definite case) | 7.7e-8 | verified |
+| mirt `SE.type='Richardson'`, default 61-node grid | info 6.0e-8, SE 4.7e-8 | verified (3PL) |
+| SE refusal decision (not positive definite) | identical in 4/4 cases | verified |
+| Free 3PL ML estimates | <=0.0014 SE; logLik gap 1.5e-6 | verified (one interior case) |
+
+Not verified: free 4PL estimation (no small interior 4PL MLE was found; Python's
+bounded space and mirt's logit space then target different points), Oakes/Louis/
+sandwich SE types, real data, other quadrature sizes. Note: mirt's numerical
+SE.type Hessian re-weights custom nodes by `dnorm(theta)` and ignores
+`customPriorFun` (mirt 1.48, `R/utils.R::BL.LL`), so that route is compared on
+mirt's default grid only.
+
+Open issue found: complete 0/1 data on k items give `2**k-1` degrees of freedom.
+mirt refuses models with more parameters (e.g. 4PL with k=4: 16 > 15). `fit_irt`
+does not, and the Hessian condition-number gate did not flag such a case in B2.

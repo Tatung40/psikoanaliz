@@ -1,0 +1,6 @@
+case,model,design,n,k,seed
+3pl_strong,3PL,strong,2000,4,2026
+4pl_strong,4PL,strong,2000,5,2026
+3pl_weak,3PL,weak,400,4,2026
+4pl_weak,4PL,weak,400,5,2026
+3pl_est,3PL,est,3000,8,2026
