@@ -73,6 +73,7 @@ from core.irt_hessian import observed_information_se
 from core.irt_se_diagnostics import hessian_boundary_diagnostics
 from core.irt_multistart import fit_irt_multistart
 from core.irt_model_reliability import model_reliability
+from core.irt_stationarity import stationarity_diagnostics
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 
@@ -1416,6 +1417,22 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     if spread>0.1:
                         st.warning("Başlangıçlar farklı logLik çözümlerine ulaştı; "
                                    "parametre kararlılığını inceleyin.")
+            if model in ("3PL","4PL"):
+                with st.expander("🧪 Birinci mertebe KKT/durağanlık tanısı"):
+                    st.caption("Türev tabanlı sınır optimizasyonu tanısıdır; "
+                               "yakınsama ve model geçerliğini tek başına kanıtlamaz.")
+                    if st.button("KKT tanısını hesapla",key=f"kkt_{model}"):
+                        kkt_table,kkt_summary=stationarity_diagnostics(
+                            target.loc[:,irt_columns],r["items"],model,
+                            points=qpoints,a_upper=r.get("a_upper",4.),
+                            d_lower=r.get("d_lower",.65))
+                        st.metric("KKT toleransını aşan parametre",
+                                  kkt_summary["violations"])
+                        st.dataframe(kkt_table.round(6),hide_index=True,
+                                     use_container_width=True)
+                        download_table_pair(
+                            kkt_table,f"psikoanaliz_{model}_kkt_tanisi",
+                            "KKT Tanı Tablosu",f"kkt_export_{model}")
             tabs = st.tabs(["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
                             "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
                             "👤 Yetenek Kestirimi", "🔎 Model Tanıları"])
