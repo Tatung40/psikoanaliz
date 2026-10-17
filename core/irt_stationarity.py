@@ -8,12 +8,13 @@ import numpy as np
 import pandas as pd
 from core.irt_hessian import marginal_score
 from core.irt import validate_binary
+from core.irt_se_diagnostics import BOUNDARY_TOLERANCE
 
 _ACTIVE={"3PL":("a","b","c"),"4PL":("a","b","c","d")}
 
 def stationarity_diagnostics(data, items, model, points=31,
                              a_upper=4.,d_lower=.65,
-                             boundary_tolerance=1e-3, gradient_tolerance=1e-3):
+                             boundary_tolerance=BOUNDARY_TOLERANCE, gradient_tolerance=1e-3):
     if model not in _ACTIVE:
         raise ValueError("Model 3PL/4PL olmalıdır.")
     if gradient_tolerance<=0 or boundary_tolerance<=0:
