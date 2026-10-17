@@ -1403,38 +1403,19 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                        f"Yakınsama: {'Evet' if r['converged'] else 'Hayır'}")
             st.caption(f"Başlangıç sonuçları (logLik): {', '.join(f'{x:.3f}' for x in r.get('start_logliks', [r['loglik']]))} | "
                        f"a üst sınırı: {r.get('a_upper', 4.0)} | d alt sınırı: {r.get('d_lower', 0.65)}")
-            if model in ("3PL","4PL"):
-                attempts=r.get("start_logliks",[r["loglik"]])
-                statuses=r.get("start_convergences",[r["converged"]])
-                attempted=len(attempts)
-                successful=sum(bool(v) for v in statuses)
-                with st.expander("Kalibrasyon kararlılığı: başlangıçlar ve güvenilirlik"):
-                    st.markdown(
-                        f"**Deneme sayısı:** {attempted} | "
-                        f"**Yakınsayan deneme:** {successful}. "
-                        "Farklı ilk değerlerle aynı log-olabilirliğe ulaşılması "
-                        "yerel çözüm riskini azaltır fakat parametrelerin "
-                        "güvenilirliğini tek başına kanıtlamaz.")
-                    st.dataframe(pd.DataFrame({
-                        "Başlangıç":list(range(1,attempted+1)),
-                        "logLik":attempts,
-                        "Yakınsama":statuses
-                    }).round(6),hide_index=True,use_container_width=True)
-                    if successful>=2:
-                        stable=[v for v,c in zip(attempts,statuses) if c]
-                        spread=max(stable)-min(stable)
-                        st.metric("Yakınsayan logLik aralığı",f"{spread:.6f}")
-                        if spread>0.1:
-                            st.warning("Farklı başlangıçlardan farklı çözümler "
-                                       "bulundu. Madde parametreleri, sınır "
-                                       "uyarıları ve model seçimi ihtiyatla "
-                                       "yorumlanmalıdır.")
-                    elif successful==0:
-                        st.error("Hiçbir deneme yakınsamamış. Modeli kesin "
-                                 "kestirim olarak raporlamayın.")
-                    else:
-                        st.info("Tek yakınsayan çözüm var; çoklu başlangıç "
-                                "kararlılığı için yeterli kanıt yok.")
+            if model in ("3PL","4PL") and "multistart_audit" in r:
+                all_attempts=r["multistart_audit"]
+                converged_runs=all_attempts[all_attempts["Yakınsama"]]
+                st.caption(
+                    f"Başlangıç sayısı: {len(all_attempts)} | "
+                    f"Yakınsayan: {len(converged_runs)} | "
+                    f"Başarısız başlangıç: "
+                    f"{int((~all_attempts['Başarılı']).sum())}")
+                if len(converged_runs)>1:
+                    spread=converged_runs["logLik"].max()-converged_runs["logLik"].min()
+                    if spread>0.1:
+                        st.warning("Başlangıçlar farklı logLik çözümlerine ulaştı; "
+                                   "parametre kararlılığını inceleyin.")
             tabs = st.tabs(["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
                             "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
                             "👤 Yetenek Kestirimi", "🔎 Model Tanıları"])
