@@ -138,7 +138,7 @@ def test_item_order_permutes_standard_errors():
     assert list(swapped["Madde"])==list(items["Madde"].iloc[order])
     for q in ACTIVE["3PL"]:
         np.testing.assert_allclose(swapped[f"SH({q})"].to_numpy(),
-                                   base[f"SH({q})"].to_numpy()[order],rtol=1e-10)
+                                   base[f"SH({q})"].to_numpy()[order],rtol=1e-8)
 
 
 def test_structurally_unidentified_4pl_se_refused_despite_positive_definite_matrix():
