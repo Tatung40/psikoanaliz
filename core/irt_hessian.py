@@ -50,6 +50,36 @@ def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
     m=len(active);count=k*m
     if count>max_parameters:
         return None,"Bilgi matrisi için parametre sayısı işlem sınırını aşıyor."
+    hessian,reason=_observed_information(x,items,active,points,a_upper,d_lower)
+    if reason:
+        return None,reason
+    info=(hessian+hessian.T)/2
+    eigen=np.linalg.eigvalsh(info)
+    if not np.isfinite(eigen).all() or eigen[0]<=1e-7:
+        return None,"Gözlenen bilgi matrisi pozitif tanımlı değil; SH üretilemez."
+    cond=float(eigen[-1]/eigen[0])
+    if cond>1e8:
+        return None,f"Gözlenen bilgi matrisi kötü koşullanmış (koşul sayısı {cond:.3g})."
+    try:
+        cov=np.linalg.inv(info)
+    except np.linalg.LinAlgError:
+        return None,"Gözlenen bilgi matrisi terslenemedi."
+    variances=np.diag(cov)
+    if np.any(variances<=0) or not np.isfinite(variances).all():
+        return None,"Pozitif, sonlu SH varyansı hesaplanamadı."
+    se=np.sqrt(variances).reshape(k,m)
+    out=pd.DataFrame({"Madde":list(items["Madde"])})
+    for col,q in enumerate(active):
+        out["SH("+q+")"]=se[:,col]
+        out[q+" %95 alt"]=items[q].to_numpy(float)-1.96*se[:,col]
+        out[q+" %95 üst"]=items[q].to_numpy(float)+1.96*se[:,col]
+    return out,""
+
+
+def _observed_information(x,items,active,points,a_upper,d_lower):
+    """Unsymmetrized observed information, or (None, refusal reason)."""
+    k=x.shape[1]
+    m=len(active);count=k*m
     bound={"a":(.15,a_upper),"b":(-4.,4.),
            "c":(0.,.35),"d":(d_lower,1.)}
     original=np.array([items[q].to_numpy(float) for q in ("a","b","c","d")]).T
@@ -78,24 +108,4 @@ def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
         up=pars.copy();down=pars.copy()
         up[col]+=step;down[col]-=step
         hessian[:,col]=-(score(up)-score(down))/(2*step)
-    info=(hessian+hessian.T)/2
-    eigen=np.linalg.eigvalsh(info)
-    if not np.isfinite(eigen).all() or eigen[0]<=1e-7:
-        return None,"Gözlenen bilgi matrisi pozitif tanımlı değil; SH üretilemez."
-    cond=float(eigen[-1]/eigen[0])
-    if cond>1e8:
-        return None,f"Gözlenen bilgi matrisi kötü koşullanmış (koşul sayısı {cond:.3g})."
-    try:
-        cov=np.linalg.inv(info)
-    except np.linalg.LinAlgError:
-        return None,"Gözlenen bilgi matrisi terslenemedi."
-    variances=np.diag(cov)
-    if np.any(variances<=0) or not np.isfinite(variances).all():
-        return None,"Pozitif, sonlu SH varyansı hesaplanamadı."
-    se=np.sqrt(variances).reshape(k,m)
-    out=pd.DataFrame({"Madde":list(items["Madde"])})
-    for col,q in enumerate(active):
-        out["SH("+q+")"]=se[:,col]
-        out[q+" %95 alt"]=items[q].to_numpy(float)-1.96*se[:,col]
-        out[q+" %95 üst"]=items[q].to_numpy(float)+1.96*se[:,col]
-    return out,""
+    return hessian,""
