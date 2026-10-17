@@ -17,6 +17,14 @@ Points are true generating values, not MLEs: in these small 3PL/4PL designs
 fitted solutions reached a parameter bound (SE correctly refused), so an
 interior MLE could not serve as fixture. SEs here verify numerics only and
 carry no sampling interpretation.
+
+B4: 4PL fixtures use k=5 (20 parameters <= 2**5-1 = 31). With k=4 the 4PL has
+16 parameters for 15 pattern degrees of freedom and is structurally
+unidentified; its observed information can still look positive definite, so
+SEs are refused on structural grounds. No identifiable 4PL fixture with a
+positive definite information matrix was found up to k=8, N=4000, so the
+SE chain (model independent) is checked numerically on 3PL; 4PL-specific
+derivatives are covered by the matrix tests here and by the mirt tests (B3).
 """
 from functools import lru_cache
 import numpy as np
@@ -34,8 +42,8 @@ SE_RTOL=2e-5
 ACTIVE={"3PL":["a","b","c"],"4PL":["a","b","c","d"]}
 
 
-def _items(model,design):
-    k=4
+def _items(model,design,k=None):
+    k=k or (4 if model=="3PL" else 5)
     if design=="weak":
         a,b=np.linspace(1.,2.,k),np.linspace(-1,1,k)
         c,d=np.linspace(.12,.2,k),np.linspace(.85,.92,k)
@@ -92,16 +100,17 @@ def test_information_matches_direct_loglik_second_differences(model,design,n):
     assert np.abs(np.linalg.eigvalsh(info)-np.linalg.eigvalsh(ref)).max()<=gap*(1+1e-6)+1e-9
 
 
-@pytest.mark.parametrize("model",["3PL","4PL"])
-def test_indefinite_information_is_refused_consistently(model):
-    items,data,_,ref=_case(model,"weak",400)
+@pytest.mark.parametrize("model,design,n",[("3PL","weak",400),("4PL","weak",400),
+                                            ("4PL","strong",2000)])
+def test_indefinite_information_is_refused_consistently(model,design,n):
+    items,data,_,ref=_case(model,design,n)
     assert np.linalg.eigvalsh(ref)[0]<0
     table,reason=observed_information_se(data,items,model,points=POINTS)
     assert table is None
     assert "pozitif tanımlı değil" in reason
 
 
-@pytest.mark.parametrize("model",["3PL","4PL"])
+@pytest.mark.parametrize("model",["3PL"])
 def test_hessian_se_matches_independent_inverse(model):
     items,data,_,ref=_case(model,"strong",2000)
     eig=np.linalg.eigvalsh(ref)
@@ -130,3 +139,16 @@ def test_item_order_permutes_standard_errors():
     for q in ACTIVE["3PL"]:
         np.testing.assert_allclose(swapped[f"SH({q})"].to_numpy(),
                                    base[f"SH({q})"].to_numpy()[order],rtol=1e-10)
+
+
+def test_structurally_unidentified_4pl_se_refused_despite_positive_definite_matrix():
+    """4PL with k=4: 16 parameters > 15 pattern degrees of freedom."""
+    items=_items("4PL","strong",k=4)
+    data,_=simulate_irt(2000,items,seed=2026)
+    raw,reason=_observed_information(data.to_numpy(float),items,ACTIVE["4PL"],POINTS,4.,.65)
+    assert not reason
+    eig=np.linalg.eigvalsh((raw+raw.T)/2)
+    assert eig[0]>1e-7 and eig[-1]/eig[0]<1e8      # passes the numerical gates
+    table,reason=observed_information_se(data,items,"4PL",points=POINTS)
+    assert table is None
+    assert "yapısal olarak tanımlanamaz" in reason

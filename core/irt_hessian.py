@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.special import expit,logsumexp
 from numpy.polynomial.hermite import hermgauss
-from core.irt import validate_binary
+from core.irt import validate_binary, structural_identifiability
 from core.irt_se_diagnostics import BOUNDARY_TOLERANCE
 
 
@@ -48,6 +48,11 @@ def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
     active={"1PL":("b",),"2PL":("a","b"),
             "3PL":("a","b","c"),"4PL":("a","b","c","d")}[model]
     m=len(active);count=k*m
+    # A positive definite observed information does not prove identification:
+    # with more parameters than 2**k-1 pattern probabilities SEs are meaningless.
+    structural=structural_identifiability(k,model)["reason"]
+    if structural:
+        return None,structural
     if count>max_parameters:
         return None,"Bilgi matrisi için parametre sayısı işlem sınırını aşıyor."
     hessian,reason=_observed_information(x,items,active,points,a_upper,d_lower)

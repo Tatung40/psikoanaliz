@@ -170,6 +170,23 @@ SE.type Hessian re-weights custom nodes by `dnorm(theta)` and ignores
 `customPriorFun` (mirt 1.48, `R/utils.R::BL.LL`), so that route is compared on
 mirt's default grid only.
 
-Open issue found: complete 0/1 data on k items give `2**k-1` degrees of freedom.
-mirt refuses models with more parameters (e.g. 4PL with k=4: 16 > 15). `fit_irt`
-does not, and the Hessian condition-number gate did not flag such a case in B2.
+Structural identifiability (resolved in B4): complete 0/1 data on k items give
+`2**k-1` pattern degrees of freedom. `fit_irt`, `fit_irt_multistart`, the Hessian
+SE and the OPG approximation now reject models with more free parameters
+(3PL with k=3: 9 > 7; 4PL with k=3 or 4: 12 > 7, 16 > 15), like mirt. The rule
+is a necessary condition only and lives in `core.irt.structural_identifiability`,
+not in the model-independent `validate_binary`. Item priors would not remove the
+problem. In B2 a 4PL with k=4 passed the numerical SE gates (condition number
+about 4e3), which is why the structural refusal is checked first. No identifiable
+4PL fixture (k=5..8, N<=4000) gave a positive definite information matrix at the
+generating values.
+
+## Convergence diagnostics (B4)
+
+`converged` keeps the marginal log-likelihood criterion. `fit["convergence"]`
+also reports the largest parameter change in the last EM cycle (default
+diagnostic threshold `param_tolerance=1e-3`), split into interior parameters and
+parameters on an optimization bound, with status `converged`, `loglik_only`
+(warned, not rejected) or `not_converged`. On the interior 3PL fixture the
+default logL stop lies within 0.022 SE of the mirt MLE, so the parameter
+criterion is reported as a warning rather than used to reject estimates.

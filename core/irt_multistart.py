@@ -6,7 +6,7 @@ automatically accepted as statistically reliable.
 """
 import numpy as np
 import pandas as pd
-from core.irt import fit_irt
+from core.irt import fit_irt, validate_binary, structural_identifiability
 from core.irt_se_diagnostics import hessian_boundary_diagnostics
 
 def fit_irt_multistart(data,model="3PL",starts=(0.,-1.,1.),**kwargs):
@@ -16,6 +16,11 @@ def fit_irt_multistart(data,model="3PL",starts=(0.,-1.,1.),**kwargs):
         raise ValueError("Geçersiz başlangıç listesi.")
     if "initial_shift" in kwargs:
         raise ValueError("initial_shift yerine starts kullanın.")
+    # Data/structure problems are not start-specific: report them directly
+    # instead of logging the same failure once per start.
+    structure=structural_identifiability(validate_binary(data).shape[1],model)
+    if not structure["satisfied"]:
+        raise ValueError(structure["reason"])
     fits=[]; logs=[]
     for shift in starts:
         try:
