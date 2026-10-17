@@ -40,7 +40,8 @@ def main(argv=None):
     p.add_argument("--seed",type=int,default=2026)
     p.add_argument("--items",type=int,default=25)
     p.add_argument("--max-iter",type=int,default=15)
-    p.add_argument("--points",type=int,default=21)\n    p.add_argument("--starts",type=int,choices=(1,3),default=1)
+    p.add_argument("--points",type=int,default=21)
+    p.add_argument("--starts",type=int,choices=(1,3),default=1)
     p.add_argument("--output-dir",default="artifacts/irt-benchmark")
     args=p.parse_args(argv)
     sizes=tuple(int(s) for s in args.sample_sizes.split(","))
@@ -54,7 +55,8 @@ def main(argv=None):
     result=run_timed_recovery(
         reference_items(args.items,args.generating_model),models=models,
         sample_sizes=sizes,repetitions=args.repetitions,
-        seed=args.seed,points=args.points,max_iter=args.max_iter,\n        starts=(0.,-1.,1.)[:args.starts])
+        seed=args.seed,points=args.points,max_iter=args.max_iter,
+        starts=(0.,-1.,1.)[:args.starts])
     annotate_generating_model(result,args.generating_model)
     path=Path(args.output_dir)
     path.mkdir(parents=True,exist_ok=True)
