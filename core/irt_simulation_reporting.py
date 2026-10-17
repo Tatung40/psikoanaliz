@@ -48,6 +48,9 @@ def export_recovery_excel(result):
             frame=result[key]
             (frame if not frame.empty else pd.DataFrame({"Bilgi":["Veri yok"]})
              ).to_excel(writer,sheet_name=name,index=False)
+        if "monte_carlo_precision" in result:
+            result["monte_carlo_precision"].to_excel(
+                writer,sheet_name="MC_Belirsizlik",index=False)
         meta=result.get("metadata",{})
         pd.DataFrame([{"Ayar":k,"Değer":json.dumps(v,ensure_ascii=False)
                        if isinstance(v,(list,dict)) else v}
