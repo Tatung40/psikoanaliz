@@ -13,7 +13,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from core.irt_simulation_reporting import run_timed_recovery,export_recovery_excel
+from core.irt_simulation_reporting import (run_timed_recovery, export_recovery_excel,
+                                            annotate_generating_model)
 
 
 def reference_items(k=25, generating_model="4PL"):
@@ -54,7 +55,7 @@ def main(argv=None):
         reference_items(args.items,args.generating_model),models=models,
         sample_sizes=sizes,repetitions=args.repetitions,
         seed=args.seed,points=args.points,max_iter=args.max_iter)
-    result["metadata"]["generating_model"]=args.generating_model
+    annotate_generating_model(result,args.generating_model)
     path=Path(args.output_dir)
     path.mkdir(parents=True,exist_ok=True)
     (path/"study.xlsx").write_bytes(export_recovery_excel(result))
