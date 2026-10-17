@@ -104,3 +104,37 @@ or three starts remain user-selectable.
 None of these internal studies, even if all workflows succeed, substitutes
 for independent implementation equivalence or full Monte Carlo evidence
 with quantified Monte Carlo sampling error.
+
+## Extended matched-generating-model Monte Carlo (10 replications per N)
+
+Completed [GitHub Actions run 39001046381](https://github.com/Tatung40/psikoanaliz/actions/runs/39001046381)
+with N=200,500,1000,2000; 25 items; 10 replications for *each*
+generating model and sample size; maximum 70 EM iterations, 21
+Gauss-Hermite points, single default start. Results are conditional
+on converged calibrations.
+
+| N | Correct 3PL convergence | 3PL MAE(a) | 3PL mean boundary parameters | Correct 4PL convergence | 4PL MAE(a) | 4PL mean boundary parameters |
+|---|---:|---:|---:|---:|---:|---:|
+| 200 | 10/10 | 0.544 | 12.6 | 10/10 | 1.162 | 31.2 |
+| 500 | 10/10 | 0.311 | 7.4 | 9/10 | 0.857 | 22.3 |
+| 1000 | 10/10 | 0.188 | 6.2 | 7/10 | 0.704 | 16.1 |
+| 2000 | 10/10 | 0.153 | 4.6 | 10/10 | 0.452 | 15.7 |
+
+Across each generative branch 80 model fits were attempted because both
+3PL and 4PL were fitted to each simulated dataset; 79/80 and 76/80
+converged respectively, including misspecified model fits. The table
+above reports only *matched* generating/fitted model pairs. Ten draws
+per condition remain exploratory and cannot establish nominal statistical
+coverage, general robustness or universal bias properties.
+
+The [independent internal 3PL/4PL audit](https://github.com/Tatung40/psikoanaliz/actions/runs/39001405713)
+tested a five-item N=500 stress case. Neither model supplied a
+publishable Hessian CI: 3PL SE was refused in both runs and 4PL
+calibration did not converge in both runs. The automated refusal guards
+correctly prevented presenting these as valid intervals.
+
+**Final scientific boundary:** software regression tests and internal
+numerical identities are passed, but neither an external real-data
+calibration comparison nor broad SE interval coverage studies have been
+completed. This is an implementation validation stage, not a claim that
+3PL/4PL are fully scientifically validated.
