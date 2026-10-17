@@ -20,7 +20,9 @@ def reference_items(k=25, generating_model="4PL"):
     """Moderate interior 4PL generating values; not fitted to real students."""
     if k<3:
         raise ValueError("At least three items required")
-    if generating_model not in ("3PL","4PL"):\n        raise ValueError("Generating model must be 3PL or 4PL")\n    return pd.DataFrame({
+    if generating_model not in ("3PL","4PL"):
+        raise ValueError("Generating model must be 3PL or 4PL")
+    return pd.DataFrame({
         "Madde":[f"M{i+1}" for i in range(k)],
         "a":np.linspace(.8,1.8,k),
         "b":np.linspace(-1.3,1.3,k),
@@ -31,7 +33,8 @@ def reference_items(k=25, generating_model="4PL"):
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--sample-sizes",default="200",help="Comma-separated N")
-    p.add_argument("--models",default="3PL,4PL")\n    p.add_argument("--generating-model",choices=("3PL","4PL"),default="4PL")
+    p.add_argument("--models",default="3PL,4PL")
+    p.add_argument("--generating-model",choices=("3PL","4PL"),default="4PL")
     p.add_argument("--repetitions",type=int,default=1)
     p.add_argument("--seed",type=int,default=2026)
     p.add_argument("--items",type=int,default=25)
@@ -51,7 +54,8 @@ def main(argv=None):
         reference_items(args.items,args.generating_model),models=models,
         sample_sizes=sizes,repetitions=args.repetitions,
         seed=args.seed,points=args.points,max_iter=args.max_iter)
-    result["metadata"]["generating_model"]=args.generating_model\n    path=Path(args.output_dir)
+    result["metadata"]["generating_model"]=args.generating_model
+    path=Path(args.output_dir)
     path.mkdir(parents=True,exist_ok=True)
     (path/"study.xlsx").write_bytes(export_recovery_excel(result))
     (path/"metadata.json").write_text(
