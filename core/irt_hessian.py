@@ -10,6 +10,7 @@ import pandas as pd
 from scipy.special import expit,logsumexp
 from numpy.polynomial.hermite import hermgauss
 from core.irt import validate_binary
+from core.irt_se_diagnostics import BOUNDARY_TOLERANCE
 
 
 def _analytic_marginal_score(x,full,active,theta,logprior):
@@ -57,7 +58,7 @@ def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
     for j,q in enumerate(active):
         lo,hi=bound[q]
         vals=pars[j::m]
-        if np.any(vals-lo<1e-3) or np.any(hi-vals<1e-3):
+        if np.any(vals-lo<BOUNDARY_TOLERANCE) or np.any(hi-vals<BOUNDARY_TOLERANCE):
             return None,"Parametrelerden biri izin verilen optimizasyon sınırına çok yakın."
     gh,hw=hermgauss(points)
     theta=np.sqrt(2)*gh
