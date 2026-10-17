@@ -216,3 +216,39 @@ solutions are compared through the same likelihood, not through the stopping rul
 | 4PL Hessian SE at an interior MLE | no interior finite 4PL MLE in these fixtures | NOT TESTED |
 
 No reproducible mathematical or algorithmic disagreement with mirt was found (no FAIL).
+
+## Estimation speed and optimizer stability (B6)
+
+Profile (4PL k=5, N=3000, 300 EM cycles: 22.7 ms/cycle): 78% of the time is the
+item-wise M-step L-BFGS-B, mostly its numerical gradient. The limiting factor is
+the number of EM cycles on the flat 4PL surface (B5: 5000 cycles still short of the
+optimum), so three approaches were compared on the B5 fixtures (same machine,
+3 repeats for the shipped options):
+
+| Case | Method | Time (s) | EM / opt. iterations | logL vs B5 optimum | max abs param diff | KKT/person | Status |
+|---|---|---:|---:|---:|---:|---:|---|
+| 4PL k=5 | EM default (tol 1e-4, 70) | 1.54 ± 0.06 | 70 / 0 | -0.18 | 1.21 | 9.6e-4 | not converged |
+| 4PL k=5 | EM tight (B5 fixture, 1 run) | 48 | 5000 / 0 | -2.9e-3 | 0.25 | 5.5e-6 | not converged |
+| 4PL k=5 | safeguarded SQUAREM (prototype, 1 run) | 14.8 | 1500 EM evals | -2.6e-3 | 0.24 | 3.1e-5 | not converged |
+| 4PL k=5 | **EM + L-BFGS-B** | 4.74 ± 0.20 | 70 / 658 | -4.8e-9 | 5.8e-4 | 7.7e-8 | converged (KKT) |
+| 4PL k=8 | EM default | 2.19 ± 0.05 | 70 / 0 | -0.10 | 0.21 | 3.7e-4 | not converged |
+| 4PL k=8 | EM tight (B5 fixture) | 37.5 | 2988 / 0 | -1.0e-5 | 9.1e-3 | 7.2e-7 | converged |
+| 4PL k=8 | safeguarded SQUAREM (prototype) | 18.8 | 1500 EM evals | -5.1e-5 | 0.021 | 3.8e-6 | not converged |
+| 4PL k=8 | **EM + L-BFGS-B** | 4.53 ± 0.16 | 70 / 481 | -1.1e-8 | 7.9e-5 | 6.0e-8 | converged (KKT) |
+| 3PL k=8 (vs mirt MLE) | EM default | 0.61 ± 0.08 | 25 / 0 | -8.4e-4 | 8.1e-3 | - | converged |
+| 3PL k=8 (vs mirt MLE) | **EM + L-BFGS-B** | 1.51 ± 0.06 | 25 / 175 | -1.4e-10 | 4.3e-6 | 3.4e-8 | converged (KKT) |
+
+SE decisions are unchanged: 4PL optima have 4 (k=5) / 8 (k=8) parameters on bounds,
+so SEs are refused; the interior 3PL solution gets SEs. SQUAREM gave no measurable
+benefit (frequent safeguard fallbacks, no convergence in 1500 evaluations) and is not
+shipped.
+
+Decision: `fit_irt(..., refine=True)` (3PL/4PL, opt-in; default EM unchanged). After
+EM the same marginal logL (same clipping and GH grid) is maximized in the same bounds
+by L-BFGS-B with the analytic score. The result is accepted only if finite, inside
+the bounds and not lower in logL; the optimizer's success flag is recorded but not
+trusted. Otherwise the EM solution is kept and a warning states why. KKT violation is
+reported before and after (`fit["refinement"]`); `converged` becomes True after an
+accepted refinement only when KKT <= `kkt_tolerance` (default 1e-6 per person), with
+`convergence["criterion"] = "kkt_after_refinement"`. Reproduce:
+`python scripts/irt_refine_benchmark.py`; tests: `tests/test_irt_refinement.py`.
