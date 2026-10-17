@@ -14,7 +14,7 @@ on:
       max_iter:
         description: 'EM iteration cap'
         required: true
-        default: '15'
+        default: '70'
   push:
     paths:
       - 'scripts/irt_benchmark.py'
@@ -36,7 +36,7 @@ jobs:
         env:
           SAMPLE_SIZES: ${{ inputs.sample_sizes || '200' }}
           REPETITIONS: ${{ inputs.repetitions || '1' }}
-          MAX_ITER: ${{ inputs.max_iter || '15' }}
+          MAX_ITER: ${{ inputs.max_iter || '70' }}
         run: |
           python scripts/irt_benchmark.py \
             --sample-sizes "$SAMPLE_SIZES" \
