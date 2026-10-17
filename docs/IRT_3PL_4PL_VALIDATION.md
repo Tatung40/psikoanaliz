@@ -190,3 +190,29 @@ parameters on an optimization bound, with status `converged`, `loglik_only`
 (warned, not rejected) or `not_converged`. On the interior 3PL fixture the
 default logL stop lies within 0.022 SE of the mirt MLE, so the parameter
 criterion is reported as a warning rather than used to reject estimates.
+
+## Free 4PL estimation vs R mirt 1.48 (B5)
+
+Reproduce: `python scripts/make_mirt_fixtures.py`; `Rscript scripts/mirt_free_4pl.R`
+(~3 min); `python scripts/python_free_4pl.py` (~5 min). Checked by
+`tests/test_irt_mirt_free4pl.py` (~3 s; `PSIKOANALIZ_SLOW_TESTS=1` adds a live k=5
+optimization and a full k=8 refit, ~50 s). Data: 4PL, k=5 and k=8, N=3000, seed 2026.
+Matched: data, parameterization, N(0,1) fixed (recorded), GH-21 nodes/weights, all
+a, b, c, d free, no item priors (recorded `prior.type = none`), the three Python
+starting values. mirt stops on max |parameter change| < 1e-7, Python on |dlogL| < 1e-9;
+solutions are compared through the same likelihood, not through the stopping rules.
+
+| Check | Result | Class |
+|---|---|---|
+| logLik at all 8 mirt solutions (incl. degenerate ones) | rel. diff <= 2.6e-15 | PASS |
+| Gradient at 8 mirt solutions, mirt internal space (a1, d, logit g, logit u) | abs. diff <= 1.1e-7 | PASS |
+| Observed information at unbounded mirt solutions, internal space | rel. diff <= 1.8e-7; both numerically singular | PASS |
+| Unbounded mirt optimum | not a finite interior MLE: one slope runs to a = 22-166 depending on start (k=5), a = 13-19 (k=8), logLik differs < 1.2e-3; lies outside Python's box (a <= 4) | WARNING (not comparable) |
+| Bounded optimum (Python box; mirt with the same lbound/ubound) | mirt and all Python solutions, maximized further by L-BFGS-B on the validated likelihood, reach one KKT point (KKT <= 4e-8 per person): logLik equal within 1e-5, parameters within 1e-3 | PASS |
+| How close each EM stops to that optimum | k=8: Python logLik gap 1e-5, max |da| 0.009 (converged); mirt-box gap 9e-4, |da| 0.006. k=5: Python gap 5e-4 to 4.6e-3, max |da| 0.12-0.31, not converged after 5000 cycles; mirt-box gap 1.8e-3, |da| 0.034 | WARNING (slow EM on a flat surface) |
+| SE decision | optimum has 4 (k=5) / 8 (k=8) parameters on bounds: Python refuses SE; mirt's unbounded information is singular: no reportable SE in either | PASS |
+| Multistart stability | Python k=8: logLik spread 1e-6, params 5e-4; k=5: logLik spread 4e-3, a spread 0.19 (EM unfinished), but all starts reach the same bounded optimum after direct optimization | PASS (optimum) / WARNING (EM) |
+| Recovery of generating values | max |a - a_true| 2.2 (k=5), 1.9 (k=8) at the bounded optimum | reported only; sampling/identifiability, not an implementation property |
+| 4PL Hessian SE at an interior MLE | no interior finite 4PL MLE in these fixtures | NOT TESTED |
+
+No reproducible mathematical or algorithmic disagreement with mirt was found (no FAIL).

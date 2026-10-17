@@ -1,0 +1,7 @@
+R version 4.3.3 (2024-02-29)
+mirt 1.48
+SimDesign 2.24
+Deriv 4.2.0
+mirt source: github philchalmers/mirt a95523595be1d3d1df60b425fab42a1a02ce612d (1.48)
+EM TOL: 1e-07 | NCYCLES: 20000 | accelerate: default
+generated: 2026-10-17 20:14:32 UTC

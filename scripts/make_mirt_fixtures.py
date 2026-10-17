@@ -39,6 +39,18 @@ def items(model, design):
                          "c": c, "d": np.ones(k) if model == "3PL" else d})
 
 
+# B5: free 4PL estimation fixtures (written to a separate case list so the
+# B3 reference run is unchanged).
+FREE_4PL = [("4pl_free_k5", 5, 3000), ("4pl_free_k8", 8, 3000)]
+
+
+def free_4pl_items(k):
+    return pd.DataFrame({"Madde": [f"M{i+1}" for i in range(k)],
+                         "a": np.linspace(1.6, 2.4, k) if k == 5 else np.linspace(1.4, 2.4, k),
+                         "b": np.linspace(-1., 1., k) if k == 5 else np.linspace(-1.4, 1.4, k),
+                         "c": np.linspace(.12, .20, k), "d": np.linspace(.86, .94, k)})
+
+
 CASES = [("3pl_strong", "3PL", "strong", 2000), ("4pl_strong", "4PL", "strong", 2000),
          ("3pl_weak", "3PL", "weak", 400), ("4pl_weak", "4PL", "weak", 400),
          ("3pl_est", "3PL", "est", 3000)]
@@ -58,6 +70,14 @@ def main():
         rows.append({"case": case, "model": model, "design": design, "n": n,
                      "k": len(truth), "seed": SEED})
     pd.DataFrame(rows).to_csv(OUT / "cases.csv", index=False)
+    rows = []
+    for case, k, n in FREE_4PL:
+        truth = free_4pl_items(k)
+        data, _ = simulate_irt(n, truth, seed=SEED)
+        data.to_csv(OUT / f"data_{case}.csv", index=False)
+        truth.to_csv(OUT / f"items_{case}.csv", index=False, float_format="%.17g")
+        rows.append({"case": case, "model": "4PL", "design": "free", "n": n, "k": k, "seed": SEED})
+    pd.DataFrame(rows).to_csv(OUT / "cases_free4pl.csv", index=False)
 
 
 if __name__ == "__main__":
