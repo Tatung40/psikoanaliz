@@ -16,22 +16,22 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from core.irt_simulation_reporting import run_timed_recovery,export_recovery_excel
 
 
-def reference_items(k=25):
+def reference_items(k=25, generating_model="4PL"):
     """Moderate interior 4PL generating values; not fitted to real students."""
     if k<3:
         raise ValueError("At least three items required")
-    return pd.DataFrame({
+    if generating_model not in ("3PL","4PL"):\n        raise ValueError("Generating model must be 3PL or 4PL")\n    return pd.DataFrame({
         "Madde":[f"M{i+1}" for i in range(k)],
         "a":np.linspace(.8,1.8,k),
         "b":np.linspace(-1.3,1.3,k),
         "c":np.linspace(.06,.20,k),
-        "d":np.linspace(.87,.97,k)})
+        "d":np.ones(k) if generating_model=="3PL" else np.linspace(.87,.97,k)})
 
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--sample-sizes",default="200",help="Comma-separated N")
-    p.add_argument("--models",default="3PL,4PL")
+    p.add_argument("--models",default="3PL,4PL")\n    p.add_argument("--generating-model",choices=("3PL","4PL"),default="4PL")
     p.add_argument("--repetitions",type=int,default=1)
     p.add_argument("--seed",type=int,default=2026)
     p.add_argument("--items",type=int,default=25)
@@ -48,10 +48,10 @@ def main(argv=None):
             or len(sizes)*len(models)*args.repetitions>400):
         p.error("Invalid setting or excessive workload")
     result=run_timed_recovery(
-        reference_items(args.items),models=models,
+        reference_items(args.items,args.generating_model),models=models,
         sample_sizes=sizes,repetitions=args.repetitions,
         seed=args.seed,points=args.points,max_iter=args.max_iter)
-    path=Path(args.output_dir)
+    result["metadata"]["generating_model"]=args.generating_model\n    path=Path(args.output_dir)
     path.mkdir(parents=True,exist_ok=True)
     (path/"study.xlsx").write_bytes(export_recovery_excel(result))
     (path/"metadata.json").write_text(
