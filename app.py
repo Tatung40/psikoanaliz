@@ -1478,11 +1478,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                "Özellikle 3PL/4PL için yayınlarda kullanılmamalıdır.")
                     if st.button("Deneysel Hessian SH hesapla",
                                  key=f"irt_hessian_{model}"):
-                        with st.spinner("Bilgi matrisi hesaplanıyor…"):
-                            hessian_result,hessian_reason=observed_information_se(
-                                target.loc[:,irt_columns],r["items"],model,
-                                points=qpoints,a_upper=r.get("a_upper",4.0),
-                                d_lower=r.get("d_lower",0.65))
+                        if not r["converged"]:
+                            hessian_result,hessian_reason=(None,
+                                "EM yakınsamadığı için standart hata raporlanmaz.")
+                        else:
+                            with st.spinner("Bilgi matrisi hesaplanıyor…"):
+                                hessian_result,hessian_reason=observed_information_se(
+                                    target.loc[:,irt_columns],r["items"],model,
+                                    points=qpoints,a_upper=r.get("a_upper",4.0),
+                                    d_lower=r.get("d_lower",0.65))
                         if hessian_reason:
                             st.warning("Hessian SH hesaplanamadı: "+hessian_reason)
                             blocked=hessian_boundary_diagnostics(
