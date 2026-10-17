@@ -3,6 +3,7 @@
 Not a statistical goodness-of-fit test or evidence of construct validity.
 Never labels a fit scientifically validated solely because EM converged.
 """
+from core.irt import structural_identifiability
 from core.irt_se_diagnostics import hessian_boundary_diagnostics
 
 
@@ -15,26 +16,45 @@ def model_reliability(fit):
         d_lower=fit.get("d_lower",.65))
     converged=bool(fit.get("converged",False))
     k=int(fit["k"])
+    structure=structural_identifiability(k,model)
+    convergence=fit.get("convergence") or {}
+    params_ok=convergence.get("parameter_criterion_met",True)
     affected=int(diagnostics["Madde"].nunique())
     events=len(diagnostics)
     warnings=[]
+    if not structure["satisfied"]:
+        warnings.append(structure["reason"])
+    else:
+        warnings.append(f"Yapısal sayım: {structure['parameters']} serbest parametre, en fazla "
+                        f"{structure['pattern_df']} yanıt örüntüsü serbestlik derecesi. Bu koşul "
+                        "gereklidir ama tanımlanabilirliği kanıtlamaz.")
     if not converged:
         warnings.append("EM yakınsama koşulu sağlanmadı.")
+    elif not params_ok:
+        warnings.append(convergence.get("message","Parametre değişimi ölçütü sağlanmadı."))
     if events:
-        warnings.append(f"{events} parametre sınırda/yakın; {affected}/{k} madde etkilendi.")
+        warnings.append(f"{events} parametre sınırda/yakın; {affected}/{k} madde etkilendi. "
+                        "Bu parametreler için Hessian SH ve Wald aralıkları hesaplanmaz.")
     if model=="4PL":
         warnings.append("c ve d parametrelerinin birlikte kestirimi zayıf tanımlanabilirlik gösterebilir.")
-    if not converged:
+    if not structure["satisfied"]:
+        decision="Yapısal olarak tanımlanamaz"
+    elif not converged:
         decision="Güvenilir kestirim sağlanamadı"
-    elif events:
+    elif events or not params_ok:
         decision="İhtiyatla yorumlanmalı"
     else:
         decision="Tanılar açısından ön koşullar sağlandı; bağımsız doğrulama gerekli"
     return {
         "Model":model,"Karar":decision,"Yakınsama":converged,
+        "Parametre yakınsaması":bool(params_ok),
+        "Serbest parametre":structure["parameters"],
+        "Örüntü serbestlik derecesi":structure["pattern_df"],
         "Sınırdaki madde":affected,"Sınırdaki parametre":events,
         "Madde oranı":affected/k,"Açıklamalar":warnings,
-        "Sınırlılık":"Bu karar parametre sınırları ve EM yakınsamasına dayanır. "
-                     "Bilgi matrisi, model uyumu, yerel bağımsızlık, "
-                     "karşılaştırmalı doğrulama ayrıca değerlendirilmelidir."
+        "Sınırlılık":"Bu karar yapısal parametre sayımı, sınır kestirimleri ve EM "
+                     "yakınsamasına dayanır. Pozitif tanımlı bir bilgi matrisi ya da madde "
+                     "önselleri tanımlanabilirliği kendiliğinden sağlamaz. Bilgi matrisi, "
+                     "model uyumu, yerel bağımsızlık ve karşılaştırmalı doğrulama ayrıca "
+                     "değerlendirilmelidir."
     }

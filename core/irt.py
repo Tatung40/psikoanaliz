@@ -49,15 +49,54 @@ def _initial(prob, model):
     if model=="3PL": return np.array([1., b, .1])
     return np.array([1., b, .1, .95])
 
+_ACTIVE = {"1PL": ("b",), "2PL": ("a", "b"), "3PL": ("a", "b", "c"),
+           "4PL": ("a", "b", "c", "d")}
+
+
+def structural_identifiability(k, model):
+    """Necessary (not sufficient) parameter-counting condition.
+
+    Complete 0/1 data on k items have 2**k response patterns, i.e. at most
+    2**k - 1 free pattern probabilities. A model with more free item
+    parameters cannot be identified whatever the data, starting values or
+    item priors (a prior regularizes the estimate; it adds no information
+    about the response patterns). Equality is not rejected automatically.
+    Satisfying the condition does not prove identification.
+    """
+    if model not in _ACTIVE:
+        raise ValueError("Geçersiz MTK modeli.")
+    k = int(k)
+    parameters = k * len(_ACTIVE[model])
+    pattern_df = 2**k - 1
+    reason = "" if parameters <= pattern_df else (
+        f"{model} modeli {k} maddede {parameters} serbest parametre içerir; tam 0/1 "
+        f"veride en fazla {pattern_df} bağımsız yanıt örüntüsü olasılığı vardır. Model "
+        "yapısal olarak tanımlanamaz; madde sayısını artırın veya daha yalın bir model seçin.")
+    return {"parameters": parameters, "pattern_df": pattern_df,
+            "satisfied": not reason, "reason": reason}
+
+
 def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
-            a_upper=4.0, d_lower=0.65, initial_shift=0.0):
+            a_upper=4.0, d_lower=0.65, initial_shift=0.0, param_tolerance=1e-3):
     """MML EM, N(0,1) özdeşleme; 1PL için a=1 (Rasch benzeri sabit eğim).
     Returns item params, EAP theta, posterior SD, diagnostic/log-likelihood.
+
+    `converged` keeps the marginal log-likelihood criterion (|dlogL| <
+    tolerance). `convergence` additionally reports the largest absolute
+    parameter change in the last EM cycle against `param_tolerance`
+    (diagnostic only; it does not change `converged`), separately for
+    parameters inside the bounds and parameters on an optimization bound.
+    Models with more free parameters than 2**k - 1 are rejected.
     """
     if model not in ("1PL","2PL","3PL","4PL"):
         raise ValueError("Geçersiz MTK modeli.")
     x = validate_binary(data)
     n,k = x.shape
+    structure = structural_identifiability(k, model)
+    if not structure["satisfied"]:
+        raise ValueError(structure["reason"])
+    if not (np.isfinite(param_tolerance) and param_tolerance > 0):
+        raise ValueError("Parametre değişimi toleransı pozitif olmalıdır.")
     gh, hw = hermgauss(points)
     nodes = np.sqrt(2)*gh
     logprior = np.log(hw/np.sqrt(np.pi))
@@ -77,6 +116,9 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
             if model=="4PL":
                 par[3] = float(np.clip(.95-initial_shift*.15, d_lower+.01, .99))
     history=[]
+    param_changes=[]
+    last_delta=None
+    last_ll_change=np.nan
     converged=False
     for step in range(max_iter):
         a,b,c,d = (np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
@@ -99,6 +141,8 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
             result=minimize(objective,params[j],method="L-BFGS-B",bounds=bounds,
                             options={"maxiter":85,"ftol":1e-9})
             nextparams.append(result.x if np.isfinite(result.fun) else params[j])
+        last_delta=np.abs(np.vstack(nextparams)-np.vstack(params))
+        param_changes.append(float(last_delta.max()))
         params=nextparams
         # Yakınsama kararını yeni M-adımı parametrelerinde hesaplanan
         # marjinal log-olabilirliğe göre ver; önceki E-adımlarını kıyaslama.
@@ -111,6 +155,7 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
             # M-adımı beklenen fonksiyonu artırdığı için büyük düşüş olası
             # sayısal hata veya yetersiz optimizasyona işaret edebilir.
             raise RuntimeError("EM log-olabilirliği azaldı; sayısal yakınsama güvenilir değil.")
+        last_ll_change=abs(updated_ll-ll)
         if abs(updated_ll-ll) < tolerance:
             converged=True
             history.append(updated_ll)
@@ -137,11 +182,26 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
                        "Sınır uyarısı":[bool((model!="1PL" and (a[i]<.17 or a[i]>a_upper-.05)) or
                            abs(b[i])>3.95 or (model in ("3PL","4PL") and c[i]>.345) or
                            (model=="4PL" and d[i]<d_lower+.005)) for i in range(k)]})
+    # Strict boundary diagnostics (same rule as the Hessian SE gate), by position.
+    diag=hessian_boundary_diagnostics(table.assign(Madde=np.arange(k)),model,
+                                      a_upper=a_upper,d_lower=d_lower)
+    active=_ACTIVE[model]
+    at_bound=np.zeros((k,len(active)),dtype=bool)
+    for i,param in zip(diag["Madde"].astype(int),diag["Parametre"]):
+        at_bound[i,active.index(param)]=True
     if model in ("3PL","4PL"):
-        flagged=hessian_boundary_diagnostics(
-            table.assign(Madde=np.arange(k)),model,
-            a_upper=a_upper,d_lower=d_lower)["Madde"].astype(int).unique()
-        table["Sınır uyarısı"]=np.isin(np.arange(k),flagged)
+        table["Sınır uyarısı"]=at_bound.any(axis=1)
+    convergence=_convergence_diagnostics(converged,max_iter,tolerance,last_ll_change,
+                                         param_tolerance,last_delta,at_bound,
+                                         table["Madde"].tolist(),active)
+    warnings=[]
+    if convergence["status"]!="converged" and converged:
+        warnings.append(convergence["message"])
+    if at_bound.any():
+        warnings.append(f"{int(at_bound.sum())} parametre optimizasyon sınırında "
+                        f"({int(at_bound.any(axis=1).sum())}/{k} madde). Bu parametreler sınır "
+                        "kestirimidir: Hessian SH ve Wald aralıkları hesaplanmaz; sınırı keyfî "
+                        "genişletmek tanımlanabilirliği sağlamaz.")
     return {"model":model,"items":table,"theta":eap,"theta_sd":psd,
             "grid":theta,"icc":probabilities(theta,a,b,c,d),
             "iif":iteminfo,"tif":iteminfo.sum(axis=1),
@@ -150,9 +210,55 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
             "iterations":len(history),"converged":converged,
             "history":history,"n":n,"k":k,"param_count":numpar,
             "a_upper":a_upper,"d_lower":d_lower,"initial_shift":initial_shift,
+            "param_change_history":param_changes,"convergence":convergence,
+            "structure":structure,"warnings":warnings,
             "warning":("4PL modelindeki c ve d parametreleri yüksek örneklem büyüklüğü "
                        "ve güçlü madde bilgisi gerektirir; sınır kestirimlerini inceleyin."
                        if model=="4PL" else "")}
+
+
+def _convergence_diagnostics(converged, max_iter, tolerance, ll_change,
+                             param_tolerance, delta, at_bound, names, active):
+    """Log-likelihood criterion plus last-cycle parameter change (diagnostic).
+
+    A parameter fixed on an optimization bound has zero change once pinned; a
+    large change of a parameter that has just reached a bound is reported
+    separately, since it signals a boundary estimate rather than slow EM.
+    """
+    if delta is None:
+        delta=np.zeros_like(at_bound,dtype=float)
+    interior=delta[~at_bound]
+    bounded=delta[at_bound]
+    max_change=float(delta.max()) if delta.size else 0.
+    worst=np.unravel_index(int(np.argmax(delta)),delta.shape) if delta.size else (0,0)
+    params_ok=bool(max_change<=param_tolerance)
+    if not converged:
+        status="not_converged"
+        message=(f"logL ölçütü (|ΔlogL| < {tolerance:g}) {max_iter} yinelemede sağlanmadı; "
+                 "kestirimler geçicidir.")
+    elif params_ok:
+        status="converged"
+        message="logL ve parametre değişimi ölçütleri sağlandı."
+    else:
+        status="loglik_only"
+        where=f"{names[worst[0]]} maddesinin {active[worst[1]]} parametresi"
+        if at_bound[worst]:
+            message=(f"logL ölçütü sağlandı, ancak son EM yinelemesinde {where} "
+                     f"{max_change:.2g} değişerek optimizasyon sınırına ulaştı "
+                     f"(eşik {param_tolerance:g}). Bu bir sınır kestirimidir; KKT tanısı "
+                     "(stationarity_diagnostics) ve daha yalın modelle karşılaştırma önerilir.")
+        else:
+            message=(f"logL ölçütü sağlandı, ancak son EM yinelemesinde {where} hâlâ "
+                     f"{max_change:.2g} değişti (eşik {param_tolerance:g}). Olabilirlik yüzeyi "
+                     "düz olabilir (zayıf tanımlanabilirlik) veya EM yavaş ilerliyor; daha küçük "
+                     "tolerans ve daha fazla yinelemeyle sonuçların değişmediğini doğrulayın.")
+    return {"status":status,"message":message,"loglik_converged":bool(converged),
+            "loglik_tolerance":float(tolerance),"last_loglik_change":float(ll_change),
+            "param_tolerance":float(param_tolerance),"max_param_change":max_change,
+            "max_param_change_interior":float(interior.max()) if interior.size else 0.,
+            "max_param_change_at_bound":float(bounded.max()) if bounded.size else 0.,
+            "parameters_at_bound":int(at_bound.sum()),
+            "parameter_criterion_met":params_ok}
 
 
 def estimate_ability(data, item_table, method="EAP", points=81, prior_sd=1.0):
@@ -232,8 +338,10 @@ def approximate_parameter_uncertainty(data, item_table, model, points=31,
         result[f"SE({name})"]=np.nan
         result[f"{name} %95 alt"]=np.nan
         result[f"{name} %95 üst"]=np.nan
-    reason=""
-    if count>max_parameters or n <= 5*count:
+    reason=structural_identifiability(k,model)["reason"]
+    if reason:
+        pass
+    elif count>max_parameters or n <= 5*count:
         reason="OPG için parametre sayısı fazla veya örneklem yetersiz."
     else:
         a,b,c,d=[np.asarray(item_table[name],dtype=float) for name in ("a","b","c","d")]

@@ -251,10 +251,15 @@ def test_free_3pl_estimates_match_mirt():
         assert (diff / se[f"SH({q})"].to_numpy(float)).max() <= .01
 
 
-@pytest.mark.xfail(strict=True, reason="Open issue (B3): fit_irt does not reject structurally "
-                   "unidentified models with more parameters than 2**k-1 response-pattern "
-                   "degrees of freedom; mirt refuses 4PL with k=4 (16 > 15).")
-def test_4pl_with_four_items_is_rejected_like_mirt():
-    _, data, _, _ = _case("3pl_weak")    # any complete 0/1 data with k=4
-    with pytest.raises(ValueError):
-        fit_irt(data, "4PL", points=11, max_iter=1)
+@pytest.mark.parametrize("model,k,rejected",[("3PL",3,True),("3PL",4,False),
+                                              ("4PL",4,True),("4PL",5,False)])
+def test_structural_parameter_count_rule_matches_mirt(model,k,rejected):
+    """Resolved in B4: like mirt (16 > 15 for 4PL, k=4), fit_irt rejects models
+    with more free parameters than 2**k-1 pattern degrees of freedom."""
+    case="3pl_weak" if k==4 else "4pl_weak"          # k=4 and k=5 fixtures
+    data=_case(case)[1].iloc[:,:k]
+    if rejected:
+        with pytest.raises(ValueError,match="yapısal olarak tanımlanamaz"):
+            fit_irt(data,model,points=11,max_iter=1)
+    else:
+        assert fit_irt(data,model,points=11,max_iter=1)["structure"]["satisfied"]

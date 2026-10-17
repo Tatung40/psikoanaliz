@@ -13,7 +13,7 @@ def test_fixed_parameter_likelihood_finite_both_models():
         assert np.isfinite(val) and val<0
 
 def test_quadrature_comparison_uses_shared_reference_grid():
-    truth=generating_items("3PL",3)
+    truth=generating_items("3PL",4)      # 3PL with k=3 is structurally unidentified
     x,_=simulate_irt(90,truth,seed=19)
     result=quadrature_sensitivity(
         x,"3PL",fit_points=(11,15),reference_points=21,

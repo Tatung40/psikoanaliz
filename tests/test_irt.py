@@ -82,11 +82,12 @@ def test_irt_fit_loglik_consistency():
 
 @pytest.mark.parametrize("model",["1PL","2PL","3PL","4PL"])
 def test_opg_uncertainty_schema_and_safety(model):
-    data=make_data(n=180,k=4,seed=91)
+    k=5 if model=="4PL" else 4          # 4PL with k=4 is structurally unidentified
+    data=make_data(n=180,k=k,seed=91)
     fitted=fit_irt(data,model=model,points=15,max_iter=8)
     table, reason=approximate_parameter_uncertainty(
         data,fitted["items"],model,points=15)
-    assert len(table)==4
+    assert len(table)==k
     assert all(f"SE({p})" in table.columns for p in ("a","b","c","d"))
     if reason:
         assert table[[f"SE({p})" for p in ("a","b","c","d")]].isna().all().all()

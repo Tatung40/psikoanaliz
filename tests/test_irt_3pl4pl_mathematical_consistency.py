@@ -26,7 +26,7 @@ def test_information_matches_independent_theta_difference(model):
 
 @pytest.mark.parametrize("model",("3PL","4PL"))
 def test_final_marginal_likelihood_matches_independent_evaluator(model):
-    truth=generating_items(model,4)
+    truth=generating_items(model,4 if model=="3PL" else 5)
     x,_=simulate_irt(125,truth,seed=82)
     fit=fit_irt(x,model=model,points=15,max_iter=4)
     independent=marginal_loglik_at_fixed_parameters(
