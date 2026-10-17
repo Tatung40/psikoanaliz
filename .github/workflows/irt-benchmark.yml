@@ -15,10 +15,6 @@ on:
         description: 'EM iteration cap'
         required: true
         default: '70'
-  push:
-    paths:
-      - 'scripts/irt_benchmark.py'
-      - '.github/workflows/irt-benchmark.yml'
 
 jobs:
   benchmark:
