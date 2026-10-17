@@ -1,0 +1,54 @@
+name: IRT benchmark (opt-in)
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_sizes:
+        description: 'Comma-separated sample sizes'
+        required: true
+        default: '200'
+      repetitions:
+        description: 'Simulation repetitions'
+        required: true
+        default: '1'
+      max_iter:
+        description: 'EM iteration cap'
+        required: true
+        default: '15'
+  push:
+    paths:
+      - 'scripts/irt_benchmark.py'
+      - '.github/workflows/irt-benchmark.yml'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install scientific dependencies
+        run: python -m pip install numpy pandas scipy xlsxwriter openpyxl
+      - name: Run bounded parameter recovery benchmark
+        env:
+          SAMPLE_SIZES: ${{ inputs.sample_sizes || '200' }}
+          REPETITIONS: ${{ inputs.repetitions || '1' }}
+          MAX_ITER: ${{ inputs.max_iter || '15' }}
+        run: |
+          python scripts/irt_benchmark.py \
+            --sample-sizes "$SAMPLE_SIZES" \
+            --repetitions "$REPETITIONS" \
+            --max-iter "$MAX_ITER" \
+            --items 25 --points 21 \
+            --output-dir artifacts/irt-benchmark
+      - name: Upload reproducible results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: irt-benchmark-results
+          path: artifacts/irt-benchmark/
+          if-no-files-found: warn
+          retention-days: 14
