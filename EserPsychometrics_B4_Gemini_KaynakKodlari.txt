@@ -1,0 +1,752 @@
+# EserPsychometrics — Gemini B4 scientific audit sources
+# Exact snapshot from main, 2026-10-17
+# Four files delimited below. Do not interpret separators as original code.
+
+============================ BEGIN core/irt.py ============================
+"""Tek boyutlu ikili MTK: Gauss-Hermite MML/EM kalibrasyonu (1PL-4PL)."""
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
+from scipy.special import expit, logsumexp
+from numpy.polynomial.hermite import hermgauss
+from core.irt_se_diagnostics import hessian_boundary_diagnostics, BOUNDARY_TOLERANCE
+
+def probabilities(theta, a, b, c, d):
+    """P(X=1|theta)=c+(d-c)*sigmoid(a*(theta-b)); theta x item."""
+    z = expit(np.asarray(theta, dtype=float)[:, None] * a[None, :] - (a*b)[None, :])
+    return c[None, :] + (d-c)[None, :] * z
+
+def information(theta, a, b, c, d):
+    z = expit(np.asarray(theta, dtype=float)[:, None]*a[None, :]-(a*b)[None, :])
+    p = np.clip(c[None, :] + (d-c)[None, :]*z, 1e-10, 1-1e-10)
+    derivative = (d-c)[None, :]*a[None, :]*z*(1-z)
+    return derivative**2/(p*(1-p))
+
+def validate_binary(data):
+    x = np.asarray(data, dtype=float)
+    if x.ndim != 2 or x.shape[0] < 30 or x.shape[1] < 3:
+        raise ValueError("MTK için en az 30 katılımcı ve 3 madde gereklidir.")
+    if not np.isfinite(x).all() or not np.isin(x, [0, 1]).all():
+        raise ValueError("MTK, eksiksiz 0/1 puanlı maddeler gerektirir. Eksikleri önce temizleyin.")
+    p = x.mean(axis=0)
+    if np.any((p <= .01) | (p >= .99)):
+        raise ValueError("Ortalaması 0.01–0.99 dışında olan maddeleri ayıklayın (tüm doğru/tüm yanlış dahil).")
+    return x
+
+def _bounds(model):
+    b = [(0.15, 4.0), (-4.0, 4.0)]
+    if model in ("3PL", "4PL"):
+        b.append((0.0, .35))
+    if model == "4PL":
+        b.append((.65, 1.0))
+    return b
+
+def _unpack(p, model):
+    a,b = (1.0, p[0]) if model=="1PL" else (p[0],p[1])
+    c = p[2] if model in ("3PL", "4PL") else 0.
+    d = p[3] if model=="4PL" else 1.
+    return float(a), float(b), float(c), float(d)
+
+def _initial(prob, model):
+    b = float(np.clip(-np.log(prob/(1-prob)), -3, 3))
+    if model=="1PL": return np.array([b])
+    if model=="2PL": return np.array([1., b])
+    if model=="3PL": return np.array([1., b, .1])
+    return np.array([1., b, .1, .95])
+
+def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
+            a_upper=4.0, d_lower=0.65, initial_shift=0.0):
+    """MML EM, N(0,1) özdeşleme; 1PL için a=1 (Rasch benzeri sabit eğim).
+    Returns item params, EAP theta, posterior SD, diagnostic/log-likelihood.
+    """
+    if model not in ("1PL","2PL","3PL","4PL"):
+        raise ValueError("Geçersiz MTK modeli.")
+    x = validate_binary(data)
+    n,k = x.shape
+    gh, hw = hermgauss(points)
+    nodes = np.sqrt(2)*gh
+    logprior = np.log(hw/np.sqrt(np.pi))
+    pop = x.mean(0)
+    if not (4.0 <= a_upper <= 30.0 and 0.05 <= d_lower <= 0.65):
+        raise ValueError("Parametre sınırları geçersiz.")
+    params = [_initial(p,model) for p in pop]
+    bounds = [(-4,4)] if model=="1PL" else _bounds(model)
+    if model != "1PL":
+        bounds[0] = (0.15, a_upper)
+    if model == "4PL":
+        bounds[-1] = (d_lower, 1.0)
+    if initial_shift and model in ("3PL","4PL"):
+        for par in params:
+            par[0] = float(np.clip(1+initial_shift*.4, 0.16, a_upper-.01))
+            par[2] = float(np.clip(.1+initial_shift*.08, .001, .34))
+            if model=="4PL":
+                par[3] = float(np.clip(.95-initial_shift*.15, d_lower+.01, .99))
+    history=[]
+    converged=False
+    for step in range(max_iter):
+        a,b,c,d = (np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+        probs = np.clip(probabilities(nodes,a,b,c,d), 1e-9, 1-1e-9)
+        logpost = x@np.log(probs).T + (1-x)@np.log1p(-probs).T + logprior[None,:]
+        lognorm = logsumexp(logpost,axis=1)
+        ll = float(lognorm.sum())
+        history.append(ll)
+        posterior = np.exp(logpost-lognorm[:,None])
+        weight = posterior.sum(0)
+        successes = x.T @ posterior
+        nextparams=[]
+        for j in range(k):
+            s = successes[j]
+            def objective(par):
+                aj,bj,cj,dj = _unpack(par,model)
+                pj = np.clip(probabilities(nodes, np.array([aj]),np.array([bj]),
+                      np.array([cj]),np.array([dj]))[:,0],1e-9,1-1e-9)
+                return -float(s@np.log(pj)+(weight-s)@np.log1p(-pj))
+            result=minimize(objective,params[j],method="L-BFGS-B",bounds=bounds,
+                            options={"maxiter":85,"ftol":1e-9})
+            nextparams.append(result.x if np.isfinite(result.fun) else params[j])
+        params=nextparams
+        # Yakınsama kararını yeni M-adımı parametrelerinde hesaplanan
+        # marjinal log-olabilirliğe göre ver; önceki E-adımlarını kıyaslama.
+        a1,b1,c1,d1=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+        updated_probs=np.clip(probabilities(nodes,a1,b1,c1,d1),1e-9,1-1e-9)
+        updated_logpost=(x@np.log(updated_probs).T
+                         +(1-x)@np.log1p(-updated_probs).T+logprior[None,:])
+        updated_ll=float(logsumexp(updated_logpost,axis=1).sum())
+        if updated_ll < ll - 1e-5 * (1+abs(ll)):
+            # M-adımı beklenen fonksiyonu artırdığı için büyük düşüş olası
+            # sayısal hata veya yetersiz optimizasyona işaret edebilir.
+            raise RuntimeError("EM log-olabilirliği azaldı; sayısal yakınsama güvenilir değil.")
+        if abs(updated_ll-ll) < tolerance:
+            converged=True
+            history.append(updated_ll)
+            break
+    a,b,c,d=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+    probs=np.clip(probabilities(nodes,a,b,c,d),1e-9,1-1e-9)
+    logpost=x@np.log(probs).T+(1-x)@np.log1p(-probs).T+logprior[None,:]
+    lnorm=logsumexp(logpost,axis=1)
+    post=np.exp(logpost-lnorm[:,None])
+    eap=post@nodes
+    psd=np.sqrt(np.maximum(post@(nodes**2)-eap**2,0))
+    ll=float(lnorm.sum())
+    numpar=k*({"1PL":1,"2PL":2,"3PL":3,"4PL":4}[model])
+    theta=np.linspace(-4,4,161)
+    iteminfo=information(theta,a,b,c,d)
+    # Posterior predictive model fit: empirical and expected proportion; descriptive only
+    expected=post@probs
+    residual=x-expected
+    table=pd.DataFrame({"Madde":list(data.columns) if isinstance(data,pd.DataFrame) else
+                       [f"M{i+1:02d}" for i in range(k)],
+                       "a":a,"b":b,"c":c,"d":d,"Gözlenen p":pop,
+                       "Model p":expected.mean(0),
+                       "Artık RMS":np.sqrt(np.mean(residual**2,axis=0)),
+                       "Sınır uyarısı":[bool((model!="1PL" and (a[i]<.17 or a[i]>a_upper-.05)) or
+                           abs(b[i])>3.95 or (model in ("3PL","4PL") and c[i]>.345) or
+                           (model=="4PL" and d[i]<d_lower+.005)) for i in range(k)]})
+    if model in ("3PL","4PL"):
+        flagged=hessian_boundary_diagnostics(
+            table.assign(Madde=np.arange(k)),model,
+            a_upper=a_upper,d_lower=d_lower)["Madde"].astype(int).unique()
+        table["Sınır uyarısı"]=np.isin(np.arange(k),flagged)
+    return {"model":model,"items":table,"theta":eap,"theta_sd":psd,
+            "grid":theta,"icc":probabilities(theta,a,b,c,d),
+            "iif":iteminfo,"tif":iteminfo.sum(axis=1),
+            "loglik":ll,"aic":2*numpar-2*ll,
+            "bic":np.log(n)*numpar-2*ll,
+            "iterations":len(history),"converged":converged,
+            "history":history,"n":n,"k":k,"param_count":numpar,
+            "a_upper":a_upper,"d_lower":d_lower,"initial_shift":initial_shift,
+            "warning":("4PL modelindeki c ve d parametreleri yüksek örneklem büyüklüğü "
+                       "ve güçlü madde bilgisi gerektirir; sınır kestirimlerini inceleyin."
+                       if model=="4PL" else "")}
+
+
+def estimate_ability(data, item_table, method="EAP", points=81, prior_sd=1.0):
+    """Estimate person ability under fixed item params. EAP/MAP use N(0, prior_sd²);
+    ML uses likelihood only and flags boundary estimates.
+    Scores are conditional on fitted item parameters; SE is posterior SD (EAP),
+    local curvature approximation (MAP/ML).
+    """
+    from scipy.special import logsumexp
+    x = validate_binary(data)
+    k = x.shape[1]
+    if len(item_table) != k:
+        raise ValueError("Madde sayısı parametre tablosuyla uyuşmuyor.")
+    if method not in ("EAP","MAP","ML"):
+        raise ValueError("Yetenek kestirim yöntemi EAP, MAP veya ML olmalıdır.")
+    if method != "ML" and (prior_sd <= 0 or not np.isfinite(prior_sd)):
+        raise ValueError("Önsel standart sapma pozitif olmalıdır.")
+    a,b,c,d = [np.asarray(item_table[col], dtype=float) for col in ("a","b","c","d")]
+    theta = np.linspace(-5.,5.,int(points))
+    p = np.clip(probabilities(theta,a,b,c,d),1e-10,1-1e-10)
+    loglike = x@np.log(p).T+(1-x)@np.log1p(-p).T
+    logprior = -.5*(theta/prior_sd)**2 if method in ("EAP","MAP") else np.zeros_like(theta)
+    lp = loglike + logprior[None,:]
+    if method=="EAP":
+        weights = np.exp(lp-logsumexp(lp,axis=1,keepdims=True))
+        ability=weights@theta
+        se=np.sqrt(np.maximum(weights@(theta**2)-ability**2,0))
+        bounds=np.zeros(len(x),dtype=bool)
+    else:
+        index=np.argmax(lp,axis=1)
+        ability=theta[index]
+        bounds=(index==0)|(index==len(theta)-1)
+        # Approximate conditional SE from Fisher information and prior precision.
+        iif=information(ability,a,b,c,d).sum(axis=1)
+        prior_precision=(1/prior_sd**2) if method=="MAP" else 0.
+        se=1/np.sqrt(np.maximum(iif+prior_precision,1e-10))
+    return pd.DataFrame({"Yetenek (theta)":ability,
+                         "Standart Hata":se,
+                         "Sınır Kestirimi":bounds})
+
+
+def approximate_q3(data, item_table, theta):
+    """Yen's Q3-like residual correlations conditional on point theta estimates.
+
+    Exploratory diagnostic, not a calibrated hypothesis test. Estimating theta
+    from the same responses typically induces negative residual dependence.
+    """
+    x = validate_binary(data)
+    theta = np.asarray(theta, dtype=float).ravel()
+    if len(theta) != len(x):
+        raise ValueError("Yetenek sayısı kişi sayısıyla uyuşmuyor.")
+    a,b,c,d=(np.asarray(item_table[k],dtype=float) for k in ("a","b","c","d"))
+    expected=probabilities(theta,a,b,c,d)
+    residual=x-expected
+    corr=np.corrcoef(residual,rowvar=False)
+    np.fill_diagonal(corr,np.nan)
+    names=(list(data.columns) if isinstance(data,pd.DataFrame)
+           else [f"M{i+1}" for i in range(x.shape[1])])
+    return pd.DataFrame(corr,index=names,columns=names)
+
+
+def approximate_parameter_uncertainty(data, item_table, model, points=31,
+                                      max_parameters=120, a_upper=4.0,
+                                      d_lower=0.65):
+    """Exploratory OPG covariance based on marginal per-person score vectors.
+
+    Not an observed-Hessian or Louis information SE. Normal intervals can be
+    unreliable close to parameter boundaries; return unavailable in that case.
+    """
+    x=validate_binary(data)
+    n,k=x.shape
+    active={"1PL":["b"],"2PL":["a","b"],"3PL":["a","b","c"],
+            "4PL":["a","b","c","d"]}[model]
+    count=k*len(active)
+    result=pd.DataFrame({"Madde":list(item_table["Madde"])})
+    for name in ("a","b","c","d"):
+        result[f"SE({name})"]=np.nan
+        result[f"{name} %95 alt"]=np.nan
+        result[f"{name} %95 üst"]=np.nan
+    reason=""
+    if count>max_parameters or n <= 5*count:
+        reason="OPG için parametre sayısı fazla veya örneklem yetersiz."
+    else:
+        a,b,c,d=[np.asarray(item_table[name],dtype=float) for name in ("a","b","c","d")]
+        bounds={"a":(0.15,a_upper),"b":(-4.,4.),"c":(0.,.35),"d":(d_lower,1.)}
+        for name in active:
+            vv=locals()[name]
+            lo,hi=bounds[name]
+            if np.any((vv-lo)<BOUNDARY_TOLERANCE) or np.any((hi-vv)<BOUNDARY_TOLERANCE):
+                reason="Bir veya daha fazla parametre optimizasyon sınırında."
+                break
+    if not reason:
+        gh,w=hermgauss(points)
+        nodes=np.sqrt(2)*gh
+        z=expit(nodes[:,None]*a[None,:]-(a*b)[None,:])
+        probs=np.clip(c[None,:]+(d-c)[None,:]*z,1e-9,1-1e-9)
+        lpost=x@np.log(probs).T+(1-x)@np.log1p(-probs).T+np.log(w/np.sqrt(np.pi))[None,:]
+        posterior=np.exp(lpost-logsumexp(lpost,axis=1,keepdims=True))
+        scores=np.empty((n,count))
+        for j in range(k):
+            shared=z[:,j]*(1-z[:,j])*(d[j]-c[j])
+            derivatives={
+                "a":shared*(nodes-b[j]),
+                "b":-shared*a[j],
+                "c":1-z[:,j],
+                "d":z[:,j],
+            }
+            scale=(x[:,j,None]-probs[None,:,j]) / (
+                probs[None,:,j]*(1-probs[None,:,j]))
+            for h,name in enumerate(active):
+                scores[:,j*len(active)+h]=(
+                    posterior*(scale*derivatives[name][None,:])).sum(axis=1)
+        opg=scores.T@scores
+        try:
+            cond=np.linalg.cond(opg)
+            if not np.isfinite(cond) or cond>1e9:
+                reason="OPG bilgi matrisi kötü koşullanmış/tekil."
+            else:
+                covariance=np.linalg.inv(opg)
+                diag=np.diag(covariance)
+                if np.any(diag<=0) or not np.isfinite(diag).all():
+                    reason="Pozitif ve sonlu standart hata elde edilemedi."
+                else:
+                    ses=np.sqrt(diag).reshape(k,len(active))
+                    for h,name in enumerate(active):
+                        v=np.asarray(item_table[name],dtype=float)
+                        se=ses[:,h]
+                        result[f"SE({name})"]=se
+                        result[f"{name} %95 alt"]=v-1.96*se
+                        result[f"{name} %95 üst"]=v+1.96*se
+        except np.linalg.LinAlgError:
+            reason="OPG bilgi matrisi terslenemedi."
+    return result, reason
+
+
+def item_fit_by_restscore(data, item_table, min_group=5):
+    """Exploratory item-rest-score Pearson fit diagnostic; NOT Orlando-Thissen S-X2.
+
+    For each item, group examinees by their observed rest score, compute
+    model-expected correct responses averaged over EAP posterior conditional
+    on the rest items alone, then calculate Pearson discrepancies. No
+    inferential p-value is provided because parameters and groups are fitted.
+    """
+    x=validate_binary(data)
+    n,k=x.shape
+    a,b,c,d=[np.asarray(item_table[key],dtype=float) for key in ("a","b","c","d")]
+    gh,w=hermgauss(31)
+    theta=np.sqrt(2)*gh
+    prior=np.log(w/np.sqrt(np.pi))
+    p=np.clip(probabilities(theta,a,b,c,d),1e-9,1-1e-9)
+    names=list(data.columns) if isinstance(data,pd.DataFrame) else [f"M{i+1}" for i in range(k)]
+    out=[]
+    total=x.sum(axis=1)
+    for j in range(k):
+        rest=total-x[:,j]
+        other=np.arange(k)!=j
+        logpost=(x[:,other]@np.log(p[:,other]).T+
+                 (1-x[:,other])@np.log1p(-p[:,other]).T+prior[None,:])
+        weights=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
+        expected=weights@p[:,j]
+        chi=0.
+        groups=0
+        for score in np.unique(rest):
+            take=rest==score
+            size=int(take.sum())
+            if size<min_group:
+                continue
+            obs=float(x[take,j].sum())
+            exp=float(expected[take].sum())
+            variance=max(exp*(1-exp/size),1e-8)
+            chi+=(obs-exp)**2/variance
+            groups+=1
+        out.append({"Madde":names[j],"Rest-puan Pearson":chi if groups>=2 else np.nan,
+                    "Kullanılan grup":groups,
+                    "Kapsanan kişi":int(sum((rest==v).sum() for v in np.unique(rest)
+                                      if (rest==v).sum()>=min_group))})
+    return pd.DataFrame(out)
+
+
+def sx2_pilot(data, item_table, model, points=31, min_expected=5):
+    """Experimental Orlando–Thissen-style S-X2 grouped by observed total score.
+
+    Conditional P(Y_i=1|S=s) is calculated from the marginal IRT model,
+    integrating over standard normal theta by Gauss-Hermite quadrature and
+    Poisson-binomial recursion for the other items. Sparse score groups are
+    excluded; no p-value is reported when asymptotic criteria fail. This
+    implementation has not been benchmarked against mirt::itemfit.
+    """
+    from scipy.stats import chi2
+    x=validate_binary(data)
+    n,k=x.shape
+    a,b,c,d=[np.asarray(item_table[q],dtype=float) for q in ("a","b","c","d")]
+    gh,hw=hermgauss(points)
+    p=np.clip(probabilities(np.sqrt(2)*gh,a,b,c,d),1e-12,1-1e-12)
+    weights=hw/np.sqrt(np.pi)
+    totals=x.sum(axis=1).astype(int)
+    active={"1PL":1,"2PL":2,"3PL":3,"4PL":4}[model]
+    names=list(data.columns) if isinstance(data,pd.DataFrame) else list(item_table["Madde"])
+    out=[]
+    for j in range(k):
+        other=np.delete(p,j,axis=1)
+        distribution=np.ones((len(weights),1))
+        for h in range(k-1):
+            ph=other[:,h,None]
+            updated=np.zeros((len(weights),distribution.shape[1]+1))
+            updated[:,:-1]+=distribution*(1-ph)
+            updated[:,1:]+=distribution*ph
+            distribution=updated
+        # Model probability for full score s and item success at score s.
+        weighted_yes=(weights[:,None]*p[:,j,None]*distribution).sum(axis=0)
+        weighted_no=(weights[:,None]*(1-p[:,j,None])*distribution).sum(axis=0)
+        ps=np.r_[weighted_no,0.] + np.r_[0.,weighted_yes]
+        yes=np.r_[0.,weighted_yes]
+        cond=np.divide(yes,ps,out=np.zeros(k+1),where=ps>1e-12)
+        stat=0.
+        used=0
+        covered=0
+        for score in range(k+1):
+            indices=totals==score
+            m=int(indices.sum())
+            if not m:continue
+            expect=m*cond[score]
+            if expect<min_expected or m-expect<min_expected:
+                continue
+            obs=float(x[indices,j].sum())
+            stat+=(obs-expect)**2/expect + ((m-obs)-(m-expect))**2/(m-expect)
+            used+=1
+            covered+=m
+        df=used-active-1
+        valid=bool(df>0 and covered>=max(30,2*used) and
+                   not bool(item_table.iloc[j].get("Sınır uyarısı",False)))
+        out.append({"Madde":names[j],"S-X² (pilot)":stat if valid else np.nan,
+                    "sd (yaklaşık)":df if valid else np.nan,
+                    "p (yaklaşık)":float(chi2.sf(stat,df)) if valid else np.nan,
+                    "Kullanılan puan grubu":used,
+                    "Kapsanan kişi":covered,
+                    "Durum":"Pilot / bağımsız doğrulama gerekli" if valid
+                    else "Yetersiz grup veya sınır parametresi"})
+    return pd.DataFrame(out)
+============================ END core/irt.py ============================
+
+============================ BEGIN core/irt_hessian.py ============================
+"""Experimental observed-information uncertainty for dichotomous IRT.
+
+Numerical Hessian of the analytic marginal score, not OPG. No standard
+errors are produced if any fitted parameter is at its optimization boundary,
+or if the observed information is not demonstrably positive definite.
+Requires independent comparison against R mirt before scientific reporting.
+"""
+import numpy as np
+import pandas as pd
+from scipy.special import expit,logsumexp
+from numpy.polynomial.hermite import hermgauss
+from core.irt import validate_binary
+from core.irt_se_diagnostics import BOUNDARY_TOLERANCE
+
+
+def _analytic_marginal_score(x,full,active,theta,logprior):
+    """Exact marginal score at supplied quadrature grid and item parameters."""
+    a,b,c,d=full.T
+    z=expit(theta[:,None]*a[None,:]-a[None,:]*b[None,:])
+    p=np.clip(c[None,:]+(d-c)[None,:]*z,1e-10,1-1e-10)
+    logpost=x@np.log(p).T+(1-x)@np.log1p(-p).T+logprior[None,:]
+    posterior=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
+    weighted=posterior.T@x
+    total=posterior.sum(axis=0)[:,None]
+    scale=(weighted-total*p)/(p*(1-p))
+    common=(d-c)[None,:]*z*(1-z)
+    deriv={"a":common*(theta[:,None]-b[None,:]),
+           "b":-common*a[None,:],"c":1-z,"d":z}
+    return np.stack([(scale*deriv[q]).sum(axis=0) for q in active],
+                    axis=1).reshape(-1)
+
+
+def marginal_score(data,items,model,points=31):
+    """Analytic marginal log-likelihood score for independent derivative tests."""
+    active={"1PL":("b",),"2PL":("a","b"),
+            "3PL":("a","b","c"),"4PL":("a","b","c","d")}[model]
+    x=validate_binary(data)
+    full=np.array([items[q].to_numpy(float) for q in ("a","b","c","d")]).T
+    gh,w=hermgauss(points)
+    return _analytic_marginal_score(
+        x,full,active,np.sqrt(2)*gh,np.log(w/np.sqrt(np.pi)))
+
+
+def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
+                            max_parameters=110):
+    x=validate_binary(data)
+    n,k=x.shape
+    active={"1PL":("b",),"2PL":("a","b"),
+            "3PL":("a","b","c"),"4PL":("a","b","c","d")}[model]
+    m=len(active);count=k*m
+    if count>max_parameters:
+        return None,"Bilgi matrisi için parametre sayısı işlem sınırını aşıyor."
+    hessian,reason=_observed_information(x,items,active,points,a_upper,d_lower)
+    if reason:
+        return None,reason
+    info=(hessian+hessian.T)/2
+    eigen=np.linalg.eigvalsh(info)
+    if not np.isfinite(eigen).all() or eigen[0]<=1e-7:
+        return None,"Gözlenen bilgi matrisi pozitif tanımlı değil; SH üretilemez."
+    cond=float(eigen[-1]/eigen[0])
+    if cond>1e8:
+        return None,f"Gözlenen bilgi matrisi kötü koşullanmış (koşul sayısı {cond:.3g})."
+    try:
+        cov=np.linalg.inv(info)
+    except np.linalg.LinAlgError:
+        return None,"Gözlenen bilgi matrisi terslenemedi."
+    variances=np.diag(cov)
+    if np.any(variances<=0) or not np.isfinite(variances).all():
+        return None,"Pozitif, sonlu SH varyansı hesaplanamadı."
+    se=np.sqrt(variances).reshape(k,m)
+    out=pd.DataFrame({"Madde":list(items["Madde"])})
+    for col,q in enumerate(active):
+        out["SH("+q+")"]=se[:,col]
+        out[q+" %95 alt"]=items[q].to_numpy(float)-1.96*se[:,col]
+        out[q+" %95 üst"]=items[q].to_numpy(float)+1.96*se[:,col]
+    return out,""
+
+
+def _observed_information(x,items,active,points,a_upper,d_lower):
+    """Unsymmetrized observed information, or (None, refusal reason)."""
+    k=x.shape[1]
+    m=len(active);count=k*m
+    bound={"a":(.15,a_upper),"b":(-4.,4.),
+           "c":(0.,.35),"d":(d_lower,1.)}
+    original=np.array([items[q].to_numpy(float) for q in ("a","b","c","d")]).T
+    indices=[("a","b","c","d").index(q) for q in active]
+    pars=original[:,indices].reshape(-1)
+    for j,q in enumerate(active):
+        lo,hi=bound[q]
+        vals=pars[j::m]
+        if np.any(vals-lo<BOUNDARY_TOLERANCE) or np.any(hi-vals<BOUNDARY_TOLERANCE):
+            return None,"Parametrelerden biri izin verilen optimizasyon sınırına çok yakın."
+    gh,hw=hermgauss(points)
+    theta=np.sqrt(2)*gh
+    lp=np.log(hw/np.sqrt(np.pi))
+    def score(v):
+        full=original.copy()
+        full[:,indices]=v.reshape(k,m)
+        return _analytic_marginal_score(x,full,active,theta,lp)
+    hessian=np.zeros((count,count))
+    for col in range(count):
+        q=active[col%m]
+        lo,hi=bound[q]
+        step=min(1e-4*max(1,abs(pars[col])),(pars[col]-lo)*.25,
+                 (hi-pars[col])*.25)
+        if step<=1e-8:
+            return None,"Sayısal türev adımı güvenle oluşturulamadı."
+        up=pars.copy();down=pars.copy()
+        up[col]+=step;down[col]-=step
+        hessian[:,col]=-(score(up)-score(down))/(2*step)
+    return hessian,""
+============================ END core/irt_hessian.py ============================
+
+============================ BEGIN core/irt_se_diagnostics.py ============================
+"""Per-item diagnostics for IRT observed-information standard errors.
+
+Identifies directly observable optimization-boundary conditions. Global
+information-matrix problems cannot be assigned to one specific item without
+further analysis, so those retain a separate model-level warning.
+"""
+import numpy as np
+import pandas as pd
+
+# Shared absolute boundary tolerance for 3PL/4PL diagnostics.
+BOUNDARY_TOLERANCE=1e-3
+
+_ACTIVE={"1PL":("b",),"2PL":("a","b"),
+         "3PL":("a","b","c"),"4PL":("a","b","c","d")}
+_DESCRIPTIONS={
+    "a":"Ayırt edicilik (eğimin dikliği)",
+    "b":"Güçlük / yetenek konumu",
+    "c":"Alt asimptot (düşük yetenekte doğru yanıtlama)",
+    "d":"Üst asimptot (yüksek yetenekte doğru yanıtlama)"
+}
+
+def hessian_boundary_diagnostics(items, model, a_upper=4., d_lower=.65,
+                                  tolerance=BOUNDARY_TOLERANCE):
+    """Return explicit at-bound flags using same strict tolerance as Hessian."""
+    if model not in _ACTIVE:
+        raise ValueError("Bilinmeyen MTK modeli.")
+    boundaries={"a":(.15,float(a_upper)), "b":(-4.,4.),
+                "c":(0.,.35), "d":(float(d_lower),1.)}
+    frame=pd.DataFrame(items)
+    rows=[]
+    for _,item in frame.iterrows():
+        for param in _ACTIVE[model]:
+            value=float(item[param])
+            low,high=boundaries[param]
+            if not np.isfinite(value):
+                side="Geçersiz kestirim"
+            elif value-low<=tolerance:
+                side="Alt sınır"
+            elif high-value<=tolerance:
+                side="Üst sınır"
+            else:
+                continue
+            rows.append({
+                "Madde":str(item["Madde"]),
+                "Parametre":param,
+                "Parametrenin anlamı":_DESCRIPTIONS[param],
+                "Kestirim":value,
+                "Alt sınır":low,
+                "Üst sınır":high,
+                "Sorun":side,
+                "SH durumu":"Model düzeyinde hesaplanamaz",
+                "Ne yapılmalı":"Kodlama/örneklem ve madde içeriğini kontrol edin; "
+                               "daha yalın modelle karşılaştırın; sınırı keyfî değiştirmeyin."
+            })
+    return pd.DataFrame(rows,columns=[
+        "Madde","Parametre","Parametrenin anlamı","Kestirim",
+        "Alt sınır","Üst sınır","Sorun","SH durumu","Ne yapılmalı"])
+============================ END core/irt_se_diagnostics.py ============================
+
+============================ BEGIN docs/IRT_3PL_4PL_VALIDATION.md ============================
+# 3PL / 4PL scientific validation record
+
+**Status:** Internal verification and simulations are available. **NOT independently
+validated against an external calibration implementation under matched fixed
+parameters and real data.** The software must not claim otherwise.
+
+## Model and numerical definition
+
+- Dichotomous unidimensional logistic IRT:
+  `P_i(theta)=c_i+(d_i-c_i) sigmoid[a_i(theta-b_i)]`.
+- Identification: examinee ability prior N(0,1), fixed. 3PL fixes d=1.
+- Estimation: Gauss-Hermite marginal maximum likelihood, EM, L-BFGS-B
+  itemwise M step, bounded parameter space.
+- Original default limits: a in [0.15,4], b in [-4,4], c in [0,.35],
+  4PL d in [.65,1]. Expanded limits are exploratory, not recommended
+  as a fix for identifiability.
+- Convergence: marginal log-likelihood increment under configured tolerance;
+  nonconvergence is reported and never interpreted as proven reliability.
+- Three deterministic EM starting positions can be compared; selected converged
+  candidate maximizes the fitted marginal log-likelihood.
+- 3PL and 4PL with many parameters can remain practically unidentifiable,
+  even when the EM stopping rule fires.
+
+## What has been independently checked internally
+
+- Data generation reproducibility, probability frequencies, and parameter
+  admissibility (automated deterministic tests).
+- Fitted solution selection across starting points and per-start audit.
+- Repeated-simulation design, seed tracking, empirical bias, MAE and RMSE.
+- Paired (same observed data) one-start versus three-start benchmark.
+- Boundary proximity flags and conservative model-reliability interpretation.
+- Refusal to claim Hessian standard errors on nonconverged fits.
+- Hessian observed information numerical tests for 1PL/2PL. **This is
+  NOT evidence of 3PL/4PL SE equivalence to external software.**
+
+## Preliminary simulation results (NOT publication-grade)
+
+From [2026-10-17 paired generating-model simulation](https://github.com/Tatung40/psikoanaliz/actions/runs/38999527120):
+25 items, data generated under the correct model, three replications per
+sample size, Gauss-Hermite with 21 nodes, max 70 EM iterations.
+
+| N | 3PL correct-model MAE(a) | 4PL correct-model MAE(a) |
+|---|---:|---:|
+| 200 | 0.606 | 1.143 |
+| 500 | 0.316 | 0.883 |
+| 1000 | 0.243 | 0.746 |
+| 2000 | 0.153 | 0.405 |
+
+MAE improvements with N are promising but no uncertainty intervals are
+justifiable at three replications. The 4PL has substantial boundary and
+identification issues; do not interpret mere convergence as correctness.
+Mismatched fitted and generating models must be labeled separately.
+
+## Required before externally validated / publication-ready designation
+
+1. Fixed-parameter comparison of 3PL and 4PL log-likelihood, gradients,
+   model fit, and covariance / standard errors with independent R mirt,
+   or another rigorously verified scientific implementation.
+2. Full Monte Carlo design with multiple truth regimes:
+   a, b, c, d ranges, ability distributions, sample sizes, item counts,
+   and at least dozens (preferably 100+) successful and failed replications
+   separately accounted for in Monte Carlo standard errors.
+3. Coverage assessment of 3PL/4PL SE intervals against known true item
+   parameters, including near-boundary scenarios and failure rates.
+4. Sensitivity to quadrature nodes, EM iteration limits, tolerance,
+   initialization, and alternative optimization paths.
+5. Runtime/memory under concurrent Streamlit users and the constrained
+   free host. Avoid heavy simulations in the interactive request thread.
+6. Documentation: no automatic choice of the most complex model; model
+   fit, local dependence, information-matrix eigenvalues and boundary
+   diagnostics need triangulation.
+
+**Do not remove the experimental 3PL/4PL SH warning solely because unit
+tests or internal simulations pass.**
+
+## Further internal verifications and reproducible commands
+
+- `tests/test_irt_3pl4pl_marginal_gradient.py`: independent finite differences
+  of the marginal log-likelihood verify the analytic 3PL/4PL score.
+- `tests/test_irt_3pl4pl_mathematical_consistency.py`: independent check of
+  ICC information, marginal log-likelihood, AIC and BIC identities.
+- `core/irt_stationarity.py`: per-parameter first-order KKT necessary
+  condition (gradient per examinee; descriptive threshold, not proof).
+- `core/irt_truth_scenarios.py`: five explicitly bounded parameter regimes.
+- `core/irt_quadrature_validation.py`: different estimation quadratures
+  compared on one common high-resolution likelihood grid.
+- `core/irt_se_coverage.py`: report *availability* of Hessian SE before
+  conditional interval coverage, including all declined runs.
+- `core/irt_model_reliability.py`: qualitative diagnostic status; never
+  equates convergence with validation.
+
+For complete deterministic CI tests, review the standard GitHub Actions
+`PsikoAnaliz tests` workflow. Scientific evidence is stored separately
+under `IRT benchmark (opt-in)`, `IRT multistart empirical check`, and
+`IRT 3PL 4PL internal scientific audit`.
+
+The early paired initialization experiment is stored in
+[GitHub Actions run 39000776556](https://github.com/Tatung40/psikoanaliz/actions/runs/39000776556).
+For 4PL N=500 with two replications, three initializations changed the
+convergence count from 1/2 to 2/2, but required about three times the
+computation and did not establish lower parameter error. Therefore one
+or three starts remain user-selectable.
+
+None of these internal studies, even if all workflows succeed, substitutes
+for independent implementation equivalence or full Monte Carlo evidence
+with quantified Monte Carlo sampling error.
+
+## Extended matched-generating-model Monte Carlo (10 replications per N)
+
+Completed [GitHub Actions run 39001046381](https://github.com/Tatung40/psikoanaliz/actions/runs/39001046381)
+with N=200,500,1000,2000; 25 items; 10 replications for *each*
+generating model and sample size; maximum 70 EM iterations, 21
+Gauss-Hermite points, single default start. Results are conditional
+on converged calibrations.
+
+| N | Correct 3PL convergence | 3PL MAE(a) | 3PL mean boundary parameters | Correct 4PL convergence | 4PL MAE(a) | 4PL mean boundary parameters |
+|---|---:|---:|---:|---:|---:|---:|
+| 200 | 10/10 | 0.544 | 12.6 | 10/10 | 1.162 | 31.2 |
+| 500 | 10/10 | 0.311 | 7.4 | 9/10 | 0.857 | 22.3 |
+| 1000 | 10/10 | 0.188 | 6.2 | 7/10 | 0.704 | 16.1 |
+| 2000 | 10/10 | 0.153 | 4.6 | 10/10 | 0.452 | 15.7 |
+
+Across each generative branch 80 model fits were attempted because both
+3PL and 4PL were fitted to each simulated dataset; 79/80 and 76/80
+converged respectively, including misspecified model fits. The table
+above reports only *matched* generating/fitted model pairs. Ten draws
+per condition remain exploratory and cannot establish nominal statistical
+coverage, general robustness or universal bias properties.
+
+The [independent internal 3PL/4PL audit](https://github.com/Tatung40/psikoanaliz/actions/runs/39001405713)
+tested a five-item N=500 stress case. Neither model supplied a
+publishable Hessian CI: 3PL SE was refused in both runs and 4PL
+calibration did not converge in both runs. The automated refusal guards
+correctly prevented presenting these as valid intervals.
+
+**Final scientific boundary:** software regression tests and internal
+numerical identities are passed, but neither an external real-data
+calibration comparison nor broad SE interval coverage studies have been
+completed. This is an implementation validation stage, not a claim that
+3PL/4PL are fully scientifically validated.
+
+## External comparison with R mirt 1.48 (B3, fixed-parameter and 3PL estimation)
+
+Reproduce: `python scripts/make_mirt_fixtures.py`, then
+`Rscript scripts/mirt_reference_3pl4pl.R` (writes `tests/fixtures/mirt/mirt_results.csv`
+and `mirt_session.txt`; R 4.3.3, mirt 1.48 built from source commit
+a955235, SimDesign 2.24, Deriv 4.2.0). Checked by `tests/test_irt_mirt_reference.py`.
+
+Matched conditions: mirt `P=g+(u-g)/(1+exp(-(a1*theta+d)))` with `a=a1`, `b=-d/a1`,
+`c=g`, `d=u`; g and u are stored on the logit scale inside mirt, so derivatives are
+mapped with the Jacobian including its second-order term. Integration uses the same
+21-node Gauss-Hermite grid (`customTheta`, `customPriorFun`). Fixtures: 3PL k=4 and
+4PL k=5 (N=400 and 2000), and a 3PL k=8, N=3000 free-estimation case.
+
+| Quantity | Max. relative difference | Status |
+|---|---:|---|
+| Item response function (absolute) | 5.6e-16 | verified |
+| Marginal log-likelihood (GH-21) | 2.6e-15 | verified (3PL, 4PL) |
+| Analytic score vs mirt numerical gradient | 2.7e-9 | verified (3PL, 4PL) |
+| Observed information vs Hessian of mirt logLik | 6.6e-8 | verified (3PL, 4PL; also indefinite cases) |
+| Hessian SE vs mirt (3PL, positive definite case) | 7.7e-8 | verified |
+| mirt `SE.type='Richardson'`, default 61-node grid | info 6.0e-8, SE 4.7e-8 | verified (3PL) |
+| SE refusal decision (not positive definite) | identical in 4/4 cases | verified |
+| Free 3PL ML estimates | <=0.0014 SE; logLik gap 1.5e-6 | verified (one interior case) |
+
+Not verified: free 4PL estimation (no small interior 4PL MLE was found; Python's
+bounded space and mirt's logit space then target different points), Oakes/Louis/
+sandwich SE types, real data, other quadrature sizes. Note: mirt's numerical
+SE.type Hessian re-weights custom nodes by `dnorm(theta)` and ignores
+`customPriorFun` (mirt 1.48, `R/utils.R::BL.LL`), so that route is compared on
+mirt's default grid only.
+
+Open issue found: complete 0/1 data on k items give `2**k-1` degrees of freedom.
+mirt refuses models with more parameters (e.g. 4PL with k=4: 16 > 15). `fit_irt`
+does not, and the Hessian condition-number gate did not flag such a case in B2.
+============================ END docs/IRT_3PL_4PL_VALIDATION.md ============================
