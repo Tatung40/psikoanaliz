@@ -72,3 +72,35 @@ Mismatched fitted and generating models must be labeled separately.
 
 **Do not remove the experimental 3PL/4PL SH warning solely because unit
 tests or internal simulations pass.**
+
+## Further internal verifications and reproducible commands
+
+- `tests/test_irt_3pl4pl_marginal_gradient.py`: independent finite differences
+  of the marginal log-likelihood verify the analytic 3PL/4PL score.
+- `tests/test_irt_3pl4pl_mathematical_consistency.py`: independent check of
+  ICC information, marginal log-likelihood, AIC and BIC identities.
+- `core/irt_stationarity.py`: per-parameter first-order KKT necessary
+  condition (gradient per examinee; descriptive threshold, not proof).
+- `core/irt_truth_scenarios.py`: five explicitly bounded parameter regimes.
+- `core/irt_quadrature_validation.py`: different estimation quadratures
+  compared on one common high-resolution likelihood grid.
+- `core/irt_se_coverage.py`: report *availability* of Hessian SE before
+  conditional interval coverage, including all declined runs.
+- `core/irt_model_reliability.py`: qualitative diagnostic status; never
+  equates convergence with validation.
+
+For complete deterministic CI tests, review the standard GitHub Actions
+`PsikoAnaliz tests` workflow. Scientific evidence is stored separately
+under `IRT benchmark (opt-in)`, `IRT multistart empirical check`, and
+`IRT 3PL 4PL internal scientific audit`.
+
+The early paired initialization experiment is stored in
+[GitHub Actions run 39000776556](https://github.com/Tatung40/psikoanaliz/actions/runs/39000776556).
+For 4PL N=500 with two replications, three initializations changed the
+convergence count from 1/2 to 2/2, but required about three times the
+computation and did not establish lower parameter error. Therefore one
+or three starts remain user-selectable.
+
+None of these internal studies, even if all workflows succeed, substitutes
+for independent implementation equivalence or full Monte Carlo evidence
+with quantified Monte Carlo sampling error.
