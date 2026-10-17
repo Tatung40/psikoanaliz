@@ -4,6 +4,7 @@ import pandas as pd
 from scipy.optimize import minimize
 from scipy.special import expit, logsumexp
 from numpy.polynomial.hermite import hermgauss
+from core.irt_se_diagnostics import hessian_boundary_diagnostics, BOUNDARY_TOLERANCE
 
 def probabilities(theta, a, b, c, d):
     """P(X=1|theta)=c+(d-c)*sigmoid(a*(theta-b)); theta x item."""
@@ -136,6 +137,11 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
                        "Sınır uyarısı":[bool((model!="1PL" and (a[i]<.17 or a[i]>a_upper-.05)) or
                            abs(b[i])>3.95 or (model in ("3PL","4PL") and c[i]>.345) or
                            (model=="4PL" and d[i]<d_lower+.005)) for i in range(k)]})
+    if model in ("3PL","4PL"):
+        flagged=hessian_boundary_diagnostics(
+            table.assign(Madde=np.arange(k)),model,
+            a_upper=a_upper,d_lower=d_lower)["Madde"].astype(int).unique()
+        table["Sınır uyarısı"]=np.isin(np.arange(k),flagged)
     return {"model":model,"items":table,"theta":eap,"theta_sd":psd,
             "grid":theta,"icc":probabilities(theta,a,b,c,d),
             "iif":iteminfo,"tif":iteminfo.sum(axis=1),
@@ -235,7 +241,7 @@ def approximate_parameter_uncertainty(data, item_table, model, points=31,
         for name in active:
             vv=locals()[name]
             lo,hi=bounds[name]
-            if np.any((vv-lo)<1e-3) or np.any((hi-vv)<1e-3):
+            if np.any((vv-lo)<BOUNDARY_TOLERANCE) or np.any((hi-vv)<BOUNDARY_TOLERANCE):
                 reason="Bir veya daha fazla parametre optimizasyon sınırında."
                 break
     if not reason:
