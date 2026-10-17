@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from core.irt_monte_carlo_precision import monte_carlo_precision
 from core.irt_simulation_reporting import (run_timed_recovery, export_recovery_excel,
                                             annotate_generating_model)
 
@@ -58,6 +59,7 @@ def main(argv=None):
         seed=args.seed,points=args.points,max_iter=args.max_iter,
         starts=(0.,-1.,1.)[:args.starts])
     annotate_generating_model(result,args.generating_model)
+    result["monte_carlo_precision"]=monte_carlo_precision(result["runs"])
     path=Path(args.output_dir)
     path.mkdir(parents=True,exist_ok=True)
     (path/"study.xlsx").write_bytes(export_recovery_excel(result))
@@ -66,6 +68,7 @@ def main(argv=None):
         encoding="utf-8")
     result["summary"].to_csv(path/"summary.csv",index=False)
     result["runs"].to_csv(path/"runs.csv",index=False)
+    result["monte_carlo_precision"].to_csv(path/"precision.csv",index=False)
     print(json.dumps({"metadata":result["metadata"],
                       "summary":result["summary"].replace(
                           {np.nan:None}).to_dict(orient="records")},
