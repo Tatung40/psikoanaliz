@@ -53,3 +53,23 @@ def export_recovery_excel(result):
                       for k,v in meta.items()]).to_excel(
             writer,sheet_name="Çalışma_Bilgileri",index=False)
     return output.getvalue()
+
+
+def annotate_generating_model(result, generating_model):
+    """Distinguish correct-model recovery from intentionally misspecified fits.
+
+    Correct-model labels refer to model specification, not proven numerical
+    accuracy. No metrics from misspecified models are treated as recovery.
+    """
+    if generating_model not in ("3PL","4PL"):
+        raise ValueError("Unsupported data generating model.")
+    for key in ("summary","runs","item_recovery"):
+        frame=result[key].copy()
+        if "Model" in frame.columns:
+            frame.insert(0,"Veri üreten model",generating_model)
+            frame.insert(2,"Model koşulu",np.where(
+                frame["Model"].eq(generating_model),
+                "Doğru model","Yanlış tanımlanmış model"))
+        result[key]=frame
+    result.setdefault("metadata",{})["generating_model"]=generating_model
+    return result
