@@ -1,0 +1,1631 @@
+# EserPsychometrics B4 — Gemini bağımsız denetim kaynakları
+# Kaynak: Tatung40/psikoanaliz, main merge commit 222ae43365cc880a532bcda9bc99e039be42472a
+# Aşağıdaki her bölüm, ilgili GitHub dosyasının bu commit'teki tam içeriğidir.
+# Dosyalar birbirinden BEGIN/END ayraçlarıyla ayrılmıştır; ayraçlar özgün koda dahil değildir.
+
+================ BEGIN core/irt.py ================
+"""Tek boyutlu ikili MTK: Gauss-Hermite MML/EM kalibrasyonu (1PL-4PL)."""
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
+from scipy.special import expit, logsumexp
+from numpy.polynomial.hermite import hermgauss
+from core.irt_se_diagnostics import hessian_boundary_diagnostics, BOUNDARY_TOLERANCE
+
+def probabilities(theta, a, b, c, d):
+    """P(X=1|theta)=c+(d-c)*sigmoid(a*(theta-b)); theta x item."""
+    z = expit(np.asarray(theta, dtype=float)[:, None] * a[None, :] - (a*b)[None, :])
+    return c[None, :] + (d-c)[None, :] * z
+
+def information(theta, a, b, c, d):
+    z = expit(np.asarray(theta, dtype=float)[:, None]*a[None, :]-(a*b)[None, :])
+    p = np.clip(c[None, :] + (d-c)[None, :]*z, 1e-10, 1-1e-10)
+    derivative = (d-c)[None, :]*a[None, :]*z*(1-z)
+    return derivative**2/(p*(1-p))
+
+def validate_binary(data):
+    x = np.asarray(data, dtype=float)
+    if x.ndim != 2 or x.shape[0] < 30 or x.shape[1] < 3:
+        raise ValueError("MTK için en az 30 katılımcı ve 3 madde gereklidir.")
+    if not np.isfinite(x).all() or not np.isin(x, [0, 1]).all():
+        raise ValueError("MTK, eksiksiz 0/1 puanlı maddeler gerektirir. Eksikleri önce temizleyin.")
+    p = x.mean(axis=0)
+    if np.any((p <= .01) | (p >= .99)):
+        raise ValueError("Ortalaması 0.01–0.99 dışında olan maddeleri ayıklayın (tüm doğru/tüm yanlış dahil).")
+    return x
+
+def _bounds(model):
+    b = [(0.15, 4.0), (-4.0, 4.0)]
+    if model in ("3PL", "4PL"):
+        b.append((0.0, .35))
+    if model == "4PL":
+        b.append((.65, 1.0))
+    return b
+
+def _unpack(p, model):
+    a,b = (1.0, p[0]) if model=="1PL" else (p[0],p[1])
+    c = p[2] if model in ("3PL", "4PL") else 0.
+    d = p[3] if model=="4PL" else 1.
+    return float(a), float(b), float(c), float(d)
+
+def _initial(prob, model):
+    b = float(np.clip(-np.log(prob/(1-prob)), -3, 3))
+    if model=="1PL": return np.array([b])
+    if model=="2PL": return np.array([1., b])
+    if model=="3PL": return np.array([1., b, .1])
+    return np.array([1., b, .1, .95])
+
+_ACTIVE = {"1PL": ("b",), "2PL": ("a", "b"), "3PL": ("a", "b", "c"),
+           "4PL": ("a", "b", "c", "d")}
+
+
+def structural_identifiability(k, model):
+    """Necessary (not sufficient) parameter-counting condition.
+
+    Complete 0/1 data on k items have 2**k response patterns, i.e. at most
+    2**k - 1 free pattern probabilities. A model with more free item
+    parameters cannot be identified whatever the data, starting values or
+    item priors (a prior regularizes the estimate; it adds no information
+    about the response patterns). Equality is not rejected automatically.
+    Satisfying the condition does not prove identification.
+    """
+    if model not in _ACTIVE:
+        raise ValueError("Geçersiz MTK modeli.")
+    k = int(k)
+    parameters = k * len(_ACTIVE[model])
+    pattern_df = 2**k - 1
+    reason = "" if parameters <= pattern_df else (
+        f"{model} modeli {k} maddede {parameters} serbest parametre içerir; tam 0/1 "
+        f"veride en fazla {pattern_df} bağımsız yanıt örüntüsü olasılığı vardır. Model "
+        "yapısal olarak tanımlanamaz; madde sayısını artırın veya daha yalın bir model seçin.")
+    return {"parameters": parameters, "pattern_df": pattern_df,
+            "satisfied": not reason, "reason": reason}
+
+
+def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
+            a_upper=4.0, d_lower=0.65, initial_shift=0.0, param_tolerance=1e-3):
+    """MML EM, N(0,1) özdeşleme; 1PL için a=1 (Rasch benzeri sabit eğim).
+    Returns item params, EAP theta, posterior SD, diagnostic/log-likelihood.
+
+    `converged` keeps the marginal log-likelihood criterion (|dlogL| <
+    tolerance). `convergence` additionally reports the largest absolute
+    parameter change in the last EM cycle against `param_tolerance`
+    (diagnostic only; it does not change `converged`), separately for
+    parameters inside the bounds and parameters on an optimization bound.
+    Models with more free parameters than 2**k - 1 are rejected.
+    """
+    if model not in ("1PL","2PL","3PL","4PL"):
+        raise ValueError("Geçersiz MTK modeli.")
+    x = validate_binary(data)
+    n,k = x.shape
+    structure = structural_identifiability(k, model)
+    if not structure["satisfied"]:
+        raise ValueError(structure["reason"])
+    if not (np.isfinite(param_tolerance) and param_tolerance > 0):
+        raise ValueError("Parametre değişimi toleransı pozitif olmalıdır.")
+    gh, hw = hermgauss(points)
+    nodes = np.sqrt(2)*gh
+    logprior = np.log(hw/np.sqrt(np.pi))
+    pop = x.mean(0)
+    if not (4.0 <= a_upper <= 30.0 and 0.05 <= d_lower <= 0.65):
+        raise ValueError("Parametre sınırları geçersiz.")
+    params = [_initial(p,model) for p in pop]
+    bounds = [(-4,4)] if model=="1PL" else _bounds(model)
+    if model != "1PL":
+        bounds[0] = (0.15, a_upper)
+    if model == "4PL":
+        bounds[-1] = (d_lower, 1.0)
+    if initial_shift and model in ("3PL","4PL"):
+        for par in params:
+            par[0] = float(np.clip(1+initial_shift*.4, 0.16, a_upper-.01))
+            par[2] = float(np.clip(.1+initial_shift*.08, .001, .34))
+            if model=="4PL":
+                par[3] = float(np.clip(.95-initial_shift*.15, d_lower+.01, .99))
+    history=[]
+    param_changes=[]
+    last_delta=None
+    last_ll_change=np.nan
+    converged=False
+    for step in range(max_iter):
+        a,b,c,d = (np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+        probs = np.clip(probabilities(nodes,a,b,c,d), 1e-9, 1-1e-9)
+        logpost = x@np.log(probs).T + (1-x)@np.log1p(-probs).T + logprior[None,:]
+        lognorm = logsumexp(logpost,axis=1)
+        ll = float(lognorm.sum())
+        history.append(ll)
+        posterior = np.exp(logpost-lognorm[:,None])
+        weight = posterior.sum(0)
+        successes = x.T @ posterior
+        nextparams=[]
+        for j in range(k):
+            s = successes[j]
+            def objective(par):
+                aj,bj,cj,dj = _unpack(par,model)
+                pj = np.clip(probabilities(nodes, np.array([aj]),np.array([bj]),
+                      np.array([cj]),np.array([dj]))[:,0],1e-9,1-1e-9)
+                return -float(s@np.log(pj)+(weight-s)@np.log1p(-pj))
+            result=minimize(objective,params[j],method="L-BFGS-B",bounds=bounds,
+                            options={"maxiter":85,"ftol":1e-9})
+            nextparams.append(result.x if np.isfinite(result.fun) else params[j])
+        last_delta=np.abs(np.vstack(nextparams)-np.vstack(params))
+        param_changes.append(float(last_delta.max()))
+        params=nextparams
+        # Yakınsama kararını yeni M-adımı parametrelerinde hesaplanan
+        # marjinal log-olabilirliğe göre ver; önceki E-adımlarını kıyaslama.
+        a1,b1,c1,d1=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+        updated_probs=np.clip(probabilities(nodes,a1,b1,c1,d1),1e-9,1-1e-9)
+        updated_logpost=(x@np.log(updated_probs).T
+                         +(1-x)@np.log1p(-updated_probs).T+logprior[None,:])
+        updated_ll=float(logsumexp(updated_logpost,axis=1).sum())
+        if updated_ll < ll - 1e-5 * (1+abs(ll)):
+            # M-adımı beklenen fonksiyonu artırdığı için büyük düşüş olası
+            # sayısal hata veya yetersiz optimizasyona işaret edebilir.
+            raise RuntimeError("EM log-olabilirliği azaldı; sayısal yakınsama güvenilir değil.")
+        last_ll_change=abs(updated_ll-ll)
+        if abs(updated_ll-ll) < tolerance:
+            converged=True
+            history.append(updated_ll)
+            break
+    a,b,c,d=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+    probs=np.clip(probabilities(nodes,a,b,c,d),1e-9,1-1e-9)
+    logpost=x@np.log(probs).T+(1-x)@np.log1p(-probs).T+logprior[None,:]
+    lnorm=logsumexp(logpost,axis=1)
+    post=np.exp(logpost-lnorm[:,None])
+    eap=post@nodes
+    psd=np.sqrt(np.maximum(post@(nodes**2)-eap**2,0))
+    ll=float(lnorm.sum())
+    numpar=k*({"1PL":1,"2PL":2,"3PL":3,"4PL":4}[model])
+    theta=np.linspace(-4,4,161)
+    iteminfo=information(theta,a,b,c,d)
+    # Posterior predictive model fit: empirical and expected proportion; descriptive only
+    expected=post@probs
+    residual=x-expected
+    table=pd.DataFrame({"Madde":list(data.columns) if isinstance(data,pd.DataFrame) else
+                       [f"M{i+1:02d}" for i in range(k)],
+                       "a":a,"b":b,"c":c,"d":d,"Gözlenen p":pop,
+                       "Model p":expected.mean(0),
+                       "Artık RMS":np.sqrt(np.mean(residual**2,axis=0)),
+                       "Sınır uyarısı":[bool((model!="1PL" and (a[i]<.17 or a[i]>a_upper-.05)) or
+                           abs(b[i])>3.95 or (model in ("3PL","4PL") and c[i]>.345) or
+                           (model=="4PL" and d[i]<d_lower+.005)) for i in range(k)]})
+    # Strict boundary diagnostics (same rule as the Hessian SE gate), by position.
+    diag=hessian_boundary_diagnostics(table.assign(Madde=np.arange(k)),model,
+                                      a_upper=a_upper,d_lower=d_lower)
+    active=_ACTIVE[model]
+    at_bound=np.zeros((k,len(active)),dtype=bool)
+    for i,param in zip(diag["Madde"].astype(int),diag["Parametre"]):
+        at_bound[i,active.index(param)]=True
+    if model in ("3PL","4PL"):
+        table["Sınır uyarısı"]=at_bound.any(axis=1)
+    convergence=_convergence_diagnostics(converged,max_iter,tolerance,last_ll_change,
+                                         param_tolerance,last_delta,at_bound,
+                                         table["Madde"].tolist(),active)
+    warnings=[]
+    if convergence["status"]!="converged" and converged:
+        warnings.append(convergence["message"])
+    if at_bound.any():
+        warnings.append(f"{int(at_bound.sum())} parametre optimizasyon sınırında "
+                        f"({int(at_bound.any(axis=1).sum())}/{k} madde). Bu parametreler sınır "
+                        "kestirimidir: Hessian SH ve Wald aralıkları hesaplanmaz; sınırı keyfî "
+                        "genişletmek tanımlanabilirliği sağlamaz.")
+    return {"model":model,"items":table,"theta":eap,"theta_sd":psd,
+            "grid":theta,"icc":probabilities(theta,a,b,c,d),
+            "iif":iteminfo,"tif":iteminfo.sum(axis=1),
+            "loglik":ll,"aic":2*numpar-2*ll,
+            "bic":np.log(n)*numpar-2*ll,
+            "iterations":len(history),"converged":converged,
+            "history":history,"n":n,"k":k,"param_count":numpar,
+            "a_upper":a_upper,"d_lower":d_lower,"initial_shift":initial_shift,
+            "param_change_history":param_changes,"convergence":convergence,
+            "structure":structure,"warnings":warnings,
+            "warning":("4PL modelindeki c ve d parametreleri yüksek örneklem büyüklüğü "
+                       "ve güçlü madde bilgisi gerektirir; sınır kestirimlerini inceleyin."
+                       if model=="4PL" else "")}
+
+
+def _convergence_diagnostics(converged, max_iter, tolerance, ll_change,
+                             param_tolerance, delta, at_bound, names, active):
+    """Log-likelihood criterion plus last-cycle parameter change (diagnostic).
+
+    A parameter fixed on an optimization bound has zero change once pinned; a
+    large change of a parameter that has just reached a bound is reported
+    separately, since it signals a boundary estimate rather than slow EM.
+    """
+    if delta is None:
+        delta=np.zeros_like(at_bound,dtype=float)
+    interior=delta[~at_bound]
+    bounded=delta[at_bound]
+    max_change=float(delta.max()) if delta.size else 0.
+    worst=np.unravel_index(int(np.argmax(delta)),delta.shape) if delta.size else (0,0)
+    params_ok=bool(max_change<=param_tolerance)
+    if not converged:
+        status="not_converged"
+        message=(f"logL ölçütü (|ΔlogL| < {tolerance:g}) {max_iter} yinelemede sağlanmadı; "
+                 "kestirimler geçicidir.")
+    elif params_ok:
+        status="converged"
+        message="logL ve parametre değişimi ölçütleri sağlandı."
+    else:
+        status="loglik_only"
+        where=f"{names[worst[0]]} maddesinin {active[worst[1]]} parametresi"
+        if at_bound[worst]:
+            message=(f"logL ölçütü sağlandı, ancak son EM yinelemesinde {where} "
+                     f"{max_change:.2g} değişerek optimizasyon sınırına ulaştı "
+                     f"(eşik {param_tolerance:g}). Bu bir sınır kestirimidir; KKT tanısı "
+                     "(stationarity_diagnostics) ve daha yalın modelle karşılaştırma önerilir.")
+        else:
+            message=(f"logL ölçütü sağlandı, ancak son EM yinelemesinde {where} hâlâ "
+                     f"{max_change:.2g} değişti (eşik {param_tolerance:g}). Olabilirlik yüzeyi "
+                     "düz olabilir (zayıf tanımlanabilirlik) veya EM yavaş ilerliyor; daha küçük "
+                     "tolerans ve daha fazla yinelemeyle sonuçların değişmediğini doğrulayın.")
+    return {"status":status,"message":message,"loglik_converged":bool(converged),
+            "loglik_tolerance":float(tolerance),"last_loglik_change":float(ll_change),
+            "param_tolerance":float(param_tolerance),"max_param_change":max_change,
+            "max_param_change_interior":float(interior.max()) if interior.size else 0.,
+            "max_param_change_at_bound":float(bounded.max()) if bounded.size else 0.,
+            "parameters_at_bound":int(at_bound.sum()),
+            "parameter_criterion_met":params_ok}
+
+
+def estimate_ability(data, item_table, method="EAP", points=81, prior_sd=1.0):
+    """Estimate person ability under fixed item params. EAP/MAP use N(0, prior_sd²);
+    ML uses likelihood only and flags boundary estimates.
+    Scores are conditional on fitted item parameters; SE is posterior SD (EAP),
+    local curvature approximation (MAP/ML).
+    """
+    from scipy.special import logsumexp
+    x = validate_binary(data)
+    k = x.shape[1]
+    if len(item_table) != k:
+        raise ValueError("Madde sayısı parametre tablosuyla uyuşmuyor.")
+    if method not in ("EAP","MAP","ML"):
+        raise ValueError("Yetenek kestirim yöntemi EAP, MAP veya ML olmalıdır.")
+    if method != "ML" and (prior_sd <= 0 or not np.isfinite(prior_sd)):
+        raise ValueError("Önsel standart sapma pozitif olmalıdır.")
+    a,b,c,d = [np.asarray(item_table[col], dtype=float) for col in ("a","b","c","d")]
+    theta = np.linspace(-5.,5.,int(points))
+    p = np.clip(probabilities(theta,a,b,c,d),1e-10,1-1e-10)
+    loglike = x@np.log(p).T+(1-x)@np.log1p(-p).T
+    logprior = -.5*(theta/prior_sd)**2 if method in ("EAP","MAP") else np.zeros_like(theta)
+    lp = loglike + logprior[None,:]
+    if method=="EAP":
+        weights = np.exp(lp-logsumexp(lp,axis=1,keepdims=True))
+        ability=weights@theta
+        se=np.sqrt(np.maximum(weights@(theta**2)-ability**2,0))
+        bounds=np.zeros(len(x),dtype=bool)
+    else:
+        index=np.argmax(lp,axis=1)
+        ability=theta[index]
+        bounds=(index==0)|(index==len(theta)-1)
+        # Approximate conditional SE from Fisher information and prior precision.
+        iif=information(ability,a,b,c,d).sum(axis=1)
+        prior_precision=(1/prior_sd**2) if method=="MAP" else 0.
+        se=1/np.sqrt(np.maximum(iif+prior_precision,1e-10))
+    return pd.DataFrame({"Yetenek (theta)":ability,
+                         "Standart Hata":se,
+                         "Sınır Kestirimi":bounds})
+
+
+def approximate_q3(data, item_table, theta):
+    """Yen's Q3-like residual correlations conditional on point theta estimates.
+
+    Exploratory diagnostic, not a calibrated hypothesis test. Estimating theta
+    from the same responses typically induces negative residual dependence.
+    """
+    x = validate_binary(data)
+    theta = np.asarray(theta, dtype=float).ravel()
+    if len(theta) != len(x):
+        raise ValueError("Yetenek sayısı kişi sayısıyla uyuşmuyor.")
+    a,b,c,d=(np.asarray(item_table[k],dtype=float) for k in ("a","b","c","d"))
+    expected=probabilities(theta,a,b,c,d)
+    residual=x-expected
+    corr=np.corrcoef(residual,rowvar=False)
+    np.fill_diagonal(corr,np.nan)
+    names=(list(data.columns) if isinstance(data,pd.DataFrame)
+           else [f"M{i+1}" for i in range(x.shape[1])])
+    return pd.DataFrame(corr,index=names,columns=names)
+
+
+def approximate_parameter_uncertainty(data, item_table, model, points=31,
+                                      max_parameters=120, a_upper=4.0,
+                                      d_lower=0.65):
+    """Exploratory OPG covariance based on marginal per-person score vectors.
+
+    Not an observed-Hessian or Louis information SE. Normal intervals can be
+    unreliable close to parameter boundaries; return unavailable in that case.
+    """
+    x=validate_binary(data)
+    n,k=x.shape
+    active={"1PL":["b"],"2PL":["a","b"],"3PL":["a","b","c"],
+            "4PL":["a","b","c","d"]}[model]
+    count=k*len(active)
+    result=pd.DataFrame({"Madde":list(item_table["Madde"])})
+    for name in ("a","b","c","d"):
+        result[f"SE({name})"]=np.nan
+        result[f"{name} %95 alt"]=np.nan
+        result[f"{name} %95 üst"]=np.nan
+    reason=structural_identifiability(k,model)["reason"]
+    if reason:
+        pass
+    elif count>max_parameters or n <= 5*count:
+        reason="OPG için parametre sayısı fazla veya örneklem yetersiz."
+    else:
+        a,b,c,d=[np.asarray(item_table[name],dtype=float) for name in ("a","b","c","d")]
+        bounds={"a":(0.15,a_upper),"b":(-4.,4.),"c":(0.,.35),"d":(d_lower,1.)}
+        for name in active:
+            vv=locals()[name]
+            lo,hi=bounds[name]
+            if np.any((vv-lo)<BOUNDARY_TOLERANCE) or np.any((hi-vv)<BOUNDARY_TOLERANCE):
+                reason="Bir veya daha fazla parametre optimizasyon sınırında."
+                break
+    if not reason:
+        gh,w=hermgauss(points)
+        nodes=np.sqrt(2)*gh
+        z=expit(nodes[:,None]*a[None,:]-(a*b)[None,:])
+        probs=np.clip(c[None,:]+(d-c)[None,:]*z,1e-9,1-1e-9)
+        lpost=x@np.log(probs).T+(1-x)@np.log1p(-probs).T+np.log(w/np.sqrt(np.pi))[None,:]
+        posterior=np.exp(lpost-logsumexp(lpost,axis=1,keepdims=True))
+        scores=np.empty((n,count))
+        for j in range(k):
+            shared=z[:,j]*(1-z[:,j])*(d[j]-c[j])
+            derivatives={
+                "a":shared*(nodes-b[j]),
+                "b":-shared*a[j],
+                "c":1-z[:,j],
+                "d":z[:,j],
+            }
+            scale=(x[:,j,None]-probs[None,:,j]) / (
+                probs[None,:,j]*(1-probs[None,:,j]))
+            for h,name in enumerate(active):
+                scores[:,j*len(active)+h]=(
+                    posterior*(scale*derivatives[name][None,:])).sum(axis=1)
+        opg=scores.T@scores
+        try:
+            cond=np.linalg.cond(opg)
+            if not np.isfinite(cond) or cond>1e9:
+                reason="OPG bilgi matrisi kötü koşullanmış/tekil."
+            else:
+                covariance=np.linalg.inv(opg)
+                diag=np.diag(covariance)
+                if np.any(diag<=0) or not np.isfinite(diag).all():
+                    reason="Pozitif ve sonlu standart hata elde edilemedi."
+                else:
+                    ses=np.sqrt(diag).reshape(k,len(active))
+                    for h,name in enumerate(active):
+                        v=np.asarray(item_table[name],dtype=float)
+                        se=ses[:,h]
+                        result[f"SE({name})"]=se
+                        result[f"{name} %95 alt"]=v-1.96*se
+                        result[f"{name} %95 üst"]=v+1.96*se
+        except np.linalg.LinAlgError:
+            reason="OPG bilgi matrisi terslenemedi."
+    return result, reason
+
+
+def item_fit_by_restscore(data, item_table, min_group=5):
+    """Exploratory item-rest-score Pearson fit diagnostic; NOT Orlando-Thissen S-X2.
+
+    For each item, group examinees by their observed rest score, compute
+    model-expected correct responses averaged over EAP posterior conditional
+    on the rest items alone, then calculate Pearson discrepancies. No
+    inferential p-value is provided because parameters and groups are fitted.
+    """
+    x=validate_binary(data)
+    n,k=x.shape
+    a,b,c,d=[np.asarray(item_table[key],dtype=float) for key in ("a","b","c","d")]
+    gh,w=hermgauss(31)
+    theta=np.sqrt(2)*gh
+    prior=np.log(w/np.sqrt(np.pi))
+    p=np.clip(probabilities(theta,a,b,c,d),1e-9,1-1e-9)
+    names=list(data.columns) if isinstance(data,pd.DataFrame) else [f"M{i+1}" for i in range(k)]
+    out=[]
+    total=x.sum(axis=1)
+    for j in range(k):
+        rest=total-x[:,j]
+        other=np.arange(k)!=j
+        logpost=(x[:,other]@np.log(p[:,other]).T+
+                 (1-x[:,other])@np.log1p(-p[:,other]).T+prior[None,:])
+        weights=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
+        expected=weights@p[:,j]
+        chi=0.
+        groups=0
+        for score in np.unique(rest):
+            take=rest==score
+            size=int(take.sum())
+            if size<min_group:
+                continue
+            obs=float(x[take,j].sum())
+            exp=float(expected[take].sum())
+            variance=max(exp*(1-exp/size),1e-8)
+            chi+=(obs-exp)**2/variance
+            groups+=1
+        out.append({"Madde":names[j],"Rest-puan Pearson":chi if groups>=2 else np.nan,
+                    "Kullanılan grup":groups,
+                    "Kapsanan kişi":int(sum((rest==v).sum() for v in np.unique(rest)
+                                      if (rest==v).sum()>=min_group))})
+    return pd.DataFrame(out)
+
+
+def sx2_pilot(data, item_table, model, points=31, min_expected=5):
+    """Experimental Orlando–Thissen-style S-X2 grouped by observed total score.
+
+    Conditional P(Y_i=1|S=s) is calculated from the marginal IRT model,
+    integrating over standard normal theta by Gauss-Hermite quadrature and
+    Poisson-binomial recursion for the other items. Sparse score groups are
+    excluded; no p-value is reported when asymptotic criteria fail. This
+    implementation has not been benchmarked against mirt::itemfit.
+    """
+    from scipy.stats import chi2
+    x=validate_binary(data)
+    n,k=x.shape
+    a,b,c,d=[np.asarray(item_table[q],dtype=float) for q in ("a","b","c","d")]
+    gh,hw=hermgauss(points)
+    p=np.clip(probabilities(np.sqrt(2)*gh,a,b,c,d),1e-12,1-1e-12)
+    weights=hw/np.sqrt(np.pi)
+    totals=x.sum(axis=1).astype(int)
+    active={"1PL":1,"2PL":2,"3PL":3,"4PL":4}[model]
+    names=list(data.columns) if isinstance(data,pd.DataFrame) else list(item_table["Madde"])
+    out=[]
+    for j in range(k):
+        other=np.delete(p,j,axis=1)
+        distribution=np.ones((len(weights),1))
+        for h in range(k-1):
+            ph=other[:,h,None]
+            updated=np.zeros((len(weights),distribution.shape[1]+1))
+            updated[:,:-1]+=distribution*(1-ph)
+            updated[:,1:]+=distribution*ph
+            distribution=updated
+        # Model probability for full score s and item success at score s.
+        weighted_yes=(weights[:,None]*p[:,j,None]*distribution).sum(axis=0)
+        weighted_no=(weights[:,None]*(1-p[:,j,None])*distribution).sum(axis=0)
+        ps=np.r_[weighted_no,0.] + np.r_[0.,weighted_yes]
+        yes=np.r_[0.,weighted_yes]
+        cond=np.divide(yes,ps,out=np.zeros(k+1),where=ps>1e-12)
+        stat=0.
+        used=0
+        covered=0
+        for score in range(k+1):
+            indices=totals==score
+            m=int(indices.sum())
+            if not m:continue
+            expect=m*cond[score]
+            if expect<min_expected or m-expect<min_expected:
+                continue
+            obs=float(x[indices,j].sum())
+            stat+=(obs-expect)**2/expect + ((m-obs)-(m-expect))**2/(m-expect)
+            used+=1
+            covered+=m
+        df=used-active-1
+        valid=bool(df>0 and covered>=max(30,2*used) and
+                   not bool(item_table.iloc[j].get("Sınır uyarısı",False)))
+        out.append({"Madde":names[j],"S-X² (pilot)":stat if valid else np.nan,
+                    "sd (yaklaşık)":df if valid else np.nan,
+                    "p (yaklaşık)":float(chi2.sf(stat,df)) if valid else np.nan,
+                    "Kullanılan puan grubu":used,
+                    "Kapsanan kişi":covered,
+                    "Durum":"Pilot / bağımsız doğrulama gerekli" if valid
+                    else "Yetersiz grup veya sınır parametresi"})
+    return pd.DataFrame(out)
+================ END core/irt.py ================
+
+================ BEGIN core/irt_hessian.py ================
+"""Experimental observed-information uncertainty for dichotomous IRT.
+
+Numerical Hessian of the analytic marginal score, not OPG. No standard
+errors are produced if any fitted parameter is at its optimization boundary,
+or if the observed information is not demonstrably positive definite.
+Requires independent comparison against R mirt before scientific reporting.
+"""
+import numpy as np
+import pandas as pd
+from scipy.special import expit,logsumexp
+from numpy.polynomial.hermite import hermgauss
+from core.irt import validate_binary, structural_identifiability
+from core.irt_se_diagnostics import BOUNDARY_TOLERANCE
+
+
+def _analytic_marginal_score(x,full,active,theta,logprior):
+    """Exact marginal score at supplied quadrature grid and item parameters."""
+    a,b,c,d=full.T
+    z=expit(theta[:,None]*a[None,:]-a[None,:]*b[None,:])
+    p=np.clip(c[None,:]+(d-c)[None,:]*z,1e-10,1-1e-10)
+    logpost=x@np.log(p).T+(1-x)@np.log1p(-p).T+logprior[None,:]
+    posterior=np.exp(logpost-logsumexp(logpost,axis=1,keepdims=True))
+    weighted=posterior.T@x
+    total=posterior.sum(axis=0)[:,None]
+    scale=(weighted-total*p)/(p*(1-p))
+    common=(d-c)[None,:]*z*(1-z)
+    deriv={"a":common*(theta[:,None]-b[None,:]),
+           "b":-common*a[None,:],"c":1-z,"d":z}
+    return np.stack([(scale*deriv[q]).sum(axis=0) for q in active],
+                    axis=1).reshape(-1)
+
+
+def marginal_score(data,items,model,points=31):
+    """Analytic marginal log-likelihood score for independent derivative tests."""
+    active={"1PL":("b",),"2PL":("a","b"),
+            "3PL":("a","b","c"),"4PL":("a","b","c","d")}[model]
+    x=validate_binary(data)
+    full=np.array([items[q].to_numpy(float) for q in ("a","b","c","d")]).T
+    gh,w=hermgauss(points)
+    return _analytic_marginal_score(
+        x,full,active,np.sqrt(2)*gh,np.log(w/np.sqrt(np.pi)))
+
+
+def observed_information_se(data,items,model,points=31,a_upper=4.,d_lower=.65,
+                            max_parameters=110):
+    x=validate_binary(data)
+    n,k=x.shape
+    active={"1PL":("b",),"2PL":("a","b"),
+            "3PL":("a","b","c"),"4PL":("a","b","c","d")}[model]
+    m=len(active);count=k*m
+    # A positive definite observed information does not prove identification:
+    # with more parameters than 2**k-1 pattern probabilities SEs are meaningless.
+    structural=structural_identifiability(k,model)["reason"]
+    if structural:
+        return None,structural
+    if count>max_parameters:
+        return None,"Bilgi matrisi için parametre sayısı işlem sınırını aşıyor."
+    hessian,reason=_observed_information(x,items,active,points,a_upper,d_lower)
+    if reason:
+        return None,reason
+    info=(hessian+hessian.T)/2
+    eigen=np.linalg.eigvalsh(info)
+    if not np.isfinite(eigen).all() or eigen[0]<=1e-7:
+        return None,"Gözlenen bilgi matrisi pozitif tanımlı değil; SH üretilemez."
+    cond=float(eigen[-1]/eigen[0])
+    if cond>1e8:
+        return None,f"Gözlenen bilgi matrisi kötü koşullanmış (koşul sayısı {cond:.3g})."
+    try:
+        cov=np.linalg.inv(info)
+    except np.linalg.LinAlgError:
+        return None,"Gözlenen bilgi matrisi terslenemedi."
+    variances=np.diag(cov)
+    if np.any(variances<=0) or not np.isfinite(variances).all():
+        return None,"Pozitif, sonlu SH varyansı hesaplanamadı."
+    se=np.sqrt(variances).reshape(k,m)
+    out=pd.DataFrame({"Madde":list(items["Madde"])})
+    for col,q in enumerate(active):
+        out["SH("+q+")"]=se[:,col]
+        out[q+" %95 alt"]=items[q].to_numpy(float)-1.96*se[:,col]
+        out[q+" %95 üst"]=items[q].to_numpy(float)+1.96*se[:,col]
+    return out,""
+
+
+def _observed_information(x,items,active,points,a_upper,d_lower):
+    """Unsymmetrized observed information, or (None, refusal reason)."""
+    k=x.shape[1]
+    m=len(active);count=k*m
+    bound={"a":(.15,a_upper),"b":(-4.,4.),
+           "c":(0.,.35),"d":(d_lower,1.)}
+    original=np.array([items[q].to_numpy(float) for q in ("a","b","c","d")]).T
+    indices=[("a","b","c","d").index(q) for q in active]
+    pars=original[:,indices].reshape(-1)
+    for j,q in enumerate(active):
+        lo,hi=bound[q]
+        vals=pars[j::m]
+        if np.any(vals-lo<BOUNDARY_TOLERANCE) or np.any(hi-vals<BOUNDARY_TOLERANCE):
+            return None,"Parametrelerden biri izin verilen optimizasyon sınırına çok yakın."
+    gh,hw=hermgauss(points)
+    theta=np.sqrt(2)*gh
+    lp=np.log(hw/np.sqrt(np.pi))
+    def score(v):
+        full=original.copy()
+        full[:,indices]=v.reshape(k,m)
+        return _analytic_marginal_score(x,full,active,theta,lp)
+    hessian=np.zeros((count,count))
+    for col in range(count):
+        q=active[col%m]
+        lo,hi=bound[q]
+        step=min(1e-4*max(1,abs(pars[col])),(pars[col]-lo)*.25,
+                 (hi-pars[col])*.25)
+        if step<=1e-8:
+            return None,"Sayısal türev adımı güvenle oluşturulamadı."
+        up=pars.copy();down=pars.copy()
+        up[col]+=step;down[col]-=step
+        hessian[:,col]=-(score(up)-score(down))/(2*step)
+    return hessian,""
+================ END core/irt_hessian.py ================
+
+================ BEGIN core/irt_multistart.py ================
+"""Guarded multi-start 3PL/4PL calibration and reliability audit.
+
+Multi-start is a numerical safeguard, not an identification remedy.
+All candidates and failures are retained. A converged solution is not
+automatically accepted as statistically reliable.
+"""
+import numpy as np
+import pandas as pd
+from core.irt import fit_irt, validate_binary, structural_identifiability
+from core.irt_se_diagnostics import hessian_boundary_diagnostics
+
+def fit_irt_multistart(data,model="3PL",starts=(0.,-1.,1.),**kwargs):
+    if model not in ("3PL","4PL"):
+        raise ValueError("Çoklu başlangıç 3PL/4PL için tasarlanmıştır.")
+    if not starts or len(starts)>7 or not np.isfinite(starts).all():
+        raise ValueError("Geçersiz başlangıç listesi.")
+    if "initial_shift" in kwargs:
+        raise ValueError("initial_shift yerine starts kullanın.")
+    # Data/structure problems are not start-specific: report them directly
+    # instead of logging the same failure once per start.
+    structure=structural_identifiability(validate_binary(data).shape[1],model)
+    if not structure["satisfied"]:
+        raise ValueError(structure["reason"])
+    fits=[]; logs=[]
+    for shift in starts:
+        try:
+            fit=fit_irt(data,model=model,initial_shift=float(shift),**kwargs)
+            if not np.isfinite(fit["loglik"]):
+                raise RuntimeError("Sonlu logLik yok.")
+            diag=hessian_boundary_diagnostics(
+                fit["items"],model,
+                a_upper=fit["a_upper"],d_lower=fit["d_lower"])
+            fits.append((float(shift),fit,diag))
+            logs.append({"Başlangıç":float(shift),"Başarılı":True,
+                         "Yakınsama":bool(fit["converged"]),
+                         "logLik":float(fit["loglik"]),
+                         "Sınırdaki parametre":len(diag),
+                         "Yineleme":int(fit["iterations"]),"Hata":""})
+        except (RuntimeError, ValueError, FloatingPointError,
+                np.linalg.LinAlgError) as exc:
+            logs.append({"Başlangıç":float(shift),"Başarılı":False,
+                         "Yakınsama":False,"logLik":np.nan,
+                         "Sınırdaki parametre":np.nan,
+                         "Yineleme":np.nan,"Hata":str(exc)})
+    if not fits:
+        raise RuntimeError("Hiçbir başlangıçta kestirim üretilemedi.")
+    # Prefer converged candidate; do not silently treat nonconvergence as success.
+    converged=[entry for entry in fits if entry[1]["converged"]]
+    selected=max(converged or fits,key=lambda entry:entry[1]["loglik"])
+    shift,best,diagnostics=selected
+    table=pd.DataFrame(logs)
+    best_loglik=float(best["loglik"])
+    near=table[(table["Yakınsama"])&(table["logLik"]>=best_loglik-.01)]
+    spread=float(near["logLik"].max()-near["logLik"].min()) if len(near)>1 else np.nan
+    summary={
+        "Başlangıç sayısı":len(starts),
+        "Başarılı kestirim":len(fits),
+        "Yakınsayan":len(converged),
+        "Seçilen başlangıç":shift,
+        "Seçilen logLik":best_loglik,
+        "Sınırdaki parametre":len(diagnostics),
+        "Sınırdaki madde":int(diagnostics["Madde"].nunique()),
+        "Eşdeğer logLik aday sayısı":int(len(near)),
+        "Eşdeğer logLik aralığı":spread,
+        "Not":"Yakınsama ve yüksek logLik tek başına parametre "
+              "tanımlanabilirliğini veya SH geçerliğini kanıtlamaz."
+    }
+    return {"fit":best,"candidates":table,"boundary":diagnostics,
+            "summary":summary}
+================ END core/irt_multistart.py ================
+
+================ BEGIN core/irt_model_reliability.py ================
+"""Conservative, descriptive 3PL/4PL calibration reliability assessment.
+
+Not a statistical goodness-of-fit test or evidence of construct validity.
+Never labels a fit scientifically validated solely because EM converged.
+"""
+from core.irt import structural_identifiability
+from core.irt_se_diagnostics import hessian_boundary_diagnostics
+
+
+def model_reliability(fit):
+    model=fit["model"]
+    if model not in ("3PL","4PL"):
+        raise ValueError("Tanı yalnızca 3PL ve 4PL için tasarlanmıştır.")
+    diagnostics=hessian_boundary_diagnostics(
+        fit["items"],model,a_upper=fit.get("a_upper",4.),
+        d_lower=fit.get("d_lower",.65))
+    converged=bool(fit.get("converged",False))
+    k=int(fit["k"])
+    structure=structural_identifiability(k,model)
+    convergence=fit.get("convergence") or {}
+    params_ok=convergence.get("parameter_criterion_met",True)
+    affected=int(diagnostics["Madde"].nunique())
+    events=len(diagnostics)
+    warnings=[]
+    if not structure["satisfied"]:
+        warnings.append(structure["reason"])
+    else:
+        warnings.append(f"Yapısal sayım: {structure['parameters']} serbest parametre, en fazla "
+                        f"{structure['pattern_df']} yanıt örüntüsü serbestlik derecesi. Bu koşul "
+                        "gereklidir ama tanımlanabilirliği kanıtlamaz.")
+    if not converged:
+        warnings.append("EM yakınsama koşulu sağlanmadı.")
+    elif not params_ok:
+        warnings.append(convergence.get("message","Parametre değişimi ölçütü sağlanmadı."))
+    if events:
+        warnings.append(f"{events} parametre sınırda/yakın; {affected}/{k} madde etkilendi. "
+                        "Bu parametreler için Hessian SH ve Wald aralıkları hesaplanmaz.")
+    if model=="4PL":
+        warnings.append("c ve d parametrelerinin birlikte kestirimi zayıf tanımlanabilirlik gösterebilir.")
+    if not structure["satisfied"]:
+        decision="Yapısal olarak tanımlanamaz"
+    elif not converged:
+        decision="Güvenilir kestirim sağlanamadı"
+    elif events or not params_ok:
+        decision="İhtiyatla yorumlanmalı"
+    else:
+        decision="Tanılar açısından ön koşullar sağlandı; bağımsız doğrulama gerekli"
+    return {
+        "Model":model,"Karar":decision,"Yakınsama":converged,
+        "Parametre yakınsaması":bool(params_ok),
+        "Serbest parametre":structure["parameters"],
+        "Örüntü serbestlik derecesi":structure["pattern_df"],
+        "Sınırdaki madde":affected,"Sınırdaki parametre":events,
+        "Madde oranı":affected/k,"Açıklamalar":warnings,
+        "Sınırlılık":"Bu karar yapısal parametre sayımı, sınır kestirimleri ve EM "
+                     "yakınsamasına dayanır. Pozitif tanımlı bir bilgi matrisi ya da madde "
+                     "önselleri tanımlanabilirliği kendiliğinden sağlamaz. Bilgi matrisi, "
+                     "model uyumu, yerel bağımsızlık ve karşılaştırmalı doğrulama ayrıca "
+                     "değerlendirilmelidir."
+    }
+================ END core/irt_model_reliability.py ================
+
+================ BEGIN core/irt_se_diagnostics.py ================
+"""Per-item diagnostics for IRT observed-information standard errors.
+
+Identifies directly observable optimization-boundary conditions. Global
+information-matrix problems cannot be assigned to one specific item without
+further analysis, so those retain a separate model-level warning.
+"""
+import numpy as np
+import pandas as pd
+
+# Shared absolute boundary tolerance for 3PL/4PL diagnostics.
+BOUNDARY_TOLERANCE=1e-3
+
+_ACTIVE={"1PL":("b",),"2PL":("a","b"),
+         "3PL":("a","b","c"),"4PL":("a","b","c","d")}
+_DESCRIPTIONS={
+    "a":"Ayırt edicilik (eğimin dikliği)",
+    "b":"Güçlük / yetenek konumu",
+    "c":"Alt asimptot (düşük yetenekte doğru yanıtlama)",
+    "d":"Üst asimptot (yüksek yetenekte doğru yanıtlama)"
+}
+
+def hessian_boundary_diagnostics(items, model, a_upper=4., d_lower=.65,
+                                  tolerance=BOUNDARY_TOLERANCE):
+    """Return explicit at-bound flags using same strict tolerance as Hessian."""
+    if model not in _ACTIVE:
+        raise ValueError("Bilinmeyen MTK modeli.")
+    boundaries={"a":(.15,float(a_upper)), "b":(-4.,4.),
+                "c":(0.,.35), "d":(float(d_lower),1.)}
+    frame=pd.DataFrame(items)
+    rows=[]
+    for _,item in frame.iterrows():
+        for param in _ACTIVE[model]:
+            value=float(item[param])
+            low,high=boundaries[param]
+            if not np.isfinite(value):
+                side="Geçersiz kestirim"
+            elif value-low<=tolerance:
+                side="Alt sınır"
+            elif high-value<=tolerance:
+                side="Üst sınır"
+            else:
+                continue
+            rows.append({
+                "Madde":str(item["Madde"]),
+                "Parametre":param,
+                "Parametrenin anlamı":_DESCRIPTIONS[param],
+                "Kestirim":value,
+                "Alt sınır":low,
+                "Üst sınır":high,
+                "Sorun":side,
+                "SH durumu":"Model düzeyinde hesaplanamaz",
+                "Ne yapılmalı":"Kodlama/örneklem ve madde içeriğini kontrol edin; "
+                               "daha yalın modelle karşılaştırın; sınırı keyfî değiştirmeyin."
+            })
+    return pd.DataFrame(rows,columns=[
+        "Madde","Parametre","Parametrenin anlamı","Kestirim",
+        "Alt sınır","Üst sınır","Sorun","SH durumu","Ne yapılmalı"])
+================ END core/irt_se_diagnostics.py ================
+
+================ BEGIN tests/test_irt_identifiability_convergence.py ================
+"""B4: structural identifiability and convergence diagnostics for fit_irt."""
+import inspect
+from functools import lru_cache
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import pytest
+from core.irt import (fit_irt, validate_binary, structural_identifiability,
+                      approximate_parameter_uncertainty)
+from core.irt_hessian import observed_information_se
+from core.irt_se_diagnostics import hessian_boundary_diagnostics
+from core.irt_simulation import simulate_irt
+
+MIRT = Path(__file__).parent / "fixtures" / "mirt"
+
+
+@pytest.mark.parametrize("model,k,ok", [("1PL", 3, True), ("2PL", 3, True),
+                                        ("3PL", 3, False), ("3PL", 4, True),
+                                        ("4PL", 4, False), ("4PL", 5, True)])
+def test_parameter_count_against_pattern_degrees_of_freedom(model, k, ok):
+    s = structural_identifiability(k, model)
+    assert s["pattern_df"] == 2**k - 1
+    assert s["satisfied"] is ok and (s["reason"] == "") is ok
+    assert s["parameters"] <= s["pattern_df"] if ok else s["parameters"] > s["pattern_df"]
+
+
+def test_equality_is_not_rejected_and_rule_is_not_in_validate_binary():
+    # parameters == 2**k - 1 does not occur for 1PL-4PL with k>=3; check the
+    # boundary of the rule directly: one parameter fewer/more than the limit.
+    assert list(inspect.signature(validate_binary).parameters) == ["data"]
+    for model in ("3PL", "4PL"):
+        k = 4 if model == "3PL" else 5
+        s = structural_identifiability(k, model)
+        assert s["satisfied"] and s["parameters"] < s["pattern_df"]
+
+
+def _items(k):
+    return pd.DataFrame({"Madde": [f"M{i+1}" for i in range(k)],
+                         "a": np.linspace(1., 1.6, k), "b": np.linspace(-.8, .8, k),
+                         "c": np.linspace(.12, .18, k), "d": np.linspace(.9, .95, k)})
+
+
+@pytest.mark.parametrize("model,k", [("3PL", 3), ("4PL", 3), ("4PL", 4)])
+def test_unidentified_models_are_rejected_before_estimation(model, k):
+    data, _ = simulate_irt(200, _items(k), seed=4)
+    with pytest.raises(ValueError, match="yapısal olarak tanımlanamaz"):
+        fit_irt(data, model, points=11, max_iter=1)
+    _, reason = observed_information_se(data, _items(k), model, points=11)
+    assert "yapısal olarak tanımlanamaz" in reason
+    _, reason = approximate_parameter_uncertainty(data, _items(k), model, points=11)
+    assert "yapısal olarak tanımlanamaz" in reason
+
+
+@lru_cache(maxsize=None)
+def _est_data():
+    return pd.read_csv(MIRT / "data_3pl_est.csv")   # interior 3PL MLE, verified vs mirt (B3)
+
+
+def test_well_identified_fit_is_not_rejected_by_parameter_criterion():
+    fit = fit_irt(_est_data(), "3PL", points=21)
+    conv = fit["convergence"]
+    assert fit["converged"] and conv["status"] == "converged"
+    assert conv["parameter_criterion_met"] and conv["max_param_change"] <= 1e-3
+    assert conv["last_loglik_change"] < conv["loglik_tolerance"]
+    assert fit["warnings"] == []
+    assert len(fit["param_change_history"]) == fit["iterations"] - 1
+    assert fit["param_change_history"][-1] == conv["max_param_change"]
+
+
+def test_loglik_only_convergence_warns_but_keeps_estimate():
+    fit = fit_irt(_est_data(), "3PL", points=21, param_tolerance=1e-5)
+    conv = fit["convergence"]
+    assert fit["converged"]                               # logL criterion unchanged
+    assert conv["status"] == "loglik_only" and not conv["parameter_criterion_met"]
+    assert conv["message"] in fit["warnings"]
+    assert np.isfinite(fit["items"][["a", "b", "c"]].to_numpy()).all()
+
+
+def test_nonconvergence_status():
+    fit = fit_irt(_est_data(), "3PL", points=21, max_iter=2)
+    assert not fit["converged"] and fit["convergence"]["status"] == "not_converged"
+
+
+def test_boundary_parameters_reported_separately():
+    truth = pd.DataFrame({"Madde": [f"M{i}" for i in range(6)], "a": np.linspace(.8, 1.6, 6),
+                          "b": np.linspace(-1, 1, 6), "c": 0., "d": 1.})
+    x, _ = simulate_irt(300, truth, seed=3)                 # B1 fixture: c estimates hit 0
+    fit = fit_irt(x, "3PL", points=21)
+    conv = fit["convergence"]
+    diag = hessian_boundary_diagnostics(fit["items"], "3PL")
+    assert conv["parameters_at_bound"] == len(diag) > 0
+    assert conv["max_param_change"] == max(conv["max_param_change_interior"],
+                                           conv["max_param_change_at_bound"])
+    assert any("optimizasyon sınırında" in w for w in fit["warnings"])
+
+
+def test_invalid_parameter_tolerance():
+    with pytest.raises(ValueError, match="toleransı"):
+        fit_irt(_est_data(), "3PL", points=11, max_iter=1, param_tolerance=0.)
+================ END tests/test_irt_identifiability_convergence.py ================
+
+================ BEGIN tests/test_irt_hessian_3pl4pl_independent.py ================
+"""B2: independent check of the 3PL/4PL observed information and Hessian SEs.
+
+Reference: direct four-point second differences of a marginal log-likelihood
+written here with NumPy/SciPy only (no core likelihood or score code). The
+module differentiates the analytic score instead, so agreement checks the
+score, the parameter ordering and the information -> covariance -> SE chain.
+
+Tolerances come from measured numerical stability (16 fixtures, both models,
+N=400-2000, k=4-6, 21 nodes): the reference itself changes by <=5.1e-7
+(relative to max|H|) between steps h and 2h; module-reference differences
+were <=8.7e-8; score-Jacobian asymmetry <=1.2e-8; SE differences <=2.3e-6
+while the reference SE changes by <=1.9e-6 between h and 2h. Tolerances are
+about 4x-10x those measurements, far below the O(1) entry errors a wrong
+derivative or ordering would cause.
+
+Points are true generating values, not MLEs: in these small 3PL/4PL designs
+fitted solutions reached a parameter bound (SE correctly refused), so an
+interior MLE could not serve as fixture. SEs here verify numerics only and
+carry no sampling interpretation.
+
+B4: 4PL fixtures use k=5 (20 parameters <= 2**5-1 = 31). With k=4 the 4PL has
+16 parameters for 15 pattern degrees of freedom and is structurally
+unidentified; its observed information can still look positive definite, so
+SEs are refused on structural grounds. No identifiable 4PL fixture with a
+positive definite information matrix was found up to k=8, N=4000, so the
+SE chain (model independent) is checked numerically on 3PL; 4PL-specific
+derivatives are covered by the matrix tests here and by the mirt tests (B3).
+"""
+from functools import lru_cache
+import numpy as np
+import pandas as pd
+import pytest
+from numpy.polynomial.hermite import hermgauss
+from scipy.special import expit, logsumexp
+from core.irt_simulation import simulate_irt
+from core.irt_hessian import observed_information_se, _observed_information
+
+POINTS=21
+MATRIX_RTOL=2e-6
+ASYMMETRY_RTOL=1e-7
+SE_RTOL=2e-5
+ACTIVE={"3PL":["a","b","c"],"4PL":["a","b","c","d"]}
+
+
+def _items(model,design,k=None):
+    k=k or (4 if model=="3PL" else 5)
+    if design=="weak":
+        a,b=np.linspace(1.,2.,k),np.linspace(-1,1,k)
+        c,d=np.linspace(.12,.2,k),np.linspace(.85,.92,k)
+    else:
+        a,b=np.linspace(2.,2.6,k),np.linspace(-.4,.4,k)
+        c,d=np.linspace(.15,.22,k),np.linspace(.82,.88,k)
+    return pd.DataFrame({"Madde":[f"M{i+1}" for i in range(k)],"a":a,"b":b,"c":c,
+                         "d":np.ones(k) if model=="3PL" else d})
+
+
+def _loglik(x,a,b,c,d):
+    g,w=hermgauss(POINTS)
+    theta=np.sqrt(2.)*g
+    p=c+(d-c)*expit(a*(theta[:,None]-b))
+    return float(logsumexp(x@np.log(p).T+(1-x)@np.log1p(-p).T
+                           +np.log(w/np.sqrt(np.pi)),axis=1).sum())
+
+
+def _reference_information(x,items,model,scale=1e-4):
+    act=ACTIVE[model]; m=len(act)
+    v=items[act].to_numpy(float).reshape(-1)
+    def f(z):
+        t=items.copy(); t[act]=z.reshape(-1,m)
+        return _loglik(x,*(t[q].to_numpy(float) for q in "abcd"))
+    h=scale*np.maximum(1.,np.abs(v)); n=len(v); info=np.zeros((n,n))
+    for i in range(n):
+        for j in range(i+1):
+            ei=np.zeros(n); ej=np.zeros(n); ei[i]=h[i]; ej[j]=h[j]
+            info[i,j]=info[j,i]=-(f(v+ei+ej)-f(v+ei-ej)-f(v-ei+ej)+f(v-ei-ej))/(4*h[i]*h[j])
+    return info
+
+
+@lru_cache(maxsize=None)
+def _case(model,design,n):
+    items=_items(model,design)
+    data,_=simulate_irt(n,items,seed=2026)
+    x=data.to_numpy(float)
+    raw,reason=_observed_information(x,items,ACTIVE[model],POINTS,4.,.65)
+    assert not reason
+    return items,data,raw,_reference_information(x,items,model)
+
+
+CASES=[(m,design,n) for m in ("3PL","4PL") for design,n in (("weak",400),("strong",2000))]
+
+
+@pytest.mark.parametrize("model,design,n",CASES)
+def test_information_matches_direct_loglik_second_differences(model,design,n):
+    _,_,raw,ref=_case(model,design,n)
+    scale=np.abs(ref).max()
+    assert np.abs(raw-raw.T).max()<=ASYMMETRY_RTOL*scale
+    info=(raw+raw.T)/2
+    assert np.abs(info-ref).max()<=MATRIX_RTOL*scale
+    gap=np.linalg.norm(info-ref,2)
+    assert np.abs(np.linalg.eigvalsh(info)-np.linalg.eigvalsh(ref)).max()<=gap*(1+1e-6)+1e-9
+
+
+@pytest.mark.parametrize("model,design,n",[("3PL","weak",400),("4PL","weak",400),
+                                            ("4PL","strong",2000)])
+def test_indefinite_information_is_refused_consistently(model,design,n):
+    items,data,_,ref=_case(model,design,n)
+    assert np.linalg.eigvalsh(ref)[0]<0
+    table,reason=observed_information_se(data,items,model,points=POINTS)
+    assert table is None
+    assert "pozitif tanımlı değil" in reason
+
+
+@pytest.mark.parametrize("model",["3PL"])
+def test_hessian_se_matches_independent_inverse(model):
+    items,data,_,ref=_case(model,"strong",2000)
+    eig=np.linalg.eigvalsh(ref)
+    assert eig[0]>1e-7 and eig[-1]/eig[0]<1e8
+    table,reason=observed_information_se(data,items,model,points=POINTS)
+    assert not reason, reason
+    act=ACTIVE[model]
+    expected=np.sqrt(np.diag(np.linalg.inv(ref))).reshape(len(items),len(act))
+    for h,q in enumerate(act):
+        se=table[f"SH({q})"].to_numpy(float)
+        np.testing.assert_allclose(se,expected[:,h],rtol=SE_RTOL,atol=0)
+        est=items[q].to_numpy(float)
+        np.testing.assert_allclose(table[f"{q} %95 alt"],est-1.96*se,rtol=0,atol=1e-12)
+        np.testing.assert_allclose(table[f"{q} %95 üst"],est+1.96*se,rtol=0,atol=1e-12)
+
+
+def test_item_order_permutes_standard_errors():
+    items,data,_,_=_case("3PL","strong",2000)
+    base,_=observed_information_se(data,items,"3PL",points=POINTS)
+    order=[2,0,3,1]
+    swapped,reason=observed_information_se(data.iloc[:,order],
+                                           items.iloc[order].reset_index(drop=True),
+                                           "3PL",points=POINTS)
+    assert not reason
+    assert list(swapped["Madde"])==list(items["Madde"].iloc[order])
+    for q in ACTIVE["3PL"]:
+        np.testing.assert_allclose(swapped[f"SH({q})"].to_numpy(),
+                                   base[f"SH({q})"].to_numpy()[order],rtol=1e-8)
+
+
+def test_structurally_unidentified_4pl_se_refused_despite_positive_definite_matrix():
+    """4PL with k=4: 16 parameters > 15 pattern degrees of freedom."""
+    items=_items("4PL","strong",k=4)
+    data,_=simulate_irt(2000,items,seed=2026)
+    raw,reason=_observed_information(data.to_numpy(float),items,ACTIVE["4PL"],POINTS,4.,.65)
+    assert not reason
+    eig=np.linalg.eigvalsh((raw+raw.T)/2)
+    assert eig[0]>1e-7 and eig[-1]/eig[0]<1e8      # passes the numerical gates
+    table,reason=observed_information_se(data,items,"4PL",points=POINTS)
+    assert table is None
+    assert "yapısal olarak tanımlanamaz" in reason
+================ END tests/test_irt_hessian_3pl4pl_independent.py ================
+
+================ BEGIN tests/test_irt_mirt_reference.py ================
+"""B3: 3PL/4PL comparison with R mirt 1.48 on matched fixtures.
+
+Reference values: tests/fixtures/mirt/mirt_results.csv, produced by
+scripts/mirt_reference_3pl4pl.R (provenance in mirt_session.txt). Fixtures
+come from scripts/make_mirt_fixtures.py. Only methodologically equivalent
+quantities are compared:
+
+* Parameterization: mirt P = g + (u-g)/(1+exp(-(a1*theta+d))), g and u on
+  the logit scale internally; Python a=a1, b=-d/a1, c=g, d=u.
+* Integration: identical 21-node Gauss-Hermite grid in both programs
+  (mirt technical customTheta/customPriorFun).
+* Derivatives: mirt quantities are in its internal space (a1, d, logit g,
+  logit u). They are mapped with K = d(theta_mirt)/d(theta_python) and, for
+  Hessians away from a stationary point, the second-order term
+  sum_k g_k * d2 theta_mirt_k (omitting it changes the matrix by 10-30%).
+* mirt's SE.type numerical Hessian (R/utils.R::BL.LL) re-weights the nodes by
+  dnorm(theta)/sum and ignores customPriorFun; it is therefore compared on
+  mirt's default 61-node grid, where logLik uses the same weights.
+
+Tolerances (relative to the largest absolute entry) come from measured
+agreement and from mirt's own numerical spread (Richardson vs central):
+gradient: observed <=2.7e-9, mirt spread ~4e-9 -> 5e-8; Hessian: observed
+<=6.6e-8, mirt spread <=1.0e-6 -> 1e-5; SE: observed <=7.7e-8 -> 1e-5.
+"""
+from functools import lru_cache
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import pytest
+from numpy.polynomial.hermite import hermgauss
+from core.irt import fit_irt, probabilities
+from core.irt_hessian import (_analytic_marginal_score, _observed_information,
+                              marginal_score, observed_information_se)
+from core.irt_quadrature_validation import marginal_loglik_at_fixed_parameters
+
+FIX = Path(__file__).parent / "fixtures" / "mirt"
+RESULTS = FIX / "mirt_results.csv"
+if not RESULTS.exists():
+    pytest.skip("R mirt reference values missing: run scripts/mirt_reference_3pl4pl.R "
+                "(open validation task; no reference values are invented).",
+                allow_module_level=True)
+
+GRADIENT_RTOL = 5e-8
+HESSIAN_RTOL = 1e-5
+SE_RTOL = 1e-5
+POINTS = 21
+ACTIVE = {"3PL": ["a", "b", "c"], "4PL": ["a", "b", "c", "d"]}
+CASES = pd.read_csv(FIX / "cases.csv")
+FIXED = [c for c in CASES["case"] if not c.endswith("_est")]
+
+
+@lru_cache(maxsize=None)
+def _results():
+    return pd.read_csv(RESULTS, keep_default_na=False, na_values=["NA"])
+
+
+@lru_cache(maxsize=None)
+def _case(case):
+    row = CASES.set_index("case").loc[case]
+    data = pd.read_csv(FIX / f"data_{case}.csv")
+    items = pd.read_csv(FIX / f"items_{case}.csv")
+    r = _results()
+    return row["model"], data, items, r[r["case"] == case]
+
+
+def _vector(r, quantity):
+    return r[r["quantity"] == quantity]["value"].to_numpy(float)
+
+
+def _matrix(r, quantity):
+    v = _vector(r, quantity)
+    n = int(round(np.sqrt(len(v))))
+    return v.reshape(n, n) if len(v) else None
+
+
+def _jacobian(items, model):
+    """K = d(a1, d, logit g, logit u)/d(a, b, c, d) and second-derivative terms."""
+    m = len(ACTIVE[model]); n = len(items) * m
+    K = np.zeros((n, n)); second = []
+    for j, (a, b, c, d) in enumerate(items[["a", "b", "c", "d"]].to_numpy(float)):
+        o = j * m
+        K[o, o] = 1.
+        K[o + 1, o], K[o + 1, o + 1] = -b, -a
+        K[o + 2, o + 2] = 1 / (c * (1 - c))
+        second += [(o + 1, o, o + 1, -1.), (o + 2, o + 2, o + 2, -(1 - 2 * c) / (c * (1 - c)) ** 2)]
+        if m == 4:
+            K[o + 3, o + 3] = 1 / (d * (1 - d))
+            second.append((o + 3, o + 3, o + 3, -(1 - 2 * d) / (d * (1 - d)) ** 2))
+    return K, second
+
+
+def _python_space_hessian(h_mirt, g_mirt, K, second, with_second_order=True):
+    h = K.T @ h_mirt @ K
+    if with_second_order:
+        for k, i, j, val in second:
+            h[i, j] += g_mirt[k] * val
+            if i != j:
+                h[j, i] += g_mirt[k] * val
+    return h
+
+
+def _info_on_grid(x, items, model, theta, logprior):
+    """Observed information on an arbitrary grid: central differences of the
+    module's analytic score (same construction as _observed_information)."""
+    act = tuple(ACTIVE[model]); m = len(act); idx = ["abcd".index(q) for q in act]
+    full = items[["a", "b", "c", "d"]].to_numpy(float)
+    v = full[:, idx].reshape(-1); out = np.zeros((len(v), len(v)))
+    for col in range(len(v)):
+        h = 1e-4 * max(1., abs(v[col]))
+        up, dn = full.copy(), full.copy()
+        up[:, idx] = (v + h * (np.arange(len(v)) == col)).reshape(-1, m)
+        dn[:, idx] = (v - h * (np.arange(len(v)) == col)).reshape(-1, m)
+        out[:, col] = -(_analytic_marginal_score(x, up, act, theta, logprior)
+                        - _analytic_marginal_score(x, dn, act, theta, logprior)) / (2 * h)
+    return (out + out.T) / 2, _analytic_marginal_score(x, full, act, theta, logprior)
+
+
+@pytest.mark.parametrize("case", FIXED)
+def test_parameterization_matches_mirt_probtrace(case):
+    model, _, items, r = _case(case)
+    pt = r[r["quantity"] == "probtrace"]
+    theta = pt["col"].astype(float).unique()
+    expected = np.array([pt[pt["row"] == name]["value"].to_numpy(float)
+                         for name in items["Madde"]]).T
+    got = probabilities(theta, *(items[q].to_numpy(float) for q in "abcd"))
+    np.testing.assert_allclose(got, expected, rtol=0, atol=1e-12)
+
+
+@pytest.mark.parametrize("case", FIXED)
+def test_marginal_loglik_matches_mirt_on_gauss_hermite_grid(case):
+    _, data, items, r = _case(case)
+    expected = _vector(r, "loglik_gh21")[0]
+    got = marginal_loglik_at_fixed_parameters(data, items, points=POINTS)
+    assert got == pytest.approx(expected, rel=1e-12)
+
+
+@pytest.mark.parametrize("case", FIXED)
+def test_marginal_score_matches_mirt_gradient(case):
+    model, data, items, r = _case(case)
+    K, _ = _jacobian(items, model)
+    expected = K.T @ _vector(r, "gradient_internal_Richardson")
+    got = marginal_score(data, items, model, points=POINTS)
+    assert np.abs(got - expected).max() <= GRADIENT_RTOL * np.abs(got).max()
+
+
+@pytest.mark.parametrize("case", FIXED)
+def test_observed_information_matches_mirt_loglik_hessian(case):
+    model, data, items, r = _case(case)
+    K, second = _jacobian(items, model)
+    g = _vector(r, "gradient_internal_Richardson")
+    h_mirt = _matrix(r, "hessian_internal_Richardson")
+    raw, reason = _observed_information(data.to_numpy(float), items, ACTIVE[model], POINTS, 4., .65)
+    assert not reason
+    info = (raw + raw.T) / 2
+    scale = np.abs(info).max()
+    reference = -_python_space_hessian(h_mirt, g, K, second)
+    assert np.abs(info - reference).max() <= HESSIAN_RTOL * scale
+    gap = np.linalg.norm(info - reference, 2)   # Weyl bound for eigenvalues
+    assert np.abs(np.linalg.eigvalsh(info) - np.linalg.eigvalsh(reference)).max() <= gap * (1 + 1e-6) + 1e-9
+    # The Jacobian's second-order term is not negligible away from the MLE.
+    naive = -_python_space_hessian(h_mirt, g, K, second, with_second_order=False)
+    assert np.abs(info - naive).max() > 100 * HESSIAN_RTOL * scale
+
+
+@pytest.mark.parametrize("case", FIXED)
+def test_standard_error_refusal_agrees_with_mirt(case):
+    model, data, items, r = _case(case)
+    _, reason = observed_information_se(data, items, model, points=POINTS)
+    mirt_available = _matrix(r, "vcov_internal_default61_Richardson") is not None
+    assert (not reason) == mirt_available
+    if reason:
+        assert "pozitif tanımlı değil" in reason
+
+
+def test_standard_errors_match_mirt_gauss_hermite_hessian():
+    model, data, items, r = _case("3pl_strong")
+    K, second = _jacobian(items, model)
+    info = -_python_space_hessian(_matrix(r, "hessian_internal_Richardson"),
+                                  _vector(r, "gradient_internal_Richardson"), K, second)
+    expected = np.sqrt(np.diag(np.linalg.inv(info))).reshape(len(items), -1)
+    table, reason = observed_information_se(data, items, model, points=POINTS)
+    assert not reason
+    got = table[[f"SH({q})" for q in ACTIVE[model]]].to_numpy(float)
+    np.testing.assert_allclose(got, expected, rtol=SE_RTOL, atol=0)
+
+
+def test_mirt_se_type_on_default_grid():
+    """mirt's own SE.type='Richardson' route, on its default 61-node grid."""
+    model, data, items, r = _case("3pl_strong")
+    x = data.to_numpy(float)
+    theta = np.linspace(-6, 6, 61)
+    w = np.exp(-theta ** 2 / 2); w /= w.sum()
+    p = probabilities(theta, *(items[q].to_numpy(float) for q in "abcd"))
+    ll = float(np.log(np.exp(x @ np.log(p).T + (1 - x) @ np.log1p(-p).T) @ w).sum())
+    assert ll == pytest.approx(_vector(r, "loglik_default61")[0], rel=1e-12)
+    info, score = _info_on_grid(x, items, model, theta, np.log(w))
+    K, second = _jacobian(items, model)
+    g = _vector(r, "gradient_internal_default61")
+    assert np.abs(score - K.T @ g).max() <= GRADIENT_RTOL * np.abs(score).max()
+    reference = -_python_space_hessian(-np.linalg.inv(_matrix(r, "vcov_internal_default61_Richardson")),
+                                       g, K, second)
+    assert np.abs(info - reference).max() <= HESSIAN_RTOL * np.abs(info).max()
+    np.testing.assert_allclose(np.sqrt(np.diag(np.linalg.inv(info))),
+                               np.sqrt(np.diag(np.linalg.inv(reference))), rtol=SE_RTOL)
+
+
+def test_mirt_numerical_se_ignores_custom_prior_weights():
+    """Documents mirt 1.48 behaviour behind the default-grid choice above."""
+    model, data, items, r = _case("3pl_strong")
+    x = data.to_numpy(float)
+    gx, gw = hermgauss(POINTS)
+    nodes = np.sqrt(2.) * gx
+    dn = np.exp(-nodes ** 2 / 2); dn /= dn.sum()
+    K, second = _jacobian(items, model)
+    h_mirt = -np.linalg.inv(_matrix(r, "vcov_internal_customgh_Richardson"))
+    info_dn, score_dn = _info_on_grid(x, items, model, nodes, np.log(dn))
+    ref_dn = -_python_space_hessian(h_mirt, np.linalg.solve(K.T, score_dn), K, second)
+    assert np.abs(info_dn - ref_dn).max() <= HESSIAN_RTOL * np.abs(info_dn).max()
+    info_gh, score_gh = _info_on_grid(x, items, model, nodes, np.log(gw / np.sqrt(np.pi)))
+    ref_gh = -_python_space_hessian(h_mirt, np.linalg.solve(K.T, score_gh), K, second)
+    assert np.abs(info_gh - ref_gh).max() > 100 * HESSIAN_RTOL * np.abs(info_gh).max()
+
+
+@lru_cache(maxsize=None)
+def _python_free_fit():
+    _, data, _, _ = _case("3pl_est")
+    return fit_irt(data, "3PL", points=POINTS, max_iter=3000, tolerance=1e-8)
+
+
+def test_free_3pl_estimates_match_mirt():
+    model, data, _, r = _case("3pl_est")
+    assert r[r["quantity"] == "prior_types"]["row"].iloc[0] == "none"
+    assert _vector(r, "fit_converged")[0] == 1
+    est = r[r["quantity"] == "fit_irtpars"].pivot(index="row", columns="col", values="value")
+    est = est.loc[list(data.columns)]
+    mirt_items = pd.DataFrame({"Madde": data.columns, "a": est["a"].to_numpy(float),
+                               "b": est["b"].to_numpy(float), "c": est["g"].to_numpy(float), "d": 1.})
+    mirt_ll = _vector(r, "fit_loglik")[0]
+    # mirt's MLE is a stationary point of the Python likelihood (same objective).
+    assert marginal_loglik_at_fixed_parameters(data, mirt_items, points=POINTS) == pytest.approx(mirt_ll, rel=1e-12)
+    assert np.abs(marginal_score(data, mirt_items, model, points=POINTS)).max() / len(data) <= 1e-6
+    fit = _python_free_fit()
+    assert fit["converged"] and not fit["items"]["Sınır uyarısı"].any()
+    # Python's EM stops slightly earlier (|dLL| < 1e-8 per cycle); differences
+    # must be a negligible fraction of sampling error and never exceed mirt's maximum.
+    assert -1e-6 <= mirt_ll - fit["loglik"] <= 1e-4
+    se, reason = observed_information_se(data, mirt_items, model, points=POINTS)
+    assert not reason
+    for q in ACTIVE[model]:
+        diff = np.abs(fit["items"][q].to_numpy(float) - mirt_items[q].to_numpy(float))
+        assert (diff / se[f"SH({q})"].to_numpy(float)).max() <= .01
+
+
+@pytest.mark.parametrize("model,k,rejected",[("3PL",3,True),("3PL",4,False),
+                                              ("4PL",4,True),("4PL",5,False)])
+def test_structural_parameter_count_rule_matches_mirt(model,k,rejected):
+    """Resolved in B4: like mirt (16 > 15 for 4PL, k=4), fit_irt rejects models
+    with more free parameters than 2**k-1 pattern degrees of freedom."""
+    case="3pl_weak" if k==4 else "4pl_weak"          # k=4 and k=5 fixtures
+    data=_case(case)[1].iloc[:,:k]
+    if rejected:
+        with pytest.raises(ValueError,match="yapısal olarak tanımlanamaz"):
+            fit_irt(data,model,points=11,max_iter=1)
+    else:
+        assert fit_irt(data,model,points=11,max_iter=1)["structure"]["satisfied"]
+================ END tests/test_irt_mirt_reference.py ================
+
+================ BEGIN tests/test_irt_model_reliability.py ================
+import pandas as pd
+from core.irt_model_reliability import model_reliability
+
+def _fit(converged=True, a=1.2, c=.12, d=.95, k=5, convergence=None):
+    # 4PL with k=5 is structurally identifiable (20 <= 2**5-1).
+    items=pd.DataFrame({"Madde":["M1","M2","M3","M4","M5"],
+                        "a":[a,1.,1.5,1.1,1.3],"b":[-.3,0.,.7,.2,-.5],
+                        "c":[c,.1,.13,.11,.12],"d":[d,.96,.92,.94,.93]}).head(k)
+    out={"model":"4PL","k":k,"converged":converged,
+         "a_upper":4.,"d_lower":.65,"items":items}
+    if convergence is not None:
+        out["convergence"]=convergence
+    return out
+
+def test_no_boundary_does_not_claim_validation():
+    x=model_reliability(_fit())
+    assert x["Yakınsama"]
+    assert x["Sınırdaki parametre"]==0
+    assert "bağımsız doğrulama" in x["Karar"]
+
+def test_boundary_is_cautioned_with_count():
+    x=model_reliability(_fit(a=4.,c=0.,d=1.))
+    assert x["Sınırdaki madde"]==1
+    assert x["Sınırdaki parametre"]==3
+    assert x["Karar"]=="İhtiyatla yorumlanmalı"
+
+def test_nonconverged_is_not_reported_as_reliable():
+    x=model_reliability(_fit(converged=False))
+    assert x["Karar"]=="Güvenilir kestirim sağlanamadı"
+
+
+def test_structurally_unidentified_fit_is_labelled_as_such():
+    x=model_reliability(_fit(k=4))
+    assert x["Karar"]=="Yapısal olarak tanımlanamaz"
+    assert (x["Serbest parametre"],x["Örüntü serbestlik derecesi"])==(16,15)
+
+
+def test_loglik_only_convergence_is_cautioned_not_rejected():
+    x=model_reliability(_fit(convergence={"parameter_criterion_met":False,
+                                          "message":"parametreler hâlâ değişiyor"}))
+    assert x["Yakınsama"] and not x["Parametre yakınsaması"]
+    assert x["Karar"]=="İhtiyatla yorumlanmalı"
+    assert "parametreler hâlâ değişiyor" in x["Açıklamalar"]
+================ END tests/test_irt_model_reliability.py ================
+
+================ BEGIN tests/test_irt_multistart.py ================
+import numpy as np
+import pandas as pd
+import pytest
+from core.irt_multistart import fit_irt_multistart
+
+def _responses(k=4):
+    rng=np.random.default_rng(24)
+    theta=rng.normal(size=120)
+    a=np.array([.8,1.,1.4,1.2,1.1])[:k]
+    b=np.array([-.9,-.2,.3,.9,0.])[:k]
+    prob=.1+.9/(1+np.exp(-a[None,:]*(theta[:,None]-b[None,:])))
+    return pd.DataFrame((rng.random(prob.shape)<prob).astype(int),
+                        columns=[f"M{i+1}" for i in range(k)])
+
+@pytest.mark.parametrize("model",["3PL","4PL"])
+def test_multistart_returns_audited_candidate_and_keeps_failures_visible(model):
+    data=_responses(5 if model=="4PL" else 4)   # 4PL needs k>=5 (2**k-1 >= 4k)
+    result=fit_irt_multistart(data,model=model,
+                             starts=(0.,-1.,1.),points=11,max_iter=3)
+    assert len(result["candidates"])==3
+    assert result["fit"]["model"]==model
+    assert result["summary"]["Başarılı kestirim"]>=1
+    assert len(result["boundary"])==result["summary"]["Sınırdaki parametre"]
+    assert np.isfinite(result["summary"]["Seçilen logLik"])
+    assert result["fit"]["loglik"]==result["summary"]["Seçilen logLik"]
+
+def test_multistart_refuses_invalid_inputs():
+    x=_responses()
+    with pytest.raises(ValueError,match="3PL/4PL"):
+        fit_irt_multistart(x,model="2PL")
+    with pytest.raises(ValueError,match="başlangıç"):
+        fit_irt_multistart(x,starts=())
+
+
+def test_multistart_reports_structural_unidentifiability_once():
+    with pytest.raises(ValueError,match="yapısal olarak tanımlanamaz"):
+        fit_irt_multistart(_responses(4),model="4PL",starts=(0.,-1.,1.))
+================ END tests/test_irt_multistart.py ================
+
+================ BEGIN docs/IRT_3PL_4PL_VALIDATION.md ================
+# 3PL / 4PL scientific validation record
+
+**Status:** Internal verification and simulations are available. **NOT independently
+validated against an external calibration implementation under matched fixed
+parameters and real data.** The software must not claim otherwise.
+
+## Model and numerical definition
+
+- Dichotomous unidimensional logistic IRT:
+  `P_i(theta)=c_i+(d_i-c_i) sigmoid[a_i(theta-b_i)]`.
+- Identification: examinee ability prior N(0,1), fixed. 3PL fixes d=1.
+- Estimation: Gauss-Hermite marginal maximum likelihood, EM, L-BFGS-B
+  itemwise M step, bounded parameter space.
+- Original default limits: a in [0.15,4], b in [-4,4], c in [0,.35],
+  4PL d in [.65,1]. Expanded limits are exploratory, not recommended
+  as a fix for identifiability.
+- Convergence: marginal log-likelihood increment under configured tolerance;
+  nonconvergence is reported and never interpreted as proven reliability.
+- Three deterministic EM starting positions can be compared; selected converged
+  candidate maximizes the fitted marginal log-likelihood.
+- 3PL and 4PL with many parameters can remain practically unidentifiable,
+  even when the EM stopping rule fires.
+
+## What has been independently checked internally
+
+- Data generation reproducibility, probability frequencies, and parameter
+  admissibility (automated deterministic tests).
+- Fitted solution selection across starting points and per-start audit.
+- Repeated-simulation design, seed tracking, empirical bias, MAE and RMSE.
+- Paired (same observed data) one-start versus three-start benchmark.
+- Boundary proximity flags and conservative model-reliability interpretation.
+- Refusal to claim Hessian standard errors on nonconverged fits.
+- Hessian observed information numerical tests for 1PL/2PL. **This is
+  NOT evidence of 3PL/4PL SE equivalence to external software.**
+
+## Preliminary simulation results (NOT publication-grade)
+
+From [2026-10-17 paired generating-model simulation](https://github.com/Tatung40/psikoanaliz/actions/runs/38999527120):
+25 items, data generated under the correct model, three replications per
+sample size, Gauss-Hermite with 21 nodes, max 70 EM iterations.
+
+| N | 3PL correct-model MAE(a) | 4PL correct-model MAE(a) |
+|---|---:|---:|
+| 200 | 0.606 | 1.143 |
+| 500 | 0.316 | 0.883 |
+| 1000 | 0.243 | 0.746 |
+| 2000 | 0.153 | 0.405 |
+
+MAE improvements with N are promising but no uncertainty intervals are
+justifiable at three replications. The 4PL has substantial boundary and
+identification issues; do not interpret mere convergence as correctness.
+Mismatched fitted and generating models must be labeled separately.
+
+## Required before externally validated / publication-ready designation
+
+1. Fixed-parameter comparison of 3PL and 4PL log-likelihood, gradients,
+   model fit, and covariance / standard errors with independent R mirt,
+   or another rigorously verified scientific implementation.
+2. Full Monte Carlo design with multiple truth regimes:
+   a, b, c, d ranges, ability distributions, sample sizes, item counts,
+   and at least dozens (preferably 100+) successful and failed replications
+   separately accounted for in Monte Carlo standard errors.
+3. Coverage assessment of 3PL/4PL SE intervals against known true item
+   parameters, including near-boundary scenarios and failure rates.
+4. Sensitivity to quadrature nodes, EM iteration limits, tolerance,
+   initialization, and alternative optimization paths.
+5. Runtime/memory under concurrent Streamlit users and the constrained
+   free host. Avoid heavy simulations in the interactive request thread.
+6. Documentation: no automatic choice of the most complex model; model
+   fit, local dependence, information-matrix eigenvalues and boundary
+   diagnostics need triangulation.
+
+**Do not remove the experimental 3PL/4PL SH warning solely because unit
+tests or internal simulations pass.**
+
+## Further internal verifications and reproducible commands
+
+- `tests/test_irt_3pl4pl_marginal_gradient.py`: independent finite differences
+  of the marginal log-likelihood verify the analytic 3PL/4PL score.
+- `tests/test_irt_3pl4pl_mathematical_consistency.py`: independent check of
+  ICC information, marginal log-likelihood, AIC and BIC identities.
+- `core/irt_stationarity.py`: per-parameter first-order KKT necessary
+  condition (gradient per examinee; descriptive threshold, not proof).
+- `core/irt_truth_scenarios.py`: five explicitly bounded parameter regimes.
+- `core/irt_quadrature_validation.py`: different estimation quadratures
+  compared on one common high-resolution likelihood grid.
+- `core/irt_se_coverage.py`: report *availability* of Hessian SE before
+  conditional interval coverage, including all declined runs.
+- `core/irt_model_reliability.py`: qualitative diagnostic status; never
+  equates convergence with validation.
+
+For complete deterministic CI tests, review the standard GitHub Actions
+`PsikoAnaliz tests` workflow. Scientific evidence is stored separately
+under `IRT benchmark (opt-in)`, `IRT multistart empirical check`, and
+`IRT 3PL 4PL internal scientific audit`.
+
+The early paired initialization experiment is stored in
+[GitHub Actions run 39000776556](https://github.com/Tatung40/psikoanaliz/actions/runs/39000776556).
+For 4PL N=500 with two replications, three initializations changed the
+convergence count from 1/2 to 2/2, but required about three times the
+computation and did not establish lower parameter error. Therefore one
+or three starts remain user-selectable.
+
+None of these internal studies, even if all workflows succeed, substitutes
+for independent implementation equivalence or full Monte Carlo evidence
+with quantified Monte Carlo sampling error.
+
+## Extended matched-generating-model Monte Carlo (10 replications per N)
+
+Completed [GitHub Actions run 39001046381](https://github.com/Tatung40/psikoanaliz/actions/runs/39001046381)
+with N=200,500,1000,2000; 25 items; 10 replications for *each*
+generating model and sample size; maximum 70 EM iterations, 21
+Gauss-Hermite points, single default start. Results are conditional
+on converged calibrations.
+
+| N | Correct 3PL convergence | 3PL MAE(a) | 3PL mean boundary parameters | Correct 4PL convergence | 4PL MAE(a) | 4PL mean boundary parameters |
+|---|---:|---:|---:|---:|---:|---:|
+| 200 | 10/10 | 0.544 | 12.6 | 10/10 | 1.162 | 31.2 |
+| 500 | 10/10 | 0.311 | 7.4 | 9/10 | 0.857 | 22.3 |
+| 1000 | 10/10 | 0.188 | 6.2 | 7/10 | 0.704 | 16.1 |
+| 2000 | 10/10 | 0.153 | 4.6 | 10/10 | 0.452 | 15.7 |
+
+Across each generative branch 80 model fits were attempted because both
+3PL and 4PL were fitted to each simulated dataset; 79/80 and 76/80
+converged respectively, including misspecified model fits. The table
+above reports only *matched* generating/fitted model pairs. Ten draws
+per condition remain exploratory and cannot establish nominal statistical
+coverage, general robustness or universal bias properties.
+
+The [independent internal 3PL/4PL audit](https://github.com/Tatung40/psikoanaliz/actions/runs/39001405713)
+tested a five-item N=500 stress case. Neither model supplied a
+publishable Hessian CI: 3PL SE was refused in both runs and 4PL
+calibration did not converge in both runs. The automated refusal guards
+correctly prevented presenting these as valid intervals.
+
+**Final scientific boundary:** software regression tests and internal
+numerical identities are passed, but neither an external real-data
+calibration comparison nor broad SE interval coverage studies have been
+completed. This is an implementation validation stage, not a claim that
+3PL/4PL are fully scientifically validated.
+
+## External comparison with R mirt 1.48 (B3, fixed-parameter and 3PL estimation)
+
+Reproduce: `python scripts/make_mirt_fixtures.py`, then
+`Rscript scripts/mirt_reference_3pl4pl.R` (writes `tests/fixtures/mirt/mirt_results.csv`
+and `mirt_session.txt`; R 4.3.3, mirt 1.48 built from source commit
+a955235, SimDesign 2.24, Deriv 4.2.0). Checked by `tests/test_irt_mirt_reference.py`.
+
+Matched conditions: mirt `P=g+(u-g)/(1+exp(-(a1*theta+d)))` with `a=a1`, `b=-d/a1`,
+`c=g`, `d=u`; g and u are stored on the logit scale inside mirt, so derivatives are
+mapped with the Jacobian including its second-order term. Integration uses the same
+21-node Gauss-Hermite grid (`customTheta`, `customPriorFun`). Fixtures: 3PL k=4 and
+4PL k=5 (N=400 and 2000), and a 3PL k=8, N=3000 free-estimation case.
+
+| Quantity | Max. relative difference | Status |
+|---|---:|---|
+| Item response function (absolute) | 5.6e-16 | verified |
+| Marginal log-likelihood (GH-21) | 2.6e-15 | verified (3PL, 4PL) |
+| Analytic score vs mirt numerical gradient | 2.7e-9 | verified (3PL, 4PL) |
+| Observed information vs Hessian of mirt logLik | 6.6e-8 | verified (3PL, 4PL; also indefinite cases) |
+| Hessian SE vs mirt (3PL, positive definite case) | 7.7e-8 | verified |
+| mirt `SE.type='Richardson'`, default 61-node grid | info 6.0e-8, SE 4.7e-8 | verified (3PL) |
+| SE refusal decision (not positive definite) | identical in 4/4 cases | verified |
+| Free 3PL ML estimates | <=0.0014 SE; logLik gap 1.5e-6 | verified (one interior case) |
+
+Not verified: free 4PL estimation (no small interior 4PL MLE was found; Python's
+bounded space and mirt's logit space then target different points), Oakes/Louis/
+sandwich SE types, real data, other quadrature sizes. Note: mirt's numerical
+SE.type Hessian re-weights custom nodes by `dnorm(theta)` and ignores
+`customPriorFun` (mirt 1.48, `R/utils.R::BL.LL`), so that route is compared on
+mirt's default grid only.
+
+Structural identifiability (resolved in B4): complete 0/1 data on k items give
+`2**k-1` pattern degrees of freedom. `fit_irt`, `fit_irt_multistart`, the Hessian
+SE and the OPG approximation now reject models with more free parameters
+(3PL with k=3: 9 > 7; 4PL with k=3 or 4: 12 > 7, 16 > 15), like mirt. The rule
+is a necessary condition only and lives in `core.irt.structural_identifiability`,
+not in the model-independent `validate_binary`. Item priors would not remove the
+problem. In B2 a 4PL with k=4 passed the numerical SE gates (condition number
+about 4e3), which is why the structural refusal is checked first. No identifiable
+4PL fixture (k=5..8, N<=4000) gave a positive definite information matrix at the
+generating values.
+
+## Convergence diagnostics (B4)
+
+`converged` keeps the marginal log-likelihood criterion. `fit["convergence"]`
+also reports the largest parameter change in the last EM cycle (default
+diagnostic threshold `param_tolerance=1e-3`), split into interior parameters and
+parameters on an optimization bound, with status `converged`, `loglik_only`
+(warned, not rejected) or `not_converged`. On the interior 3PL fixture the
+default logL stop lies within 0.022 SE of the mirt MLE, so the parameter
+criterion is reported as a warning rather than used to reject estimates.
+================ END docs/IRT_3PL_4PL_VALIDATION.md ================
