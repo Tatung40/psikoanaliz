@@ -10,7 +10,7 @@ on:
       repetitions:
         description: 'Simulation repetitions'
         required: true
-        default: '3'
+        default: '10'
       max_iter:
         description: 'EM iteration cap'
         required: true
@@ -39,7 +39,7 @@ jobs:
       - name: Run bounded parameter recovery benchmark
         env:
           SAMPLE_SIZES: ${{ inputs.sample_sizes || '200,500,1000,2000' }}
-          REPETITIONS: ${{ inputs.repetitions || '3' }}
+          REPETITIONS: ${{ inputs.repetitions || '10' }}
           MAX_ITER: ${{ inputs.max_iter || '70' }}
         run: |
           python scripts/irt_benchmark.py \
