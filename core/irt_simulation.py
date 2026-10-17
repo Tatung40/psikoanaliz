@@ -32,7 +32,7 @@ def simulate_irt(n, true_items, seed=2026):
     return responses,ability
 
 
-def parameter_recovery(data,true_items,model,**fit_kwargs):
+def parameter_recovery(data,true_items,model,starts=(0.,),**fit_kwargs):
     """Return fitted model, recovery table and model-level recovery summary.
 
     Recovery is descriptive, not proof of convergence or identification.
@@ -43,7 +43,7 @@ def parameter_recovery(data,true_items,model,**fit_kwargs):
     truth=pd.DataFrame(true_items).reset_index(drop=True)
     if list(data.columns)!=list(truth["Madde"]):
         raise ValueError("Gerçek parametrelerle veri madde sırası uyuşmuyor.")
-    result=fit_irt(data,model=model,**fit_kwargs)
+    if model in ("3PL","4PL"):\n        from core.irt_multistart import fit_irt_multistart\n        audited=fit_irt_multistart(data,model=model,starts=starts,**fit_kwargs)\n        result=audited["fit"]\n    else:\n        result=fit_irt(data,model=model,**fit_kwargs)
     fitted=result["items"].reset_index(drop=True)
     diag=hessian_boundary_diagnostics(
         fitted,model,a_upper=result["a_upper"],d_lower=result["d_lower"])
@@ -61,7 +61,7 @@ def parameter_recovery(data,true_items,model,**fit_kwargs):
         "model":model,"n":result["n"],"k":result["k"],
         "converged":bool(result["converged"]),
         "iterations":int(result["iterations"]),
-        "loglik":float(result["loglik"]),
+        "loglik":float(result["loglik"]),\n        "start_count":len(starts),
         "boundary_item_count":int(diag["Madde"].nunique()),
         "boundary_parameter_count":int(len(diag)),
         "MAE":float(recovery["Mutlak hata"].mean()),
@@ -76,7 +76,7 @@ def parameter_recovery(data,true_items,model,**fit_kwargs):
 
 def repeated_recovery(true_items, models=("3PL","4PL"),
                       sample_sizes=(200,500,1000,2000),
-                      repetitions=10, seed=2026, **fit_kwargs):
+                      repetitions=10, seed=2026, starts=(0.,), **fit_kwargs):
     """Run reproducible, independent replications across sample sizes/models.
 
     Each simulation draw is reused across requested models for a fair paired
@@ -108,13 +108,13 @@ def repeated_recovery(true_items, models=("3PL","4PL"),
         for model in models:
             meta={"Model":model,"N":int(n),"Tekrar":rep+1,"Tohum":drawseed}
             try:
-                output=parameter_recovery(x,parameters,model,**fit_kwargs)
+                output=parameter_recovery(x,parameters,model,starts=starts,**fit_kwargs)
                 info=output["summary"]
                 row={**meta,"Durum":"Yakınsadı" if info["converged"]
                      else "Yakınsamadı","Yakınsama":bool(info["converged"]),
                      "Sınırdaki madde":info["boundary_item_count"],
                      "Sınırdaki parametre":info["boundary_parameter_count"],
-                     "MAE":info["MAE"],"RMSE":info["RMSE"],"Hata":""}
+                     "MAE":info["MAE"],"RMSE":info["RMSE"],\n                     "Başlangıç sayısı":info["start_count"],"Hata":""}
                 for q in _MODELS[model]:
                     row["MAE("+q+")"]=info["MAE("+q+")"]
                     row["Bias("+q+")"]=info["Bias("+q+")"]
