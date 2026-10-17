@@ -22,6 +22,10 @@ on:
 
 jobs:
   benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        generating_model: ['3PL', '4PL']
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -42,13 +46,14 @@ jobs:
             --sample-sizes "$SAMPLE_SIZES" \
             --repetitions "$REPETITIONS" \
             --max-iter "$MAX_ITER" \
+            --generating-model "${{ matrix.generating_model }}" \
             --items 25 --points 21 \
             --output-dir artifacts/irt-benchmark
       - name: Upload reproducible results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: irt-benchmark-results
+          name: irt-benchmark-${{ matrix.generating_model }}
           path: artifacts/irt-benchmark/
           if-no-files-found: warn
           retention-days: 14
