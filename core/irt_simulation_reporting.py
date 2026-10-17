@@ -14,18 +14,18 @@ from core.irt_simulation import repeated_recovery
 
 def run_timed_recovery(true_items, models=("3PL", "4PL"),
                        sample_sizes=(200, 500, 1000, 2000),
-                       repetitions=10, seed=2026, **fit_kwargs):
+                       repetitions=10, seed=2026, starts=(0.,), **fit_kwargs):
     """Time an explicitly requested simulation study; preserve all run outputs."""
     started=perf_counter()
     result=repeated_recovery(
         true_items, models=models, sample_sizes=sample_sizes,
-        repetitions=repetitions, seed=seed, **fit_kwargs)
+        repetitions=repetitions, seed=seed, starts=starts, **fit_kwargs)
     elapsed=perf_counter()-started
     # Record settings for repeatability; do not claim a scientific finding.
     result["metadata"]={
         "seed":int(seed), "models":list(models),
         "sample_sizes":[int(n) for n in sample_sizes],
-        "repetitions":int(repetitions),
+        "repetitions":int(repetitions),\n        "starts":list(starts),
         "fit_kwargs":dict(fit_kwargs),
         "elapsed_seconds":float(elapsed),
         "total_model_fits":int(len(result["runs"])),
