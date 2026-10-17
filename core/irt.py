@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
+from scipy.optimize import minimize as _refine_minimize   # separate name: patchable in tests
 from scipy.special import expit, logsumexp
 from numpy.polynomial.hermite import hermgauss
 from core.irt_se_diagnostics import hessian_boundary_diagnostics, BOUNDARY_TOLERANCE
@@ -77,7 +78,8 @@ def structural_identifiability(k, model):
 
 
 def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
-            a_upper=4.0, d_lower=0.65, initial_shift=0.0, param_tolerance=1e-3):
+            a_upper=4.0, d_lower=0.65, initial_shift=0.0, param_tolerance=1e-3,
+            refine=False, kkt_tolerance=1e-6, refine_max_iter=2000):
     """MML EM, N(0,1) özdeşleme; 1PL için a=1 (Rasch benzeri sabit eğim).
     Returns item params, EAP theta, posterior SD, diagnostic/log-likelihood.
 
@@ -87,6 +89,14 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
     (diagnostic only; it does not change `converged`), separately for
     parameters inside the bounds and parameters on an optimization bound.
     Models with more free parameters than 2**k - 1 are rejected.
+
+    refine=True (3PL/4PL, opt-in): after EM, the same marginal log-likelihood
+    is maximized inside the same bounds by L-BFGS-B with the analytic score.
+    The candidate is accepted only if it is finite, inside the bounds and does
+    not lower logL (the optimizer's success flag is recorded, not trusted);
+    otherwise the EM solution is kept and a warning says why. KKT violation
+    (per person) is reported before/after; `converged` becomes True after an
+    accepted refinement only if KKT <= kkt_tolerance. See fit["refinement"].
     """
     if model not in ("1PL","2PL","3PL","4PL"):
         raise ValueError("Geçersiz MTK modeli.")
@@ -97,6 +107,10 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
         raise ValueError(structure["reason"])
     if not (np.isfinite(param_tolerance) and param_tolerance > 0):
         raise ValueError("Parametre değişimi toleransı pozitif olmalıdır.")
+    if refine and model not in ("3PL","4PL"):
+        raise ValueError("L-BFGS-B iyileştirmesi yalnızca 3PL/4PL için tanımlıdır.")
+    if refine and not (np.isfinite(kkt_tolerance) and kkt_tolerance > 0 and refine_max_iter >= 1):
+        raise ValueError("İyileştirme ayarları geçersiz.")
     gh, hw = hermgauss(points)
     nodes = np.sqrt(2)*gh
     logprior = np.log(hw/np.sqrt(np.pi))
@@ -160,6 +174,10 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
             converged=True
             history.append(updated_ll)
             break
+    refinement={"requested":bool(refine)}
+    if refine:
+        em_params=[np.array(t,dtype=float) for t in params]
+        params,refinement=_refine_lbfgsb(x,params,model,bounds,nodes,logprior,refine_max_iter)
     a,b,c,d=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
     probs=np.clip(probabilities(nodes,a,b,c,d),1e-9,1-1e-9)
     logpost=x@np.log(probs).T+(1-x)@np.log1p(-probs).T+logprior[None,:]
@@ -191,10 +209,36 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
         at_bound[i,active.index(param)]=True
     if model in ("3PL","4PL"):
         table["Sınır uyarısı"]=at_bound.any(axis=1)
+    if refine:
+        from core.irt_stationarity import stationarity_diagnostics   # lazy: avoids import cycle
+        def max_kkt(item_params):
+            tab=pd.DataFrame([_unpack(t,model) for t in item_params],columns=list("abcd"))
+            tab.insert(0,"Madde",table["Madde"].tolist())
+            return float(stationarity_diagnostics(x,tab,model,points=points,a_upper=a_upper,
+                                                  d_lower=d_lower)[1]["max_KKT_violation"])
+        refinement["max_kkt_em"]=max_kkt(em_params)
+        refinement["max_kkt_final"]=max_kkt(params)
+        refinement["kkt_tolerance"]=float(kkt_tolerance)
+        refinement["kkt_met"]=bool(refinement["max_kkt_final"]<=kkt_tolerance)
+        if refinement["accepted"] and refinement["kkt_met"]:
+            converged=True
     convergence=_convergence_diagnostics(converged,max_iter,tolerance,last_ll_change,
                                          param_tolerance,last_delta,at_bound,
                                          table["Madde"].tolist(),active)
+    convergence["criterion"]="loglik"
+    if refine and refinement["accepted"] and refinement["kkt_met"]:
+        convergence.update(status="converged",parameter_criterion_met=True,
+                           criterion="kkt_after_refinement",
+                           message=(f"EM + L-BFGS-B: en büyük KKT ihlali kişi başına "
+                                    f"{refinement['max_kkt_final']:.2g} (eşik {kkt_tolerance:g})."))
     warnings=[]
+    if refine and not refinement["accepted"]:
+        warnings.append("L-BFGS-B iyileştirmesi reddedildi: "+refinement["reason"]+
+                        " EM çözümü korundu.")
+    elif refine and not refinement["kkt_met"]:
+        warnings.append(f"L-BFGS-B iyileştirmesi kabul edildi ancak KKT ihlali kişi başına "
+                        f"{refinement['max_kkt_final']:.2g} > {kkt_tolerance:g}; çözüm "
+                        "durağan nokta olarak doğrulanmadı.")
     if convergence["status"]!="converged" and converged:
         warnings.append(convergence["message"])
     if at_bound.any():
@@ -211,10 +255,67 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
             "history":history,"n":n,"k":k,"param_count":numpar,
             "a_upper":a_upper,"d_lower":d_lower,"initial_shift":initial_shift,
             "param_change_history":param_changes,"convergence":convergence,
-            "structure":structure,"warnings":warnings,
+            "structure":structure,"warnings":warnings,"refinement":refinement,
             "warning":("4PL modelindeki c ve d parametreleri yüksek örneklem büyüklüğü "
                        "ve güçlü madde bilgisi gerektirir; sınır kestirimlerini inceleyin."
                        if model=="4PL" else "")}
+
+
+def _marginal_loglik(x, params, model, nodes, logprior):
+    """Marginal log-likelihood exactly as evaluated inside the EM loop."""
+    a,b,c,d=(np.array(v) for v in zip(*[_unpack(t,model) for t in params]))
+    p=np.clip(probabilities(nodes,a,b,c,d),1e-9,1-1e-9)
+    return float(logsumexp(x@np.log(p).T+(1-x)@np.log1p(-p).T+logprior[None,:],axis=1).sum())
+
+
+def _refine_lbfgsb(x, params, model, bounds, nodes, logprior, max_iter):
+    """Bounded L-BFGS-B on the EM objective; returns (params, record).
+
+    Never trusts the optimizer status alone: the candidate must be finite, in
+    bounds and not lower the marginal log-likelihood; else EM params are kept.
+    """
+    from core.irt_hessian import _analytic_marginal_score   # lazy: irt_hessian imports irt
+    n,k=x.shape
+    m=len(params[0])
+    active=_ACTIVE[model]
+    start=np.concatenate([np.asarray(t,dtype=float) for t in params])
+    split=lambda v:[np.asarray(v[j*m:(j+1)*m],dtype=float) for j in range(k)]
+    ll_em=_marginal_loglik(x,params,model,nodes,logprior)
+    record={"requested":True,"accepted":False,"reason":"","loglik_em":ll_em,
+            "loglik_refined":np.nan,"loglik_gain":np.nan,"optimizer_success":False,
+            "optimizer_message":"","iterations":0}
+    def objective(v):
+        return -_marginal_loglik(x,split(v),model,nodes,logprior)/n
+    def gradient(v):
+        full=np.array([_unpack(t,model) for t in split(v)])
+        return -_analytic_marginal_score(x,full,active,nodes,logprior)/n
+    try:
+        result=_refine_minimize(objective,start,jac=gradient,method="L-BFGS-B",
+                                bounds=list(bounds)*k,
+                                options={"maxiter":int(max_iter),"ftol":1e-15,"gtol":1e-10})
+        candidate=np.asarray(result.x,dtype=float)
+        record.update(optimizer_success=bool(result.success),
+                      optimizer_message=str(result.message),
+                      iterations=int(getattr(result,"nit",0)))
+    except Exception as exc:          # fall back to EM, but report it
+        record["reason"]=f"Optimizasyon hata verdi ({type(exc).__name__}: {exc})."
+        return params,record
+    lower=np.array([b[0] for b in bounds]*k,dtype=float)
+    upper=np.array([b[1] for b in bounds]*k,dtype=float)
+    if candidate.shape!=start.shape or not np.isfinite(candidate).all():
+        record["reason"]="Sonlu olmayan veya geçersiz parametre üretildi."
+        return params,record
+    if np.any(candidate<lower-1e-12) or np.any(candidate>upper+1e-12):
+        record["reason"]="Parametre sınırlarının dışına çıkıldı."
+        return params,record
+    ll_new=_marginal_loglik(x,split(candidate),model,nodes,logprior)
+    record["loglik_refined"]=ll_new
+    record["loglik_gain"]=ll_new-ll_em
+    if not np.isfinite(ll_new) or ll_new<ll_em-1e-10*(1+abs(ll_em)):
+        record["reason"]="İyileştirme marjinal log-olabilirliği düşürdü."
+        return params,record
+    record["accepted"]=True
+    return split(candidate),record
 
 
 def _convergence_diagnostics(converged, max_iter, tolerance, ll_change,
