@@ -72,6 +72,7 @@ from core.irt_itemfit import sx2_mirt_compatible
 from core.irt_hessian import observed_information_se
 from core.irt_se_diagnostics import hessian_boundary_diagnostics
 from core.irt_multistart import fit_irt_multistart
+from core.irt_model_reliability import model_reliability
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 
@@ -1363,6 +1364,13 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "Düğüm/yineleme sayısını artırın veya daha yalın model kullanın.")
                 with st.expander("Yakınsama uyarısı: açıklama ve öneriler"):
                     st.markdown(GUIDE["yakinsama"])
+            if model in ("3PL","4PL"):
+                evaluation=model_reliability(r)
+                st.markdown("#### Bilimsel güvenilirlik ön değerlendirmesi")
+                st.write("**"+evaluation["Karar"]+"**")
+                st.caption(evaluation["Sınırlılık"])
+                for note in evaluation["Açıklamalar"]:
+                    st.caption("• "+note)
             if r["warning"]:
                 st.warning(r["warning"])
                 with st.expander("4PL modelinde bu uyarı ne demek?"):
