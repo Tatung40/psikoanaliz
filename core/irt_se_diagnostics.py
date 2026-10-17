@@ -7,6 +7,9 @@ further analysis, so those retain a separate model-level warning.
 import numpy as np
 import pandas as pd
 
+# Shared absolute boundary tolerance for 3PL/4PL diagnostics.
+BOUNDARY_TOLERANCE=1e-3
+
 _ACTIVE={"1PL":("b",),"2PL":("a","b"),
          "3PL":("a","b","c"),"4PL":("a","b","c","d")}
 _DESCRIPTIONS={
@@ -17,7 +20,7 @@ _DESCRIPTIONS={
 }
 
 def hessian_boundary_diagnostics(items, model, a_upper=4., d_lower=.65,
-                                  tolerance=1e-3):
+                                  tolerance=BOUNDARY_TOLERANCE):
     """Return explicit at-bound flags using same strict tolerance as Hessian."""
     if model not in _ACTIVE:
         raise ValueError("Bilinmeyen MTK modeli.")
