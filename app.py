@@ -71,6 +71,7 @@ import plotly.graph_objects as go
 from core.irt_itemfit import sx2_mirt_compatible
 from core.irt_hessian import observed_information_se
 from core.irt_se_diagnostics import hessian_boundary_diagnostics
+from core.irt_multistart import fit_irt_multistart
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 
@@ -1322,22 +1323,21 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             try:
                 data = target.loc[:, irt_columns].copy()
                 with st.spinner(f"{model} kalibrasyonu hesaplanıyor…"):
-                    candidates = []
-                    for shift in ([0.0, -1.0, 1.0][:starts]):
-                        try:
-                            candidate = fit_irt(data, model=model, points=qpoints,
-                                                max_iter=iterations,a_upper=a_upper,
-                                                d_lower=d_lower,initial_shift=shift)
-                            candidates.append(candidate)
-                        except (RuntimeError, ValueError) as start_error:
-                            st.warning(f"Başlangıç {shift:+.0f} başarısız: {start_error}")
-                    if not candidates:
-                        raise RuntimeError("Bütün kalibrasyon başlangıçları başarısız.")
-                    converged_candidates = [c for c in candidates if c["converged"]]
-                    pool = converged_candidates if converged_candidates else candidates
-                    result = max(pool, key=lambda c: c["loglik"])
-                    result["start_logliks"] = [c["loglik"] for c in candidates]
-                    result["start_convergences"] = [c["converged"] for c in candidates]
+                    if model in ("3PL","4PL"):
+                        audit=fit_irt_multistart(
+                            data,model=model,
+                            starts=tuple([0.,-1.,1.][:starts]),
+                            points=qpoints,max_iter=iterations,
+                            a_upper=a_upper,d_lower=d_lower)
+                        result=audit["fit"]
+                        result["start_logliks"]=audit["candidates"]["logLik"].dropna().tolist()
+                        result["start_convergences"]=audit["candidates"]["Yakınsama"].tolist()
+                        result["multistart_audit"]=audit["candidates"]
+                        result["multistart_summary"]=audit["summary"]
+                    else:
+                        result=fit_irt(data,model=model,points=qpoints,
+                                       max_iter=iterations,a_upper=a_upper,
+                                       d_lower=d_lower)
                 fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
                 if "irt_model_results" not in st.session_state:
                     st.session_state.irt_model_results = {}
@@ -1353,6 +1353,11 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         r = saved.get("result") if saved.get("fingerprint") == current_fingerprint else None
         if r is not None:
             st.markdown(f"### {r['model']} — Kestirim Sonuçları")
+            if "multistart_audit" in r:
+                with st.expander("🔎 Çoklu başlangıç ve optimizasyon denetimi"):
+                    st.dataframe(r["multistart_audit"].round(5),
+                                 hide_index=True,use_container_width=True)
+                    st.caption(r["multistart_summary"]["Not"])
             if not r["converged"]:
                 st.warning("EM yakınsama ölçütü sağlanmadı; sonuçlar geçicidir. "
                            "Düğüm/yineleme sayısını artırın veya daha yalın model kullanın.")
