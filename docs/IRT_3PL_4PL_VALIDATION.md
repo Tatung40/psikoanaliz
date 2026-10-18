@@ -252,3 +252,25 @@ reported before and after (`fit["refinement"]`); `converged` becomes True after 
 accepted refinement only when KKT <= `kkt_tolerance` (default 1e-6 per person), with
 `convergence["criterion"] = "kkt_after_refinement"`. Reproduce:
 `python scripts/irt_refine_benchmark.py`; tests: `tests/test_irt_refinement.py`.
+
+## Streamlit integration of the refinement (B7)
+
+- 3PL/4PL "İleri kalibrasyon" offers **Gelişmiş kestirim (EM + L-BFGS-B)** (default off);
+  1PL/2PL never show or pass it. The option reaches every multistart run
+  (`fit_irt_multistart(..., refine=...)`); each start's outcome is listed
+  (`İyileştirme`: uygulanmadı / kabul edildi / reddedildi).
+- Core fix: with an accepted refinement `convergence["loglik_converged"]` previously
+  reported the KKT decision (True) although EM had not converged. EM-stage fields
+  (`loglik_converged`, `em_status`, `refinement["em_converged"]`) now always describe EM;
+  `converged`, `status` and `criterion="kkt_after_refinement"` describe the final decision.
+- The results page reports both stages separately, never shows "EM yakınsamadı,
+  sonuç geçicidir" when the KKT stage succeeded, always adds that KKT is a local
+  first-order condition, and for 4PL boundary optima states that a box-bounded optimum
+  is not evidence of a reliable calibration. Rejections show the reason and the EM result.
+- Each stored result carries its settings (`fit["settings"]`: quadrature, iterations,
+  bounds, starts, refine, method, seconds). Later diagnostics (KKT, OPG, Hessian SE)
+  use the stored quadrature, and a notice appears if current UI settings differ. The
+  model comparison table shows the method and warns when quadratures differ.
+- Logic lives in `ui/irt_optimization.py` (no Streamlit import); tested by
+  `tests/test_irt_streamlit_helpers.py` and, through the real app with Streamlit's
+  AppTest, by `tests/test_irt_streamlit_apptest.py`.

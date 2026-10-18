@@ -9,6 +9,13 @@ import pandas as pd
 from core.irt import fit_irt, validate_binary, structural_identifiability
 from core.irt_se_diagnostics import hessian_boundary_diagnostics
 
+def _refinement_label(fit):
+    record=fit.get("refinement") or {}
+    if not record.get("requested"):
+        return "uygulanmadı"
+    return "kabul edildi" if record.get("accepted") else "reddedildi"
+
+
 def fit_irt_multistart(data,model="3PL",starts=(0.,-1.,1.),**kwargs):
     if model not in ("3PL","4PL"):
         raise ValueError("Çoklu başlangıç 3PL/4PL için tasarlanmıştır.")
@@ -35,13 +42,16 @@ def fit_irt_multistart(data,model="3PL",starts=(0.,-1.,1.),**kwargs):
                          "Yakınsama":bool(fit["converged"]),
                          "logLik":float(fit["loglik"]),
                          "Sınırdaki parametre":len(diag),
-                         "Yineleme":int(fit["iterations"]),"Hata":""})
+                         "Yineleme":int(fit["iterations"]),
+                         "İyileştirme":_refinement_label(fit),"Hata":""})
         except (RuntimeError, ValueError, FloatingPointError,
                 np.linalg.LinAlgError) as exc:
             logs.append({"Başlangıç":float(shift),"Başarılı":False,
                          "Yakınsama":False,"logLik":np.nan,
                          "Sınırdaki parametre":np.nan,
-                         "Yineleme":np.nan,"Hata":str(exc)})
+                         "Yineleme":np.nan,
+                         "İyileştirme":"istendi" if kwargs.get("refine") else "uygulanmadı",
+                         "Hata":str(exc)})
     if not fits:
         raise RuntimeError("Hiçbir başlangıçta kestirim üretilemedi.")
     # Prefer converged candidate; do not silently treat nonconvergence as success.
