@@ -76,6 +76,9 @@ from core.irt_model_reliability import model_reliability
 from core.irt_stationarity import stationarity_diagnostics
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
+from ui.irt_optimization import (REFINE_LABEL, REFINE_HELP, calibration_settings,
+                                 run_irt_calibration, estimation_method, result_points,
+                                 settings_mismatch, optimization_summary, convergence_messages)
 
 
 # =============================================================================
@@ -1246,7 +1249,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                      "BIC":float(usable[m]["bic"]),
                      "logLik":float(usable[m]["loglik"]),
                      "Parametre sayısı":int(usable[m]["param_count"]),
-                     "Yakınsama":bool(usable[m]["converged"])}
+                     "Yakınsama":bool(usable[m]["converged"]),
+                     "Yöntem":estimation_method(usable[m]),
+                     "GH düğümü":(usable[m].get("settings") or {}).get("points")}
                     for m in model_order if m in usable
                 ])
                 valid = comparison[comparison["Yakınsama"]]
@@ -1263,12 +1268,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             table_rows.append({"Model":m, "AIC":f'{rr["AIC"]:.3f}',
                                                "BIC":f'{rr["BIC"]:.3f}',
                                                "logLik":f'{rr["logLik"]:.3f}',
-                                               "Yakınsama":"Evet" if rr["Yakınsama"] else "Hayır"})
+                                               "Yakınsama":"Evet" if rr["Yakınsama"] else "Hayır",
+                                               "Yöntem":rr["Yöntem"]})
                         else:
                             table_rows.append({"Model":m, "AIC":"—", "BIC":"—",
-                                               "logLik":"—", "Yakınsama":"Çalıştırılmadı"})
+                                               "logLik":"—", "Yakınsama":"Çalıştırılmadı",
+                                               "Yöntem":"—"})
                     table_rows.append({"Model":"EN İYİ", "AIC":best_aic, "BIC":best_bic,
-                                       "logLik":"—", "Yakınsama":"Yalnızca yakınsayanlar"})
+                                       "logLik":"—", "Yakınsama":"Yalnızca yakınsayanlar",
+                                       "Yöntem":"—"})
                     st.dataframe(pd.DataFrame(table_rows), hide_index=True, use_container_width=True)
                     ca, cb = st.columns(2)
                     ca.metric("AIC'ye göre en iyi model", best_aic)
@@ -1283,6 +1291,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     download_table_pair(pd.DataFrame(table_rows),
                                         "psikoanaliz_mtk_model_karsilastirma",
                                         "Model Karşılaştırması", "irt_comparison")
+                if comparison["GH düğümü"].nunique(dropna=False)>1:
+                    st.warning("Modeller farklı Gauss–Hermite düğüm sayılarıyla kestirildi; "
+                               "logLik/AIC/BIC değerleri tam olarak aynı olabilirlik "
+                               "yaklaşımına dayanmaz. Karşılaştırma için aynı düğüm sayısıyla "
+                               "yeniden kestirin.")
+                if (comparison["Yöntem"]=="EM + L-BFGS-B").any():
+                    st.caption("Yöntem sütunu her modelin hangi optimizasyonla kestirildiğini gösterir. "
+                               "İyileştirme yalnızca aynı olabilirlik içinde daha yüksek bir noktaya "
+                               "ulaşır; model seçiminin gerekçesi değildir.")
                 if (~comparison["Yakınsama"]).any():
                     st.warning("Yakınsamamış model(ler) bulunuyor. Bu modeller 'EN İYİ' "
                                "seçiminde değerlendirilmedi.")
@@ -1319,32 +1336,27 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.caption("Başlangıçlar farklı ilk parametre değerlerinden yürütülür; "
                            "en yüksek logLik değerli çözüm sunulur. Geniş sınırlar "
                            "kararsız veya gerçekçi olmayan kestirimlere yol açabilir.")
+                refine = st.checkbox(REFINE_LABEL, value=False, key=f"refine_{model}")
+                st.caption(REFINE_HELP + " Seçilirse her başlangıçta uygulanır ve "
+                           "kestirim süresini birkaç kat artırabilir.")
         else:
-            a_upper,d_lower,starts=4.0,0.65,1
+            a_upper,d_lower,starts,refine=4.0,0.65,1,False
+        current_settings = calibration_settings(model, qpoints, iterations, a_upper,
+                                                d_lower, starts, refine)
         if st.button("▶️ MTK Analizini Başlat", type="primary"):
             try:
                 data = target.loc[:, irt_columns].copy()
-                with st.spinner(f"{model} kalibrasyonu hesaplanıyor…"):
-                    if model in ("3PL","4PL"):
-                        audit=fit_irt_multistart(
-                            data,model=model,
-                            starts=tuple([0.,-1.,1.][:starts]),
-                            points=qpoints,max_iter=iterations,
-                            a_upper=a_upper,d_lower=d_lower)
-                        result=audit["fit"]
-                        result["start_logliks"]=audit["candidates"]["logLik"].dropna().tolist()
-                        result["start_convergences"]=audit["candidates"]["Yakınsama"].tolist()
-                        result["multistart_audit"]=audit["candidates"]
-                        result["multistart_summary"]=audit["summary"]
-                    else:
-                        result=fit_irt(data,model=model,points=qpoints,
-                                       max_iter=iterations,a_upper=a_upper,
-                                       d_lower=d_lower)
+                spinner_text=(f"{model} kalibrasyonu hesaplanıyor "
+                              f"({'EM + L-BFGS-B' if current_settings['refine'] else 'EM'})…")
+                with st.spinner(spinner_text):
+                    result=run_irt_calibration(data,current_settings)
                 fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
                 if "irt_model_results" not in st.session_state:
                     st.session_state.irt_model_results = {}
                 st.session_state.irt_model_results[model] = {"fingerprint": fingerprint, "result": result}
-                st.success(f"{model} kestirimi tamamlandı.")
+                st.success(f"{model} kestirimi tamamlandı "
+                           f"({result['settings']['method']}, "
+                           f"{result['settings']['seconds']:.1f} sn).")
             except Exception as exc:
                 st.session_state.get("irt_model_results", {}).pop(model, None)
                 st.error(f"MTK analizi tamamlanamadı: {exc}")
@@ -1355,20 +1367,35 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         r = saved.get("result") if saved.get("fingerprint") == current_fingerprint else None
         if r is not None:
             st.markdown(f"### {r['model']} — Kestirim Sonuçları")
+            rpoints = result_points(r, qpoints)
+            st.caption(f"Yöntem: {estimation_method(r)} | Gauss–Hermite düğümü: {rpoints}"
+                       + (f" | Hesaplama süresi: {r['settings']['seconds']:.1f} sn"
+                          if "settings" in r else ""))
+            changed = settings_mismatch(r, current_settings)
+            if changed:
+                st.info("Gösterilen sonuç farklı ayarlarla üretildi ("
+                        + ", ".join(changed) + "). Tanılar kayıtlı ayarlarla hesaplanır; "
+                        "yeni ayarlar için analizi yeniden başlatın.")
+            for level, text in convergence_messages(r):
+                getattr(st, level)(text)
+            if not r["converged"]:
+                with st.expander("Yakınsama uyarısı: açıklama ve öneriler"):
+                    st.markdown(GUIDE["yakinsama"])
             if "multistart_audit" in r:
                 with st.expander("🔎 Çoklu başlangıç ve optimizasyon denetimi"):
+                    st.dataframe(optimization_summary(r), hide_index=True,
+                                 use_container_width=True)
+                    st.markdown("**Başlangıçlar**")
                     st.dataframe(r["multistart_audit"].round(5),
                                  hide_index=True,use_container_width=True)
                     st.caption(r["multistart_summary"]["Not"])
-            if not r["converged"]:
-                st.warning("EM yakınsama ölçütü sağlanmadı; sonuçlar geçicidir. "
-                           "Düğüm/yineleme sayısını artırın veya daha yalın model kullanın.")
-                with st.expander("Yakınsama uyarısı: açıklama ve öneriler"):
-                    st.markdown(GUIDE["yakinsama"])
             if model in ("3PL","4PL"):
                 evaluation=model_reliability(r)
                 st.markdown("#### Bilimsel güvenilirlik ön değerlendirmesi")
                 st.write("**"+evaluation["Karar"]+"**")
+                st.caption(f"Kestirim yöntemi: {evaluation['Kestirim yöntemi']} | "
+                           f"Yakınsama ölçütü: "
+                           f"{'iyileştirme sonrası KKT' if evaluation['Yakınsama ölçütü']=='kkt_after_refinement' else 'EM logL değişimi'}")
                 st.caption(evaluation["Sınırlılık"])
                 for note in evaluation["Açıklamalar"]:
                     st.caption("• "+note)
@@ -1401,7 +1428,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             c4.metric("BIC", f"{r['bic']:,.1f}")
             st.caption(f"Log-olabilirlik: {r['loglik']:.3f} | "
                        f"EM yineleme: {r['iterations']} | "
-                       f"Yakınsama: {'Evet' if r['converged'] else 'Hayır'}")
+                       f"Yakınsama: {'Evet' if r['converged'] else 'Hayır'}"
+                       + (" (iyileştirme sonrası KKT ölçütü)"
+                          if (r.get("convergence") or {}).get("criterion")=="kkt_after_refinement"
+                          else ""))
             st.caption(f"Başlangıç sonuçları (logLik): {', '.join(f'{x:.3f}' for x in r.get('start_logliks', [r['loglik']]))} | "
                        f"a üst sınırı: {r.get('a_upper', 4.0)} | d alt sınırı: {r.get('d_lower', 0.65)}")
             if model in ("3PL","4PL") and "multistart_audit" in r:
@@ -1424,7 +1454,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     if st.button("KKT tanısını hesapla",key=f"kkt_{model}"):
                         kkt_table,kkt_summary=stationarity_diagnostics(
                             target.loc[:,irt_columns],r["items"],model,
-                            points=qpoints,a_upper=r.get("a_upper",4.),
+                            points=rpoints,a_upper=r.get("a_upper",4.),
                             d_lower=r.get("d_lower",.65))
                         st.metric("KKT toleransını aşan parametre",
                                   kkt_summary["violations"])
@@ -1457,7 +1487,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     with st.spinner("Yaklaşık belirsizlik hesaplanıyor…"):
                         uncertainty, unavailable = approximate_parameter_uncertainty(
                             target.loc[:, irt_columns], r["items"], model,
-                            points=qpoints, a_upper=r.get("a_upper",4.0),
+                            points=rpoints, a_upper=r.get("a_upper",4.0),
                             d_lower=r.get("d_lower",0.65))
                     if unavailable:
                         st.warning(f"Yaklaşık SH hesaplanamadı: {unavailable}")
@@ -1491,7 +1521,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             with st.spinner("Bilgi matrisi hesaplanıyor…"):
                                 hessian_result,hessian_reason=observed_information_se(
                                     target.loc[:,irt_columns],r["items"],model,
-                                    points=qpoints,a_upper=r.get("a_upper",4.0),
+                                    points=rpoints,a_upper=r.get("a_upper",4.0),
                                     d_lower=r.get("d_lower",0.65))
                         if hessian_reason:
                             st.warning("Hessian SH hesaplanamadı: "+hessian_reason)

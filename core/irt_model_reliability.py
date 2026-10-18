@@ -18,6 +18,9 @@ def model_reliability(fit):
     k=int(fit["k"])
     structure=structural_identifiability(k,model)
     convergence=fit.get("convergence") or {}
+    refinement=fit.get("refinement") or {}
+    refined=bool(refinement.get("requested"))
+    method="EM + L-BFGS-B" if refined else "EM"
     params_ok=convergence.get("parameter_criterion_met",True)
     affected=int(diagnostics["Madde"].nunique())
     events=len(diagnostics)
@@ -28,8 +31,20 @@ def model_reliability(fit):
         warnings.append(f"Yapısal sayım: {structure['parameters']} serbest parametre, en fazla "
                         f"{structure['pattern_df']} yanıt örüntüsü serbestlik derecesi. Bu koşul "
                         "gereklidir ama tanımlanabilirliği kanıtlamaz.")
+    if refined:
+        em_ok=refinement.get("em_converged",convergence.get("loglik_converged"))
+        stage=("EM aşaması logL ölçütüyle yakınsadı" if em_ok
+               else "EM aşaması logL ölçütüyle yakınsamadı")
+        if not refinement.get("accepted"):
+            warnings.append(f"Kestirim yöntemi: {method}. İyileştirme reddedildi "
+                            f"({refinement.get('reason','neden belirtilmedi')}); EM sonucu raporlanıyor. {stage}.")
+        else:
+            warnings.append(f"Kestirim yöntemi: {method}. {stage}; L-BFGS-B iyileştirmesi kabul edildi, "
+                            f"KKT ihlali {refinement.get('max_kkt_final',float('nan')):.2g}/kişi. "
+                            "KKT koşulu yerel birinci mertebe koşuludur; global optimumu, "
+                            "tanımlanabilirliği veya model geçerliğini kanıtlamaz.")
     if not converged:
-        warnings.append("EM yakınsama koşulu sağlanmadı.")
+        warnings.append("Yakınsama koşulu sağlanmadı." if refined else "EM yakınsama koşulu sağlanmadı.")
     elif not params_ok:
         warnings.append(convergence.get("message","Parametre değişimi ölçütü sağlanmadı."))
     if events:
@@ -46,14 +61,15 @@ def model_reliability(fit):
     else:
         decision="Tanılar açısından ön koşullar sağlandı; bağımsız doğrulama gerekli"
     return {
-        "Model":model,"Karar":decision,"Yakınsama":converged,
+        "Model":model,"Karar":decision,"Yakınsama":converged,"Kestirim yöntemi":method,
+        "Yakınsama ölçütü":convergence.get("criterion","loglik"),
         "Parametre yakınsaması":bool(params_ok),
         "Serbest parametre":structure["parameters"],
         "Örüntü serbestlik derecesi":structure["pattern_df"],
         "Sınırdaki madde":affected,"Sınırdaki parametre":events,
         "Madde oranı":affected/k,"Açıklamalar":warnings,
-        "Sınırlılık":"Bu karar yapısal parametre sayımı, sınır kestirimleri ve EM "
-                     "yakınsamasına dayanır. Pozitif tanımlı bir bilgi matrisi ya da madde "
+        "Sınırlılık":"Bu karar yapısal parametre sayımı, sınır kestirimleri ve yakınsama "
+                     "tanısına (EM logL ölçütü ya da iyileştirme sonrası KKT ölçütü) dayanır. Pozitif tanımlı bir bilgi matrisi ya da madde "
                      "önselleri tanımlanabilirliği kendiliğinden sağlamaz. Bilgi matrisi, "
                      "model uyumu, yerel bağımsızlık ve karşılaştırmalı doğrulama ayrıca "
                      "değerlendirilmelidir."

@@ -220,13 +220,19 @@ def fit_irt(data, model="2PL", points=31, max_iter=70, tolerance=1e-4,
         refinement["max_kkt_final"]=max_kkt(params)
         refinement["kkt_tolerance"]=float(kkt_tolerance)
         refinement["kkt_met"]=bool(refinement["max_kkt_final"]<=kkt_tolerance)
-        if refinement["accepted"] and refinement["kkt_met"]:
-            converged=True
-    convergence=_convergence_diagnostics(converged,max_iter,tolerance,last_ll_change,
+    em_converged=bool(converged)
+    # EM-stage diagnostics are computed from the EM result before any KKT-based
+    # decision, so convergence["loglik_converged"] always describes EM itself.
+    convergence=_convergence_diagnostics(em_converged,max_iter,tolerance,last_ll_change,
                                          param_tolerance,last_delta,at_bound,
                                          table["Madde"].tolist(),active)
     convergence["criterion"]="loglik"
+    convergence["em_status"]=convergence["status"]
+    if refine:
+        refinement["em_converged"]=em_converged
+        refinement["em_status"]=convergence["status"]
     if refine and refinement["accepted"] and refinement["kkt_met"]:
+        converged=True
         convergence.update(status="converged",parameter_criterion_met=True,
                            criterion="kkt_after_refinement",
                            message=(f"EM + L-BFGS-B: en büyük KKT ihlali kişi başına "
