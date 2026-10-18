@@ -81,6 +81,7 @@ from ui.rasch_view import (MNSQ_OPTIONS, METHOD_NOTE, screen_items, rasch_settin
                            misfit_persons, wright_map, DIF_NOTE, Q3_NOTE, group_candidates,
                            dif_figure, q3_heatmap, raw_score_figure, run_global_fit, m2_rows, run_q3,
                            run_dif, dif_summary_rows)
+from ui import irt_b10_view as b10
 from ui.irt_optimization import (REFINE_LABEL, REFINE_HELP, calibration_settings,
                                  run_irt_calibration, estimation_method, result_points,
                                  settings_mismatch, optimization_summary, convergence_messages)
@@ -1737,9 +1738,12 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         download_table_pair(
                             kkt_table,f"psikoanaliz_{model}_kkt_tanisi",
                             "KKT Tanı Tablosu",f"kkt_export_{model}")
-            tabs = st.tabs(["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
-                            "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
-                            "👤 Yetenek Kestirimi", "🔎 Model Tanıları"])
+            tab_names = ["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
+                         "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
+                         "👤 Yetenek Kestirimi", "🔎 Model Tanıları"]
+            if model in b10.B10_MODELS:
+                tab_names += ["🧮 Model Uyumu", "🔗 Yerel Bağımsızlık", "⚖️ DIF / Ölçme Değişmezliği"]
+            tabs = st.tabs(tab_names)
             with tabs[0]:
                 param_names = {
                     "a": "a (Ayırt edicilik)",
@@ -2037,3 +2041,182 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.caption("Artık RMS betimsel bir tanıdır; formal madde uyum "
                            "testi değildir. AIC/BIC yalnızca aynı veri "
                            "üzerindeki modeller arasında karşılaştırılmalıdır.")
+            # ---- B10: 1PL/2PL tanıları (gösterilen kalibrasyona ve veriye bağlı; 3PL/4PL değişmez)
+            if model in b10.B10_MODELS:
+                b10_data = target.loc[:, irt_columns]
+                b10_key = b10.result_key(model, current_fingerprint, r)
+                store = st.session_state.setdefault("irt_b10", {})
+                def b10_get(kind):
+                    entry = store.get((kind, model)) or {}
+                    return entry.get("result") if entry.get("key") == b10_key else None
+                if not r["converged"]:
+                    st.warning("Gösterilen kalibrasyon yakınsamadı; B10 sekmelerinde çıkarımsal sonuç (M2 p değeri) "
+                               "verilmez, diğer çıktılar geçicidir.")
+                with tabs[6]:
+                    st.caption("Uyum tanıları gösterilen kalibrasyonun madde parametreleriyle, yeniden kestirim "
+                               "yapmadan hesaplanır. Her istatistiğin sınıfı (çıkarımsal / betimsel / deneysel) "
+                               "tabloda belirtilir.")
+                    g1, g2 = st.columns(2)
+                    with g1:
+                        gf_person = st.selectbox("Tabakalama için kişi kestirimi", ["WLE", "EAP"],
+                                                 key=f"b10_gf_person_{model}")
+                    with g2:
+                        gf_strata = st.select_slider("Yetenek tabakası sayısı", options=[3, 4, 5, 6, 8, 10],
+                                                     value=5, key=f"b10_gf_strata_{model}")
+                    if st.button("▶️ Model uyumunu hesapla", key=f"b10_gf_run_{model}"):
+                        try:
+                            with st.spinner("M2 ve betimsel uyum özetleri hesaplanıyor…"):
+                                store[("gf", model)] = {"key": b10_key, "result": b10.run_global_fit(
+                                    b10_data, r, model, gf_person, gf_strata)}
+                        except Exception as exc:
+                            store.pop(("gf", model), None)
+                            st.error(f"Model uyumu hesaplanamadı: {exc}")
+                    gf = b10_get("gf")
+                    if gf is not None:
+                        if (gf["ui_settings"]["person_method"], gf["ui_settings"]["strata"]) != (gf_person, gf_strata):
+                            st.info("Gösterilen sonuç farklı ayarlarla üretildi; yeniden hesaplayın.")
+                        st.markdown("**Sınırlı bilgi uyumu (M2)**")
+                        st.dataframe(b10.m2_rows(gf), hide_index=True, use_container_width=True)
+                        if gf["m2"]["available"]:
+                            st.caption(f"M2 tek ve iki değişkenli marjinallerden hesaplanır (Maydeu-Olivares ve Joe, "
+                                       f"2006). Jacobian yalnızca serbest kestirilen {gf['m2']['free_parameters']} "
+                                       f"madde parametresini içerir ({'b' if model == '1PL' else 'a ve b'}; θ ~ N(0,1) "
+                                       "sabit). p değeri asimptotik χ² yaklaşımına dayanır; RMSEA2 N ile hesaplanır "
+                                       "(mirt N−1 kullanır). Kalibrasyonun EM yakınsama toleransı M2'yi çok az etkiler.")
+                        st.dataframe(gf["classification"], hide_index=True, use_container_width=True)
+                        st.plotly_chart(raw_score_figure(gf), use_container_width=True)
+                        download_table_pair(gf["raw_scores"].round(4), f"psikoanaliz_{model}_hampuan",
+                                            "Ham puan dağılımı", f"b10_raw_dl_{model}")
+                        item_pick = st.selectbox("Madde uyum grafiği", list(r["items"]["Madde"]),
+                                                 key=f"b10_gf_item_{model}")
+                        st.plotly_chart(b10.item_fit_figure(gf, r, item_pick), use_container_width=True)
+                        st.caption("Noktalar tabaka içindeki gözlenen doğru oranı, çizgi model ICC'sidir; hata "
+                                   "çubukları model varyansıyla yaklaşık ±1,96 SH'dir ve betimseldir.")
+                        st.dataframe(gf["strata"].round(3), hide_index=True, use_container_width=True)
+                        download_table_pair(gf["strata"].round(4), f"psikoanaliz_{model}_tabaka",
+                                            "Tabaka tablosu", f"b10_strata_dl_{model}")
+                        st.markdown("**Standart artık özeti (betimsel)**")
+                        st.dataframe(pd.DataFrame([gf["residuals"]]).round(4), hide_index=True,
+                                     use_container_width=True)
+                with tabs[7]:
+                    st.caption(b10.Q3_NOTE)
+                    h1, h2, h3 = st.columns(3)
+                    with h1:
+                        q3_person = st.selectbox("Kişi kestirimi", ["WLE", "EAP"], key=f"b10_q3_person_{model}")
+                    with h2:
+                        q3_min = st.select_slider("Çift başına en az ortak yanıt", options=[10, 20, 30, 50, 100],
+                                                  value=30, key=f"b10_q3_min_{model}")
+                    with h3:
+                        q3_boot = st.select_slider("Parametrik bootstrap tekrar sayısı", options=[0, 25, 50, 100],
+                                                   value=0, key=f"b10_q3_boot_{model}",
+                                                   help="Her tekrarda model aynı ayarlarla yeniden kestirilir; "
+                                                        "100 tekrar birkaç dakika sürebilir.")
+                    q3_seed = st.number_input("Bootstrap tohum değeri", min_value=0, max_value=2**31 - 1, value=2026,
+                                              step=1, key=f"b10_q3_seed_{model}")
+                    q3_now = {"person_method": q3_person, "min_pairs": int(q3_min), "bootstrap": int(q3_boot),
+                              "seed": int(q3_seed)}
+                    if st.button("▶️ Q3 analizini başlat", key=f"b10_q3_run_{model}"):
+                        try:
+                            with st.spinner("Q3 artık korelasyonları hesaplanıyor…"):
+                                store[("q3", model)] = {"key": b10_key, "result": b10.run_q3(
+                                    b10_data, r, model, q3_person, q3_min, q3_boot, q3_seed)}
+                        except Exception as exc:
+                            store.pop(("q3", model), None)
+                            st.error(f"Q3 analizi tamamlanamadı: {exc}")
+                    q3r = b10_get("q3")
+                    if q3r is not None:
+                        if {k_: q3r["ui_settings"][k_] for k_ in q3_now} != q3_now:
+                            st.info("Gösterilen Q3 sonucu farklı ayarlarla üretildi; yeniden başlatın.")
+                        c1_, c2_, c3_ = st.columns(3)
+                        c1_.metric("Ortalama Q3", f"{q3r['mean_q3']:.3f}")
+                        c2_.metric("Bağımsızlık altında beklenen ≈ −1/(k−1)", f"{q3r['expected_under_li']:.3f}")
+                        c3_.metric("Tanımsız çift", q3r["n_undefined"])
+                        bs = q3r["bootstrap"]
+                        if bs:
+                            st.markdown(f"**Parametrik bootstrap — deneysel** ({bs['used']} geçerli / "
+                                        f"{bs['replications']} tekrar, tohum {bs['seed']}): gözlenen en büyük "
+                                        f"düzeltilmiş Q3 = {bs['observed_max_adjusted_q3']:.3f}; %95 / %99 nicelikleri "
+                                        f"{bs['max_quantile_95']:.3f} / {bs['max_quantile_99']:.3f}; Monte Carlo p "
+                                        f"(en büyük değer) = {bs['p_max']:.3f}.")
+                            st.caption("Her tekrarda veri, gösterilen modelden (aynı eksiklik örüntüsü, θ ~ N(0,1)) "
+                                       "üretilir ve model aynı kestirim ayarlarıyla yeniden kestirilir. Bu referans "
+                                       "B10'da yalnızca sınırlı biçimde doğrulanmıştır; çift bazındaki %95 nicelikleri "
+                                       "betimseldir.")
+                            if bs["failed"]:
+                                st.warning(f"{bs['failed']} bootstrap tekrarı yakınsamadı veya kestirilemedi ve "
+                                           "dışarıda bırakıldı.")
+                        st.plotly_chart(q3_heatmap(q3r), use_container_width=True)
+                        st.dataframe(q3r["pairs"].round(4), hide_index=True, use_container_width=True)
+                        download_table_pair(q3r["pairs"].round(5), f"psikoanaliz_{model}_q3_ciftler", "Q3 çiftleri",
+                                            f"b10_q3_dl_{model}")
+                with tabs[8]:
+                    st.caption(b10.DIF_NOTE[model])
+                    st.caption(b10.COMMON_NOTE)
+                    excluded = set(irt_columns) | {st.session_state.id_col}
+                    cand = b10.group_candidates(target.drop(columns=[c for c in excluded if c in target.columns]),
+                                                irt_columns)
+                    if not cand:
+                        st.info("DIF için 2–20 düzeyli, madde ve kimlik dışı bir grup sütunu bulunamadı.")
+                    else:
+                        gi = cand.index(st.session_state.group_col) if st.session_state.group_col in cand else 0
+                        dgcol = st.selectbox("Grup değişkeni", cand, index=gi, key=f"b10_dif_group_{model}")
+                        dlev = sorted(target[dgcol].dropna().unique().tolist(), key=str)
+                        e1_, e2_ = st.columns(2)
+                        with e1_:
+                            dref = st.selectbox("Referans grup", dlev, key=f"b10_dif_ref_{model}")
+                        with e2_:
+                            dfoc = st.selectbox("Odak grup", [v for v in dlev if v != dref], key=f"b10_dif_focal_{model}")
+                        if len(dlev) > 2:
+                            st.caption(f"Grup değişkeninde {len(dlev)} düzey var; yalnızca seçilen iki grup "
+                                       "karşılaştırılır.")
+                        f1_, f2_, f3_ = st.columns(3)
+                        with f1_:
+                            dalpha = st.select_slider("FDR düzeyi (BH)", options=[.01, .05, .10], value=.05,
+                                                      key=f"b10_dif_alpha_{model}")
+                        with f2_:
+                            dpur = st.checkbox("Yinelemeli çapa arındırması", value=True, key=f"b10_dif_purify_{model}")
+                        with f3_:
+                            drounds = st.select_slider("En fazla arındırma turu", options=[1, 3, 5, 10], value=10,
+                                                       key=f"b10_dif_rounds_{model}", disabled=not dpur)
+                        dif_now = {"group_col": dgcol, "reference": dref, "focal": dfoc, "alpha": float(dalpha),
+                                   "purify": bool(dpur), "max_rounds": int(drounds)}
+                        if model == "2PL":
+                            st.caption("2PL DIF her madde için üç model kestirir; 12 maddede yaklaşık 15–30 sn sürer.")
+                        if st.button("▶️ DIF analizini başlat", key=f"b10_dif_run_{model}"):
+                            try:
+                                with st.spinner(f"İki gruplu ortak {model} modeli kestiriliyor…"):
+                                    store[("dif", model)] = {"key": b10_key, "result": b10.run_dif(
+                                        target, irt_columns, dgcol, dref, dfoc, model, dalpha, dpur, drounds,
+                                        points=int(r.get("settings", {}).get("points", 41)))}
+                            except Exception as exc:
+                                store.pop(("dif", model), None)
+                                st.error(f"DIF analizi tamamlanamadı: {exc}")
+                        dr = b10_get("dif")
+                        if dr is not None:
+                            if {k_: dr["ui_settings"][k_] for k_ in dif_now} != dif_now:
+                                st.info("Gösterilen DIF sonucu farklı grup veya ayarlarla üretildi; yeniden başlatın.")
+                            st.markdown(f"**Karşılaştırma:** {dr['focal']} (odak) − {dr['reference']} (referans); "
+                                        f"grup değişkeni `{dr['ui_settings']['group_col']}`; model {dr['model']}.")
+                            for note in dr["warnings"]:
+                                st.warning(note)
+                            if not dr["joint"]["converged"]:
+                                st.error("Ortak model yakınsamadı; DIF sonuçları yorumlanmamalıdır.")
+                            st.dataframe(b10.dif_summary_rows(dr), hide_index=True, use_container_width=True)
+                            st.caption("μ_odak ve σ_odak grupların yetenek dağılımı farkıdır (etki/impact); DIF değildir.")
+                            st.plotly_chart(b10.dif_effect_figure(dr), use_container_width=True)
+                            st.dataframe(dr["table"].round(4), hide_index=True, use_container_width=True)
+                            st.caption("p ve q (BH): " + ("LR χ² (sd = 1) testinden; Δb ve SH(Δb) ortak modelin gözlenen "
+                                       "bilgi matrisinden (Wald). Etki sınıfı ETS A/B/C ölçütlerinin logit karşılığıdır "
+                                       "(yaklaşık)." if dr["model"] == "1PL" else
+                                       "genel LR χ² (sd = 2) testinden; Δa, Δb ve SH'ler ortak modelin gözlenen bilgi "
+                                       "matrisinden. Tek biçimli / tek biçimli olmayan LR testleri işaretlenen maddeler "
+                                       "için ayrıştırma sağlar.") + " İşaretli ve işaretsiz farklar odak grubun yetenek "
+                                       "dağılımı üzerinden ortalanmış olasılık farklarıdır.")
+                            pick = st.selectbox("Grup tepki fonksiyonları", list(dr["table"].dropna(subset=["a_ref"])["Madde"]),
+                                                key=f"b10_dif_item_{model}")
+                            if pick:
+                                st.plotly_chart(b10.group_irf_figure(dr, pick), use_container_width=True)
+                            st.markdown("**Arındırma geçmişi**")
+                            st.dataframe(dr["history"], hide_index=True, use_container_width=True)
+                            download_table_pair(dr["table"].round(5), f"psikoanaliz_{model}_dif", "DIF tablosu",
+                                                f"b10_dif_dl_{model}")
