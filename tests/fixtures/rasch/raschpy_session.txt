@@ -1,0 +1,5 @@
+RaschPy 1.4.0 (PyPI wheel raschpy-1.4.0-py3-none-any.whl)
+Python 3.13.16 | numpy 2.5.3 | pandas 3.0.5
+SLM(responses) default extreme_persons=True; calibrate() defaults (PAIR, method='log-lik',
+data-adaptive constant); std_errors(se_method='sandwich'); person_estimates() (Warm WLE);
+fit_statistics() defaults.
