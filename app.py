@@ -76,6 +76,9 @@ from core.irt_model_reliability import model_reliability
 from core.irt_stationarity import stationarity_diagnostics
 from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
+from ui.rasch_view import (MNSQ_OPTIONS, METHOD_NOTE, screen_items, rasch_settings, run_rasch,
+                           fingerprint as rasch_fingerprint, summary_rows as rasch_summary,
+                           misfit_persons, wright_map)
 from ui.irt_optimization import (REFINE_LABEL, REFINE_HELP, calibration_settings,
                                  run_irt_calibration, estimation_method, result_points,
                                  settings_mismatch, optimization_summary, convergence_messages)
@@ -194,6 +197,9 @@ with st.sidebar:
     st.button("📊 Model Karşılaştırması", key="nav_irt_comparison",
               use_container_width=True, on_click=navigate_to,
               args=("MTK: Karşılaştırma",))
+    st.button("📏 Rasch Analizi", key="nav_irt_rasch",
+              use_container_width=True, on_click=navigate_to,
+              args=("MTK: Rasch",))
     st.markdown("**Çok Kategorili Modeller**")
     st.button("🔒 GRM / GPCM / NRM — Yakında", disabled=True,
               use_container_width=True)
@@ -1137,6 +1143,106 @@ elif selected_page == "12. Kullanım Kılavuzu":
     **Kaynak kodu:** https://github.com/Tatung40/psikoanaliz
     """)
 
+
+# =============================================================================
+# SAYFA 14: RASCH ANALİZİ (İKİLİ, MML)
+# =============================================================================
+elif selected_page == "MTK: Rasch":
+    render_academic_header()
+    st.subheader("📏 Rasch Analizi — ikili (dikotom) Rasch modeli")
+    st.caption(METHOD_NOTE)
+    scored = st.session_state.scored_df
+    raw = st.session_state.raw_df
+    target = scored if scored is not None else raw
+    columns = [c for c in st.session_state.item_cols
+               if c not in (st.session_state.id_col, st.session_state.group_col)]
+    if target is not None and not columns:
+        columns = [c for c in target.columns if c not in (st.session_state.id_col, st.session_state.group_col)]
+    if target is None:
+        st.warning("Önce Veri Yükleme bölümünden 0/1 puanlı bir veri dosyası yükleyin.")
+    else:
+        usable, screen = screen_items(target, columns)
+        excluded = screen[screen["Durum"] != "Uygun"]
+        if not excluded.empty:
+            st.warning(f"{len(excluded)} sütun Rasch analizine alınmadı (0/1 dışı değer veya sabit yanıt).")
+            with st.expander("Madde ön taraması"):
+                st.dataframe(screen.round(3), hide_index=True, use_container_width=True)
+        if len(usable) < 3:
+            st.error("Rasch analizi için en az 3 uygun ikili madde gereklidir.")
+        else:
+            if screen.loc[screen["Durum"] == "Uygun", "Eksik"].sum():
+                st.info("Eksik yanıtlar silinmez; olabilirlikten çıkarılır (MAR varsayımı). "
+                        "Eksikliğin nedeni sistematikse sonuçlar yanlı olabilir.")
+            c1, c2 = st.columns(2)
+            with c1:
+                points = st.select_slider("Gauss–Hermite düğüm sayısı", options=[21, 31, 41, 61],
+                                          value=41, key="rasch_points")
+                zlim = st.select_slider("|ZSTD| eşiği", options=[1.96, 2.0, 2.5, 3.0], value=2.0,
+                                        key="rasch_zstd")
+            with c2:
+                label = st.selectbox("Kabul edilebilir MNSQ aralığı", list(MNSQ_OPTIONS),
+                                     key="rasch_mnsq")
+                include_ext = st.checkbox("Uç puanlı kişileri madde uyumuna kat", value=False,
+                                          key="rasch_ext")
+            st.caption("Bir madde veya kişi yalnızca MNSQ aralık dışında **ve** |ZSTD| eşiği "
+                       "aşıldığında 'İnceleme önerilir' olarak işaretlenir (Wright & Linacre, 1994). "
+                       "Bu bir karar kuralı değil, inceleme önerisidir.")
+            settings = rasch_settings(points, label, zlim, include_ext)
+            fp = rasch_fingerprint(target, usable)
+            if st.button("▶️ Rasch Analizini Başlat", type="primary", key="rasch_run"):
+                try:
+                    with st.spinner("Rasch modeli kestiriliyor (MML)…"):
+                        result = run_rasch(target, usable, settings)
+                    st.session_state.rasch_result = {"fingerprint": fp, "result": result}
+                    st.success(f"Rasch analizi tamamlandı ({result['ui_settings']['seconds']:.1f} sn).")
+                except Exception as exc:
+                    st.session_state.pop("rasch_result", None)
+                    st.error(f"Rasch analizi tamamlanamadı: {exc}")
+            saved = st.session_state.get("rasch_result") or {}
+            rr = saved.get("result") if saved.get("fingerprint") == fp else None
+            if rr is not None:
+                stored = {k: rr["ui_settings"][k] for k in ("points", "mnsq_label", "zstd_limit", "include_extreme")}
+                current = {k: settings[k] for k in stored}
+                if stored != current:
+                    st.info("Gösterilen sonuç farklı ayarlarla üretildi; yeni ayarlar için analizi yeniden başlatın.")
+                if not rr["fit"]["converged"]:
+                    st.warning("MML kestirimi yakınsama ölçütünü sağlamadı; sonuçlar geçicidir.")
+                for note in rr["warnings"]:
+                    st.caption("• " + note)
+                rel = rr["reliability"].set_index("Gösterge")
+                m1, m2, m3, m4 = st.columns(4)
+                m1.metric("Örtük SS (σ)", f"{rr['fit']['sd']:.3f}")
+                m2.metric("Kişi güvenirliği", f"{rel['Güvenirlik'].iloc[0]:.3f}")
+                m3.metric("Madde güvenirliği", f"{rel['Güvenirlik'].iloc[1]:.3f}"
+                          if np.isfinite(rel['Güvenirlik'].iloc[1]) else "—")
+                m4.metric("İncelenecek madde", int((rr["items"]["Uyum"] == "İnceleme önerilir").sum()))
+                tabs = st.tabs(["📋 Madde parametreleri ve uyum", "👤 Kişi uyumu", "🗺️ Wright haritası",
+                                "📐 Güvenirlik ve model özeti"])
+                with tabs[0]:
+                    st.dataframe(rr["items"].round(3), hide_index=True, use_container_width=True)
+                    st.caption("b: madde güçlüğü (logit; örtük ortalama 0). Infit bilgiye ağırlıklı, Outfit "
+                               "uç yanıtlara duyarlı ortalama kare uyumdur; beklenen değer 1'dir. "
+                               ">1 beklenenden fazla gürültü, <1 aşırı tahmin edilebilirlik gösterir.")
+                    download_table_pair(rr["items"], "psikoanaliz_rasch_maddeler", "Rasch Maddeler", "rasch_items_dl")
+                with tabs[1]:
+                    flagged = misfit_persons(rr)
+                    st.write(f"İnceleme önerilen kişi: **{len(flagged)}** / {len(rr['persons'])}")
+                    only = st.checkbox("Yalnızca inceleme önerilenleri göster", value=True, key="rasch_only_flagged")
+                    st.dataframe((flagged if only else rr["persons"]).round(3), hide_index=True,
+                                 use_container_width=True)
+                    st.caption("Kişi uyumu WLE ile hesaplanır; uç puanlı kişiler için uyum tanımsızdır. "
+                               "Az sayıda maddede ZSTD değerleri kararsızdır.")
+                    download_table_pair(rr["persons"], "psikoanaliz_rasch_kisiler", "Rasch Kişiler", "rasch_persons_dl")
+                with tabs[2]:
+                    st.plotly_chart(wright_map(rr), use_container_width=True)
+                    st.caption("Sol: kişi WLE dağılımı; sağ: madde güçlükleri. Aynı logit ölçeğindedir; "
+                               "kişi dağılımının madde güçlükleriyle örtüşmesi ölçme duyarlılığını gösterir.")
+                with tabs[3]:
+                    st.dataframe(rr["reliability"].round(4), hide_index=True, use_container_width=True)
+                    st.caption("Kişi güvenirliği model SH ile ve uç puanlılar hariç hesaplanır; "
+                               "uyumsuzlukla şişirilmiş (RSEM) hata kullanan yazılımlar (ör. RaschPy) daha "
+                               "farklı değer verebilir. Marjinal güvenirlik EAP tabanlıdır.")
+                    st.dataframe(rasch_summary(rr), hide_index=True, use_container_width=True)
 
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)

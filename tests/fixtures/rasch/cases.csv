@@ -1,0 +1,3 @@
+case,n,k,sd,missing_rate
+rasch_main,1000,10,1.2,0.0
+rasch_missing,800,10,1.0,0.11887500000000002

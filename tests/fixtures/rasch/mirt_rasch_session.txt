@@ -1,0 +1,5 @@
+R version 4.3.3 (2024-02-29)
+mirt 1.48
+mirt source: github philchalmers/mirt a95523595be1d3d1df60b425fab42a1a02ce612d (1.48)
+EM TOL 1e-9, NCYCLES 20000, GH-41 custom grid; WLE via fscores(method='WLE')
+generated: 2026-10-18 05:37:51 UTC
