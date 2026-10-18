@@ -78,7 +78,9 @@ from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 from ui.rasch_view import (MNSQ_OPTIONS, METHOD_NOTE, screen_items, rasch_settings, run_rasch,
                            fingerprint as rasch_fingerprint, summary_rows as rasch_summary,
-                           misfit_persons, wright_map)
+                           misfit_persons, wright_map, DIF_NOTE, Q3_NOTE, group_candidates,
+                           dif_figure, q3_heatmap, raw_score_figure, run_global_fit, m2_rows, run_q3,
+                           run_dif, dif_summary_rows)
 from ui.irt_optimization import (REFINE_LABEL, REFINE_HELP, calibration_settings,
                                  run_irt_calibration, estimation_method, result_points,
                                  settings_mismatch, optimization_summary, convergence_messages)
@@ -1217,7 +1219,8 @@ elif selected_page == "MTK: Rasch":
                           if np.isfinite(rel['Güvenirlik'].iloc[1]) else "—")
                 m4.metric("İncelenecek madde", int((rr["items"]["Uyum"] == "İnceleme önerilir").sum()))
                 tabs = st.tabs(["📋 Madde parametreleri ve uyum", "👤 Kişi uyumu", "🗺️ Wright haritası",
-                                "📐 Güvenirlik ve model özeti"])
+                                "📐 Güvenirlik ve model özeti", "🧮 Model Uyumu", "🔗 Yerel Bağımsızlık",
+                                "⚖️ DIF / Ölçme Değişmezliği"])
                 with tabs[0]:
                     st.dataframe(rr["items"].round(3), hide_index=True, use_container_width=True)
                     st.caption("b: madde güçlüğü (logit; örtük ortalama 0). Infit bilgiye ağırlıklı, Outfit "
@@ -1243,6 +1246,171 @@ elif selected_page == "MTK: Rasch":
                                "uyumsuzlukla şişirilmiş (RSEM) hata kullanan yazılımlar (ör. RaschPy) daha "
                                "farklı değer verebilir. Marjinal güvenirlik EAP tabanlıdır.")
                     st.dataframe(rasch_summary(rr), hide_index=True, use_container_width=True)
+                # ---- B9: genel uyum, yerel bağımsızlık, DIF (B8 sonucuna bağlı; ayrı oturum anahtarları)
+                b8_key = (fp, tuple(sorted(stored.items())))
+                with tabs[4]:
+                    st.caption("Genel uyum B8 kestirimleri (b, σ, WLE θ) üzerinden yeniden kestirim yapmadan "
+                               "hesaplanır. Her istatistiğin sınıfı (çıkarımsal/betimsel) tabloda belirtilir.")
+                    strata = st.select_slider("Yetenek tabakası sayısı (WLE çeyreklik dilimleri)",
+                                              options=[3, 4, 5, 6, 8, 10], value=5, key="rasch_gf_strata")
+                    if st.button("▶️ Model uyumunu hesapla", key="rasch_gf_run"):
+                        try:
+                            with st.spinner("M2 ve betimsel uyum özetleri hesaplanıyor…"):
+                                st.session_state.rasch_gf = {"key": b8_key, "result": run_global_fit(rr, strata)}
+                        except Exception as exc:
+                            st.session_state.pop("rasch_gf", None)
+                            st.error(f"Model uyumu hesaplanamadı: {exc}")
+                    saved_gf = st.session_state.get("rasch_gf") or {}
+                    gf = saved_gf.get("result") if saved_gf.get("key") == b8_key else None
+                    if gf is not None:
+                        if gf["ui_settings"]["strata"] != strata:
+                            st.info("Gösterilen sonuç farklı tabaka sayısıyla üretildi; yeniden hesaplayın.")
+                        st.markdown("**Sınırlı bilgi uyumu (M2)**")
+                        st.dataframe(m2_rows(gf), hide_index=True, use_container_width=True)
+                        if gf["m2"]["available"]:
+                            st.caption("M2 tek ve iki değişkenli marjinallerden hesaplanır (Maydeu-Olivares ve Joe, "
+                                       "2006); sd = s − q, s = k + k(k−1)/2, q = k + 1. p değeri asimptotik χ² "
+                                       "yaklaşımına dayanır ve küçük örneklemde kalibrasyonu sınırlıdır. RMSEA2 "
+                                       "N ile hesaplanır (mirt N−1 kullanır).")
+                        st.markdown("**İstatistik sınıflandırması**")
+                        st.dataframe(gf["classification"], hide_index=True, use_container_width=True)
+                        st.plotly_chart(raw_score_figure(gf), use_container_width=True)
+                        st.caption(f"Ham puan karşılaştırması yalnızca eksiksiz yanıtlı {gf['raw_complete_n']} kişiyi "
+                                   f"içerir ({gf['raw_incomplete_n']} kişi eksik yanıt nedeniyle dışarıda).")
+                        download_table_pair(gf["raw_scores"].round(4), "psikoanaliz_rasch_hampuan",
+                                            "Ham puan dağılımı", "rasch_gf_raw_dl")
+                        st.markdown("**Madde × yetenek tabakası: gözlenen ve beklenen doğru oranı (betimsel)**")
+                        st.dataframe(gf["strata"].round(3), hide_index=True, use_container_width=True)
+                        download_table_pair(gf["strata"].round(4), "psikoanaliz_rasch_tabaka",
+                                            "Tabaka tablosu", "rasch_gf_strata_dl")
+                        st.markdown("**Standart artık özeti (betimsel)**")
+                        st.dataframe(pd.DataFrame([gf["residuals"]]).round(4), hide_index=True,
+                                     use_container_width=True)
+                with tabs[5]:
+                    st.caption(Q3_NOTE)
+                    q1, q2, q3c = st.columns(3)
+                    with q1:
+                        q3_person = st.selectbox("Kişi kestirimi", ["WLE", "EAP"], key="rasch_q3_person")
+                    with q2:
+                        q3_min = st.select_slider("Çift başına en az ortak yanıt", options=[10, 20, 30, 50, 100],
+                                                  value=30, key="rasch_q3_min")
+                    with q3c:
+                        q3_boot = st.select_slider("Parametrik bootstrap tekrar sayısı", options=[0, 50, 100, 200],
+                                                   value=0, key="rasch_q3_boot",
+                                                   help="Her tekrarda model yeniden kestirilir; 200 tekrar "
+                                                        "orta boyutlu veride birkaç dakika sürebilir.")
+                    q3_seed = st.number_input("Bootstrap tohum değeri", min_value=0, max_value=2**31 - 1,
+                                              value=2026, step=1, key="rasch_q3_seed")
+                    q3_settings = {"person_method": q3_person, "min_pairs": int(q3_min),
+                                   "bootstrap": int(q3_boot), "seed": int(q3_seed)}
+                    if st.button("▶️ Q3 analizini başlat", key="rasch_q3_run"):
+                        try:
+                            with st.spinner("Q3 artık korelasyonları hesaplanıyor…"):
+                                st.session_state.rasch_q3 = {"key": b8_key, "result": run_q3(
+                                    target, usable, rr, q3_person, q3_min, q3_boot, q3_seed)}
+                        except Exception as exc:
+                            st.session_state.pop("rasch_q3", None)
+                            st.error(f"Q3 analizi tamamlanamadı: {exc}")
+                    saved_q3 = st.session_state.get("rasch_q3") or {}
+                    q3r = saved_q3.get("result") if saved_q3.get("key") == b8_key else None
+                    if q3r is not None:
+                        shown = {k: q3r["ui_settings"][k] for k in q3_settings}
+                        if shown != q3_settings:
+                            st.info("Gösterilen Q3 sonucu farklı ayarlarla üretildi; yeniden başlatın.")
+                        a1, a2, a3 = st.columns(3)
+                        a1.metric("Ortalama Q3", f"{q3r['mean_q3']:.3f}")
+                        a2.metric("Bağımsızlık altında beklenen ≈ −1/(k−1)", f"{q3r['expected_under_li']:.3f}")
+                        a3.metric("Tanımsız çift", q3r["n_undefined"])
+                        bs = q3r["bootstrap"]
+                        if bs:
+                            st.markdown(
+                                f"**Parametrik bootstrap** ({bs['used']} geçerli / {bs['replications']} tekrar, "
+                                f"tohum {bs['seed']}): gözlenen en büyük düzeltilmiş Q3 = "
+                                f"{bs['observed_max_adjusted_q3']:.3f}; yerel bağımsızlık altında %95 / %99 "
+                                f"nicelikleri {bs['max_quantile_95']:.3f} / {bs['max_quantile_99']:.3f}; "
+                                f"Monte Carlo p (en büyük değer) = {bs['p_max']:.3f}.")
+                            st.caption("Bootstrap p değeri tüm çiftlerin en büyüğüne aittir (çoklu karşılaştırmayı "
+                                       "hesaba katar); sınırlı tekrar sayısı p değerinin çözünürlüğünü 1/(B+1) ile "
+                                       "sınırlar. Çift bazındaki %95 nicelikleri yalnızca betimseldir. Bu bootstrap "
+                                       "referansı B9'da yalnızca sınırlı bir simülasyonla incelenmiştir (deneysel).")
+                            if bs["failed"]:
+                                st.warning(f"{bs['failed']} bootstrap tekrarı yakınsamadı veya kestirilemedi ve "
+                                           "dışarıda bırakıldı.")
+                        st.plotly_chart(q3_heatmap(q3r), use_container_width=True)
+                        st.markdown("**Düzeltilmiş Q3'e göre sıralı madde çiftleri**")
+                        st.dataframe(q3r["pairs"].round(4), hide_index=True, use_container_width=True)
+                        download_table_pair(q3r["pairs"].round(5), "psikoanaliz_rasch_q3_ciftler", "Q3 çiftleri",
+                                            "rasch_q3_dl")
+                        if not q3r["fit_converged"]:
+                            st.warning("Q3 için yeniden kestirim yakınsamadı; sonuçlar geçicidir.")
+                with tabs[6]:
+                    st.caption(DIF_NOTE)
+                    excluded_cols = set(usable) | {st.session_state.id_col}
+                    candidates = group_candidates(target.drop(columns=[c for c in excluded_cols
+                                                                       if c in target.columns]), usable)
+                    if not candidates:
+                        st.info("DIF için 2–20 düzeyli, madde ve kimlik dışı bir grup sütunu bulunamadı.")
+                    else:
+                        default_g = (candidates.index(st.session_state.group_col)
+                                     if st.session_state.group_col in candidates else 0)
+                        gcol = st.selectbox("Grup değişkeni", candidates, index=default_g, key="rasch_dif_group")
+                        levels = sorted(target[gcol].dropna().unique().tolist(), key=str)
+                        d1, d2 = st.columns(2)
+                        with d1:
+                            ref = st.selectbox("Referans grup", levels, key="rasch_dif_ref")
+                        with d2:
+                            foc_options = [v for v in levels if v != ref]
+                            foc = st.selectbox("Odak grup", foc_options, key="rasch_dif_focal")
+                        if len(levels) > 2:
+                            st.caption(f"Grup değişkeninde {len(levels)} düzey var; yalnızca seçilen iki grup "
+                                       "karşılaştırılır, diğer kişiler bu analizden çıkarılır.")
+                        e1, e2, e3 = st.columns(3)
+                        with e1:
+                            alpha = st.select_slider("FDR düzeyi (BH)", options=[.01, .05, .10], value=.05,
+                                                     key="rasch_dif_alpha")
+                        with e2:
+                            purify = st.checkbox("Yinelemeli çapa arındırması", value=True, key="rasch_dif_purify")
+                        with e3:
+                            rounds = st.select_slider("En fazla arındırma turu", options=[1, 3, 5, 10], value=10,
+                                                      key="rasch_dif_rounds", disabled=not purify)
+                        dif_settings = {"group_col": gcol, "reference": ref, "focal": foc, "alpha": float(alpha),
+                                        "purify": bool(purify), "max_rounds": int(rounds)}
+                        if st.button("▶️ DIF analizini başlat", key="rasch_dif_run"):
+                            try:
+                                with st.spinner("İki gruplu ortak Rasch modeli kestiriliyor…"):
+                                    st.session_state.rasch_dif = {"key": b8_key, "result": run_dif(
+                                        target, usable, gcol, ref, foc, alpha, purify, rounds,
+                                        points=settings["points"])}
+                            except Exception as exc:
+                                st.session_state.pop("rasch_dif", None)
+                                st.error(f"DIF analizi tamamlanamadı: {exc}")
+                        saved_dif = st.session_state.get("rasch_dif") or {}
+                        dr = saved_dif.get("result") if saved_dif.get("key") == b8_key else None
+                        if dr is not None:
+                            shown = {k: dr["ui_settings"][k] for k in dif_settings}
+                            if shown != dif_settings:
+                                st.info("Gösterilen DIF sonucu farklı grup veya ayarlarla üretildi; yeniden başlatın.")
+                            st.markdown(f"**Karşılaştırma:** {dr['focal']} (odak) − {dr['reference']} (referans); "
+                                        f"grup değişkeni `{dr['ui_settings']['group_col']}`.")
+                            for note in dr["warnings"]:
+                                st.warning(note)
+                            if not dr["joint"]["converged"]:
+                                st.error("Ortak model yakınsamadı; DIF sonuçları yorumlanmamalıdır.")
+                            st.dataframe(dif_summary_rows(dr), hide_index=True, use_container_width=True)
+                            st.caption("μ_odak, aynı ölçekte grupların ortalama yetenek farkıdır (etki/impact); "
+                                       "DIF değildir. Ölçek referans grup ortalaması 0 ile tanımlıdır.")
+                            st.plotly_chart(dif_figure(dr), use_container_width=True)
+                            st.dataframe(dr["table"].round(4), hide_index=True, use_container_width=True)
+                            st.caption("Δ ve SH(Δ) ortak modelin gözlenen bilgi matrisinden; z Wald testi; q "
+                                       "Benjamini–Hochberg düzeltilmiş değerdir. Etki sınıfı ETS A/B/C ölçütlerinin "
+                                       "logit karşılığıdır (|Δ| 0,426 ve 0,638; D = 2,35·logit) ve yaklaşık bir "
+                                       "rehberdir. Her madde, kendisi dışındaki çapa maddeleriyle bağlanmış ayrı bir "
+                                       "modelde test edilir; 'Çapa' sütunu son arındırılmış çapa kümesini gösterir. Bu "
+                                       "analiz CML tabanlı Andersen olabilirlik oranı testi değildir.")
+                            st.markdown("**Arındırma geçmişi**")
+                            st.dataframe(dr["history"], hide_index=True, use_container_width=True)
+                            download_table_pair(dr["table"].round(5), "psikoanaliz_rasch_dif", "DIF tablosu",
+                                                "rasch_dif_dl")
 
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
