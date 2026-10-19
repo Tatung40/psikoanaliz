@@ -1,0 +1,4 @@
+R version 4.3.3 (2024-02-29)
+mirt 1.48
+mirt source: github philchalmers/mirt a95523595be1d3d1df60b425fab42a1a02ce612d (1.48)
+generated: 2026-10-18 11:06:22 UTC
