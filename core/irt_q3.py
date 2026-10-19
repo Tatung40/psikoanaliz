@@ -26,8 +26,56 @@ from core.irt_mg import as_matrix, fit_single, Design
 MAX_BOOTSTRAP = 500
 
 
-def probabilities(theta, a, b):
-    return expit(np.asarray(a, float)[None, :] * (np.asarray(theta, float)[:, None] - np.asarray(b, float)[None, :]))
+def probabilities(theta, a, b, c=None, d=None):
+    """P = c + (d - c) logistic(a (theta - b)); c = 0, d = 1 when omitted (1PL/2PL)."""
+    L = expit(np.asarray(a, float)[None, :] * (np.asarray(theta, float)[:, None] - np.asarray(b, float)[None, :]))
+    if c is None and d is None:
+        return L
+    c = np.zeros(L.shape[1]) if c is None else np.asarray(c, float)
+    d = np.ones(L.shape[1]) if d is None else np.asarray(d, float)
+    return c[None, :] + (d - c)[None, :] * L
+
+
+def wle_general(x, observed, a, b, c, d, lo=-12., hi=12., iterations=80):
+    """Warm (1989) WLE for c + (d - c) logistic(a(theta - b)) (3PL/4PL).
+
+    Root of  sum_i (x_i - P_i) P_i' / (P_i Q_i) + J / (2 I),  I = sum P'^2 / (PQ),
+    J = sum P' P'' / (PQ),  P' = (d - c) a L (1 - L),  P'' = (d - c) a^2 L (1 - L)(1 - 2L).
+    The weighted score need not be monotone for 3PL/4PL: the estimating equation is scanned on a
+    grid over [lo, hi]; persons with more than one root (non-unique WLE, seen for 4PL) get NaN and
+    are flagged in `multiple` (returned as the fourth element); otherwise bisection finds the root.
+    Estimates at a bracket end are flagged in `edge`.
+    """
+    x = np.where(observed, x, 0.); a, b, c, d = (np.asarray(v, float) for v in (a, b, c, d))
+
+    def parts(theta):
+        L = expit(a[None, :] * (theta[:, None] - b[None, :]))
+        P = np.clip(c + (d - c) * L, 1e-12, 1 - 1e-12)
+        d1 = (d - c) * a * L * (1 - L); d2 = d1 * a * (1 - 2 * L)
+        w = np.where(observed, 1. / (P * (1 - P)), 0.)
+        return P, d1, d2, w
+
+    def weighted_score(theta):
+        P, d1, d2, w = parts(theta)
+        info = (w * d1 ** 2).sum(1); j = (w * d1 * d2).sum(1)
+        return (w * (x - P) * d1).sum(1) + j / (2 * np.maximum(info, 1e-300))
+
+    grid = np.linspace(lo, hi, 1201)                       # step 0.02: separates closely spaced roots
+    signs = np.sign(np.column_stack([weighted_score(np.full(len(x), g)) for g in grid]))
+    changes = (np.diff(signs, axis=1) != 0).sum(1)
+    multiple = changes > 1
+    low = np.full(len(x), lo); high = np.full(len(x), hi)
+    for _ in range(iterations):
+        mid = (low + high) / 2
+        positive = weighted_score(mid) > 0
+        low = np.where(positive, mid, low); high = np.where(positive, high, mid)
+    theta = (low + high) / 2
+    P, d1, _, w = parts(theta)
+    info = (w * d1 ** 2).sum(1)
+    edge = (np.abs(theta - lo) < 1e-6) | (np.abs(theta - hi) < 1e-6)
+    theta[~observed.any(1) | multiple] = np.nan
+    se = np.where((info > 0) & np.isfinite(theta), 1 / np.sqrt(np.maximum(info, 1e-300)), np.nan)
+    return theta, se, edge, multiple
 
 
 def wle(x, observed, a, b, lo=-12., hi=12., iterations=80):
@@ -54,22 +102,26 @@ def wle(x, observed, a, b, lo=-12., hi=12., iterations=80):
     return theta, np.where(info > 0, 1 / np.sqrt(np.maximum(info, 1e-300)), np.nan)
 
 
-def eap(x, observed, a, b, points=41, grid=None):
+def eap(x, observed, a, b, points=41, grid=None, c=None, d=None):
     """EAP under N(0, 1): Gauss-Hermite nodes, or an explicit (theta, log-weight) grid."""
     if grid is None:
         theta, lw = _grid(points)
     else:
         theta, lw = grid
     x1 = np.where(observed, x, 0.); x0 = np.where(observed, 1. - x, 0.)
-    eta = np.asarray(a, float)[None, :] * (theta[:, None] - np.asarray(b, float)[None, :])
-    lp = x1 @ log_expit(eta).T + x0 @ log_expit(-eta).T + lw
+    if c is None and d is None:
+        eta = np.asarray(a, float)[None, :] * (theta[:, None] - np.asarray(b, float)[None, :])
+        lp = x1 @ log_expit(eta).T + x0 @ log_expit(-eta).T + lw
+    else:
+        P = np.clip(probabilities(theta, a, b, c, d), 1e-12, 1 - 1e-12)
+        lp = x1 @ np.log(P).T + x0 @ np.log1p(-P).T + lw
     post = np.exp(lp - logsumexp(lp, axis=1)[:, None])
     mean = post @ theta
     return mean, np.sqrt(np.maximum(post @ theta ** 2 - mean ** 2, 0.))
 
 
-def q3_matrix(x, observed, theta, a, b, min_pairs=30):
-    resid = np.where(observed, x - probabilities(theta, a, b), np.nan)
+def q3_matrix(x, observed, theta, a, b, min_pairs=30, c=None, d=None):
+    resid = np.where(observed, x - probabilities(theta, a, b, c, d), np.nan)
     k = resid.shape[1]; q3 = np.full((k, k), np.nan); counts = np.zeros((k, k), int)
     for i in range(k):
         for j in range(i + 1, k):
@@ -85,15 +137,24 @@ def q3_matrix(x, observed, theta, a, b, min_pairs=30):
     return q3, counts
 
 
-def _persons(x, obs, a, b, method, points):
+def _persons(x, obs, a, b, method, points, c=None, d=None):
     if method == "WLE":
-        return wle(x, obs, a, b)[0]
+        return wle(x, obs, a, b)[0] if c is None and d is None else wle_general(x, obs, a, b, c, d)[0]   # NaN: non-unique
     if method == "EAP":
-        return eap(x, obs, a, b, points)[0]
+        return eap(x, obs, a, b, points, c=c, d=d)[0]
     raise ValueError("Kişi kestirimi WLE veya EAP olmalıdır.")
 
 
 def default_refit(model, points=41):
+    if model in ("3PL", "4PL"):
+        from core.irt_mg34 import fit_single as fit34, Design34
+
+        def refit34(frame):
+            f = fit34(frame, model, points=points, information=False)
+            aa, bb, cc, dd = Design34(model, ["anchor"] * frame.shape[1], 1).unpack(f["params"], 0)
+            return aa, bb, cc, dd, f["converged"]
+        return refit34
+
     def refit(frame):
         f = fit_single(frame, model, points=points, information=False)
         a, b = Design(model, ["anchor"] * frame.shape[1], 1).unpack(f["params"], 0)
@@ -102,10 +163,25 @@ def default_refit(model, points=41):
 
 
 def q3_analysis(data, a, b, model, person_method="WLE", min_pairs=30, bootstrap=0, seed=2026,
-                points=41, refit=None, converged=True):
-    """Q3 for fixed 1PL/2PL item parameters; optional parametric bootstrap."""
-    if model not in ("1PL", "2PL"):
-        raise ValueError("Bu Q3 uygulaması yalnızca 1PL ve 2PL içindir.")
+                points=41, refit=None, converged=True, c=None, d=None):
+    """Q3 for fixed 1PL/2PL/3PL/4PL item parameters; optional parametric bootstrap.
+
+    3PL/4PL: c (and d for 4PL) are required and the full IRF is used for residuals,
+    persons and simulation; `refit` must return (a, b, c, d, converged) for these models.
+    """
+    if model not in ("1PL", "2PL", "3PL", "4PL"):
+        raise ValueError("Geçersiz model.")
+    full = model in ("3PL", "4PL")
+    if full:
+        if c is None:
+            raise ValueError("3PL/4PL Q3 için c parametreleri gereklidir.")
+        c = np.asarray(c, float); d = np.ones(len(c)) if model == "3PL" or d is None else np.asarray(d, float)
+        if model == "4PL" and not np.all((0 <= c) & (c < d) & (d <= 1)):
+            raise ValueError("4PL için 0 ≤ c < d ≤ 1 olmalıdır.")
+        if model == "3PL" and not np.all((0 <= c) & (c < 1)):
+            raise ValueError("3PL için 0 ≤ c < 1 olmalıdır.")
+    else:
+        c = d = None
     if person_method not in ("WLE", "EAP"):
         raise ValueError("Kişi kestirimi WLE veya EAP olmalıdır.")
     if not (isinstance(bootstrap, (int, np.integer)) and 0 <= bootstrap <= MAX_BOOTSTRAP):
@@ -118,8 +194,8 @@ def q3_analysis(data, a, b, model, person_method="WLE", min_pairs=30, bootstrap=
     if len(a) != k or len(b) != k:
         raise ValueError("Madde parametresi sayısı veriyle uyuşmuyor.")
     names = list(data.columns) if isinstance(data, pd.DataFrame) else [f"M{i+1}" for i in range(k)]
-    theta = _persons(x, obs, a, b, person_method, points)
-    q3, counts = q3_matrix(x, obs, theta, a, b, min_pairs)
+    theta = _persons(x, obs, a, b, person_method, points, c, d)
+    q3, counts = q3_matrix(x, obs, theta, a, b, min_pairs, c, d)
     adj, mean = _adjust(q3)
     iu = np.triu_indices(k, 1)
     pairs = pd.DataFrame({"Madde 1": [names[i] for i in iu[0]], "Madde 2": [names[j] for j in iu[1]],
@@ -128,7 +204,8 @@ def q3_analysis(data, a, b, model, person_method="WLE", min_pairs=30, bootstrap=
     out = {"q3": pd.DataFrame(q3, index=names, columns=names), "adjusted": pd.DataFrame(adj, index=names, columns=names),
            "pairs": pairs, "mean_q3": mean, "expected_under_li": -1. / (k - 1), "person_method": person_method,
            "min_pairs": int(min_pairs), "n_undefined": int(pairs["Q3"].isna().sum()), "model": model,
-           "theta": theta, "bootstrap": None, "fit_converged": bool(converged)}
+           "theta": theta, "bootstrap": None, "fit_converged": bool(converged),
+           "n_person_undefined": int((~np.isfinite(theta) & obs.any(1)).sum())}
     if bootstrap:
         refit = refit or default_refit(model, points)
         rng = np.random.default_rng(seed)
@@ -136,17 +213,21 @@ def q3_analysis(data, a, b, model, person_method="WLE", min_pairs=30, bootstrap=
         maxima, vals, failed = [], [], 0
         for _ in range(int(bootstrap)):
             th = rng.normal(0., 1., len(x))
-            sim = (rng.random(x.shape) < probabilities(th, a, b)).astype(float)
+            sim = (rng.random(x.shape) < probabilities(th, a, b, c, d)).astype(float)
             sim[~obs] = np.nan
             try:
-                aa, bb, ok = refit(pd.DataFrame(sim, columns=names))
+                got = refit(pd.DataFrame(sim, columns=names))
             except (ValueError, RuntimeError, np.linalg.LinAlgError):
                 failed += 1; continue
+            if full:
+                aa, bb, cc, dd, ok = got
+            else:
+                (aa, bb, ok), cc, dd = got, None, None
             if not ok:
                 failed += 1; continue
             xs, os_ = as_matrix(sim)
-            t = _persons(xs, os_, aa, bb, person_method, points)
-            qs, _ = q3_matrix(xs, os_, t, aa, bb, min_pairs)
+            t = _persons(xs, os_, aa, bb, person_method, points, cc, dd)
+            qs, _ = q3_matrix(xs, os_, t, aa, bb, min_pairs, cc, dd)
             aq, _ = _adjust(qs)
             maxima.append(float(np.nanmax(aq[iu]))); vals.append(aq[iu])
         maxima = np.array(maxima); used = len(maxima)
