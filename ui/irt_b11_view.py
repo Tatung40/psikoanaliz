@@ -29,9 +29,9 @@ Q3_NOTE = ("Artıklar modelin tam tepki fonksiyonuyla (3PL'de c, 4PL'de c ve d d
            "kesme değeri karar kuralı olarak kullanılmaz.")
 DIF_NOTE = {
     "3PL": ("Ortak ölçek: referans grupta θ ~ N(0, 1); odak grubun ortalaması ve SS'si serbest; çapa maddelerinin a, b, c "
-            "parametreleri iki grupta eşittir. Genel LR testi (sd = 3) a, b ve c farkını birlikte sınar; yalnızca maddenin "
-            "parametreleri iki modelde de iç noktadaysa asimptotik χ² p değeri verilir (diğer maddelerin sınır "
-            "parametreleri sabit kabul edilir). Madde sınıra dokunuyorsa (örn. c = 0) sonuç betimseldir. Tek "
+            "parametreleri iki grupta eşittir. Genel LR testi (sd = 3) a, b ve c farkını birlikte sınar; yalnızca iki model de "
+            "yakınsamış, çapalı ve tüm serbest parametreleri iç noktadaysa asimptotik χ² p değeri verilir (bu bir "
+            "geçerlilik kanıtı değil, ihtiyatlı bir kuraldır). Herhangi bir parametre sınırdaysa (örn. c = 0) sonuç betimseldir. Tek "
             "parametreli testler (Δa, Δb, Δc) bu parametreleştirmedeki hipotezlerdir; c > 0 iken yalnızca b farkı "
             "sabit bir logit kayması değildir, DIF'in biçimi grup tepki fonksiyonlarından okunur."),
     "4PL": ("4PL DIF için çıkarımsal test DOĞRULANMADI: c ve d'nin sınır davranışı ve zayıf tanımlanması nedeniyle χ² "

@@ -75,15 +75,25 @@ def item_on_bound(f, i):
 
 
 def _lr(f_alt, f_null, i):
-    """(statistic, usable for inference, note)."""
+    """(statistic, usable for inference, note).
+
+    Conservative rule: an asymptotic chi-square p-value is allowed only when both nested fits
+    converged, are identified (anchored) and are fully regular, i.e. no free parameter of any
+    item or of the latent distribution is boundary-active in either fit. This is a screening
+    rule, not a proof that the chi-square reference holds; otherwise the LR is descriptive.
+    """
     if not (f_alt["converged"] and f_null["converged"]):
         return np.nan, False, "Model yakınsamadı; p değeri verilmedi."
     stat = max(2. * (f_alt["loglik"] - f_null["loglik"]), 0.)
+    if not (f_alt.get("linked", True) and f_null.get("linked", True)):
+        return stat, False, "Ortak ölçek tanımlanamıyor (çapa yok); p değeri verilmedi (betimsel)."
     if item_on_bound(f_alt, i) or item_on_bound(f_null, i):
         return stat, False, ("Maddenin bir parametresi kestirim sınırında (örn. c = 0); χ² referansı geçerli değil, "
                              "p değeri verilmedi (betimsel).")
-    others = len([lab for lab in f_alt["bound_labels"] if lab[2] != i])
-    return stat, True, (f"Diğer maddelerde {others} sınır parametresi sabit kabul edildi (koşullu)." if others else "")
+    if not (f_alt["regular"] and f_null["regular"]):
+        return stat, False, ("Başka maddelerde veya gizil dağılımda sınır parametresi var; χ² referansı "
+                             "varsayılamaz, p değeri verilmedi (betimsel).")
+    return stat, True, ""
 
 
 def _contrast(f, i, p):
@@ -247,7 +257,7 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
             base[f"Δ{prm} (odak − ref)"] = dlt; base[f"SH(Δ{prm})"] = se
         base.update({f"LR χ² genel (sd={npar})": r["stat"], "p": pi[i], "q (BH)": qi[i], "DIF işareti": sig,
                      "Çapa taraması": ("Çapa dışı (sezgisel)" if i in screened and not sig and inferential else ""),
-                     "Çıkarım": ("Asimptotik χ² (iç nokta)" if r["ok"] else
+                     "Çıkarım": ("Asimptotik χ² (düzenli çözüm)" if r["ok"] else
                                  "Betimsel (p verilmedi)" if inferential else "Betimsel")})
         notes = [r["note"]] if r["note"] else []
         if sig or (i in screened and inferential):        # parameter-specific decomposition

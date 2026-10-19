@@ -354,8 +354,25 @@ def test_3pl_dif_procedure_on_planted_and_null_data():
             assert t.loc[item, "Çapa taraması"] == "Çapa dışı (sezgisel)" and not t.loc[item, "DIF işareti"]
     assert t.loc["M3", "İşaretli fark E_F[P_F − P_R]"] < 0          # b +0.6: harder for focal
     assert t.loc["M8", "İşaretli fark E_F[P_F − P_R]"] > 0          # c +0.15: easier at low theta
-    ok = t[t["Çıkarım"] == "Asimptotik χ² (iç nokta)"]
-    assert len(ok) and np.isfinite(ok["p"]).all()
+    assert t.loc[np.isfinite(t["p"].astype(float)), "Çıkarım"].eq("Asimptotik χ² (düzenli çözüm)").all()
+    assert not t.loc[~np.isfinite(t["p"].astype(float)), "DIF işareti"].any()      # no p-value -> never flagged
+
+
+def _fake(converged=True, regular=True, linked=True, bound=(), ll=-100.):
+    return {"converged": converged, "regular": regular, "linked": linked, "loglik": ll, "bound_labels": list(bound)}
+
+
+def test_lr_rule_interior_nuisance_boundary_and_nonconvergence():
+    null, alt = _fake(ll=-105.), _fake(ll=-100.)
+    assert D._lr(alt, null, 0)[:2] == (10., True)                                         # all interior
+    nuis = _fake(regular=False, bound=[("c", -1, 3)], ll=-100.)                          # other item on a bound
+    stat, ok, note = D._lr(nuis, null, 0)
+    assert stat == 10. and not ok and "Başka" in note
+    stat, ok, _ = D._lr(_fake(regular=False, bound=[("c", 1, 0)]), null, 0)               # studied item on a bound
+    assert stat == 10. and not ok
+    stat, ok, note = D._lr(_fake(converged=False), null, 0)
+    assert np.isnan(stat) and not ok and "yakınsamadı" in note
+    assert not D._lr(_fake(linked=False, regular=False), null, 0)[1]
 
 
 # ------------------------------------------------------------------- Phase B: 4PL references
