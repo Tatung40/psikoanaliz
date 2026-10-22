@@ -27,7 +27,7 @@ def compare_ctt(data,items):
         other=None;ci=None;difference=None
     cross=item_crosscheck(stats,independent_item_metrics(clean))
     split_comparison=compare_splits(native,independent_splits(clean))
-    return dict(item_crosscheck=cross,split_comparison=split_comparison,native_alpha=alpha,reference_alpha=other,ci=ci,difference=difference,
+    return dict(native=native,item_crosscheck=cross,split_comparison=split_comparison,native_alpha=alpha,reference_alpha=other,ci=ci,difference=difference,
                 item_stats=stats,N=len(clean),k=len(items),binary=binary,
                 removed=len(x)-len(clean))
 
