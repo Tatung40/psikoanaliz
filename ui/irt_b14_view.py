@@ -10,6 +10,7 @@ from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
 from reports.irt_b14_narrative import guided_report
 from reports.irt_b14_audit import interpretation_audit
 from core.irt_b14_profiles import empirical_profiles
+from core.irt_b14_model_curves import fitted_category_curves
 from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
 def render(data,existing_item_cols=(),id_col=None,group_col=None):
@@ -91,6 +92,20 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         except Exception as exc:
             st.info(f"Standartlaştırılmış parametre tablosu alınamadı: {exc}")
         audit=interpretation_audit(result)
+        st.markdown("### Model Tabanlı Kategori Tepki Eğrileri (CRC)")
+        try:
+            curve_table=fitted_category_curves(result)
+            curve_items=list(result["items"])
+            curve_selected=st.selectbox("CRC maddesi",curve_items,key="b14_crc_item")
+            shown_curve=curve_table.loc[curve_table["Madde"]==str(curve_selected)]
+            st.line_chart(shown_curve.pivot(index="Theta",columns="Kategori",values="Olasılık"),
+                          y_label="Kestirilen yanıt olasılığı",x_label="Theta")
+            st.download_button("Model CRC verisi CSV",curve_table.to_csv(index=False).encode("utf-8-sig"),
+                               "B14_model_CRC.csv",mime="text/csv",key="b14_crc_csv")
+            st.caption("Bu eğriler doğrudan kestirilen modelin olasılık fonksiyonundan hesaplanır; "
+                       "modelin bağımsız bilimsel geçerliği ayrıca doğrulanmalıdır.")
+        except Exception as exc:
+            st.info(f"Model CRC grafiği gösterilemiyor: {exc}. Betimsel profiller kullanılabilir.")
         st.markdown("### Bilimsel Yorumlama ve Kanıt Denetimi")
         st.write("**Karar:** "+audit["decision"])
         st.info(audit["explanation"])
