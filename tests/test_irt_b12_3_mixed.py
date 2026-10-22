@@ -42,8 +42,10 @@ def test_group_and_quadrature_guards():
         X.fit_mixed(d,TYPES,groups=["A"]*40+["B"]*39+["C"],reference="A",focal="B")
     with pytest.raises(ValueError,match="61"):
         X.fit_mixed(d,TYPES,points=31)
-    with pytest.raises(ValueError,match="Bilinmeyen"):
+    with pytest.raises(ValueError,match="Tek grupta DIF"):
         X.fit_mixed(d,TYPES,group_specific=["X"])
+    with pytest.raises(ValueError,match="Bilinmeyen"):
+        X.fit_mixed(d,TYPES,groups=["A"]*40+["B"]*40,reference="A",focal="B",group_specific=["X"])
 
 def test_design_fixed_parameters():
     des=X.MixedDesign(TYPES)
