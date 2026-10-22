@@ -77,7 +77,7 @@ def summarize(df):
     if df.empty:return pd.DataFrame()
     rows=[]
     for (n,cond),g in df.groupby(["N","condition"]):
-        good=g[(g.status=="ok") & g.converged.astype(bool)]
+        good=g[(g.status=="ok") & g.converged.fillna(False).astype(bool)]
         r={"N":n,"condition":cond,"attempted":len(g),"successful":len(good),
            "convergence_rate":len(good)/len(g),"failure_count":len(g)-len(good)}
         for p in ("boundary_count","elapsed_seconds"):
