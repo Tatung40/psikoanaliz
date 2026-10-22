@@ -115,7 +115,6 @@ def fit_mixed(data,item_types,groups=None,reference=None,focal=None,group_specif
         if not gs.isin([reference,focal]).all():raise ValueError("Tanımsız grup düzeyleri var; gözlemler sessizce çıkarılamaz.")
         gv=(gs==focal).to_numpy(dtype=int);G=2
         if np.sum(gv==0)<30 or np.sum(gv==1)<30:raise ValueError("Her grupta en az 30 kişi gerekir.")
-        if not group_specific:raise ValueError("İki grupta ortak ölçek için DIF olmayan çapa tasarımı açıkça incelenmelidir.") if len(item_types)<3 else None
     unknown=set(group_specific)-set(names)
     if unknown:raise ValueError("Bilinmeyen DIF maddeleri: "+str(sorted(unknown)))
     idx=[names.index(n) for n in group_specific]
