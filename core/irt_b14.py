@@ -23,7 +23,7 @@ def prepare_polytomous(data,model,*,categories=None):
             raise ValueError("Nominal kategori sayısı 3–20 ve etiketleri benzersiz olmalı.")
         code={name:i for i,name in enumerate(labels)}
         values=data.astype(str).apply(lambda col:col.str.strip().str.upper())
-        if not values.isin(code).all().all():
+        if not values.isin(list(code)).all().all():
             raise ValueError("Yanıtlarda tanımlı olmayan nominal kategoriler var.")
         x=values.replace(code).astype(int)
     else:
