@@ -1,0 +1,31 @@
+name: Python mirt dependency smoke
+on:
+  pull_request:
+    paths:
+      - 'core/irt_engine_registry.py'
+      - '.github/workflows/python-mirt-smoke.yml'
+  workflow_dispatch:
+jobs:
+  optional-python-mirt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install optional pinned Python mirt (not production dependency)
+        run: python -m pip install --only-binary=:all: 'mirt==1.2.0' pandas numpy scipy
+      - name: Test install and public API availability
+        run: |
+          python - <<'PY'
+          import importlib.metadata
+          import mirt
+          from core.irt_engine_registry import engine_inventory
+          assert importlib.metadata.version("mirt") == "1.2.0"
+          for name in ("fit_mirt", "simdata", "fscores"):
+              assert callable(getattr(mirt,name,None)), f"Missing public function {name}"
+          row=next(x for x in engine_inventory() if x["engine"]=="python_mirt")
+          assert row["installed"] and not row["production_ready"]
+          print("PYTHON MIRT IMPORT SMOKE PASS; FIT SCIENTIFICALLY UNVALIDATED")
+          PY
