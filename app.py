@@ -1674,8 +1674,18 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     external_fit = previous_external["fit"]
                     st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
                                f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
-                    st.info("Deneysel motor çıktısı oturumda saklandı. Geçerliliği "
-                            "doğrulanmamış parametre ve SH tabloları sunulmuyor.")
+                    st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
+                            "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
+                            "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
+                    with st.expander("Python mirt — ham kestirim özeti (deneysel)"):
+                        try:
+                            raw_summary = external_fit.fit.summary()
+                            st.text(str(raw_summary)[:15000])
+                        except Exception as summary_error:
+                            st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
+                    st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
+                               "henüz bağımsız eşleştirmeden geçmediği için "
+                               "resmî analiz sonuçlarına eklenmez.")
                 else:
                     st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
         current_settings = calibration_settings(model, qpoints, iterations, a_upper,
