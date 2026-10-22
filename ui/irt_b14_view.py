@@ -7,6 +7,7 @@ import io
 import pandas as pd
 import streamlit as st
 from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
+from core.irt_b14_profiles import empirical_profiles
 from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
 def render(data,existing_item_cols=(),id_col=None,group_col=None):
@@ -40,6 +41,22 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
             st.dataframe(counts,hide_index=True,use_container_width=True)
             st.markdown("**Madde × kategori frekansları**")
             st.dataframe(category_frequencies(numeric,category_labels),hide_index=True,use_container_width=True)
+            st.markdown("**Gözlenen kategori profilleri (betimsel)**")
+            st.caption("Bunlar MTK modeliyle kestirilmiş kategori tepki eğrileri değildir. "
+                       "Sıralı modellerde diğer maddelerin toplamına göre oluşan grupları; "
+                       "NRM'de ise seçeneklerin ham tercih oranlarını gösterir.")
+            profile=empirical_profiles(numeric,category_labels,model)
+            if not profile.empty:
+                selected_item=st.selectbox("Grafiği çizilecek madde",list(numeric.columns),key="b14_empirical_item")
+                part=profile.loc[profile["Madde"]==str(selected_item)]
+                if model=="NRM":
+                    st.bar_chart(part.set_index("Kategori")["Oran"],y_label="Seçim oranı")
+                else:
+                    pivot=part.pivot(index="Grup",columns="Kategori",values="Oran")
+                    st.line_chart(pivot,y_label="Gözlenen kategori oranı",x_label="Diğer maddelerin ortalama toplam puanı")
+                st.download_button("Betimsel kategori profillerini CSV indir",
+                    profile.to_csv(index=False).encode("utf-8-sig"),
+                    "B14_betimsel_kategori_profilleri.csv",mime="text/csv",key="b14_empirical_csv")
             quality=quality_report(numeric,category_labels,model)
             st.markdown("**Kategori seyrekliği ve kalite denetimleri**")
             st.dataframe(quality,hide_index=True,use_container_width=True)
