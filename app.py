@@ -226,6 +226,9 @@ with st.sidebar:
               args=("MTK: Rasch",))
     st.button("📋 İkili MTK B13 Raporu", key="nav_irt_b13", use_container_width=True,
               on_click=navigate_to, args=("MTK: İkili Rapor",))
+    st.button("🔍 MTK Varsayım Denetimi", key="nav_irt_assumptions",
+              use_container_width=True, on_click=navigate_to,
+              args=("MTK: Varsayım Denetimi",))
     st.markdown("**Çok Kategorili Modeller**")
     st.button("🧬 B14 Çok Kategorili MTK", key="nav_irt_b14",
               use_container_width=True, on_click=navigate_to,
@@ -1448,6 +1451,14 @@ elif selected_page == "MTK: Çok Kategorili B14":
         st.warning("Önce Veri Yükleme bölümünden kategorili yanıt dosyası yükleyin.")
     else:
         render_b14(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page == "MTK: Varsayım Denetimi":
+    render_academic_header()
+    from ui.irt_assumptions_view import render as render_irt_assumptions
+    src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
+    if src is None:
+        st.warning("Önce yanıt verilerini yükleyin.")
+    else:
+        render_irt_assumptions(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: İkili Rapor":
     render_academic_header()
     from ui.irt_b13_view import render as render_b13
