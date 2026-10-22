@@ -4,6 +4,7 @@ import pandas as pd
 from core.reliability import compute_reliability_indices
 from core.item_analysis import compute_item_statistics
 from core.ctt_item_crosscheck import independent_item_metrics,item_crosscheck
+from core.ctt_split_crosscheck import independent_splits,compare_splits
 
 def compare_ctt(data,items):
     x=data[list(items)].apply(pd.to_numeric,errors="coerce")
@@ -25,7 +26,8 @@ def compare_ctt(data,items):
     except ImportError:
         other=None;ci=None;difference=None
     cross=item_crosscheck(stats,independent_item_metrics(clean))
-    return dict(item_crosscheck=cross,native_alpha=alpha,reference_alpha=other,ci=ci,difference=difference,
+    split_comparison=compare_splits(native,independent_splits(clean))
+    return dict(item_crosscheck=cross,split_comparison=split_comparison,native_alpha=alpha,reference_alpha=other,ci=ci,difference=difference,
                 item_stats=stats,N=len(clean),k=len(items),binary=binary,
                 removed=len(x)-len(clean))
 
