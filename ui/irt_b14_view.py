@@ -11,6 +11,7 @@ from reports.irt_b14_narrative import guided_report
 from reports.irt_b14_audit import interpretation_audit
 from core.irt_b14_profiles import empirical_profiles
 from core.irt_b14_model_curves import fitted_category_curves
+from core.irt_b14_diagnostics import model_diagnostics
 from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
 def render(data,existing_item_cols=(),id_col=None,group_col=None):
@@ -91,6 +92,22 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
                                "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv")
         except Exception as exc:
             st.info(f"Standartlaştırılmış parametre tablosu alınamadı: {exc}")
+        st.markdown("### Model ve Madde Uyum Tanıları (Deneysel)")
+        if st.button("Model sonrası tanıları çalıştır",key="b14_diagnostics_run"):
+            status,tables=model_diagnostics(result)
+            st.session_state["b14_diagnostics"]={"model":model,"status":status,"tables":tables}
+        diagnostic=st.session_state.get("b14_diagnostics")
+        if diagnostic and diagnostic["model"]==model:
+            st.dataframe(diagnostic["status"],hide_index=True,use_container_width=True)
+            for diagnostic_name,diagnostic_table in diagnostic["tables"].items():
+                st.markdown("**"+diagnostic_name+"**")
+                st.dataframe(diagnostic_table,hide_index=True,use_container_width=True)
+                st.download_button(diagnostic_name+" CSV indir",
+                    safe_frame(diagnostic_table).to_csv(index=False).encode("utf-8-sig"),
+                    "B14_"+diagnostic_name.replace(" ","_")+".csv",
+                    mime="text/csv",key="b14_diag_"+diagnostic_name)
+            st.caption("Motor çıktılarının varlığı tek başına bilimsel geçerliği kanıtlamaz; "
+                       "model, veri ve bağımsız referans incelemesi gerekir.")
         audit=interpretation_audit(result)
         st.markdown("### Model Tabanlı Kategori Tepki Eğrileri (CRC)")
         try:
