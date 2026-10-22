@@ -1,0 +1,147 @@
+"""B13 integrated native dichotomous IRT reporting page.
+The native estimators remain authoritative; external-engine scientific mappings
+are not silently inferred. CSV/XLSX/ZIP exports exclude IDs by default.
+"""
+import io
+import zipfile
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+from core.irt_b13_curves import compute_curves, check_curves
+from core.irt import fit_irt
+from core.rasch import rasch_analysis
+
+MODELS=("Rasch","1PL","2PL","3PL","4PL")
+def prepare(data, model):
+    x=data.apply(pd.to_numeric,errors="coerce")
+    if len(x)<30 or x.shape[1]<3: raise ValueError("En az 30 kişi ve 3 madde gereklidir.")
+    if x.isna().any().any() or not x.isin([0,1]).all().all():
+        raise ValueError("Eksiksiz, 0/1 kodlu madde yanıt matrisi gereklidir.")
+    if (x.nunique()!=2).any():raise ValueError("Sabit yanıtlı maddeleri inceleyin veya dışlayın.")
+    return x.astype(int)
+
+def native_fit(data,model):
+    x=prepare(data,model)
+    if model=="Rasch":
+        r=rasch_analysis(x)
+        f=r["fit"]
+        it=pd.DataFrame({"Madde":x.columns,"a":1.0,"b":f["b"],"c":0.0,"d":1.0,
+                         "SH(b)":f["items"]["SH(b)"].to_numpy()})
+        p=r["persons"]
+        th=np.asarray(p["WLE θ"],float)
+        se=np.asarray(p["SH(θ)"],float)
+        fit=f
+        diag=r["items"]
+        scale=f"Rasch logit, sigma={f['sd']:.5g}"
+    else:
+        f=fit_irt(x.to_numpy(),model=model)
+        it=f["items"].copy()
+        it["Madde"]=list(map(str,x.columns))
+        th=np.asarray(f["theta"],float)
+        se=np.asarray(f["theta_sd"],float)
+        fit=f
+        diag=None
+        scale="theta ~ N(0,1); D=1"
+    if len(th)!=len(x):raise ValueError("Kişi yetenekleri ve yanıt satırları eşleşmiyor.")
+    persons=pd.DataFrame({"Sıra":np.arange(1,len(x)+1),"Theta":th,"KSH":se,
+                          "Ham puan":x.sum(axis=1).to_numpy()})
+    overview=pd.DataFrame([{"Model":model,"Motor":"EserPsychometrics",
+      "N":len(x),"Madde":x.shape[1],"logLik":fit["loglik"],
+      "AIC":fit["aic"],"BIC":fit["bic"],"Yineleme":fit["iterations"],
+      "Yakınsama":bool(fit["converged"]),"Ölçek":scale}])
+    return {"items":it,"persons":persons,"overview":overview,"diagnostics":diag,
+            "model":model,"scale":scale,"fit":fit,"checks":check_curves(it,model)}
+
+def excel_bytes(tables):
+    out=io.BytesIO()
+    with pd.ExcelWriter(out,engine="openpyxl") as writer:
+        for name,df in tables.items():
+            df.to_excel(writer,sheet_name=name[:31],index=False)
+    return out.getvalue()
+
+def render(target,columns,id_col=None,group_col=None):
+    st.subheader("İkili MTK — Bütünleşik Analiz ve Rapor")
+    st.caption("Rasch, 1PL, 2PL, 3PL ve 4PL | EserPsychometrics yerel motor")
+    tabs=st.tabs(["Model ve Ayarlar","Genel Sonuçlar","Madde Parametreleri",
+                  "Kişi Yetenekleri","Bilimsel Grafikler","Uyum ve Tanılar",
+                  "Motor Karşılaştırması","Raporlar ve İndirme"])
+    data=target[[c for c in columns if c not in (id_col,group_col)]]
+    with tabs[0]:
+        model=st.radio("İkili MTK modeli",MODELS,horizontal=True,key="b13_model")
+        if st.button("Analizi başlat",key="b13_run",type="primary"):
+            try:
+                with st.spinner("Parametre kestirimi ve tanılar hesaplanıyor"):
+                    result=native_fit(data,model)
+                st.session_state["b13_latest"]={"result":result,
+                    "fingerprint":int(pd.util.hash_pandas_object(data,index=True).sum())}
+                st.success("Analiz tamamlandı.")
+            except Exception as exc:
+                st.session_state.pop("b13_latest",None)
+                st.error(str(exc))
+    saved=st.session_state.get("b13_latest")
+    fingerprint=int(pd.util.hash_pandas_object(data,index=True).sum())
+    result=saved["result"] if saved and saved["fingerprint"]==fingerprint and saved["result"]["model"]==model else None
+    if result is None:
+        with tabs[1]:st.info("Önce Model ve Ayarlar sekmesinden analizi başlatın.")
+        return
+    overview=result["overview"];items=result["items"];persons=result["persons"]
+    with tabs[1]:
+        row=overview.iloc[0]
+        cols=st.columns(4)
+        for col,key in zip(cols,("N","Madde","AIC","BIC")):col.metric(key,round(float(row[key]),2))
+        st.dataframe(overview,hide_index=True,use_container_width=True)
+        if not bool(row["Yakınsama"]):st.warning("Yakınsama sağlanmadı; çıkarımsal yorumlardan kaçının.")
+    with tabs[2]:
+        st.dataframe(items,hide_index=True,use_container_width=True)
+        st.download_button("Madde parametreleri CSV",items.to_csv(index=False).encode("utf-8-sig"),
+                           "b13_items.csv",mime="text/csv")
+    with tabs[3]:
+        ids=st.checkbox("Kişi kimliklerini rapora ekle",value=False,key="b13_ids",disabled=id_col is None)
+        shown=persons.copy()
+        if ids and id_col in target:
+            shown.insert(0,"Kişi kimliği",target[id_col].astype(str).to_numpy())
+        st.dataframe(shown.head(500),hide_index=True,use_container_width=True)
+        st.download_button("Kişi yetenekleri CSV",shown.to_csv(index=False).encode("utf-8-sig"),
+                           "b13_persons.csv",mime="text/csv")
+    with tabs[4]:
+        kind=st.selectbox("Grafik",("ICC","IIC","TIF","SEM","Theta dağılımı"),key="b13_figure")
+        cv=compute_curves(items)
+        fig=go.Figure()
+        if kind in ("ICC","IIC"):
+            names=items["Madde"].astype(str).tolist()
+            selected=st.multiselect("Maddeler",names,default=names[:8],key="b13_fig_items")
+            for item in selected:
+                j=names.index(item)
+                fig.add_scatter(x=cv["theta"],y=cv[kind.lower()][:,j],name=item)
+        elif kind=="TIF":fig.add_scatter(x=cv["theta"],y=cv["tif"],name="Test bilgisi")
+        elif kind=="SEM":fig.add_scatter(x=cv["theta"],y=cv["sem"],name="Koşullu SEM")
+        else:fig.add_histogram(x=persons["Theta"],name="Theta")
+        fig.update_layout(title=f"{model} — {kind}",xaxis_title="Theta",
+                          template="plotly_white")
+        st.plotly_chart(fig,use_container_width=True)
+        st.write("Matematiksel kontroller:",result["checks"])
+    with tabs[5]:
+        st.write("Yakınsama",bool(overview.iloc[0]["Yakınsama"]))
+        if result["diagnostics"] is not None:
+            st.dataframe(result["diagnostics"],hide_index=True,use_container_width=True)
+        else:st.info("Model uyum tanılarını mevcut model sayfasında inceleyin.")
+    with tabs[6]:
+        st.info("Motorların parametre ölçekleri doğrulanmadan doğrudan fark tablosu üretilmez. "
+                "Python mirt sonuçlarını ilgili modelin alternatif motor ekranında inceleyin.")
+    with tabs[7]:
+        tablemap={"Model_Ozeti":overview,"Madde_Parametreleri":items,
+                  "Kisi_Yetenekleri":shown,"Kontroller":pd.DataFrame([
+                     {"Denetim":k,"Durum":str(v)} for k,v in result["checks"]["checks"].items()])}
+        rawxlsx=excel_bytes(tablemap)
+        txt=f"EserPsychometrics B13\nModel: {model}\nMotor: native\nOlcek: {result['scale']}\n"
+        st.download_button("Excel — tüm tablolar",rawxlsx,"B13_rapor.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.download_button("Yöntem TXT",txt,"B13_yontem.txt")
+        mem=io.BytesIO()
+        with zipfile.ZipFile(mem,"w",zipfile.ZIP_DEFLATED) as z:
+            z.writestr("B13_rapor.xlsx",rawxlsx)
+            z.writestr("B13_items.csv",items.to_csv(index=False))
+            z.writestr("B13_persons.csv",shown.to_csv(index=False))
+            z.writestr("B13_yontem.txt",txt)
+        st.download_button("ZIP — rapor paketi",mem.getvalue(),"B13_rapor.zip",mime="application/zip")
