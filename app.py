@@ -224,6 +224,8 @@ with st.sidebar:
     st.button("📏 Rasch Analizi", key="nav_irt_rasch",
               use_container_width=True, on_click=navigate_to,
               args=("MTK: Rasch",))
+    st.button("📋 İkili MTK B13 Raporu", key="nav_irt_b13", use_container_width=True,
+              on_click=navigate_to, args=("MTK: İkili Rapor",))
     st.markdown("**Çok Kategorili Modeller**")
     st.button("🔒 GRM / GPCM / NRM — Yakında", disabled=True,
               use_container_width=True)
@@ -1437,6 +1439,14 @@ elif selected_page == "MTK: Rasch":
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
 # =============================================================================
+elif selected_page == "MTK: İkili Rapor":
+    render_academic_header()
+    from ui.irt_b13_view import render as render_b13
+    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if src is None:
+        st.warning("Önce veri dosyası yükleyin.")
+    else:
+        render_b13(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma"):
     render_academic_header()
     st.subheader("🧪 Madde Tepki Kuramı — 1PL, 2PL, 3PL, 4PL")
