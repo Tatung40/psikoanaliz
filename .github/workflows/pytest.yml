@@ -6,6 +6,7 @@ on:
 jobs:
   pytest:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -15,5 +16,11 @@ jobs:
         run: pip install -r requirements.txt
       - name: Compile Python sources
         run: python -m compileall -q app.py core ui tests
-      - name: Run test suite
+      - name: B11.1 targeted regression tests (pull requests)
+        if: github.event_name == 'pull_request'
+        timeout-minutes: 15
+        run: python -m pytest -vv -s tests/test_irt_b11_regression_gates.py
+      - name: Full regression suite (main)
+        if: github.event_name == 'push'
+        timeout-minutes: 55
         run: python -m pytest -q
