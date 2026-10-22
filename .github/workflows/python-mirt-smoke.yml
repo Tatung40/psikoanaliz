@@ -1,5 +1,7 @@
 name: Python mirt dependency smoke
 on:
+  push:
+    branches: [feat/hybrid-engine-registry]
   pull_request:
     paths:
       - 'core/irt_engine_registry.py'
