@@ -19,7 +19,7 @@ jobs:
       - name: Targeted regression tests (pull requests)
         if: github.event_name == 'pull_request'
         timeout-minutes: 15
-        run: python -m pytest -vv -s tests/test_irt_b11_regression_gates.py tests/test_irt_b12_audit.py tests/test_irt_b12_compare.py tests/test_irt_b12_3_mixed.py tests/test_irt_b12_reference.py
+        run: python -m pytest -vv -s tests/test_irt_b11_regression_gates.py tests/test_irt_b12_audit.py tests/test_irt_b12_compare.py tests/test_irt_b12_3_mixed.py tests/test_irt_b12_reference.py tests/test_irt_mixed_se.py
       - name: Full regression suite (main)
         if: github.event_name == 'push'
         timeout-minutes: 55
