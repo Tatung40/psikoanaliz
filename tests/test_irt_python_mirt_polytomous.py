@@ -9,7 +9,7 @@ from core.irt_python_mirt_adapter import fit_python_mirt
 @pytest.mark.parametrize("model",["PCM","GPCM","RSM","NRM"])
 def test_polytomous_fit_model(model):
     import mirt
-    x=mirt.simdata(model=model,n_persons=120,n_items=5,n_categories=4,seed=20261022)
+    x=mirt.simdata(model=("PCM" if model=="RSM" else model),n_persons=120,n_items=5,n_categories=4,seed=20261022)
     x=np.asarray(x)
     assert x.ndim==2 and x.shape==(120,5)
     r=fit_python_mirt(x,model=model,n_categories=4)
