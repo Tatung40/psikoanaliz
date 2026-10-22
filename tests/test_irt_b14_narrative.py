@@ -7,7 +7,7 @@ from reports.irt_b14_report import export_zip
 
 def case(model="NRM"):
     data=pd.DataFrame((np.arange(80)[:,None]+np.arange(5)[None,:])%5,columns=list("ABCDE"))
-    return {"model":model,"engine":"Python mirt 1.2.0","N":80,"k":5,
+    return {"model":model,"engine":"Python mirt 1.2.0","status":"DENEYSEL","N":80,"k":5,
         "labels":tuple("ABCDE"),"coded":data,
         "result":type("Stub",(),{"coef_with_se":lambda self:pd.DataFrame({"estimate":[.3]})})()}
 
