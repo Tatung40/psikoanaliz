@@ -1,6 +1,7 @@
 import streamlit as st
 from core.ctt_dual_engine import compare_ctt,item_guidance
 from reports.ctt_guided_docx import ctt_docx
+from reports.ctt_release_bundle import export_ktk_xlsx,export_ktk_zip
 
 def render(data,items=(),id_col=None,group_col=None):
     st.subheader("KTK: Çift Motor ve Akademik Rapor")
@@ -15,7 +16,12 @@ def render(data,items=(),id_col=None,group_col=None):
     st.dataframe(item_guidance(r),hide_index=True)
     st.markdown("**Bağımsız madde istatistikleri karşılaştırması**")
     st.dataframe(r["item_crosscheck"],hide_index=True)
+    st.markdown("**İki yarı ve Spearman–Brown bağımsız denetimi**")
+    st.dataframe(r["split_comparison"],hide_index=True)
     st.download_button("Karşılaştırma CSV",r["item_crosscheck"].to_csv(index=False).encode("utf-8-sig"),"KTK_karsilastirma.csv",mime="text/csv",key="ctt_cross_csv")
     st.info("Madde kararları uzman incelemesi gerektirir; otomatik silme yapılmaz.")
     st.download_button("KTK Word raporu",ctt_docx(r),"KTK_Akademik_Rapor.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",key="ctt_double_docx")
+
+    st.download_button("Tüm KTK tabloları Excel",export_ktk_xlsx(r),"KTK_Tablolar.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",key="ctt_all_xlsx")
+    st.download_button("KTK akademik rapor paketi ZIP",export_ktk_zip(r),"KTK_Akademik_Rapor_Paketi.zip",mime="application/zip",key="ctt_all_zip")
