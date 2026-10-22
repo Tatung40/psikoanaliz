@@ -6,7 +6,7 @@ from core.irt_b14 import prepare_polytomous
 
 def nominal(n=90):
     letters=np.array(list("ABCDE"))
-    x=np.resize(letters,n*5).reshape(n,5)
+    x=letters[(np.arange(n)[:,None]+np.arange(5)[None,:])%5]
     return pd.DataFrame(x,columns=list("JKLMN"))
 
 def test_nominal_ae_preserved_as_distinct_categories():
@@ -21,7 +21,7 @@ def test_reject_nominal_letters_in_ordered_model():
 
 @pytest.mark.parametrize("model",["GRM","PCM","GPCM","RSM"])
 def test_ordered_scores(model):
-    x=pd.DataFrame(np.resize(np.arange(4),360).reshape(90,4))
+    x=pd.DataFrame((np.arange(90)[:,None]+np.arange(4)[None,:])%4)
     coded,labs=prepare_polytomous(x,model)
     assert labs==("0","1","2","3")
     assert coded.shape==(90,4)
