@@ -202,6 +202,18 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
     st.markdown("**İki Kategorili Modeller**")
+    binary_quick_model = st.selectbox(
+        "Hızlı ikili MTK model seçimi",
+        ("Rasch", "1PL", "2PL", "3PL", "4PL"),
+        key="binary_irt_quick_model",
+    )
+    st.button(
+        "Seçili MTK analizine git",
+        key="binary_irt_quick_go",
+        use_container_width=True,
+        on_click=navigate_to,
+        args=(f"MTK: {binary_quick_model}",),
+    )
     for m in ("1PL", "2PL", "3PL", "4PL"):
         st.button(f"📐 {m} Modeli", key=f"nav_irt_{m}",
                   use_container_width=True, on_click=navigate_to,
