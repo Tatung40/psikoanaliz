@@ -7,6 +7,7 @@ import io
 import pandas as pd
 import streamlit as st
 from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
+from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
 def render(data,existing_item_cols=(),id_col=None,group_col=None):
     st.subheader("B14 — Çok Kategorili MTK (Deneysel Pilot)")
@@ -37,6 +38,13 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
             counts=numeric.stack().value_counts().sort_index().rename_axis("Kategori kodu").reset_index(name="Frekans")
             counts["Etiket"]=counts["Kategori kodu"].map(dict(enumerate(category_labels)))
             st.dataframe(counts,hide_index=True,use_container_width=True)
+            st.markdown("**Madde × kategori frekansları**")
+            st.dataframe(category_frequencies(numeric,category_labels),hide_index=True,use_container_width=True)
+            quality=quality_report(numeric,category_labels,model)
+            st.markdown("**Kategori seyrekliği ve kalite denetimleri**")
+            st.dataframe(quality,hide_index=True,use_container_width=True)
+            if (quality["Uyarı"]!="—").any():
+                st.warning("Bazı maddelerde kategoriler seyrek (<5). Parametre tahminleri kararsız olabilir.")
         except ValueError as e:
             numeric=None
             st.error(f"Veri denetimi: {e}")
@@ -59,9 +67,20 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         try:
             summary=fit.coef_with_se()
             st.dataframe(summary,hide_index=False,use_container_width=True)
-            st.download_button("Madde parametrelerini CSV indir",summary.to_csv(index=True).encode("utf-8-sig"),
+            st.download_button("Madde parametrelerini CSV indir",safe_frame(summary.reset_index()).to_csv(index=False).encode("utf-8-sig"),
                                "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv")
         except Exception as exc:
             st.info(f"Standartlaştırılmış parametre tablosu alınamadı: {exc}")
+        tables=report_tables(result)
+        st.markdown("**Model ve kestirim bilgileri**")
+        st.dataframe(tables["Meta"],hide_index=True,use_container_width=True)
+        left,right=st.columns(2)
+        left.download_button("B14 tüm tablolar Excel",export_xlsx(tables),
+            "B14_rapor.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",key="b14_xlsx")
+        if right.button("B14 ZIP paketini hazırla",key="b14_zip_make"):
+            st.session_state["b14_zip"]=export_zip(result)
+        if "b14_zip" in st.session_state:
+            right.download_button("B14 ZIP indir",st.session_state["b14_zip"],
+                "B14_rapor.zip",mime="application/zip",key="b14_zip_dl")
         st.caption("Parametre SH, model uyumu ve karşılaştırma yorumları bağımsız doğrulama tamamlanmadan "
                    "kesin bilimsel kanıt olarak sunulmaz.")
