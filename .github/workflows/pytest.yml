@@ -16,10 +16,10 @@ jobs:
         run: pip install -r requirements.txt
       - name: Compile Python sources
         run: python -m compileall -q app.py core ui tests
-      - name: B11.1 targeted regression tests (pull requests)
+      - name: Targeted regression tests (pull requests)
         if: github.event_name == 'pull_request'
         timeout-minutes: 15
-        run: python -m pytest -vv -s tests/test_irt_b11_regression_gates.py
+        run: python -m pytest -vv -s tests/test_irt_b11_regression_gates.py tests/test_irt_b12_audit.py
       - name: Full regression suite (main)
         if: github.event_name == 'push'
         timeout-minutes: 55
