@@ -1639,11 +1639,12 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             a_upper,d_lower,starts,refine=4.0,0.65,1,False
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
-        with st.expander("🧪 Alternatif kestirim motoru — Python mirt (deneysel)"):
-            st.warning("Bu dış motorun kestirimleri ve standart hataları R ile bağımsız "
-                       "olarak doğrulanmadı. Sonuçlar bilimsel rapora veya yerel "
-                       "model karşılaştırmasına otomatik alınmaz.")
-            if st.button("▶️ Python mirt ile deneysel kestirim", key=f"py_mirt_run_{model}"):
+        with st.expander("⚙️ Alternatif kestirim motoru — Python mirt"):
+            st.caption("Python mirt hazır bir MTK kütüphanesidir. EserPsychometrics "
+                       "arayüzündeki parametre eşleştirmeleri ve çıkarımsal "
+                       "raporlama henüz bağımsız karşılaştırmadan geçmediği için "
+                       "bu motorun çıktıları ayrı tutulur.")
+            if st.button("▶️ Python mirt ile analiz", key=f"py_mirt_run_{model}"):
                 try:
                     from core.irt_python_mirt_adapter import fit_python_mirt
                     external_data = target.loc[:, irt_columns].apply(
@@ -1659,8 +1660,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         "fingerprint": fingerprint_external,
                         "fit": external_fit,
                     }
-                    st.success("Deneysel hesaplama tamamlandı. Bu çıktı henüz "
-                               "bağımsız psikometrik doğrulamadan geçmedi.")
+                    st.success("Python mirt analizi tamamlandı. Çıktılar ayrı kaydedildi.")
                 except Exception as exc:
                     st.session_state.get("python_mirt_experimental_results", {}).pop(model, None)
                     st.error(f"Python mirt çalıştırılamadı: {exc}")
@@ -1677,7 +1677,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
                             "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
                             "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
-                    with st.expander("Python mirt — ham kestirim özeti (deneysel)"):
+                    with st.expander("Python mirt — kütüphane kestirim özeti"):
                         try:
                             raw_summary = external_fit.fit.summary()
                             st.text(str(raw_summary)[:15000])
