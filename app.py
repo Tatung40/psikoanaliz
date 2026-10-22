@@ -1681,6 +1681,24 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         try:
                             raw_summary = external_fit.fit.summary()
                             st.text(str(raw_summary)[:15000])
+                            import importlib.metadata
+                            try:
+                                mirt_version = importlib.metadata.version("mirt")
+                            except importlib.metadata.PackageNotFoundError:
+                                mirt_version = "unknown"
+                            st.caption(f"Kaynak: Python mirt v{mirt_version}; model: {model}; "
+                                       "kestirim: kütüphane ham özeti. Parametre "
+                                       "metriği veya çıkarımsal doğrulama iddiası yok.")
+                            st.download_button(
+                                "Ham kestirim özetini TXT olarak indir",
+                                data=(f"Engine: Python mirt {mirt_version}\\n"
+                                      f"Model: {model}\\n"
+                                      "Status: library output; no cross-engine equivalence certified\\n\\n"
+                                      +str(raw_summary)),
+                                file_name=f"mirt_{model}_raw_summary.txt",
+                                mime="text/plain",
+                                key=f"mirt_raw_download_{model}",
+                            )
                         except Exception as summary_error:
                             st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
                     st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
