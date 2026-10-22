@@ -13,6 +13,9 @@ def render(data,items=(),id_col=None,group_col=None):
     if r is None:return
     st.write("Yerel alfa:",r["native_alpha"],"Pingouin alfa:",r["reference_alpha"])
     st.dataframe(item_guidance(r),hide_index=True)
+    st.markdown("**Bağımsız madde istatistikleri karşılaştırması**")
+    st.dataframe(r["item_crosscheck"],hide_index=True)
+    st.download_button("Karşılaştırma CSV",r["item_crosscheck"].to_csv(index=False).encode("utf-8-sig"),"KTK_karsilastirma.csv",mime="text/csv",key="ctt_cross_csv")
     st.info("Madde kararları uzman incelemesi gerektirir; otomatik silme yapılmaz.")
     st.download_button("KTK Word raporu",ctt_docx(r),"KTK_Akademik_Rapor.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",key="ctt_double_docx")
