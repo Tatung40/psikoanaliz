@@ -78,10 +78,12 @@ def export_xlsx(frames):
     return buf.getvalue()
 
 def export_zip(result):
+    from reports.irt_b14_narrative import guided_report
     frames=report_tables(result)
     buf=io.BytesIO()
     with zipfile.ZipFile(buf,"w",zipfile.ZIP_DEFLATED) as z:
         z.writestr("B14_rapor.xlsx",export_xlsx(frames))
+        z.writestr("B14_Aciklamali_Rapor.md",guided_report(result).encode("utf-8"))
         for name,frame in frames.items():
             slug={"Meta":"meta","Kategori Frekansları":"kategori_frekans",
                   "Kalite Denetimi":"kalite","Motor Parametreleri":"parametre",
