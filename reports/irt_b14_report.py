@@ -58,7 +58,8 @@ def summary_metadata(result):
     return pd.DataFrame([{"Özellik":k,"Değer":v} for k,v in vals.items()])
 
 def report_tables(result):
-    frames={"Meta":summary_metadata(result),
+    from reports.irt_b14_audit import interpretation_audit
+    frames={"Bilimsel Denetim":interpretation_audit(result)["table"],"Meta":summary_metadata(result),
         "Kategori Frekansları":category_frequencies(result["coded"],result["labels"]),
         "Kalite Denetimi":quality_report(result["coded"],result["labels"],result["model"])}
     try:
@@ -85,7 +86,7 @@ def export_zip(result):
         z.writestr("B14_rapor.xlsx",export_xlsx(frames))
         z.writestr("B14_Aciklamali_Rapor.md",guided_report(result).encode("utf-8"))
         for name,frame in frames.items():
-            slug={"Meta":"meta","Kategori Frekansları":"kategori_frekans",
+            slug={"Bilimsel Denetim":"bilimsel_denetim","Meta":"meta","Kategori Frekansları":"kategori_frekans",
                   "Kalite Denetimi":"kalite","Motor Parametreleri":"parametre",
                   "Parametre Açıklaması":"aciklama"}[name]
             z.writestr(slug+".csv",safe_frame(frame).to_csv(index=False).encode("utf-8-sig"))
