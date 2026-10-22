@@ -7,6 +7,7 @@ import io
 import pandas as pd
 import streamlit as st
 from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
+from reports.irt_b14_narrative import guided_report
 from core.irt_b14_profiles import empirical_profiles
 from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
@@ -88,6 +89,11 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
                                "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv")
         except Exception as exc:
             st.info(f"Standartlaştırılmış parametre tablosu alınamadı: {exc}")
+        st.markdown("### Akademik Türkçe Açıklamalı Rapor")
+        narrative=guided_report(result)
+        st.markdown(narrative)
+        st.download_button("Açıklamalı raporu Markdown indir",narrative.encode("utf-8"),
+                           "B14_Aciklamali_Rapor.md",mime="text/markdown",key="b14_narrative_dl")
         tables=report_tables(result)
         st.markdown("**Model ve kestirim bilgileri**")
         st.dataframe(tables["Meta"],hide_index=True,use_container_width=True)
