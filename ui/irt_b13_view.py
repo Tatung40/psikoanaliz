@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from core.irt_b13_curves import compute_curves, check_curves
+from core.irt_b13_diagnostics import calculate_diagnostics
 from reports.irt_b13_png import png_bytes
 from core.irt_b13_compare import compare_engines
 from core.irt import fit_irt
@@ -52,7 +53,11 @@ def native_fit(data,model):
       "N":len(x),"Madde":x.shape[1],"logLik":fit["loglik"],
       "AIC":fit["aic"],"BIC":fit["bic"],"Yineleme":fit["iterations"],
       "Yakınsama":bool(fit["converged"]),"Ölçek":scale}])
+    d=calculate_diagnostics(x,fit,it,model)
+    if d["se"] is not None:
+        it=it.merge(d["se"],on="Madde",how="left",validate="one_to_one")
     return {"items":it,"persons":persons,"overview":overview,"diagnostics":diag,
+            "item_fit":d["item_fit"],"q3":d["q3"],"diagnostic_notes":d["messages"],
             "model":model,"scale":scale,"fit":fit,"checks":check_curves(it,model)}
 
 def safe_export(frame):
@@ -153,7 +158,16 @@ def render(target,columns,id_col=None,group_col=None):
         st.write("Yakınsama",bool(overview.iloc[0]["Yakınsama"]))
         if result["diagnostics"] is not None:
             st.dataframe(result["diagnostics"],hide_index=True,use_container_width=True)
-        else:st.info("Model uyum tanılarını mevcut model sayfasında inceleyin.")
+        if result["item_fit"] is not None:
+            st.markdown("**S-X² madde uyum istatistikleri**")
+            st.dataframe(result["item_fit"],hide_index=True,use_container_width=True)
+        if result["q3"] is not None:
+            st.markdown("**Yerel bağımsızlık: Q3 madde çiftleri**")
+            st.dataframe(result["q3"].head(30),hide_index=True,use_container_width=True)
+        for note in result["diagnostic_notes"]:
+            st.info(note)
+        if result["diagnostics"] is None and result["item_fit"] is None:
+            st.info("Model uyum tanılarını mevcut model sayfasında da inceleyin.")
     with tabs[6]:
         st.caption("Motor karşılaştırması yalnızca Python mirt IRF parametre eşleşmesi "
                    "doğrulanırsa sunulur.")
@@ -182,6 +196,10 @@ def render(target,columns,id_col=None,group_col=None):
         tablemap={"Model_Ozeti":overview,"Madde_Parametreleri":items,
                   "Kisi_Yetenekleri":shown,"Kontroller":pd.DataFrame([
                      {"Denetim":k,"Durum":str(v)} for k,v in result["checks"]["checks"].items()])}
+        if result["item_fit"] is not None:
+            tablemap["Madde_Uyumu"]=result["item_fit"]
+        if result["q3"] is not None:
+            tablemap["Yerel_Bagimsizlik_Q3"]=result["q3"]
         rawxlsx=excel_bytes(tablemap)
         txt=f"EserPsychometrics B13\nModel: {model}\nMotor: native\nOlcek: {result['scale']}\n"
         st.download_button("Excel — tüm tablolar",rawxlsx,"B13_rapor.xlsx",
