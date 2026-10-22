@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from core.irt_b13_curves import compute_curves, check_curves
+from core.irt_b13_compare import compare_engines
 from core.irt import fit_irt
 from core.rasch import rasch_analysis
 
@@ -127,8 +128,30 @@ def render(target,columns,id_col=None,group_col=None):
             st.dataframe(result["diagnostics"],hide_index=True,use_container_width=True)
         else:st.info("Model uyum tanılarını mevcut model sayfasında inceleyin.")
     with tabs[6]:
-        st.info("Motorların parametre ölçekleri doğrulanmadan doğrudan fark tablosu üretilmez. "
-                "Python mirt sonuçlarını ilgili modelin alternatif motor ekranında inceleyin.")
+        st.caption("İki motor yalnızca Python mirt IRF'i aynı parametrelerle "
+                   "yeniden üretilebildiğinde karşılaştırılır. Rasch ölçekleri farklıdır.")
+        if model=="Rasch":
+            st.warning("Rasch: örtük SD serbest; Python mirt 1PL doğrudan karşılaştırılamaz.")
+        elif st.button("Python mirt ile karşılaştırmayı başlat",key="b13_compare"):
+            try:
+                if not result["fit"]["converged"]:
+                    raise ValueError("Yerel model yakınsamadı; karşılaştırma ertelendi.")
+                x=prepare(data,model)
+                with st.spinner("Python mirt modelini kalibre ediyor…"):
+                    comp=compare_engines(result,x.to_numpy())
+                st.session_state["b13_comparison"]={"model":model,"fp":fingerprint,"data":comp}
+            except Exception as exc:
+                st.session_state.pop("b13_comparison",None)
+                st.error(f"Karşılaştırma engellendi: {exc}")
+        comp_saved=st.session_state.get("b13_comparison")
+        if comp_saved and comp_saved["model"]==model and comp_saved["fp"]==fingerprint:
+            comp=comp_saved["data"]
+            st.success(f"IRF parametre eşlemesi doğrulandı (sapma={comp['irf_deviation']:.2e}).")
+            st.dataframe(comp["summary"],hide_index=True,use_container_width=True)
+            st.dataframe(comp["items"],hide_index=True,use_container_width=True)
+            st.caption(f"logLik: yerel {comp['native_loglik']:.4f}; "
+                       f"Python mirt {comp['library_loglik']:.4f}. "
+                       "Optimizasyon ve kuadratür ayarları farklı olabilir.")
     with tabs[7]:
         tablemap={"Model_Ozeti":overview,"Madde_Parametreleri":items,
                   "Kisi_Yetenekleri":shown,"Kontroller":pd.DataFrame([
