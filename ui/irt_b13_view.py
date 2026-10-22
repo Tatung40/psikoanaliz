@@ -55,11 +55,20 @@ def native_fit(data,model):
     return {"items":it,"persons":persons,"overview":overview,"diagnostics":diag,
             "model":model,"scale":scale,"fit":fit,"checks":check_curves(it,model)}
 
+def safe_export(frame):
+    """Protect spreadsheet cell evaluation in Excel-compatible exports."""
+    result=frame.copy()
+    for col in result.columns:
+        if pd.api.types.is_object_dtype(result[col]) or pd.api.types.is_string_dtype(result[col]):
+            result[col]=result[col].map(lambda v: "'" + v if isinstance(v,str) and
+                                           v.lstrip().startswith(("=","+","-","@")) else v)
+    return result
+
 def excel_bytes(tables):
     out=io.BytesIO()
     with pd.ExcelWriter(out,engine="openpyxl") as writer:
         for name,df in tables.items():
-            df.to_excel(writer,sheet_name=name[:31],index=False)
+            safe_export(df).to_excel(writer,sheet_name=name[:31],index=False)
     return out.getvalue()
 
 def render(target,columns,id_col=None,group_col=None):
@@ -96,7 +105,7 @@ def render(target,columns,id_col=None,group_col=None):
         if not bool(row["Yakınsama"]):st.warning("Yakınsama sağlanmadı; çıkarımsal yorumlardan kaçının.")
     with tabs[2]:
         st.dataframe(items,hide_index=True,use_container_width=True)
-        st.download_button("Madde parametreleri CSV",items.to_csv(index=False).encode("utf-8-sig"),
+        st.download_button("Madde parametreleri CSV",safe_export(items).to_csv(index=False).encode("utf-8-sig"),
                            "b13_items.csv",mime="text/csv")
     with tabs[3]:
         ids=st.checkbox("Kişi kimliklerini rapora ekle",value=False,key="b13_ids",disabled=id_col is None)
@@ -104,7 +113,7 @@ def render(target,columns,id_col=None,group_col=None):
         if ids and id_col in target:
             shown.insert(0,"Kişi kimliği",target[id_col].astype(str).to_numpy())
         st.dataframe(shown.head(500),hide_index=True,use_container_width=True)
-        st.download_button("Kişi yetenekleri CSV",shown.to_csv(index=False).encode("utf-8-sig"),
+        st.download_button("Kişi yetenekleri CSV",safe_export(shown).to_csv(index=False).encode("utf-8-sig"),
                            "b13_persons.csv",mime="text/csv")
     with tabs[4]:
         kind=st.selectbox("Grafik",("ICC","IIC","TIF","SEM","Theta dağılımı","Wright haritası","Parametre dağılımı","Asimptotlar"),key="b13_figure")
@@ -181,8 +190,8 @@ def render(target,columns,id_col=None,group_col=None):
         mem=io.BytesIO()
         with zipfile.ZipFile(mem,"w",zipfile.ZIP_DEFLATED) as z:
             z.writestr("B13_rapor.xlsx",rawxlsx)
-            z.writestr("B13_items.csv",items.to_csv(index=False))
-            z.writestr("B13_persons.csv",shown.to_csv(index=False))
+            z.writestr("B13_items.csv",safe_export(items).to_csv(index=False))
+            z.writestr("B13_persons.csv",safe_export(shown).to_csv(index=False))
             z.writestr("B13_yontem.txt",txt)
             for img_kind in ("ICC","IIC","TIF","SEM","Theta dağılımı",
                              "Wright haritası","Parametre dağılımı"):
