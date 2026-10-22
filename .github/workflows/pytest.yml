@@ -16,6 +16,12 @@ jobs:
         run: pip install -r requirements.txt
       - name: Compile Python sources
         run: python -m compileall -q app.py core ui tests
+      - name: Optional Python mirt 1.2.0 install/import smoke (pull requests)
+        if: github.event_name == 'pull_request'
+        timeout-minutes: 5
+        run: |
+          python -m pip install --only-binary=:all: 'mirt==1.2.0'
+          python -c "import importlib.metadata, mirt; assert importlib.metadata.version('mirt') == '1.2.0'; assert callable(mirt.fit_mirt); print('PYTHON MIRT IMPORT OK - SCIENTIFIC FIT NOT YET VALIDATED')"
       - name: Targeted regression tests (pull requests)
         if: github.event_name == 'pull_request'
         timeout-minutes: 15
