@@ -8,6 +8,7 @@ import pandas as pd
 import streamlit as st
 from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
 from reports.irt_b14_narrative import guided_report
+from reports.irt_b14_audit import interpretation_audit
 from core.irt_b14_profiles import empirical_profiles
 from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
@@ -89,6 +90,14 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
                                "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv")
         except Exception as exc:
             st.info(f"Standartlaştırılmış parametre tablosu alınamadı: {exc}")
+        audit=interpretation_audit(result)
+        st.markdown("### Bilimsel Yorumlama ve Kanıt Denetimi")
+        st.write("**Karar:** "+audit["decision"])
+        st.info(audit["explanation"])
+        st.dataframe(audit["table"],hide_index=True,use_container_width=True)
+        st.download_button("Kanıt denetimini CSV indir",
+            audit["table"].to_csv(index=False).encode("utf-8-sig"),
+            "B14_bilimsel_denetim.csv",mime="text/csv",key="b14_audit_csv")
         st.markdown("### Akademik Türkçe Açıklamalı Rapor")
         narrative=guided_report(result)
         st.markdown(narrative)
