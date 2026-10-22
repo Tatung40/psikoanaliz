@@ -22,6 +22,9 @@ def ctt_docx(result):
         row=table.add_row().cells
         for c,v in zip(row,[str(r["Madde"]),str(round(r["p"],3)),
                             str(round(r["r_ir"],3)),str(r["Durum"])]):c.text=v
+    doc.add_heading("Bağımsız madde hesaplama denetimi",1)
+    flagged=r["item_crosscheck"] if False else result["item_crosscheck"]
+    doc.add_paragraph(f"{len(flagged)} madde karşılaştırıldı; {(flagged['Karar']=='YÖNTEM/FARK İNCELENMELİ').sum()} maddede hesaplama farkı gözlendi.")
     doc.add_heading("Karar ve bilimsel sınırlar",1)
     doc.add_paragraph("Düşük düzeltilmiş madde-toplam ilişkisi ya da uç madde güçlüğü "
         "otomatik silme nedeni değildir. İçerik, anahtar, hedef grup ve çeldiriciler "
