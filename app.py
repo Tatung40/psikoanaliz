@@ -1637,6 +1637,47 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "kestirim süresini birkaç kat artırabilir.")
         else:
             a_upper,d_lower,starts,refine=4.0,0.65,1,False
+        # Optional external engine: isolated experimental output, never mixed with
+        # the native model history, AIC/BIC or inferential diagnostics.
+        with st.expander("🧪 Alternatif kestirim motoru — Python mirt (deneysel)"):
+            st.warning("Bu dış motorun kestirimleri ve standart hataları R ile bağımsız "
+                       "olarak doğrulanmadı. Sonuçlar bilimsel rapora veya yerel "
+                       "model karşılaştırmasına otomatik alınmaz.")
+            if st.button("▶️ Python mirt ile deneysel kestirim", key=f"py_mirt_run_{model}"):
+                try:
+                    from core.irt_python_mirt_adapter import fit_python_mirt
+                    external_data = target.loc[:, irt_columns].apply(
+                        pd.to_numeric, errors="raise")
+                    fingerprint_external = (
+                        tuple(irt_columns), external_data.shape,
+                        int(pd.util.hash_pandas_object(external_data, index=True).sum()))
+                    with st.spinner("Deneysel Python mirt kestirimi hesaplanıyor…"):
+                        external_fit = fit_python_mirt(external_data.to_numpy(), model=model)
+                    if "python_mirt_experimental_results" not in st.session_state:
+                        st.session_state.python_mirt_experimental_results = {}
+                    st.session_state.python_mirt_experimental_results[model] = {
+                        "fingerprint": fingerprint_external,
+                        "fit": external_fit,
+                    }
+                    st.success("Deneysel hesaplama tamamlandı. Bu çıktı henüz "
+                               "bağımsız psikometrik doğrulamadan geçmedi.")
+                except Exception as exc:
+                    st.session_state.get("python_mirt_experimental_results", {}).pop(model, None)
+                    st.error(f"Python mirt çalıştırılamadı: {exc}")
+            previous_external = st.session_state.get("python_mirt_experimental_results", {}).get(model)
+            if previous_external is not None:
+                current_external_data = target.loc[:, irt_columns]
+                current_external_fingerprint = (
+                    tuple(irt_columns), current_external_data.shape,
+                    int(pd.util.hash_pandas_object(current_external_data, index=True).sum()))
+                if previous_external["fingerprint"] == current_external_fingerprint:
+                    external_fit = previous_external["fit"]
+                    st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
+                               f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
+                    st.info("Deneysel motor çıktısı oturumda saklandı. Geçerliliği "
+                            "doğrulanmamış parametre ve SH tabloları sunulmuyor.")
+                else:
+                    st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
         current_settings = calibration_settings(model, qpoints, iterations, a_upper,
                                                 d_lower, starts, refine)
         if st.button("▶️ MTK Analizini Başlat", type="primary"):
