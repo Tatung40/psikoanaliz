@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from core.irt_b13_curves import compute_curves, check_curves
+from reports.irt_b13_png import png_bytes
 from core.irt import fit_irt
 from core.rasch import rasch_analysis
 
@@ -105,7 +106,7 @@ def render(target,columns,id_col=None,group_col=None):
         st.download_button("Kişi yetenekleri CSV",shown.to_csv(index=False).encode("utf-8-sig"),
                            "b13_persons.csv",mime="text/csv")
     with tabs[4]:
-        kind=st.selectbox("Grafik",("ICC","IIC","TIF","SEM","Theta dağılımı"),key="b13_figure")
+        kind=st.selectbox("Grafik",("ICC","IIC","TIF","SEM","Theta dağılımı","Wright haritası","Parametre dağılımı","Asimptotlar"),key="b13_figure")
         cv=compute_curves(items)
         fig=go.Figure()
         if kind in ("ICC","IIC"):
@@ -116,11 +117,28 @@ def render(target,columns,id_col=None,group_col=None):
                 fig.add_scatter(x=cv["theta"],y=cv[kind.lower()][:,j],name=item)
         elif kind=="TIF":fig.add_scatter(x=cv["theta"],y=cv["tif"],name="Test bilgisi")
         elif kind=="SEM":fig.add_scatter(x=cv["theta"],y=cv["sem"],name="Koşullu SEM")
-        else:fig.add_histogram(x=persons["Theta"],name="Theta")
+        elif kind=="Theta dağılımı":
+            fig.add_histogram(x=persons["Theta"],name="Theta")
+        elif kind=="Wright haritası":
+            fig.add_histogram(y=persons["Theta"],orientation="h",name="Kişiler")
+            fig.add_scatter(x=np.zeros(len(items)),y=items["b"],mode="markers+text",
+                            text=items["Madde"],name="Maddeler (b)")
+        elif kind=="Parametre dağılımı":
+            for p in ("a","b","c","d"):
+                fig.add_box(y=items[p],name=p)
+        elif model in ("3PL","4PL"):
+            fig.add_bar(x=items["Madde"],y=items["c"],name="c")
+            if model=="4PL":fig.add_scatter(x=items["Madde"],y=items["d"],name="d")
+        else:
+            st.info("Asimptot grafiği yalnızca 3PL/4PL için anlamlıdır.")
         fig.update_layout(title=f"{model} — {kind}",xaxis_title="Theta",
                           template="plotly_white")
         st.plotly_chart(fig,use_container_width=True)
         st.write("Matematiksel kontroller:",result["checks"])
+        if kind!="Asimptotlar" or model in ("3PL","4PL"):
+            st.download_button("PNG indir (300 dpi)",
+                png_bytes(result,kind,selected if kind in ("ICC","IIC") else None),
+                file_name=f"B13_{model}_{kind}.png",mime="image/png",key="b13_png_dl")
     with tabs[5]:
         st.write("Yakınsama",bool(overview.iloc[0]["Yakınsama"]))
         if result["diagnostics"] is not None:
@@ -144,4 +162,9 @@ def render(target,columns,id_col=None,group_col=None):
             z.writestr("B13_items.csv",items.to_csv(index=False))
             z.writestr("B13_persons.csv",shown.to_csv(index=False))
             z.writestr("B13_yontem.txt",txt)
+            for img_kind in ("ICC","IIC","TIF","SEM","Theta dağılımı",
+                             "Wright haritası","Parametre dağılımı"):
+                z.writestr(f"grafikler/{img_kind}.png",png_bytes(result,img_kind))
+            if model in ("3PL","4PL"):
+                z.writestr("grafikler/Asimptotlar.png",png_bytes(result,"Asimptotlar"))
         st.download_button("ZIP — rapor paketi",mem.getvalue(),"B13_rapor.zip",mime="application/zip")
