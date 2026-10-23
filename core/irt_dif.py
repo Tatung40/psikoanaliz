@@ -93,7 +93,23 @@ def _valid(*fits):
 def _lr(f_alt, f_null):
     if not _valid(f_alt, f_null):
         return np.nan
-    return max(2. * (f_alt["loglik"] - f_null["loglik"]), 0.)
+    return _nested_lr(f_alt["loglik"], f_null["loglik"])[0]
+
+
+def _nested_lr(loglik_alt, loglik_null):
+    """Reject failed nested optimization rather than turn it into evidence of no DIF.
+
+    At a nested maximum log L_alt >= log L_null. Allow only 1e-6 absolute
+    log-likelihood units of numerical roundoff; do not scale this tolerance by N.
+    This check is necessary, but does not establish convergence or regularity.
+    """
+    if not (np.isfinite(loglik_alt) and np.isfinite(loglik_null)):
+        return np.nan, "Sonlu olmayan log-olabilirlik; p değeri verilmedi."
+    difference = loglik_alt - loglik_null
+    if difference < -1e-6:
+        return np.nan, ("Alternatif modelin log-olabilirliği kısıtlı modelden düşük; "
+                        "optimizasyon doğrulanamadı, p değeri verilmedi.")
+    return max(2. * difference, 0.), ""
 
 
 def _contrast(f, i, kind):
@@ -182,6 +198,12 @@ def dif_analysis(data, group, reference, focal, model="2PL", alpha=.05, purify=T
                 rows[i] = {"omni": _lr(m2, m0), "df": 2, "uni": _lr(m1, m0), "non": _lr(m2, m1)}
             bad = [f for f in (m0, m1, m2) if f is not None and not f["converged"]]
             rows[i]["note"] = (bad[0]["se_reason"] + " p değeri verilmedi.") if bad else ""
+            if not bad:
+                comparisons = [("Tek biçimli", m1, m0)] if m2 is None else [
+                    ("Genel", m2, m0), ("Tek biçimli", m1, m0), ("Tek biçimli olmayan", m2, m1)]
+                notes = [f"{label}: {note}" for label, a, n in comparisons
+                         if (note := _nested_lr(a["loglik"], n["loglik"])[1])]
+                rows[i]["note"] = " ".join(dict.fromkeys(note for note in notes if note))
             rows[i]["fits"] = (m0, m1, m2)
         return rows
 
