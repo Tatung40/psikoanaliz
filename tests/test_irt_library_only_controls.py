@@ -23,3 +23,10 @@ def test_visible_mtk_ui_has_no_legacy_tuning_sliders():
                       "a üst sınırı", "d alt sınırı", "Bağımsız başlangıç sayısı"):
         assert forbidden not in block
     assert "Etkin kestirim motoru: Python mirt" in block
+
+
+def test_retired_native_calibration_button_and_call_are_removed():
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
+    assert "MTK Analizini Başlat — eski yerel motor devre dışı" not in source
+    assert "result=run_irt_calibration(data,current_settings)" not in source
+    assert "Eski yerel MTK motorunun kayıtlı sonucu kaldırıldı." in source
