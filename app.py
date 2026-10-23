@@ -209,6 +209,14 @@ with st.sidebar:
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
     with st.expander("🧮 EserPsychometrics Yerel MTK Motoru", expanded=True):
         st.caption("İkili modeller: yerel analiz ve model karşılaştırmaları")
+        binary_quick_model = st.selectbox(
+            "Hızlı ikili MTK model seçimi",
+            ("Rasch", "1PL", "2PL", "3PL", "4PL"),
+            key="binary_irt_quick_model",
+        )
+        st.button("Seçili MTK analizine git",key="binary_irt_quick_go",
+                  use_container_width=True,on_click=navigate_to,
+                  args=(f"MTK: {binary_quick_model}",))
         for m in ("Rasch","1PL","2PL","3PL","4PL"):
             st.button(f"📐 {m} Modeli",key=f"native_irt_{m}",
                       use_container_width=True,on_click=navigate_to,args=(f"MTK: {m}",))
