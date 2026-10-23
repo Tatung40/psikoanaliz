@@ -1807,7 +1807,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
         current_settings = calibration_settings(model, qpoints, iterations, a_upper,
                                                 d_lower, starts, refine)
-        if st.button("🧪 Eski yerel motorla analiz (yalnızca geriye dönük kontrol)", type="secondary", disabled=True):
+        if st.button("▶️ MTK Analizini Başlat — eski yerel motor devre dışı", type="secondary", disabled=True):
             try:
                 data = target.loc[:, irt_columns].copy()
                 spinner_text=(f"{model} kalibrasyonu hesaplanıyor "
