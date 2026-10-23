@@ -45,7 +45,7 @@ if source is not None:
                 "median":"Medyan — sayısal merkezi değer; kategorik madde için dikkat.",
                 "knn":"KNN — yakın yanıt örüntülerine göre atama; ikili maddelerde yuvarlama gerekir."
             }
-            st.write("**Tanısal öneri:** "+details[report["recommended"]])
+            st.write("**Tanısal öneri:** "+("Atama yapmayın: eksik hücre yok." if report["missing"] == 0 else details[report["recommended"]]))
             method = st.radio("Uygulanacak yöntem", METHODS,
                               index=METHODS.index(report["recommended"]),
                               format_func=lambda m:details[m])
@@ -54,7 +54,7 @@ if source is not None:
             if report["binary"] and method in ("median","knn"):
                 rounding = st.checkbox("0.5 eşiğiyle 0/1 yuvarlamasını kabul ediyorum")
             st.caption("Tek atama standart hataları küçümseyebilir. KNN/medyan çoklu atama değildir.")
-            if st.button("▶ Seçili yöntemi uygula", type="primary"):
+            if st.button("▶ Seçili yöntemi uygula", type="primary", disabled=(report["missing"] == 0)):
                 result = apply(df,cols,method,neighbors=int(neighbors),binary_round=rounding)
                 st.session_state["missing_lab_result"] = result
                 st.session_state["missing_lab_method"] = method
