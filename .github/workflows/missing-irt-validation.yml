@@ -7,6 +7,7 @@ on:
       - 'core/irt_python_mirt_adapter.py'
       - 'core/irt_python_mirt_parameters.py'
       - 'tests/test_irt_python_mirt_parameters.py'
+      - 'tests/test_irt_library_only_controls.py'
       - 'core/irt_library_*.py'
       - 'validation/inspect_python_mirt_api.py'
       - 'tests/test_irt_library_*.py'
@@ -28,7 +29,7 @@ jobs:
       - name: Install numerical dependencies
         run: python -m pip install numpy pandas scipy scikit-learn pytest mirt==1.2.0
       - name: Execute every missing-data and IRT numerical gate
-        run: python -m pytest -q tests/test_missing_imputation.py tests/test_missing_decision.py tests/test_irt_missing_likelihood.py tests/test_irt_missing_em.py tests/test_irt_missing_three_way.py tests/test_irt_engine_policy.py tests/test_irt_binary_navigation.py tests/test_irt_library_model_smoke.py tests/test_irt_library_curves.py tests/test_irt_library_parameter_mapping.py tests/test_irt_library_diagnostics.py tests/test_irt_python_mirt_parameters.py tests/test_irt_python_mirt_adapter.py
+        run: python -m pytest -q tests/test_missing_imputation.py tests/test_missing_decision.py tests/test_irt_missing_likelihood.py tests/test_irt_missing_em.py tests/test_irt_missing_three_way.py tests/test_irt_engine_policy.py tests/test_irt_binary_navigation.py tests/test_irt_library_model_smoke.py tests/test_irt_library_curves.py tests/test_irt_library_parameter_mapping.py tests/test_irt_library_diagnostics.py tests/test_irt_python_mirt_parameters.py tests/test_irt_library_only_controls.py tests/test_irt_python_mirt_adapter.py
       - name: Inspect real Python mirt fit-object structure
         run: python validation/inspect_python_mirt_api.py > python_mirt_api_report.json
       - name: Upload API structure report
