@@ -44,7 +44,13 @@ def main():
                     attrs[name] = describe(value)
             except Exception:
                 attrs[name] = {"type": "unavailable"}
-        coef = fit.coef()
+        try:
+            coef = fit.coef()
+        except (AttributeError, TypeError, ValueError) as exc:
+            coef = None
+            coef_error = type(exc).__name__
+        else:
+            coef_error = None
         if hasattr(coef, "columns"):
             coef_info = {"type": type(coef).__name__,
                          "columns": [str(x) for x in coef.columns],
@@ -66,6 +72,7 @@ def main():
         report["models"][model] = {"fit_type": type(fit).__name__,
                                     "attributes": attrs,
                                     "coef": coef_info,
+                                    "coef_error": coef_error,
                                     "model_attributes": model_attrs}
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
