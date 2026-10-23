@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-23",
+  "base_sha": "4558b0dba9f63cb9635b25d2e5f35a18736ed996",
+  "branch": "fix/dif-likelihood-validity",
+  "scope": "Reject invalid nested LR maxima; preserve existing calibrators and screens",
+  "focused_tests": {"suite": "tests/test_dif_likelihood_validity.py", "passed": 13},
+  "reference_integration_tests": "B10/B11, their UI, Rasch B9 and multimodel screen: running at commit preparation; inspect PR validation",
+  "baseline_main_ci": "https://github.com/Tatung40/psikoanaliz/actions/runs/39906198907",
+  "baseline_main_ci_conclusion": "success",
+  "merge_gate": "New PR numerical/reference gates and all CI checks must pass; full regression runs once on final main via push workflow",
+  "retained_formal_methods": ["Rasch", "1PL", "2PL", "3PL interior-only"],
+  "not_fully_validated": ["4PL inference", "GRM DIF", "PCM DIF", "GPCM DIF", "RSM DIF", "NRM DIF"],
+  "open_prs": {
+    "20": "failed CI: KeyError elapsed_seconds; not mergeable",
+    "23": "failed CI: unsupported RSM model; not mergeable"
+  },
+  "scientific_blockers": [
+    "No Rscript runtime for new independently reproduced polytomous reference fits",
+    "Installed Python mirt multigroup support is not independent validation; source clips negative LR",
+    "RSM requires validated shared-step constraints, not an unrestricted PCM alias",
+    "Limited binary Monte Carlo does not establish general Type I error/power or coverage",
+    "Insufficient/unstable anchor inference and post-selection limitations need further work",
+    "Complete formal DIF academic export package remains unfinished"
+  ],
+  "next": "Inspect PR/CI, reuse pinned binary fixtures, validate ordinal/nominal multigroup parameterization before exposing new formal tests"
+}

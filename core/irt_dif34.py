@@ -13,11 +13,10 @@ crossing) is derived separately from the two group response functions, because w
 (or d < 1) a difference in b alone is not a constant logit shift.
 
 Inference policy (box-constrained ML; Self & Liang, 1987): an LR p-value is reported only when
-M0 and the alternative converged (KKT) and none of the studied item's parameters is on an
-estimation bound in either model; the chi-square reference is then the ordinary asymptotic
-one, conditional on any other parameters that sit on a bound (held fixed; reported). When the
-studied item touches a bound (typically c = 0) the null distribution is a chi-bar-square
-mixture that is not computed: the item gets descriptive contrasts only. Wald SEs come from
+M0 and the alternative converged (KKT), their finite log-likelihoods respect nestedness,
+and no item or latent-distribution parameter is on an estimation bound in either model.
+Boundary cases do not receive an ordinary chi-square p-value; the applicable nonstandard
+reference distribution is not computed. Wald SEs come from
 the conditional observed information and are reported only for interior studied parameters.
 BH-FDR is applied to the available omnibus p-values. Items without a p-value cannot be flagged;
 if their LR statistic exceeds the chi-square critical value they are removed from the anchor set
@@ -31,7 +30,7 @@ import pandas as pd
 from scipy.stats import chi2
 from core.irt_mg import as_matrix
 from core.irt_mg34 import Design34, PARAMS, default_bounds, fit as fit34, irf
-from core.irt_dif import _prepare
+from core.irt_dif import _prepare, _nested_lr
 from core.rasch import _grid
 from core.rasch_dif import benjamini_hochberg
 
@@ -84,7 +83,9 @@ def _lr(f_alt, f_null, i):
     """
     if not (f_alt["converged"] and f_null["converged"]):
         return np.nan, False, "Model yakınsamadı; p değeri verilmedi."
-    stat = max(2. * (f_alt["loglik"] - f_null["loglik"]), 0.)
+    stat, note = _nested_lr(f_alt["loglik"], f_null["loglik"])
+    if note:
+        return stat, False, note
     if not (f_alt.get("linked", True) and f_null.get("linked", True)):
         return stat, False, "Ortak ölçek tanımlanamıyor (çapa yok); p değeri verilmedi (betimsel)."
     if item_on_bound(f_alt, i) or item_on_bound(f_null, i):
