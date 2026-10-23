@@ -1815,6 +1815,46 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             "Python mirt yakınsamadı. Parametreler ve model "
                             "karşılaştırmaları kesin sonuç olarak yorumlanmamalıdır."
                         )
+                    if model in ("1PL", "2PL", "3PL", "4PL"):
+                        try:
+                            from core.irt_python_mirt_parameters import python_mirt_binary_parameters
+                            from core.irt_library_parameter_mapping import curves_from_normalized_table
+                            import plotly.graph_objects as go
+                            item_table = python_mirt_binary_parameters(
+                                library_fit, model=model, item_names=irt_columns)
+                            st.markdown("#### Python mirt — madde parametreleri")
+                            st.dataframe(item_table, hide_index=True, use_container_width=True)
+                            st.download_button(
+                                "Madde parametrelerini CSV indir",
+                                data=item_table.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_parameters.csv",
+                                mime="text/csv", key=f"py_mirt_params_csv_{model}")
+                            theta_grid = np.linspace(-4, 4, 161)
+                            curve_data = curves_from_normalized_table(item_table, theta_grid)
+                            selected_item = st.selectbox(
+                                "ICC / IIF için madde", list(irt_columns),
+                                key=f"py_mirt_curve_item_{model}")
+                            idx = list(irt_columns).index(selected_item)
+                            for title, key, ylabel in (
+                                ("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),
+                                ("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)")):
+                                fig = go.Figure()
+                                fig.add_scatter(x=theta_grid, y=curve_data[key][:, idx],
+                                                mode="lines", name=str(selected_item))
+                                fig.update_layout(title=title, xaxis_title="θ",
+                                                  yaxis_title=ylabel)
+                                st.plotly_chart(fig, use_container_width=True)
+                            tif = go.Figure()
+                            tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
+                                            mode="lines", name="TIF")
+                            tif.update_layout(title="Test Bilgi Fonksiyonu",
+                                              xaxis_title="θ", yaxis_title="I(θ)")
+                            st.plotly_chart(tif, use_container_width=True)
+                            st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
+                                       "bağımsız analitik eğriler. Parametre kurtarma "
+                                       "ve R mirt eşdeğerliği henüz sertifikalı değildir.")
+                        except (ValueError, TypeError, AttributeError) as mapping_error:
+                            st.error(f"Python mirt madde parametresi/eğri eşleştirme hatası: {mapping_error}")
                     with st.expander("Python mirt — kütüphane kestirim özeti"):
                         try:
                             raw_summary = external_fit.fit.summary()
