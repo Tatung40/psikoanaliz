@@ -31,3 +31,14 @@ def test_rejects_missing_and_unknown():
         fit_python_mirt(x,model="2PL")
     with pytest.raises(ValueError,match="Unsupported"):
         fit_python_mirt(np.zeros((10,5)),model="UNKNOWN")
+
+@pytest.mark.parametrize("model", ["1PL", "2PL", "3PL", "4PL"])
+def test_constant_item_is_rejected_before_fit(model):
+    x=np.random.default_rng(2026).integers(0,2,size=(80,8))
+    x[:,3]=1
+    with pytest.raises(ValueError, match="değişkenliği olmayan"):
+        fit_python_mirt(x,model=model)
+
+def test_rsm_is_not_silently_routed_to_native():
+    with pytest.raises(ValueError, match="RSM"):
+        fit_python_mirt(np.zeros((20,5)),model="RSM",n_categories=4)
