@@ -1,9 +1,17 @@
 """Direct Python mirt analysis entry, distinct from EserPsychometrics native pages."""
+import hashlib
 import pandas as pd
 import streamlit as st
 from core.irt_python_mirt_adapter import fit_python_mirt
 
 MODELS=("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM")
+
+def _data_fingerprint(frame):
+    """Order-sensitive digest of data, columns, index and dtype."""
+    hashes = pd.util.hash_pandas_object(frame, index=True).to_numpy().tobytes()
+    info = repr((tuple(frame.columns), tuple(map(str,frame.dtypes)),frame.shape)).encode("utf-8")
+    return hashlib.sha256(info + hashes).hexdigest()
+
 
 def render(data,items=(),id_col=None,group_col=None,model="1PL"):
     st.subheader(f"Python mirt Kütüphanesi — {model}")
@@ -18,21 +26,27 @@ def render(data,items=(),id_col=None,group_col=None,model="1PL"):
         categories=st.number_input("Kategori sayısı",min_value=3,max_value=20,value=3,step=1,
                                    key=f"python_mirt_categories_{model}")
     if st.button("Python mirt ile hesapla",key=f"python_mirt_start_{model}"):
+        st.session_state.pop(f"python_mirt_fit_{model}", None)
         try:
             if len(cols)<3:raise ValueError("En az üç madde seçin.")
             x=data[cols].apply(pd.to_numeric,errors="raise")
             if x.isna().any().any():raise ValueError("Eksik yanıtları bu modülde önce temizleyin.")
             with st.spinner("Python mirt kestirimi çalışıyor"):
                 outcome=fit_python_mirt(x.to_numpy(),model=model,n_categories=int(categories) if categories else None)
-            st.session_state[f"python_mirt_fit_{model}"]=(outcome,tuple(cols),pd.util.hash_pandas_object(x,index=True).sum(),int(categories) if categories else None)
+            st.session_state[f"python_mirt_fit_{model}"]=(outcome,tuple(cols),_data_fingerprint(x),int(categories) if categories else None)
         except Exception as exc:st.error(f"Kestirim yapılamadı: {exc}")
     result=st.session_state.get(f"python_mirt_fit_{model}")
     if result is None:return
     outcome,old_cols,old_hash,old_categories=result
-    try:current_hash=pd.util.hash_pandas_object(data[list(old_cols)].apply(pd.to_numeric,errors='raise'),index=True).sum()
-    except Exception:return
+    try:current_hash=_data_fingerprint(data[list(old_cols)].apply(pd.to_numeric,errors='raise'))
+    except Exception:
+        st.session_state.pop(f"python_mirt_fit_{model}", None)
+        st.warning("Veri artık okunamıyor; önceki sonuç temizlendi.")
+        return
     if tuple(cols)!=old_cols or current_hash!=old_hash or (int(categories) if categories else None)!=old_categories:
-        st.info("Veri veya madde seçimi değişti. Yeniden hesaplayın.");return
+        st.session_state.pop(f"python_mirt_fit_{model}", None)
+        st.info("Veri, madde veya kategori ayarları değişti. Yeniden hesaplayın.")
+        return
     st.success(f"Python mirt kestirimi çalıştırıldı: N={outcome.n_persons}, k={outcome.n_items}.")
     st.warning("Bilimsel statü: bağımsız model bazlı doğrulama gerekli. "
                "Bu sonuç formel DIF değildir.")
