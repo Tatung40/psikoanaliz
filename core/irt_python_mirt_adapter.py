@@ -26,7 +26,7 @@ def fit_python_mirt(responses, *, model, n_categories=None):
     if model not in SUPPORTED:
         raise ValueError(f"Unsupported model: {model}")
     if model in UNSUPPORTED_PUBLIC_MODELS:
-        raise ValueError("Python mirt 1.2.0 fit_mirt API RSM modelini desteklemiyor. Yerel RSM motorunu kullanın.")
+        raise ValueError("Python mirt 1.2.0 fit_mirt API RSM modelini desteklemiyor. RSM için desteklenen bağımsız bir kütüphane motoru gereklidir.")
     try:
         x=np.asarray(responses, dtype=float)
     except (TypeError, ValueError) as ex:
@@ -51,6 +51,16 @@ def fit_python_mirt(responses, *, model, n_categories=None):
         if set(np.unique(x))!=set(range(n_categories)):
             raise ValueError("All categories must occur in the validation pilot.")
         cats=n_categories
+    # Constant items are not identifiable under ordinary IRT calibration.
+    # Reject explicitly rather than returning misleading parameter estimates.
+    if np.any(np.ptp(x, axis=0) == 0):
+        bad = np.flatnonzero(np.ptp(x, axis=0) == 0) + 1
+        raise ValueError(
+            "Yanıt değişkenliği olmayan madde(ler) kestirilemez: "
+            + ", ".join(map(str, bad.tolist()))
+        )
+    # Every dichotomous item must have observed successes and failures.
+    # This check is separate from person-score extremes, which are allowed.
     try:
         mirt=import_module("mirt")
     except ImportError as ex:
