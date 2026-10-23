@@ -213,7 +213,7 @@ with st.sidebar:
         ]:
             st.button(label, key=f"nav_{page}", use_container_width=True,
                       on_click=navigate_to, args=(page,))
-    with st.expander("🐍 Python Kütüphaneleri / Bağımsız KTK Motoru"):
+    with st.expander("Python Kütüphaneleri / Bağımsız KTK Motoru"):
         st.button("📄 Alfa ve Madde Karşılaştırması (Pingouin)",
                   key="nav_ctt_dual",use_container_width=True,
                   on_click=navigate_to,args=("KTK: Çift Motor Rapor",))
@@ -247,11 +247,11 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: GRM Formel DIF",))
         st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)",key="nav_poly_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Çok Kategorili Formel DIF",))
-    with st.expander("🐍 Python mirt Kütüphanesi — MTK"):
+    with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
         for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
-            st.button(f"🐍 Python mirt — {m}",key=f"python_irt_{m}",
+            st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
         st.caption("RSM: Python mirt genel API'sinde desteklenmiyor; yerel B14 motorunu kullanın.")
@@ -1736,7 +1736,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                    "Yerel motor da bağımsız sertifikasyon tamamlanana kadar deneysel kabul edilir.")
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
-        with st.expander("🐍 Öncelikli kütüphane motoru — Python mirt (doğrulama aşamasında)", expanded=True):
+        with st.expander("Öncelikli kütüphane motoru — Python mirt (doğrulama aşamasında)", expanded=True):
             st.caption("Python mirt hazır bir MTK kütüphanesidir. EserPsychometrics "
                        "arayüzündeki parametre eşleştirmeleri ve çıkarımsal "
                        "raporlama henüz bağımsız karşılaştırmadan geçmediği için "
