@@ -1736,6 +1736,22 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                    "Python mirt parametre kestirimi henüz bağımsız parametre kurtarma "
                    "denetiminden geçmedi; aşağıdaki çıktılar araştırma amaçlıdır. "
                    "Yerel motor da bağımsız sertifikasyon tamamlanana kadar deneysel kabul edilir.")
+        # SPSS/Xcalibre-style left settings, right output surface.
+        # Selection changes only presentation, never silently recalibrates.
+        with st.sidebar.expander("⚙️ MTK rapor ayarları", expanded=True):
+            st.caption(f"Etkin model: {model} | Motor: Python mirt")
+            report_params = st.checkbox("Madde parametreleri", value=True,
+                                        key=f"py_mirt_show_params_{model}")
+            report_icc = st.checkbox("ICC — karakteristik eğriler", value=True,
+                                     key=f"py_mirt_show_icc_{model}")
+            report_iif = st.checkbox("IIF — madde bilgi eğrileri", value=True,
+                                     key=f"py_mirt_show_iif_{model}")
+            report_tif = st.checkbox("TIF — test bilgi fonksiyonu", value=True,
+                                     key=f"py_mirt_show_tif_{model}")
+            report_diagnostics = st.checkbox("Kestirim tanıları (AIC/BIC)", value=True,
+                                             key=f"py_mirt_show_diagnostics_{model}")
+            st.caption("Bu kutucuklar yalnızca sağdaki rapor görünümünü değiştirir; "
+                       "model yeniden kestirilmez.")
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
         with st.expander("🐍 Öncelikli kütüphane motoru — Python mirt (doğrulama aşamasında)", expanded=True):
@@ -1804,8 +1820,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         "Serbest parametre": diag["n_parameters"],
                         "Gözlem": diag["n_observations"],
                     }
-                    st.markdown("#### Python mirt — kestirim tanıları")
-                    st.dataframe(
+                    if report_diagnostics:
+                        st.markdown("#### Python mirt — kestirim tanıları")
+                    if report_diagnostics:
+                        st.dataframe(
                         pd.DataFrame([diagnostics]),
                         hide_index=True,
                         use_container_width=True,
@@ -1822,8 +1840,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             import plotly.graph_objects as go
                             item_table = python_mirt_binary_parameters(
                                 library_fit, model=model, item_names=irt_columns)
-                            st.markdown("#### Python mirt — madde parametreleri")
-                            st.dataframe(item_table, hide_index=True, use_container_width=True)
+                            if report_params:
+                                st.markdown("#### Python mirt — madde parametreleri")
+                                st.dataframe(item_table, hide_index=True, use_container_width=True)
                             st.download_button(
                                 "Madde parametrelerini CSV indir",
                                 data=item_table.to_csv(index=False).encode("utf-8-sig"),
@@ -1836,20 +1855,24 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 key=f"py_mirt_curve_item_{model}")
                             idx = list(irt_columns).index(selected_item)
                             for title, key, ylabel in (
-                                ("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),
-                                ("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)")):
+                                *((("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),) if report_icc else ()),
+                                *((("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)"),) if report_iif else ())):
                                 fig = go.Figure()
                                 fig.add_scatter(x=theta_grid, y=curve_data[key][:, idx],
                                                 mode="lines", name=str(selected_item))
                                 fig.update_layout(title=title, xaxis_title="θ",
                                                   yaxis_title=ylabel)
                                 st.plotly_chart(fig, use_container_width=True)
-                            tif = go.Figure()
-                            tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
+                            if report_tif:
+                                tif = go.Figure()
+                            if report_tif:
+                                tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
                                             mode="lines", name="TIF")
-                            tif.update_layout(title="Test Bilgi Fonksiyonu",
+                            if report_tif:
+                                tif.update_layout(title="Test Bilgi Fonksiyonu",
                                               xaxis_title="θ", yaxis_title="I(θ)")
-                            st.plotly_chart(tif, use_container_width=True)
+                            if report_tif:
+                                st.plotly_chart(tif, use_container_width=True)
                             st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
                                        "bağımsız analitik eğriler. Parametre kurtarma "
                                        "ve R mirt eşdeğerliği henüz sertifikalı değildir.")
