@@ -26,7 +26,8 @@ def normalize_binary_item_parameters(frame, *, model, item_names=None):
     n = len(frame)
     if n < 1:
         raise ValueError("Empty parameter table")
-    a = np.ones(n) if model == "1PL" else pd.to_numeric(frame["a"], errors="raise").to_numpy(float)
+    a = (pd.to_numeric(frame["a"], errors="raise").to_numpy(float)
+         if "a" in frame.columns else np.ones(n))
     b = pd.to_numeric(frame["b"], errors="raise").to_numpy(float)
     c = pd.to_numeric(frame["c"], errors="raise").to_numpy(float) if model in ("3PL", "4PL") else np.zeros(n)
     d = pd.to_numeric(frame["d"], errors="raise").to_numpy(float) if model == "4PL" else np.ones(n)
