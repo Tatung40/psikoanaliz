@@ -1833,10 +1833,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             mime="text/csv", key=f"py_mirt_params_csv_{model}")
                         theta_grid = np.linspace(-4, 4, 161)
                         curve_data = curves_from_normalized_table(item_table, theta_grid)
-                        selected_item = st.selectbox(
-                            "ICC / IIF için madde", list(irt_columns),
-                            key=f"py_mirt_curve_item_{model}")
-                        idx = list(irt_columns).index(selected_item)
+                        if report_icc or report_iif:
+                            with st.sidebar.expander("📈 Eğri madde seçimi", expanded=False):
+                                selected_item = st.selectbox(
+                                    "ICC / IIF için madde", list(irt_columns),
+                                    key=f"py_mirt_curve_item_{model}")
+                            idx = list(irt_columns).index(selected_item)
+                        else:
+                            idx = 0
+                            selected_item = list(irt_columns)[0]
                         for title, key, ylabel in (
                             *((("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),) if report_icc else ()),
                             *((("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)"),) if report_iif else ())):
