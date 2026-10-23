@@ -1,47 +1,61 @@
 {
   "date": "2026-10-23",
-  "base_sha": "521fb310e577755aea22b35928024365cd9e04cb",
-  "branch": "feat/dif-fixed-anchor-inference",
-  "scope": "1PL/2PL predeclared anchors, strict anchor and information gates, separate BH families, pointwise parameter intervals and safe item exports",
-  "independent_reference": "Existing pinned R mirt 1.48: LR, joint item parameters and focal mean/variance tests passed; no regeneration",
-  "targeted_validation": {
-    "numerical_and_anchor_tests_passed": 44,
-    "missingness_and_input_tests_passed": 3,
-    "app_test_with_fixed_anchor_interaction_passed": 1,
-    "simulation_bookkeeping_tests_passed": 4,
-    "export_tests_passed": 2
+  "base_sha": "893d1cb4b73ad2937eb8aa0c1ad8ed760e5f8d41",
+  "base_pr": 54,
+  "branch": "feat/grm-concurrent-dif",
+  "scope": "EXPERIMENTAL fixed-anchor concurrent GRM DIF, physical threshold and slope hypotheses; qualified Turkish research bundle",
+  "completed_binary_work": "Preserved. No 1PL/2PL calibration, input, inference or reporting modules changed; no binary simulations repeated.",
+  "reference": {
+    "engine": "Python mirt 1.2.0 EM, NOT R mirt",
+    "fits": 8,
+    "conditions": [
+      "null",
+      "both"
+    ],
+    "hypotheses": [
+      "H0",
+      "Hb",
+      "Ha",
+      "H2"
+    ],
+    "max_loglik_difference_lt": 1e-05,
+    "max_parameter_difference_lt": 0.0002,
+    "r_mirt_executed": false,
+    "fixtures": "tests/fixtures/grm_dif/"
   },
   "simulation": {
-    "artifact": "tests/fixtures/irt_b10/fixed_anchor_simulation_summary.json",
-    "null_replicates": 100,
-    "dif_replicates": 100,
+    "null": 100,
+    "both_dif": 100,
     "inconclusive": 0,
-    "optimizer_fits": 1000,
-    "null_any_bh": 0.07,
-    "null_mc_ci95": [
+    "optimizer_fits": 1400,
+    "fit_seconds_approx": 154,
+    "omnibus_power_M5": 1.0,
+    "omnibus_power_M6": 1.0,
+    "threshold_power_M5": 0.99,
+    "slope_power_M6": 0.88,
+    "null_any_global_bh": 0.07,
+    "null_global_mc_ci95": [
       0.0286052889,
       0.1389197285
     ],
-    "M3_power_bh": 0.97,
-    "M7_power_bh": 1.0,
-    "limitation": "Narrow design and wide null interval; nominal FDR control not established"
+    "limitation": "Narrow 3-category/6-item/N600+400/4-anchor design; general FDR and coverage NOT established"
   },
-  "baseline_main_ci": "https://github.com/Tatung40/psikoanaliz/actions/runs/39929140214",
-  "final_validation": "Pending this branch PR checks, then one full regression on final merged main; final SHA and conclusions recorded on PR",
-  "not_fully_validated": [
-    "GRM DIF",
-    "GPCM DIF",
+  "tests": "Analytic/probability/adaptive integral, independent EM calibration, information curvature, group reversal, failure modes, safe bundles/PNG, stale UI and cache/routing tests; inspect PR for final counts",
+  "merge_gate": "Only merge after green scientific/CI gates; one full regression on final main; final SHA and conclusions recorded on PR",
+  "remaining": [
+    "GRM R reference and heterogeneous category calibration",
+    "data-selected GRM anchors and post-selection correction",
     "PCM DIF",
-    "RSM DIF",
-    "NRM DIF",
-    "4PL inference",
-    "general Monte Carlo control",
-    "post-selection-adjusted inference",
-    "full academic DIF exports"
+    "GPCM DIF",
+    "RSM shared-step DIF",
+    "NRM identified nominal DIF",
+    "3PL/4PL stable/boundary inference",
+    "general simulation error control"
   ],
-  "next": "Validate GRM constrained multigroup threshold/slope likelihood and scale against independent reference before enabling formal production tests; then GPCM/PCM/RSM and NRM",
+  "next": "PCM: audit Python mirt difficulty plus centered steps against native adjacent-category step locations; PCM steps need not be ordered and slopes are fixed. Then GPCM, RSM common steps, NRM reference-category constraints; finally 3PL/4PL.",
+  "parameterization_warning": "GRM b cutpoints are theta locations; d=-a*b. Ha (b shared/a free) is not the standard R slope-intercept d equality hypothesis.",
   "open_prs": {
-    "20": "failed CI: elapsed_seconds; do not merge",
-    "23": "failed CI: unsupported RSM; do not merge"
+    "20": "prior failed elapsed_seconds CI; not merged",
+    "23": "prior unsupported RSM string CI; not merged"
   }
 }

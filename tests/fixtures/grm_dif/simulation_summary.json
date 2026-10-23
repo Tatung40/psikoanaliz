@@ -1,0 +1,490 @@
+{
+  "config": {
+    "model": "GRM",
+    "seed": 20261024,
+    "n_reference": 600,
+    "n_focal": 400,
+    "categories": 3,
+    "points": 61,
+    "audit_points": 81,
+    "anchors": [
+      "M1",
+      "M2",
+      "M3",
+      "M4"
+    ],
+    "latent": {
+      "reference": [
+        0.0,
+        1.0
+      ],
+      "focal": [
+        -0.4,
+        1.2
+      ]
+    },
+    "effects": {
+      "M5": "all thresholds +.6",
+      "M6": "slope -.8"
+    },
+    "python": "3.11.17",
+    "versions": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pandas": "3.1.0"
+    },
+    "source_sha256": "1d999a7e3ac2d363a9783ef62869c06db5cb80f5e07ebb4b01dfba9c937fe742"
+  },
+  "repetitions_per_condition": 100,
+  "results": {
+    "null": {
+      "total": 100,
+      "valid": 100,
+      "inconclusive": 0,
+      "any_bh": {
+        "events": 7,
+        "trials": 100,
+        "estimate": 0.07,
+        "mc_ci95": [
+          0.028605288907418584,
+          0.13891972845586648
+        ]
+      },
+      "items": {
+        "M5": {
+          "raw_rejection": {
+            "events": 9,
+            "trials": 100,
+            "estimate": 0.09,
+            "mc_ci95": [
+              0.041983595628391525,
+              0.16398225502964012
+            ]
+          },
+          "bh_rejection": {
+            "events": 5,
+            "trials": 100,
+            "estimate": 0.05,
+            "mc_ci95": [
+              0.016431879181728278,
+              0.11283491110546288
+            ]
+          },
+          "threshold_bh": {
+            "events": 8,
+            "trials": 100,
+            "estimate": 0.08,
+            "mc_ci95": [
+              0.035171562517808085,
+              0.1515576358644209
+            ]
+          },
+          "slope_bh": {
+            "events": 2,
+            "trials": 100,
+            "estimate": 0.02,
+            "mc_ci95": [
+              0.0024313368239247935,
+              0.07038393247107005
+            ]
+          },
+          "parameters": [
+            {
+              "parameter": "a",
+              "n": 100,
+              "bias": 0.01887174215234084,
+              "rmse": 0.2713936983620009,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            },
+            {
+              "parameter": "b1",
+              "n": 100,
+              "bias": -0.0010249298046256267,
+              "rmse": 0.13824947084452885,
+              "pointwise_coverage": {
+                "events": 92,
+                "trials": 100,
+                "estimate": 0.92,
+                "mc_ci95": [
+                  0.848442364135579,
+                  0.9648284374821919
+                ]
+              }
+            },
+            {
+              "parameter": "b2",
+              "n": 100,
+              "bias": 0.004733712773957951,
+              "rmse": 0.22697689540189733,
+              "pointwise_coverage": {
+                "events": 95,
+                "trials": 100,
+                "estimate": 0.95,
+                "mc_ci95": [
+                  0.887165088894537,
+                  0.9835681208182717
+                ]
+              }
+            }
+          ],
+          "signed_effect": {
+            "n": 100,
+            "bias": -0.00019958615928702934,
+            "rmse": 0.045954644336328086,
+            "pointwise_coverage": {
+              "events": 92,
+              "trials": 100,
+              "estimate": 0.92,
+              "mc_ci95": [
+                0.848442364135579,
+                0.9648284374821919
+              ]
+            }
+          }
+        },
+        "M6": {
+          "raw_rejection": {
+            "events": 4,
+            "trials": 100,
+            "estimate": 0.04,
+            "mc_ci95": [
+              0.011004493986188203,
+              0.09925715671265992
+            ]
+          },
+          "bh_rejection": {
+            "events": 3,
+            "trials": 100,
+            "estimate": 0.03,
+            "mc_ci95": [
+              0.006229971538306227,
+              0.08517605297428028
+            ]
+          },
+          "threshold_bh": {
+            "events": 4,
+            "trials": 100,
+            "estimate": 0.04,
+            "mc_ci95": [
+              0.011004493986188203,
+              0.09925715671265992
+            ]
+          },
+          "slope_bh": {
+            "events": 1,
+            "trials": 100,
+            "estimate": 0.01,
+            "mc_ci95": [
+              0.00025314603268189283,
+              0.054459385392080666
+            ]
+          },
+          "parameters": [
+            {
+              "parameter": "a",
+              "n": 100,
+              "bias": 0.02346958524439401,
+              "rmse": 0.3324567547037721,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            },
+            {
+              "parameter": "b1",
+              "n": 100,
+              "bias": -0.0192265889741215,
+              "rmse": 0.1211510500218468,
+              "pointwise_coverage": {
+                "events": 95,
+                "trials": 100,
+                "estimate": 0.95,
+                "mc_ci95": [
+                  0.887165088894537,
+                  0.9835681208182717
+                ]
+              }
+            },
+            {
+              "parameter": "b2",
+              "n": 100,
+              "bias": 0.007232864217953819,
+              "rmse": 0.22616308626119472,
+              "pointwise_coverage": {
+                "events": 97,
+                "trials": 100,
+                "estimate": 0.97,
+                "mc_ci95": [
+                  0.9148239470257197,
+                  0.9937700284616938
+                ]
+              }
+            }
+          ],
+          "signed_effect": {
+            "n": 100,
+            "bias": 0.004553595161470839,
+            "rmse": 0.041463503854025925,
+            "pointwise_coverage": {
+              "events": 93,
+              "trials": 100,
+              "estimate": 0.93,
+              "mc_ci95": [
+                0.8610802715441336,
+                0.9713947110925814
+              ]
+            }
+          }
+        }
+      },
+      "latent_recovery": {
+        "mu": {
+          "bias": -0.009444308927355288,
+          "rmse": 0.09134528389861142
+        },
+        "sd": {
+          "bias": -0.002535124512465764,
+          "rmse": 0.11461182901774859
+        }
+      }
+    },
+    "both": {
+      "total": 100,
+      "valid": 100,
+      "inconclusive": 0,
+      "any_bh": {
+        "events": 100,
+        "trials": 100,
+        "estimate": 1.0,
+        "mc_ci95": [
+          0.9637833073548094,
+          1.0
+        ]
+      },
+      "items": {
+        "M5": {
+          "raw_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "bh_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "threshold_bh": {
+            "events": 99,
+            "trials": 100,
+            "estimate": 0.99,
+            "mc_ci95": [
+              0.9455406146079194,
+              0.9997468539673181
+            ]
+          },
+          "slope_bh": {
+            "events": 3,
+            "trials": 100,
+            "estimate": 0.03,
+            "mc_ci95": [
+              0.006229971538306227,
+              0.08517605297428028
+            ]
+          },
+          "parameters": [
+            {
+              "parameter": "a",
+              "n": 100,
+              "bias": 0.029985213997982665,
+              "rmse": 0.2836656164382992,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            },
+            {
+              "parameter": "b1",
+              "n": 100,
+              "bias": 0.010044021257318425,
+              "rmse": 0.14943032204018522,
+              "pointwise_coverage": {
+                "events": 92,
+                "trials": 100,
+                "estimate": 0.92,
+                "mc_ci95": [
+                  0.848442364135579,
+                  0.9648284374821919
+                ]
+              }
+            },
+            {
+              "parameter": "b2",
+              "n": 100,
+              "bias": 0.05356274201277685,
+              "rmse": 0.266207988956006,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            }
+          ],
+          "signed_effect": {
+            "n": 100,
+            "bias": -0.004597814946074726,
+            "rmse": 0.0429172968343839,
+            "pointwise_coverage": {
+              "events": 95,
+              "trials": 100,
+              "estimate": 0.95,
+              "mc_ci95": [
+                0.887165088894537,
+                0.9835681208182717
+              ]
+            }
+          }
+        },
+        "M6": {
+          "raw_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "bh_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "threshold_bh": {
+            "events": 3,
+            "trials": 100,
+            "estimate": 0.03,
+            "mc_ci95": [
+              0.006229971538306227,
+              0.08517605297428028
+            ]
+          },
+          "slope_bh": {
+            "events": 88,
+            "trials": 100,
+            "estimate": 0.88,
+            "mc_ci95": [
+              0.7997643163799613,
+              0.9364310974389741
+            ]
+          },
+          "parameters": [
+            {
+              "parameter": "a",
+              "n": 100,
+              "bias": -0.0036105037773768835,
+              "rmse": 0.23989040582599302,
+              "pointwise_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            },
+            {
+              "parameter": "b1",
+              "n": 100,
+              "bias": 0.00951047631650102,
+              "rmse": 0.16774287525663192,
+              "pointwise_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            },
+            {
+              "parameter": "b2",
+              "n": 100,
+              "bias": 0.04366692325467711,
+              "rmse": 0.32941744628898173,
+              "pointwise_coverage": {
+                "events": 97,
+                "trials": 100,
+                "estimate": 0.97,
+                "mc_ci95": [
+                  0.9148239470257197,
+                  0.9937700284616938
+                ]
+              }
+            }
+          ],
+          "signed_effect": {
+            "n": 100,
+            "bias": -0.0042859322303236145,
+            "rmse": 0.053611440214055964,
+            "pointwise_coverage": {
+              "events": 93,
+              "trials": 100,
+              "estimate": 0.93,
+              "mc_ci95": [
+                0.8610802715441336,
+                0.9713947110925814
+              ]
+            }
+          }
+        }
+      },
+      "latent_recovery": {
+        "mu": {
+          "bias": -0.012011443417956666,
+          "rmse": 0.09710290070714453
+        },
+        "sd": {
+          "bias": 0.012395004853730004,
+          "rmse": 0.10194801908080074
+        }
+      }
+    }
+  },
+  "interpretation": "Rates and pointwise coverage condition on valid fits; inconclusive fits are counted separately. Exact binomial Monte Carlo intervals. Complete-null any-BH estimates FDR for this two-item family, not general FDR control. Independent reference: Python mirt EM and analytic/adaptive-integral checks, NOT R mirt."
+}

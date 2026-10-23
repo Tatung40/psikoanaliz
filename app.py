@@ -235,6 +235,8 @@ with st.sidebar:
     st.button("🧬 B14 Çok Kategorili MTK", key="nav_irt_b14",
               use_container_width=True, on_click=navigate_to,
               args=("MTK: Çok Kategorili B14",))
+    st.button("⚖️ GRM Formel DIF (Deneysel)", key="nav_grm_dif", use_container_width=True,
+              on_click=navigate_to, args=("MTK: GRM Formel DIF",))
 
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
@@ -1445,6 +1447,11 @@ elif selected_page == "MTK: Rasch":
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
 # =============================================================================
+elif selected_page == "MTK: GRM Formel DIF":
+    from ui.grm_dif_view import render as render_grm_dif
+    src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
+    if src is None: st.warning("Önce sıralı puan verisi yükleyin.")
+    else: render_grm_dif(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Çok Kategorili B14":
     render_academic_header()
     from ui.irt_b14_view import render as render_b14

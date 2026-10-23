@@ -1,6 +1,6 @@
 # Formal DIF completion evidence
 
-Baseline: `521fb31` (2026-10-23); the invalid nested-LR repair is retained. Preserve existing KTK, Rasch and binary MTK implementations.
+Baseline: `893d1cb` / PR #54 (2026-10-23); completed binary DIF work is retained. Preserve existing KTK, Rasch and binary MTK implementations.
 This is a status record, not a claim that every family is validated for production DIF.
 
 | Family | Existing calibrator / parameters and hypothesis | Identification / sample / anchors | Independent evidence / current status |
@@ -10,7 +10,7 @@ This is a status record, not a claim that every family is validated for producti
 | 2PL | Same; b shift LR df=1, a conditional on b LR df=1, omnibus df=2 | Same scale; a in [0.05,8], b in [-8,8] (`irt_mg` bounds); free focal impact; purified anchors | Fixed-anchor LR/scale/parameter tests match pinned R references. Unstable or insufficient purification blocks inference; selected-anchor p-values remain conditional. See the bounded fixed-anchor study below. |
 | 3PL | `irt_mg34` / `irt_dif34`; a,b,c invariance | Reference N(0,1), focal impact free, invariant anchors; >=100/group, warning <300; all free parameters must be interior for LR inference | B11 boxed R mirt references. Boundary planted items are descriptive screens, not significant formal DIF. Broad simulation/coverage remains unvalidated. |
 | 4PL | Same, plus upper asymptote d | Same linking; c<d and bounds; weak identifiability | B11 descriptive comparisons; UI inferential DIF disabled. Keep disabled pending valid boundary inference and independent simulation. |
-| GRM | Python mirt pilot, ordered thresholds and slopes | Requires ordered category codes, common latent scale and invariant threshold/slope anchors | SCREEN ONLY in current DIF UI. Installed multigroup API is a candidate, not independently validated here. Need nested threshold/slope fits, constraints, recovery and pinned R comparisons. |
+| GRM | Python mirt pilot, ordered thresholds and slopes | Requires ordered category codes, common latent scale and invariant threshold/slope anchors | New isolated EXPERIMENTAL formal GRM: native concurrent MML; H2/H0 global, H2/Ha physical-threshold and H2/Hb slope LR; fixed anchors. Eight independent Python mirt 1.2.0 EM reference fits, analytic/integral/score/information/scale checks and 200 simulation repetitions. Qualified Turkish bundle available; R mirt, heterogeneous categories and general error control remain unvalidated. See GRM_DIF_VALIDATION.md. |
 | PCM | Python mirt pilot, step intercepts with fixed slope | Ordered scores; step linking and free focal impact required | SCREEN ONLY. Need independent step parameterization / likelihood / df / recovery checks before formal integration. |
 | GPCM | Python mirt pilot, steps and slope | Ordered scores; invariant anchors identify both location and scale | SCREEN ONLY. Need independent step/slope and nested multigroup validation. |
 | RSM | Adapter lists RSM, but installed mirt 1.2.0 rejects this model name | Must impose shared category steps across items; cannot substitute unrestricted PCM | UNAVAILABLE for formal DIF. PR #23 confirms unsupported model. A tested shared-step constraint implementation or pinned R runtime is required. |
@@ -59,8 +59,9 @@ no unvalidated formal polytomous p-values or automatic item deletion are introdu
   Smoke fits do not validate model parameters or DIF. Neither PR is merged.
 - Issue #44 remains open for B14 scientific validation and reports.
 
-Next scientific priority: GRM, then GPCM/PCM/RSM multigroup parameterization and
-independent reference validation. Keep the installed unvalidated API separate from formal
+Next scientific priority (user order): PCM, then GPCM/RSM/NRM, then the remaining
+3PL/4PL inference gaps. GRM remains explicitly experimental outside the tested design;
+its physical-threshold hypothesis must not be confused with slope-intercept equality in R mirt. Keep the installed unvalidated API separate from formal
 production inference; do not merge the failed PRs as a substitute for validation. See `DIF_CHECKPOINT.json` for execution evidence.
 
 ## Binary fixed-anchor contract (current branch)
@@ -122,3 +123,12 @@ CSV/XLSX item exports escape formula-like labels, include the actual per-test an
 likelihoods, raw/adjusted p-values, parameter intervals and decisions, and exclude
 respondent rows. Full academic DOCX/ZIP packages and probability-effect uncertainty
 remain unfinished.
+
+## GRM evidence added after PR #54
+
+See `GRM_DIF_VALIDATION.md` for exact hypotheses, parameterization, numerical tolerances,
+Monte Carlo intervals and remaining limitations. The new page requires an explicit
+experimental/ordinal-data acknowledgment; it does not change binary DIF or rename the
+existing score screen. Its ZIP includes qualified DOCX, XLSX, BOM CSV and 300-dpi curves,
+without respondent records. Completed binary numerical gates are selected only when their
+sources/shared helpers change; the final main regression still runs every test.
