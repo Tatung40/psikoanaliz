@@ -2302,17 +2302,28 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         if len(dlev) > 2:
                             st.caption(f"Grup değişkeninde {len(dlev)} düzey var; yalnızca seçilen iki grup "
                                        "karşılaştırılır.")
+                        use_fixed = st.checkbox("Önceden belirlenmiş sabit çapalar", value=False,
+                                                key=f"b10_dif_fixed_{model}")
+                        fixed_items = None
+                        if use_fixed:
+                            fixed_items = st.multiselect("Sabit çapa maddeleri", irt_columns,
+                                                        key=f"b10_dif_anchors_{model}")
+                            st.caption("Çapaları bu verinin DIF sonuçlarından seçmeyin. Bağımsız içerik veya "
+                                       "önceki çalışma kanıtı gerekir; seçilen çapalar test edilmez.")
                         f1_, f2_, f3_ = st.columns(3)
                         with f1_:
                             dalpha = st.select_slider("FDR düzeyi (BH)", options=[.01, .05, .10], value=.05,
                                                       key=f"b10_dif_alpha_{model}")
                         with f2_:
-                            dpur = st.checkbox("Yinelemeli çapa arındırması", value=True, key=f"b10_dif_purify_{model}")
+                            dpur = st.checkbox("Yinelemeli çapa arındırması", value=True,
+                                               key=f"b10_dif_purify_{model}", disabled=use_fixed)
+                            dpur = bool(dpur) and not use_fixed
                         with f3_:
                             drounds = st.select_slider("En fazla arındırma turu", options=[1, 3, 5, 10], value=10,
                                                        key=f"b10_dif_rounds_{model}", disabled=not dpur)
                         dif_now = {"group_col": dgcol, "reference": dref, "focal": dfoc, "alpha": float(dalpha),
-                                   "purify": bool(dpur), "max_rounds": int(drounds)}
+                                   "purify": bool(dpur), "max_rounds": int(drounds),
+                                   "fixed_anchors": None if fixed_items is None else tuple(fixed_items)}
                         if model == "2PL":
                             st.caption("2PL DIF her madde için üç model kestirir; 12 maddede yaklaşık 15–30 sn sürer.")
                         if st.button("▶️ DIF analizini başlat", key=f"b10_dif_run_{model}"):
@@ -2320,7 +2331,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 with st.spinner(f"İki gruplu ortak {model} modeli kestiriliyor…"):
                                     store[("dif", model)] = {"key": b10_key, "result": b10.run_dif(
                                         target, irt_columns, dgcol, dref, dfoc, model, dalpha, dpur, drounds,
-                                        points=int(r.get("settings", {}).get("points", 41)))}
+                                        points=int(r.get("settings", {}).get("points", 41)), fixed_anchors=fixed_items)}
                             except Exception as exc:
                                 store.pop(("dif", model), None)
                                 st.error(f"DIF analizi tamamlanamadı: {exc}")
@@ -2335,6 +2346,11 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             if not dr["joint"]["converged"]:
                                 st.error("Ortak model yakınsamadı; DIF sonuçları yorumlanmamalıdır.")
                             st.dataframe(b10.dif_summary_rows(dr), hide_index=True, use_container_width=True)
+                            st.caption(dr["multiplicity"] + " Δa/Δb aralıkları noktasal Wald %95 güven aralıklarıdır; "
+                                       "çapa varsayımı koşulundadır ve çoklu aralık düzeltmesi içermez.")
+                            st.caption(dr["missing_policy"] + f" Dışlanan satır: {dr['excluded_rows']}.")
+                            with st.expander("Madde bazında eksik yanıtlar"):
+                                st.dataframe(dr["missingness"], hide_index=True, use_container_width=True)
                             st.caption("μ_odak ve σ_odak grupların yetenek dağılımı farkıdır (etki/impact); DIF değildir.")
                             st.plotly_chart(b10.dif_effect_figure(dr), use_container_width=True)
                             st.dataframe(dr["table"].round(4), hide_index=True, use_container_width=True)
@@ -2345,13 +2361,14 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                        "matrisinden. Tek biçimli / tek biçimli olmayan LR testleri işaretlenen maddeler "
                                        "için ayrıştırma sağlar.") + " İşaretli ve işaretsiz farklar odak grubun yetenek "
                                        "dağılımı üzerinden ortalanmış olasılık farklarıdır.")
-                            pick = st.selectbox("Grup tepki fonksiyonları", list(dr["table"].dropna(subset=["a_ref"])["Madde"]),
+                            pick = st.selectbox("Grup tepki fonksiyonları", list(dr["table"].reindex(
+                                                columns=["Madde", "a_ref"]).dropna(subset=["a_ref"])["Madde"]),
                                                 key=f"b10_dif_item_{model}")
                             if pick:
                                 st.plotly_chart(b10.group_irf_figure(dr, pick), use_container_width=True)
                             st.markdown("**Arındırma geçmişi**")
                             st.dataframe(dr["history"], hide_index=True, use_container_width=True)
-                            download_table_pair(dr["table"].round(5), f"psikoanaliz_{model}_dif", "DIF tablosu",
+                            download_table_pair(b10.dif_export_table(dr).round(5), f"psikoanaliz_{model}_dif", "DIF tablosu",
                                                 f"b10_dif_dl_{model}")
             # ---- B11: 3PL/4PL tanıları (gösterilen kalibrasyona ve veriye bağlı; 1PL/2PL/Rasch değişmez)
             if model in b11.B11_MODELS:

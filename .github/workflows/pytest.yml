@@ -31,7 +31,7 @@ jobs:
         env:
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
-        run: python -m pytest -q tests/test_dif_likelihood_validity.py tests/test_irt_b10.py tests/test_irt_b11.py
+        run: python -m pytest -q tests/test_dif_likelihood_validity.py tests/test_dif_fixed_anchors.py tests/test_dif_fixed_anchor_simulation.py tests/test_dif_fixed_anchor_exports.py tests/test_irt_b10.py tests/test_irt_b10_streamlit.py tests/test_irt_b11.py
       - name: Full regression suite (main)
         if: github.event_name == 'push'
         timeout-minutes: 55

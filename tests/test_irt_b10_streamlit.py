@@ -96,6 +96,17 @@ def test_apptest_1pl_tabs_and_3pl_unchanged():
     assert any("F (odak) − R (referans)" in m.value for m in at.markdown)
     at.checkbox(key="b10_dif_purify_1PL").uncheck().run()
     assert any("farklı grup veya ayarlarla" in i.value for i in at.info)
+    at.checkbox(key="b10_dif_fixed_1PL").check().run()
+    anchors = [c for c in ITEMS if c not in ("M3", "M7")]
+    at.multiselect(key="b10_dif_anchors_1PL").set_value(anchors).run()
+    assert at.checkbox(key="b10_dif_purify_1PL").disabled
+    at.button(key="b10_dif_run_1PL").click().run()
+    assert not at.exception
+    fixed = at.session_state["irt_b10"][("dif", "1PL")]["result"]
+    assert fixed["anchor_policy"] == "fixed" and fixed["anchors"] == anchors
+    assert fixed["table"].set_index("Madde").loc[anchors, "p"].isna().all()
+    at.multiselect(key="b10_dif_anchors_1PL").set_value(anchors[:-1]).run()
+    assert any("farklı grup veya ayarlarla" in i.value for i in at.info)
     # a new calibration run invalidates the B10 results shown for the old one
     next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
     assert not any("F (odak) − R (referans)" in m.value for m in at.markdown)
