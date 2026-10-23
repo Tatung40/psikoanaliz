@@ -131,6 +131,20 @@ def download_table_pair(frame, basename, label, key):
 
 inject_custom_css()
 
+PRIVACY_DISCLOSURE = (
+    "Yüklediğiniz veriler etkin oturumda analiz için işlenir. Uygulama kalıcı bir kullanıcı veri arşivi tutmayı amaçlamaz. "
+    "Verilerinizi oturumdan temizlemek için Oturum Verilerini Temizle düğmesini kullanın. "
+    "Barındırma sağlayıcısının teknik kayıtları, tarayıcı önbelleği ve geçici sunucu kopyaları "
+    "bu işlemle garanti olarak silinemez. Kimlik belirleyici bilgileri yüklemeden önce anonimleştirin." 
+)
+
+def clear_active_analysis_session():
+    next_nonce = int(st.session_state.get('privacy_upload_nonce', 0)) + 1
+    for name in list(st.session_state.keys()):
+        if name not in ('nav_page', 'privacy_upload_nonce'):
+            del st.session_state[name]
+    st.session_state['privacy_upload_nonce'] = next_nonce
+
 # Session State Başlatma
 if "raw_df" not in st.session_state:
     st.session_state.raw_df = None
@@ -257,6 +271,11 @@ with st.sidebar:
     selected_page = st.session_state.nav_page
 
     st.markdown("---")
+    st.markdown("### 🔐 Veri Gizliliği")
+    st.caption(PRIVACY_DISCLOSURE)
+    if st.button("🗑️ Oturum Verilerini Temizle", key="clear_privacy_session", use_container_width=True):
+        clear_active_analysis_session()
+        st.rerun()
     st.markdown("### 📊 Mevcut Veri Durumu")
     if st.session_state.scored_df is not None:
         n_rows = len(st.session_state.scored_df)
@@ -306,13 +325,15 @@ if selected_page == "1. Ana Sayfa":
 elif selected_page == "2. Veri Yükleme":
     render_academic_header()
     st.subheader("📁 Veri Yükleme ve Örnek Veri Setleri")
+    st.info(PRIVACY_DISCLOSURE)
 
     tab_upload, tab_sample = st.tabs(["📤 Kendi Verinizi Yükleyin", "🧪 Örnek Veri Setleri ile Deneyin"])
 
     with tab_upload:
         uploaded_file = st.file_uploader(
             "Veri dosyanızı seçin (CSV, Excel .xlsx/.xls veya SPSS .sav)",
-            type=["csv", "xlsx", "xls", "sav"]
+            type=["csv", "xlsx", "xls", "sav"],
+            key=f"private_file_upload_{st.session_state.get('privacy_upload_nonce', 0)}"
         )
 
         col_enc, col_sep = st.columns(2)
