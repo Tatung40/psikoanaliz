@@ -1,6 +1,6 @@
 """Isolated adapter for Cameron Lyons' Python mirt (NOT R mirt).
 
-Explicit opt-in, raw fit preserved for subsequent model-specific inspection.
+Primary external library calibration; raw fit preserved for model-specific inspection.
 No claim that R parameter agreement or standard errors are validated.
 """
 from dataclasses import dataclass
@@ -19,7 +19,7 @@ class PythonMirtResult:
     n_items: int
     n_categories: int | None
     fit: object
-    scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
+    scientific_status: str = "LIBRARY_FIT_PARAMETER_MAPPING_NOT_YET_VALIDATED"
 
 def fit_python_mirt(responses, *, model, n_categories=None):
     """One public fit call; no implicit engine fallback or unsupported inference."""
