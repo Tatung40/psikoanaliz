@@ -87,6 +87,24 @@ F. Produce final report with links to PRs, commits, CI, verified models, scienti
 
 **Do not say "all DIF models completed" until all nine named model families have supported, model-correct hypothesis tests, demonstrably convergent fits, simulation and independent validation, tests for failure modes, and usable Turkish exports.** Otherwise deliver verified subset plus accurately named blockers. The user wants rigorous implementation, not optimistic interface labels.
 
+## NON-NEGOTIABLE: MINIMUM TOKEN, COMPUTE AND TIME BUDGET
+
+**Optimize first for the fewest model tokens and tool calls needed to achieve correct, independently validated scientific software.** Token efficiency is a hard engineering requirement, not permission to skip scientific validation, required tests or safety gates.
+
+1. **Resume, never restart.** At entry inspect only `git status`, current branch, latest relevant commits, and the targeted DIF status matrix/known failures. Reuse files, code, fixtures, CI artifacts and decisions already available; do not reread the whole repository or prior transcripts.
+2. **Progressive context retrieval.** Search exact symbols/paths via `rg` or narrow GitHub searches; open only relevant code ranges. Avoid whole-file dumps, recursive giant listings, duplicate API documentation and large test logs. For failures show only the traceback and concise neighboring lines.
+3. **Think and edit in batches.** Choose one scientifically coherent change per iteration; prepare an explicit 2–4 sentence internal plan, then perform related edits together. Do not spawn many overlapping agents or ask for routine confirmations.
+4. **Tests as a funnel.** Start with syntax/type import and smallest relevant unit tests. Run impacted integration tests next. Run **one full regression on final `main`** after all verified changes are merged; repeat only to repair a real failure. Never continuously rerun the full suite or rerun green tests with unchanged code.
+5. **Reuse numerical computation.** Cache pinned environments, simulated datasets, fitted models, reproducible seeds, and comparison results. Do not recalibrate identical data for every chart or report; do not regenerate expensive Monte Carlo fixtures unnecessarily. Perform adequate scientifically justified simulation replicates, not arbitrary computationally wasteful repetitions.
+6. **Avoid context duplication.** Keep one concise machine-readable DIF completion matrix and a short checkpoint: latest SHA/PR, validated models, tests run, active blocker, next step. Incrementally update this checkpoint; do not regenerate lengthy weekly summaries or copy full source files into messages.
+7. **Compact communications.** Respond only on milestone, blocker, validation failure or final result. Use short status lines with model, change, test counts, PR and CI links; no repetitive narrative, no giant prompt echoes and no unsolicited tutorials. Ask user only for an essential authorization/decision.
+8. **No gratuitous downloads or dependencies.** Prefer installed numerical stacks and existing repository APIs. Add a dependency only if justified by independent verification and reproducibility; do not download unneeded models, datasets, manuals or artifacts.
+9. **Budget-aware model use.** Use lowest sufficient reasoning effort for rote file edits, summarization and routine tests; concentrate deeper reasoning on identification, nested hypotheses, group linking, Hessian and inference. Avoid repetitive exploratory tool calls that do not affect a decision.
+10. **Stop conditions.** If running out of model quota, compute budget or wall-time, finish a coherent tested commit, record exact remaining tasks in the checkpoint/issue, and report the limitation. Never pretend work will continue autonomously after execution stops.
+11. **Protect correctness.** If savings conflict with unbiased DIF inference, numerical validity, test coverage or transparent reporting, scientific correctness wins. Explicitly document what was not independently validated.
+
+**Ideal loop:** check checkpoint → inspect minimal diff/context → implement one verified feature → focused tests → fix only failures → PR/CI → update checkpoint → next feature → one final full regression.
+
 ## Resource discipline
 
 Reuse the repository; cache dependencies and fixtures where possible; targeted iterative test runs and one final full regression; avoid repetitive downloads, massive context dumps and self-rewriting code. Do not add paid services or trigger unapproved cloud charges. GitHub CI limits and Codex usage quotas still apply. Respect service sandbox and execution timeouts.
