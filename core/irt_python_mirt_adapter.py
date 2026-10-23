@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from importlib import import_module
 import numpy as np
 
-SUPPORTED = frozenset(("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","RSM","NRM"))
+SUPPORTED = frozenset(("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"))
+UNSUPPORTED_PUBLIC_MODELS = frozenset(("RSM",))
 POLY = frozenset(("GRM","PCM","GPCM","RSM","NRM"))
 
 @dataclass
@@ -24,6 +25,8 @@ def fit_python_mirt(responses, *, model, n_categories=None):
     """One public fit call; no implicit engine fallback or unsupported inference."""
     if model not in SUPPORTED:
         raise ValueError(f"Unsupported model: {model}")
+    if model in UNSUPPORTED_PUBLIC_MODELS:
+        raise ValueError("Python mirt 1.2.0 fit_mirt API RSM modelini desteklemiyor. Yerel RSM motorunu kullanın.")
     try:
         x=np.asarray(responses, dtype=float)
     except (TypeError, ValueError) as ex:
