@@ -44,8 +44,29 @@ def main():
                     attrs[name] = describe(value)
             except Exception:
                 attrs[name] = {"type": "unavailable"}
+        coef = fit.coef()
+        if hasattr(coef, "columns"):
+            coef_info = {"type": type(coef).__name__,
+                         "columns": [str(x) for x in coef.columns],
+                         "shape": list(coef.shape)}
+        elif isinstance(coef, dict):
+            coef_info = {"type": "dict", "keys": list(map(str, coef.keys()))}
+        else:
+            coef_info = describe(coef)
+        model_attrs = {}
+        for name in dir(fit.model):
+            if name.startswith("_"):
+                continue
+            try:
+                value = getattr(fit.model, name)
+                if not callable(value):
+                    model_attrs[name] = describe(value)
+            except Exception:
+                pass
         report["models"][model] = {"fit_type": type(fit).__name__,
-                                    "attributes": attrs}
+                                    "attributes": attrs,
+                                    "coef": coef_info,
+                                    "model_attributes": model_attrs}
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
