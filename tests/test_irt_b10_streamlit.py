@@ -63,54 +63,24 @@ def test_run_dif_rejects_group_as_item_and_builds_figures():
     assert len(irf.data) == 2 and "M3" in irf.layout.title.text
 
 
-def test_apptest_1pl_tabs_and_3pl_unchanged():
+def test_apptest_1pl_library_first_and_3pl_navigation():
+    """Library-only UI must not expose an executable native calibration."""
     st_testing = pytest.importorskip("streamlit.testing.v1")
-    at = st_testing.AppTest.from_file(APP, default_timeout=300)
+    at = st_testing.AppTest.from_file(APP, default_timeout=120)
     df = _dif_frame()
     at.session_state["raw_df"] = df
     at.session_state["scored_df"] = df.copy()
-    at.session_state["item_cols"] = ITEMS + ["Grup"]           # a mis-selected group column
+    at.session_state["item_cols"] = ITEMS + ["Grup"]
     at.session_state["id_col"] = "OGRENCI_NO"
     at.session_state["group_col"] = "Grup"
     at.session_state["is_dichotomous"] = True
     at.session_state["nav_page"] = "MTK: 1PL"
     at.run()
     assert not at.exception
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
-    assert not at.exception
-    fit = at.session_state["irt_model_results"]["1PL"]["result"]
-    assert list(fit["items"]["Madde"]) == ITEMS                 # group / ID never items
-    at.button(key="b10_gf_run_1PL").click().run()
-    assert not at.exception
-    gf = at.session_state["irt_b10"][("gf", "1PL")]["result"]
-    assert gf["m2"]["available"] and gf["m2"]["free_parameters"] == 12
-    at.button(key="b10_q3_run_1PL").click().run()
-    assert not at.exception and at.session_state["irt_b10"][("q3", "1PL")]["result"]["model"] == "1PL"
-    assert at.selectbox(key="b10_dif_group_1PL").value == "Grup"
-    at.selectbox(key="b10_dif_ref_1PL").select("R").run()
-    at.selectbox(key="b10_dif_focal_1PL").select("F").run()
-    at.button(key="b10_dif_run_1PL").click().run()
-    assert not at.exception
-    dif = at.session_state["irt_b10"][("dif", "1PL")]["result"]
-    assert dif["model"] == "1PL" and "M3" in set(dif["table"].loc[dif["table"]["DIF işareti"], "Madde"])
-    assert any("F (odak) − R (referans)" in m.value for m in at.markdown)
-    at.checkbox(key="b10_dif_purify_1PL").uncheck().run()
-    assert any("farklı grup veya ayarlarla" in i.value for i in at.info)
-    at.checkbox(key="b10_dif_fixed_1PL").check().run()
-    anchors = [c for c in ITEMS if c not in ("M3", "M7")]
-    at.multiselect(key="b10_dif_anchors_1PL").set_value(anchors).run()
-    assert at.checkbox(key="b10_dif_purify_1PL").disabled
-    at.button(key="b10_dif_run_1PL").click().run()
-    assert not at.exception
-    fixed = at.session_state["irt_b10"][("dif", "1PL")]["result"]
-    assert fixed["anchor_policy"] == "fixed" and fixed["anchors"] == anchors
-    assert fixed["table"].set_index("Madde").loc[anchors, "p"].isna().all()
-    at.multiselect(key="b10_dif_anchors_1PL").set_value(anchors[:-1]).run()
-    assert any("farklı grup veya ayarlarla" in i.value for i in at.info)
-    # a new calibration run invalidates the B10 results shown for the old one
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
-    assert not any("F (odak) − R (referans)" in m.value for m in at.markdown)
-    # 3PL page: no B10 tabs (B10 scope is 1PL/2PL only)
+    assert len([b for b in at.button if b.key == "py_mirt_run_1PL" and not b.disabled]) == 1
+    legacy = [b for b in at.button if "MTK Analizini Başlat" in b.label]
+    assert len(legacy) == 1 and legacy[0].disabled
+    assert not at.session_state.get("irt_model_results", {}).get("1PL")
     assert ui.B10_MODELS == ("1PL", "2PL")
     at.session_state["nav_page"] = "MTK: 3PL"
     at.run()
