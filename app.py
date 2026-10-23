@@ -1752,6 +1752,14 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         tuple(irt_columns), external_data.shape,
                         int(pd.util.hash_pandas_object(external_data, index=True).sum()))
                     with st.spinner("Deneysel Python mirt kestirimi hesaplanıyor…"):
+                        missing_count = int(external_data.isna().sum().sum())
+                        if missing_count:
+                            raise ValueError(
+                                f"{missing_count} eksik yanıt bulundu. Python mirt adaptörü "
+                                "eksik yanıtları henüz desteklemiyor; otomatik sıfıra "
+                                "dönüştürme veya örtük atama yapılmadı. Eksik veri "
+                                "analizi sekmesinde uygun yöntemi değerlendirin."
+                            )
                         external_fit = fit_python_mirt(external_data.to_numpy(), model=model)
                     if "python_mirt_experimental_results" not in st.session_state:
                         st.session_state.python_mirt_experimental_results = {}
