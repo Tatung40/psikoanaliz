@@ -1,6 +1,6 @@
 # Formal DIF completion evidence
 
-Baseline: `893d1cb` / PR #54 (2026-10-23); completed binary DIF work is retained. Preserve existing KTK, Rasch and binary MTK implementations.
+Baseline: `f63b253` / PR #55 (2026-10-23); completed binary DIF work is retained. Preserve existing KTK, Rasch and binary MTK implementations.
 This is a status record, not a claim that every family is validated for production DIF.
 
 | Family | Existing calibrator / parameters and hypothesis | Identification / sample / anchors | Independent evidence / current status |
@@ -8,13 +8,13 @@ This is a status record, not a claim that every family is validated for producti
 | Rasch | `rasch_dif`, concurrent MML; difficulty shift, Wald | Reference mean 0 and slope 1; reference SD and focal mean/SD separately free; >=50/group, warning <200; other-item anchors, purification | R fixtures and B9 tests; limited simulation, not a Type I/power study. Existing formal method retained. |
 | 1PL | `irt_mg` / `irt_dif`; a=1, b shift, LR df=1 | Reference N(0,1); focal mean/SD free; >=50/group, warning <200; other-item anchors | Pinned R mirt 1.48 fixtures in B10, logL/LR/parameter tests. Predeclared fixed anchors now supported; excluded from testing. Existing R LR benchmarks retained; broad generalization remains unvalidated. |
 | 2PL | Same; b shift LR df=1, a conditional on b LR df=1, omnibus df=2 | Same scale; a in [0.05,8], b in [-8,8] (`irt_mg` bounds); free focal impact; purified anchors | Fixed-anchor LR/scale/parameter tests match pinned R references. Unstable or insufficient purification blocks inference; selected-anchor p-values remain conditional. See the bounded fixed-anchor study below. |
-| 3PL | `irt_mg34` / `irt_dif34`; a,b,c invariance | Reference N(0,1), focal impact free, invariant anchors; >=100/group, warning <300; all free parameters must be interior for LR inference | B11 boxed R mirt references. Boundary planted items are descriptive screens, not significant formal DIF. Broad simulation/coverage remains unvalidated. |
-| 4PL | Same, plus upper asymptote d | Same linking; c<d and bounds; weak identifiability | B11 descriptive comparisons; UI inferential DIF disabled. Keep disabled pending valid boundary inference and independent simulation. |
+| 3PL | `irt_mg34` / `irt_dif34`; a,b,c invariance | Reference N(0,1), focal moments free; fixed anchors now supported, >=2 valid; unstable purification blocks inference | Existing B11 R references retained; LR now requires full observed information and higher-grid likelihood/score audit. Pointwise parameter intervals only for valid inference. General simulation/coverage and boundary inference remain unvalidated. |
+| 4PL | Same, plus upper asymptote d | Boundary and weak-identification risks | Inferential API now explicitly unavailable, matching the existing disabled UI; use `inferential=False` for descriptive comparisons. No boundary chi-square or fabricated bootstrap. Still unfinished. |
 | GRM | Python mirt pilot, ordered thresholds and slopes | Requires ordered category codes, common latent scale and invariant threshold/slope anchors | New isolated EXPERIMENTAL formal GRM: native concurrent MML; H2/H0 global, H2/Ha physical-threshold and H2/Hb slope LR; fixed anchors. Eight independent Python mirt 1.2.0 EM reference fits, analytic/integral/score/information/scale checks and 200 simulation repetitions. Qualified Turkish bundle available; R mirt, heterogeneous categories and general error control remain unvalidated. See GRM_DIF_VALIDATION.md. |
-| PCM | Python mirt pilot, step intercepts with fixed slope | Ordered scores; step linking and free focal impact required | SCREEN ONLY. Need independent step parameterization / likelihood / df / recovery checks before formal integration. |
-| GPCM | Python mirt pilot, steps and slope | Ordered scores; invariant anchors identify both location and scale | SCREEN ONLY. Need independent step/slope and nested multigroup validation. |
-| RSM | Adapter lists RSM, but installed mirt 1.2.0 rejects this model name | Must impose shared category steps across items; cannot substitute unrestricted PCM | UNAVAILABLE for formal DIF. PR #23 confirms unsupported model. A tested shared-step constraint implementation or pinned R runtime is required. |
-| NRM | Python mirt pilot; category-specific intercepts/slopes | Unordered labels; reference-category or sum-to-zero identification; invariant labels and anchors | Raw option-distribution screen only, explicitly NOT DIF. Need nominal multigroup identification, permutation-invariance and R reference tests. |
+| PCM | New native concurrent MML; fixed a=1, unordered-in-value adjacent steps, global LR C−1 df | Fixed reference N(0,1) is an extra variance assumption; focal moments free, >=2 predeclared anchors | EXPERIMENTAL: 4 independent Python mirt EM calibrations, analytic/integral/probability checks, 200 simulations, Turkish bundle. General error control/R benchmark/heterogeneous categories remain open. |
+| GPCM | New native MML; physical adjacent steps and positive slope; global C df, conditional step C−1 / slope 1 df | Reference N(0,1), focal moments free; invariant fixed anchors | EXPERIMENTAL: 8 Python mirt EM references, adaptive quadrature audits, 200 simulations; qualified bundle. Conditional slope power 70% in bounded design; general FDR unproven. |
+| RSM | New native MML with truly common centered category steps across all items AND groups; item-location LR 1 df | a=1, reference variance=1 extra assumption; fixed anchors; category-step DIF not tested | EXPERIMENTAL: 4 independently coded numerical calibration references (NOT R), public RatingScaleModel probabilities and adaptive integrals, 200 simulations, qualified bundle. No unrestricted PCM substitution. |
+| NRM | New native nominal MML; reference-category intercept/slope constraints; global 2(C−1) df, conditional C−1 df | Explicit unordered labels; first anchor/category contrast fixes axis sign; no matching score/expected score | EXPERIMENTAL: 8 Python mirt EM references, label permutation and scale tests, 200 simulations. Weighted category-effect intervals undercovered (minimum 88%) and are withheld from UI/reports. General coverage/R/FDR remain open. |
 
 ## Installed API audit
 
@@ -45,7 +45,7 @@ ordinal/nominal validation, probability-effect uncertainty and complete Turkish
 DOCX/XLSX/CSV/300-dpi ZIP exports still require work. Binary fixed-anchor tests,
 strict anchor-failure gates and pointwise parameter confidence intervals are implemented;
 post-selection-adjusted inference remains unavailable. Existing exports/screens are retained;
-no unvalidated formal polytomous p-values or automatic item deletion are introduced.
+experimental polytomous p-values are restricted to the documented model/regularity gates; general validation is not claimed and no item is automatically deleted.
 
 ## Reviewed remote state
 
@@ -59,8 +59,7 @@ no unvalidated formal polytomous p-values or automatic item deletion are introdu
   Smoke fits do not validate model parameters or DIF. Neither PR is merged.
 - Issue #44 remains open for B14 scientific validation and reports.
 
-Next scientific priority (user order): PCM, then GPCM/RSM/NRM, then the remaining
-3PL/4PL inference gaps. GRM remains explicitly experimental outside the tested design;
+PCM/GPCM/RSM/NRM now have bounded EXPERIMENTAL likelihood implementations; see POLYTOMOUS_DIF_VALIDATION.md. Remaining scientific priorities: broader coverage/FDR and R references, then valid 3PL/4PL boundary inference. GRM remains explicitly experimental outside the tested design;
 its physical-threshold hypothesis must not be confused with slope-intercept equality in R mirt. Keep the installed unvalidated API separate from formal
 production inference; do not merge the failed PRs as a substitute for validation. See `DIF_CHECKPOINT.json` for execution evidence.
 
@@ -132,3 +131,7 @@ experimental/ordinal-data acknowledgment; it does not change binary DIF or renam
 existing score screen. Its ZIP includes qualified DOCX, XLSX, BOM CSV and 300-dpi curves,
 without respondent records. Completed binary numerical gates are selected only when their
 sources/shared helpers change; the final main regression still runs every test.
+
+## Current polytomous and asymptote safeguards
+
+See `POLYTOMOUS_DIF_VALIDATION.md` and `DIF_CHECKPOINT.json`. Existing Rasch, 1PL, 2PL and GRM sources/fixtures are retained. GRM R reference and FDR limitations remain explicit open tasks. New nominal categories are never scored as ordered success. No new model is certified FORMAL VALIDATED; opt-in experimental pages disclose the actual evidence and gaps.

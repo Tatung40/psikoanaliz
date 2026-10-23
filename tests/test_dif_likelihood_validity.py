@@ -9,7 +9,7 @@ from core import irt_dif34 as asymptote
 
 def fit(ll, **updates):
     return dict(converged=True, regular=True, linked=True, bound_labels=[],
-                loglik=ll, **updates)
+                loglik=ll, cov=np.eye(1), cov_conditional=False, quadrature_ok=True, **updates)
 
 
 @pytest.mark.parametrize("alt,null,expected", [

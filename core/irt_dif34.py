@@ -17,19 +17,25 @@ M0 and the alternative converged (KKT), their finite log-likelihoods respect nes
 and no item or latent-distribution parameter is on an estimation bound in either model.
 Boundary cases do not receive an ordinary chi-square p-value; the applicable nonstandard
 reference distribution is not computed. Wald SEs come from
-the conditional observed information and are reported only for interior studied parameters.
+the full observed information only when the entire inferential comparison is valid.
+Both nested fits must pass a higher-grid likelihood/score audit and information gate.
+4PL inference is unavailable at the public API, matching the disabled inferential UI.
 BH-FDR is applied to the available omnibus p-values. Items without a p-value cannot be flagged;
 if their LR statistic exceeds the chi-square critical value they are removed from the anchor set
 by a documented heuristic screen ("Çapa taraması"), which is not a DIF test. `inferential=False`
 gives the descriptive analysis only (all-other-items anchors, no p-values).
-p-values are conditional on the data-selected anchors; significant DIF is not proof of bias.
+Predeclared fixed anchors (purify=False) are not tested. Otherwise p-values are
+conditional on data-selected anchors; unstable final purification withholds inference.
+Selected-item parameter decomposition is exploratory/unadjusted, not a separate FDR
+family. Significant DIF is not proof of bias.
 """
 import math
 import numpy as np
 import pandas as pd
-from scipy.stats import chi2
+from scipy.stats import chi2, norm
 from core.irt_mg import as_matrix
-from core.irt_mg34 import Design34, PARAMS, default_bounds, fit as fit34, irf
+from core.irt_mg34 import Design34, PARAMS, default_bounds, fit as fit34, irf, covariance, negloglik
+from core.irt_mg import Quadrature, _parts
 from core.irt_dif import _prepare, _nested_lr
 from core.rasch import _grid
 from core.rasch_dif import benjamini_hochberg
@@ -51,13 +57,29 @@ class _Fitter34:
                                 or got.get("info_done")):
             return got
         design = Design34(self.model, types, 2, self.bounds)
+        if got is not None and got["converged"] and information:
+            parts = _parts(*self.args, design.groups)
+            got["cov"], got["se_reason"], got["condition"] = covariance(
+                got["params"], design, parts, Quadrature(self.quadrature, self.points), len(self.args[0]), free=~got["at_bound"])
+            got["info_done"] = True
+            self._audit(got, parts)
+            return got
         start = got["params"] if got is not None else self._start(design)
         f = fit34(*self.args, design, self.quadrature, self.points, start=start, information=information)
         f["info_done"] = information
+        if information: self._audit(f)
         self.cache[key] = f
         if self.base is None:
             self.base = f
         return f
+
+    def _audit(self, f, parts=None):
+        parts = _parts(*self.args, f["design"].groups) if parts is None else parts
+        points = max(self.points * 2 - 1, 81)
+        value, score = negloglik(f["params"], f["design"], parts, Quadrature(self.quadrature, points), len(self.args[0]))
+        f["quadrature_error"] = abs(-value * len(self.args[0]) - f["loglik"])
+        f["quadrature_ok"] = bool(f["quadrature_error"] <= .001 and np.max(np.abs(score)) <= 1e-5)
+        f["audit_points"] = points
 
     def _start(self, design):
         if self.base is None:
@@ -94,6 +116,11 @@ def _lr(f_alt, f_null, i):
     if not (f_alt["regular"] and f_null["regular"]):
         return stat, False, ("Başka maddelerde veya gizil dağılımda sınır parametresi var; χ² referansı "
                              "varsayılamaz, p değeri verilmedi (betimsel).")
+    if any(f.get("cov") is None or f.get("cov_conditional", False)
+           or not np.isfinite(f["cov"]).all() for f in (f_alt, f_null)):
+        return stat, False, "Tam gözlenen bilgi matrisi doğrulanamadı; p değeri verilmedi (betimsel)."
+    if not all(f.get("quadrature_ok", False) for f in (f_alt, f_null)):
+        return stat, False, "Daha yoğun quadrature ile olabilirlik/skor doğrulanamadı; p değeri verilmedi (betimsel)."
     return stat, True, ""
 
 
@@ -133,9 +160,15 @@ def response_function_comparison(ref, foc, mu_f, sd_f, points=41, tol=1e-3):
 
 def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purify=True, max_rounds=10,
                     min_anchors=None, quadrature="gauss-hermite", points=41, min_group=300, bounds=None,
-                    inferential=True):
+                    inferential=True, fixed_anchors=None):
     if model not in PARAMS:
         raise ValueError("Bu DIF uygulaması yalnızca 3PL ve 4PL içindir.")
+    if model == "4PL" and inferential:
+        raise ValueError("4PL çıkarımsal DIF bağımsız doğrulanmadı; inferential=False ile yalnız betimsel analiz kullanılabilir.")
+    if np.isinf(np.asarray(data, float)).any():
+        raise ValueError("Sonsuz yanıt eksik veri değildir; 0/1 veya NaN kullanın.")
+    if isinstance(group, pd.Series) and isinstance(data, pd.DataFrame) and group.name in data.columns:
+        raise ValueError("Grup sütunu madde olarak kullanılamaz.")
     if reference == focal:
         raise ValueError("Referans ve odak grup farklı olmalıdır.")
     if not 0 < alpha < .5:
@@ -143,10 +176,30 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
     x, obs, groups, keep = _prepare(data, group, reference, focal)
     names = list(data.columns) if isinstance(data, pd.DataFrame) else [f"M{i+1}" for i in range(x.shape[1])]
     k = x.shape[1]; npar = len(PARAMS[model])
+    if len(set(names)) != k: raise ValueError("Madde adları benzersiz olmalıdır.")
+    min_anchors = max(2, math.ceil(.2 * k)) if min_anchors is None else min_anchors
+    if isinstance(min_anchors, (bool, np.bool_)) or not isinstance(min_anchors, (int, np.integer)) or min_anchors < 2:
+        raise ValueError("En az çapa sayısı 2 veya daha büyük tamsayı olmalıdır.")
+    if purify and (isinstance(max_rounds, bool) or not isinstance(max_rounds, (int, np.integer)) or max_rounds < 1):
+        raise ValueError("Arındırma tur sayısı pozitif tamsayı olmalıdır.")
+    fixed = None
+    if fixed_anchors is not None:
+        if purify or isinstance(fixed_anchors, (str, bytes)):
+            raise ValueError("Sabit çapalar liste olmalı ve purify=False kullanılmalıdır.")
+        labels = list(fixed_anchors)
+        if len(set(labels)) != len(labels) or any(a not in names for a in labels):
+            raise ValueError("Sabit çapa adları benzersiz olmalı ve maddelerde bulunmalıdır.")
+        fixed = [names.index(a) for a in labels]
+        if not min_anchors <= len(fixed) < k:
+            raise ValueError(f"En az {min_anchors} sabit çapa ve bir test maddesi gereklidir.")
     sizes = {reference: int((groups == 0).sum()), focal: int((groups == 1).sum())}
     if min(sizes.values()) < 100:
         raise ValueError(f"{model} DIF için her grupta en az 100 kişi gereklidir (bulunan: {sizes}).")
     warnings = []
+    if fixed is not None:
+        warnings.append("Çapalar önceden belirlenmiştir; değişmezlikleri bu analizle kanıtlanmaz.")
+    else:
+        warnings.append("Çapa seçimine koşullu p değerleri: veriyle seçim belirsizliği ve genel FDR kontrolü doğrulanmadı.")
     if min(sizes.values()) < min_group:
         warnings.append(f"Grup büyüklükleri küçük ({sizes}); {model} parametreleri (özellikle c"
                         + (" ve d" if model == "4PL" else "") + ") zayıf tanımlanır, DIF kestirimleri kararsızdır.")
@@ -167,23 +220,26 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
     if len(linking) < 2:
         raise ValueError("Bağlantısız tasarım: iki grubun ortak yanıtladığı madde sayısı yetersiz.")
     if untestable:
-        warnings.append("DIF için test edilemeyen maddeler (yalnızca çapa olabilir): "
+        warnings.append("DIF için test edilemeyen maddeler (geçerli çapa sayılmaz): "
                         + "; ".join(f"{names[i]}: {r}" for i, r in untestable.items()))
-    min_anchors = max(2, math.ceil(.2 * k)) if min_anchors is None else int(min_anchors)
+    if fixed is not None:
+        if any(i in untestable for i in fixed): raise ValueError("Sabit çapa her iki grupta değişken ve gözlenmiş olmalıdır.")
+        testable = [i for i in testable if i not in fixed]
     fitter = _Fitter34(x, obs, groups, model, quadrature, points, bounds or default_bounds())
 
     def types_for(pool, i, role):
-        t = ["anchor" if (j in pool or j not in testable) else "all" for j in range(k)]
+        t = ["anchor" if j in pool else "all" for j in range(k)]
         t[i] = role
         return t
 
     def omnibus(pool, information=False):
         rows = {}
         for i in testable:
-            pl = [j for j in pool if j != i and j in linking]
-            if not pl:
-                rows[i] = {"note": "Çapa yok", "ok": False, "stat": np.nan}; continue
-            m0 = fitter(types_for(pl, i, "anchor")); m_all = fitter(types_for(pl, i, "all"), information)
+            pl = [j for j in pool if j != i and j in linking and j not in untestable]
+            if len(pl) < min_anchors:
+                raise ValueError(f"{names[i]} için en az {min_anchors} geçerli çapa gereklidir; çıkarım yapılmadı.")
+            m0 = fitter(types_for(pl, i, "anchor"), information=inferential)
+            m_all = fitter(types_for(pl, i, "all"), information or inferential)
             stat, ok, note = _lr(m_all, m0, i)
             rows[i] = {"stat": stat, "ok": ok and inferential, "note": note, "m0": m0, "m_all": m_all, "pool": pl}
         return rows
@@ -201,12 +257,13 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
         return p, q, flagged, screened
 
     history = []; stable = True
-    rows = omnibus(list(range(k)))
+    initial_pool = list(range(k)) if fixed is None else fixed
+    rows = omnibus(initial_pool)
     p, q, flagged, screened = flags(rows)
     removed = flagged | screened if inferential else set()
-    history.append({"Tur": 0, "Çapa sayısı": k - 1, "İşaretlenen": sorted(names[i] for i in flagged),
+    history.append({"Tur": 0, "Çapa sayısı": len(initial_pool) if fixed is not None else k - 1, "İşaretlenen": sorted(names[i] for i in flagged),
                     "Taramayla çapa dışı": sorted(names[i] for i in screened - flagged)})
-    pool = list(range(k))
+    pool = initial_pool
     if purify and inferential:
         stable = False
         for r in range(1, max_rounds + 1):
@@ -227,6 +284,7 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
             removed = new
         if not stable:
             warnings.append("Çapa arındırma kararlı bir kümeye ulaşmadı; sonuçlar çapa seçimine duyarlıdır.")
+    previous_removed = removed
     rows = omnibus(pool, information=True)
     p, q, flagged, screened = flags(rows)
     removed = (flagged | screened) if inferential else set()
@@ -234,7 +292,13 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
     if no_p and inferential:
         warnings.append("Genel DIF testi p değeri verilemeyen maddeler (çapa olarak kalırlar; DIF içeriyorlarsa "
                         "bağlantılamayı etkileyebilir): " + ", ".join(no_p))
-    final_anchors = [j for j in range(k) if j not in removed]
+    final_anchors = [j for j in range(k) if j not in removed] if fixed is None else fixed
+    if inferential and purify and (not stable or removed != previous_removed):
+        stable = False
+        for r in rows.values():
+            r["ok"] = False; r["note"] += " Çapa arındırması/son karar kararsız; çıkarım kullanılamıyor."
+        p, q, flagged, _ = flags(rows)
+        warnings.append("Çapa kararsızlığı nedeniyle tüm p değerleri ve güven aralıkları engellendi.")
     if screened - flagged and inferential:
         warnings.append("p değeri verilemeyen ancak LR istatistiği χ² kritik değerini aşan maddeler çapa kümesinden "
                         "çıkarıldı (sezgisel tarama; DIF kanıtı olarak yorumlanmaz): "
@@ -250,12 +314,20 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
         r = rows.get(i, {})
         if "m_all" not in r:
             base.update({"DIF işareti": False, "Çıkarım": "Test edilemedi",
-                         "Not": untestable.get(i, r.get("note", ""))})
+                         "Not": "Önceden belirlenmiş sabit çapa; test edilmedi." if fixed is not None and i in fixed else untestable.get(i, r.get("note", ""))})
             table.append(base); continue
         m0, ma = r["m0"], r["m_all"]; sig = bool(np.isfinite(qi[i]) and qi[i] < alpha)
+        base.update({"logL (H0)": m0["loglik"], "logL (H2)": ma["loglik"],
+                     "Tam bilgi matrisi": ma["cov"] is not None and not ma.get("cov_conditional", False),
+                     "Quadrature doğrulandı (H0/H2)": bool(m0.get("quadrature_ok", False) and ma.get("quadrature_ok", False)),
+                     "Quadrature logL farkı (H0)": m0.get("quadrature_error", np.nan),
+                     "Quadrature logL farkı (H2)": ma.get("quadrature_error", np.nan)})
         for prm in pars:
             dlt, se = _contrast(ma, i, prm)
+            if not r["ok"]: se = np.nan
             base[f"Δ{prm} (odak − ref)"] = dlt; base[f"SH(Δ{prm})"] = se
+            base[f"Δ{prm} %95 GA alt"] = dlt - norm.ppf(.975) * se
+            base[f"Δ{prm} %95 GA üst"] = dlt + norm.ppf(.975) * se
         base.update({f"LR χ² genel (sd={npar})": r["stat"], "p": pi[i], "q (BH)": qi[i], "DIF işareti": sig,
                      "Çapa taraması": ("Çapa dışı (sezgisel)" if i in screened and not sig and inferential else ""),
                      "Çıkarım": ("Asimptotik χ² (düzenli çözüm)" if r["ok"] else
@@ -263,10 +335,12 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
         notes = [r["note"]] if r["note"] else []
         if sig or (i in screened and inferential):        # parameter-specific decomposition
             for prm in pars:
-                mp = fitter(types_for(r["pool"], i, prm))
+                mp = fitter(types_for(r["pool"], i, prm), information=inferential)
                 stat, ok, note = _lr(mp, m0, i)
                 base[f"LR χ² Δ{prm} (sd=1)"] = stat
-                base[f"p (Δ{prm})"] = chi2.sf(stat, 1) if ok else np.nan
+                base[f"p (Δ{prm})"] = chi2.sf(stat, 1) if ok and r["ok"] else np.nan
+                if note: notes.append(note)
+            notes.append("Parametre p değerleri seçilmiş maddelerde keşifsel/hamdır; ayrı FDR kontrolü yoktur.")
         if ma["converged"]:
             d = ma["design"]
             ref = [d.unpack(ma["params"], 0)[j][i] for j in range(4)]
@@ -288,6 +362,7 @@ def dif_analysis_34(data, group, reference, focal, model="3PL", alpha=.05, purif
             "reference": reference, "focal": focal, "alpha": alpha, "purify": bool(purify and inferential),
             "min_anchors": min_anchors, "quadrature": quadrature, "points": points, "model": model,
             "inferential": bool(inferential), "warnings": warnings, "kept_rows": keep, "n_fits": len(fitter.cache),
+            "anchor_policy": "predeclared fixed" if fixed is not None else "data-selected / other items",
             "estimand": ("Δp = p_odak − p_referans (p ∈ {a, b, c" + (", d" if model == "4PL" else "") + "}); "
                          "işaretli fark < 0: madde odak grup için daha zor. DIF'in biçimi grup tepki "
                          "fonksiyonlarından belirlenir.")}
