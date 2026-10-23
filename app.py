@@ -188,57 +188,53 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### I. Klasik Test Kuramı (KTK)")
-    for label, page in [
-        ("📊 Test İstatistikleri", "4. Test İstatistikleri"),
-        ("🔍 Madde Analizi", "5. Madde Analizi"),
-        ("🎯 Çeldirici Analizi", "6. Çeldirici Analizi"),
-        ("📐 Güvenirlik ve Ölçme Hatası", "7. Güvenirlik & Ölçme Hatası"),
-        ("👥 Grup Bazlı Analizler", "8. Grup Bazlı Analizler"),
-        ("📈 Bilimsel Grafikler", "9. Bilimsel Grafikler"),
-    ]:
-        st.button(label, key=f"nav_{page}", use_container_width=True,
-                  on_click=navigate_to, args=(page,))
+    with st.expander("🧮 EserPsychometrics Yerel KTK Motoru", expanded=True):
+        for label, page in [
+            ("📊 Test İstatistikleri", "4. Test İstatistikleri"),
+            ("🔍 Madde Analizi", "5. Madde Analizi"),
+            ("🎯 Çeldirici Analizi", "6. Çeldirici Analizi"),
+            ("📐 Güvenirlik ve Ölçme Hatası", "7. Güvenirlik & Ölçme Hatası"),
+            ("👥 Grup Bazlı Analizler", "8. Grup Bazlı Analizler"),
+            ("📈 Bilimsel Grafikler", "9. Bilimsel Grafikler"),
+        ]:
+            st.button(label, key=f"nav_{page}", use_container_width=True,
+                      on_click=navigate_to, args=(page,))
+    with st.expander("🐍 Python Kütüphaneleri / Bağımsız KTK Motoru"):
+        st.button("📄 Alfa ve Madde Karşılaştırması (Pingouin)",
+                  key="nav_ctt_dual",use_container_width=True,
+                  on_click=navigate_to,args=("KTK: Çift Motor Rapor",))
+        st.caption("Bu sayfa yerel KTK ile bağımsız Python hesaplamalarını karşılaştırır.")
 
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
-    st.markdown("**İki Kategorili Modeller**")
-    binary_quick_model = st.selectbox(
-        "Hızlı ikili MTK model seçimi",
-        ("Rasch", "1PL", "2PL", "3PL", "4PL"),
-        key="binary_irt_quick_model",
-    )
-    st.button(
-        "Seçili MTK analizine git",
-        key="binary_irt_quick_go",
-        use_container_width=True,
-        on_click=navigate_to,
-        args=(f"MTK: {binary_quick_model}",),
-    )
-    for m in ("1PL", "2PL", "3PL", "4PL"):
-        st.button(f"📐 {m} Modeli", key=f"nav_irt_{m}",
-                  use_container_width=True, on_click=navigate_to,
-                  args=(f"MTK: {m}",))
-    st.button("📊 Model Karşılaştırması", key="nav_irt_comparison",
-              use_container_width=True, on_click=navigate_to,
-              args=("MTK: Karşılaştırma",))
-    st.button("📏 Rasch Analizi", key="nav_irt_rasch",
-              use_container_width=True, on_click=navigate_to,
-              args=("MTK: Rasch",))
-    st.button("📋 İkili MTK B13 Raporu", key="nav_irt_b13", use_container_width=True,
-              on_click=navigate_to, args=("MTK: İkili Rapor",))
-    st.button("🔍 MTK Varsayım Denetimi", key="nav_irt_assumptions",
-              use_container_width=True, on_click=navigate_to,
-              args=("MTK: Varsayım Denetimi",))
-    st.button("📄 KTK Çift Motor Akademik Rapor", key="nav_ctt_dual", use_container_width=True, on_click=navigate_to, args=("KTK: Çift Motor Rapor",))
-    st.button("⚖️ MTK DIF Ön Taraması (Tüm Modeller)", key="nav_multi_dif", use_container_width=True, on_click=navigate_to, args=("MTK: Çok Modelli DIF Taraması",))
-    st.markdown("**Çok Kategorili Modeller**")
-    st.button("🧬 B14 Çok Kategorili MTK", key="nav_irt_b14",
-              use_container_width=True, on_click=navigate_to,
-              args=("MTK: Çok Kategorili B14",))
-    st.button("⚖️ GRM Formel DIF (Deneysel)", key="nav_grm_dif", use_container_width=True,
-              on_click=navigate_to, args=("MTK: GRM Formel DIF",))
-    st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)", key="nav_poly_dif", use_container_width=True,
-              on_click=navigate_to, args=("MTK: Çok Kategorili Formel DIF",))
+    with st.expander("🧮 EserPsychometrics Yerel MTK Motoru", expanded=True):
+        st.caption("İkili modeller: yerel analiz ve model karşılaştırmaları")
+        for m in ("Rasch","1PL","2PL","3PL","4PL"):
+            st.button(f"📐 {m} Modeli",key=f"native_irt_{m}",
+                      use_container_width=True,on_click=navigate_to,args=(f"MTK: {m}",))
+        for label,page in [
+            ("📊 Model Karşılaştırması","MTK: Karşılaştırma"),
+            ("📋 İkili MTK B13 Raporu","MTK: İkili Rapor"),
+            ("🔍 MTK Varsayım Denetimi","MTK: Varsayım Denetimi"),
+            ("⚖️ MTK DIF Ön Taraması","MTK: Çok Modelli DIF Taraması"),
+        ]:
+            st.button(label,key=f"native_{page}",use_container_width=True,
+                      on_click=navigate_to,args=(page,))
+        st.caption("Formel DIF sayfalarında doğrulama durumu ayrıca belirtilir.")
+        st.button("⚖️ GRM Formel DIF (Deneysel)",key="nav_grm_dif",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: GRM Formel DIF",))
+        st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)",key="nav_poly_dif",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: Çok Kategorili Formel DIF",))
+    with st.expander("🐍 Python mirt Kütüphanesi — MTK"):
+        st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
+                   "DIF'in yerel uygulamalarıyla karıştırmayın.")
+        for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","RSM","NRM"):
+            st.button(f"🐍 Python mirt — {m}",key=f"python_irt_{m}",
+                      use_container_width=True,on_click=navigate_to,
+                      args=(f"MTK: Python mirt {m}",))
+        st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
+                  key="nav_irt_b14",use_container_width=True,
+                  on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
 
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
@@ -1183,6 +1179,16 @@ elif selected_page == "12. Kullanım Kılavuzu":
 # =============================================================================
 # SAYFA 14: RASCH ANALİZİ (İKİLİ, MML)
 # =============================================================================
+elif selected_page.startswith("MTK: Python mirt "):
+    from ui.irt_python_library_view import render as render_python_library
+    py_model = selected_page.replace("MTK: Python mirt ", "", 1)
+    py_data = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if py_data is None:
+        st.warning("Önce veri yükleyin.")
+    else:
+        render_python_library(py_data,st.session_state.item_cols,
+                              st.session_state.id_col,st.session_state.group_col,py_model)
+
 elif selected_page == "MTK: Rasch":
     render_academic_header()
     st.subheader("📏 Rasch Analizi — ikili (dikotom) Rasch modeli")
