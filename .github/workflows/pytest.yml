@@ -27,6 +27,10 @@ jobs:
         if: github.event_name == 'pull_request'
         timeout-minutes: 15
         run: python -m pytest -vv -s tests/test_irt_b11_regression_gates.py tests/test_irt_b12_audit.py tests/test_irt_b12_compare.py tests/test_irt_b12_3_mixed.py tests/test_irt_b12_reference.py tests/test_irt_mixed_se.py tests/test_irt_engine_registry.py tests/test_irt_python_mirt_adapter.py tests/test_irt_python_mirt_3pl_4pl.py tests/test_irt_binary_unified.py tests/test_irt_binary_navigation.py tests/test_irt_python_mirt_ui.py tests/test_irt_b13_curves.py tests/test_irt_b13_integration.py tests/test_irt_b13_png.py tests/test_irt_b13_comparison.py tests/test_irt_b13_diagnostics.py tests/test_irt_b14.py tests/test_irt_b14_reporting.py tests/test_irt_assumptions.py tests/test_irt_b14_profiles.py tests/test_irt_b14_narrative.py tests/test_irt_b14_audit.py tests/test_irt_b14_model_curves.py tests/test_irt_b14_diagnostics.py tests/test_ctt_dual_engine.py tests/test_ctt_item_crosscheck.py tests/test_ctt_release_bundle.py tests/test_irt_dif_multimodel_screen.py tests/test_dual_engine_sidebar.py
+      - name: Real public LSAT6 KTK benchmark (independent Pingouin)
+        if: github.event_name == 'pull_request'
+        timeout-minutes: 3
+        run: python -m scripts.real_lsat6_ctt_pilot
       - name: Select relevant formal DIF gates
         id: dif_paths
         if: github.event_name == 'pull_request'
