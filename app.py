@@ -237,6 +237,8 @@ with st.sidebar:
               args=("MTK: Çok Kategorili B14",))
     st.button("⚖️ GRM Formel DIF (Deneysel)", key="nav_grm_dif", use_container_width=True,
               on_click=navigate_to, args=("MTK: GRM Formel DIF",))
+    st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)", key="nav_poly_dif", use_container_width=True,
+              on_click=navigate_to, args=("MTK: Çok Kategorili Formel DIF",))
 
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
@@ -1447,6 +1449,12 @@ elif selected_page == "MTK: Rasch":
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
 # =============================================================================
+elif selected_page == "MTK: Çok Kategorili Formel DIF":
+    from ui.polytomous_dif_view import render as render_poly_dif
+    src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
+    if src is None: st.warning("Önce yanıt verisi yükleyin.")
+    else: render_poly_dif(src, st.session_state.item_cols, st.session_state.id_col, st.session_state.group_col)
+
 elif selected_page == "MTK: GRM Formel DIF":
     from ui.grm_dif_view import render as render_grm_dif
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df

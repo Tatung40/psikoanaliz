@@ -1,0 +1,340 @@
+{
+  "config": {
+    "model": "RSM",
+    "seed": 20261025,
+    "n_reference": 600,
+    "n_focal": 400,
+    "categories": 3,
+    "points": 61,
+    "audit_points": 81,
+    "anchors": [
+      "M1",
+      "M2",
+      "M3",
+      "M4"
+    ],
+    "latent": {
+      "reference": [
+        0.0,
+        1.0
+      ],
+      "focal": [
+        -0.4,
+        1.2
+      ]
+    },
+    "python": "3.11.17",
+    "versions": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pandas": "3.1.0"
+    },
+    "source_sha256": "ad350e37c06915cb31691d4b1c970b5870d3a7e1d3502039c57c437f0f19242e"
+  },
+  "cache_key": "13c5de3b5f43af47",
+  "computed": 200,
+  "reused": 0,
+  "optimizer_fits": 600,
+  "fit_seconds": 31.114009504028218,
+  "conditions": {
+    "null": {
+      "total": 100,
+      "valid": 100,
+      "inconclusive": 0,
+      "inconclusive_fraction": {
+        "events": 0,
+        "trials": 100,
+        "estimate": 0.0,
+        "mc_ci95": [
+          0.0,
+          0.03621669264519054
+        ]
+      },
+      "items": {
+        "M5": {
+          "raw_rejection": {
+            "events": 10,
+            "trials": 100,
+            "estimate": 0.1,
+            "mc_ci95": [
+              0.04900468922148595,
+              0.17622259774017532
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 5,
+              "trials": 100,
+              "estimate": 0.05,
+              "mc_ci95": [
+                0.016431879181728278,
+                0.11283491110546288
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Konum b",
+              "n": 100,
+              "bias": -0.004341586430947238,
+              "rmse": 0.13301987469420357,
+              "pointwise_coverage": {
+                "events": 90,
+                "trials": 100,
+                "estimate": 0.9,
+                "mc_ci95": [
+                  0.8237774022598247,
+                  0.9509953107785141
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": 0.0015599200021308825,
+              "rmse": 0.04910022620817537,
+              "pointwise_coverage": {
+                "events": 90,
+                "trials": 100,
+                "estimate": 0.9,
+                "mc_ci95": [
+                  0.8237774022598247,
+                  0.9509953107785141
+                ]
+              }
+            }
+          ]
+        },
+        "M6": {
+          "raw_rejection": {
+            "events": 2,
+            "trials": 100,
+            "estimate": 0.02,
+            "mc_ci95": [
+              0.0024313368239247935,
+              0.07038393247107005
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 2,
+              "trials": 100,
+              "estimate": 0.02,
+              "mc_ci95": [
+                0.0024313368239247935,
+                0.07038393247107005
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Konum b",
+              "n": 100,
+              "bias": 0.0012003777417137328,
+              "rmse": 0.11029510222013024,
+              "pointwise_coverage": {
+                "events": 97,
+                "trials": 100,
+                "estimate": 0.97,
+                "mc_ci95": [
+                  0.9148239470257197,
+                  0.9937700284616938
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": -0.00013235231399740853,
+              "rmse": 0.03850019432502175,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "any_bh": {
+        "q (BH)": {
+          "events": 5,
+          "trials": 100,
+          "estimate": 0.05,
+          "mc_ci95": [
+            0.016431879181728278,
+            0.11283491110546288
+          ]
+        }
+      },
+      "latent_recovery": {
+        "mu": {
+          "bias": -0.0006505219895721862,
+          "rmse": 0.08886050975188126
+        },
+        "sd": {
+          "bias": 0.0066010529049410314,
+          "rmse": 0.05987385993268337
+        }
+      }
+    },
+    "both": {
+      "total": 100,
+      "valid": 100,
+      "inconclusive": 0,
+      "inconclusive_fraction": {
+        "events": 0,
+        "trials": 100,
+        "estimate": 0.0,
+        "mc_ci95": [
+          0.0,
+          0.03621669264519054
+        ]
+      },
+      "items": {
+        "M5": {
+          "raw_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 100,
+              "trials": 100,
+              "estimate": 1.0,
+              "mc_ci95": [
+                0.9637833073548094,
+                1.0
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Konum b",
+              "n": 100,
+              "bias": 0.0009915107218089797,
+              "rmse": 0.11699089092700783,
+              "pointwise_coverage": {
+                "events": 95,
+                "trials": 100,
+                "estimate": 0.95,
+                "mc_ci95": [
+                  0.887165088894537,
+                  0.9835681208182717
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": 7.425941441940753e-05,
+              "rmse": 0.03843617006861578,
+              "pointwise_coverage": {
+                "events": 97,
+                "trials": 100,
+                "estimate": 0.97,
+                "mc_ci95": [
+                  0.9148239470257197,
+                  0.9937700284616938
+                ]
+              }
+            }
+          ]
+        },
+        "M6": {
+          "raw_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 100,
+              "trials": 100,
+              "estimate": 1.0,
+              "mc_ci95": [
+                0.9637833073548094,
+                1.0
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Konum b",
+              "n": 100,
+              "bias": 0.0031162112503569928,
+              "rmse": 0.11055146459748119,
+              "pointwise_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": -0.0016742441669699896,
+              "rmse": 0.04126338266133279,
+              "pointwise_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "any_bh": {
+        "q (BH)": {
+          "events": 100,
+          "trials": 100,
+          "estimate": 1.0,
+          "mc_ci95": [
+            0.9637833073548094,
+            1.0
+          ]
+        }
+      },
+      "latent_recovery": {
+        "mu": {
+          "bias": 0.008968318952273614,
+          "rmse": 0.09550441746867779
+        },
+        "sd": {
+          "bias": -0.0007937997779934403,
+          "rmse": 0.06135519626059449
+        }
+      }
+    }
+  },
+  "limitation": "EXPERIMENTAL. Rates/coverage condition on valid fits; inconclusives explicit. Narrow 3-category/6-item/N600+400/4-true-anchor design. General FDR, selected anchors and broad coverage NOT established. No R execution."
+}

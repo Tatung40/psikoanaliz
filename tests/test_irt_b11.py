@@ -359,7 +359,8 @@ def test_3pl_dif_procedure_on_planted_and_null_data():
 
 
 def _fake(converged=True, regular=True, linked=True, bound=(), ll=-100.):
-    return {"converged": converged, "regular": regular, "linked": linked, "loglik": ll, "bound_labels": list(bound)}
+    return {"converged": converged, "regular": regular, "linked": linked, "loglik": ll, "bound_labels": list(bound),
+            "cov": np.eye(1), "cov_conditional": False, "quadrature_ok": True}
 
 
 def test_lr_rule_interior_nuisance_boundary_and_nonconvergence():

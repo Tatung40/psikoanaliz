@@ -39,13 +39,21 @@ jobs:
           OMP_NUM_THREADS: '1'
           RAYON_NUM_THREADS: '1'
         run: python -m pytest -q tests/test_grm_dif.py tests/test_grm_report_ui.py tests/test_grm_study.py tests/test_grm_ci_routes.py
+      - name: PCM GPCM RSM NRM scientific and research bundle gates
+        if: github.event_name == 'pull_request' && steps.dif_paths.outputs.polytomous == 'true'
+        timeout-minutes: 10
+        env:
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
+          RAYON_NUM_THREADS: '1'
+        run: python -m pytest -q tests/test_polytomous_dif.py tests/test_polytomous_reports_ui.py tests/test_polytomous_study.py tests/test_polytomous_ci.py
       - name: Formal DIF numerical and reference gates (pull requests)
         if: github.event_name == 'pull_request' && steps.dif_paths.outputs.binary == 'true'
         timeout-minutes: 15
         env:
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'
-        run: python -m pytest -q tests/test_dif_likelihood_validity.py tests/test_dif_fixed_anchors.py tests/test_dif_fixed_anchor_simulation.py tests/test_dif_fixed_anchor_exports.py tests/test_irt_b10.py tests/test_irt_b10_streamlit.py tests/test_irt_b11.py
+        run: python -m pytest -q tests/test_dif_likelihood_validity.py tests/test_dif34_safeguards.py tests/test_dif_fixed_anchors.py tests/test_dif_fixed_anchor_simulation.py tests/test_dif_fixed_anchor_exports.py tests/test_irt_b10.py tests/test_irt_b10_streamlit.py tests/test_irt_b11.py
       - name: Full regression suite (main)
         if: github.event_name == 'push'
         timeout-minutes: 55

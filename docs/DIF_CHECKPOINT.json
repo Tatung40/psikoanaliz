@@ -1,61 +1,168 @@
 {
   "date": "2026-10-23",
-  "base_sha": "893d1cb4b73ad2937eb8aa0c1ad8ed760e5f8d41",
-  "base_pr": 54,
-  "branch": "feat/grm-concurrent-dif",
-  "scope": "EXPERIMENTAL fixed-anchor concurrent GRM DIF, physical threshold and slope hypotheses; qualified Turkish research bundle",
-  "completed_binary_work": "Preserved. No 1PL/2PL calibration, input, inference or reporting modules changed; no binary simulations repeated.",
-  "reference": {
-    "engine": "Python mirt 1.2.0 EM, NOT R mirt",
-    "fits": 8,
-    "conditions": [
-      "null",
-      "both"
-    ],
-    "hypotheses": [
-      "H0",
-      "Hb",
-      "Ha",
-      "H2"
-    ],
-    "max_loglik_difference_lt": 1e-05,
-    "max_parameter_difference_lt": 0.0002,
-    "r_mirt_executed": false,
-    "fixtures": "tests/fixtures/grm_dif/"
+  "base_sha": "f63b253bd1d12fb51cdfe197d32364144b2339a2",
+  "base_pr": 55,
+  "branch": "feat/polytomous-formal-dif",
+  "scope": "EXPERIMENTAL native fixed-anchor PCM/GPCM/RSM/NRM; stricter 3PL/4PL inference safeguards",
+  "retained": "Rasch/1PL/2PL/GRM sources and reference fixtures unchanged; no existing model simulations repeated.",
+  "references": {
+    "PCM": "4 Python mirt 1.2.0 EM calibrations",
+    "GPCM": "8 Python mirt 1.2.0 EM calibrations",
+    "RSM": "4 independent direct-likelihood numerical calibrations, not R",
+    "NRM": "8 Python mirt 1.2.0 EM calibrations",
+    "R_executed": false
   },
   "simulation": {
-    "null": 100,
-    "both_dif": 100,
-    "inconclusive": 0,
-    "optimizer_fits": 1400,
-    "fit_seconds_approx": 154,
-    "omnibus_power_M5": 1.0,
-    "omnibus_power_M6": 1.0,
-    "threshold_power_M5": 0.99,
-    "slope_power_M6": 0.88,
-    "null_any_global_bh": 0.07,
-    "null_global_mc_ci95": [
-      0.0286052889,
-      0.1389197285
-    ],
-    "limitation": "Narrow 3-category/6-item/N600+400/4-anchor design; general FDR and coverage NOT established"
+    "PCM": {
+      "cache_key": "65e89feb98dc7c48",
+      "optimizer_fits": 600,
+      "fit_seconds": 44.71643465102534,
+      "conditions": {
+        "null": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 4,
+            "trials": 100,
+            "estimate": 0.04,
+            "mc_ci95": [
+              0.011004493986188203,
+              0.09925715671265992
+            ]
+          }
+        },
+        "both": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          }
+        }
+      }
+    },
+    "GPCM": {
+      "cache_key": "d1f9af0ebd075013",
+      "optimizer_fits": 1539,
+      "fit_seconds": 158.5498019930128,
+      "conditions": {
+        "null": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 7,
+            "trials": 100,
+            "estimate": 0.07,
+            "mc_ci95": [
+              0.028605288907418584,
+              0.13891972845586648
+            ]
+          }
+        },
+        "both": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          }
+        }
+      }
+    },
+    "RSM": {
+      "cache_key": "13c5de3b5f43af47",
+      "optimizer_fits": 600,
+      "fit_seconds": 31.114009504028218,
+      "conditions": {
+        "null": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 5,
+            "trials": 100,
+            "estimate": 0.05,
+            "mc_ci95": [
+              0.016431879181728278,
+              0.11283491110546288
+            ]
+          }
+        },
+        "both": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          }
+        }
+      }
+    },
+    "NRM": {
+      "cache_key": "5dca8a65c36e83a7",
+      "optimizer_fits": 1400,
+      "fit_seconds": 167.4624703229856,
+      "conditions": {
+        "null": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 5,
+            "trials": 100,
+            "estimate": 0.05,
+            "mc_ci95": [
+              0.016431879181728278,
+              0.11283491110546288
+            ]
+          }
+        },
+        "both": {
+          "valid": 100,
+          "inconclusive": 0,
+          "any_bh": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          }
+        }
+      }
+    }
   },
-  "tests": "Analytic/probability/adaptive integral, independent EM calibration, information curvature, group reversal, failure modes, safe bundles/PNG, stale UI and cache/routing tests; inspect PR for final counts",
-  "merge_gate": "Only merge after green scientific/CI gates; one full regression on final main; final SHA and conclusions recorded on PR",
+  "qualification": "All new families EXPERIMENTAL, not production FDR/coverage certification. NRM weighted-effect candidate intervals undercovered to 88%; withheld in UI/reports.",
+  "three_four_pl": "3PL fixed anchors, full-information/quadrature and purification gates, pointwise parameter intervals. Existing R references reused. 4PL inferential API blocked to match UI; descriptive only.",
+  "tests": "Focused analytical/integral/public probability/reference/permutation/scale/failure/report/UI/cache tests; final CI counts and merge SHA on PR.",
+  "merge_gate": "Merge only green required CI and documented scientific scope. One full regression on final main; no local duplicate full suite.",
   "remaining": [
-    "GRM R reference and heterogeneous category calibration",
-    "data-selected GRM anchors and post-selection correction",
-    "PCM DIF",
-    "GPCM DIF",
-    "RSM shared-step DIF",
-    "NRM identified nominal DIF",
-    "3PL/4PL stable/boundary inference",
-    "general simulation error control"
+    "GRM independent R reference",
+    "GRM general FDR and heterogeneous categories",
+    "General FDR and coverage across all new models, >3-category calibration and unequal category sets",
+    "NRM weighted category-effect interval repair/independent coverage validation",
+    "RSM independent R multigroup reference",
+    "Predeclared/data-selected anchor sensitivity and post-selection correction",
+    "3PL broad simulation/coverage, probability-effect intervals and validated boundary inference",
+    "4PL identifiable calibration and validated boundary/bootstrap inference; remains unavailable"
   ],
-  "next": "PCM: audit Python mirt difficulty plus centered steps against native adjacent-category step locations; PCM steps need not be ordered and slopes are fixed. Then GPCM, RSM common steps, NRM reference-category constraints; finally 3PL/4PL.",
-  "parameterization_warning": "GRM b cutpoints are theta locations; d=-a*b. Ha (b shared/a free) is not the standard R slope-intercept d equality hypothesis.",
+  "next": "Repair NRM weighted-effect coverage without weakening gates; broader design studies and independent R calibration. Keep 4PL inferential disabled pending genuine validation.",
   "open_prs": {
-    "20": "prior failed elapsed_seconds CI; not merged",
-    "23": "prior unsupported RSM string CI; not merged"
+    "20": "Prior failed elapsed_seconds CI; not merged",
+    "23": "Prior unsupported RSM factory CI; not merged"
   }
 }

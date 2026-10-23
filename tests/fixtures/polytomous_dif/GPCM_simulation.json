@@ -1,0 +1,568 @@
+{
+  "config": {
+    "model": "GPCM",
+    "seed": 20261025,
+    "n_reference": 600,
+    "n_focal": 400,
+    "categories": 3,
+    "points": 61,
+    "audit_points": 81,
+    "anchors": [
+      "M1",
+      "M2",
+      "M3",
+      "M4"
+    ],
+    "latent": {
+      "reference": [
+        0.0,
+        1.0
+      ],
+      "focal": [
+        -0.4,
+        1.2
+      ]
+    },
+    "python": "3.11.17",
+    "versions": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pandas": "3.1.0"
+    },
+    "source_sha256": "ad350e37c06915cb31691d4b1c970b5870d3a7e1d3502039c57c437f0f19242e"
+  },
+  "cache_key": "d1f9af0ebd075013",
+  "computed": 200,
+  "reused": 0,
+  "optimizer_fits": 1539,
+  "fit_seconds": 158.5498019930128,
+  "conditions": {
+    "null": {
+      "total": 100,
+      "valid": 100,
+      "inconclusive": 0,
+      "inconclusive_fraction": {
+        "events": 0,
+        "trials": 100,
+        "estimate": 0.0,
+        "mc_ci95": [
+          0.0,
+          0.03621669264519054
+        ]
+      },
+      "items": {
+        "M5": {
+          "raw_rejection": {
+            "events": 9,
+            "trials": 100,
+            "estimate": 0.09,
+            "mc_ci95": [
+              0.041983595628391525,
+              0.16398225502964012
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 4,
+              "trials": 100,
+              "estimate": 0.04,
+              "mc_ci95": [
+                0.011004493986188203,
+                0.09925715671265992
+              ]
+            },
+            "q (BH, adım/kesişim | eğim)": {
+              "events": 3,
+              "trials": 100,
+              "estimate": 0.03,
+              "mc_ci95": [
+                0.006229971538306227,
+                0.08517605297428028
+              ]
+            },
+            "q (BH, eğim | adım/kesişim)": {
+              "events": 6,
+              "trials": 100,
+              "estimate": 0.06,
+              "mc_ci95": [
+                0.02233488607131638,
+                0.12602993458082287
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Eğim a",
+              "n": 100,
+              "bias": -0.02554303677719337,
+              "rmse": 0.30415015593713596,
+              "pointwise_coverage": {
+                "events": 91,
+                "trials": 100,
+                "estimate": 0.91,
+                "mc_ci95": [
+                  0.83601774497036,
+                  0.9580164043716084
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b1",
+              "n": 100,
+              "bias": 0.027882215219013712,
+              "rmse": 0.3046281531713203,
+              "pointwise_coverage": {
+                "events": 93,
+                "trials": 100,
+                "estimate": 0.93,
+                "mc_ci95": [
+                  0.8610802715441336,
+                  0.9713947110925814
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b2",
+              "n": 100,
+              "bias": -0.003024356413638859,
+              "rmse": 0.2686309794175646,
+              "pointwise_coverage": {
+                "events": 93,
+                "trials": 100,
+                "estimate": 0.93,
+                "mc_ci95": [
+                  0.8610802715441336,
+                  0.9713947110925814
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": -0.0008621459968534487,
+              "rmse": 0.04099671304213766,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            }
+          ]
+        },
+        "M6": {
+          "raw_rejection": {
+            "events": 5,
+            "trials": 100,
+            "estimate": 0.05,
+            "mc_ci95": [
+              0.016431879181728278,
+              0.11283491110546288
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 3,
+              "trials": 100,
+              "estimate": 0.03,
+              "mc_ci95": [
+                0.006229971538306227,
+                0.08517605297428028
+              ]
+            },
+            "q (BH, adım/kesişim | eğim)": {
+              "events": 3,
+              "trials": 100,
+              "estimate": 0.03,
+              "mc_ci95": [
+                0.006229971538306227,
+                0.08517605297428028
+              ]
+            },
+            "q (BH, eğim | adım/kesişim)": {
+              "events": 2,
+              "trials": 100,
+              "estimate": 0.02,
+              "mc_ci95": [
+                0.0024313368239247935,
+                0.07038393247107005
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Eğim a",
+              "n": 100,
+              "bias": -0.016710760056606877,
+              "rmse": 0.321776381123306,
+              "pointwise_coverage": {
+                "events": 97,
+                "trials": 100,
+                "estimate": 0.97,
+                "mc_ci95": [
+                  0.9148239470257197,
+                  0.9937700284616938
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b1",
+              "n": 100,
+              "bias": 0.051208579581028736,
+              "rmse": 0.3285076383036288,
+              "pointwise_coverage": {
+                "events": 94,
+                "trials": 100,
+                "estimate": 0.94,
+                "mc_ci95": [
+                  0.8739700654191771,
+                  0.9776651139286836
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b2",
+              "n": 100,
+              "bias": -0.0241869033669123,
+              "rmse": 0.26883626461343085,
+              "pointwise_coverage": {
+                "events": 92,
+                "trials": 100,
+                "estimate": 0.92,
+                "mc_ci95": [
+                  0.848442364135579,
+                  0.9648284374821919
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": -0.0016961083373633879,
+              "rmse": 0.04168195302447177,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "any_bh": {
+        "q (BH)": {
+          "events": 7,
+          "trials": 100,
+          "estimate": 0.07,
+          "mc_ci95": [
+            0.028605288907418584,
+            0.13891972845586648
+          ]
+        },
+        "q (BH, adım/kesişim | eğim)": {
+          "events": 6,
+          "trials": 100,
+          "estimate": 0.06,
+          "mc_ci95": [
+            0.02233488607131638,
+            0.12602993458082287
+          ]
+        },
+        "q (BH, eğim | adım/kesişim)": {
+          "events": 8,
+          "trials": 100,
+          "estimate": 0.08,
+          "mc_ci95": [
+            0.035171562517808085,
+            0.1515576358644209
+          ]
+        }
+      },
+      "latent_recovery": {
+        "mu": {
+          "bias": -0.010183439509737085,
+          "rmse": 0.08971745757013765
+        },
+        "sd": {
+          "bias": 0.022763910405299542,
+          "rmse": 0.11246424221250506
+        }
+      }
+    },
+    "both": {
+      "total": 100,
+      "valid": 100,
+      "inconclusive": 0,
+      "inconclusive_fraction": {
+        "events": 0,
+        "trials": 100,
+        "estimate": 0.0,
+        "mc_ci95": [
+          0.0,
+          0.03621669264519054
+        ]
+      },
+      "items": {
+        "M5": {
+          "raw_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 100,
+              "trials": 100,
+              "estimate": 1.0,
+              "mc_ci95": [
+                0.9637833073548094,
+                1.0
+              ]
+            },
+            "q (BH, adım/kesişim | eğim)": {
+              "events": 100,
+              "trials": 100,
+              "estimate": 1.0,
+              "mc_ci95": [
+                0.9637833073548094,
+                1.0
+              ]
+            },
+            "q (BH, eğim | adım/kesişim)": {
+              "events": 4,
+              "trials": 100,
+              "estimate": 0.04,
+              "mc_ci95": [
+                0.011004493986188203,
+                0.09925715671265992
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Eğim a",
+              "n": 100,
+              "bias": 0.049112898185111546,
+              "rmse": 0.313775372962847,
+              "pointwise_coverage": {
+                "events": 99,
+                "trials": 100,
+                "estimate": 0.99,
+                "mc_ci95": [
+                  0.9455406146079194,
+                  0.9997468539673181
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b1",
+              "n": 100,
+              "bias": -0.0021971077540638905,
+              "rmse": 0.3625206257623037,
+              "pointwise_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b2",
+              "n": 100,
+              "bias": 0.011849892655222944,
+              "rmse": 0.2959461861952614,
+              "pointwise_coverage": {
+                "events": 90,
+                "trials": 100,
+                "estimate": 0.9,
+                "mc_ci95": [
+                  0.8237774022598247,
+                  0.9509953107785141
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": -0.004256215244636324,
+              "rmse": 0.04580518992185946,
+              "pointwise_coverage": {
+                "events": 94,
+                "trials": 100,
+                "estimate": 0.94,
+                "mc_ci95": [
+                  0.8739700654191771,
+                  0.9776651139286836
+                ]
+              }
+            }
+          ]
+        },
+        "M6": {
+          "raw_rejection": {
+            "events": 97,
+            "trials": 100,
+            "estimate": 0.97,
+            "mc_ci95": [
+              0.9148239470257197,
+              0.9937700284616938
+            ]
+          },
+          "bh_rejection": {
+            "q (BH)": {
+              "events": 97,
+              "trials": 100,
+              "estimate": 0.97,
+              "mc_ci95": [
+                0.9148239470257197,
+                0.9937700284616938
+              ]
+            },
+            "q (BH, adım/kesişim | eğim)": {
+              "events": 2,
+              "trials": 100,
+              "estimate": 0.02,
+              "mc_ci95": [
+                0.0024313368239247935,
+                0.07038393247107005
+              ]
+            },
+            "q (BH, eğim | adım/kesişim)": {
+              "events": 70,
+              "trials": 100,
+              "estimate": 0.7,
+              "mc_ci95": [
+                0.6001853238202136,
+                0.7875935795103465
+              ]
+            }
+          },
+          "parameters": [
+            {
+              "parameter": "Eğim a",
+              "n": 100,
+              "bias": 0.0047244491901179565,
+              "rmse": 0.2433082323102069,
+              "pointwise_coverage": {
+                "events": 95,
+                "trials": 100,
+                "estimate": 0.95,
+                "mc_ci95": [
+                  0.887165088894537,
+                  0.9835681208182717
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b1",
+              "n": 100,
+              "bias": 0.011530898977465471,
+              "rmse": 0.32032230395436767,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            },
+            {
+              "parameter": "Adım b2",
+              "n": 100,
+              "bias": -0.008391413202925675,
+              "rmse": 0.27310482342386055,
+              "pointwise_coverage": {
+                "events": 97,
+                "trials": 100,
+                "estimate": 0.97,
+                "mc_ci95": [
+                  0.9148239470257197,
+                  0.9937700284616938
+                ]
+              }
+            }
+          ],
+          "effects": [
+            {
+              "parameter": "Beklenen puan farkı",
+              "n": 100,
+              "bias": -0.00025350982893243166,
+              "rmse": 0.04759541045379712,
+              "pointwise_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "any_bh": {
+        "q (BH)": {
+          "events": 100,
+          "trials": 100,
+          "estimate": 1.0,
+          "mc_ci95": [
+            0.9637833073548094,
+            1.0
+          ]
+        },
+        "q (BH, adım/kesişim | eğim)": {
+          "events": 100,
+          "trials": 100,
+          "estimate": 1.0,
+          "mc_ci95": [
+            0.9637833073548094,
+            1.0
+          ]
+        },
+        "q (BH, eğim | adım/kesişim)": {
+          "events": 70,
+          "trials": 100,
+          "estimate": 0.7,
+          "mc_ci95": [
+            0.6001853238202136,
+            0.7875935795103465
+          ]
+        }
+      },
+      "latent_recovery": {
+        "mu": {
+          "bias": 0.006621373731993167,
+          "rmse": 0.08834125636916378
+        },
+        "sd": {
+          "bias": 0.0024240048149869655,
+          "rmse": 0.0958511786818132
+        }
+      }
+    }
+  },
+  "limitation": "EXPERIMENTAL. Rates/coverage condition on valid fits; inconclusives explicit. Narrow 3-category/6-item/N600+400/4-true-anchor design. General FDR, selected anchors and broad coverage NOT established. No R execution."
+}
