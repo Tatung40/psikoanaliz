@@ -132,10 +132,10 @@ def download_table_pair(frame, basename, label, key):
 inject_custom_css()
 
 PRIVACY_DISCLOSURE = (
-    "Yuklediginiz veriler etkin oturumda analiz icin islenir. Uygulama kalici bir kullanici veri arsivi tutmayi amaclamaz. "
-    "Verilerinizi oturumdan temizlemek icin Oturum Verilerini Temizle dugmesini kullanin. "
-    "Barindirma saglayicisinin teknik loglari, tarayici onbellegi ve gecici sunucu kopyalari "
-    "bu islemle garanti olarak silinemez. Kimlik belirleyici bilgileri yuklemeden once anonimlestirin." 
+    "Yüklediğiniz veriler etkin oturumda analiz için işlenir. Uygulama kalıcı bir kullanıcı veri arşivi tutmayı amaçlamaz. "
+    "Verilerinizi oturumdan temizlemek için Oturum Verilerini Temizle düğmesini kullanın. "
+    "Barındırma sağlayıcısının teknik kayıtları, tarayıcı önbelleği ve geçici sunucu kopyaları "
+    "bu işlemle garanti olarak silinemez. Kimlik belirleyici bilgileri yüklemeden önce anonimleştirin." 
 )
 
 def clear_active_analysis_session():
