@@ -1,0 +1,285 @@
+{
+  "config": {
+    "seed": 20261023,
+    "n_reference": 800,
+    "n_focal": 500,
+    "model": "2PL",
+    "quadrature": "gauss-hermite",
+    "points": 41,
+    "fixed_anchors": [
+      "M1",
+      "M2",
+      "M4",
+      "M5",
+      "M6",
+      "M8",
+      "M9",
+      "M10",
+      "M11",
+      "M12"
+    ],
+    "versions": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pandas": "3.1.0"
+    },
+    "python": "3.11.17",
+    "source_sha256": "c5713a14e12deaf8c6093653a7e77de9f34e7c0a5e91cf073d704bc24451ca46"
+  },
+  "repetitions_per_condition": 100,
+  "interpretation": "Rates and pointwise Wald coverage are conditional on valid fits in this design. Inconclusive replicates are reported separately. Exact binomial intervals quantify Monte Carlo uncertainty. Under the complete null, any BH rejection estimates FDR for the two studied items; not a general FDR guarantee.",
+  "results": {
+    "null": {
+      "total_replicates": 100,
+      "valid_replicates": 100,
+      "inconclusive_replicates": 0,
+      "any_bh_rejection": {
+        "events": 7,
+        "trials": 100,
+        "estimate": 0.07,
+        "mc_ci95": [
+          0.028605288907418584,
+          0.13891972845586648
+        ]
+      },
+      "latent_recovery": {
+        "mu_f": {
+          "bias": -0.004368524676973364,
+          "rmse": 0.08611559669466687
+        },
+        "sd_f": {
+          "bias": 0.00032702268799823076,
+          "rmse": 0.06931128760120235
+        }
+      },
+      "items": {
+        "M3": {
+          "raw_rejection": {
+            "events": 6,
+            "trials": 100,
+            "estimate": 0.06,
+            "mc_ci95": [
+              0.02233488607131638,
+              0.12602993458082287
+            ]
+          },
+          "bh_rejection": {
+            "events": 3,
+            "trials": 100,
+            "estimate": 0.03,
+            "mc_ci95": [
+              0.006229971538306227,
+              0.08517605297428028
+            ]
+          },
+          "parameter_contrasts": {
+            "a": {
+              "n": 100,
+              "bias": -0.0037464965956128336,
+              "rmse": 0.19051283471499936,
+              "pointwise_ci_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            },
+            "b": {
+              "n": 100,
+              "bias": 0.017939916241196893,
+              "rmse": 0.19455919749948014,
+              "pointwise_ci_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            }
+          }
+        },
+        "M7": {
+          "raw_rejection": {
+            "events": 7,
+            "trials": 100,
+            "estimate": 0.07,
+            "mc_ci95": [
+              0.028605288907418584,
+              0.13891972845586648
+            ]
+          },
+          "bh_rejection": {
+            "events": 4,
+            "trials": 100,
+            "estimate": 0.04,
+            "mc_ci95": [
+              0.011004493986188203,
+              0.09925715671265992
+            ]
+          },
+          "parameter_contrasts": {
+            "a": {
+              "n": 100,
+              "bias": 0.018140773635535443,
+              "rmse": 0.24393136819718356,
+              "pointwise_ci_coverage": {
+                "events": 95,
+                "trials": 100,
+                "estimate": 0.95,
+                "mc_ci95": [
+                  0.887165088894537,
+                  0.9835681208182717
+                ]
+              }
+            },
+            "b": {
+              "n": 100,
+              "bias": -0.011909104285482903,
+              "rmse": 0.11223152668653157,
+              "pointwise_ci_coverage": {
+                "events": 95,
+                "trials": 100,
+                "estimate": 0.95,
+                "mc_ci95": [
+                  0.887165088894537,
+                  0.9835681208182717
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "dif": {
+      "total_replicates": 100,
+      "valid_replicates": 100,
+      "inconclusive_replicates": 0,
+      "any_bh_rejection": {
+        "events": 100,
+        "trials": 100,
+        "estimate": 1.0,
+        "mc_ci95": [
+          0.9637833073548094,
+          1.0
+        ]
+      },
+      "latent_recovery": {
+        "mu_f": {
+          "bias": -0.0007091011805164215,
+          "rmse": 0.07178185169215226
+        },
+        "sd_f": {
+          "bias": -0.009031561796411148,
+          "rmse": 0.0718071824905609
+        }
+      },
+      "items": {
+        "M3": {
+          "raw_rejection": {
+            "events": 97,
+            "trials": 100,
+            "estimate": 0.97,
+            "mc_ci95": [
+              0.9148239470257197,
+              0.9937700284616938
+            ]
+          },
+          "bh_rejection": {
+            "events": 97,
+            "trials": 100,
+            "estimate": 0.97,
+            "mc_ci95": [
+              0.9148239470257197,
+              0.9937700284616938
+            ]
+          },
+          "parameter_contrasts": {
+            "a": {
+              "n": 100,
+              "bias": 0.015997672672132795,
+              "rmse": 0.20374865639666104,
+              "pointwise_ci_coverage": {
+                "events": 94,
+                "trials": 100,
+                "estimate": 0.94,
+                "mc_ci95": [
+                  0.8739700654191771,
+                  0.9776651139286836
+                ]
+              }
+            },
+            "b": {
+              "n": 100,
+              "bias": 0.008725730770491333,
+              "rmse": 0.1937778978973027,
+              "pointwise_ci_coverage": {
+                "events": 94,
+                "trials": 100,
+                "estimate": 0.94,
+                "mc_ci95": [
+                  0.8739700654191771,
+                  0.9776651139286836
+                ]
+              }
+            }
+          }
+        },
+        "M7": {
+          "raw_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "bh_rejection": {
+            "events": 100,
+            "trials": 100,
+            "estimate": 1.0,
+            "mc_ci95": [
+              0.9637833073548094,
+              1.0
+            ]
+          },
+          "parameter_contrasts": {
+            "a": {
+              "n": 100,
+              "bias": -0.010846652410438806,
+              "rmse": 0.15594955400741295,
+              "pointwise_ci_coverage": {
+                "events": 98,
+                "trials": 100,
+                "estimate": 0.98,
+                "mc_ci95": [
+                  0.9296160675289299,
+                  0.9975686631760752
+                ]
+              }
+            },
+            "b": {
+              "n": 100,
+              "bias": 0.0014098816382530988,
+              "rmse": 0.24789810110022406,
+              "pointwise_ci_coverage": {
+                "events": 96,
+                "trials": 100,
+                "estimate": 0.96,
+                "mc_ci95": [
+                  0.90074284328734,
+                  0.9889955060138118
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

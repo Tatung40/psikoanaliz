@@ -1,26 +1,47 @@
 {
   "date": "2026-10-23",
-  "base_sha": "4558b0dba9f63cb9635b25d2e5f35a18736ed996",
-  "branch": "fix/dif-likelihood-validity",
-  "scope": "Reject invalid nested LR maxima; preserve existing calibrators and screens",
-  "focused_tests": {"suite": "tests/test_dif_likelihood_validity.py", "passed": 13},
-  "reference_integration_tests": "B10/B11, their UI, Rasch B9 and multimodel screen: running at commit preparation; inspect PR validation",
-  "baseline_main_ci": "https://github.com/Tatung40/psikoanaliz/actions/runs/39906198907",
-  "baseline_main_ci_conclusion": "success",
-  "merge_gate": "New PR numerical/reference gates and all CI checks must pass; full regression runs once on final main via push workflow",
-  "retained_formal_methods": ["Rasch", "1PL", "2PL", "3PL interior-only"],
-  "not_fully_validated": ["4PL inference", "GRM DIF", "PCM DIF", "GPCM DIF", "RSM DIF", "NRM DIF"],
-  "open_prs": {
-    "20": "failed CI: KeyError elapsed_seconds; not mergeable",
-    "23": "failed CI: unsupported RSM model; not mergeable"
+  "base_sha": "521fb310e577755aea22b35928024365cd9e04cb",
+  "branch": "feat/dif-fixed-anchor-inference",
+  "scope": "1PL/2PL predeclared anchors, strict anchor and information gates, separate BH families, pointwise parameter intervals and safe item exports",
+  "independent_reference": "Existing pinned R mirt 1.48: LR, joint item parameters and focal mean/variance tests passed; no regeneration",
+  "targeted_validation": {
+    "numerical_and_anchor_tests_passed": 44,
+    "missingness_and_input_tests_passed": 3,
+    "app_test_with_fixed_anchor_interaction_passed": 1,
+    "simulation_bookkeeping_tests_passed": 4,
+    "export_tests_passed": 2
   },
-  "scientific_blockers": [
-    "No Rscript runtime for new independently reproduced polytomous reference fits",
-    "Installed Python mirt multigroup support is not independent validation; source clips negative LR",
-    "RSM requires validated shared-step constraints, not an unrestricted PCM alias",
-    "Limited binary Monte Carlo does not establish general Type I error/power or coverage",
-    "Insufficient/unstable anchor inference and post-selection limitations need further work",
-    "Complete formal DIF academic export package remains unfinished"
+  "simulation": {
+    "artifact": "tests/fixtures/irt_b10/fixed_anchor_simulation_summary.json",
+    "null_replicates": 100,
+    "dif_replicates": 100,
+    "inconclusive": 0,
+    "optimizer_fits": 1000,
+    "null_any_bh": 0.07,
+    "null_mc_ci95": [
+      0.0286052889,
+      0.1389197285
+    ],
+    "M3_power_bh": 0.97,
+    "M7_power_bh": 1.0,
+    "limitation": "Narrow design and wide null interval; nominal FDR control not established"
+  },
+  "baseline_main_ci": "https://github.com/Tatung40/psikoanaliz/actions/runs/39929140214",
+  "final_validation": "Pending this branch PR checks, then one full regression on final merged main; final SHA and conclusions recorded on PR",
+  "not_fully_validated": [
+    "GRM DIF",
+    "GPCM DIF",
+    "PCM DIF",
+    "RSM DIF",
+    "NRM DIF",
+    "4PL inference",
+    "general Monte Carlo control",
+    "post-selection-adjusted inference",
+    "full academic DIF exports"
   ],
-  "next": "Inspect PR/CI, reuse pinned binary fixtures, validate ordinal/nominal multigroup parameterization before exposing new formal tests"
+  "next": "Validate GRM constrained multigroup threshold/slope likelihood and scale against independent reference before enabling formal production tests; then GPCM/PCM/RSM and NRM",
+  "open_prs": {
+    "20": "failed CI: elapsed_seconds; do not merge",
+    "23": "failed CI: unsupported RSM; do not merge"
+  }
 }

@@ -27,8 +27,9 @@ DIF_NOTE = {
             "tek biçimli (sd = 1) ve tek biçimli olmayan (sd = 1) LR testleri ayrıştırmayı verir. DIF türü grup "
             "tepki fonksiyonlarının kesişip kesişmediğine göre belirlenir; yalnızca b farkı tek biçimli DIF "
             "anlamına gelmez.")}
-COMMON_NOTE = ("p değerleri verinin seçtiği çapa kümesine koşulludur (seçim belirsizliği SH'ye ve LR referans "
-               "dağılımına yansımaz). Yakınsamayan veya sınırda kalan modellerde p değeri verilmez. Anlamlı DIF, "
+COMMON_NOTE = ("p değerleri çapa varsayımlarına koşulludur. Çapalar aynı veriyle seçildiyse seçim belirsizliği "
+               "SH'ye ve LR referans dağılımına yansımaz; sabit çapalar bağımsız kanıt gerektirir. "
+               "Yakınsamayan, sınırda kalan veya bilgi matrisi doğrulanamayan modellerde p değeri verilmez. Anlamlı DIF, "
                "maddenin yanlı olduğunun kanıtı değildir; içerik incelemesi gerektirir.")
 
 
@@ -102,15 +103,18 @@ def run_q3(frame, fit, model, person_method="WLE", min_pairs=30, bootstrap=0, se
     return out
 
 
-def run_dif(frame, columns, group_col, reference, focal, model, alpha=.05, purify=True, max_rounds=10, points=41):
+def run_dif(frame, columns, group_col, reference, focal, model, alpha=.05, purify=True, max_rounds=10, points=41,
+            fixed_anchors=None):
     if group_col in columns:
         raise ValueError("Grup değişkeni madde olarak kullanılamaz.")
     data = frame.loc[:, columns].apply(pd.to_numeric, errors="coerce").reset_index(drop=True)
     started = perf_counter()
     out = dif_analysis(data, frame[group_col].reset_index(drop=True), reference, focal, model=model,
-                       alpha=float(alpha), purify=bool(purify), max_rounds=int(max_rounds), points=int(points))
+                       alpha=float(alpha), purify=bool(purify), max_rounds=int(max_rounds), points=int(points),
+                       fixed_anchors=fixed_anchors)
     out["ui_settings"] = {"group_col": group_col, "reference": reference, "focal": focal, "alpha": float(alpha),
                           "purify": bool(purify), "max_rounds": int(max_rounds), "points": int(points),
+                          "fixed_anchors": None if fixed_anchors is None else tuple(fixed_anchors),
                           "seconds": perf_counter() - started}
     return out
 
@@ -118,19 +122,33 @@ def run_dif(frame, columns, group_col, reference, focal, model, alpha=.05, purif
 def dif_summary_rows(dif):
     j = dif["joint"]
     return pd.DataFrame({"Gösterge": [f"N ({dif['reference']}, referans)", f"N ({dif['focal']}, odak)", "Model",
-                                      "Çapa madde sayısı", "Arındırma", "Arındırma kararlı",
+                                      "Çapa madde sayısı", "Çapa politikası", "Test ailesi", "Arındırma", "Arındırma kararlı",
                                       "Odak grup gizil ortalaması (μ_odak)", "Odak grup gizil SS (σ_odak)",
                                       "logL (ortak model)", "Yakınsama", "Anlamlılık (BH-FDR)", "Süre (sn)"],
                          "Değer": [dif["sizes"][dif["reference"]], dif["sizes"][dif["focal"]], dif["model"],
-                                   len(dif["anchors"]), "Evet" if dif["purify"] else "Hayır",
+                                   len(dif["anchors"]), {"fixed": "Önceden belirlenmiş sabit çapalar",
+                                   "purified": "Bu veriyle seçilmiş çapalar (seçim belirsizliği dahil değil)",
+                                   "all_other_items": "Diğer maddeler çapa varsayıldı"}.get(dif.get("anchor_policy"), ""),
+                                   dif.get("test_family", ""), "Evet" if dif["purify"] else "Hayır",
                                    "Evet" if dif["stable"] else "Hayır",
                                    round(j.get("mu_F", np.nan), 4), round(j.get("sd_F", np.nan), 4),
                                    round(j["loglik"], 3), "Evet" if j["converged"] else "Hayır", dif["alpha"],
                                    round(dif.get("ui_settings", {}).get("seconds", np.nan), 1)]})
 
 
+def dif_export_table(dif):
+    """Only item results; escape spreadsheet formulas in user-supplied labels."""
+    table = dif["table"].copy()
+    for col in table.columns:
+        if pd.api.types.is_object_dtype(table[col]) or pd.api.types.is_string_dtype(table[col]):
+            table[col] = table[col].map(lambda v: "'" + v if isinstance(v, str) and
+                                       v.lstrip().startswith(("=", "+", "-", "@")) else v)
+    return table
+
+
 def dif_effect_figure(dif):
-    t = dif["table"].dropna(subset=["İşaretli fark E_F[P_F − P_R]"])
+    t = dif["table"].reindex(columns=["Madde", "DIF işareti", "İşaretli fark E_F[P_F − P_R]",
+                                     "İşaretsiz fark E_F|P_F − P_R|"]).dropna(subset=["İşaretli fark E_F[P_F − P_R]"])
     colors = np.where(t["DIF işareti"], "#E45756", "#4C78A8")
     fig = go.Figure()
     fig.add_bar(x=t["İşaretli fark E_F[P_F − P_R]"], y=t["Madde"], orientation="h", marker_color=colors,
