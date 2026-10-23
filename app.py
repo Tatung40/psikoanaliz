@@ -1716,38 +1716,39 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                              key=f"py_mirt_show_diagnostics_{model}")
             st.caption("Bu kutucuklar yalnızca sağdaki rapor görünümünü değiştirir; "
                        "model yeniden kestirilmez.")
-        selected_model = st.radio("İki kategorili MTK modeli",
-            ["1PL", "2PL", "3PL", "4PL"],
-            index=("1PL", "2PL", "3PL", "4PL").index(model),
-            key=f"model_radio_{model}", horizontal=True)
-        if selected_model != model:
-            st.session_state.nav_page = f"MTK: {selected_model}"
-            st.rerun()
-        mc1, mc2 = st.columns(2)
-        with mc1:
-            qpoints = st.select_slider("Gauss-Hermite düğüm sayısı",
-                         options=[15, 21, 31, 41], value=31)
-        with mc2:
-            iterations = st.slider("Azami EM yinelemesi", 20, 150, 70, 10)
-        st.caption("Madde parametreleri MML/EM ile kalibre edilir; kişi yeteneğinde EAP, MAP veya ML seçilebilir.")
-        st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
-                   "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
-        if model in ("3PL", "4PL"):
-            with st.expander("⚙️ İleri kalibrasyon: sınırlar ve çoklu başlangıç"):
-                a_upper = st.select_slider("a üst sınırı", options=[4.0, 6.0, 10.0, 20.0, 30.0],
-                                           value=4.0, key=f"a_upper_{model}")
-                d_lower = (st.select_slider("d alt sınırı",options=[0.05,0.20,0.40,0.65],
-                            value=0.65,key="d_lower_4PL") if model=="4PL" else 0.65)
-                starts = st.select_slider("Bağımsız başlangıç sayısı", options=[1,2,3],
-                                           value=1,key=f"starts_{model}")
-                st.caption("Başlangıçlar farklı ilk parametre değerlerinden yürütülür; "
-                           "en yüksek logLik değerli çözüm sunulur. Geniş sınırlar "
-                           "kararsız veya gerçekçi olmayan kestirimlere yol açabilir.")
-                refine = st.checkbox(REFINE_LABEL, value=False, key=f"refine_{model}")
-                st.caption(REFINE_HELP + " Seçilirse her başlangıçta uygulanır ve "
-                           "kestirim süresini birkaç kat artırabilir.")
-        else:
-            a_upper,d_lower,starts,refine=4.0,0.65,1,False
+        with st.sidebar.expander("⚙️ MTK model ve kestirim ayarları", expanded=True):
+            selected_model = st.radio("İki kategorili MTK modeli",
+                ["1PL", "2PL", "3PL", "4PL"],
+                index=("1PL", "2PL", "3PL", "4PL").index(model),
+                key=f"model_radio_{model}", horizontal=True)
+            if selected_model != model:
+                st.session_state.nav_page = f"MTK: {selected_model}"
+                st.rerun()
+            mc1, mc2 = st.columns(2)
+            with mc1:
+                qpoints = st.select_slider("Gauss-Hermite düğüm sayısı",
+                             options=[15, 21, 31, 41], value=31)
+            with mc2:
+                iterations = st.slider("Azami EM yinelemesi", 20, 150, 70, 10)
+            st.caption("Madde parametreleri MML/EM ile kalibre edilir; kişi yeteneğinde EAP, MAP veya ML seçilebilir.")
+            st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
+                       "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
+            if model in ("3PL", "4PL"):
+                with st.expander("⚙️ İleri kalibrasyon: sınırlar ve çoklu başlangıç"):
+                    a_upper = st.select_slider("a üst sınırı", options=[4.0, 6.0, 10.0, 20.0, 30.0],
+                                               value=4.0, key=f"a_upper_{model}")
+                    d_lower = (st.select_slider("d alt sınırı",options=[0.05,0.20,0.40,0.65],
+                                value=0.65,key="d_lower_4PL") if model=="4PL" else 0.65)
+                    starts = st.select_slider("Bağımsız başlangıç sayısı", options=[1,2,3],
+                                               value=1,key=f"starts_{model}")
+                    st.caption("Başlangıçlar farklı ilk parametre değerlerinden yürütülür; "
+                               "en yüksek logLik değerli çözüm sunulur. Geniş sınırlar "
+                               "kararsız veya gerçekçi olmayan kestirimlere yol açabilir.")
+                    refine = st.checkbox(REFINE_LABEL, value=False, key=f"refine_{model}")
+                    st.caption(REFINE_HELP + " Seçilirse her başlangıçta uygulanır ve "
+                               "kestirim süresini birkaç kat artırabilir.")
+            else:
+                a_upper,d_lower,starts,refine=4.0,0.65,1,False
         st.warning("Motor politikası: Python kütüphanesi tek etkin kestirim yoludur. "
                    "Python mirt parametre kestirimi henüz bağımsız parametre kurtarma "
                    "denetiminden geçmedi; aşağıdaki çıktılar araştırma amaçlıdır. "
