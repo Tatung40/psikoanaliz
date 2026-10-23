@@ -1700,6 +1700,22 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "Standart olabilirlik oranı testi ancak düzenli iç içe modeller için "
                            "uygundur; özellikle 3PL/4PL sınır parametreleri için dikkat gerekir.")
             st.stop()
+        # SPSS/Xcalibre-style left settings, right output surface.
+        # Selection changes only presentation, never silently recalibrates.
+        with st.sidebar.expander("⚙️ MTK rapor ayarları", expanded=True):
+            st.caption(f"Etkin model: {model} | Motor: Python mirt")
+            report_params = st.checkbox("Madde parametreleri", value=True,
+                                        key=f"py_mirt_show_params_{model}")
+            report_icc = st.checkbox("ICC — karakteristik eğriler", value=True,
+                                     key=f"py_mirt_show_icc_{model}")
+            report_iif = st.checkbox("IIF — madde bilgi eğrileri", value=True,
+                                     key=f"py_mirt_show_iif_{model}")
+            report_tif = st.checkbox("TIF — test bilgi fonksiyonu", value=True,
+                                     key=f"py_mirt_show_tif_{model}")
+            report_diagnostics = st.checkbox("Kestirim tanıları (AIC/BIC)", value=True,
+                                             key=f"py_mirt_show_diagnostics_{model}")
+            st.caption("Bu kutucuklar yalnızca sağdaki rapor görünümünü değiştirir; "
+                       "model yeniden kestirilmez.")
         selected_model = st.radio("İki kategorili MTK modeli",
             ["1PL", "2PL", "3PL", "4PL"],
             index=("1PL", "2PL", "3PL", "4PL").index(model),
@@ -1736,22 +1752,6 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                    "Python mirt parametre kestirimi henüz bağımsız parametre kurtarma "
                    "denetiminden geçmedi; aşağıdaki çıktılar araştırma amaçlıdır. "
                    "Yerel motor da bağımsız sertifikasyon tamamlanana kadar deneysel kabul edilir.")
-        # SPSS/Xcalibre-style left settings, right output surface.
-        # Selection changes only presentation, never silently recalibrates.
-        with st.sidebar.expander("⚙️ MTK rapor ayarları", expanded=True):
-            st.caption(f"Etkin model: {model} | Motor: Python mirt")
-            report_params = st.checkbox("Madde parametreleri", value=True,
-                                        key=f"py_mirt_show_params_{model}")
-            report_icc = st.checkbox("ICC — karakteristik eğriler", value=True,
-                                     key=f"py_mirt_show_icc_{model}")
-            report_iif = st.checkbox("IIF — madde bilgi eğrileri", value=True,
-                                     key=f"py_mirt_show_iif_{model}")
-            report_tif = st.checkbox("TIF — test bilgi fonksiyonu", value=True,
-                                     key=f"py_mirt_show_tif_{model}")
-            report_diagnostics = st.checkbox("Kestirim tanıları (AIC/BIC)", value=True,
-                                             key=f"py_mirt_show_diagnostics_{model}")
-            st.caption("Bu kutucuklar yalnızca sağdaki rapor görünümünü değiştirir; "
-                       "model yeniden kestirilmez.")
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
         with st.expander("🐍 Öncelikli kütüphane motoru — Python mirt (doğrulama aşamasında)", expanded=True):
