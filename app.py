@@ -230,6 +230,7 @@ with st.sidebar:
               use_container_width=True, on_click=navigate_to,
               args=("MTK: Varsayım Denetimi",))
     st.button("📄 KTK Çift Motor Akademik Rapor", key="nav_ctt_dual", use_container_width=True, on_click=navigate_to, args=("KTK: Çift Motor Rapor",))
+    st.button("⚖️ MTK DIF Ön Taraması (Tüm Modeller)", key="nav_multi_dif", use_container_width=True, on_click=navigate_to, args=("MTK: Çok Modelli DIF Taraması",))
     st.markdown("**Çok Kategorili Modeller**")
     st.button("🧬 B14 Çok Kategorili MTK", key="nav_irt_b14",
               use_container_width=True, on_click=navigate_to,
@@ -1452,6 +1453,11 @@ elif selected_page == "MTK: Çok Kategorili B14":
         st.warning("Önce Veri Yükleme bölümünden kategorili yanıt dosyası yükleyin.")
     else:
         render_b14(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page == "MTK: Çok Modelli DIF Taraması":
+    from ui.irt_dif_multimodel_view import render as render_multi_dif
+    dif_source=st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if dif_source is None:st.warning("Önce veri yükleyin.")
+    else:render_multi_dif(dif_source,list(st.session_state.item_cols),st.session_state.id_col,st.session_state.group_col)
 elif selected_page == "KTK: Çift Motor Rapor":
     render_academic_header()
     from ui.ctt_dual_report_view import render as render_ctt_dual
