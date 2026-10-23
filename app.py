@@ -250,10 +250,11 @@ with st.sidebar:
     with st.expander("🐍 Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
-        for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","RSM","NRM"):
+        for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
             st.button(f"🐍 Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
+        st.caption("RSM: Python mirt genel API'sinde desteklenmiyor; yerel B14 motorunu kullanın.")
         st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
                   key="nav_irt_b14",use_container_width=True,
                   on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
