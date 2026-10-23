@@ -1790,6 +1790,28 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
                             "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
                             "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
+                    # Fit diagnostics are read directly from the external library,
+                    # never recomputed from the retired native engine.
+                    library_fit = external_fit.fit
+                    diagnostics = {
+                        "Yakınsama": bool(library_fit.converged),
+                        "Yineleme": int(library_fit.n_iterations),
+                        "Log-olabilirlik": float(library_fit.log_likelihood),
+                        "AIC": float(library_fit.aic),
+                        "BIC": float(library_fit.bic),
+                        "Serbest parametre": int(library_fit.n_parameters),
+                    }
+                    st.markdown("#### Python mirt — kestirim tanıları")
+                    st.dataframe(
+                        pd.DataFrame([diagnostics]),
+                        hide_index=True,
+                        use_container_width=True,
+                    )
+                    if not library_fit.converged:
+                        st.error(
+                            "Python mirt yakınsamadı. Parametreler ve model "
+                            "karşılaştırmaları kesin sonuç olarak yorumlanmamalıdır."
+                        )
                     with st.expander("Python mirt — kütüphane kestirim özeti"):
                         try:
                             raw_summary = external_fit.fit.summary()
