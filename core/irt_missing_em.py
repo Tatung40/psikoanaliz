@@ -15,11 +15,14 @@ def fit_irt_missing(data, model="2PL", points=21, max_iter=60, tolerance=1e-5):
     x=np.asarray(data,dtype=float)
     if x.ndim!=2 or x.shape[0]<30 or x.shape[1]<3:
         raise ValueError("Need at least 30 people and 3 items")
+    if np.isinf(x).any():
+        raise ValueError("Infinite responses are invalid; use NaN for missing.")
     observed=np.isfinite(x)
     if not np.isin(x[observed],[0,1]).all():
         raise ValueError("Observed responses must be 0/1")
     n,k=x.shape
-    if not structural_identifiability(k,model)["satisfied"]:
+    identifiability=structural_identifiability(k,model)
+    if not identifiability["satisfied"]:
         raise ValueError("Model not structurally identifiable")
     counts=observed.sum(0)
     if np.any(counts<10):
