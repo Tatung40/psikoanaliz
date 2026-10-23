@@ -3,6 +3,7 @@ import io
 import pandas as pd
 import streamlit as st
 from core.missing_imputation import diagnose, apply, METHODS
+from core.missing_decision import assess_necessity
 
 st.title("🧩 Kayıp Veri Analizi ve Atama")
 st.caption("PsikoAnaliz • scikit-learn destekli • yalnızca seçilen madde sütunlarında işlem yapar")
@@ -28,6 +29,12 @@ if source is not None:
             st.bar_chart(report["per_item"].set_index("item")["missing_rate"])
             st.dataframe(report["per_item"], use_container_width=True)
             st.warning(report["warning"])
+            decision = assess_necessity(df, cols, analysis="MTK", supports_missing=False)
+            if decision["needed"] is False:
+                st.success("Atama gerekmiyor: " + decision["reason"])
+            else:
+                st.info("Atama gerekliligi: " + decision["reason"])
+            st.caption("Kaynaklar: " + "; ".join(decision["references"]))
             if report["high_missing"]:
                 st.warning(">%30 kayıp madde: "+", ".join(report["high_missing"]))
             details = {
