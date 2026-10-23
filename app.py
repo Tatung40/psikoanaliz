@@ -1748,6 +1748,12 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     from core.irt_python_mirt_adapter import fit_python_mirt
                     external_data = target.loc[:, irt_columns].apply(
                         pd.to_numeric, errors="raise")
+                    # Transparent calibration preflight: never hide dropped responses.
+                    st.caption(
+                        f"Ön kontrol: {external_data.shape[0]} kişi × "
+                        f"{external_data.shape[1]} madde; "
+                        f"eksik yanıt: {int(external_data.isna().sum().sum())}."
+                    )
                     fingerprint_external = (
                         tuple(irt_columns), external_data.shape,
                         int(pd.util.hash_pandas_object(external_data, index=True).sum()))
