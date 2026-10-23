@@ -19,7 +19,7 @@ class PythonMirtResult:
     n_items: int
     n_categories: int | None
     fit: object
-    scientific_status: str = "LIBRARY_FIT_PARAMETER_MAPPING_NOT_YET_VALIDATED"
+    scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
 
 def fit_python_mirt(responses, *, model, n_categories=None):
     """One public fit call; no implicit engine fallback or unsupported inference."""
