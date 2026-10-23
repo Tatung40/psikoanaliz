@@ -304,10 +304,11 @@ if selected_page == "1. Ana Sayfa":
     kestirimleri ile grup bazlı karşılaştırmaları sunmaktadır. Analiz sonuçları,
     bilimsel görselleştirmeler ve akademik raporlarla desteklenmektedir.
 
-    **Madde Tepki Kuramı (MTK)** kapsamındaki 1PL/Rasch, 2PL ve 3PL modelleri,
-    madde karakteristik eğrileri, test bilgi fonksiyonları, yetenek kestirimi ve
-    model uyum analizlerinin ilerleyen sürümlerde geliştirilmesi hedeflenmektedir.
-    Bu analizler mevcut sürümde henüz kullanıma sunulmamıştır.
+    **Madde Tepki Kuramı (MTK)** bölümünde Rasch, 1PL, 2PL, 3PL, 4PL ve
+    çok kategorili modeller için yerel ve Python kütüphane tabanlı analiz yolları
+    bulunmaktadır. Modellerin destek kapsamı, yakınsama durumu ve bilimsel
+    doğrulama düzeyi farklıdır. Bazı DIF yöntemleri deneysel olup 4PL formel
+    DIF çıkarımı güvenilir koşullar sağlanana kadar kapalıdır.
 
     PsikoAnaliz, psikometrik analiz süreçlerinin anlaşılır, bütünleşik ve
     yeniden üretilebilir bir ortamda yürütülmesini amaçlamaktadır.
