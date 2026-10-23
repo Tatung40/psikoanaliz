@@ -1792,14 +1792,17 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
                     # Fit diagnostics are read directly from the external library,
                     # never recomputed from the retired native engine.
+                    from core.irt_library_diagnostics import library_fit_diagnostics
                     library_fit = external_fit.fit
+                    diag = library_fit_diagnostics(library_fit)
                     diagnostics = {
-                        "Yakınsama": bool(library_fit.converged),
-                        "Yineleme": int(library_fit.n_iterations),
-                        "Log-olabilirlik": float(library_fit.log_likelihood),
-                        "AIC": float(library_fit.aic),
-                        "BIC": float(library_fit.bic),
-                        "Serbest parametre": int(library_fit.n_parameters),
+                        "Yakınsama": diag["converged"],
+                        "Yineleme": diag["iterations"],
+                        "Log-olabilirlik": diag["log_likelihood"],
+                        "AIC": diag["aic"],
+                        "BIC": diag["bic"],
+                        "Serbest parametre": diag["n_parameters"],
+                        "Gözlem": diag["n_observations"],
                     }
                     st.markdown("#### Python mirt — kestirim tanıları")
                     st.dataframe(
