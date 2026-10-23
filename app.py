@@ -1732,9 +1732,13 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "kestirim süresini birkaç kat artırabilir.")
         else:
             a_upper,d_lower,starts,refine=4.0,0.65,1,False
+        st.warning("Motor politikası: Doğrulanmış Python kütüphanesi önceliklidir. "
+                   "Python mirt parametre kestirimi henüz bağımsız parametre kurtarma "
+                   "denetiminden geçmedi; aşağıdaki çıktılar araştırma amaçlıdır. "
+                   "Yerel motor da bağımsız sertifikasyon tamamlanana kadar deneysel kabul edilir.")
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
-        with st.expander("⚙️ Alternatif kestirim motoru — Python mirt"):
+        with st.expander("🐍 Öncelikli kütüphane motoru — Python mirt (doğrulama aşamasında)", expanded=True):
             st.caption("Python mirt hazır bir MTK kütüphanesidir. EserPsychometrics "
                        "arayüzündeki parametre eşleştirmeleri ve çıkarımsal "
                        "raporlama henüz bağımsız karşılaştırmadan geçmediği için "
@@ -1803,7 +1807,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
         current_settings = calibration_settings(model, qpoints, iterations, a_upper,
                                                 d_lower, starts, refine)
-        if st.button("▶️ MTK Analizini Başlat", type="primary"):
+        if st.button("🧪 Yerel deneysel MTK motoruyla analiz", type="secondary"):
             try:
                 data = target.loc[:, irt_columns].copy()
                 spinner_text=(f"{model} kalibrasyonu hesaplanıyor "
