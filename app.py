@@ -1730,7 +1730,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                              options=[15, 21, 31, 41], value=31)
             with mc2:
                 iterations = st.slider("Azami EM yinelemesi", 20, 150, 70, 10)
-            st.caption("Madde parametreleri MML/EM ile kalibre edilir; kişi yeteneğinde EAP, MAP veya ML seçilebilir.")
+            st.caption("Bu bölümdeki eski motor ayarları Python mirt API\u0027sine bağlanana kadar uygulanmaz; yalnızca model seçimi etkindir.")
             st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
                        "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
             if model in ("3PL", "4PL"):
