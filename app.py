@@ -1736,7 +1736,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                    "Yerel motor da bağımsız sertifikasyon tamamlanana kadar deneysel kabul edilir.")
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
-        with st.expander("Öncelikli kütüphane motoru — Python mirt (doğrulama aşamasında)", expanded=True):
+        # Library calibration controls live in the left settings panel; output stays right.
+        with st.sidebar.expander("▶ MTK analizini çalıştır", expanded=True):
             st.caption("Python mirt hazır bir MTK kütüphanesidir. EserPsychometrics "
                        "arayüzündeki parametre eşleştirmeleri ve çıkarımsal "
                        "raporlama henüz bağımsız karşılaştırmadan geçmediği için "
@@ -1775,120 +1776,120 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 except Exception as exc:
                     st.session_state.get("python_mirt_experimental_results", {}).pop(model, None)
                     st.error(f"Python mirt çalıştırılamadı: {exc}")
-            previous_external = st.session_state.get("python_mirt_experimental_results", {}).get(model)
-            if previous_external is not None:
-                current_external_data = target.loc[:, irt_columns]
-                current_external_fingerprint = (
-                    tuple(irt_columns), current_external_data.shape,
-                    int(pd.util.hash_pandas_object(current_external_data, index=True).sum()))
-                if previous_external["fingerprint"] == current_external_fingerprint:
-                    external_fit = previous_external["fit"]
-                    st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
-                               f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
-                    st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
-                            "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
-                            "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
-                    # Fit diagnostics are read directly from the external library,
-                    # never recomputed from the retired native engine.
-                    from core.irt_library_diagnostics import library_fit_diagnostics
-                    library_fit = external_fit.fit
-                    diag = library_fit_diagnostics(library_fit)
-                    diagnostics = {
-                        "Yakınsama": diag["converged"],
-                        "Yineleme": diag["iterations"],
-                        "Log-olabilirlik": diag["log_likelihood"],
-                        "AIC": diag["aic"],
-                        "BIC": diag["bic"],
-                        "Serbest parametre": diag["n_parameters"],
-                        "Gözlem": diag["n_observations"],
-                    }
-                    if report_diagnostics:
-                        st.markdown("#### Python mirt — kestirim tanıları")
-                    if report_diagnostics:
-                        st.dataframe(
-                        pd.DataFrame([diagnostics]),
-                        hide_index=True,
-                        use_container_width=True,
+        previous_external = st.session_state.get("python_mirt_experimental_results", {}).get(model)
+        if previous_external is not None:
+            current_external_data = target.loc[:, irt_columns]
+            current_external_fingerprint = (
+                tuple(irt_columns), current_external_data.shape,
+                int(pd.util.hash_pandas_object(current_external_data, index=True).sum()))
+            if previous_external["fingerprint"] == current_external_fingerprint:
+                external_fit = previous_external["fit"]
+                st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
+                           f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
+                st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
+                        "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
+                        "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
+                # Fit diagnostics are read directly from the external library,
+                # never recomputed from the retired native engine.
+                from core.irt_library_diagnostics import library_fit_diagnostics
+                library_fit = external_fit.fit
+                diag = library_fit_diagnostics(library_fit)
+                diagnostics = {
+                    "Yakınsama": diag["converged"],
+                    "Yineleme": diag["iterations"],
+                    "Log-olabilirlik": diag["log_likelihood"],
+                    "AIC": diag["aic"],
+                    "BIC": diag["bic"],
+                    "Serbest parametre": diag["n_parameters"],
+                    "Gözlem": diag["n_observations"],
+                }
+                if report_diagnostics:
+                    st.markdown("#### Python mirt — kestirim tanıları")
+                if report_diagnostics:
+                    st.dataframe(
+                    pd.DataFrame([diagnostics]),
+                    hide_index=True,
+                    use_container_width=True,
+                )
+                if not library_fit.converged:
+                    st.error(
+                        "Python mirt yakınsamadı. Parametreler ve model "
+                        "karşılaştırmaları kesin sonuç olarak yorumlanmamalıdır."
                     )
-                    if not library_fit.converged:
-                        st.error(
-                            "Python mirt yakınsamadı. Parametreler ve model "
-                            "karşılaştırmaları kesin sonuç olarak yorumlanmamalıdır."
+                if model in ("1PL", "2PL", "3PL", "4PL"):
+                    try:
+                        from core.irt_python_mirt_parameters import python_mirt_binary_parameters
+                        from core.irt_library_parameter_mapping import curves_from_normalized_table
+                        import plotly.graph_objects as go
+                        item_table = python_mirt_binary_parameters(
+                            library_fit, model=model, item_names=irt_columns)
+                        if report_params:
+                            st.markdown("#### Python mirt — madde parametreleri")
+                            st.dataframe(item_table, hide_index=True, use_container_width=True)
+                        st.download_button(
+                            "Madde parametrelerini CSV indir",
+                            data=item_table.to_csv(index=False).encode("utf-8-sig"),
+                            file_name=f"python_mirt_{model}_parameters.csv",
+                            mime="text/csv", key=f"py_mirt_params_csv_{model}")
+                        theta_grid = np.linspace(-4, 4, 161)
+                        curve_data = curves_from_normalized_table(item_table, theta_grid)
+                        selected_item = st.selectbox(
+                            "ICC / IIF için madde", list(irt_columns),
+                            key=f"py_mirt_curve_item_{model}")
+                        idx = list(irt_columns).index(selected_item)
+                        for title, key, ylabel in (
+                            *((("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),) if report_icc else ()),
+                            *((("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)"),) if report_iif else ())):
+                            fig = go.Figure()
+                            fig.add_scatter(x=theta_grid, y=curve_data[key][:, idx],
+                                            mode="lines", name=str(selected_item))
+                            fig.update_layout(title=title, xaxis_title="θ",
+                                              yaxis_title=ylabel)
+                            st.plotly_chart(fig, use_container_width=True)
+                        if report_tif:
+                            tif = go.Figure()
+                        if report_tif:
+                            tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
+                                        mode="lines", name="TIF")
+                        if report_tif:
+                            tif.update_layout(title="Test Bilgi Fonksiyonu",
+                                          xaxis_title="θ", yaxis_title="I(θ)")
+                        if report_tif:
+                            st.plotly_chart(tif, use_container_width=True)
+                        st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
+                                   "bağımsız analitik eğriler. Parametre kurtarma "
+                                   "ve R mirt eşdeğerliği henüz sertifikalı değildir.")
+                    except (ValueError, TypeError, AttributeError) as mapping_error:
+                        st.error(f"Python mirt madde parametresi/eğri eşleştirme hatası: {mapping_error}")
+                with st.expander("Python mirt — kütüphane kestirim özeti"):
+                    try:
+                        raw_summary = external_fit.fit.summary()
+                        st.text(str(raw_summary)[:15000])
+                        import importlib.metadata
+                        try:
+                            mirt_version = importlib.metadata.version("mirt")
+                        except importlib.metadata.PackageNotFoundError:
+                            mirt_version = "unknown"
+                        st.caption(f"Kaynak: Python mirt v{mirt_version}; model: {model}; "
+                                   "kestirim: kütüphane ham özeti. Parametre "
+                                   "metriği veya çıkarımsal doğrulama iddiası yok.")
+                        st.download_button(
+                            "Ham kestirim özetini TXT olarak indir",
+                            data=(f"Engine: Python mirt {mirt_version}\\n"
+                                  f"Model: {model}\\n"
+                                  "Status: library output; no cross-engine equivalence certified\\n\\n"
+                                  +str(raw_summary)),
+                            file_name=f"mirt_{model}_raw_summary.txt",
+                            mime="text/plain",
+                            key=f"mirt_raw_download_{model}",
                         )
-                    if model in ("1PL", "2PL", "3PL", "4PL"):
-                        try:
-                            from core.irt_python_mirt_parameters import python_mirt_binary_parameters
-                            from core.irt_library_parameter_mapping import curves_from_normalized_table
-                            import plotly.graph_objects as go
-                            item_table = python_mirt_binary_parameters(
-                                library_fit, model=model, item_names=irt_columns)
-                            if report_params:
-                                st.markdown("#### Python mirt — madde parametreleri")
-                                st.dataframe(item_table, hide_index=True, use_container_width=True)
-                            st.download_button(
-                                "Madde parametrelerini CSV indir",
-                                data=item_table.to_csv(index=False).encode("utf-8-sig"),
-                                file_name=f"python_mirt_{model}_parameters.csv",
-                                mime="text/csv", key=f"py_mirt_params_csv_{model}")
-                            theta_grid = np.linspace(-4, 4, 161)
-                            curve_data = curves_from_normalized_table(item_table, theta_grid)
-                            selected_item = st.selectbox(
-                                "ICC / IIF için madde", list(irt_columns),
-                                key=f"py_mirt_curve_item_{model}")
-                            idx = list(irt_columns).index(selected_item)
-                            for title, key, ylabel in (
-                                *((("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),) if report_icc else ()),
-                                *((("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)"),) if report_iif else ())):
-                                fig = go.Figure()
-                                fig.add_scatter(x=theta_grid, y=curve_data[key][:, idx],
-                                                mode="lines", name=str(selected_item))
-                                fig.update_layout(title=title, xaxis_title="θ",
-                                                  yaxis_title=ylabel)
-                                st.plotly_chart(fig, use_container_width=True)
-                            if report_tif:
-                                tif = go.Figure()
-                            if report_tif:
-                                tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
-                                            mode="lines", name="TIF")
-                            if report_tif:
-                                tif.update_layout(title="Test Bilgi Fonksiyonu",
-                                              xaxis_title="θ", yaxis_title="I(θ)")
-                            if report_tif:
-                                st.plotly_chart(tif, use_container_width=True)
-                            st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
-                                       "bağımsız analitik eğriler. Parametre kurtarma "
-                                       "ve R mirt eşdeğerliği henüz sertifikalı değildir.")
-                        except (ValueError, TypeError, AttributeError) as mapping_error:
-                            st.error(f"Python mirt madde parametresi/eğri eşleştirme hatası: {mapping_error}")
-                    with st.expander("Python mirt — kütüphane kestirim özeti"):
-                        try:
-                            raw_summary = external_fit.fit.summary()
-                            st.text(str(raw_summary)[:15000])
-                            import importlib.metadata
-                            try:
-                                mirt_version = importlib.metadata.version("mirt")
-                            except importlib.metadata.PackageNotFoundError:
-                                mirt_version = "unknown"
-                            st.caption(f"Kaynak: Python mirt v{mirt_version}; model: {model}; "
-                                       "kestirim: kütüphane ham özeti. Parametre "
-                                       "metriği veya çıkarımsal doğrulama iddiası yok.")
-                            st.download_button(
-                                "Ham kestirim özetini TXT olarak indir",
-                                data=(f"Engine: Python mirt {mirt_version}\\n"
-                                      f"Model: {model}\\n"
-                                      "Status: library output; no cross-engine equivalence certified\\n\\n"
-                                      +str(raw_summary)),
-                                file_name=f"mirt_{model}_raw_summary.txt",
-                                mime="text/plain",
-                                key=f"mirt_raw_download_{model}",
-                            )
-                        except Exception as summary_error:
-                            st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
-                    st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
-                               "henüz bağımsız eşleştirmeden geçmediği için "
-                               "resmî analiz sonuçlarına eklenmez.")
-                else:
-                    st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
+                    except Exception as summary_error:
+                        st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
+                st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
+                           "henüz bağımsız eşleştirmeden geçmediği için "
+                           "resmî analiz sonuçlarına eklenmez.")
+            else:
+                st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
         # The retired native engine has no executable UI path. Legacy results
         # from an earlier session must not be mistaken for library estimates.
         current_settings = calibration_settings(model, qpoints, iterations, a_upper,
