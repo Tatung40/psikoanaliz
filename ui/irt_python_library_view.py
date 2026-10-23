@@ -24,20 +24,20 @@ def render(data,items=(),id_col=None,group_col=None,model="1PL"):
             if x.isna().any().any():raise ValueError("Eksik yanıtları bu modülde önce temizleyin.")
             with st.spinner("Python mirt kestirimi çalışıyor"):
                 outcome=fit_python_mirt(x.to_numpy(),model=model,n_categories=int(categories) if categories else None)
-            st.session_state[f"python_mirt_fit_{model}"]=(outcome,tuple(cols),pd.util.hash_pandas_object(x,index=True).sum())
+            st.session_state[f"python_mirt_fit_{model}"]=(outcome,tuple(cols),pd.util.hash_pandas_object(x,index=True).sum(),int(categories) if categories else None)
         except Exception as exc:st.error(f"Kestirim yapılamadı: {exc}")
     result=st.session_state.get(f"python_mirt_fit_{model}")
     if result is None:return
-    outcome,old_cols,old_hash=result
+    outcome,old_cols,old_hash,old_categories=result
     try:current_hash=pd.util.hash_pandas_object(data[list(old_cols)].apply(pd.to_numeric,errors='raise'),index=True).sum()
     except Exception:return
-    if tuple(cols)!=old_cols or current_hash!=old_hash:
+    if tuple(cols)!=old_cols or current_hash!=old_hash or (int(categories) if categories else None)!=old_categories:
         st.info("Veri veya madde seçimi değişti. Yeniden hesaplayın.");return
     st.success(f"Python mirt kestirimi çalıştırıldı: N={outcome.n_persons}, k={outcome.n_items}.")
     st.warning("Bilimsel statü: bağımsız model bazlı doğrulama gerekli. "
                "Bu sonuç formel DIF değildir.")
     fit=outcome.fit
-    if hasattr(fit,"parameters"):
+    if hasattr(fit,"parameters") and getattr(fit,"parameters") is not None:
         p=getattr(fit,"parameters")
         st.write("Kestirilen parametreler:")
         st.dataframe(pd.DataFrame(p) if not isinstance(p,pd.DataFrame) else p)
