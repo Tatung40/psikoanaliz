@@ -29,7 +29,7 @@ def render(data,items=(),id_col=None,group_col=None,model="1PL"):
     result=st.session_state.get(f"python_mirt_fit_{model}")
     if result is None:return
     outcome,old_cols,old_hash=result
-    try:current_hash=pd.util.hash_pandas_object(data[list(old_cols)],index=True).sum()
+    try:current_hash=pd.util.hash_pandas_object(data[list(old_cols)].apply(pd.to_numeric,errors='raise'),index=True).sum()
     except Exception:return
     if tuple(cols)!=old_cols or current_hash!=old_hash:
         st.info("Veri veya madde seçimi değişti. Yeniden hesaplayın.");return
