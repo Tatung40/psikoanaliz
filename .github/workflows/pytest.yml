@@ -30,7 +30,7 @@ jobs:
       - name: Real public LSAT6 KTK benchmark (independent Pingouin)
         if: github.event_name == 'pull_request'
         timeout-minutes: 3
-        run: python scripts/real_lsat6_ctt_pilot.py
+        run: python -m scripts.real_lsat6_ctt_pilot
       - name: Select relevant formal DIF gates
         id: dif_paths
         if: github.event_name == 'pull_request'
