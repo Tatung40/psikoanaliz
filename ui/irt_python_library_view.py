@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 from core.irt_python_mirt_adapter import fit_python_mirt
 
-MODELS=("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","RSM","NRM")
+MODELS=("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM")
 
 def render(data,items=(),id_col=None,group_col=None,model="1PL"):
     st.subheader(f"Python mirt Kütüphanesi — {model}")
