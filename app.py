@@ -1889,25 +1889,14 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                "resmî analiz sonuçlarına eklenmez.")
                 else:
                     st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
+        # The retired native engine has no executable UI path. Legacy results
+        # from an earlier session must not be mistaken for library estimates.
         current_settings = calibration_settings(model, qpoints, iterations, a_upper,
                                                 d_lower, starts, refine)
-        if st.button("▶️ MTK Analizini Başlat — eski yerel motor devre dışı", type="secondary", disabled=True):
-            try:
-                data = target.loc[:, irt_columns].copy()
-                spinner_text=(f"{model} kalibrasyonu hesaplanıyor "
-                              f"({'EM + L-BFGS-B' if current_settings['refine'] else 'EM'})…")
-                with st.spinner(spinner_text):
-                    result=run_irt_calibration(data,current_settings)
-                fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
-                if "irt_model_results" not in st.session_state:
-                    st.session_state.irt_model_results = {}
-                st.session_state.irt_model_results[model] = {"fingerprint": fingerprint, "result": result}
-                st.success(f"{model} kestirimi tamamlandı "
-                           f"({result['settings']['method']}, "
-                           f"{result['settings']['seconds']:.1f} sn).")
-            except Exception as exc:
-                st.session_state.get("irt_model_results", {}).pop(model, None)
-                st.error(f"MTK analizi tamamlanamadı: {exc}")
+        if st.session_state.get("irt_model_results", {}).get(model):
+            st.session_state.irt_model_results.pop(model, None)
+            st.info("Eski yerel MTK motorunun kayıtlı sonucu kaldırıldı. "
+                    "Güncel analiz için Python mirt kullanın.")
         data_for_check = target.loc[:, irt_columns]
         current_fingerprint = (tuple(columns), data_for_check.shape,
             int(pd.util.hash_pandas_object(data_for_check, index=True).sum()))
