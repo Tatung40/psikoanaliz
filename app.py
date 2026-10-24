@@ -1881,9 +1881,21 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             tif.update_layout(title="Test Bilgi Fonksiyonu",
                                               xaxis_title="θ", yaxis_title="I(θ)")
                             st.plotly_chart(tif, use_container_width=True)
+                            conditional_sem = np.where(
+                                curve_data["test_information"] > 0,
+                                1 / np.sqrt(np.maximum(curve_data["test_information"], 1e-300)),
+                                np.nan)
+                            sem_fig = go.Figure()
+                            sem_fig.add_scatter(x=theta_grid, y=conditional_sem,
+                                                mode="lines", name="SEM(θ)")
+                            sem_fig.update_layout(
+                                title="Koşullu Ölçmenin Standart Hatası",
+                                xaxis_title="θ", yaxis_title="SEM(θ)")
+                            st.plotly_chart(sem_fig, use_container_width=True)
                             tif_table = pd.DataFrame({
                                 "theta": theta_grid,
                                 "test_information": curve_data["test_information"],
+                                "conditional_sem": conditional_sem,
                             })
                             st.download_button(
                                 "Test bilgi fonksiyonunu CSV indir",
