@@ -49,3 +49,11 @@ def test_library_curve_and_diagnostic_download_controls():
         "python_mirt_{model}_tif.csv",
     ):
         assert marker in source
+
+
+def test_curve_grid_settings_are_sidebar_only():
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
+    assert 'with st.sidebar.expander("📐 Grafik ölçeği"' in source
+    assert 'key=f"py_mirt_theta_range_{model}"' in source
+    assert 'key=f"py_mirt_theta_points_{model}"' in source
+    assert "np.linspace(theta_min, theta_max, theta_count)" in source
