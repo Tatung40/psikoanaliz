@@ -52,6 +52,17 @@ jobs:
         run: PYTHONPATH=. python validation/known_truth_irt_recovery.py > python_mirt_known_truth_recovery.json
       - name: Run 3PL and 4PL sample-size sensitivity
         run: PYTHONPATH=. python -c 'import json; from validation.known_truth_irt_recovery import sensitivity_run; print(json.dumps(sensitivity_run(), indent=2, allow_nan=False))' > python_mirt_34pl_sensitivity.json
+      - name: Validate sensitivity experiment integrity
+        run: |
+          python - <<'PY'
+          import json
+          report = json.load(open('python_mirt_34pl_sensitivity.json'))
+          assert len(report['runs']) == 12, 'Incomplete sensitivity design'
+          groups = report['summary_by_sample_size']
+          assert len(groups) == 6, 'Missing model/sample-size groups'
+          assert all(g['attempted'] == 2 for g in groups.values())
+          print('Sensitivity experiment design verified; recovery errors remain empirical.')
+          PY
       - name: Upload 3PL and 4PL sensitivity report
         uses: actions/upload-artifact@v4
         with:
