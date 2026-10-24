@@ -42,3 +42,14 @@ def test_constant_item_is_rejected_before_fit(model):
 def test_rsm_is_not_silently_routed_to_native():
     with pytest.raises(ValueError, match="RSM"):
         fit_python_mirt(np.zeros((20,5)),model="RSM",n_categories=4)
+
+
+@pytest.mark.parametrize("model", ["GRM", "PCM", "GPCM", "NRM"])
+def test_polytomous_real_fit_smoke(model):
+    import mirt
+    x = mirt.simdata(model=model, n_persons=120, n_items=5, n_categories=4, seed=2026)
+    result = fit_python_mirt(x, model=model, n_categories=4)
+    assert result.model == model
+    assert result.n_categories == 4
+    assert result.fit is not None
+    assert result.scientific_status.startswith("EXPERIMENTAL")
