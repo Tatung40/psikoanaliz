@@ -33,3 +33,21 @@ def test_no_unvalidated_native_engine_path():
     assert "run_irt_calibration(" not in source
     assert "b11.run_dif(" not in source
     assert "b10.run_global_fit(" not in source
+
+
+def test_report_exports_and_scientific_caveat():
+    source = (ROOT / "app.py").read_text(encoding="utf-8")
+    for name in (
+        "python_mirt_{model}_parameters.csv",
+        "python_mirt_{model}_parameters.xlsx",
+        "python_mirt_{model}_diagnostics.csv",
+        "python_mirt_{model}_all_curves.csv",
+        "python_mirt_{model}_tif.csv",
+    ):
+        assert name in source
+    assert "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından" in source
+
+
+def test_legacy_dependency_inventory_script_parses():
+    script = ROOT / "validation" / "audit_legacy_irt_imports.py"
+    ast.parse(script.read_text(encoding="utf-8"))
