@@ -1816,7 +1816,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 file_name=f"python_mirt_{model}_parameters.xlsx",
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                 key=f"py_mirt_params_xlsx_{model}")
-                        theta_grid = np.linspace(-4, 4, 161)
+                        with st.sidebar.expander("📐 Grafik ölçeği", expanded=False):
+                            theta_min, theta_max = st.slider(
+                                "Yetenek (θ) aralığı", min_value=-6.0, max_value=6.0,
+                                value=(-4.0, 4.0), step=0.5,
+                                key=f"py_mirt_theta_range_{model}")
+                            theta_count = st.select_slider(
+                                "Grafik noktası", options=[81, 161, 321, 641],
+                                value=161, key=f"py_mirt_theta_points_{model}")
+                        theta_grid = np.linspace(theta_min, theta_max, theta_count)
                         curve_data = curves_from_normalized_table(item_table, theta_grid)
                         if report_icc or report_iif:
                             with st.sidebar.expander("📈 Eğri madde seçimi", expanded=False):
