@@ -227,6 +227,8 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
         st.button("⚖️ Gözlenen Puan DIF (MH / Lojistik)",key="nav_classical_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
+        st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: 3PL/4PL Bootstrap DIF",))
     with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
@@ -1472,6 +1474,12 @@ elif selected_page == "MTK: RSM":
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
     if src is None: st.warning("Önce 0,1,2,... sıralı puanlı yanıt verisi yükleyin.")
     else: render_rsm(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page == "MTK: 3PL/4PL Bootstrap DIF":
+    render_academic_header()
+    from ui.dif34_bootstrap_view import render as render_dif34_boot
+    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if src is None: st.warning("Önce 0/1 puanlanmış yanıt verisi yükleyin.")
+    else: render_dif34_boot(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Gözlenen Puan DIF":
     render_academic_header()
     from ui.dif_classical_view import render as render_classical_dif

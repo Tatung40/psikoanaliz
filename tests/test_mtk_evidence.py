@@ -56,3 +56,12 @@ def test_polytomous_evidence(name):
             assert row["meets_criteria"] or row["N"] != 2000
         else:
             assert row["coverage_slopes"] < .8                      # library-default NRM SE defect (before fix)
+
+
+def test_dif34_bootstrap_size_evidence_and_gate():
+    d = load("p2_dif34_bootstrap/dif34_bootstrap_size_study.json")
+    s = {r["condition"]: r for r in d["summary"]}
+    assert s["3PL-null-M1"]["meets_criterion"] and not s["3PL-null-M3"]["meets_criterion"]
+    assert s["4PL-null-M1"]["meets_criterion"] and s["3PL-DIF-M1"]["bootstrap_rejection"] > .9
+    assert d["ui_enabled"] == {"3PL": False, "4PL": True}
+    assert all(r["boundary_fraction"] > .95 for r in s.values())  # chi-square p would be withheld

@@ -38,3 +38,23 @@ def test_classical_dif_page_runs():
     assert not at.exception
     at.button(key="cdif_run").click().run()
     assert not at.exception and at.session_state["cdif_result"][0].shape[0] == 8
+
+
+def test_dif34_bootstrap_page_respects_size_study_gate():
+    import json
+    from scipy.special import expit
+    from ui.dif34_bootstrap_view import EVIDENCE
+    gate = json.loads(EVIDENCE.read_text(encoding="utf-8"))["ui_enabled"]
+    rng = np.random.default_rng(5); n = 300
+    g = np.r_[np.zeros(n, int), np.ones(n, int)]; th = rng.standard_normal(2 * n)
+    c = np.linspace(.05, .2, 6)
+    x = (rng.random((2 * n, 6)) < c + (1 - c) * expit(th[:, None] - np.linspace(-1, 1, 6))).astype(int)
+    df = pd.DataFrame(x, columns=[f"M{j}" for j in range(6)]); df["grup"] = np.where(g, "B", "A")
+    at = _app(df, "MTK: 3PL/4PL Bootstrap DIF", [f"M{j}" for j in range(6)], group="grup")
+    assert not at.exception
+    at.select_slider(key="b34_B").set_value(99).run()
+    at.button(key="b34_run").click().run()
+    assert not at.exception
+    res, model = at.session_state["b34_result"]
+    shown = at.dataframe[0].value["Bootstrap p"].iloc[0]
+    assert (np.isfinite(shown)) == (bool(gate[model]) and np.isfinite(res["p"]))
