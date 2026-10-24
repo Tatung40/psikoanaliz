@@ -5,7 +5,7 @@ import subprocess
 
 
 def choose(paths):
-    shared = {"core/rasch.py", "core/rasch_dif.py", "core/irt_dif.py"}
+    shared = {"core/rasch.py", "core/rasch_dif.py", "core/irt_dif.py", "app.py", "scripts/dif_ci_paths.py"}
     binary_prefixes = ("core/irt_dif", "core/irt_mg", "ui/irt_b10", "ui/irt_b11", "ui/rasch",
                        "tests/test_dif_", "tests/test_dif34_", "tests/test_irt_b10", "tests/test_irt_b11", "tests/fixtures/irt_b10/", "tests/fixtures/irt_b11/")
     grm_prefixes = ("core/grm_", "ui/grm_", "reports/grm_", "scripts/grm_", "tests/test_grm_", "tests/fixtures/grm_dif/")
