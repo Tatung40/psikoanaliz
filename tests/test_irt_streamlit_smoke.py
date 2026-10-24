@@ -60,3 +60,9 @@ def test_3pl_4pl_empirical_recovery_warnings_are_visible_in_ui_source():
     assert 'elif model == "3PL":' in source
     assert "ortalama mutlak hata yaklaşık 0,37" in source
     assert "Sonuçları doğrulanmış" in source
+
+
+def test_polytomous_fit_passes_explicit_category_count():
+    source = (ROOT / "app.py").read_text(encoding="utf-8")
+    assert 'n_categories=(int(external_data.to_numpy().max()) + 1)' in source
+    assert 'if model in ("GRM", "PCM", "GPCM", "NRM") else None' in source
