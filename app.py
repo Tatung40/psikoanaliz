@@ -1694,6 +1694,14 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
         # Library calibration controls live in the left settings panel; output stays right.
+        with st.sidebar.expander("📐 Grafik ölçeği", expanded=False):
+            theta_min, theta_max = st.slider(
+                "Yetenek (θ) aralığı", min_value=-6.0, max_value=6.0,
+                value=(-4.0, 4.0), step=0.5,
+                key=f"py_mirt_theta_range_{model}")
+            theta_count = st.select_slider(
+                "Grafik noktası", options=[81, 161, 321, 641],
+                value=161, key=f"py_mirt_theta_points_{model}")
         with st.sidebar.expander("⚙️ MTK rapor ayarları", expanded=True):
             st.caption(f"Etkin model: {model} | Motor: Python mirt")
             report_params = st.checkbox("Madde parametreleri", value=True,
@@ -1816,14 +1824,6 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 file_name=f"python_mirt_{model}_parameters.xlsx",
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                 key=f"py_mirt_params_xlsx_{model}")
-                        with st.sidebar.expander("📐 Grafik ölçeği", expanded=False):
-                            theta_min, theta_max = st.slider(
-                                "Yetenek (θ) aralığı", min_value=-6.0, max_value=6.0,
-                                value=(-4.0, 4.0), step=0.5,
-                                key=f"py_mirt_theta_range_{model}")
-                            theta_count = st.select_slider(
-                                "Grafik noktası", options=[81, 161, 321, 641],
-                                value=161, key=f"py_mirt_theta_points_{model}")
                         theta_grid = np.linspace(theta_min, theta_max, theta_count)
                         curve_data = curves_from_normalized_table(item_table, theta_grid)
                         if report_icc or report_iif or report_tif:
