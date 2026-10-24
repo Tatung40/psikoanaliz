@@ -1702,10 +1702,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.rerun()
             st.caption("Etkin kestirim motoru: Python mirt 1.2.0. "
                        "Desteklenmeyen optimizasyon ayarları gösterilmez.")
-        st.warning("Motor politikası: Python kütüphanesi tek etkin kestirim yoludur. "
-                   "Python mirt parametre kestirimi henüz bağımsız parametre kurtarma "
-                   "denetiminden geçmedi; aşağıdaki çıktılar araştırma amaçlıdır. "
-                   "Yerel motor da bağımsız sertifikasyon tamamlanana kadar deneysel kabul edilir.")
+        st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
+                   "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
+                   "bu çıktılar araştırma amaçlıdır.")
         # Optional external engine: isolated experimental output, never mixed with
         # the native model history, AIC/BIC or inferential diagnostics.
         # Library calibration controls live in the left settings panel; output stays right.
