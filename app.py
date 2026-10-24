@@ -1836,6 +1836,16 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             fig.update_layout(title=title, xaxis_title="θ",
                                               yaxis_title=ylabel)
                             st.plotly_chart(fig, use_container_width=True)
+                            export_curve = pd.DataFrame({
+                                "theta": theta_grid,
+                                str(selected_item): curve_data[key][:, idx],
+                            })
+                            st.download_button(
+                                f"{key.upper()} eğri verisini CSV indir",
+                                data=export_curve.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_{key}_{selected_item}.csv",
+                                mime="text/csv",
+                                key=f"py_mirt_curve_csv_{model}_{key}")
                         if report_tif:
                             tif = go.Figure()
                             tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
