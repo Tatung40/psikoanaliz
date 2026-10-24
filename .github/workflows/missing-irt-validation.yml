@@ -50,6 +50,13 @@ jobs:
         run: python -m pytest -q tests/test_known_truth_irt_recovery.py
       - name: Run independent known-truth parameter recovery
         run: PYTHONPATH=. python validation/known_truth_irt_recovery.py > python_mirt_known_truth_recovery.json
+      - name: Run 3PL and 4PL sample-size sensitivity
+        run: PYTHONPATH=. python -c 'import json; from validation.known_truth_irt_recovery import sensitivity_run; print(json.dumps(sensitivity_run(), indent=2, allow_nan=False))' > python_mirt_34pl_sensitivity.json
+      - name: Upload 3PL and 4PL sensitivity report
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-mirt-34pl-sensitivity
+          path: python_mirt_34pl_sensitivity.json
       - name: Upload known-truth recovery report
         uses: actions/upload-artifact@v4
         with:
