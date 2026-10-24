@@ -111,3 +111,14 @@ def run():
 
 if __name__ == "__main__":
     print(json.dumps(run(), ensure_ascii=False, indent=2, allow_nan=False))
+
+
+def sensitivity_run(sample_sizes=(1000, 3000, 5000), seeds=(2026, 2027)):
+    """Compare 3PL/4PL recovery at increasing N; no implicit pass threshold."""
+    records = [evaluate(model, n_persons=n, n_items=12, seed=seed)
+               for model in ("3PL", "4PL")
+               for n in sample_sizes for seed in seeds]
+    return {"design": {"sample_sizes": list(sample_sizes), "seeds": list(seeds),
+                       "models": ["3PL", "4PL"], "n_items": 12},
+            "runs": records,
+            "note": "Exploratory sensitivity, not independent engine validation."}
