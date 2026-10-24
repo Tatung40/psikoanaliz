@@ -32,6 +32,7 @@ from scipy.stats import norm
 
 K, C = 10, 4
 LOC = np.linspace(-1, 1, K)
+ENGINE = os.environ.get("P4_ENGINE", "library_default")  # "adapter" = the application's fit path
 CRITERIA = {"converged_rate": .95, "curve_rmse": .02, "coverage": (.925, .975), "info_rel": 1e-4, "eap_corr": .85}
 
 
@@ -82,7 +83,11 @@ def fit_job(job):
     t0 = time.perf_counter()
     try:
         x, th = simulate(model, n, seed)
-        r = mirt.fit_mirt(x, model=model, n_categories=C)
+        if ENGINE == "adapter":
+            from core.irt_python_mirt_adapter import fit_python_mirt
+            r = fit_python_mirt(x, model=model, n_categories=C).fit
+        else:
+            r = mirt.fit_mirt(x, model=model, n_categories=C)
         rec["seconds"] = time.perf_counter() - t0
         rec["converged"] = bool(r.converged)
         est = {k: np.asarray(v, float) for k, v in r.model.parameters.items()}
@@ -137,8 +142,9 @@ def fit_job(job):
 
 def jobs(quick=False):
     R = 3 if quick else 50
-    return [(m, n, 300_000 + 10_000 * i + n + r) for i, m in enumerate(("GRM", "PCM", "GPCM", "NRM"))
-            for n in (500, 2000) for r in range(R)]
+    models = [m for m in os.environ.get("P4_MODELS", "GRM,PCM,GPCM,NRM").split(",")]
+    order = ("GRM", "PCM", "GPCM", "NRM")
+    return [(m, n, 300_000 + 10_000 * order.index(m) + n + r) for m in models for n in (500, 2000) for r in range(R)]
 
 
 def summarize(recs):
@@ -149,6 +155,8 @@ def summarize(recs):
     for m in ("GRM", "PCM", "GPCM", "NRM"):
         for n in (500, 2000):
             rs = [r for r in recs if r["model"] == m and r["N"] == n]
+            if not rs:
+                continue
             ms = [r for r in rs if r["status"] == "MEASURED"]
             row = {"model": m, "N": n, "attempted": len(rs), "measured": len(ms),
                    "nonconverged": sum(r["status"] == "NONCONVERGED" for r in rs),
@@ -187,10 +195,11 @@ def main(outdir, quick=False):
     js = jobs(quick); t0 = time.time()
     with Pool(int(os.environ.get("P4_PROCS", "2"))) as pool:
         recs = pool.map(fit_job, js, chunksize=1)
-    payload = {"design": __doc__, "criteria": CRITERIA, "n_jobs": len(js), "wall_seconds": time.time() - t0,
+    payload = {"design": __doc__, "engine_path": ENGINE, "criteria": CRITERIA, "n_jobs": len(js), "wall_seconds": time.time() - t0,
                "versions": {"mirt": __import__("importlib.metadata").metadata.version("mirt")},
                "summary": summarize(recs), "runs": recs}
-    with open(os.path.join(outdir, "polytomous_mc_study.json"), "w") as f:
+    name = "polytomous_mc_study.json" if ENGINE == "library_default" else f"polytomous_mc_study_{ENGINE}.json"
+    with open(os.path.join(outdir, name), "w") as f:
         json.dump(payload, f, ensure_ascii=False, indent=1, default=float)
     return payload
 

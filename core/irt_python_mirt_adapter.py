@@ -84,6 +84,11 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
     kwargs={"model":model}
     if cats is not None:kwargs["n_categories"]=cats
+    if model=="NRM":
+        # Python mirt 1.2.0 defect: se_method="auto" labels NRM SEs "oakes" but returns values ~0.45x the
+        # empirical SD (95% CI coverage .62); an explicit "oakes" request gives ratio .99 / coverage .94.
+        # Other families are identical under both settings. Evidence: validation/evidence/p4_polytomous.
+        kwargs["se_method"]="oakes"
     if estimation=="MAP":
         from mirt.estimation.priors import default_priors
         kwargs["priors"]=default_priors(model)

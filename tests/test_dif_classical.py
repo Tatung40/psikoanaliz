@@ -108,3 +108,12 @@ def test_decision_rules_and_input_validation():
         dif_screen(data.replace(1, 2), g, 0, 1)
     with pytest.raises(ValueError):
         dif_screen(data, g, 0, 0)
+
+
+def test_impact_warning_is_reported():
+    data, g = binary(n=1500, seed=8, mu=-.9)
+    _, meta = dif_screen(data, g, 0, 1, method="MH")
+    assert meta["impact_cohen_d"] < -.3 and any("Cohen d" in n for n in meta["notes"])
+    data, g = binary(n=1500, seed=8, mu=0.)
+    _, meta = dif_screen(data, g, 0, 1, method="MH")
+    assert not any("Cohen d" in n for n in meta["notes"])

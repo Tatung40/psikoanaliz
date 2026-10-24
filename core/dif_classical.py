@@ -263,6 +263,18 @@ def dif_screen(data, group, reference, focal, *, method="MH", ordinal=False, adj
         frame["lnOR %95 üst"] = frame["log_or"] + z * frame["se_log_or"]
     if method == "LR":
         frame["Jodoin–Gierl sınıfı"] = [jodoin_gierl(d, p, alpha) for d, p in zip(frame["delta_r2"], frame["p_adj"])]
+    tot = x.sum(1); r_, f_ = tot[gf == 0], tot[gf == 1]
+    pooled = np.sqrt(((len(r_) - 1) * r_.var(ddof=1) + (len(f_) - 1) * f_.var(ddof=1)) / (len(tot) - 2))
+    impact_d = float((f_.mean() - r_.mean()) / pooled) if pooled > 0 else np.nan
+    if np.isfinite(impact_d) and abs(impact_d) >= .3:
+        history.append(
+            f"Gruplar arasında toplam puan farkı büyük (Cohen d = {impact_d:.2f}). Önceden tanımlı simülasyonda "
+            "(validation/evidence/p2_dif) odak ortalaması −0,5 iken " +
+            ("sıralı maddelerde aile bazlı hata (Holm FWER / BH FDR) %9–12'ye çıktı; sonuçları MTK-LR DIF ile "
+             "doğrulayın." if ordinal else
+             "ikili maddelerde madde başına I. tip hata %4–7, aile bazlı hata %4–9 bulundu; sınırda sonuçları "
+             "MTK-LR DIF ile doğrulayın."))
     meta = {"method": method, "ordinal": ordinal, "adjust": adjust, "alpha": alpha, "purify": purify,
+            "impact_cohen_d": impact_d,
             "rounds": rounds, "notes": history, "n_reference": int((gf == 0).sum()), "n_focal": int((gf == 1).sum())}
     return frame, meta

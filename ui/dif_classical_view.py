@@ -27,8 +27,9 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     st.caption("İkili maddeler: MH (Holland–Thayer; ETS A/B/C) ve lojistik regresyon (tek biçimli / tek biçimli "
                "olmayan; Jodoin–Gierl ΔR²). Sıralı maddeler: Mantel testi + SMD ve sıralı lojistik regresyon. "
                "Eşleştirme: toplam puan (incelenen madde dahil); isteğe bağlı saflaştırma.")
-    st.warning("Bu yöntemler MTK olabilirlik DIF'i değildir. Gruplar arasında yetenek farkı (impact) varken ve "
-               "madde ayırt edicilikleri farklıyken I. tip hata şişebilir; ayrıntı validation/evidence/p2_dif.")
+    st.warning("Bu yöntemler MTK olabilirlik DIF'i değildir. Gruplar arasında yetenek farkı (impact) varken "
+               "I. tip hata şişebilir (özellikle sıralı maddelerde); MH tek biçimli olmayan DIF'e duyarsızdır "
+               "(önceden tanımlı simülasyonda güç %18–41). Ayrıntı: validation/DIF_VALIDATION.md.")
     available = [c for c in data.columns if c not in (id_col,)]
     gcol = st.selectbox("Grup değişkeni", [c for c in available if c != id_col],
                         index=([c for c in available].index(group_col) if group_col in available else 0), key="cdif_group")
