@@ -53,6 +53,5 @@ def test_apptest_4pl_library_first_and_no_native_results():
     assert len(library_buttons) == 1
     assert not library_buttons[0].disabled
     legacy_buttons = [b for b in at.button if "MTK Analizini Başlat" in b.label]
-    assert len(legacy_buttons) == 1
-    assert legacy_buttons[0].disabled
+    assert len(legacy_buttons) == 0  # Retired control is fully removed.
     assert not at.session_state.get("irt_model_results", {}).get("4PL")
