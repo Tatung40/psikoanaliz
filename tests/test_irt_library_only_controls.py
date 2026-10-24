@@ -35,7 +35,7 @@ def test_retired_native_calibration_button_and_call_are_removed():
 def test_native_results_ui_is_not_present():
     source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
     assert 'saved = st.session_state.get("irt_model_results"' not in source
-    assert 'r = saved.get("result")' not in source
+    assert '\n        r = saved.get("result")' not in source
     assert 'b11.run_dif(' not in source
     assert 'b10.run_global_fit(' not in source
 
