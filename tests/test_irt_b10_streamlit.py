@@ -79,7 +79,7 @@ def test_apptest_1pl_library_first_and_3pl_navigation():
     assert not at.exception
     assert len([b for b in at.button if b.key == "py_mirt_run_1PL" and not b.disabled]) == 1
     legacy = [b for b in at.button if "MTK Analizini Başlat" in b.label]
-    assert len(legacy) == 1 and legacy[0].disabled
+    assert not legacy, "Retired native calibration button must be absent"
     assert not at.session_state.get("irt_model_results", {}).get("1PL")
     assert ui.B10_MODELS == ("1PL", "2PL")
     at.session_state["nav_page"] = "MTK: 3PL"
