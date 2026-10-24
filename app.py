@@ -1824,13 +1824,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             st.plotly_chart(fig, use_container_width=True)
                         if report_tif:
                             tif = go.Figure()
-                        if report_tif:
                             tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
-                                        mode="lines", name="TIF")
-                        if report_tif:
+                                            mode="lines", name="TIF")
                             tif.update_layout(title="Test Bilgi Fonksiyonu",
-                                          xaxis_title="θ", yaxis_title="I(θ)")
-                        if report_tif:
+                                              xaxis_title="θ", yaxis_title="I(θ)")
                             st.plotly_chart(tif, use_container_width=True)
                         st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
                                    "bağımsız analitik eğriler. Parametre kurtarma "
