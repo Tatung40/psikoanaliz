@@ -42,7 +42,7 @@ Rasch code were not modified.
 1. 3PL/4PL: parameter interpretation supported only with MAP at N ≥ 3000 (3PL ML N ≥ 10000; 4PL ML
    never), k ≥ 12, normal θ. SE/CI coverage of 3PL/4PL item parameters not validated.
 2. 3PL bootstrap DIF size .076 for an interior studied item (criterion ≤ .075 missed) → p withheld;
-   4PL bootstrap validated only in the studied design (k = 8, 500 + 500).
+   4PL warp-speed evidence covers only the studied design (k = 8, 500 + 500), not input-specific eligibility; both models’ inferential p-values are now withheld in UI/CSV.
 3. Observed-score ordinal DIF under group impact: family-wise error .09–.12 (warned in UI).
 4. Selection-adjusted inference after data-driven anchor purification; broader FDR/coverage designs.
 5. NRM weighted category-effect intervals in `core.polytomous_dif` (previous 88 % coverage) remain

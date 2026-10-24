@@ -59,9 +59,13 @@ k = 8, 500 + 500, focal N(−.3, 1.1²)):
 | 3PL DIF Δb = .6 (power) | 198/200 | .949 | .889 | — |
 
 Invalid observed fits (non-convergence or nested-likelihood violation) are excluded and counted
-(4/400, 5/400, 19/300, 2/200). By the pre-registered rule the bootstrap p-value is shown in the UI for
-4PL (this design only) and **not** for 3PL; for 3PL the page reports the LR statistic and its bootstrap
-distribution descriptively.
+(4/400, 5/400, 19/300, 2/200). The committed study's `ui_enabled` field records its historical
+model-level criterion only; it is not an input-specific eligibility certificate. Exact eligibility
+for arbitrary observed data cannot be established from this restricted warp-speed study. The UI
+therefore withholds **both 3PL and 4PL p-values**, including CSV exports, and preserves descriptive
+LR statistics and bootstrap distributions. Results are invalidated when data values or fit settings
+change, including same-shape replacements. The underlying research bootstrap calculation and the
+study's criteria/results remain unchanged.
 
 ## Still open
 

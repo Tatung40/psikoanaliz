@@ -10,8 +10,10 @@ Only replicates where both nested fits converged and logL_alt >= logL_null - 1e-
 `max_fail_rate` of the requested replicates fail, NO p-value is reported (an incomplete bootstrap is not
 a result). Known limitation: bootstrap consistency is not guaranteed when the true null parameter lies
 exactly on the boundary (Andrews, 2000); the size of this procedure was therefore checked by the
-pre-registered simulation in validation/dif34_bootstrap_size_study.py; its "ui_enabled" result decides
-whether ui/dif34_bootstrap_view.py may show the p-value for a model.
+pre-registered simulation in validation/dif34_bootstrap_size_study.py. Its historical "ui_enabled"
+field does not establish eligibility for arbitrary input data or the finite-bootstrap procedure.
+The computed p is a research bootstrap tail fraction; the UI withholds inferential p-values for
+both models until input-specific eligibility is independently established.
 """
 import numpy as np
 import pandas as pd

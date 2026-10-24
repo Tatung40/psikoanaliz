@@ -41,10 +41,7 @@ def test_classical_dif_page_runs():
 
 
 def test_dif34_bootstrap_page_respects_size_study_gate():
-    import json
     from scipy.special import expit
-    from ui.dif34_bootstrap_view import EVIDENCE
-    gate = json.loads(EVIDENCE.read_text(encoding="utf-8"))["ui_enabled"]
     rng = np.random.default_rng(5); n = 300
     g = np.r_[np.zeros(n, int), np.ones(n, int)]; th = rng.standard_normal(2 * n)
     c = np.linspace(.05, .2, 6)
@@ -55,6 +52,8 @@ def test_dif34_bootstrap_page_respects_size_study_gate():
     at.select_slider(key="b34_B").set_value(99).run()
     at.button(key="b34_run").click().run()
     assert not at.exception
-    res, model = at.session_state["b34_result"]
+    saved = at.session_state["b34_result"]
+    res, model = saved["result"], saved["model"]
     shown = at.dataframe[0].value["Bootstrap p"].iloc[0]
-    assert (np.isfinite(shown)) == (bool(gate[model]) and np.isfinite(res["p"]))
+    from ui.dif34_bootstrap_view import inference_eligibility
+    assert (np.isfinite(shown)) == (inference_eligibility(model)[0] and np.isfinite(res["p"]))
