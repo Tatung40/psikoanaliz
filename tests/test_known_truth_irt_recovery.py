@@ -64,3 +64,33 @@ def test_fitting_failure_is_reported_not_silently_discarded(monkeypatch):
     assert result["error_type"] == "RuntimeError"
     assert result["metrics"] == {}
     assert result["converged"] is None
+
+
+def test_sensitivity_summary_reports_each_sample_size_without_real_fits(monkeypatch):
+    import validation.known_truth_irt_recovery as recovery
+
+    def fake_evaluate(model, *, n_persons, n_items, seed):
+        return {"model": model, "n_persons": n_persons, "n_items": n_items,
+                "seed": seed, "status": "MEASURED", "converged": True,
+                "metrics": {p: {"mae": float(n_persons) / 1000}
+                            for p in ("a", "b", "c") + (("d",) if model == "4PL" else ())}}
+
+    monkeypatch.setattr(recovery, "evaluate", fake_evaluate)
+    report = recovery.sensitivity_run(sample_sizes=(1000, 3000), seeds=(11, 12))
+    assert len(report["runs"]) == 8
+    assert report["summary_by_sample_size"]["3PL_N1000"]["measured"] == 2
+    assert report["summary_by_sample_size"]["4PL_N3000"]["mae"]["d"] == pytest.approx(3.0)
+
+
+def test_sensitivity_summary_never_hides_failed_runs(monkeypatch):
+    import validation.known_truth_irt_recovery as recovery
+
+    def failed(model, *, n_persons, n_items, seed):
+        return {"model": model, "n_persons": n_persons, "n_items": n_items,
+                "seed": seed, "status": "FAILED", "metrics": {}}
+
+    monkeypatch.setattr(recovery, "evaluate", failed)
+    report = recovery.sensitivity_run(sample_sizes=(1000,), seeds=(11,))
+    for row in report["summary_by_sample_size"].values():
+        assert row["attempted"] == 1 and row["failed"] == 1
+        assert row["measured"] == 0 and row["mae"] == {}
