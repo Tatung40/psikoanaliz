@@ -48,3 +48,25 @@ def test_adapter_map_option_uses_library_default_priors():
         fit_python_mirt(x, model="2PL", estimation="MAP")
     with pytest.raises(ValueError):
         fit_python_mirt(x, model="3PL", estimation="Bayes")
+
+
+@pytest.mark.parametrize("model", ["3PL", "4PL"])
+def test_3pl_4pl_page_renders_curves_with_policy_columns(model):
+    st = pytest.importorskip("streamlit.testing.v1")
+    pytest.importorskip("mirt")
+    import pandas as pd
+    rng = np.random.default_rng(9); n, k = 600, 12
+    th = rng.standard_normal(n)
+    x = (rng.random((n, k)) < .15 + .8 * expit(np.linspace(.8, 1.6, k) * (th[:, None] - np.linspace(-1, 1, k)))).astype(int)
+    df = pd.DataFrame(x, columns=[f"M{j}" for j in range(k)])
+    at = st.AppTest.from_file(str(ROOT / "app.py"), default_timeout=240)
+    for key, value in (("raw_df", df), ("scored_df", df.copy()), ("item_cols", list(df.columns)), ("id_col", None),
+                       ("group_col", None), ("is_dichotomous", True), ("nav_page", f"MTK: {model}")):
+        at.session_state[key] = value
+    at.run()
+    at.button(key=f"py_mirt_run_{model}").click().run()
+    assert not at.exception
+    assert not any("eşleştirme hatası" in e.value for e in at.error)
+    assert len(at.get("plotly_chart")) >= 3
+    table = next(d.value for d in at.dataframe if "Sınırdaki parametre" in d.value.columns)
+    assert set(table["Kestirim"]) == {"MAP"} and set(table["Kullanım durumu"]) == {"not_supported"}  # N = 600 < 1000

@@ -60,7 +60,12 @@ def run(output):
                     return result.get("result", {}).get("value")
                 def wait(expression, seconds=60):
                     end = time.monotonic() + seconds
-                    while not evaluate(expression):
+                    def ready():
+                        try:
+                            return evaluate(expression)
+                        except RuntimeError:  # document.body may still be null during navigation
+                            return False
+                    while not ready():
                         if time.monotonic() > end:
                             (output / "failure_dom.txt").write_text(evaluate("document.body.innerText"), encoding="utf-8")
                             raise TimeoutError(expression)

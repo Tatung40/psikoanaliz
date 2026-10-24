@@ -109,14 +109,15 @@ def flow_polytomous(browser, outdir, log):
                 charts = page.locator("[data-testid=stVegaLiteChart], [data-testid=stArrowVegaLiteChart], .vega-embed").count()
                 path = download(page, "Madde parametrelerini CSV indir", outdir / model)
                 got = pd.read_csv(path)
-                ref = mirt.fit_mirt(np.asarray(frame.replace({"A": 0, "B": 1, "C": 2, "D": 3}), int), model=model,
-                                    n_categories=4).coef_with_se().reset_index()
+                from core.irt_python_mirt_adapter import fit_python_mirt  # the application's engine path
+                ref = fit_python_mirt(np.asarray(frame.replace({"A": 0, "B": 1, "C": 2, "D": 3}), int), model=model,
+                                      n_categories=4).fit.coef_with_se().reset_index()
                 num = [c for c in ref.columns if pd.api.types.is_numeric_dtype(ref[c])]
                 diff = float(np.nanmax(np.abs(got[num].to_numpy(float) - ref[num].to_numpy(float))))
                 ppath = download(page, "Kişi yeteneklerini CSV indir", outdir / model)
                 xpath = download(page, "B14 tüm tablolar Excel", outdir / model)
                 coded = np.asarray(frame.replace({"A": 0, "B": 1, "C": 2, "D": 3}), int)
-                ref_fit = mirt.fit_mirt(coded, model=model, n_categories=4)
+                ref_fit = fit_python_mirt(coded, model=model, n_categories=4).fit
                 theta_ref = np.asarray(mirt.fscores(ref_fit, coded, method="EAP").theta, float).reshape(-1)
                 dtheta = float(np.abs(pd.read_csv(ppath)["θ"].to_numpy() - theta_ref).max())
                 sheets = pd.read_excel(xpath, sheet_name=None)

@@ -1882,7 +1882,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                 key=f"py_mirt_params_xlsx_{model}")
                         theta_grid = np.linspace(theta_min, theta_max, theta_count)
-                        curve_data = curves_from_normalized_table(item_table, theta_grid)
+                        curve_data = curves_from_normalized_table(item_table[["Madde", "a", "b", "c", "d"]], theta_grid)
                         if report_icc or report_iif or report_tif:
                             with st.expander("📦 Tüm eğri verilerini indir", expanded=False):
                                 all_curves = pd.DataFrame({"theta": theta_grid})
