@@ -18,6 +18,8 @@ def run(n_persons=600, n_items=12, seeds=(2026, 2027)):
             fitted = mirt.fit_mirt(simulated, model=model)
             table = python_mirt_binary_parameters(fitted, model=model)
             converged = getattr(fitted, "converged", None)
+            if callable(converged):
+                converged = converged()
             estimates = table[["a", "b", "c", "d"]].to_numpy(float)
             results.append({
                 "model": model, "seed": seed, "n_persons": n_persons,
@@ -29,6 +31,7 @@ def run(n_persons=600, n_items=12, seeds=(2026, 2027)):
                 "mean_guessing": float(np.mean(estimates[:, 2])),
                 "mean_upper_asymptote": float(np.mean(estimates[:, 3])),
                 "recovery_mae": None,
+                "fit_success": bool(np.isfinite(estimates).all()),
                 "recovery_note": (
                     "simdata true item parameters not available from this API call; "
                     "cannot calculate recovery MAE without documented ground truth"),
