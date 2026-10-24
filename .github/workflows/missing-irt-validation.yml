@@ -12,6 +12,7 @@ on:
       - 'tests/test_irt_streamlit_smoke.py'
       - 'core/irt_library_*.py'
       - 'validation/inspect_python_mirt_api.py'
+      - 'validation/python_mirt_parameter_recovery.py'
       - 'tests/test_irt_library_*.py'
       - 'tests/test_irt_python_mirt_adapter.py'
       - 'pages/90_Kayip_Veri_Analizi_ve_Atama.py'
@@ -36,6 +37,13 @@ jobs:
         run: python -m py_compile app.py core/irt_python_mirt_parameters.py && python -m pytest -q tests/test_irt_streamlit_smoke.py
       - name: Inspect real Python mirt fit-object structure
         run: python validation/inspect_python_mirt_api.py > python_mirt_api_report.json
+      - name: Generate fixed-seed Python mirt simulation stability report
+        run: PYTHONPATH=. python validation/python_mirt_parameter_recovery.py > python_mirt_simulation_stability.json
+      - name: Upload simulation stability report
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-mirt-simulation-stability
+          path: python_mirt_simulation_stability.json
       - name: Upload API structure report
         uses: actions/upload-artifact@v4
         with:
