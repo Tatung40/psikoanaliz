@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "browser": "Real Chromium CDP",
+  "scope": "CSV upload, 1PL/2PL/3PL/4PL real library fits, plots, actual CSV/XLSX downloads and contents; not polytomous or DIF browser coverage or recovery certification",
+  "runs": [
+    {
+      "model": "1PL",
+      "uploaded_rows": 400,
+      "items": 8,
+      "plots": true,
+      "downloads": [
+        "python_mirt_1PL_parameters.csv",
+        "python_mirt_1PL_parameters.xlsx"
+      ]
+    },
+    {
+      "model": "2PL",
+      "uploaded_rows": 400,
+      "items": 8,
+      "plots": true,
+      "downloads": [
+        "python_mirt_2PL_parameters.xlsx",
+        "python_mirt_2PL_parameters.csv"
+      ]
+    },
+    {
+      "model": "3PL",
+      "uploaded_rows": 400,
+      "items": 8,
+      "plots": true,
+      "downloads": [
+        "python_mirt_3PL_parameters.xlsx",
+        "python_mirt_3PL_parameters.csv"
+      ]
+    },
+    {
+      "model": "4PL",
+      "uploaded_rows": 400,
+      "items": 8,
+      "plots": true,
+      "downloads": [
+        "python_mirt_4PL_parameters.xlsx",
+        "python_mirt_4PL_parameters.csv"
+      ]
+    }
+  ]
+}

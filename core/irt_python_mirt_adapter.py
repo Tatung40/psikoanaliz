@@ -50,6 +50,10 @@ def fit_python_mirt(responses, *, model, n_categories=None):
             raise ValueError("Response exceeds declared category range.")
         if set(np.unique(x))!=set(range(n_categories)):
             raise ValueError("All categories must occur in the validation pilot.")
+        counts = np.array([np.bincount(col.astype(int), minlength=n_categories)
+                           for col in x.T])
+        if np.any(counts == 0):
+            raise ValueError("Her maddede beyan edilen tüm kategoriler gözlenmelidir; boş kategoriler sessizce yeniden kodlanmaz.")
         cats=n_categories
     # Constant items are not identifiable under ordinary IRT calibration.
     # Reject explicitly rather than returning misleading parameter estimates.

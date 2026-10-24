@@ -60,37 +60,26 @@ def test_4pl_dif_is_descriptive_only():
         ui.run_dif(d, ITEMS + ["Grup"], "Grup", "R", "F", "4PL", r)
 
 
-def test_apptest_3pl_tabs_and_isolation():
+def test_apptest_3pl_library_route_and_isolation():
+    """The active library page must not expose the retired native B11 controls."""
     st_testing = pytest.importorskip("streamlit.testing.v1")
-    at = st_testing.AppTest.from_file(APP, default_timeout=600)
+    at = st_testing.AppTest.from_file(APP, default_timeout=180)
     df = _small_dif()
-    at.session_state["raw_df"] = df
-    at.session_state["scored_df"] = df.copy()
-    at.session_state["item_cols"] = ITEMS + ["Grup"]
-    at.session_state["id_col"] = "OGRENCI_NO"
-    at.session_state["group_col"] = "Grup"
-    at.session_state["is_dichotomous"] = True
-    at.session_state["nav_page"] = "MTK: 3PL"
+    for key, value in dict(raw_df=df, scored_df=df.copy(), item_cols=ITEMS + ["Grup"],
+                           id_col="OGRENCI_NO", group_col="Grup", is_dichotomous=True,
+                           nav_page="MTK: 3PL").items(): at.session_state[key] = value
     at.run()
     assert not at.exception
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
+    assert not [b for b in at.button if b.key and b.key.startswith(("b10_", "b11_"))]
+    assert not [b for b in at.button if "MTK Analizini Başlat" in b.label]
+    at.button(key="py_mirt_run_3PL").click().run()
     assert not at.exception
-    fit = at.session_state["irt_model_results"]["3PL"]["result"]
-    assert list(fit["items"]["Madde"]) == ITEMS
-    at.button(key="b11_gf_run_3PL").click().run()
-    assert not at.exception and at.session_state["irt_b11"][("gf", "3PL")]["result"]["model"] == "3PL"
-    at.button(key="b11_q3_run_3PL").click().run()
-    assert not at.exception and at.session_state["irt_b11"][("q3", "3PL")]["result"]["model"] == "3PL"
-    at.selectbox(key="b11_dif_ref_3PL").select("R").run()
-    at.selectbox(key="b11_dif_focal_3PL").select("F").run()
-    at.select_slider(key="b11_dif_rounds_3PL").set_value(1).run()
-    at.button(key="b11_dif_run_3PL").click().run()
+    entry = at.session_state["python_mirt_experimental_results"]["3PL"]
+    assert entry["fit"].engine == "python_mirt" and entry["fit"].model == "3PL"
+    assert entry["fit"].n_items == len(ITEMS)
+    assert "3PL" not in at.session_state.get("irt_model_results", {})
+    changed = df.copy(); changed.loc[0, ITEMS[0]] = 1 - changed.loc[0, ITEMS[0]]
+    at.session_state["scored_df"] = changed
+    at.run()
     assert not at.exception
-    dif = at.session_state["irt_b11"][("dif", "3PL")]["result"]
-    assert dif["model"] == "3PL" and dif["inferential"]
-    assert any("F (odak) − R (referans)" in m.value for m in at.markdown)
-    at.checkbox(key="b11_dif_purify_3PL").uncheck().run()
-    assert any("farklı grup veya ayarlarla" in i.value for i in at.info)
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()      # new run hides old results
-    assert not any("F (odak) − R (referans)" in m.value for m in at.markdown)
-    assert not [b for b in at.button if b.key and b.key.startswith("b10_")]          # 1PL/2PL tabs not on 3PL page
+    assert not any("Motor: python_mirt | Model: 3PL" in c.value for c in at.caption)
