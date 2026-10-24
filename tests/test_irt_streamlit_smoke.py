@@ -51,3 +51,12 @@ def test_report_exports_and_scientific_caveat():
 def test_legacy_dependency_inventory_script_parses():
     script = ROOT / "validation" / "audit_legacy_irt_imports.py"
     ast.parse(script.read_text(encoding="utf-8"))
+
+
+def test_3pl_4pl_empirical_recovery_warnings_are_visible_in_ui_source():
+    source = (ROOT / "app.py").read_text(encoding="utf-8")
+    assert 'if model == "4PL":' in source
+    assert "ortalama mutlak hata yaklaşık 1,73" in source
+    assert 'elif model == "3PL":' in source
+    assert "ortalama mutlak hata yaklaşık 0,37" in source
+    assert "Sonuçları doğrulanmış" in source
