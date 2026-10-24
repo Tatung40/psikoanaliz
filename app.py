@@ -64,36 +64,12 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
-from core.irt import (fit_irt, estimate_ability, approximate_q3,
-                      approximate_parameter_uncertainty, item_fit_by_restscore,
-                      sx2_pilot)
-import plotly.graph_objects as go
-from core.irt_itemfit import sx2_mirt_compatible
-from core.irt_hessian import observed_information_se
-from core.irt_se_diagnostics import hessian_boundary_diagnostics
-from core.irt_multistart import fit_irt_multistart
-from core.irt_model_reliability import model_reliability
-from core.irt_stationarity import stationarity_diagnostics
-from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 from ui.rasch_view import (MNSQ_OPTIONS, METHOD_NOTE, screen_items, rasch_settings, run_rasch,
                            fingerprint as rasch_fingerprint, summary_rows as rasch_summary,
                            misfit_persons, wright_map, DIF_NOTE, Q3_NOTE, group_candidates,
                            dif_figure, q3_heatmap, raw_score_figure, run_global_fit, m2_rows, run_q3,
                            run_dif, dif_summary_rows)
-from ui import irt_b10_view as b10
-# B11 is optional at app startup: CTT/descriptive analyses must remain accessible
-# even if a B11-only dependency fails to import in Streamlit Cloud.
-try:
-    from ui import irt_b11_view as b11
-    _b11_import_problem = None
-except ImportError as exc:
-    from types import SimpleNamespace
-    b11 = SimpleNamespace(B11_MODELS=())
-    _b11_import_problem = str(exc)
-from ui.irt_optimization import (REFINE_LABEL, REFINE_HELP, calibration_settings,
-                                 run_irt_calibration, estimation_method, result_points,
-                                 settings_mismatch, optimization_summary, convergence_messages)
 
 
 # =============================================================================
