@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install numerical dependencies
-        run: python -m pip install numpy pandas scipy scikit-learn pytest streamlit plotly openpyxl mirt==1.2.0
+        run: python -m pip install numpy pandas scipy scikit-learn pytest streamlit plotly openpyxl python-docx mirt==1.2.0
       - name: Execute every missing-data and IRT numerical gate
         run: python -m pytest -q tests/test_missing_imputation.py tests/test_missing_decision.py tests/test_irt_missing_likelihood.py tests/test_irt_missing_em.py tests/test_irt_missing_three_way.py tests/test_irt_engine_policy.py tests/test_irt_binary_navigation.py tests/test_irt_library_model_smoke.py tests/test_irt_library_curves.py tests/test_irt_library_parameter_mapping.py tests/test_irt_library_diagnostics.py tests/test_irt_python_mirt_parameters.py tests/test_irt_library_only_controls.py tests/test_irt_python_mirt_adapter.py
       - name: Compile Streamlit app and verify static UI contracts
