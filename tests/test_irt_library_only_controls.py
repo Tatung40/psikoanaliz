@@ -66,3 +66,12 @@ def test_all_item_curve_export_and_conditional_sem_are_present():
     assert 'conditional_sem' in source
     assert 'with st.expander("📦 Tüm eğri verilerini indir"' in source
     assert 'with st.sidebar.expander("📦 Tüm eğri verileri"' not in source
+
+
+def test_plot_controls_exist_outside_fit_result_block():
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
+    sidebar = source.index('with st.sidebar.expander("📐 Grafik ölçeği"')
+    runner = source.index('with st.sidebar.expander("▶ MTK analizini çalıştır"')
+    assert sidebar < runner
+    assert source.index('with st.sidebar.expander("📈 Eğri madde seçimi"') < runner
+    assert source.count('key=f"py_mirt_curve_item_{model}"') == 1
