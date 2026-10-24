@@ -1827,7 +1827,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         theta_grid = np.linspace(theta_min, theta_max, theta_count)
                         curve_data = curves_from_normalized_table(item_table, theta_grid)
                         if report_icc or report_iif or report_tif:
-                            with st.sidebar.expander("📦 Tüm eğri verileri", expanded=False):
+                            with st.expander("📦 Tüm eğri verilerini indir", expanded=False):
                                 all_curves = pd.DataFrame({"theta": theta_grid})
                                 for curve_key, prefix in (("probability", "ICC"),
                                                           ("information", "IIF")):
