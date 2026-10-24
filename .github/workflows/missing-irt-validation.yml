@@ -13,6 +13,7 @@ on:
       - 'core/irt_library_*.py'
       - 'validation/inspect_python_mirt_api.py'
       - 'validation/python_mirt_parameter_recovery.py'
+      - 'validation/audit_legacy_irt_imports.py'
       - 'tests/test_irt_library_*.py'
       - 'tests/test_irt_python_mirt_adapter.py'
       - 'pages/90_Kayip_Veri_Analizi_ve_Atama.py'
@@ -35,6 +36,13 @@ jobs:
         run: python -m pytest -q tests/test_missing_imputation.py tests/test_missing_decision.py tests/test_irt_missing_likelihood.py tests/test_irt_missing_em.py tests/test_irt_missing_three_way.py tests/test_irt_engine_policy.py tests/test_irt_binary_navigation.py tests/test_irt_library_model_smoke.py tests/test_irt_library_curves.py tests/test_irt_library_parameter_mapping.py tests/test_irt_library_diagnostics.py tests/test_irt_python_mirt_parameters.py tests/test_irt_library_only_controls.py tests/test_irt_python_mirt_adapter.py
       - name: Compile Streamlit app and verify static UI contracts
         run: python -m py_compile app.py core/irt_python_mirt_parameters.py && python -m pytest -q tests/test_irt_streamlit_smoke.py
+      - name: Audit retired IRT import dependencies
+        run: python validation/audit_legacy_irt_imports.py > legacy_irt_import_inventory.json
+      - name: Upload legacy IRT import inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-irt-import-inventory
+          path: legacy_irt_import_inventory.json
       - name: Inspect real Python mirt fit-object structure
         run: python validation/inspect_python_mirt_api.py > python_mirt_api_report.json
       - name: Generate fixed-seed Python mirt simulation stability report
