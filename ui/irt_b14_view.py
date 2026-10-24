@@ -127,6 +127,40 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
                        "modelin bağımsız bilimsel geçerliği ayrıca doğrulanmalıdır.")
         except Exception as exc:
             st.info(f"Model CRC grafiği gösterilemiyor: {exc}. Betimsel profiller kullanılabilir.")
+        st.markdown("### Kişi Yetenekleri, Bilgi Fonksiyonları ve Model Karşılaştırması")
+        from core.irt_b14_persons_info import person_scores, information_table, model_comparison
+        try:
+            persons=person_scores(result)
+            st.dataframe(persons.head(200).round(4),hide_index=True,use_container_width=True)
+            st.caption(f"EAP θ ve posterior SS (Python mirt fscores); {len(persons)} kişi. Kişi kimlikleri eklenmez."
+                       + (" NRM'de θ ekseninin işareti kütüphaneye aittir; başarı yönü değildir." if model=="NRM" else ""))
+            st.download_button("Kişi yeteneklerini CSV indir",safe_frame(persons).to_csv(index=False).encode("utf-8-sig"),
+                               "B14_kisi_yetenekleri.csv",mime="text/csv",key="b14_persons_csv")
+        except Exception as exc:
+            st.info(f"Kişi kestirimi yapılamadı: {exc}")
+        try:
+            info=information_table(result)
+            import plotly.graph_objects as go
+            fig=go.Figure()
+            fig.add_scatter(x=info["θ"],y=info["Test bilgisi"],name="Test bilgisi")
+            fig.add_scatter(x=info["θ"],y=info["SEM(θ)"],name="SEM(θ)",yaxis="y2")
+            fig.update_layout(title=f"{model} — Test Bilgi Fonksiyonu ve Koşullu SEM",xaxis_title="θ",
+                              yaxis_title="Bilgi",yaxis2=dict(title="SEM",overlaying="y",side="right"),template="plotly_white")
+            st.plotly_chart(fig,use_container_width=True)
+            st.download_button("Madde/test bilgi fonksiyonlarını CSV indir",info.to_csv(index=False).encode("utf-8-sig"),
+                               "B14_bilgi_fonksiyonlari.csv",mime="text/csv",key="b14_info_csv")
+        except Exception as exc:
+            st.info(f"Bilgi fonksiyonu hesaplanamadı: {exc}")
+        if model!="NRM" and st.button("GRM / PCM / GPCM model karşılaştırmasını çalıştır",key="b14_compare_run"):
+            with st.spinner("Üç sıralı model kestiriliyor"):
+                st.session_state["b14_compare"]=(tuple(cols),model_comparison(result["coded"]))
+        cmp=st.session_state.get("b14_compare")
+        if cmp and cmp[0]==tuple(cols):
+            table,lr=cmp[1]
+            st.dataframe(table,hide_index=True,use_container_width=True)
+            if lr:
+                st.caption(f"{lr['Karşılaştırma']}: LR = {lr['LR']:.3f}, sd = {lr['sd']}, p = {lr['p']:.4g}. "
+                           "GRM ile PCM/GPCM iç içe değildir; yalnızca AIC/BIC karşılaştırılır.")
         st.markdown("### Bilimsel Yorumlama ve Kanıt Denetimi")
         st.write("**Karar:** "+audit["decision"])
         st.info(audit["explanation"])
