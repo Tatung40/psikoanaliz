@@ -50,3 +50,17 @@ def test_recovery_summary_counts_failures_and_aggregates_only_measured():
     assert summary["1PL"]["parameters"]["a"]["mae"] == pytest.approx(0.2)
     assert summary["2PL"]["nonconverged"] == 1
     assert summary["3PL"]["measured"] == 0
+
+
+def test_fitting_failure_is_reported_not_silently_discarded(monkeypatch):
+    import validation.known_truth_irt_recovery as recovery
+
+    def broken_fit(*args, **kwargs):
+        raise RuntimeError("intentional calibration failure")
+
+    monkeypatch.setattr(recovery.mirt, "fit_mirt", broken_fit)
+    result = recovery.evaluate("2PL", n_persons=50, n_items=6)
+    assert result["status"] == "FAILED"
+    assert result["error_type"] == "RuntimeError"
+    assert result["metrics"] == {}
+    assert result["converged"] is None
