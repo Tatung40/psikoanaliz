@@ -1691,6 +1691,21 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
                    "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
                    "bu çıktılar araştırma amaçlıdır.")
+        if model == "4PL":
+            st.error(
+                "Bilimsel doğrulama uyarısı (4PL): Bağımsız, bilinen parametreli "
+                "N=1000 ve 12 maddelik iki simülasyonda ayırt edicilik (a) için "
+                "ortalama mutlak hata yaklaşık 1,73 bulundu. Yakınsama görülse de "
+                "parametre kurtarma yetersiz olabilir. Sonuçları doğrulanmış "
+                "ölçme parametreleri olarak yorumlamayın."
+            )
+        elif model == "3PL":
+            st.warning(
+                "Bilimsel doğrulama uyarısı (3PL): Aynı simülasyon koşullarında "
+                "ayırt edicilik (a) için ortalama mutlak hata yaklaşık 0,37 "
+                "bulundu. Kestirimleri örneklem büyüklüğü ve bağımsız yazılım "
+                "karşılaştırması olmadan kesin kabul etmeyin."
+            )
         # Library-backed binary IRT results remain separate from unvalidated
         # legacy research reports and their inferential diagnostics.
         # Library calibration controls live in the left settings panel; output stays right.
