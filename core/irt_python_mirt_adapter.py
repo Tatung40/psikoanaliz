@@ -1,6 +1,6 @@
 """Isolated adapter for Cameron Lyons' Python mirt (NOT R mirt).
 
-Explicit opt-in, raw fit preserved for subsequent model-specific inspection.
+Primary external library calibration; raw fit preserved for model-specific inspection.
 No claim that R parameter agreement or standard errors are validated.
 """
 from dataclasses import dataclass
@@ -20,13 +20,26 @@ class PythonMirtResult:
     n_categories: int | None
     fit: object
     scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
+    estimation: str = "ML"
 
-def fit_python_mirt(responses, *, model, n_categories=None):
-    """One public fit call; no implicit engine fallback or unsupported inference."""
+ESTIMATIONS = ("ML", "MAP")
+
+
+def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
+    """One public fit call; no implicit engine fallback or unsupported inference.
+
+    estimation="MAP" (3PL/4PL only) uses Python mirt's documented library default item priors
+    (mirt.estimation.priors.default_priors: a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)).
+    They were not tuned to any result; see validation/evidence/p1_3pl4pl for the pre-registered study.
+    """
+    if estimation not in ESTIMATIONS:
+        raise ValueError("estimation must be 'ML' or 'MAP'.")
+    if estimation == "MAP" and model not in ("3PL", "4PL"):
+        raise ValueError("MAP (library default priors) is enabled only for 3PL/4PL, where it was validated.")
     if model not in SUPPORTED:
         raise ValueError(f"Unsupported model: {model}")
     if model in UNSUPPORTED_PUBLIC_MODELS:
-        raise ValueError("Python mirt 1.2.0 fit_mirt API RSM modelini desteklemiyor. Yerel RSM motorunu kullanın.")
+        raise ValueError("Python mirt 1.2.0 fit_mirt API RSM modelini desteklemiyor. RSM için desteklenen bağımsız bir kütüphane motoru gereklidir.")
     try:
         x=np.asarray(responses, dtype=float)
     except (TypeError, ValueError) as ex:
@@ -50,12 +63,34 @@ def fit_python_mirt(responses, *, model, n_categories=None):
             raise ValueError("Response exceeds declared category range.")
         if set(np.unique(x))!=set(range(n_categories)):
             raise ValueError("All categories must occur in the validation pilot.")
+        counts = np.array([np.bincount(col.astype(int), minlength=n_categories)
+                           for col in x.T])
+        if np.any(counts == 0):
+            raise ValueError("Her maddede beyan edilen tüm kategoriler gözlenmelidir; boş kategoriler sessizce yeniden kodlanmaz.")
         cats=n_categories
+    # Constant items are not identifiable under ordinary IRT calibration.
+    # Reject explicitly rather than returning misleading parameter estimates.
+    if np.any(np.ptp(x, axis=0) == 0):
+        bad = np.flatnonzero(np.ptp(x, axis=0) == 0) + 1
+        raise ValueError(
+            "Yanıt değişkenliği olmayan madde(ler) kestirilemez: "
+            + ", ".join(map(str, bad.tolist()))
+        )
+    # Every dichotomous item must have observed successes and failures.
+    # This check is separate from person-score extremes, which are allowed.
     try:
         mirt=import_module("mirt")
     except ImportError as ex:
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
     kwargs={"model":model}
     if cats is not None:kwargs["n_categories"]=cats
+    if model=="NRM":
+        # Python mirt 1.2.0 defect: se_method="auto" labels NRM SEs "oakes" but returns values ~0.45x the
+        # empirical SD (95% CI coverage .62); an explicit "oakes" request gives ratio .99 / coverage .94.
+        # Other families are identical under both settings. Evidence: validation/evidence/p4_polytomous.
+        kwargs["se_method"]="oakes"
+    if estimation=="MAP":
+        from mirt.estimation.priors import default_priors
+        kwargs["priors"]=default_priors(model)
     result=mirt.fit_mirt(x.astype(int),**kwargs)
-    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result)
+    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation)

@@ -30,12 +30,16 @@ def test_b11_import_failure_does_not_crash_ctt(monkeypatch):
                for m in at.markdown) or len(at.button) > 0
 
 
-def test_apptest_4pl_diagnostics_and_result_isolation():
-    """Real 4PL fit -> global fit/Q3 -> rerun: no stale diagnostics."""
+def test_apptest_4pl_library_first_and_no_native_results():
+    """The retired native fit cannot be invoked; library route is visible.
+
+    This is a UI safety regression, NOT a replacement for B11 diagnostics
+    validation, which must be re-established for library-backed results.
+    """
     st = pytest.importorskip("streamlit.testing.v1")
     df = pd.read_csv(FIXTURES / "data_irt4pl_ok.csv").iloc[:350].copy()
     df.insert(0, "OGRENCI_NO", np.arange(len(df)))
-    at = st.AppTest.from_file(APP, default_timeout=600)
+    at = st.AppTest.from_file(APP, default_timeout=120)
     at.session_state["raw_df"] = df
     at.session_state["scored_df"] = df.copy()
     at.session_state["item_cols"] = ITEMS
@@ -45,22 +49,9 @@ def test_apptest_4pl_diagnostics_and_result_isolation():
     at.session_state["nav_page"] = "MTK: 4PL"
     at.run()
     assert not at.exception
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
-    assert not at.exception
-    fit = at.session_state["irt_model_results"]["4PL"]["result"]
-    assert fit["items"]["Madde"].tolist() == ITEMS
-    assert {"b11_gf_run_4PL", "b11_q3_run_4PL"}.issubset(
-        {b.key for b in at.button})
-    at.button(key="b11_gf_run_4PL").click().run()
-    assert not at.exception
-    gf = at.session_state["irt_b11"][("gf", "4PL")]["result"]
-    assert gf["model"] == "4PL"
-    at.button(key="b11_q3_run_4PL").click().run()
-    assert not at.exception
-    q3 = at.session_state["irt_b11"][("q3", "4PL")]["result"]
-    assert q3["model"] == "4PL"
-    assert not [b for b in at.button if b.key and b.key.startswith("b10_")]
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
-    assert not at.exception
-    # Cache entries may be retained internally, but must not be displayed as current.
-    assert not any("Model (ICC)" in str(m.value) for m in at.markdown)
+    library_buttons = [b for b in at.button if b.key == "py_mirt_run_4PL"]
+    assert len(library_buttons) == 1
+    assert not library_buttons[0].disabled
+    legacy_buttons = [b for b in at.button if "MTK Analizini Başlat" in b.label]
+    assert len(legacy_buttons) == 0  # Retired control is fully removed.
+    assert not at.session_state.get("irt_model_results", {}).get("4PL")

@@ -64,36 +64,12 @@ from ui.charts import (
 )
 from reports.excel_export import create_excel_report
 from reports.word_export import create_word_report
-from core.irt import (fit_irt, estimate_ability, approximate_q3,
-                      approximate_parameter_uncertainty, item_fit_by_restscore,
-                      sx2_pilot)
-import plotly.graph_objects as go
-from core.irt_itemfit import sx2_mirt_compatible
-from core.irt_hessian import observed_information_se
-from core.irt_se_diagnostics import hessian_boundary_diagnostics
-from core.irt_multistart import fit_irt_multistart
-from core.irt_model_reliability import model_reliability
-from core.irt_stationarity import stationarity_diagnostics
-from core.warning_explanations import boundary_report, opg_explanation, GUIDE
 from core.descriptives import describe_items, describe_total
 from ui.rasch_view import (MNSQ_OPTIONS, METHOD_NOTE, screen_items, rasch_settings, run_rasch,
                            fingerprint as rasch_fingerprint, summary_rows as rasch_summary,
                            misfit_persons, wright_map, DIF_NOTE, Q3_NOTE, group_candidates,
                            dif_figure, q3_heatmap, raw_score_figure, run_global_fit, m2_rows, run_q3,
                            run_dif, dif_summary_rows)
-from ui import irt_b10_view as b10
-# B11 is optional at app startup: CTT/descriptive analyses must remain accessible
-# even if a B11-only dependency fails to import in Streamlit Cloud.
-try:
-    from ui import irt_b11_view as b11
-    _b11_import_problem = None
-except ImportError as exc:
-    from types import SimpleNamespace
-    b11 = SimpleNamespace(B11_MODELS=())
-    _b11_import_problem = str(exc)
-from ui.irt_optimization import (REFINE_LABEL, REFINE_HELP, calibration_settings,
-                                 run_irt_calibration, estimation_method, result_points,
-                                 settings_mismatch, optimization_summary, convergence_messages)
 
 
 # =============================================================================
@@ -213,7 +189,7 @@ with st.sidebar:
         ]:
             st.button(label, key=f"nav_{page}", use_container_width=True,
                       on_click=navigate_to, args=(page,))
-    with st.expander("🐍 Python Kütüphaneleri / Bağımsız KTK Motoru"):
+    with st.expander("Python Kütüphaneleri / Bağımsız KTK Motoru"):
         st.button("📄 Alfa ve Madde Karşılaştırması (Pingouin)",
                   key="nav_ctt_dual",use_container_width=True,
                   on_click=navigate_to,args=("KTK: Çift Motor Rapor",))
@@ -221,8 +197,8 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
-    with st.expander("🧮 EserPsychometrics Yerel MTK Motoru", expanded=True):
-        st.caption("İkili modeller: yerel analiz ve model karşılaştırmaları")
+    with st.expander("📐 MTK Modelleri ve Analizler", expanded=True):
+        st.caption("İkili modeller: Python mirt; Rasch ve diğer araştırma sayfalarının doğrulama durumu ayrıdır.")
         binary_quick_model = st.selectbox(
             "Hızlı ikili MTK model seçimi",
             ("Rasch", "1PL", "2PL", "3PL", "4PL"),
@@ -232,7 +208,7 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,
                   args=(f"MTK: {binary_quick_model}",))
         for m in ("Rasch","1PL","2PL","3PL","4PL"):
-            st.button(f"📐 {m} Modeli",key=f"native_irt_{m}",
+            st.button(f"📐 {m} Modeli",key=f"irt_nav_{m}",
                       use_container_width=True,on_click=navigate_to,args=(f"MTK: {m}",))
         for label,page in [
             ("📊 Model Karşılaştırması","MTK: Karşılaştırma"),
@@ -240,21 +216,27 @@ with st.sidebar:
             ("🔍 MTK Varsayım Denetimi","MTK: Varsayım Denetimi"),
             ("⚖️ MTK DIF Ön Taraması","MTK: Çok Modelli DIF Taraması"),
         ]:
-            st.button(label,key=f"native_{page}",use_container_width=True,
+            st.button(label,key=f"irt_nav_{page}",use_container_width=True,
                       on_click=navigate_to,args=(page,))
         st.caption("Formel DIF sayfalarında doğrulama durumu ayrıca belirtilir.")
         st.button("⚖️ GRM Formel DIF (Deneysel)",key="nav_grm_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: GRM Formel DIF",))
         st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)",key="nav_poly_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Çok Kategorili Formel DIF",))
-    with st.expander("🐍 Python mirt Kütüphanesi — MTK"):
+        st.button("📏 RSM — Derecelendirme Ölçeği Modeli",key="nav_irt_rsm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
+        st.button("⚖️ Gözlenen Puan DIF (MH / Lojistik)",key="nav_classical_dif",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
+        st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: 3PL/4PL Bootstrap DIF",))
+    with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
         for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
-            st.button(f"🐍 Python mirt — {m}",key=f"python_irt_{m}",
+            st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
-        st.caption("RSM: Python mirt genel API'sinde desteklenmiyor; yerel B14 motorunu kullanın.")
+        st.caption("RSM: Python mirt fit_mirt API'sinde yok; tam RSM analizi için 'RSM — Derecelendirme Ölçeği Modeli' sayfasını kullanın.")
         st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
                   key="nav_irt_b14",use_container_width=True,
                   on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
@@ -1486,6 +1468,24 @@ elif selected_page == "MTK: Rasch":
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
 # =============================================================================
+elif selected_page == "MTK: RSM":
+    render_academic_header()
+    from ui.irt_rsm_view import render as render_rsm
+    src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
+    if src is None: st.warning("Önce 0,1,2,... sıralı puanlı yanıt verisi yükleyin.")
+    else: render_rsm(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page == "MTK: 3PL/4PL Bootstrap DIF":
+    render_academic_header()
+    from ui.dif34_bootstrap_view import render as render_dif34_boot
+    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if src is None: st.warning("Önce 0/1 puanlanmış yanıt verisi yükleyin.")
+    else: render_dif34_boot(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page == "MTK: Gözlenen Puan DIF":
+    render_academic_header()
+    from ui.dif_classical_view import render as render_classical_dif
+    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if src is None: st.warning("Önce puanlanmış yanıt verisi yükleyin.")
+    else: render_classical_dif(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Çok Kategorili Formel DIF":
     from ui.polytomous_dif_view import render as render_poly_dif
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
@@ -1700,41 +1700,65 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "Standart olabilirlik oranı testi ancak düzenli iç içe modeller için "
                            "uygundur; özellikle 3PL/4PL sınır parametreleri için dikkat gerekir.")
             st.stop()
-        selected_model = st.radio("İki kategorili MTK modeli",
-            ["1PL", "2PL", "3PL", "4PL"],
-            index=("1PL", "2PL", "3PL", "4PL").index(model),
-            key=f"model_radio_{model}", horizontal=True)
-        if selected_model != model:
-            st.session_state.nav_page = f"MTK: {selected_model}"
-            st.rerun()
-        mc1, mc2 = st.columns(2)
-        with mc1:
-            qpoints = st.select_slider("Gauss-Hermite düğüm sayısı",
-                         options=[15, 21, 31, 41], value=31)
-        with mc2:
-            iterations = st.slider("Azami EM yinelemesi", 20, 150, 70, 10)
-        st.caption("Madde parametreleri MML/EM ile kalibre edilir; kişi yeteneğinde EAP, MAP veya ML seçilebilir.")
-        st.caption("3PL ve 4PL için yeterli örneklem ve çok sayıda madde önerilir. "
-                   "Kestirim uzun sürebilir; model uyumunu ve sınır parametreleri kontrol edin.")
+        # SPSS/Xcalibre-style left settings, right output surface.
+        # Selection changes only presentation, never silently recalibrates.
+        with st.sidebar.expander("⚙️ MTK model seçimi", expanded=True):
+            selected_model = st.radio(
+                "İki kategorili MTK modeli", ["1PL", "2PL", "3PL", "4PL"],
+                index=("1PL", "2PL", "3PL", "4PL").index(model),
+                key=f"model_radio_{model}", horizontal=False)
+            if selected_model != model:
+                st.session_state.nav_page = f"MTK: {selected_model}"
+                st.rerun()
+            st.caption("Etkin kestirim motoru: Python mirt 1.2.0. "
+                       "Desteklenmeyen optimizasyon ayarları gösterilmez.")
+        st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
+                   "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
+                   "bu çıktılar araştırma amaçlıdır.")
+        estimation = "ML"
         if model in ("3PL", "4PL"):
-            with st.expander("⚙️ İleri kalibrasyon: sınırlar ve çoklu başlangıç"):
-                a_upper = st.select_slider("a üst sınırı", options=[4.0, 6.0, 10.0, 20.0, 30.0],
-                                           value=4.0, key=f"a_upper_{model}")
-                d_lower = (st.select_slider("d alt sınırı",options=[0.05,0.20,0.40,0.65],
-                            value=0.65,key="d_lower_4PL") if model=="4PL" else 0.65)
-                starts = st.select_slider("Bağımsız başlangıç sayısı", options=[1,2,3],
-                                           value=1,key=f"starts_{model}")
-                st.caption("Başlangıçlar farklı ilk parametre değerlerinden yürütülür; "
-                           "en yüksek logLik değerli çözüm sunulur. Geniş sınırlar "
-                           "kararsız veya gerçekçi olmayan kestirimlere yol açabilir.")
-                refine = st.checkbox(REFINE_LABEL, value=False, key=f"refine_{model}")
-                st.caption(REFINE_HELP + " Seçilirse her başlangıçta uygulanır ve "
-                           "kestirim süresini birkaç kat artırabilir.")
-        else:
-            a_upper,d_lower,starts,refine=4.0,0.65,1,False
-        # Optional external engine: isolated experimental output, never mixed with
-        # the native model history, AIC/BIC or inferential diagnostics.
-        with st.expander("⚙️ Alternatif kestirim motoru — Python mirt"):
+            with st.sidebar.expander("🎯 3PL/4PL kestirim yöntemi", expanded=True):
+                estimation = st.radio(
+                    "Kestirim", ["MAP", "ML"], index=0, key=f"py_mirt_estimation_{model}",
+                    format_func=lambda v: ("MAP — mirt varsayılan önselleri (önerilen)" if v == "MAP"
+                                           else "ML — önselsiz marjinal olabilirlik"))
+                st.caption("MAP önselleri: a~LogN(0,0,5), b~N(0,2), c~Beta(2,8)"
+                           + (", d~Beta(8,2)" if model == "4PL" else "")
+                           + ". Kütüphane varsayılanıdır; sonuçlara göre ayarlanmadı. MAP altında logLik/AIC/BIC "
+                             "önselsiz ML ölçütleri değildir.")
+            from core.irt_binary_usage_policy import usage_status
+            policy_status, policy_message = usage_status(model, estimation, len(target), len(irt_columns))
+            {"supported": st.success, "caution": st.warning}.get(policy_status, st.error)(
+                "Bilimsel kullanım sınırı: " + policy_message)
+        # Library-backed binary IRT results remain separate from unvalidated
+        # legacy research reports and their inferential diagnostics.
+        # Library calibration controls live in the left settings panel; output stays right.
+        with st.sidebar.expander("📐 Grafik ölçeği", expanded=False):
+            theta_min, theta_max = st.slider(
+                "Yetenek (θ) aralığı", min_value=-6.0, max_value=6.0,
+                value=(-4.0, 4.0), step=0.5,
+                key=f"py_mirt_theta_range_{model}")
+            theta_count = st.select_slider(
+                "Grafik noktası", options=[81, 161, 321, 641],
+                value=161, key=f"py_mirt_theta_points_{model}")
+        with st.sidebar.expander("📈 Eğri madde seçimi", expanded=False):
+            st.selectbox("ICC / IIF için madde", list(irt_columns),
+                         key=f"py_mirt_curve_item_{model}")
+        with st.sidebar.expander("⚙️ MTK rapor ayarları", expanded=True):
+            st.caption(f"Etkin model: {model} | Motor: Python mirt")
+            report_params = st.checkbox("Madde parametreleri", value=True,
+                                        key=f"py_mirt_show_params_{model}")
+            report_icc = st.checkbox("ICC — karakteristik eğriler", value=True,
+                                     key=f"py_mirt_show_icc_{model}")
+            report_iif = st.checkbox("IIF — madde bilgi eğrileri", value=True,
+                                     key=f"py_mirt_show_iif_{model}")
+            report_tif = st.checkbox("TIF — test bilgi fonksiyonu", value=True,
+                                     key=f"py_mirt_show_tif_{model}")
+            report_diagnostics = st.checkbox("Kestirim tanıları (AIC/BIC)", value=True,
+                                             key=f"py_mirt_show_diagnostics_{model}")
+            st.caption("Bu kutucuklar yalnızca sağdaki rapor görünümünü değiştirir; "
+                       "model yeniden kestirilmez.")
+        with st.sidebar.expander("▶ MTK analizini çalıştır", expanded=True):
             st.caption("Python mirt hazır bir MTK kütüphanesidir. EserPsychometrics "
                        "arayüzündeki parametre eşleştirmeleri ve çıkarımsal "
                        "raporlama henüz bağımsız karşılaştırmadan geçmediği için "
@@ -1744,11 +1768,28 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     from core.irt_python_mirt_adapter import fit_python_mirt
                     external_data = target.loc[:, irt_columns].apply(
                         pd.to_numeric, errors="raise")
+                    # Transparent calibration preflight: never hide dropped responses.
+                    st.caption(
+                        f"Ön kontrol: {external_data.shape[0]} kişi × "
+                        f"{external_data.shape[1]} madde; "
+                        f"eksik yanıt: {int(external_data.isna().sum().sum())}."
+                    )
                     fingerprint_external = (
                         tuple(irt_columns), external_data.shape,
-                        int(pd.util.hash_pandas_object(external_data, index=True).sum()))
+                        int(pd.util.hash_pandas_object(external_data, index=True).sum()), estimation)
                     with st.spinner("Deneysel Python mirt kestirimi hesaplanıyor…"):
-                        external_fit = fit_python_mirt(external_data.to_numpy(), model=model)
+                        missing_count = int(external_data.isna().sum().sum())
+                        if missing_count:
+                            raise ValueError(
+                                f"{missing_count} eksik yanıt bulundu. Python mirt adaptörü "
+                                "eksik yanıtları henüz desteklemiyor; otomatik sıfıra "
+                                "dönüştürme veya örtük atama yapılmadı. Eksik veri "
+                                "analizi sekmesinde uygun yöntemi değerlendirin."
+                            )
+                        external_fit = fit_python_mirt(
+                            external_data.to_numpy(), model=model, estimation=estimation,
+                            n_categories=(int(external_data.to_numpy().max()) + 1)
+                            if model in ("GRM", "PCM", "GPCM", "NRM") else None)
                     if "python_mirt_experimental_results" not in st.session_state:
                         st.session_state.python_mirt_experimental_results = {}
                     st.session_state.python_mirt_experimental_results[model] = {
@@ -1759,841 +1800,204 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 except Exception as exc:
                     st.session_state.get("python_mirt_experimental_results", {}).pop(model, None)
                     st.error(f"Python mirt çalıştırılamadı: {exc}")
-            previous_external = st.session_state.get("python_mirt_experimental_results", {}).get(model)
-            if previous_external is not None:
-                current_external_data = target.loc[:, irt_columns]
-                current_external_fingerprint = (
-                    tuple(irt_columns), current_external_data.shape,
-                    int(pd.util.hash_pandas_object(current_external_data, index=True).sum()))
-                if previous_external["fingerprint"] == current_external_fingerprint:
-                    external_fit = previous_external["fit"]
-                    st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
-                               f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
-                    st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
-                            "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
-                            "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
-                    with st.expander("Python mirt — kütüphane kestirim özeti"):
-                        try:
-                            raw_summary = external_fit.fit.summary()
-                            st.text(str(raw_summary)[:15000])
-                            import importlib.metadata
-                            try:
-                                mirt_version = importlib.metadata.version("mirt")
-                            except importlib.metadata.PackageNotFoundError:
-                                mirt_version = "unknown"
-                            st.caption(f"Kaynak: Python mirt v{mirt_version}; model: {model}; "
-                                       "kestirim: kütüphane ham özeti. Parametre "
-                                       "metriği veya çıkarımsal doğrulama iddiası yok.")
-                            st.download_button(
-                                "Ham kestirim özetini TXT olarak indir",
-                                data=(f"Engine: Python mirt {mirt_version}\\n"
-                                      f"Model: {model}\\n"
-                                      "Status: library output; no cross-engine equivalence certified\\n\\n"
-                                      +str(raw_summary)),
-                                file_name=f"mirt_{model}_raw_summary.txt",
-                                mime="text/plain",
-                                key=f"mirt_raw_download_{model}",
-                            )
-                        except Exception as summary_error:
-                            st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
-                    st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
-                               "henüz bağımsız eşleştirmeden geçmediği için "
-                               "resmî analiz sonuçlarına eklenmez.")
-                else:
-                    st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
-        current_settings = calibration_settings(model, qpoints, iterations, a_upper,
-                                                d_lower, starts, refine)
-        if st.button("▶️ MTK Analizini Başlat", type="primary"):
-            try:
-                data = target.loc[:, irt_columns].copy()
-                spinner_text=(f"{model} kalibrasyonu hesaplanıyor "
-                              f"({'EM + L-BFGS-B' if current_settings['refine'] else 'EM'})…")
-                with st.spinner(spinner_text):
-                    result=run_irt_calibration(data,current_settings)
-                fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
-                if "irt_model_results" not in st.session_state:
-                    st.session_state.irt_model_results = {}
-                st.session_state.irt_model_results[model] = {"fingerprint": fingerprint, "result": result}
-                st.success(f"{model} kestirimi tamamlandı "
-                           f"({result['settings']['method']}, "
-                           f"{result['settings']['seconds']:.1f} sn).")
-            except Exception as exc:
-                st.session_state.get("irt_model_results", {}).pop(model, None)
-                st.error(f"MTK analizi tamamlanamadı: {exc}")
-        data_for_check = target.loc[:, irt_columns]
-        current_fingerprint = (tuple(columns), data_for_check.shape,
-            int(pd.util.hash_pandas_object(data_for_check, index=True).sum()))
-        saved = st.session_state.get("irt_model_results", {}).get(model, {})
-        r = saved.get("result") if saved.get("fingerprint") == current_fingerprint else None
-        if r is not None:
-            st.markdown(f"### {r['model']} — Kestirim Sonuçları")
-            rpoints = result_points(r, qpoints)
-            st.caption(f"Yöntem: {estimation_method(r)} | Gauss–Hermite düğümü: {rpoints}"
-                       + (f" | Hesaplama süresi: {r['settings']['seconds']:.1f} sn"
-                          if "settings" in r else ""))
-            changed = settings_mismatch(r, current_settings)
-            if changed:
-                st.info("Gösterilen sonuç farklı ayarlarla üretildi ("
-                        + ", ".join(changed) + "). Tanılar kayıtlı ayarlarla hesaplanır; "
-                        "yeni ayarlar için analizi yeniden başlatın.")
-            for level, text in convergence_messages(r):
-                getattr(st, level)(text)
-            if not r["converged"]:
-                with st.expander("Yakınsama uyarısı: açıklama ve öneriler"):
-                    st.markdown(GUIDE["yakinsama"])
-            if "multistart_audit" in r:
-                with st.expander("🔎 Çoklu başlangıç ve optimizasyon denetimi"):
-                    st.dataframe(optimization_summary(r), hide_index=True,
-                                 use_container_width=True)
-                    st.markdown("**Başlangıçlar**")
-                    st.dataframe(r["multistart_audit"].round(5),
-                                 hide_index=True,use_container_width=True)
-                    st.caption(r["multistart_summary"]["Not"])
-            if model in ("3PL","4PL"):
-                evaluation=model_reliability(r)
-                st.markdown("#### Bilimsel güvenilirlik ön değerlendirmesi")
-                st.write("**"+evaluation["Karar"]+"**")
-                st.caption(f"Kestirim yöntemi: {evaluation['Kestirim yöntemi']} | "
-                           f"Yakınsama ölçütü: "
-                           f"{'iyileştirme sonrası KKT' if evaluation['Yakınsama ölçütü']=='kkt_after_refinement' else 'EM logL değişimi'}")
-                st.caption(evaluation["Sınırlılık"])
-                for note in evaluation["Açıklamalar"]:
-                    st.caption("• "+note)
-            if r["warning"]:
-                st.warning(r["warning"])
-                with st.expander("4PL modelinde bu uyarı ne demek?"):
-                    st.markdown(GUIDE["dortpl"])
-            boundary = boundary_report(
-                r["items"], model, a_upper=r.get("a_upper", 4.0),
-                d_lower=r.get("d_lower", 0.65))
-            if not boundary.empty:
-                st.warning(f"{len(boundary)} madde-parametre kestirimi optimizasyon sınırına yakın.")
-                with st.expander("Hangi madde, hangi parametre, hangi sınır? Ne yapmalıyım?",
-                                 expanded=True):
-                    st.dataframe(boundary.round(4), hide_index=True,
-                                 use_container_width=True)
-                    st.markdown("**Ne anlama gelir?** Parametre kestirimi, programın "
-                                "izin verdiği alt/üst sınıra yaklaşmıştır. "
-                                "Bu, maddenin mutlaka hatalı olduğu anlamına gelmez. "
-                                "Kestirim kararsız olabilir; farklı başlangıçları, "
-                                "örneklem çeşitliliğini ve daha yalın modelleri "
-                                "inceleyin. Sınırı yalnızca uyarıyı kaldırmak "
-                                "amacıyla genişletmeyin.")
-                    download_table_pair(boundary, f"psikoanaliz_{model}_sinir_tanilari",
-                                        "Sınır Parametreleri", f"irt_bounds_{model}")
-            c1,c2,c3,c4 = st.columns(4)
-            c1.metric("Katılımcı (N)", r["n"])
-            c2.metric("Madde (k)", r["k"])
-            c3.metric("AIC", f"{r['aic']:,.1f}")
-            c4.metric("BIC", f"{r['bic']:,.1f}")
-            st.caption(f"Log-olabilirlik: {r['loglik']:.3f} | "
-                       f"EM yineleme: {r['iterations']} | "
-                       f"Yakınsama: {'Evet' if r['converged'] else 'Hayır'}"
-                       + (" (iyileştirme sonrası KKT ölçütü)"
-                          if (r.get("convergence") or {}).get("criterion")=="kkt_after_refinement"
-                          else ""))
-            st.caption(f"Başlangıç sonuçları (logLik): {', '.join(f'{x:.3f}' for x in r.get('start_logliks', [r['loglik']]))} | "
-                       f"a üst sınırı: {r.get('a_upper', 4.0)} | d alt sınırı: {r.get('d_lower', 0.65)}")
-            if model in ("3PL","4PL") and "multistart_audit" in r:
-                all_attempts=r["multistart_audit"]
-                converged_runs=all_attempts[all_attempts["Yakınsama"]]
-                st.caption(
-                    f"Başlangıç sayısı: {len(all_attempts)} | "
-                    f"Yakınsayan: {len(converged_runs)} | "
-                    f"Başarısız başlangıç: "
-                    f"{int((~all_attempts['Başarılı']).sum())}")
-                if len(converged_runs)>1:
-                    spread=converged_runs["logLik"].max()-converged_runs["logLik"].min()
-                    if spread>0.1:
-                        st.warning("Başlangıçlar farklı logLik çözümlerine ulaştı; "
-                                   "parametre kararlılığını inceleyin.")
-            if model in ("3PL","4PL"):
-                with st.expander("🧪 Birinci mertebe KKT/durağanlık tanısı"):
-                    st.caption("Türev tabanlı sınır optimizasyonu tanısıdır; "
-                               "yakınsama ve model geçerliğini tek başına kanıtlamaz.")
-                    if st.button("KKT tanısını hesapla",key=f"kkt_{model}"):
-                        kkt_table,kkt_summary=stationarity_diagnostics(
-                            target.loc[:,irt_columns],r["items"],model,
-                            points=rpoints,a_upper=r.get("a_upper",4.),
-                            d_lower=r.get("d_lower",.65))
-                        st.metric("KKT toleransını aşan parametre",
-                                  kkt_summary["violations"])
-                        st.dataframe(kkt_table.round(6),hide_index=True,
-                                     use_container_width=True)
-                        download_table_pair(
-                            kkt_table,f"psikoanaliz_{model}_kkt_tanisi",
-                            "KKT Tanı Tablosu",f"kkt_export_{model}")
-            tab_names = ["📋 Parametreler", "📉 Madde Karakteristik Eğrileri",
-                         "📈 Madde Bilgi Fonksiyonları", "📊 Test Bilgi Fonksiyonu",
-                         "👤 Yetenek Kestirimi", "🔎 Model Tanıları"]
-            if model in b10.B10_MODELS or model in b11.B11_MODELS:
-                tab_names += ["🧮 Model Uyumu", "🔗 Yerel Bağımsızlık", "⚖️ DIF / Ölçme Değişmezliği"]
-            tabs = st.tabs(tab_names)
-            with tabs[0]:
-                param_names = {
-                    "a": "a (Ayırt edicilik)",
-                    "b": "b (Güçlük / konum)",
-                    "c": "c (Alt asimptot / şans)",
-                    "d": "d (Üst asimptot)"
+        previous_external = st.session_state.get("python_mirt_experimental_results", {}).get(model)
+        if previous_external is not None:
+            current_external_data = target.loc[:, irt_columns]
+            current_external_fingerprint = (
+                tuple(irt_columns), current_external_data.shape,
+                int(pd.util.hash_pandas_object(current_external_data, index=True).sum()), estimation)
+            if previous_external["fingerprint"] == current_external_fingerprint:
+                external_fit = previous_external["fit"]
+                st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
+                           f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
+                st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
+                        "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
+                        "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
+                # Fit diagnostics are read directly from the external library,
+                # never recomputed from the retired native engine.
+                from core.irt_library_diagnostics import library_fit_diagnostics
+                library_fit = external_fit.fit
+                diag = library_fit_diagnostics(library_fit)
+                diagnostics = {
+                    "Yakınsama": diag["converged"],
+                    "Yineleme": diag["iterations"],
+                    "Log-olabilirlik": diag["log_likelihood"],
+                    "AIC": diag["aic"],
+                    "BIC": diag["bic"],
+                    "Serbest parametre": diag["n_parameters"],
+                    "Gözlem": diag["n_observations"],
                 }
-                param_view = st.radio("Parametre gösterimi",
-                    ["MTK (a, b, c, d)", "Eğim–sabit (a, intercept, c, d)"],
-                    horizontal=True, key=f"irt_param_view_{model}")
-                display_params = r["items"].copy()
-                if param_view.startswith("Eğim"):
-                    display_params["intercept"] = -display_params["a"] * display_params["b"]
-                    display_params = display_params.drop(columns=["b"])
-                    param_names["intercept"] = "intercept (−a × b)"
-                display_params = display_params.rename(columns=param_names)
-                if st.checkbox("Yaklaşık parametre standart hataları ve %95 güven aralıkları (OPG)",
-                               value=False, key=f"irt_opg_{model}"):
-                    with st.spinner("Yaklaşık belirsizlik hesaplanıyor…"):
-                        uncertainty, unavailable = approximate_parameter_uncertainty(
-                            target.loc[:, irt_columns], r["items"], model,
-                            points=rpoints, a_upper=r.get("a_upper",4.0),
-                            d_lower=r.get("d_lower",0.65))
-                    if unavailable:
-                        st.warning(f"Yaklaşık SH hesaplanamadı: {unavailable}")
-                        with st.expander("Bu uyarı neden çıktı? Sonuçlara etkisi nedir?",
-                                         expanded=True):
-                            st.markdown(opg_explanation(
-                                unavailable, r["n"], r["k"], model,
-                                a_upper=r.get("a_upper",4.0),
-                                d_lower=r.get("d_lower",0.65)))
-                    else:
-                        extra = uncertainty.drop(columns=["Madde"])
-                        extra.index = display_params.index
-                        display_params = pd.concat([display_params, extra], axis=1)
-                        st.info("OPG tabanlı yaklaşık standart hatalar ve normal %95 aralıklarıdır. "
-                                "Gözlenen Hessian/Louis bilgi matrisi veya bootstrap değildir. "
-                                "Özellikle 3PL/4PL için bağımsız doğrulama olmadan "
-                                "yayın amaçlı kullanılmamalıdır.")
-                with st.expander("🧪 Deneysel gözlenen bilgi matrisi SH (bağımsız doğrulanmadı)"):
-                    st.caption("OPG'den farklı olarak marjinal log-olabilirliğin "
-                               "gözlenen bilgi matrisi üzerinden sayısal türevini kullanır. "
-                               "1PL/2PL'de R mirt ile bağımsız kestirimlere dayalı "
-                               "ön karşılaştırma yapılmıştır; aynı sabit parametrelerle "
-                               "birebir eşdeğerlik ve 3PL/4PL doğrulaması henüz yoktur. "
-                               "Özellikle 3PL/4PL için yayınlarda kullanılmamalıdır.")
-                    if st.button("Deneysel Hessian SH hesapla",
-                                 key=f"irt_hessian_{model}"):
-                        if not r["converged"]:
-                            hessian_result,hessian_reason=(None,
-                                "EM yakınsamadığı için standart hata raporlanmaz.")
-                        else:
-                            with st.spinner("Bilgi matrisi hesaplanıyor…"):
-                                hessian_result,hessian_reason=observed_information_se(
-                                    target.loc[:,irt_columns],r["items"],model,
-                                    points=rpoints,a_upper=r.get("a_upper",4.0),
-                                    d_lower=r.get("d_lower",0.65))
-                        if hessian_reason:
-                            st.warning("Hessian SH hesaplanamadı: "+hessian_reason)
-                            blocked=hessian_boundary_diagnostics(
-                                r["items"],model,
-                                a_upper=r.get("a_upper",4.0),
-                                d_lower=r.get("d_lower",0.65))
-                            if not blocked.empty:
-                                st.markdown("**Sınır nedeniyle sorunlu madde-parametreler**")
-                                st.dataframe(blocked.round(5),hide_index=True,
-                                             use_container_width=True)
-                                download_table_pair(
-                                    blocked,f"psikoanaliz_{model}_sh_sinir_tanisi",
-                                    "SH Sınır Tanıları",f"irt_se_diag_{model}")
-                            else:
-                                st.info("Doğrudan sınıra dayanan madde-parametre "
-                                        "bulunamadı. Bu uyarı, tekil veya kötü "
-                                        "koşullanmış **model düzeyi bilgi matrisi** "
-                                        "gibi toplu bir nedenden kaynaklanıyor olabilir; "
-                                        "tek bir maddeye bağlanamaz.")
-                            st.caption("Sınırdaki parametreler, bilgi matrisi "
-                                       "tekilliği veya sayısal kararsızlık "
-                                       "nedeniyle güvenilir SH hesaplanamayabilir. "
-                                       "Bu durum tek başına maddeyi geçersiz kılmaz.")
-                        else:
-                            st.warning("Bu SH değerleri deneysel olup henüz "
-                                       "R mirt ile bağımsız doğrulanmamıştır.")
-                            st.dataframe(hessian_result.round(4),
-                                         hide_index=True,use_container_width=True)
-                            download_table_pair(hessian_result,
-                                                f"psikoanaliz_{model}_hessian_deneysel",
-                                                "Deneysel Hessian SH",
-                                                f"irt_hessian_dl_{model}")
-                st.dataframe(display_params.round(4), hide_index=True,
-                             use_container_width=True)
-                st.caption("a: Madde ayırt ediciliği; b: güçlük (konum) parametresi; "
-                           "c: alt asimptot (tahmin/şans); d: üst asimptot (azami doğru yanıt olasılığı). "
-                           "Modelde kestirilmeyen parametreler sabit tutulur.")
-                download_table_pair(display_params,
-                                    f"psikoanaliz_{r['model']}_parametreler",
-                                    "Madde Parametreleri", f"irt_params_{model}")
-            with tabs[1]:
-                chosen = st.multiselect("ICC için maddeler",
-                    options=r["items"]["Madde"].tolist(),
-                    default=r["items"]["Madde"].head(8).tolist(), key="irt_icc_items")
-                fig = go.Figure()
-                for label in chosen:
-                    i = r["items"].index[r["items"]["Madde"]==label][0]
-                    fig.add_scatter(x=r["grid"], y=r["icc"][:,i],
-                                    name=label, mode="lines")
-                fig.update_layout(title="Madde Karakteristik Eğrileri (ICC)",
-                    xaxis_title="Yetenek (θ)", yaxis_title="P(X=1 | θ)",
-                    yaxis_range=[0,1], template="plotly_white")
-                st.plotly_chart(fig, use_container_width=True)
-            with tabs[2]:
-                chosen_iif = st.multiselect("IIF için maddeler",
-                    options=r["items"]["Madde"].tolist(),
-                    default=r["items"]["Madde"].head(8).tolist(),key="irt_iif_items")
-                fig = go.Figure()
-                for label in chosen_iif:
-                    i = r["items"].index[r["items"]["Madde"]==label][0]
-                    fig.add_scatter(x=r["grid"],y=r["iif"][:,i],
-                                    mode="lines",name=label)
-                fig.update_layout(title="Madde Bilgi Fonksiyonları (IIF)",
-                    xaxis_title="Yetenek (θ)", yaxis_title="Bilgi",template="plotly_white")
-                st.plotly_chart(fig,use_container_width=True)
-            with tabs[3]:
-                fig=go.Figure()
-                fig.add_scatter(x=r["grid"],y=r["tif"],name="Test bilgisi")
-                fig.add_scatter(x=r["grid"],
-                    y=1/np.sqrt(np.maximum(r["tif"],1e-12)),
-                    name="Koşullu SEM",yaxis="y2")
-                fig.update_layout(title="Test Bilgi Fonksiyonu ve Koşullu SEM",
-                    xaxis_title="Yetenek (θ)",yaxis_title="Test bilgisi",
-                    yaxis2=dict(title="SEM",overlaying="y",side="right"),
-                    template="plotly_white")
-                st.plotly_chart(fig,use_container_width=True)
-            with tabs[4]:
-                ability_method = st.radio("Yetenek kestirim yöntemi",
-                    ["EAP", "MAP", "ML"], horizontal=True, key=f"ability_method_{model}")
-                prior_sd = st.number_input("Önsel dağılım SS (EAP/MAP)",
-                    min_value=0.2,max_value=3.0,value=1.0,step=0.1,
-                    key=f"prior_sd_{model}", disabled=ability_method=="ML")
-                ability_table = estimate_ability(target.loc[:, irt_columns],
-                    r["items"],method=ability_method,points=161,prior_sd=prior_sd)
-                if ability_table["Sınır Kestirimi"].any():
-                    st.warning("Bazı ML/MAP yetenek kestirimleri hesaplama aralığının sınırına ulaştı.")
-                    with st.expander("Kişi yeteneğinin sınırda olması ne demek?"):
-                        st.markdown(GUIDE["yetenek"])
-                fig=go.Figure()
-                fig.add_histogram(x=ability_table["Yetenek (theta)"],nbinsx=35,
-                    name=f"{ability_method} θ")
-                fig.update_layout(title=f"{ability_method} Yetenek Dağılımı",
-                    xaxis_title=f"{ability_method} θ",yaxis_title="Katılımcı",
-                    template="plotly_white")
-                st.plotly_chart(fig,use_container_width=True)
-                scores=ability_table.copy()
-                scores["Sınır Kestirimi"] = scores["Sınır Kestirimi"].map(
-                    {True: "Sınırda", False: "Sınırda değil"})
-                scores.insert(0, "Kişi", [f"{i}. Kişi" for i in range(1, len(scores)+1)])
-                st.dataframe(scores.head(20).round(3),hide_index=True,
-                             use_container_width=True)
-                download_table_pair(scores, f"psikoanaliz_{model}_yetenek",
-                                    "Kişi Yetenekleri", f"irt_ability_{model}")
-            with tabs[5]:
-                st.markdown("#### Test Karakteristik Eğrisi (TCC)")
-                tcc_fig = go.Figure()
-                tcc_fig.add_scatter(x=r["grid"], y=r["icc"].sum(axis=1),
-                                    mode="lines", name="Beklenen test puanı")
-                tcc_fig.update_layout(
-                    title="Test Karakteristik Eğrisi — Beklenen Toplam Puan",
-                    xaxis_title="Yetenek (θ)", yaxis_title="Beklenen doğru sayısı",
-                    template="plotly_white")
-                st.plotly_chart(tcc_fig, use_container_width=True)
-
-                st.markdown("#### Wright Haritası (Kişi–Madde Haritası)")
-                map_fig = go.Figure()
-                map_fig.add_histogram(x=ability_table["Yetenek (theta)"],
-                                      name="Kişiler", nbinsx=35, opacity=0.65)
-                for item_row in r["items"].itertuples(index=False):
-                    map_fig.add_scatter(
-                        x=[item_row.b], y=[0], mode="markers",
-                        marker=dict(symbol="diamond", size=9),
-                        name=str(item_row[0]), showlegend=False,
-                        hovertemplate=f"{item_row[0]}: b=%{{x:.2f}}<extra></extra>")
-                map_fig.update_layout(
-                    title="Kişi Yetenekleri ve Madde Güçlükleri (Ortak θ Ölçeği)",
-                    xaxis_title="Yetenek / madde güçlüğü (θ, b)",
-                    yaxis_title="Kişi frekansı (elmaslar: madde güçlükleri)",
-                    template="plotly_white")
-                st.plotly_chart(map_fig, use_container_width=True)
-
-                st.markdown("#### Toplam Puan ve MTK Yetenek Puanı İlişkisi")
-                total = target.loc[:, irt_columns].sum(axis=1).to_numpy(dtype=float)
-                z = (total-total.mean())/total.std(ddof=1) if total.std(ddof=1)>0 else np.zeros(len(total))
-                ability_values = ability_table["Yetenek (theta)"].to_numpy()
-                corr = float(np.corrcoef(z, ability_values)[0,1]) if np.std(z)>0 and np.std(ability_values)>0 else np.nan
-                scatter = go.Figure()
-                scatter.add_scatter(x=z,y=ability_values,mode="markers",
-                    marker=dict(size=5,opacity=.35),name="Katılımcılar")
-                scatter.update_layout(title="Standartlaştırılmış Test Puanı ve Yetenek Kestirimi",
-                    xaxis_title="Toplam puan Z",yaxis_title=f"{ability_method} θ",
-                    template="plotly_white")
-                st.plotly_chart(scatter,use_container_width=True)
-                st.caption(f"Pearson r = {corr:.4f}" if np.isfinite(corr) else
-                           "Korelasyon hesaplanamadı (sabit puanlar).")
-
-                st.markdown("#### Standart Puanlar ve Kişi Yetenekleri")
-                ability_report = pd.DataFrame({
-                    "Kişi":[f"{i}. Kişi" for i in range(1,len(total)+1)],
-                    "Toplam puan":total, "Z puanı":z, "T puanı":50+10*z,
-                    f"{ability_method} θ":ability_values,
-                    "Yetenek SH":ability_table["Standart Hata"].to_numpy()})
-                st.dataframe(ability_report.head(20).round(3), hide_index=True,
-                             use_container_width=True)
-                download_table_pair(ability_report,
-                                    f"psikoanaliz_{model}_kisi_puanlari",
-                                    "Tüm Kişi Puanları", f"irt_full_scores_{model}")
-
-                fig=go.Figure()
-                fig.add_scatter(x=list(range(1,len(r["history"])+1)),
-                                y=r["history"],mode="lines+markers")
-                fig.update_layout(title="EM Log-Olabilirlik İzleği",
-                    xaxis_title="Yineleme",yaxis_title="Log-olabilirlik",
-                    template="plotly_white")
-                st.plotly_chart(fig,use_container_width=True)
-                st.markdown("#### Yerel Bağımsızlık — Yaklaşık Q3")
-                st.caption("Yetenek kestirimlerine koşullu madde artıkları arasındaki "
-                           "korelasyonlar. Bu, keşifsel bir Yen Q3 benzeri tanıdır; "
-                           "kritik değer veya anlamlılık testi değildir. Kişi puanlarının "
-                           "aynı yanıtlarla kestirilmesi yanlılığa neden olabilir.")
-                q3 = approximate_q3(target.loc[:, irt_columns],
-                                    r["items"], ability_table["Yetenek (theta)"])
-                if q3.shape[0] > 1:
-                    fig_q3 = go.Figure(go.Heatmap(
-                        z=q3.to_numpy(), x=q3.columns.tolist(),
-                        y=q3.index.tolist(), zmid=0, colorscale="RdBu",
-                        colorbar=dict(title="Artık r")))
-                    fig_q3.update_layout(title="Madde Artıkları Korelasyon Matrisi (Q3 benzeri)",
-                                         template="plotly_white")
-                    st.plotly_chart(fig_q3, use_container_width=True)
-                    upper = q3.to_numpy()[np.triu_indices(len(q3), k=1)]
-                    finite = upper[np.isfinite(upper)]
-                    if len(finite):
-                        st.metric("En yüksek mutlak artık korelasyonu",
-                                  f"{np.max(np.abs(finite)):.3f}")
-                    download_table_pair(q3.reset_index().rename(columns={"index":"Madde"}),
-                                        f"psikoanaliz_{model}_q3",
-                                        "Yaklaşık Q3 Matrisi", f"irt_q3_{model}")
-                st.markdown("#### Madde–Kalan Puan Uyum Tanısı (Keşifsel)")
-                st.caption("Her madde için, diğer maddelerden elde edilen toplam "
-                           "puana göre gözlenen ve beklenen doğru yanıt sayıları "
-                           "karşılaştırılır. Bu Pearson tipi keşifsel bir ölçüdür; "
-                           "Orlando–Thissen S-X² testi değildir. Serbestlik derecesi "
-                           "ve p değeri hesaplanmaz.")
-                if st.checkbox("Madde–kalan puan uyum tablosunu hesapla",
-                               key=f"irt_restscore_{model}", value=False):
-                    with st.spinner("Madde uyum tanıları hesaplanıyor…"):
-                        fit_table=item_fit_by_restscore(
-                            target.loc[:, irt_columns],r["items"])
-                    st.dataframe(fit_table.round(3),hide_index=True,
-                                 use_container_width=True)
-                    download_table_pair(fit_table,
-                                        f"psikoanaliz_{model}_rest_puan_uyum",
-                                        "Madde–Kalan Puan Tanıları",
-                                        f"irt_restscore_download_{model}")
-                st.markdown("#### S-X² Madde Uyum Testi (mirt algoritması)")
-                st.caption("Toplam puana koşullu madde uyumu; 61 eşit aralıklı "
-                           "[-6,6] theta noktası, beklenen hücre eşiği 1 ve "
-                           "komşu grup birleştirme kullanılır. Sabit N(0,1) "
-                           "gizil dağılımı ve model başına madde parametre "
-                           "sayısı varsayılır. Parametre kestirimleri ayrıca "
-                           "bağımsız doğrulama gerektirir.")
-                if not r["converged"]:
-                    st.warning("Model yakınsamamış; S-X² p değerleri kesin "
-                               "uyum kanıtı olarak yorumlanmamalıdır.")
-                    with st.expander("S-X² ve yakınsama uyarısı hakkında"):
-                        st.markdown(GUIDE["sx2"])
-                if st.checkbox("S-X² madde uyumunu hesapla",
-                               value=False,key=f"irt_sx2_{model}"):
+                if report_diagnostics:
+                    st.markdown("#### Python mirt — kestirim tanıları")
+                    diagnostic_table = pd.DataFrame([diagnostics])
+                    st.dataframe(diagnostic_table, hide_index=True, use_container_width=True)
+                    st.download_button(
+                        "Kestirim tanılarını CSV indir",
+                        data=diagnostic_table.to_csv(index=False).encode("utf-8-sig"),
+                        file_name=f"python_mirt_{model}_diagnostics.csv",
+                        mime="text/csv", key=f"py_mirt_diagnostics_csv_{model}")
+                if not library_fit.converged:
+                    st.error(
+                        "Python mirt yakınsamadı. Parametreler ve model "
+                        "karşılaştırmaları kesin sonuç olarak yorumlanmamalıdır."
+                    )
+                if model in ("1PL", "2PL", "3PL", "4PL"):
                     try:
-                        sx2_table=sx2_mirt_compatible(
-                            target.loc[:,irt_columns],r["items"],model)
-                        st.dataframe(sx2_table.round(5),hide_index=True,
-                                     use_container_width=True)
-                        st.caption("p < .05 olası uyumsuzluğa işaret eder; "
-                                   "25 madde için çoklu test düzeltmesi "
-                                   "uygulanmamıştır. Sınır kestirimlerini "
-                                   "ve örneklem yeterliğini ayrıca inceleyin.")
-                        download_table_pair(sx2_table,
-                                            f"psikoanaliz_{model}_sx2",
-                                            "S-X² Madde Uyumu",f"irt_sx2_dl_{model}")
-                    except (ValueError,RuntimeError) as sx_error:
-                        st.warning(f"S-X² hesaplanamadı: {sx_error}")
-                diagnostic=r["items"][["Madde","Gözlenen p","Model p",
-                                       "Artık RMS","Sınır uyarısı"]]
-                st.dataframe(diagnostic.round(4),hide_index=True,
-                             use_container_width=True)
-                st.caption("Artık RMS betimsel bir tanıdır; formal madde uyum "
-                           "testi değildir. AIC/BIC yalnızca aynı veri "
-                           "üzerindeki modeller arasında karşılaştırılmalıdır.")
-            # ---- B10: 1PL/2PL tanıları (gösterilen kalibrasyona ve veriye bağlı; 3PL/4PL değişmez)
-            if model in b10.B10_MODELS:
-                b10_data = target.loc[:, irt_columns]
-                b10_key = b10.result_key(model, current_fingerprint, r)
-                store = st.session_state.setdefault("irt_b10", {})
-                def b10_get(kind):
-                    entry = store.get((kind, model)) or {}
-                    return entry.get("result") if entry.get("key") == b10_key else None
-                if not r["converged"]:
-                    st.warning("Gösterilen kalibrasyon yakınsamadı; B10 sekmelerinde çıkarımsal sonuç (M2 p değeri) "
-                               "verilmez, diğer çıktılar geçicidir.")
-                with tabs[6]:
-                    st.caption("Uyum tanıları gösterilen kalibrasyonun madde parametreleriyle, yeniden kestirim "
-                               "yapmadan hesaplanır. Her istatistiğin sınıfı (çıkarımsal / betimsel / deneysel) "
-                               "tabloda belirtilir.")
-                    g1, g2 = st.columns(2)
-                    with g1:
-                        gf_person = st.selectbox("Tabakalama için kişi kestirimi", ["WLE", "EAP"],
-                                                 key=f"b10_gf_person_{model}")
-                    with g2:
-                        gf_strata = st.select_slider("Yetenek tabakası sayısı", options=[3, 4, 5, 6, 8, 10],
-                                                     value=5, key=f"b10_gf_strata_{model}")
-                    if st.button("▶️ Model uyumunu hesapla", key=f"b10_gf_run_{model}"):
+                        from core.irt_python_mirt_parameters import python_mirt_binary_parameters
+                        from core.irt_library_parameter_mapping import curves_from_normalized_table
+                        import plotly.graph_objects as go
+                        item_table = python_mirt_binary_parameters(
+                            library_fit, model=model, item_names=irt_columns)
+                        if model in ("3PL", "4PL"):
+                            # Python mirt 1.2.0 EM box: a [0.1, 5], b [-6, 6], c [0, 0.5], d [0.5, 1].
+                            _box = {"a": (0.1, 5.0), "b": (-6.0, 6.0), "c": (0.0, 0.5), "d": (0.5, 1.0)}
+                            _free = "abc" + ("d" if model == "4PL" else "")
+                            item_table["Sınırdaki parametre"] = [
+                                ", ".join(q for q in _free if min(abs(row[q] - _box[q][0]), abs(_box[q][1] - row[q])) <= 1e-3) or "—"
+                                for _, row in item_table.iterrows()]
+                            item_table["Kestirim"] = estimation
+                            item_table["Kullanım durumu"] = policy_status
+                            if (item_table["Sınırdaki parametre"] != "—").any():
+                                st.warning("Bazı parametreler kütüphanenin kestirim sınırında; bu değerler "
+                                           "zayıf tanımlanmış sınır kestirimleridir ve SH/GA yorumlanamaz.")
+                        if report_params:
+                            st.markdown("#### Python mirt — madde parametreleri")
+                            st.dataframe(item_table, hide_index=True, use_container_width=True)
+                        csv_col, excel_col = st.columns(2)
+                        with csv_col:
+                            st.download_button(
+                                "Madde parametreleri — CSV",
+                                data=item_table.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_parameters.csv",
+                                mime="text/csv", key=f"py_mirt_params_csv_{model}")
+                        with excel_col:
+                            import io as _io
+                            _excel_bytes = _io.BytesIO()
+                            with pd.ExcelWriter(_excel_bytes, engine="openpyxl") as _writer:
+                                item_table.to_excel(_writer, index=False, sheet_name="Madde Parametreleri")
+                            st.download_button(
+                                "Madde parametreleri — Excel",
+                                data=_excel_bytes.getvalue(),
+                                file_name=f"python_mirt_{model}_parameters.xlsx",
+                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                key=f"py_mirt_params_xlsx_{model}")
+                        theta_grid = np.linspace(theta_min, theta_max, theta_count)
+                        curve_data = curves_from_normalized_table(item_table[["Madde", "a", "b", "c", "d"]], theta_grid)
+                        if report_icc or report_iif or report_tif:
+                            with st.expander("📦 Tüm eğri verilerini indir", expanded=False):
+                                all_curves = pd.DataFrame({"theta": theta_grid})
+                                for curve_key, prefix in (("probability", "ICC"),
+                                                          ("information", "IIF")):
+                                    if (curve_key == "probability" and report_icc) or (
+                                        curve_key == "information" and report_iif):
+                                        for j, item_name in enumerate(irt_columns):
+                                            all_curves[f"{prefix}_{item_name}"] = curve_data[curve_key][:, j]
+                                if report_tif:
+                                    all_curves["TIF"] = curve_data["test_information"]
+                                    all_curves["SEM_theta"] = np.where(
+                                        curve_data["test_information"] > 0,
+                                        1 / np.sqrt(np.maximum(curve_data["test_information"], 1e-300)),
+                                        np.nan)
+                                st.download_button(
+                                    "Tüm maddeler ve test — CSV",
+                                    data=all_curves.to_csv(index=False).encode("utf-8-sig"),
+                                    file_name=f"python_mirt_{model}_all_curves.csv",
+                                    mime="text/csv", key=f"py_mirt_all_curves_{model}")
+                        if report_icc or report_iif:
+                            selected_item = st.session_state.get(
+                                f"py_mirt_curve_item_{model}", list(irt_columns)[0])
+                            if selected_item not in irt_columns:
+                                selected_item = list(irt_columns)[0]
+                            idx = list(irt_columns).index(selected_item)
+                        else:
+                            idx = 0
+                            selected_item = list(irt_columns)[0]
+                        for title, key, ylabel in (
+                            *((("ICC — Madde Karakteristik Eğrisi", "probability", "P(θ)"),) if report_icc else ()),
+                            *((("IIF — Madde Bilgi Fonksiyonu", "information", "I(θ)"),) if report_iif else ())):
+                            fig = go.Figure()
+                            fig.add_scatter(x=theta_grid, y=curve_data[key][:, idx],
+                                            mode="lines", name=str(selected_item))
+                            fig.update_layout(title=title, xaxis_title="θ",
+                                              yaxis_title=ylabel)
+                            st.plotly_chart(fig, use_container_width=True)
+                            export_curve = pd.DataFrame({
+                                "theta": theta_grid,
+                                str(selected_item): curve_data[key][:, idx],
+                            })
+                            st.download_button(
+                                f"{key.upper()} eğri verisini CSV indir",
+                                data=export_curve.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_{key}_{selected_item}.csv",
+                                mime="text/csv",
+                                key=f"py_mirt_curve_csv_{model}_{key}")
+                        if report_tif:
+                            tif = go.Figure()
+                            tif.add_scatter(x=theta_grid, y=curve_data["test_information"],
+                                            mode="lines", name="TIF")
+                            tif.update_layout(title="Test Bilgi Fonksiyonu",
+                                              xaxis_title="θ", yaxis_title="I(θ)")
+                            st.plotly_chart(tif, use_container_width=True)
+                            conditional_sem = np.where(
+                                curve_data["test_information"] > 0,
+                                1 / np.sqrt(np.maximum(curve_data["test_information"], 1e-300)),
+                                np.nan)
+                            sem_fig = go.Figure()
+                            sem_fig.add_scatter(x=theta_grid, y=conditional_sem,
+                                                mode="lines", name="SEM(θ)")
+                            sem_fig.update_layout(
+                                title="Koşullu Ölçmenin Standart Hatası",
+                                xaxis_title="θ", yaxis_title="SEM(θ)")
+                            st.plotly_chart(sem_fig, use_container_width=True)
+                            tif_table = pd.DataFrame({
+                                "theta": theta_grid,
+                                "test_information": curve_data["test_information"],
+                                "conditional_sem": conditional_sem,
+                            })
+                            st.download_button(
+                                "Test bilgi fonksiyonunu CSV indir",
+                                data=tif_table.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_tif.csv",
+                                mime="text/csv", key=f"py_mirt_tif_csv_{model}")
+                        st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
+                                   "bağımsız analitik eğriler. Parametre kurtarma "
+                                   "ve R mirt eşdeğerliği henüz sertifikalı değildir.")
+                    except (ValueError, TypeError, AttributeError) as mapping_error:
+                        st.error(f"Python mirt madde parametresi/eğri eşleştirme hatası: {mapping_error}")
+                with st.expander("Python mirt — kütüphane kestirim özeti"):
+                    try:
+                        raw_summary = external_fit.fit.summary()
+                        st.text(str(raw_summary)[:15000])
+                        import importlib.metadata
                         try:
-                            with st.spinner("M2 ve betimsel uyum özetleri hesaplanıyor…"):
-                                store[("gf", model)] = {"key": b10_key, "result": b10.run_global_fit(
-                                    b10_data, r, model, gf_person, gf_strata)}
-                        except Exception as exc:
-                            store.pop(("gf", model), None)
-                            st.error(f"Model uyumu hesaplanamadı: {exc}")
-                    gf = b10_get("gf")
-                    if gf is not None:
-                        if (gf["ui_settings"]["person_method"], gf["ui_settings"]["strata"]) != (gf_person, gf_strata):
-                            st.info("Gösterilen sonuç farklı ayarlarla üretildi; yeniden hesaplayın.")
-                        st.markdown("**Sınırlı bilgi uyumu (M2)**")
-                        st.dataframe(b10.m2_rows(gf), hide_index=True, use_container_width=True)
-                        if gf["m2"]["available"]:
-                            st.caption(f"M2 tek ve iki değişkenli marjinallerden hesaplanır (Maydeu-Olivares ve Joe, "
-                                       f"2006). Jacobian yalnızca serbest kestirilen {gf['m2']['free_parameters']} "
-                                       f"madde parametresini içerir ({'b' if model == '1PL' else 'a ve b'}; θ ~ N(0,1) "
-                                       "sabit). p değeri asimptotik χ² yaklaşımına dayanır; RMSEA2 N ile hesaplanır "
-                                       "(mirt N−1 kullanır). Kalibrasyonun EM yakınsama toleransı M2'yi çok az etkiler.")
-                        st.dataframe(gf["classification"], hide_index=True, use_container_width=True)
-                        st.plotly_chart(raw_score_figure(gf), use_container_width=True)
-                        download_table_pair(gf["raw_scores"].round(4), f"psikoanaliz_{model}_hampuan",
-                                            "Ham puan dağılımı", f"b10_raw_dl_{model}")
-                        item_pick = st.selectbox("Madde uyum grafiği", list(r["items"]["Madde"]),
-                                                 key=f"b10_gf_item_{model}")
-                        st.plotly_chart(b10.item_fit_figure(gf, r, item_pick), use_container_width=True)
-                        st.caption("Noktalar tabaka içindeki gözlenen doğru oranı, çizgi model ICC'sidir; hata "
-                                   "çubukları model varyansıyla yaklaşık ±1,96 SH'dir ve betimseldir.")
-                        st.dataframe(gf["strata"].round(3), hide_index=True, use_container_width=True)
-                        download_table_pair(gf["strata"].round(4), f"psikoanaliz_{model}_tabaka",
-                                            "Tabaka tablosu", f"b10_strata_dl_{model}")
-                        st.markdown("**Standart artık özeti (betimsel)**")
-                        st.dataframe(pd.DataFrame([gf["residuals"]]).round(4), hide_index=True,
-                                     use_container_width=True)
-                with tabs[7]:
-                    st.caption(b10.Q3_NOTE)
-                    h1, h2, h3 = st.columns(3)
-                    with h1:
-                        q3_person = st.selectbox("Kişi kestirimi", ["WLE", "EAP"], key=f"b10_q3_person_{model}")
-                    with h2:
-                        q3_min = st.select_slider("Çift başına en az ortak yanıt", options=[10, 20, 30, 50, 100],
-                                                  value=30, key=f"b10_q3_min_{model}")
-                    with h3:
-                        q3_boot = st.select_slider("Parametrik bootstrap tekrar sayısı", options=[0, 25, 50, 100],
-                                                   value=0, key=f"b10_q3_boot_{model}",
-                                                   help="Her tekrarda model aynı ayarlarla yeniden kestirilir; "
-                                                        "100 tekrar birkaç dakika sürebilir.")
-                    q3_seed = st.number_input("Bootstrap tohum değeri", min_value=0, max_value=2**31 - 1, value=2026,
-                                              step=1, key=f"b10_q3_seed_{model}")
-                    q3_now = {"person_method": q3_person, "min_pairs": int(q3_min), "bootstrap": int(q3_boot),
-                              "seed": int(q3_seed)}
-                    if st.button("▶️ Q3 analizini başlat", key=f"b10_q3_run_{model}"):
-                        try:
-                            with st.spinner("Q3 artık korelasyonları hesaplanıyor…"):
-                                store[("q3", model)] = {"key": b10_key, "result": b10.run_q3(
-                                    b10_data, r, model, q3_person, q3_min, q3_boot, q3_seed)}
-                        except Exception as exc:
-                            store.pop(("q3", model), None)
-                            st.error(f"Q3 analizi tamamlanamadı: {exc}")
-                    q3r = b10_get("q3")
-                    if q3r is not None:
-                        if {k_: q3r["ui_settings"][k_] for k_ in q3_now} != q3_now:
-                            st.info("Gösterilen Q3 sonucu farklı ayarlarla üretildi; yeniden başlatın.")
-                        c1_, c2_, c3_ = st.columns(3)
-                        c1_.metric("Ortalama Q3", f"{q3r['mean_q3']:.3f}")
-                        c2_.metric("Bağımsızlık altında beklenen ≈ −1/(k−1)", f"{q3r['expected_under_li']:.3f}")
-                        c3_.metric("Tanımsız çift", q3r["n_undefined"])
-                        bs = q3r["bootstrap"]
-                        if bs:
-                            st.markdown(f"**Parametrik bootstrap — deneysel** ({bs['used']} geçerli / "
-                                        f"{bs['replications']} tekrar, tohum {bs['seed']}): gözlenen en büyük "
-                                        f"düzeltilmiş Q3 = {bs['observed_max_adjusted_q3']:.3f}; %95 / %99 nicelikleri "
-                                        f"{bs['max_quantile_95']:.3f} / {bs['max_quantile_99']:.3f}; Monte Carlo p "
-                                        f"(en büyük değer) = {bs['p_max']:.3f}.")
-                            st.caption("Her tekrarda veri, gösterilen modelden (aynı eksiklik örüntüsü, θ ~ N(0,1)) "
-                                       "üretilir ve model aynı kestirim ayarlarıyla yeniden kestirilir. Bu referans "
-                                       "B10'da yalnızca sınırlı biçimde doğrulanmıştır; çift bazındaki %95 nicelikleri "
-                                       "betimseldir.")
-                            if bs["failed"]:
-                                st.warning(f"{bs['failed']} bootstrap tekrarı yakınsamadı veya kestirilemedi ve "
-                                           "dışarıda bırakıldı.")
-                        st.plotly_chart(q3_heatmap(q3r), use_container_width=True)
-                        st.dataframe(q3r["pairs"].round(4), hide_index=True, use_container_width=True)
-                        download_table_pair(q3r["pairs"].round(5), f"psikoanaliz_{model}_q3_ciftler", "Q3 çiftleri",
-                                            f"b10_q3_dl_{model}")
-                with tabs[8]:
-                    st.caption(b10.DIF_NOTE[model])
-                    st.caption(b10.COMMON_NOTE)
-                    excluded = set(irt_columns) | {st.session_state.id_col}
-                    cand = b10.group_candidates(target.drop(columns=[c for c in excluded if c in target.columns]),
-                                                irt_columns)
-                    if not cand:
-                        st.info("DIF için 2–20 düzeyli, madde ve kimlik dışı bir grup sütunu bulunamadı.")
-                    else:
-                        gi = cand.index(st.session_state.group_col) if st.session_state.group_col in cand else 0
-                        dgcol = st.selectbox("Grup değişkeni", cand, index=gi, key=f"b10_dif_group_{model}")
-                        dlev = sorted(target[dgcol].dropna().unique().tolist(), key=str)
-                        e1_, e2_ = st.columns(2)
-                        with e1_:
-                            dref = st.selectbox("Referans grup", dlev, key=f"b10_dif_ref_{model}")
-                        with e2_:
-                            dfoc = st.selectbox("Odak grup", [v for v in dlev if v != dref], key=f"b10_dif_focal_{model}")
-                        if len(dlev) > 2:
-                            st.caption(f"Grup değişkeninde {len(dlev)} düzey var; yalnızca seçilen iki grup "
-                                       "karşılaştırılır.")
-                        use_fixed = st.checkbox("Önceden belirlenmiş sabit çapalar", value=False,
-                                                key=f"b10_dif_fixed_{model}")
-                        fixed_items = None
-                        if use_fixed:
-                            fixed_items = st.multiselect("Sabit çapa maddeleri", irt_columns,
-                                                        key=f"b10_dif_anchors_{model}")
-                            st.caption("Çapaları bu verinin DIF sonuçlarından seçmeyin. Bağımsız içerik veya "
-                                       "önceki çalışma kanıtı gerekir; seçilen çapalar test edilmez.")
-                        f1_, f2_, f3_ = st.columns(3)
-                        with f1_:
-                            dalpha = st.select_slider("FDR düzeyi (BH)", options=[.01, .05, .10], value=.05,
-                                                      key=f"b10_dif_alpha_{model}")
-                        with f2_:
-                            dpur = st.checkbox("Yinelemeli çapa arındırması", value=True,
-                                               key=f"b10_dif_purify_{model}", disabled=use_fixed)
-                            dpur = bool(dpur) and not use_fixed
-                        with f3_:
-                            drounds = st.select_slider("En fazla arındırma turu", options=[1, 3, 5, 10], value=10,
-                                                       key=f"b10_dif_rounds_{model}", disabled=not dpur)
-                        dif_now = {"group_col": dgcol, "reference": dref, "focal": dfoc, "alpha": float(dalpha),
-                                   "purify": bool(dpur), "max_rounds": int(drounds),
-                                   "fixed_anchors": None if fixed_items is None else tuple(fixed_items)}
-                        if model == "2PL":
-                            st.caption("2PL DIF her madde için üç model kestirir; 12 maddede yaklaşık 15–30 sn sürer.")
-                        if st.button("▶️ DIF analizini başlat", key=f"b10_dif_run_{model}"):
-                            try:
-                                with st.spinner(f"İki gruplu ortak {model} modeli kestiriliyor…"):
-                                    store[("dif", model)] = {"key": b10_key, "result": b10.run_dif(
-                                        target, irt_columns, dgcol, dref, dfoc, model, dalpha, dpur, drounds,
-                                        points=int(r.get("settings", {}).get("points", 41)), fixed_anchors=fixed_items)}
-                            except Exception as exc:
-                                store.pop(("dif", model), None)
-                                st.error(f"DIF analizi tamamlanamadı: {exc}")
-                        dr = b10_get("dif")
-                        if dr is not None:
-                            if {k_: dr["ui_settings"][k_] for k_ in dif_now} != dif_now:
-                                st.info("Gösterilen DIF sonucu farklı grup veya ayarlarla üretildi; yeniden başlatın.")
-                            st.markdown(f"**Karşılaştırma:** {dr['focal']} (odak) − {dr['reference']} (referans); "
-                                        f"grup değişkeni `{dr['ui_settings']['group_col']}`; model {dr['model']}.")
-                            for note in dr["warnings"]:
-                                st.warning(note)
-                            if not dr["joint"]["converged"]:
-                                st.error("Ortak model yakınsamadı; DIF sonuçları yorumlanmamalıdır.")
-                            st.dataframe(b10.dif_summary_rows(dr), hide_index=True, use_container_width=True)
-                            st.caption(dr["multiplicity"] + " Δa/Δb aralıkları noktasal Wald %95 güven aralıklarıdır; "
-                                       "çapa varsayımı koşulundadır ve çoklu aralık düzeltmesi içermez.")
-                            st.caption(dr["missing_policy"] + f" Dışlanan satır: {dr['excluded_rows']}.")
-                            with st.expander("Madde bazında eksik yanıtlar"):
-                                st.dataframe(dr["missingness"], hide_index=True, use_container_width=True)
-                            st.caption("μ_odak ve σ_odak grupların yetenek dağılımı farkıdır (etki/impact); DIF değildir.")
-                            st.plotly_chart(b10.dif_effect_figure(dr), use_container_width=True)
-                            st.dataframe(dr["table"].round(4), hide_index=True, use_container_width=True)
-                            st.caption("p ve q (BH): " + ("LR χ² (sd = 1) testinden; Δb ve SH(Δb) ortak modelin gözlenen "
-                                       "bilgi matrisinden (Wald). Etki sınıfı ETS A/B/C ölçütlerinin logit karşılığıdır "
-                                       "(yaklaşık)." if dr["model"] == "1PL" else
-                                       "genel LR χ² (sd = 2) testinden; Δa, Δb ve SH'ler ortak modelin gözlenen bilgi "
-                                       "matrisinden. Tek biçimli / tek biçimli olmayan LR testleri işaretlenen maddeler "
-                                       "için ayrıştırma sağlar.") + " İşaretli ve işaretsiz farklar odak grubun yetenek "
-                                       "dağılımı üzerinden ortalanmış olasılık farklarıdır.")
-                            pick = st.selectbox("Grup tepki fonksiyonları", list(dr["table"].reindex(
-                                                columns=["Madde", "a_ref"]).dropna(subset=["a_ref"])["Madde"]),
-                                                key=f"b10_dif_item_{model}")
-                            if pick:
-                                st.plotly_chart(b10.group_irf_figure(dr, pick), use_container_width=True)
-                            st.markdown("**Arındırma geçmişi**")
-                            st.dataframe(dr["history"], hide_index=True, use_container_width=True)
-                            download_table_pair(b10.dif_export_table(dr).round(5), f"psikoanaliz_{model}_dif", "DIF tablosu",
-                                                f"b10_dif_dl_{model}")
-            # ---- B11: 3PL/4PL tanıları (gösterilen kalibrasyona ve veriye bağlı; 1PL/2PL/Rasch değişmez)
-            if model in b11.B11_MODELS:
-                b11_data = target.loc[:, irt_columns]
-                b11_key = b10.result_key(model, current_fingerprint, r)
-                store11 = st.session_state.setdefault("irt_b11", {})
-                def b11_get(kind):
-                    entry = store11.get((kind, model)) or {}
-                    return entry.get("result") if entry.get("key") == b11_key else None
-                if not r["converged"]:
-                    st.warning("Gösterilen kalibrasyon yakınsamadı; B11 sekmelerinde çıkarımsal sonuç verilmez, "
-                               "diğer çıktılar geçicidir.")
-                with tabs[6]:
-                    st.caption(b11.MODEL_NOTE[model])
-                    st.caption("Uyum tanıları gösterilen kalibrasyonun parametreleriyle, yeniden kestirim yapmadan "
-                               "hesaplanır. Her istatistiğin sınıfı (çıkarımsal / betimsel / deneysel) tabloda belirtilir.")
-                    u1, u2 = st.columns(2)
-                    with u1:
-                        gp = st.selectbox("Tabakalama için kişi kestirimi", ["EAP", "WLE"], key=f"b11_gf_person_{model}",
-                                          help="EAP mirt ile, Warm WLE catR ile doğrulanmıştır.")
-                    with u2:
-                        gs = st.select_slider("Yetenek tabakası sayısı", options=[3, 4, 5, 6, 8, 10], value=5,
-                                              key=f"b11_gf_strata_{model}")
-                    if st.button("▶️ Model uyumunu hesapla", key=f"b11_gf_run_{model}"):
-                        try:
-                            with st.spinner("M2 ve betimsel uyum özetleri hesaplanıyor…"):
-                                store11[("gf", model)] = {"key": b11_key, "result": b11.run_global_fit(
-                                    b11_data, r, model, gp, gs)}
-                        except Exception as exc:
-                            store11.pop(("gf", model), None)
-                            st.error(f"Model uyumu hesaplanamadı: {exc}")
-                    gf11 = b11_get("gf")
-                    if gf11 is not None:
-                        if (gf11["ui_settings"]["person_method"], gf11["ui_settings"]["strata"]) != (gp, gs):
-                            st.info("Gösterilen sonuç farklı ayarlarla üretildi; yeniden hesaplayın.")
-                        st.markdown("**Sınırlı bilgi uyumu (M2)**")
-                        st.dataframe(b11.m2_rows(gf11), hide_index=True, use_container_width=True)
-                        if not gf11["boundary"].empty:
-                            st.warning(f"{len(gf11['boundary'])} parametre kestirim sınırında; M2 bu parametreler sabit "
-                                       "kabul edilerek hesaplanır ve p değeri verilmez (deneysel).")
-                            st.dataframe(gf11["boundary"][["Madde", "Parametre", "Kestirim", "Sorun"]],
-                                         hide_index=True, use_container_width=True)
-                        st.caption("Jacobian c" + (" ve d" if model == "4PL" else "") + " dahil tüm serbest parametreleri "
-                                   "içerir ve sayısal türevle doğrulanmıştır. R mirt 1.48'in M2() işlevi 3PL/4PL için "
-                                   "2PL türev formülünü kullandığından mirt'in M2 değeri bu değerden farklıdır.")
-                        st.dataframe(gf11["classification"], hide_index=True, use_container_width=True)
-                        st.plotly_chart(raw_score_figure(gf11), use_container_width=True)
-                        download_table_pair(gf11["raw_scores"].round(4), f"psikoanaliz_{model}_hampuan",
-                                            "Ham puan dağılımı", f"b11_raw_dl_{model}")
-                        it11 = st.selectbox("Madde uyum grafiği", list(r["items"]["Madde"]), key=f"b11_gf_item_{model}")
-                        st.plotly_chart(b11.item_fit_figure(gf11, r, it11), use_container_width=True)
-                        st.dataframe(gf11["strata"].round(3), hide_index=True, use_container_width=True)
-                        download_table_pair(gf11["strata"].round(4), f"psikoanaliz_{model}_tabaka", "Tabaka tablosu",
-                                            f"b11_strata_dl_{model}")
-                        st.markdown("**Standart artık özeti (betimsel)**")
-                        st.dataframe(pd.DataFrame([gf11["residuals"]]).round(4), hide_index=True,
-                                     use_container_width=True)
-                with tabs[7]:
-                    st.caption(b11.Q3_NOTE)
-                    v1, v2, v3 = st.columns(3)
-                    with v1:
-                        qp = st.selectbox("Kişi kestirimi", ["EAP", "WLE"], key=f"b11_q3_person_{model}")
-                    with v2:
-                        qm = st.select_slider("Çift başına en az ortak yanıt", options=[10, 20, 30, 50, 100], value=30,
-                                              key=f"b11_q3_min_{model}")
-                    with v3:
-                        qb = st.select_slider("Parametrik bootstrap tekrar sayısı", options=[0, 10, 25, 50], value=0,
-                                              key=f"b11_q3_boot_{model}",
-                                              help="Her tekrarda model gösterilen kalibrasyonun ayarlarıyla (sınırlar, "
-                                                   "çoklu başlangıç, iyileştirme) yeniden kestirilir; uzun sürebilir.")
-                    qs = st.number_input("Bootstrap tohum değeri", min_value=0, max_value=2**31 - 1, value=2026, step=1,
-                                         key=f"b11_q3_seed_{model}")
-                    q_now = {"person_method": qp, "min_pairs": int(qm), "bootstrap": int(qb), "seed": int(qs)}
-                    if st.button("▶️ Q3 analizini başlat", key=f"b11_q3_run_{model}"):
-                        try:
-                            with st.spinner("Q3 artık korelasyonları hesaplanıyor…"):
-                                store11[("q3", model)] = {"key": b11_key, "result": b11.run_q3(
-                                    b11_data, r, model, qp, qm, qb, qs)}
-                        except Exception as exc:
-                            store11.pop(("q3", model), None)
-                            st.error(f"Q3 analizi tamamlanamadı: {exc}")
-                    q11 = b11_get("q3")
-                    if q11 is not None:
-                        if {k_: q11["ui_settings"][k_] for k_ in q_now} != q_now:
-                            st.info("Gösterilen Q3 sonucu farklı ayarlarla üretildi; yeniden başlatın.")
-                        w1, w2, w3 = st.columns(3)
-                        w1.metric("Ortalama Q3", f"{q11['mean_q3']:.3f}")
-                        w2.metric("Bağımsızlık altında beklenen ≈ −1/(k−1)", f"{q11['expected_under_li']:.3f}")
-                        w3.metric("Tanımsız çift", q11["n_undefined"])
-                        bs11 = q11["bootstrap"]
-                        if bs11:
-                            st.markdown(f"**Parametrik bootstrap — deneysel** ({bs11['used']} geçerli / "
-                                        f"{bs11['replications']} tekrar, tohum {bs11['seed']}): gözlenen en büyük "
-                                        f"düzeltilmiş Q3 = {bs11['observed_max_adjusted_q3']:.3f}; Monte Carlo p = "
-                                        f"{bs11['p_max']:.3f}.")
-                            if bs11["failed"]:
-                                st.warning(f"{bs11['failed']} bootstrap tekrarı yakınsamadı veya kestirilemedi ve "
-                                           "dışarıda bırakıldı.")
-                        if q11["n_person_undefined"]:
-                            st.caption(f"{q11['n_person_undefined']} kişinin Warm WLE denklemi birden fazla köke sahip "
-                                       "(tek değerli kestirim yok); bu kişiler Q3'ten çıkarıldı. EAP bu sorunu taşımaz.")
-                        st.plotly_chart(q3_heatmap(q11), use_container_width=True)
-                        st.dataframe(q11["pairs"].round(4), hide_index=True, use_container_width=True)
-                        download_table_pair(q11["pairs"].round(5), f"psikoanaliz_{model}_q3_ciftler", "Q3 çiftleri",
-                                            f"b11_q3_dl_{model}")
-                with tabs[8]:
-                    st.caption(b11.DIF_NOTE[model])
-                    st.caption(b11.COMMON_NOTE)
-                    excl11 = set(irt_columns) | {st.session_state.id_col}
-                    cand11 = b11.group_candidates(target.drop(columns=[c for c in excl11 if c in target.columns]),
-                                                  irt_columns)
-                    if not cand11:
-                        st.info("DIF için 2–20 düzeyli, madde ve kimlik dışı bir grup sütunu bulunamadı.")
-                    else:
-                        gi11 = cand11.index(st.session_state.group_col) if st.session_state.group_col in cand11 else 0
-                        g11 = st.selectbox("Grup değişkeni", cand11, index=gi11, key=f"b11_dif_group_{model}")
-                        lev11 = sorted(target[g11].dropna().unique().tolist(), key=str)
-                        y1, y2 = st.columns(2)
-                        with y1:
-                            ref11 = st.selectbox("Referans grup", lev11, key=f"b11_dif_ref_{model}")
-                        with y2:
-                            foc11 = st.selectbox("Odak grup", [v for v in lev11 if v != ref11], key=f"b11_dif_focal_{model}")
-                        if target[g11].isna().any():
-                            st.caption(f"Grup bilgisi eksik {int(target[g11].isna().sum())} kişi analize alınmaz.")
-                        inf11 = b11.DIF_INFERENTIAL[model]
-                        z1, z2, z3 = st.columns(3)
-                        with z1:
-                            al11 = st.select_slider("FDR düzeyi (BH)", options=[.01, .05, .10], value=.05,
-                                                    key=f"b11_dif_alpha_{model}", disabled=not inf11)
-                        with z2:
-                            pu11 = st.checkbox("Yinelemeli çapa arındırması", value=inf11, key=f"b11_dif_purify_{model}",
-                                               disabled=not inf11)
-                        with z3:
-                            ro11 = st.select_slider("En fazla arındırma turu", options=[1, 3, 5], value=3,
-                                                    key=f"b11_dif_rounds_{model}", disabled=not (inf11 and pu11))
-                        d_now = {"group_col": g11, "reference": ref11, "focal": foc11, "alpha": float(al11),
-                                 "purify": bool(pu11), "max_rounds": int(ro11)}
-                        st.caption(f"{model} DIF her madde için ayrı çok gruplu modeller kestirir; 12 madde ve 2500 kişide "
-                                   "birkaç dakika sürebilir.")
-                        if st.button("▶️ DIF analizini başlat", key=f"b11_dif_run_{model}"):
-                            try:
-                                with st.spinner(f"İki gruplu ortak {model} modeli kestiriliyor…"):
-                                    store11[("dif", model)] = {"key": b11_key, "result": b11.run_dif(
-                                        target, irt_columns, g11, ref11, foc11, model, r, al11, pu11, ro11,
-                                        points=int(r.get("settings", {}).get("points", 31)))}
-                            except Exception as exc:
-                                store11.pop(("dif", model), None)
-                                st.error(f"DIF analizi tamamlanamadı: {exc}")
-                        dr11 = b11_get("dif")
-                        if dr11 is not None:
-                            if {k_: dr11["ui_settings"][k_] for k_ in d_now} != d_now:
-                                st.info("Gösterilen DIF sonucu farklı grup veya ayarlarla üretildi; yeniden başlatın.")
-                            st.markdown(f"**Karşılaştırma:** {dr11['focal']} (odak) − {dr11['reference']} (referans); "
-                                        f"grup değişkeni `{dr11['ui_settings']['group_col']}`; model {dr11['model']}.")
-                            if not dr11["inferential"]:
-                                st.info("4PL DIF: çıkarımsal test DOĞRULANMADI — yalnızca betimsel karşılaştırma.")
-                            for note in dr11["warnings"]:
-                                st.warning(note)
-                            if not dr11["joint"]["converged"]:
-                                st.error("Ortak model yakınsamadı; DIF sonuçları yorumlanmamalıdır.")
-                            st.dataframe(b11.dif_summary_rows(dr11), hide_index=True, use_container_width=True)
-                            st.caption("μ_odak ve σ_odak grupların yetenek dağılımı farkıdır (etki/impact); DIF değildir.")
-                            st.plotly_chart(b11.dif_effect_figure(dr11), use_container_width=True)
-                            st.dataframe(dr11["table"].round(4), hide_index=True, use_container_width=True)
-                            st.caption("'Çıkarım' sütunu her maddenin p değerinin dayanağını gösterir. 'Çapa taraması': p "
-                                       "değeri verilemeyen ancak LR istatistiği χ² kritik değerini aşan maddeler çapa "
-                                       "kümesinden çıkarılır; bu bir DIF testi değildir. İşaretli/işaretsiz farklar odak "
-                                       "grubun yetenek dağılımı üzerinden ortalanmış olasılık farklarıdır.")
-                            opts11 = list(dr11["table"].dropna(subset=["a_ref"])["Madde"]) if "a_ref" in dr11["table"] else []
-                            if opts11:
-                                pk11 = st.selectbox("Grup tepki fonksiyonları", opts11, key=f"b11_dif_item_{model}")
-                                st.plotly_chart(b11.group_irf_figure(dr11, pk11), use_container_width=True)
-                            st.markdown("**Arındırma geçmişi**")
-                            st.dataframe(dr11["history"], hide_index=True, use_container_width=True)
-                            download_table_pair(dr11["table"].round(5), f"psikoanaliz_{model}_dif", "DIF tablosu",
-                                                f"b11_dif_dl_{model}")
+                            mirt_version = importlib.metadata.version("mirt")
+                        except importlib.metadata.PackageNotFoundError:
+                            mirt_version = "unknown"
+                        st.caption(f"Kaynak: Python mirt v{mirt_version}; model: {model}; "
+                                   "kestirim: kütüphane ham özeti. Parametre "
+                                   "metriği veya çıkarımsal doğrulama iddiası yok.")
+                        st.download_button(
+                            "Ham kestirim özetini TXT olarak indir",
+                            data=(f"Engine: Python mirt {mirt_version}\\n"
+                                  f"Model: {model}\\n"
+                                  "Status: library output; no cross-engine equivalence certified\\n\\n"
+                                  +str(raw_summary)),
+                            file_name=f"mirt_{model}_raw_summary.txt",
+                            mime="text/plain",
+                            key=f"mirt_raw_download_{model}",
+                        )
+                    except Exception as summary_error:
+                        st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
+                st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
+                           "henüz bağımsız eşleştirmeden geçmediği için "
+                           "resmî analiz sonuçlarına eklenmez.")
+            else:
+                st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
+        # Retired native IRT results and diagnostics are never rendered.
+        # All current binary IRT reports above originate from Python mirt.
+        if "irt_model_results" in st.session_state:
+            st.session_state.pop("irt_model_results", None)
+        if "irt_b10" in st.session_state:
+            st.session_state.pop("irt_b10", None)
+        if "irt_b11" in st.session_state:
+            st.session_state.pop("irt_b11", None)

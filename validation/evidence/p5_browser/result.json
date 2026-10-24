@@ -1,0 +1,124 @@
+{
+  "browser": "Playwright Chromium (headless, real Streamlit server)",
+  "status": "PASS",
+  "runs": [
+    {
+      "flow": "RSM",
+      "model": "RSM",
+      "status": "PASS",
+      "charts": 4,
+      "sheets": [
+        "Meta",
+        "Madde konumları",
+        "Ortak adımlar",
+        "Örtük dağılım",
+        "Madde uyumu",
+        "Kişiler",
+        "RSM-PCM LR"
+      ],
+      "max_abs_diff_delta_xlsx": 4.440892098500626e-16,
+      "max_abs_diff_delta_csv": 6.938893903907228e-17,
+      "max_abs_diff_tau": 0.0
+    },
+    {
+      "flow": "Observed-score DIF",
+      "model": "MH",
+      "status": "PASS",
+      "max_abs_diff_p_csv": 5.551115123125783e-17,
+      "max_abs_diff_p_xlsx": 5.551115123125783e-17,
+      "flagged": [
+        "M3"
+      ]
+    },
+    {
+      "flow": "Observed-score DIF",
+      "model": "LR",
+      "status": "PASS",
+      "max_abs_diff_p_csv": 1.1102230246251565e-16,
+      "max_abs_diff_p_xlsx": 5.551115123125783e-17,
+      "flagged": [
+        "M3"
+      ]
+    },
+    {
+      "flow": "B14 polytomous",
+      "model": "GRM",
+      "status": "PASS",
+      "charts": 2,
+      "plotly_charts": 1,
+      "download": "B14_pilot_parametreler.csv",
+      "rows": 8,
+      "max_abs_diff_vs_direct_fit": 2.220446049250313e-16,
+      "max_abs_diff_theta": 4.440892098500626e-16,
+      "xlsx_sheets": [
+        "Bilimsel Denetim",
+        "Meta",
+        "Kategori Frekansları",
+        "Kalite Denetimi",
+        "Motor Parametreleri",
+        "Kişi Yetenekleri",
+        "Bilgi Fonksiyonları"
+      ]
+    },
+    {
+      "flow": "B14 polytomous",
+      "model": "PCM",
+      "status": "PASS",
+      "charts": 2,
+      "plotly_charts": 1,
+      "download": "B14_pilot_parametreler.csv",
+      "rows": 8,
+      "max_abs_diff_vs_direct_fit": 1.1102230246251565e-16,
+      "max_abs_diff_theta": 4.440892098500626e-16,
+      "xlsx_sheets": [
+        "Bilimsel Denetim",
+        "Meta",
+        "Kategori Frekansları",
+        "Kalite Denetimi",
+        "Motor Parametreleri",
+        "Kişi Yetenekleri",
+        "Bilgi Fonksiyonları"
+      ]
+    },
+    {
+      "flow": "B14 polytomous",
+      "model": "GPCM",
+      "status": "PASS",
+      "charts": 2,
+      "plotly_charts": 1,
+      "download": "B14_pilot_parametreler.csv",
+      "rows": 8,
+      "max_abs_diff_vs_direct_fit": 8.881784197001252e-16,
+      "max_abs_diff_theta": 2.220446049250313e-16,
+      "xlsx_sheets": [
+        "Bilimsel Denetim",
+        "Meta",
+        "Kategori Frekansları",
+        "Kalite Denetimi",
+        "Motor Parametreleri",
+        "Kişi Yetenekleri",
+        "Bilgi Fonksiyonları"
+      ]
+    },
+    {
+      "flow": "B14 polytomous",
+      "model": "NRM",
+      "status": "PASS",
+      "charts": 2,
+      "plotly_charts": 1,
+      "download": "B14_pilot_parametreler.csv",
+      "rows": 8,
+      "max_abs_diff_vs_direct_fit": 2.220446049250313e-16,
+      "max_abs_diff_theta": 4.440892098500626e-16,
+      "xlsx_sheets": [
+        "Bilimsel Denetim",
+        "Meta",
+        "Kategori Frekansları",
+        "Kalite Denetimi",
+        "Motor Parametreleri",
+        "Kişi Yetenekleri",
+        "Bilgi Fonksiyonları"
+      ]
+    }
+  ]
+}

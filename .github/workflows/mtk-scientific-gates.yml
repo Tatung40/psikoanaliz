@@ -1,0 +1,42 @@
+name: MTK scientific gates
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  studies-quick-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m pip install --only-binary=:all: 'mirt==1.2.0' playwright
+          python -m playwright install --with-deps chromium
+      - name: Pre-registered studies execute (quick mode; full evidence is committed)
+        run: |
+          python validation/irt_3pl4pl_root_cause.py /tmp/p1 --quick
+          python validation/dif_validation_study.py /tmp/p2 --quick
+          python validation/rsm_recovery_study.py /tmp/p3 --quick
+          python validation/polytomous_mc_study.py /tmp/p4 --quick
+          python validation/dif34_bootstrap_size_study.py /tmp/p5 --quick
+      - name: Evidence-consistency tests
+        run: python -m pytest -q tests/test_irt_binary_usage_policy.py tests/test_mtk_evidence.py
+      - name: Real browser end-to-end (RSM, DIF, GRM/PCM/GPCM/NRM)
+        timeout-minutes: 20
+        run: python validation/browser_e2e_polytomous_dif.py --output /tmp/browser && python -c "import json;assert json.load(open('/tmp/browser/result.json'))['status']=='PASS'"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mtk-scientific-gates
+          path: |
+            /tmp/browser
+            /tmp/p*/

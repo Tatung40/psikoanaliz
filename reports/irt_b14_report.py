@@ -69,6 +69,12 @@ def report_tables(result):
     except Exception as exc:
         frames["Parametre Açıklaması"]=pd.DataFrame([{"Açıklama":"Motor parametre tablosu mevcut değil.",
                                                        "Gerekçe":str(exc)}])
+    try:
+        from core.irt_b14_persons_info import person_scores, information_table
+        frames["Kişi Yetenekleri"]=person_scores(result)
+        frames["Bilgi Fonksiyonları"]=information_table(result)
+    except Exception as exc:
+        frames["Kişi ve Bilgi Açıklaması"]=pd.DataFrame([{"Açıklama":"Kişi/bilgi tablosu üretilemedi.","Gerekçe":str(exc)}])
     return frames
 
 def export_xlsx(frames):
@@ -88,7 +94,8 @@ def export_zip(result):
         for name,frame in frames.items():
             slug={"Bilimsel Denetim":"bilimsel_denetim","Meta":"meta","Kategori Frekansları":"kategori_frekans",
                   "Kalite Denetimi":"kalite","Motor Parametreleri":"parametre",
-                  "Parametre Açıklaması":"aciklama"}[name]
+                  "Parametre Açıklaması":"aciklama","Kişi Yetenekleri":"kisi_yetenekleri",
+                  "Bilgi Fonksiyonları":"bilgi_fonksiyonlari","Kişi ve Bilgi Açıklaması":"kisi_bilgi_aciklama"}[name]
             z.writestr(slug+".csv",safe_frame(frame).to_csv(index=False).encode("utf-8-sig"))
         z.writestr("BILIMSEL_UYARI.txt",
             "B14 deneysel Python mirt kestirimi. SH, GA, model uyumu, yerel bagimsizlik "

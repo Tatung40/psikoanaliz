@@ -3,7 +3,10 @@ from scripts.dif_ci_paths import choose
 
 
 @pytest.mark.parametrize("paths,expected", [
-    (["core/grm_dif.py", "reports/grm_dif_report.py", "app.py"], dict(binary=False, grm=True)),
+    # Shared app navigation executes binary DIF too; enforce its regression gate.
+    (["core/grm_dif.py", "reports/grm_dif_report.py", "app.py"], dict(binary=True, grm=True)),
+    (["core/grm_dif.py", "reports/grm_dif_report.py"], dict(binary=False, grm=True)),
+    (["app.py"], dict(binary=True, grm=True)),
     (["core/irt_dif.py"], dict(binary=True, grm=True)),
     (["core/rasch.py"], dict(binary=True, grm=True)),
     (["core/irt_mg34.py"], dict(binary=True, grm=False)),

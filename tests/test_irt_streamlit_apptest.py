@@ -44,22 +44,17 @@ def test_option_hidden_for_1pl_2pl(page):
     assert _refine_boxes(at) == []
 
 
-def test_3pl_refinement_selected_runs_and_is_stored():
+def test_3pl_library_controls_and_report_toggles_do_not_refit():
+    """Retired native refinement must stay absent from the library-only route."""
     at = _app("MTK: 3PL")
+    assert not at.exception and _refine_boxes(at) == []
+    assert not [b for b in at.button if "MTK Analizini Başlat" in b.label]
+    at.button(key="py_mirt_run_3PL").click().run()
     assert not at.exception
-    boxes = _refine_boxes(at)
-    assert len(boxes) == 1 and boxes[0].value is False          # default off
-    boxes[0].check().run()
-    next(b for b in at.button if "MTK Analizini Başlat" in b.label).click().run()
+    stored = at.session_state["python_mirt_experimental_results"]["3PL"]["fit"]
+    assert stored.model == "3PL" and stored.engine == "python_mirt"
+    assert stored.n_items == 5
+    at.checkbox(key="py_mirt_show_diagnostics_3PL").uncheck().run()
     assert not at.exception
-    assert any("EM + L-BFGS-B" in s.value for s in at.success)
-    stored = at.session_state["irt_model_results"]["3PL"]["result"]
-    assert stored["settings"]["refine"] is True and stored["refinement"]["requested"] is True
-    assert set(stored["multistart_audit"]["İyileştirme"]) <= {"kabul edildi", "reddedildi"}
-    shown = " ".join(c.value for c in at.caption)
-    assert "Yöntem: EM + L-BFGS-B" in shown and "Gauss–Hermite düğümü: 31" in shown
-    assert any("Kestirim yöntemi" in str(df.value.to_dict()) for df in at.dataframe)
-    # toggling the option afterwards does not silently relabel the stored result
-    _refine_boxes(at)[0].uncheck().run()
-    assert any("farklı ayarlarla üretildi" in i.value for i in at.info)
-    assert at.session_state["irt_model_results"]["3PL"]["result"]["settings"]["refine"] is True
+    assert at.session_state["python_mirt_experimental_results"]["3PL"]["fit"] is stored
+    assert "3PL" not in at.session_state.get("irt_model_results", {})

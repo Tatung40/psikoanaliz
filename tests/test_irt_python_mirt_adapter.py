@@ -31,3 +31,35 @@ def test_rejects_missing_and_unknown():
         fit_python_mirt(x,model="2PL")
     with pytest.raises(ValueError,match="Unsupported"):
         fit_python_mirt(np.zeros((10,5)),model="UNKNOWN")
+
+@pytest.mark.parametrize("model", ["1PL", "2PL", "3PL", "4PL"])
+def test_constant_item_is_rejected_before_fit(model):
+    x=np.random.default_rng(2026).integers(0,2,size=(80,8))
+    x[:,3]=1
+    with pytest.raises(ValueError, match="değişkenliği olmayan"):
+        fit_python_mirt(x,model=model)
+
+def test_rsm_is_not_silently_routed_to_native():
+    with pytest.raises(ValueError, match="RSM"):
+        fit_python_mirt(np.zeros((20,5)),model="RSM",n_categories=4)
+
+
+@pytest.mark.parametrize("model", ["GRM", "PCM", "GPCM", "NRM"])
+def test_empty_item_category_rejected_even_when_global_codes_complete(model, monkeypatch):
+    import core.irt_python_mirt_adapter as adapter
+    x = np.tile(np.arange(4), (60, 5)).reshape(60, 20)[:, :5]
+    x[:, 0] = np.arange(60) % 3
+    monkeypatch.setattr(adapter, "import_module", lambda *a: pytest.fail("Invalid data reached engine"))
+    with pytest.raises(ValueError, match="Her maddede"):
+        adapter.fit_python_mirt(x, model=model, n_categories=4)
+
+
+@pytest.mark.parametrize("model", ["GRM", "PCM", "GPCM", "NRM"])
+def test_polytomous_real_fit_smoke(model):
+    import mirt
+    x = mirt.simdata(model=model, n_persons=120, n_items=5, n_categories=4, seed=2026)
+    result = fit_python_mirt(x, model=model, n_categories=4)
+    assert result.model == model
+    assert result.n_categories == 4
+    assert result.fit is not None
+    assert result.scientific_status.startswith("EXPERIMENTAL")

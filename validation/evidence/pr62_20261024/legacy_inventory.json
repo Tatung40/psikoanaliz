@@ -1,0 +1,86 @@
+{
+  "legacy_import_inventory": [
+    {
+      "file": "core/irt_b12_compare.py",
+      "line": 9,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_b13_curves.py",
+      "line": 7,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_binary_unified.py",
+      "line": 9,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_hessian.py",
+      "line": 12,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_itemfit.py",
+      "line": 79,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_missing_em.py",
+      "line": 9,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_model_reliability.py",
+      "line": 6,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_multistart.py",
+      "line": 9,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_quadrature_validation.py",
+      "line": 6,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_simulation.py",
+      "line": 8,
+      "import": "core.irt"
+    },
+    {
+      "file": "core/irt_stationarity.py",
+      "line": 10,
+      "import": "core.irt"
+    },
+    {
+      "file": "ui/irt_b10_view.py",
+      "line": 11,
+      "import": "ui.irt_optimization"
+    },
+    {
+      "file": "ui/irt_b11_view.py",
+      "line": 12,
+      "import": "ui.irt_optimization"
+    },
+    {
+      "file": "ui/irt_b11_view.py",
+      "line": 13,
+      "import": "ui.irt_b10_view"
+    },
+    {
+      "file": "ui/irt_b13_view.py",
+      "line": 15,
+      "import": "core.irt"
+    },
+    {
+      "file": "ui/irt_optimization.py",
+      "line": 10,
+      "import": "core.irt"
+    }
+  ],
+  "active_entrypoint_legacy_imports": [],
+  "safe_to_remove_all_legacy_modules": false
+}

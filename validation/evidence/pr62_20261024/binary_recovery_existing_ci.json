@@ -1,0 +1,326 @@
+{
+  "generator": "Independent NumPy logistic 1PL-4PL with known a,b,c,d",
+  "theta_distribution": "standard normal",
+  "engine": "Python mirt 1.2.0",
+  "notes": [
+    "Bias, MAE, RMSE are empirical; no pass/fail threshold is imposed.",
+    "3PL/4PL recovery is sensitive to identification, sample size and optimization.",
+    "Not an independent software-engine comparison or R mirt equivalence test."
+  ],
+  "runs": [
+    {
+      "model": "1PL",
+      "seed": 2026,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 0.0,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "max_absolute_error": 0.0
+        },
+        "b": {
+          "bias": -0.015351765185168786,
+          "mae": 0.062053382297438626,
+          "rmse": 0.07365313119794661,
+          "max_absolute_error": 0.13154844917896774
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "1PL",
+      "seed": 2027,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 0.0,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "max_absolute_error": 0.0
+        },
+        "b": {
+          "bias": -0.011456555838475628,
+          "mae": 0.03493248834896887,
+          "rmse": 0.04567903252683971,
+          "max_absolute_error": 0.10111565960422242
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "2PL",
+      "seed": 2026,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 0.05272097560521405,
+          "mae": 0.11664027859760155,
+          "rmse": 0.14559406837300065,
+          "max_absolute_error": 0.30843202601372277
+        },
+        "b": {
+          "bias": -0.02091341472959772,
+          "mae": 0.08052231712486958,
+          "rmse": 0.08956532625997765,
+          "max_absolute_error": 0.1593220664792212
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "2PL",
+      "seed": 2027,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 0.06458313265019393,
+          "mae": 0.09309312298823973,
+          "rmse": 0.1361046504504662,
+          "max_absolute_error": 0.392384274890178
+        },
+        "b": {
+          "bias": -0.028307035223862426,
+          "mae": 0.0431552868461601,
+          "rmse": 0.0684360550526269,
+          "max_absolute_error": 0.18943969840164154
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "3PL",
+      "seed": 2026,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 0.31616169496351665,
+          "mae": 0.3803768604676527,
+          "rmse": 0.5963462380606891,
+          "max_absolute_error": 1.7890305114248197
+        },
+        "b": {
+          "bias": 0.0198651733416579,
+          "mae": 0.19402935922263298,
+          "rmse": 0.28978899028230426,
+          "max_absolute_error": 0.8501570613322531
+        },
+        "c": {
+          "bias": 0.004424307267029074,
+          "mae": 0.08707612416192079,
+          "rmse": 0.11752353946762825,
+          "max_absolute_error": 0.30801784695002254
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "3PL",
+      "seed": 2027,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 0.20800785370969163,
+          "mae": 0.3622409361682033,
+          "rmse": 0.5098035578500608,
+          "max_absolute_error": 1.386298114832074
+        },
+        "b": {
+          "bias": 0.06865982600135367,
+          "mae": 0.30100118337133636,
+          "rmse": 0.4358020758139505,
+          "max_absolute_error": 1.2252892262370032
+        },
+        "c": {
+          "bias": 0.027378107501766762,
+          "mae": 0.0986711560347991,
+          "rmse": 0.14123293922190663,
+          "max_absolute_error": 0.37654085946175686
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "4PL",
+      "seed": 2026,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 1.6513514562213578,
+          "mae": 1.7834397226878922,
+          "rmse": 2.529110255170681,
+          "max_absolute_error": 4.2
+        },
+        "b": {
+          "bias": 0.23087354107730784,
+          "mae": 0.32799014152374356,
+          "rmse": 0.5168705737562368,
+          "max_absolute_error": 1.3727778720541708
+        },
+        "c": {
+          "bias": 0.08728622455932938,
+          "mae": 0.14969979079448478,
+          "rmse": 0.18537768167989374,
+          "max_absolute_error": 0.33541739515315755
+        },
+        "d": {
+          "bias": -0.015943746798274344,
+          "mae": 0.07139829225281978,
+          "rmse": 0.08390033345974822,
+          "max_absolute_error": 0.1834486862137108
+        }
+      },
+      "converged": true
+    },
+    {
+      "model": "4PL",
+      "seed": 2027,
+      "n_persons": 1000,
+      "n_items": 12,
+      "status": "MEASURED",
+      "metrics": {
+        "a": {
+          "bias": 1.5092214675477154,
+          "mae": 1.6792777517047572,
+          "rmse": 2.249766916666845,
+          "max_absolute_error": 4.2
+        },
+        "b": {
+          "bias": 0.2412502545685058,
+          "mae": 0.35674578546261265,
+          "rmse": 0.5679844300394171,
+          "max_absolute_error": 1.5293662983390321
+        },
+        "c": {
+          "bias": 0.09968419269884442,
+          "mae": 0.1571646990168418,
+          "rmse": 0.1825825327450995,
+          "max_absolute_error": 0.36659673070019994
+        },
+        "d": {
+          "bias": -0.02239852534855431,
+          "mae": 0.07761576789949423,
+          "rmse": 0.08934132569808999,
+          "max_absolute_error": 0.14880978792653232
+        }
+      },
+      "converged": true
+    }
+  ],
+  "summary": {
+    "1PL": {
+      "attempted": 2,
+      "measured": 2,
+      "nonconverged": 0,
+      "failed": 0,
+      "parameters": {
+        "a": {
+          "bias": 0.0,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "max_absolute_error": 0.0
+        },
+        "b": {
+          "bias": -0.013404160511822208,
+          "mae": 0.04849293532320375,
+          "rmse": 0.05966608186239317,
+          "max_absolute_error": 0.11633205439159508
+        }
+      }
+    },
+    "2PL": {
+      "attempted": 2,
+      "measured": 2,
+      "nonconverged": 0,
+      "failed": 0,
+      "parameters": {
+        "a": {
+          "bias": 0.05865205412770399,
+          "mae": 0.10486670079292064,
+          "rmse": 0.14084935941173343,
+          "max_absolute_error": 0.3504081504519504
+        },
+        "b": {
+          "bias": -0.024610224976730072,
+          "mae": 0.06183880198551484,
+          "rmse": 0.07900069065630227,
+          "max_absolute_error": 0.17438088244043137
+        }
+      }
+    },
+    "3PL": {
+      "attempted": 2,
+      "measured": 2,
+      "nonconverged": 0,
+      "failed": 0,
+      "parameters": {
+        "a": {
+          "bias": 0.26208477433660415,
+          "mae": 0.371308898317928,
+          "rmse": 0.553074897955375,
+          "max_absolute_error": 1.587664313128447
+        },
+        "b": {
+          "bias": 0.044262499671505785,
+          "mae": 0.24751527129698467,
+          "rmse": 0.3627955330481274,
+          "max_absolute_error": 1.0377231437846282
+        },
+        "c": {
+          "bias": 0.015901207384397917,
+          "mae": 0.09287364009835994,
+          "rmse": 0.12937823934476744,
+          "max_absolute_error": 0.3422793532058897
+        }
+      }
+    },
+    "4PL": {
+      "attempted": 2,
+      "measured": 2,
+      "nonconverged": 0,
+      "failed": 0,
+      "parameters": {
+        "a": {
+          "bias": 1.5802864618845365,
+          "mae": 1.7313587371963246,
+          "rmse": 2.389438585918763,
+          "max_absolute_error": 4.2
+        },
+        "b": {
+          "bias": 0.23606189782290682,
+          "mae": 0.3423679634931781,
+          "rmse": 0.542427501897827,
+          "max_absolute_error": 1.4510720851966015
+        },
+        "c": {
+          "bias": 0.09348520862908691,
+          "mae": 0.1534322449056633,
+          "rmse": 0.18398010721249664,
+          "max_absolute_error": 0.3510070629266787
+        },
+        "d": {
+          "bias": -0.01917113607341433,
+          "mae": 0.074507030076157,
+          "rmse": 0.0866208295789191,
+          "max_absolute_error": 0.16612923707012156
+        }
+      }
+    }
+  },
+  "source_ci": "https://github.com/Tatung40/psikoanaliz/actions/runs/40075378613",
+  "source_commit": "28272cbec7a8286bec79e4b4a60abc9944e3c988"
+}

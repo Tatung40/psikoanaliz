@@ -1,0 +1,192 @@
+{
+  "engine": "Python mirt",
+  "version": "1.2.0",
+  "scope": "Two-seed 3-category N600/6-item independent-generator single-group pilot; not general recovery/coverage certification",
+  "runs": [
+    {
+      "model": "GRM",
+      "seed": 20261024,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "discrimination": {
+          "bias": -0.05475683057107935,
+          "mae": 0.12731264618044733,
+          "rmse": 0.1647196378354043,
+          "max_absolute_error": 0.3411435628429802
+        },
+        "thresholds": {
+          "bias": 0.023681134731808103,
+          "mae": 0.10456821712264402,
+          "rmse": 0.13405783910567093,
+          "max_absolute_error": 0.33770790035473675
+        }
+      }
+    },
+    {
+      "model": "GRM",
+      "seed": 20261025,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "discrimination": {
+          "bias": -0.002978433857536248,
+          "mae": 0.15597399251263472,
+          "rmse": 0.18146772157766386,
+          "max_absolute_error": 0.27472293450397034
+        },
+        "thresholds": {
+          "bias": -0.010753600719293398,
+          "mae": 0.11635470226658219,
+          "rmse": 0.14921549332837525,
+          "max_absolute_error": 0.333368886267124
+        }
+      }
+    },
+    {
+      "model": "PCM",
+      "seed": 20261024,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "discrimination": {
+          "bias": 0.0,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "max_absolute_error": 0.0
+        },
+        "steps": {
+          "bias": -0.004790037943291692,
+          "mae": 0.07209851953801359,
+          "rmse": 0.0901321229563895,
+          "max_absolute_error": 0.18802077613973278
+        }
+      }
+    },
+    {
+      "model": "PCM",
+      "seed": 20261025,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "discrimination": {
+          "bias": 0.0,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "max_absolute_error": 0.0
+        },
+        "steps": {
+          "bias": 0.03464171352331474,
+          "mae": 0.09644772210452578,
+          "rmse": 0.11212972473975888,
+          "max_absolute_error": 0.20003633935043785
+        }
+      }
+    },
+    {
+      "model": "GPCM",
+      "seed": 20261024,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "discrimination": {
+          "bias": -0.029157013872881127,
+          "mae": 0.11938019748204513,
+          "rmse": 0.15246646736023464,
+          "max_absolute_error": 0.3017689381120501
+        },
+        "steps": {
+          "bias": 0.02964278535609584,
+          "mae": 0.0831516691626845,
+          "rmse": 0.09622992864306562,
+          "max_absolute_error": 0.1625258404469292
+        }
+      }
+    },
+    {
+      "model": "GPCM",
+      "seed": 20261025,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "discrimination": {
+          "bias": -0.020482443671635875,
+          "mae": 0.08891795656115171,
+          "rmse": 0.10122178297434359,
+          "max_absolute_error": 0.1641654495836553
+        },
+        "steps": {
+          "bias": 0.03013313967957003,
+          "mae": 0.1049548961283925,
+          "rmse": 0.12533836951434874,
+          "max_absolute_error": 0.20655085393428774
+        }
+      }
+    },
+    {
+      "model": "NRM",
+      "seed": 20261024,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "slopes": {
+          "bias": 0.008958062180474482,
+          "mae": 0.07373872759125522,
+          "rmse": 0.10663829837575481,
+          "max_absolute_error": 0.20015337263338928
+        },
+        "intercepts": {
+          "bias": 0.019907319270776113,
+          "mae": 0.0550164203217988,
+          "rmse": 0.08883350000587317,
+          "max_absolute_error": 0.20348081857817776
+        }
+      }
+    },
+    {
+      "model": "NRM",
+      "seed": 20261025,
+      "n_persons": 600,
+      "n_items": 6,
+      "categories": 3,
+      "status": "MEASURED",
+      "converged": true,
+      "metrics": {
+        "slopes": {
+          "bias": 0.015601919931081672,
+          "mae": 0.11265669995435575,
+          "rmse": 0.16647885151607186,
+          "max_absolute_error": 0.37179731462286153
+        },
+        "intercepts": {
+          "bias": -0.01015363323111946,
+          "mae": 0.059126181401382545,
+          "rmse": 0.09194826144350826,
+          "max_absolute_error": 0.1895388940204371
+        }
+      }
+    }
+  ],
+  "RSM": "UNAVAILABLE in the public fit_mirt adapter; existing native fixed-anchor RSM DIF is a different limited engine"
+}

@@ -79,6 +79,10 @@ def excel_bytes(tables):
 def render(target,columns,id_col=None,group_col=None):
     st.subheader("İkili MTK — Bütünleşik Analiz ve Rapor")
     st.caption("Rasch, 1PL, 2PL, 3PL ve 4PL | EserPsychometrics yerel motor")
+    st.info("Bu sayfa, etkin 1PL–4PL sayfalarındaki Python mirt motorundan AYRI olarak emekliye ayrılmış yerel "
+            "1PL–4PL kestiricisini (core.irt) araştırma ve motor karşılaştırması için kullanır. Sonuçları etkin "
+            "Python mirt sonuçlarıyla birleştirilmez ve onların yerine geçmez; 3PL/4PL kullanım sınırları için "
+            "validation/IRT_3PL4PL_ROOT_CAUSE.md belgesine bakın. Rasch yerel motoru etkindir.")
     tabs=st.tabs(["Model ve Ayarlar","Genel Sonuçlar","Madde Parametreleri",
                   "Kişi Yetenekleri","Bilimsel Grafikler","Uyum ve Tanılar",
                   "Motor Karşılaştırması","Raporlar ve İndirme"])
