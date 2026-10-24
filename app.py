@@ -197,8 +197,8 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
-    with st.expander("🧮 EserPsychometrics Yerel MTK Motoru", expanded=True):
-        st.caption("İkili modeller: yerel analiz ve model karşılaştırmaları")
+    with st.expander("📐 MTK Modelleri ve Analizler", expanded=True):
+        st.caption("İkili modeller: Python mirt; Rasch ve diğer araştırma sayfalarının doğrulama durumu ayrıdır.")
         binary_quick_model = st.selectbox(
             "Hızlı ikili MTK model seçimi",
             ("Rasch", "1PL", "2PL", "3PL", "4PL"),
@@ -208,7 +208,7 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,
                   args=(f"MTK: {binary_quick_model}",))
         for m in ("Rasch","1PL","2PL","3PL","4PL"):
-            st.button(f"📐 {m} Modeli",key=f"native_irt_{m}",
+            st.button(f"📐 {m} Modeli",key=f"irt_nav_{m}",
                       use_container_width=True,on_click=navigate_to,args=(f"MTK: {m}",))
         for label,page in [
             ("📊 Model Karşılaştırması","MTK: Karşılaştırma"),
@@ -216,7 +216,7 @@ with st.sidebar:
             ("🔍 MTK Varsayım Denetimi","MTK: Varsayım Denetimi"),
             ("⚖️ MTK DIF Ön Taraması","MTK: Çok Modelli DIF Taraması"),
         ]:
-            st.button(label,key=f"native_{page}",use_container_width=True,
+            st.button(label,key=f"irt_nav_{page}",use_container_width=True,
                       on_click=navigate_to,args=(page,))
         st.caption("Formel DIF sayfalarında doğrulama durumu ayrıca belirtilir.")
         st.button("⚖️ GRM Formel DIF (Deneysel)",key="nav_grm_dif",
