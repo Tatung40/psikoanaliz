@@ -62,7 +62,7 @@ def evaluate(model, *, n_persons=1000, n_items=12, seed=2026):
                 "rmse": float(np.sqrt(np.mean(residual**2))),
                 "max_absolute_error": float(np.abs(residual).max()),
             }
-        result["status"] = "MEASURED" if result["converged"] is not False else "NONCONVERGED"
+        result["status"] = "MEASURED" if result["converged"] is True else "NONCONVERGED"
     except Exception as exc:  # Preserve each failed simulation as an auditable record.
         result["error_type"] = type(exc).__name__
         result["error_message"] = str(exc)[:300]
@@ -118,7 +118,20 @@ def sensitivity_run(sample_sizes=(1000, 3000, 5000), seeds=(2026, 2027)):
     records = [evaluate(model, n_persons=n, n_items=12, seed=seed)
                for model in ("3PL", "4PL")
                for n in sample_sizes for seed in seeds]
+    groups = {}
+    for model in ("3PL", "4PL"):
+        for n in sample_sizes:
+            subset = [r for r in records if r["model"] == model and r["n_persons"] == n]
+            measured = [r for r in subset if r["status"] == "MEASURED"]
+            groups[f"{model}_N{n}"] = {
+                "attempted": len(subset), "measured": len(measured),
+                "failed": sum(r["status"] == "FAILED" for r in subset),
+                "nonconverged": sum(r["status"] == "NONCONVERGED" for r in subset),
+                "mae": {p: float(np.mean([r["metrics"][p]["mae"] for r in measured]))
+                        for p in ("a", "b", "c") + (("d",) if model == "4PL" else ())}
+                       if measured else {},
+            }
     return {"design": {"sample_sizes": list(sample_sizes), "seeds": list(seeds),
                        "models": ["3PL", "4PL"], "n_items": 12},
-            "runs": records,
+            "runs": records, "summary_by_sample_size": groups,
             "note": "Exploratory sensitivity, not independent engine validation."}
