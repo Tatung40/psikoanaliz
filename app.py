@@ -1797,11 +1797,24 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         if report_params:
                             st.markdown("#### Python mirt — madde parametreleri")
                             st.dataframe(item_table, hide_index=True, use_container_width=True)
-                        st.download_button(
-                            "Madde parametrelerini CSV indir",
-                            data=item_table.to_csv(index=False).encode("utf-8-sig"),
-                            file_name=f"python_mirt_{model}_parameters.csv",
-                            mime="text/csv", key=f"py_mirt_params_csv_{model}")
+                        csv_col, excel_col = st.columns(2)
+                        with csv_col:
+                            st.download_button(
+                                "Madde parametreleri — CSV",
+                                data=item_table.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_parameters.csv",
+                                mime="text/csv", key=f"py_mirt_params_csv_{model}")
+                        with excel_col:
+                            import io as _io
+                            _excel_bytes = _io.BytesIO()
+                            with pd.ExcelWriter(_excel_bytes, engine="openpyxl") as _writer:
+                                item_table.to_excel(_writer, index=False, sheet_name="Madde Parametreleri")
+                            st.download_button(
+                                "Madde parametreleri — Excel",
+                                data=_excel_bytes.getvalue(),
+                                file_name=f"python_mirt_{model}_parameters.xlsx",
+                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                key=f"py_mirt_params_xlsx_{model}")
                         theta_grid = np.linspace(-4, 4, 161)
                         curve_data = curves_from_normalized_table(item_table, theta_grid)
                         if report_icc or report_iif:
