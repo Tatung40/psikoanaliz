@@ -69,7 +69,11 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         except ValueError as e:
             numeric=None
             st.error(f"Veri denetimi: {e}")
-        if st.button("Python mirt ile B14 pilot analizi",key="b14_run",type="primary",disabled=numeric is None):
+        if model=="RSM":
+            st.info("RSM, Python mirt fit_mirt API'sinde bulunmadığı için bu pilot sayfada kestirilmez. "
+                    "Tam RSM analizi (ortak adımlar, SH, bilgi, kişi kestirimleri, uyum, RSM–PCM testi) için "
+                    "kenar çubuğundaki 'RSM — Derecelendirme Ölçeği Modeli' sayfasını kullanın.")
+        if st.button("Python mirt ile B14 pilot analizi",key="b14_run",type="primary",disabled=numeric is None or model=="RSM"):
             try:
                 with st.spinner("Çok kategorili model kalibre ediliyor"):
                     result=fit_b14(subset,model,categories=categories)

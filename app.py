@@ -223,6 +223,10 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: GRM Formel DIF",))
         st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)",key="nav_poly_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Çok Kategorili Formel DIF",))
+        st.button("📏 RSM — Derecelendirme Ölçeği Modeli",key="nav_irt_rsm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
+        st.button("⚖️ Gözlenen Puan DIF (MH / Lojistik)",key="nav_classical_dif",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
     with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
@@ -230,7 +234,7 @@ with st.sidebar:
             st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
-        st.caption("RSM: Python mirt genel API'sinde desteklenmiyor; yerel B14 motorunu kullanın.")
+        st.caption("RSM: Python mirt fit_mirt API'sinde yok; tam RSM analizi için 'RSM — Derecelendirme Ölçeği Modeli' sayfasını kullanın.")
         st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
                   key="nav_irt_b14",use_container_width=True,
                   on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
@@ -1462,6 +1466,18 @@ elif selected_page == "MTK: Rasch":
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)
 # =============================================================================
+elif selected_page == "MTK: RSM":
+    render_academic_header()
+    from ui.irt_rsm_view import render as render_rsm
+    src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
+    if src is None: st.warning("Önce 0,1,2,... sıralı puanlı yanıt verisi yükleyin.")
+    else: render_rsm(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page == "MTK: Gözlenen Puan DIF":
+    render_academic_header()
+    from ui.dif_classical_view import render as render_classical_dif
+    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if src is None: st.warning("Önce puanlanmış yanıt verisi yükleyin.")
+    else: render_classical_dif(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Çok Kategorili Formel DIF":
     from ui.polytomous_dif_view import render as render_poly_dif
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
