@@ -56,4 +56,4 @@ def test_binary_irt_real_fit_and_download_buttons():
     assert not at.exception, [str(e) for e in at.exception]
     assert "1PL" in at.session_state.get("python_mirt_experimental_results", {})
     assert any("Python mirt analizi tamamlandı" in x.message for x in at.success)
-    assert any("Python mirt" in x.message for x in at.info)
+    assert any("Python mirt" in str(x.message) for x in at.info)
