@@ -1776,12 +1776,13 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 }
                 if report_diagnostics:
                     st.markdown("#### Python mirt — kestirim tanıları")
-                if report_diagnostics:
-                    st.dataframe(
-                    pd.DataFrame([diagnostics]),
-                    hide_index=True,
-                    use_container_width=True,
-                )
+                    diagnostic_table = pd.DataFrame([diagnostics])
+                    st.dataframe(diagnostic_table, hide_index=True, use_container_width=True)
+                    st.download_button(
+                        "Kestirim tanılarını CSV indir",
+                        data=diagnostic_table.to_csv(index=False).encode("utf-8-sig"),
+                        file_name=f"python_mirt_{model}_diagnostics.csv",
+                        mime="text/csv", key=f"py_mirt_diagnostics_csv_{model}")
                 if not library_fit.converged:
                     st.error(
                         "Python mirt yakınsamadı. Parametreler ve model "
