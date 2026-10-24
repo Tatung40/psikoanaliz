@@ -69,6 +69,29 @@ def evaluate(model, *, n_persons=1000, n_items=12, seed=2026):
     return result
 
 
+def summarize(records):
+    """Aggregate observed error only; preserve failures and do not invent thresholds."""
+    output = {}
+    for model in MODELS:
+        subset = [r for r in records if r["model"] == model]
+        measured = [r for r in subset if r["status"] == "MEASURED"]
+        parameter_names = sorted({p for r in measured for p in r["metrics"]})
+        output[model] = {
+            "attempted": len(subset),
+            "measured": len(measured),
+            "nonconverged": sum(r["status"] == "NONCONVERGED" for r in subset),
+            "failed": sum(r["status"] == "FAILED" for r in subset),
+            "parameters": {
+                p: {
+                    metric: float(np.mean([r["metrics"][p][metric] for r in measured]))
+                    for metric in ("bias", "mae", "rmse", "max_absolute_error")
+                }
+                for p in parameter_names
+            },
+        }
+    return output
+
+
 def run():
     records = [evaluate(model, seed=seed) for model in MODELS
                for seed in (2026, 2027)]
@@ -82,6 +105,7 @@ def run():
             "Not an independent software-engine comparison or R mirt equivalence test.",
         ],
         "runs": records,
+        "summary": summarize(records),
     }
 
 
