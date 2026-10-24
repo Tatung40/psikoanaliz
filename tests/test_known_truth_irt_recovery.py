@@ -94,3 +94,18 @@ def test_sensitivity_summary_never_hides_failed_runs(monkeypatch):
     for row in report["summary_by_sample_size"].values():
         assert row["attempted"] == 1 and row["failed"] == 1
         assert row["measured"] == 0 and row["mae"] == {}
+
+
+def test_unknown_convergence_is_not_reported_as_success(monkeypatch):
+    import validation.known_truth_irt_recovery as recovery
+    import pandas as pd
+
+    class FakeFit:
+        pass
+
+    monkeypatch.setattr(recovery.mirt, "fit_mirt", lambda *args, **kwargs: FakeFit())
+    monkeypatch.setattr(recovery, "python_mirt_binary_parameters",
+                        lambda fit, model: pd.DataFrame(recovery.truth(model, 6)))
+    row = recovery.evaluate("2PL", n_persons=80, n_items=6)
+    assert row["status"] == "NONCONVERGED"
+    assert row["converged"] is None
