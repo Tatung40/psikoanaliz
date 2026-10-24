@@ -1707,21 +1707,21 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
                    "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
                    "bu çıktılar araştırma amaçlıdır.")
-        if model == "4PL":
-            st.error(
-                "Bilimsel doğrulama uyarısı (4PL): Bağımsız, bilinen parametreli "
-                "N=1000 ve 12 maddelik iki simülasyonda ayırt edicilik (a) için "
-                "ortalama mutlak hata yaklaşık 1,73 bulundu. Yakınsama görülse de "
-                "parametre kurtarma yetersiz olabilir. Sonuçları doğrulanmış "
-                "ölçme parametreleri olarak yorumlamayın."
-            )
-        elif model == "3PL":
-            st.warning(
-                "Bilimsel doğrulama uyarısı (3PL): Aynı simülasyon koşullarında "
-                "ayırt edicilik (a) için ortalama mutlak hata yaklaşık 0,37 "
-                "bulundu. Kestirimleri örneklem büyüklüğü ve bağımsız yazılım "
-                "karşılaştırması olmadan kesin kabul etmeyin."
-            )
+        estimation = "ML"
+        if model in ("3PL", "4PL"):
+            with st.sidebar.expander("🎯 3PL/4PL kestirim yöntemi", expanded=True):
+                estimation = st.radio(
+                    "Kestirim", ["MAP", "ML"], index=0, key=f"py_mirt_estimation_{model}",
+                    format_func=lambda v: ("MAP — mirt varsayılan önselleri (önerilen)" if v == "MAP"
+                                           else "ML — önselsiz marjinal olabilirlik"))
+                st.caption("MAP önselleri: a~LogN(0,0,5), b~N(0,2), c~Beta(2,8)"
+                           + (", d~Beta(8,2)" if model == "4PL" else "")
+                           + ". Kütüphane varsayılanıdır; sonuçlara göre ayarlanmadı. MAP altında logLik/AIC/BIC "
+                             "önselsiz ML ölçütleri değildir.")
+            from core.irt_binary_usage_policy import usage_status
+            policy_status, policy_message = usage_status(model, estimation, len(target), len(irt_columns))
+            {"supported": st.success, "caution": st.warning}.get(policy_status, st.error)(
+                "Bilimsel kullanım sınırı: " + policy_message)
         # Library-backed binary IRT results remain separate from unvalidated
         # legacy research reports and their inferential diagnostics.
         # Library calibration controls live in the left settings panel; output stays right.
@@ -1768,7 +1768,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     )
                     fingerprint_external = (
                         tuple(irt_columns), external_data.shape,
-                        int(pd.util.hash_pandas_object(external_data, index=True).sum()))
+                        int(pd.util.hash_pandas_object(external_data, index=True).sum()), estimation)
                     with st.spinner("Deneysel Python mirt kestirimi hesaplanıyor…"):
                         missing_count = int(external_data.isna().sum().sum())
                         if missing_count:
@@ -1779,7 +1779,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 "analizi sekmesinde uygun yöntemi değerlendirin."
                             )
                         external_fit = fit_python_mirt(
-                            external_data.to_numpy(), model=model,
+                            external_data.to_numpy(), model=model, estimation=estimation,
                             n_categories=(int(external_data.to_numpy().max()) + 1)
                             if model in ("GRM", "PCM", "GPCM", "NRM") else None)
                     if "python_mirt_experimental_results" not in st.session_state:
@@ -1797,7 +1797,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             current_external_data = target.loc[:, irt_columns]
             current_external_fingerprint = (
                 tuple(irt_columns), current_external_data.shape,
-                int(pd.util.hash_pandas_object(current_external_data, index=True).sum()))
+                int(pd.util.hash_pandas_object(current_external_data, index=True).sum()), estimation)
             if previous_external["fingerprint"] == current_external_fingerprint:
                 external_fit = previous_external["fit"]
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
@@ -1840,6 +1840,18 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         import plotly.graph_objects as go
                         item_table = python_mirt_binary_parameters(
                             library_fit, model=model, item_names=irt_columns)
+                        if model in ("3PL", "4PL"):
+                            # Python mirt 1.2.0 EM box: a [0.1, 5], b [-6, 6], c [0, 0.5], d [0.5, 1].
+                            _box = {"a": (0.1, 5.0), "b": (-6.0, 6.0), "c": (0.0, 0.5), "d": (0.5, 1.0)}
+                            _free = "abc" + ("d" if model == "4PL" else "")
+                            item_table["Sınırdaki parametre"] = [
+                                ", ".join(q for q in _free if min(abs(row[q] - _box[q][0]), abs(_box[q][1] - row[q])) <= 1e-3) or "—"
+                                for _, row in item_table.iterrows()]
+                            item_table["Kestirim"] = estimation
+                            item_table["Kullanım durumu"] = policy_status
+                            if (item_table["Sınırdaki parametre"] != "—").any():
+                                st.warning("Bazı parametreler kütüphanenin kestirim sınırında; bu değerler "
+                                           "zayıf tanımlanmış sınır kestirimleridir ve SH/GA yorumlanamaz.")
                         if report_params:
                             st.markdown("#### Python mirt — madde parametreleri")
                             st.dataframe(item_table, hide_index=True, use_container_width=True)

@@ -54,12 +54,15 @@ def test_legacy_dependency_inventory_script_parses():
 
 
 def test_3pl_4pl_empirical_recovery_warnings_are_visible_in_ui_source():
+    # Superseded 2-seed warning text replaced by the pre-registered 20-replication usage policy.
     source = (ROOT / "app.py").read_text(encoding="utf-8")
-    assert 'if model == "4PL":' in source
-    assert "ortalama mutlak hata yaklaşık 1,73" in source
-    assert 'elif model == "3PL":' in source
-    assert "ortalama mutlak hata yaklaşık 0,37" in source
-    assert "Sonuçları doğrulanmış" in source
+    assert "from core.irt_binary_usage_policy import usage_status" in source
+    assert "Bilimsel kullanım sınırı: " in source
+    assert 'estimation=estimation' in source
+    from core.irt_binary_usage_policy import usage_status
+    assert usage_status("4PL", "ML", 10000, 30)[0] == "not_supported"
+    assert usage_status("4PL", "MAP", 1000, 12)[0] == "caution"
+    assert usage_status("3PL", "ML", 3000, 30)[0] == "caution"
 
 
 def test_polytomous_fit_passes_explicit_category_count():

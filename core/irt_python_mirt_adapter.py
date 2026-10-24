@@ -20,9 +20,22 @@ class PythonMirtResult:
     n_categories: int | None
     fit: object
     scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
+    estimation: str = "ML"
 
-def fit_python_mirt(responses, *, model, n_categories=None):
-    """One public fit call; no implicit engine fallback or unsupported inference."""
+ESTIMATIONS = ("ML", "MAP")
+
+
+def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
+    """One public fit call; no implicit engine fallback or unsupported inference.
+
+    estimation="MAP" (3PL/4PL only) uses Python mirt's documented library default item priors
+    (mirt.estimation.priors.default_priors: a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)).
+    They were not tuned to any result; see validation/evidence/p1_3pl4pl for the pre-registered study.
+    """
+    if estimation not in ESTIMATIONS:
+        raise ValueError("estimation must be 'ML' or 'MAP'.")
+    if estimation == "MAP" and model not in ("3PL", "4PL"):
+        raise ValueError("MAP (library default priors) is enabled only for 3PL/4PL, where it was validated.")
     if model not in SUPPORTED:
         raise ValueError(f"Unsupported model: {model}")
     if model in UNSUPPORTED_PUBLIC_MODELS:
@@ -71,5 +84,8 @@ def fit_python_mirt(responses, *, model, n_categories=None):
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
     kwargs={"model":model}
     if cats is not None:kwargs["n_categories"]=cats
+    if estimation=="MAP":
+        from mirt.estimation.priors import default_priors
+        kwargs["priors"]=default_priors(model)
     result=mirt.fit_mirt(x.astype(int),**kwargs)
-    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result)
+    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation)
