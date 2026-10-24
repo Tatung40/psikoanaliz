@@ -1826,6 +1826,26 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 value=161, key=f"py_mirt_theta_points_{model}")
                         theta_grid = np.linspace(theta_min, theta_max, theta_count)
                         curve_data = curves_from_normalized_table(item_table, theta_grid)
+                        if report_icc or report_iif or report_tif:
+                            with st.sidebar.expander("📦 Tüm eğri verileri", expanded=False):
+                                all_curves = pd.DataFrame({"theta": theta_grid})
+                                for curve_key, prefix in (("probability", "ICC"),
+                                                          ("information", "IIF")):
+                                    if (curve_key == "probability" and report_icc) or (
+                                        curve_key == "information" and report_iif):
+                                        for j, item_name in enumerate(irt_columns):
+                                            all_curves[f"{prefix}_{item_name}"] = curve_data[curve_key][:, j]
+                                if report_tif:
+                                    all_curves["TIF"] = curve_data["test_information"]
+                                    all_curves["SEM_theta"] = np.where(
+                                        curve_data["test_information"] > 0,
+                                        1 / np.sqrt(np.maximum(curve_data["test_information"], 1e-300)),
+                                        np.nan)
+                                st.download_button(
+                                    "Tüm maddeler ve test — CSV",
+                                    data=all_curves.to_csv(index=False).encode("utf-8-sig"),
+                                    file_name=f"python_mirt_{model}_all_curves.csv",
+                                    mime="text/csv", key=f"py_mirt_all_curves_{model}")
                         if report_icc or report_iif:
                             with st.sidebar.expander("📈 Eğri madde seçimi", expanded=False):
                                 selected_item = st.selectbox(
