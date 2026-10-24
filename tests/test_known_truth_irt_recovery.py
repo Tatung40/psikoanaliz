@@ -33,3 +33,20 @@ def test_known_truth_constraints(model):
 def test_known_truth_invalid_model_fails_closed():
     with pytest.raises(ValueError):
         simulate("5PL")
+
+
+def test_recovery_summary_counts_failures_and_aggregates_only_measured():
+    from validation.known_truth_irt_recovery import summarize
+    records = [
+        {"model": "1PL", "status": "MEASURED", "metrics": {
+            "a": {"bias": 0.2, "mae": 0.2, "rmse": 0.2, "max_absolute_error": 0.2}}},
+        {"model": "1PL", "status": "FAILED", "metrics": {}},
+        {"model": "2PL", "status": "NONCONVERGED", "metrics": {}},
+    ]
+    summary = summarize(records)
+    assert summary["1PL"]["attempted"] == 2
+    assert summary["1PL"]["measured"] == 1
+    assert summary["1PL"]["failed"] == 1
+    assert summary["1PL"]["parameters"]["a"]["mae"] == pytest.approx(0.2)
+    assert summary["2PL"]["nonconverged"] == 1
+    assert summary["3PL"]["measured"] == 0
