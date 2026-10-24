@@ -38,3 +38,14 @@ def test_native_results_ui_is_not_present():
     assert 'r = saved.get("result")' not in source
     assert 'b11.run_dif(' not in source
     assert 'b10.run_global_fit(' not in source
+
+
+def test_library_curve_and_diagnostic_download_controls():
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
+    for marker in (
+        "python_mirt_{model}_parameters.xlsx",
+        "python_mirt_{model}_diagnostics.csv",
+        "python_mirt_{model}_{key}_{selected_item}.csv",
+        "python_mirt_{model}_tif.csv",
+    ):
+        assert marker in source
