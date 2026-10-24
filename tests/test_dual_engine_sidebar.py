@@ -7,7 +7,7 @@ def test_engine_nav_routes_and_expanders():
     ast.parse(text)
     assert 'with st.expander("🧮 EserPsychometrics Yerel KTK Motoru"' in text
     assert 'with st.expander("Python Kütüphaneleri / Bağımsız KTK Motoru"' in text
-    assert 'with st.expander("🧮 EserPsychometrics Yerel MTK Motoru"' in text
+    assert 'with st.expander("📐 MTK Modelleri ve Analizler"' in text
     assert 'with st.expander("Python mirt Kütüphanesi — MTK"' in text
     assert 'selected_page.startswith("MTK: Python mirt ")' in text
     assert '("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM")' in text
