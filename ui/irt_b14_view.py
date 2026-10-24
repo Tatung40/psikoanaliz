@@ -93,7 +93,7 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
             summary=fit.coef_with_se()
             st.dataframe(summary,hide_index=False,use_container_width=True)
             st.download_button("Madde parametrelerini CSV indir",safe_frame(summary.reset_index()).to_csv(index=False).encode("utf-8-sig"),
-                               "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv")
+                               "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv",on_click="ignore")
         except Exception as exc:
             st.info(f"Standartlaştırılmış parametre tablosu alınamadı: {exc}")
         st.markdown("### Model ve Madde Uyum Tanıları (Deneysel)")
@@ -135,7 +135,7 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
             st.caption(f"EAP θ ve posterior SS (Python mirt fscores); {len(persons)} kişi. Kişi kimlikleri eklenmez."
                        + (" NRM'de θ ekseninin işareti kütüphaneye aittir; başarı yönü değildir." if model=="NRM" else ""))
             st.download_button("Kişi yeteneklerini CSV indir",safe_frame(persons).to_csv(index=False).encode("utf-8-sig"),
-                               "B14_kisi_yetenekleri.csv",mime="text/csv",key="b14_persons_csv")
+                               "B14_kisi_yetenekleri.csv",mime="text/csv",key="b14_persons_csv",on_click="ignore")
         except Exception as exc:
             st.info(f"Kişi kestirimi yapılamadı: {exc}")
         try:
@@ -177,8 +177,9 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         st.markdown("**Model ve kestirim bilgileri**")
         st.dataframe(tables["Meta"],hide_index=True,use_container_width=True)
         left,right=st.columns(2)
+        # Downloads must not rerun the page and replace the generated XLSX media URL.
         left.download_button("B14 tüm tablolar Excel",export_xlsx(tables),
-            "B14_rapor.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",key="b14_xlsx")
+            "B14_rapor.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",key="b14_xlsx",on_click="ignore")
         if right.button("B14 ZIP paketini hazırla",key="b14_zip_make"):
             st.session_state["b14_zip"]=export_zip(result)
         if "b14_zip" in st.session_state:

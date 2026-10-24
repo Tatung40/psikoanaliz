@@ -67,6 +67,7 @@ def wait_idle(page, timeout=180_000):
 
 
 def download(page, label, outdir):
+    wait_idle(page)
     with page.expect_download(timeout=60_000) as d:
         page.get_by_role("button", name=label).first.click()
     target = Path(outdir) / d.value.suggested_filename
