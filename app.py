@@ -1762,7 +1762,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 "dönüştürme veya örtük atama yapılmadı. Eksik veri "
                                 "analizi sekmesinde uygun yöntemi değerlendirin."
                             )
-                        external_fit = fit_python_mirt(external_data.to_numpy(), model=model)
+                        external_fit = fit_python_mirt(
+                            external_data.to_numpy(), model=model,
+                            n_categories=(int(external_data.to_numpy().max()) + 1)
+                            if model in ("GRM", "PCM", "GPCM", "NRM") else None)
                     if "python_mirt_experimental_results" not in st.session_state:
                         st.session_state.python_mirt_experimental_results = {}
                     st.session_state.python_mirt_experimental_results[model] = {
