@@ -57,3 +57,12 @@ def test_curve_grid_settings_are_sidebar_only():
     assert 'key=f"py_mirt_theta_range_{model}"' in source
     assert 'key=f"py_mirt_theta_points_{model}"' in source
     assert "np.linspace(theta_min, theta_max, theta_count)" in source
+
+
+def test_all_item_curve_export_and_conditional_sem_are_present():
+    source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
+    assert 'python_mirt_{model}_all_curves.csv' in source
+    assert 'Koşullu Ölçmenin Standart Hatası' in source
+    assert 'conditional_sem' in source
+    assert 'with st.expander("📦 Tüm eğri verilerini indir"' in source
+    assert 'with st.sidebar.expander("📦 Tüm eğri verileri"' not in source
