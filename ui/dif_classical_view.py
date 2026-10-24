@@ -1,5 +1,6 @@
 """Observed-score DIF page: Mantel–Haenszel / Mantel and (ordinal) logistic regression."""
 import io
+import hashlib
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,17 @@ from reports.excel_export import sanitize_excel_cell
 
 ADJUST_LABELS = {"BH": "Benjamini–Hochberg (FDR)", "BY": "Benjamini–Yekutieli (FDR, bağımlılığa dayanıklı)",
                  "Holm": "Holm (FWER)", "Bonferroni": "Bonferroni (FWER)", "none": "Düzeltme yok"}
+_MAX_ROUNDS = 10  # Existing estimator default; part of the request fingerprint.
+
+
+def result_key(data, items, group, reference, focal, method, ordinal, adjust, alpha, purify):
+    """Bootstrap-DIF fingerprint pattern: values/index/schema plus fit settings."""
+    frame = pd.DataFrame(data)
+    values = pd.util.hash_pandas_object(frame, index=True).values.tobytes()
+    settings = repr((tuple(frame.columns), tuple(map(str, frame.dtypes)), frame.shape,
+                     tuple(items), group, reference, focal, method, bool(ordinal), adjust,
+                     float(alpha), bool(purify), _MAX_ROUNDS, "classical-dif-ui-v1")).encode()
+    return hashlib.sha256(values + settings).hexdigest()
 
 
 def _safe(frame):
@@ -31,10 +43,14 @@ def render(data, item_cols=(), id_col=None, group_col=None):
                "I. tip hata şişebilir (özellikle sıralı maddelerde); MH tek biçimli olmayan DIF'e duyarsızdır "
                "(önceden tanımlı simülasyonda güç %18–41). Ayrıntı: validation/DIF_VALIDATION.md.")
     available = [c for c in data.columns if c not in (id_col,)]
+    if not available:
+        st.session_state.pop("cdif_result", None)
+        st.info("Grup ve madde sütunları gerekli."); return
     gcol = st.selectbox("Grup değişkeni", [c for c in available if c != id_col],
                         index=([c for c in available].index(group_col) if group_col in available else 0), key="cdif_group")
     levels = [v for v in pd.Series(data[gcol]).dropna().unique().tolist()]
     if len(levels) < 2:
+        st.session_state.pop("cdif_result", None)
         st.error("Grup değişkeninde en az iki düzey gerekli."); return
     c1, c2 = st.columns(2)
     ref = c1.selectbox("Referans grup", levels, key="cdif_ref")
@@ -48,23 +64,29 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     alpha = c5.select_slider("α", [.01, .05, .10], .05, key="cdif_alpha")
     purify = st.checkbox("Eşleştirme puanını iteratif saflaştır", True, key="cdif_purify")
     if len(items) < 3:
+        st.session_state.pop("cdif_result", None)
         st.info("En az üç madde seçin."); return
     x = data.loc[:, items].apply(pd.to_numeric, errors="coerce")
     ordinal = bool(x.max().max() > 1)
+    key = result_key(data, items, gcol, ref, foc, method, ordinal, adjust, alpha, purify)
+    saved = st.session_state.get("cdif_result")
+    if saved is not None and (not isinstance(saved, dict) or saved.get("key") != key):
+        st.session_state.pop("cdif_result", None)
+        st.info("Veri veya analiz ayarları değişti; eski DIF sonuçları geçersizleştirildi.")
     st.caption("Veri türü: " + ("sıralı (0, 1, 2, ...)" if ordinal else "ikili (0/1)"))
     if st.button("▶️ DIF analizini çalıştır", type="primary", key="cdif_run"):
         try:
             with st.spinner("DIF hesaplanıyor…"):
                 frame, meta = dif_screen(data.loc[:, items], data[gcol], ref, foc, method=method, ordinal=ordinal,
-                                         adjust=adjust, alpha=alpha, purify=purify)
-            st.session_state.cdif_result = (frame, meta, tuple(items), gcol, ref, foc)
+                                         adjust=adjust, alpha=alpha, purify=purify, max_rounds=_MAX_ROUNDS)
+            st.session_state.cdif_result = dict(key=key, frame=frame, meta=meta)
         except Exception as exc:
             st.session_state.pop("cdif_result", None)
             st.error(f"DIF analizi yapılamadı: {exc}")
     saved = st.session_state.get("cdif_result")
-    if not saved or saved[2:] != (tuple(items), gcol, ref, foc):
+    if not saved:
         return
-    frame, meta = saved[0], saved[1]
+    frame, meta = saved["frame"], saved["meta"]
     st.caption(f"Referans N = {meta['n_reference']}, odak N = {meta['n_focal']} | Düzeltme: {ADJUST_LABELS[meta['adjust']]} "
                f"| Saflaştırma turu: {meta['rounds']}")
     for note in meta["notes"]:

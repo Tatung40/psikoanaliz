@@ -37,7 +37,7 @@ def test_classical_dif_page_runs():
     at = _app(df, "MTK: Gözlenen Puan DIF", [f"M{j}" for j in range(8)], group="grup")
     assert not at.exception
     at.button(key="cdif_run").click().run()
-    assert not at.exception and at.session_state["cdif_result"][0].shape[0] == 8
+    assert not at.exception and at.session_state["cdif_result"]["frame"].shape[0] == 8
 
 
 def test_dif34_bootstrap_page_respects_size_study_gate():
