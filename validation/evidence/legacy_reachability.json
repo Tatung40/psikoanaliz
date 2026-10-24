@@ -1,0 +1,1178 @@
+{
+ "modules": [
+  {
+   "module": "core.ctt_dual_engine",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 7,
+   "consumers_sample": [
+    "reports.ctt_guided_docx",
+    "reports.ctt_release_bundle",
+    "scripts/real_lsat6_ctt_pilot.py",
+    "tests/test_ctt_dual_engine.py",
+    "tests/test_ctt_item_crosscheck.py",
+    "tests/test_ctt_release_bundle.py"
+   ]
+  },
+  {
+   "module": "core.ctt_item_crosscheck",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "core.ctt_dual_engine"
+   ]
+  },
+  {
+   "module": "core.ctt_split_crosscheck",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "core.ctt_dual_engine"
+   ]
+  },
+  {
+   "module": "core.data_processing",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_missing_data.py"
+   ]
+  },
+  {
+   "module": "core.descriptives",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_descriptives.py"
+   ]
+  },
+  {
+   "module": "core.dif_classical",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 4,
+   "consumers_sample": [
+    "tests/test_dif_classical.py",
+    "ui.dif_classical_view",
+    "validation/browser_e2e_polytomous_dif.py",
+    "validation/dif_validation_study.py"
+   ]
+  },
+  {
+   "module": "core.distractor_analysis",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_distractors.py",
+    "tests/test_e2e_cloud_simulation.py"
+   ]
+  },
+  {
+   "module": "core.grm_dif",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 7,
+   "consumers_sample": [
+    "core.polytomous_dif",
+    "reports.grm_dif_report",
+    "scripts/grm_dif_study.py",
+    "scripts/grm_dif_validation.py",
+    "tests/test_grm_dif.py",
+    "tests/test_grm_report_ui.py"
+   ]
+  },
+  {
+   "module": "core.group_analysis",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_group_analysis.py"
+   ]
+  },
+  {
+   "module": "core.irt",
+   "reachable_from_ui": true,
+   "legacy_engine": true,
+   "imports_legacy": [],
+   "n_consumers": 29,
+   "consumers_sample": [
+    "core.irt_b12_compare",
+    "core.irt_b13_curves",
+    "core.irt_binary_unified",
+    "core.irt_hessian",
+    "core.irt_itemfit",
+    "core.irt_missing_em"
+   ]
+  },
+  {
+   "module": "core.irt_assumptions",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_assumptions.py",
+    "ui.irt_assumptions_view"
+   ]
+  },
+  {
+   "module": "core.irt_b12_audit",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "core.irt_b12_compare",
+    "tests/test_irt_b12_audit.py"
+   ]
+  },
+  {
+   "module": "core.irt_b12_compare",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_b12_compare.py"
+   ]
+  },
+  {
+   "module": "core.irt_b12_reference",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_b12_reference.py"
+   ]
+  },
+  {
+   "module": "core.irt_b13_compare",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_b13_comparison.py",
+    "ui.irt_b13_view"
+   ]
+  },
+  {
+   "module": "core.irt_b13_curves",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "reports.irt_b13_png",
+    "tests/test_irt_b13_curves.py",
+    "ui.irt_b13_view"
+   ]
+  },
+  {
+   "module": "core.irt_b13_diagnostics",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_b13_diagnostics.py",
+    "ui.irt_b13_view"
+   ]
+  },
+  {
+   "module": "core.irt_b14",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "tests/test_irt_b14.py",
+    "tests/test_irt_b14_persons_info.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "core.irt_b14_diagnostics",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_b14_diagnostics.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "core.irt_b14_model_curves",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_b14_model_curves.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "core.irt_b14_persons_info",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "reports.irt_b14_report",
+    "tests/test_irt_b14_persons_info.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "core.irt_b14_profiles",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_b14_profiles.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "core.irt_binary_unified",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_binary_unified.py"
+   ]
+  },
+  {
+   "module": "core.irt_binary_usage_policy",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_binary_usage_policy.py",
+    "tests/test_irt_streamlit_smoke.py"
+   ]
+  },
+  {
+   "module": "core.irt_dif",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 12,
+   "consumers_sample": [
+    "core.grm_dif",
+    "core.irt_dif34",
+    "core.irt_dif34_bootstrap",
+    "core.polytomous_dif",
+    "scripts/dif_fixed_anchor_simulation.py",
+    "scripts/irt_b10_inputs_for_r.py"
+   ]
+  },
+  {
+   "module": "core.irt_dif34",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 5,
+   "consumers_sample": [
+    "scripts/irt_b11_simulation.py",
+    "tests/test_dif34_safeguards.py",
+    "tests/test_dif_likelihood_validity.py",
+    "tests/test_irt_b11.py",
+    "ui.irt_b11_view"
+   ]
+  },
+  {
+   "module": "core.irt_dif34_bootstrap",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "validation/dif34_bootstrap_size_study.py"
+   ]
+  },
+  {
+   "module": "core.irt_dif_multimodel_screen",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_dif_multimodel_screen.py",
+    "ui.irt_dif_multimodel_view"
+   ]
+  },
+  {
+   "module": "core.irt_engine_policy",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_engine_policy.py"
+   ]
+  },
+  {
+   "module": "core.irt_engine_registry",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_engine_registry.py"
+   ]
+  },
+  {
+   "module": "core.irt_globalfit",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 6,
+   "consumers_sample": [
+    "scripts/irt_b10_simulation.py",
+    "scripts/irt_b11_simulation.py",
+    "tests/test_irt_b10.py",
+    "tests/test_irt_b11.py",
+    "ui.irt_b10_view",
+    "ui.irt_b11_view"
+   ]
+  },
+  {
+   "module": "core.irt_hessian",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 17,
+   "consumers_sample": [
+    "core.irt",
+    "core.irt_b13_diagnostics",
+    "core.irt_se_coverage",
+    "core.irt_stationarity",
+    "scripts/irt_refine_benchmark.py",
+    "scripts/python_free_4pl.py"
+   ]
+  },
+  {
+   "module": "core.irt_itemfit",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "core.irt_b13_diagnostics",
+    "tests/test_irt_itemfit.py",
+    "tests/test_sx2_golden_models.py"
+   ]
+  },
+  {
+   "module": "core.irt_library_curves",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "core.irt_library_parameter_mapping",
+    "tests/test_irt_library_curves.py"
+   ]
+  },
+  {
+   "module": "core.irt_library_diagnostics",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_library_diagnostics.py"
+   ]
+  },
+  {
+   "module": "core.irt_library_parameter_mapping",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "core.irt_python_mirt_parameters",
+    "tests/test_irt_library_parameter_mapping.py",
+    "tests/test_irt_python_mirt_parameters.py"
+   ]
+  },
+  {
+   "module": "core.irt_mg",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 13,
+   "consumers_sample": [
+    "core.irt_dif",
+    "core.irt_dif34",
+    "core.irt_mg34",
+    "core.irt_mixed",
+    "core.irt_mixed_se",
+    "core.irt_q3"
+   ]
+  },
+  {
+   "module": "core.irt_mg34",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 9,
+   "consumers_sample": [
+    "core.irt_dif34",
+    "core.irt_dif34_bootstrap",
+    "core.irt_mixed",
+    "core.irt_q3",
+    "scripts/irt_b11_inputs_for_r.py",
+    "tests/test_dif34_safeguards.py"
+   ]
+  },
+  {
+   "module": "core.irt_missing_em",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_missing_em.py"
+   ]
+  },
+  {
+   "module": "core.irt_missing_likelihood",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 4,
+   "consumers_sample": [
+    "core.irt_missing_em",
+    "tests/test_irt_missing_em.py",
+    "tests/test_irt_missing_likelihood.py",
+    "tests/test_irt_missing_three_way.py"
+   ]
+  },
+  {
+   "module": "core.irt_mixed",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "core.irt_mixed_se",
+    "tests/test_irt_b12_3_mixed.py",
+    "tests/test_irt_mixed_se.py"
+   ]
+  },
+  {
+   "module": "core.irt_mixed_se",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_mixed_se.py"
+   ]
+  },
+  {
+   "module": "core.irt_model_reliability",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_model_reliability.py",
+    "tests/test_irt_streamlit_helpers.py"
+   ]
+  },
+  {
+   "module": "core.irt_monte_carlo_precision",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "scripts/irt_benchmark.py",
+    "tests/test_irt_monte_carlo_precision.py"
+   ]
+  },
+  {
+   "module": "core.irt_multistart",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 11,
+   "consumers_sample": [
+    "core.irt_b12_compare",
+    "core.irt_multistart_validation",
+    "core.irt_quadrature_validation",
+    "core.irt_se_coverage",
+    "core.irt_simulation",
+    "scripts/irt_internal_audit.py"
+   ]
+  },
+  {
+   "module": "core.irt_multistart_validation",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "scripts/irt_multistart_check.py",
+    "tests/test_irt_multistart_validation.py"
+   ]
+  },
+  {
+   "module": "core.irt_python_mirt_adapter",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 13,
+   "consumers_sample": [
+    "core.irt_b13_compare",
+    "core.irt_b14",
+    "core.irt_b14_persons_info",
+    "core.irt_binary_unified",
+    "tests/test_irt_binary_usage_policy.py",
+    "tests/test_irt_library_model_smoke.py"
+   ]
+  },
+  {
+   "module": "core.irt_python_mirt_parameters",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "tests/test_irt_python_mirt_parameters.py",
+    "validation/known_truth_irt_recovery.py",
+    "validation/python_mirt_parameter_recovery.py"
+   ]
+  },
+  {
+   "module": "core.irt_q3",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 8,
+   "consumers_sample": [
+    "core.irt_b13_diagnostics",
+    "scripts/irt_b10_inputs_for_r.py",
+    "scripts/irt_b10_simulation.py",
+    "scripts/irt_b11_inputs_for_r.py",
+    "tests/test_irt_b10.py",
+    "tests/test_irt_b11.py"
+   ]
+  },
+  {
+   "module": "core.irt_quadrature_validation",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 7,
+   "consumers_sample": [
+    "scripts/irt_internal_audit.py",
+    "scripts/python_free_4pl.py",
+    "tests/test_irt_3pl4pl_mathematical_consistency.py",
+    "tests/test_irt_mirt_free4pl.py",
+    "tests/test_irt_mirt_reference.py",
+    "tests/test_irt_quadrature_validation.py"
+   ]
+  },
+  {
+   "module": "core.irt_rsm",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 5,
+   "consumers_sample": [
+    "tests/test_irt_rsm.py",
+    "tests/test_rsm_dif_pages.py",
+    "ui.irt_rsm_view",
+    "validation/browser_e2e_polytomous_dif.py",
+    "validation/rsm_recovery_study.py"
+   ]
+  },
+  {
+   "module": "core.irt_se_coverage",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "scripts/irt_internal_audit.py",
+    "tests/test_irt_se_coverage.py"
+   ]
+  },
+  {
+   "module": "core.irt_se_diagnostics",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 13,
+   "consumers_sample": [
+    "core.irt",
+    "core.irt_hessian",
+    "core.irt_mg34",
+    "core.irt_mixed",
+    "core.irt_model_reliability",
+    "core.irt_multistart"
+   ]
+  },
+  {
+   "module": "core.irt_simulation",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 18,
+   "consumers_sample": [
+    "core.irt_multistart_validation",
+    "core.irt_se_coverage",
+    "core.irt_simulation_reporting",
+    "scripts/irt_internal_audit.py",
+    "scripts/make_mirt_fixtures.py",
+    "tests/test_irt_3pl4pl_mathematical_consistency.py"
+   ]
+  },
+  {
+   "module": "core.irt_simulation_reporting",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "scripts/irt_benchmark.py",
+    "tests/test_irt_simulation_labels.py",
+    "tests/test_irt_simulation_reporting.py"
+   ]
+  },
+  {
+   "module": "core.irt_stationarity",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 6,
+   "consumers_sample": [
+    "core.irt",
+    "scripts/irt_internal_audit.py",
+    "scripts/python_free_4pl.py",
+    "tests/test_irt_boundary_consistency.py",
+    "tests/test_irt_mirt_free4pl.py",
+    "tests/test_irt_stationarity.py"
+   ]
+  },
+  {
+   "module": "core.irt_truth_scenarios",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 5,
+   "consumers_sample": [
+    "scripts/irt_internal_audit.py",
+    "tests/test_irt_3pl4pl_mathematical_consistency.py",
+    "tests/test_irt_quadrature_validation.py",
+    "tests/test_irt_stationarity.py",
+    "tests/test_irt_truth_scenarios.py"
+   ]
+  },
+  {
+   "module": "core.item_analysis",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 4,
+   "consumers_sample": [
+    "core.ctt_dual_engine",
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_edge_cases.py",
+    "tests/test_items.py"
+   ]
+  },
+  {
+   "module": "core.missing_decision",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_missing_decision.py"
+   ]
+  },
+  {
+   "module": "core.missing_imputation",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_missing_imputation.py"
+   ]
+  },
+  {
+   "module": "core.polytomous_dif",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 7,
+   "consumers_sample": [
+    "reports.polytomous_dif_report",
+    "scripts/polytomous_dif_study.py",
+    "scripts/polytomous_dif_validation.py",
+    "scripts/rsm_dif_reference.py",
+    "tests/test_polytomous_dif.py",
+    "tests/test_polytomous_reports_ui.py"
+   ]
+  },
+  {
+   "module": "core.rasch",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 21,
+   "consumers_sample": [
+    "core.grm_dif",
+    "core.irt_binary_unified",
+    "core.irt_dif",
+    "core.irt_dif34",
+    "core.irt_globalfit",
+    "core.irt_mg"
+   ]
+  },
+  {
+   "module": "core.rasch_dif",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 8,
+   "consumers_sample": [
+    "core.grm_dif",
+    "core.irt_dif",
+    "core.irt_dif34",
+    "core.polytomous_dif",
+    "scripts/rasch_b9_inputs_for_r.py",
+    "scripts/rasch_b9_simulation.py"
+   ]
+  },
+  {
+   "module": "core.rasch_globalfit",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "scripts/rasch_b9_simulation.py",
+    "tests/test_rasch_b9.py",
+    "ui.rasch_view"
+   ]
+  },
+  {
+   "module": "core.rasch_q3",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 4,
+   "consumers_sample": [
+    "core.irt_q3",
+    "scripts/rasch_b9_simulation.py",
+    "tests/test_rasch_b9.py",
+    "ui.rasch_view"
+   ]
+  },
+  {
+   "module": "core.reliability",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 5,
+   "consumers_sample": [
+    "core.ctt_dual_engine",
+    "scripts/real_lsat6_ctt_pilot.py",
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_edge_cases.py",
+    "tests/test_reliability.py"
+   ]
+  },
+  {
+   "module": "core.scoring",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_real_ktk_reference.py",
+    "tests/test_scoring.py"
+   ]
+  },
+  {
+   "module": "core.test_statistics",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_items.py"
+   ]
+  },
+  {
+   "module": "core.validation",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_edge_cases.py"
+   ]
+  },
+  {
+   "module": "core.warning_explanations",
+   "reachable_from_ui": false,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_warning_explanations.py"
+   ]
+  },
+  {
+   "module": "reports.ctt_guided_docx",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "reports.ctt_release_bundle",
+    "tests/test_ctt_dual_engine.py",
+    "ui.ctt_dual_report_view"
+   ]
+  },
+  {
+   "module": "reports.ctt_release_bundle",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_ctt_release_bundle.py",
+    "ui.ctt_dual_report_view"
+   ]
+  },
+  {
+   "module": "reports.excel_export",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 4,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_reports.py",
+    "ui.dif_classical_view",
+    "ui.irt_rsm_view"
+   ]
+  },
+  {
+   "module": "reports.grm_dif_report",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_grm_report_ui.py",
+    "ui.grm_dif_view"
+   ]
+  },
+  {
+   "module": "reports.irt_b13_png",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_irt_b13_png.py",
+    "ui.irt_b13_view"
+   ]
+  },
+  {
+   "module": "reports.irt_b14_audit",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "reports.irt_b14_report",
+    "tests/test_irt_b14_audit.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "reports.irt_b14_narrative",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "reports.irt_b14_report",
+    "tests/test_irt_b14_narrative.py",
+    "ui.irt_b14_view"
+   ]
+  },
+  {
+   "module": "reports.irt_b14_report",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 9,
+   "consumers_sample": [
+    "reports.grm_dif_report",
+    "reports.irt_b14_audit",
+    "reports.irt_b14_narrative",
+    "reports.polytomous_dif_report",
+    "tests/test_irt_b14_audit.py",
+    "tests/test_irt_b14_narrative.py"
+   ]
+  },
+  {
+   "module": "reports.polytomous_dif_report",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_polytomous_reports_ui.py",
+    "ui.polytomous_dif_view"
+   ]
+  },
+  {
+   "module": "reports.word_export",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py",
+    "tests/test_reports.py"
+   ]
+  },
+  {
+   "module": "ui.charts",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_e2e_cloud_simulation.py"
+   ]
+  },
+  {
+   "module": "ui.components",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.ctt_dual_report_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.dif_classical_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.grm_dif_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_grm_report_ui.py"
+   ]
+  },
+  {
+   "module": "ui.irt_assumptions_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.irt_b10_view",
+   "reachable_from_ui": false,
+   "legacy_engine": true,
+   "imports_legacy": [
+    "ui.irt_optimization"
+   ],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "tests/test_dif_fixed_anchor_exports.py",
+    "tests/test_irt_b10_streamlit.py",
+    "ui.irt_b11_view"
+   ]
+  },
+  {
+   "module": "ui.irt_b11_view",
+   "reachable_from_ui": false,
+   "legacy_engine": true,
+   "imports_legacy": [
+    "ui.irt_b10_view",
+    "ui.irt_optimization"
+   ],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_irt_b11_streamlit.py"
+   ]
+  },
+  {
+   "module": "ui.irt_b13_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 3,
+   "consumers_sample": [
+    "tests/test_irt_b13_comparison.py",
+    "tests/test_irt_b13_integration.py",
+    "tests/test_irt_b13_png.py"
+   ]
+  },
+  {
+   "module": "ui.irt_b14_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.irt_dif_multimodel_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.irt_optimization",
+   "reachable_from_ui": false,
+   "legacy_engine": true,
+   "imports_legacy": [
+    "core.irt"
+   ],
+   "n_consumers": 7,
+   "consumers_sample": [
+    "scripts/irt_b11_simulation.py",
+    "tests/test_irt_b10_streamlit.py",
+    "tests/test_irt_b11_streamlit.py",
+    "tests/test_irt_streamlit_apptest.py",
+    "tests/test_irt_streamlit_helpers.py",
+    "ui.irt_b10_view"
+   ]
+  },
+  {
+   "module": "ui.irt_python_library_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 2,
+   "consumers_sample": [
+    "tests/test_dual_engine_sidebar.py",
+    "tests/test_pre_real_data_python_engine.py"
+   ]
+  },
+  {
+   "module": "ui.irt_rsm_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 0,
+   "consumers_sample": []
+  },
+  {
+   "module": "ui.polytomous_dif_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 1,
+   "consumers_sample": [
+    "tests/test_polytomous_reports_ui.py"
+   ]
+  },
+  {
+   "module": "ui.rasch_view",
+   "reachable_from_ui": true,
+   "legacy_engine": false,
+   "imports_legacy": [],
+   "n_consumers": 4,
+   "consumers_sample": [
+    "tests/test_rasch_b9_streamlit.py",
+    "tests/test_rasch_streamlit.py",
+    "ui.irt_b10_view",
+    "ui.irt_b11_view"
+   ]
+  }
+ ],
+ "ui_reachable_modules_touching_legacy_engine": [
+  "core.irt",
+  "core.irt_b13_curves",
+  "core.irt_hessian",
+  "core.irt_itemfit",
+  "core.irt_stationarity",
+  "ui.irt_b13_view"
+ ],
+ "removal_candidates": []
+}
