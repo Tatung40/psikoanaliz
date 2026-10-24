@@ -1691,8 +1691,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
                    "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
                    "bu çıktılar araştırma amaçlıdır.")
-        # Optional external engine: isolated experimental output, never mixed with
-        # the native model history, AIC/BIC or inferential diagnostics.
+        # Library-backed binary IRT results remain separate from unvalidated
+        # legacy research reports and their inferential diagnostics.
         # Library calibration controls live in the left settings panel; output stays right.
         with st.sidebar.expander("📐 Grafik ölçeği", expanded=False):
             theta_min, theta_max = st.slider(
