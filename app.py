@@ -1702,6 +1702,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             theta_count = st.select_slider(
                 "Grafik noktası", options=[81, 161, 321, 641],
                 value=161, key=f"py_mirt_theta_points_{model}")
+        with st.sidebar.expander("📈 Eğri madde seçimi", expanded=False):
+            st.selectbox("ICC / IIF için madde", list(irt_columns),
+                         key=f"py_mirt_curve_item_{model}")
         with st.sidebar.expander("⚙️ MTK rapor ayarları", expanded=True):
             st.caption(f"Etkin model: {model} | Motor: Python mirt")
             report_params = st.checkbox("Madde parametreleri", value=True,
@@ -1847,10 +1850,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                     file_name=f"python_mirt_{model}_all_curves.csv",
                                     mime="text/csv", key=f"py_mirt_all_curves_{model}")
                         if report_icc or report_iif:
-                            with st.sidebar.expander("📈 Eğri madde seçimi", expanded=False):
-                                selected_item = st.selectbox(
-                                    "ICC / IIF için madde", list(irt_columns),
-                                    key=f"py_mirt_curve_item_{model}")
+                            selected_item = st.session_state.get(
+                                f"py_mirt_curve_item_{model}", list(irt_columns)[0])
+                            if selected_item not in irt_columns:
+                                selected_item = list(irt_columns)[0]
                             idx = list(irt_columns).index(selected_item)
                         else:
                             idx = 0
