@@ -63,7 +63,7 @@ def evaluate(model, *, n_persons=1000, n_items=12, seed=2026):
                 "max_absolute_error": float(np.abs(residual).max()),
             }
         result["status"] = "MEASURED" if result["converged"] is not False else "NONCONVERGED"
-    except (ValueError, TypeError, RuntimeError, AttributeError, ArithmeticError) as exc:
+    except Exception as exc:  # Preserve each failed simulation as an auditable record.
         result["error_type"] = type(exc).__name__
         result["error_message"] = str(exc)[:300]
     return result
