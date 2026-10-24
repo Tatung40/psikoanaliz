@@ -18,7 +18,7 @@ def test_adapter_does_not_accept_legacy_optimizer_controls():
 def test_visible_mtk_ui_has_no_legacy_tuning_sliders():
     source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
     block = source.split('with st.sidebar.expander("⚙️ MTK model seçimi"', 1)[1].split(
-        'st.warning("Motor politikası:', 1)[0]
+        'st.warning("Etkin iki kategorili MTK motoru:', 1)[0]
     for forbidden in ("Gauss-Hermite düğüm sayısı", "Azami EM yinelemesi",
                       "a üst sınırı", "d alt sınırı", "Bağımsız başlangıç sayısı"):
         assert forbidden not in block
