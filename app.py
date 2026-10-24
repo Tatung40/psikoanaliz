@@ -1853,6 +1853,15 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             tif.update_layout(title="Test Bilgi Fonksiyonu",
                                               xaxis_title="θ", yaxis_title="I(θ)")
                             st.plotly_chart(tif, use_container_width=True)
+                            tif_table = pd.DataFrame({
+                                "theta": theta_grid,
+                                "test_information": curve_data["test_information"],
+                            })
+                            st.download_button(
+                                "Test bilgi fonksiyonunu CSV indir",
+                                data=tif_table.to_csv(index=False).encode("utf-8-sig"),
+                                file_name=f"python_mirt_{model}_tif.csv",
+                                mime="text/csv", key=f"py_mirt_tif_csv_{model}")
                         st.caption("ICC/IIF/TIF: Python mirt katsayılarından "
                                    "bağımsız analitik eğriler. Parametre kurtarma "
                                    "ve R mirt eşdeğerliği henüz sertifikalı değildir.")
