@@ -70,6 +70,7 @@ def download(page, label, outdir):
     with page.expect_download(timeout=60_000) as d:
         page.get_by_role("button", name=label).first.click()
     target = Path(outdir) / d.value.suggested_filename
+    target.parent.mkdir(parents=True, exist_ok=True)
     d.value.save_as(target)
     return target
 
