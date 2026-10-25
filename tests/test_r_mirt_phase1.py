@@ -171,3 +171,30 @@ def test_matched_report_common_likelihood_and_bound_failures(tmp_path,monkeypatc
     assert m['comparisons']['common_grid_loglik']['max_absolute']==0
     assert (m['status']=='FAIL')==outside
     assert m['status']!='PASS'
+
+
+def test_r_only_refit_imports_full_solution_without_python_recalibration(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    data=pd.DataFrame([[0,1,0],[1,0,1],[1,1,0]],columns=list('ABC'))
+    source=tmp_path/'fixture.csv';data.to_csv(source,index=False)
+    monkeypatch.setitem(H.SOURCES,'4PL',str(source))
+    params=[dict(a=1.2,b=-.4,c=0.,d=1.),dict(a=2.5,b=1.5,c=.16,d=.629),dict(a=5.,b=.2,c=.2,d=.9)]
+    pf=pd.DataFrame(params,index=data.columns)
+    curves=pd.DataFrame(dict(item=['A','A'],node=[0,0],theta=[-4.,-4.],category=[0,1],probability=[.8,.2],information=[.16,.16]))
+    meta=dict(converged=True,loglik=-10.,aic=44.,bic=40.,variance=1.)
+    monkeypatch.setattr(H,'refit_baseline',lambda *a:(curves,meta,pf))
+    monkeypatch.setattr(H,'python_fit',lambda *a,**kw:pytest.fail('Forbidden new Python fit'))
+    calls=[]
+    def process(args,**kwargs):
+        calls.append(args);assert args[-1]=='matched-python-start'
+        out=H.Path(args[-2])
+        got=pd.read_csv(out/'python_initialization.csv').set_index('item')
+        pd.testing.assert_frame_equal(got,pf.rename_axis('item'))
+        curves.to_csv(out/'curves.csv',index=False)
+        H.parameter_frame(data.columns,params).to_csv(out/'parameters.csv',index=False)
+        pd.DataFrame([dict(meta,engine='R mirt',version='mock-only',model='4PL',D=1,estimation='ML',matched_profile=True)]).to_csv(out/'metadata.csv',index=False)
+        return SimpleNamespace(returncode=0,stdout='mock',stderr='')
+    monkeypatch.setattr(H.subprocess,'run',process)
+    r=H.run(tmp_path/'out',['4PL'],rscript='mock-R',matched=True,refit_from=tmp_path)
+    assert len(calls)==1 and r['models'][0]['common_grid_loglik']['python']==r['models'][0]['common_grid_loglik']['R']
+    assert r['models'][0]['status']!='PASS'

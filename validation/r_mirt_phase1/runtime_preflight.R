@@ -67,6 +67,16 @@ test_named_optimizer_layout <- function() {
     changed <- named; changed[which(changed)[1]] <- FALSE
     changed[which(!named)[1]] <- TRUE
     stopifnot(inherits(try(fn(p,list(est=changed)),silent=TRUE),"try-error"))
+    if(model=="4PL") {
+      seed <- data.frame(item=colnames(dat),a=c(.3,1.1,5),b=c(-5.9,.25,2.2),
+                         c=c(0,.2,.5),d=c(1,.629,.95))
+      path <- file.path(td,"warm.csv");write.csv(seed,path,row.names=FALSE)
+      warm <- matched_ml(dat,model,values,td,initialization=path)$pars
+      for(i in seq_len(nrow(seed))) {
+        row <- seed[i,]; expected <- c(a1=row$a,d=-row$a*row$b,g=row$c,u=row$d)
+        for(n in names(expected)) stopifnot(warm$value[warm$item==row$item & warm$name==n]==expected[[n]])
+      }
+    }
   }
 }
 test_named_optimizer_layout()

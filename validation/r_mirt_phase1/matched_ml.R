@@ -1,5 +1,5 @@
 # Optional validation-only R mirt 1.48 configuration; no production defaults.
-matched_ml <- function(dat, model, sv, out) {
+matched_ml <- function(dat, model, sv, out, initialization=NULL) {
   stopifnot(model %in% c("3PL","4PL"), as.character(packageVersion("mirt"))=="1.48",
             requireNamespace("nloptr",quietly=TRUE))
   source("validation/r_mirt_phase1/physical_b_constraint.R")
@@ -9,6 +9,22 @@ matched_ml <- function(dat, model, sv, out) {
   sv$value[sv$name=="d"] <- 0
   sv$value[sv$name=="g"] <- .2
   sv$value[sv$name=="u"] <- if(model=="4PL") .95 else 1
+  if(!is.null(initialization)) {
+    seed <- read.csv(initialization,check.names=FALSE)
+    stopifnot(model=="4PL",!anyDuplicated(seed$item),setequal(seed$item,colnames(dat)),
+              all(c("a","b","c","d") %in% names(seed)),!anyNA(seed))
+    for(i in seq_len(nrow(seed))) {
+      p <- seed[i,]
+      stopifnot(is.finite(p$a),is.finite(p$b),is.finite(p$c),is.finite(p$d),
+        p$a>=.1,p$a<=5,p$b>=-6,p$b<=6,p$c>=0,p$c<=.5,p$d>=.5,p$d<=1)
+      # Physical P=c+(u-c)*logistic(a*(theta-b)); R P=g+(u-g)*logistic(a1*theta+d).
+      native <- c(a1=p$a,d=-p$a*p$b,g=p$c,u=p$d)
+      for(n in names(native)) {
+        idx <- sv$item==p$item & sv$name==n
+        stopifnot(sum(idx)==1L); sv$value[idx] <- native[[n]]
+      }
+    }
+  }
   sv$value[sv$name=="MEAN_1"] <- 0; sv$value[sv$name=="COV_11"] <- 1
   sv$est[sv$name %in% c("MEAN_1","COV_11")] <- FALSE
   stopifnot(all(sv$est == (sv$name %in% c("a1","d","g",if(model=="4PL") "u"))))
@@ -35,10 +51,14 @@ matched_ml <- function(dat, model, sv, out) {
   callback <- physical_b_constraint(sv)
   internal <- sv$value; internal[idx] <- logit(internal[idx])
   optargs <- list(longpars=internal,est=sv$est)
-  p <- internal[free]; baseline <- callback(p,optargs)
-  stopifnot(all(baseline<=0))
+  p <- internal[free]
+  stopifnot(all(callback(p,optargs)<=0))
+  # This linear Jacobian check uses exact integer probe coordinates, avoiding
+  # subtractive roundoff for imported starts; optimizer starts remain unchanged.
+  probe <- p; probe[match(aidx,free)] <- 1; probe[match(didx,free)] <- 0
+  baseline <- callback(probe,optargs)
   for(j in seq_along(p)) {
-    trial <- p; trial[j] <- trial[j]+1
+    trial <- probe; trial[j] <- trial[j]+1
     stopifnot(identical(as.numeric(callback(trial,optargs)-baseline),as.numeric(jac[,j])))
   }
   write.csv(sv,file.path(out,"configured_values.csv"),row.names=FALSE)

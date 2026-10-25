@@ -127,7 +127,27 @@ def compare_parameters(py, reference):
     return discrepancies(pair.value_python,pair.value_R)
 
 
-def run(output, models=("1PL","2PL"), estimation="ML", rscript=None, matched=False):
+def refit_baseline(source, data):
+    """Load only the immutable, previously diagnosed Python solution; never fit."""
+    source=Path(source)
+    anchor=json.loads(Path(__file__).with_name("m12_report.json").read_text())
+    if hashlib.sha256((source/"report.json").read_bytes()).hexdigest()!=anchor["source_report_sha256"]:
+        raise ValueError("Wrong original matched report")
+    for name, expected in anchor["input_sha256"].items():
+        if hashlib.sha256((source/name).read_bytes()).hexdigest()!=expected:
+            raise ValueError("Original evidence checksum mismatch: "+name)
+    if not pd.read_csv(source/"4PL/data.csv").equals(data):
+        raise ValueError("Refit data differ from original fit")
+    original=json.loads((source/"report.json").read_text())
+    record=next(m for m in original["models"] if m["model"]=="4PL")
+    parameters=pd.read_csv(source/"4PL/python_parameters.csv").pivot(index="item",columns="parameter",values="value").loc[data.columns]
+    metadata=dict(record["python"],baseline_versions=original["versions"],baseline_python=original["python"])
+    return pd.read_csv(source/"4PL/python_curves.csv"), metadata, parameters
+
+
+def run(output, models=("1PL","2PL"), estimation="ML", rscript=None, matched=False, refit_from=None):
+    if refit_from and (not matched or tuple(models)!=("4PL",)):
+        raise ValueError("Refit requires matched 4PL only")
     if matched and (estimation!="ML" or any(m not in ("3PL","4PL") for m in models)):
         raise ValueError("Matched profile is ML 3PL/4PL only")
     output = Path(output); output.mkdir(parents=True,exist_ok=True)
@@ -167,7 +187,11 @@ def run(output, models=("1PL","2PL"), estimation="ML", rscript=None, matched=Fal
                 rec["settings"].update(profile="matched",Python_quadrature=61,Python_tol=1e-8,max_iter=3000,
                     bounds=dict(a=[.1,5],b=[-6,6],c=[0,.5],d=[.5,1]),priors=None,
                     stopping="Python absolute logLik increment; R parameter increment. Same numeric tol; criteria NOT equivalent.")
-            completed = subprocess.run([executable,str(Path(__file__).with_name("reference.R")),model,str(path.resolve()),str(reference_dir)]+(["matched"] if matched else []),capture_output=True,text=True,timeout=1800 if matched else 180)
+            if refit_from:
+                baseline_curves, baseline_metadata, baseline_parameters=refit_baseline(refit_from,data)
+                baseline_parameters.rename_axis("item").reset_index().to_csv(reference_dir/"python_initialization.csv",index=False)
+                rec["settings"]["initialization"]="Complete preserved Python 4PL solution; no new Python fit"
+            completed = subprocess.run([executable,str(Path(__file__).with_name("reference.R")),model,str(path.resolve()),str(reference_dir)]+(["matched-python-start"] if refit_from else ["matched"] if matched else []),capture_output=True,text=True,timeout=1800 if matched else 180)
             (folder/"R_stdout.txt").write_text(completed.stdout); (folder/"R_stderr.txt").write_text(completed.stderr)
             if completed.returncode == 42:
                 rec["reason"] = "R mirt package unavailable; installation not attempted"; continue
@@ -179,7 +203,11 @@ def run(output, models=("1PL","2PL"), estimation="ML", rscript=None, matched=Fal
             if not np.isfinite([rm[k] for k in ("loglik","aic","bic","variance")]).all(): raise ValueError("Nonfinite R diagnostics")
             if matched and not rm.get("matched_profile"):
                 raise ValueError("R reference did not execute matched profile")
-            py, pm, params = python_fit(data,model,matched=True) if matched else python_fit(data,model); py.to_csv(folder/"python_curves.csv",index=False)
+            if refit_from:
+                py, pm, params=baseline_curves, baseline_metadata, baseline_parameters.to_dict("records")
+            else:
+                py, pm, params = python_fit(data,model,matched=True) if matched else python_fit(data,model)
+            py.to_csv(folder/"python_curves.csv",index=False)
             if not np.isfinite([pm[k] for k in ("loglik","aic","bic","variance")]).all(): raise ValueError("Nonfinite Python diagnostics")
             rec.update(R=rm, python=pm, python_parameters=params, comparisons=compare_curves(py,ref), reason="Discrepancies recorded; acceptance tolerances require calibration")
             pf=parameter_frame(data.columns,params);pf.to_csv(folder/"python_parameters.csv",index=False)
@@ -195,6 +223,16 @@ def run(output, models=("1PL","2PL"), estimation="ML", rscript=None, matched=Fal
                 common={key:evaluate(data.to_numpy(),p,grid.theta.to_numpy(),grid.weight.to_numpy())[2] for key,p in (("python",pp),("R",rp))}
                 rec["comparisons"]["common_grid_loglik"]=discrepancies([common["python"]],[common["R"]])
                 rec["common_grid_loglik"]=common
+                if refit_from:
+                    rec["R_minus_saved_python_loglik"]=common["R"]-common["python"]
+                    rec["fit_counts"]=dict(new_R=1,new_python=0)
+                    if "M12" in pp.index:
+                        from validation.r_mirt_phase1.m12_diagnostic import scores
+                        rec["M12"]=dict(python=pp.loc["M12"].to_dict(),R=rp.loc["M12"].to_dict(),
+                            parameter_differences=discrepancies(pp.loc["M12"],rp.loc["M12"]),
+                            curves=compare_curves(py[py.item=="M12"],ref[ref.item=="M12"]),
+                            physical_scores={key:scores(data.to_numpy(),p,grid.theta.to_numpy(),grid.weight.to_numpy()).loc["M12"].to_dict()
+                                for key,p in (("saved_python",pp),("R_refit",rp))})
                 rec["comparisons"]["parameters_by_name"]={k:discrepancies(pp[k],rp[k]) for k in BOUNDS}
                 rec["boundary_flags"]={key:[dict(item=str(item),parameter=k,value=float(v),outside=bool(v<lo or v>hi))
                     for k,(lo,hi) in BOUNDS.items() if k!="d" or model=="4PL"
@@ -227,5 +265,6 @@ if __name__ == "__main__":
     p.add_argument("--models",nargs="+",choices=MODELS,default=["1PL","2PL"])
     p.add_argument("--estimation",choices=["ML","MAP"],default="ML")
     p.add_argument("--matched",action="store_true")
-    a=p.parse_args();r=run(a.output,a.models,a.estimation,matched=a.matched)
+    p.add_argument("--refit-4pl-from",type=Path)
+    a=p.parse_args();r=run(a.output,a.models,a.estimation,matched=a.matched,refit_from=a.refit_4pl_from)
     print(json.dumps({"status":r["status"],"models":[{k:m[k] for k in ("model","status","execution")} for m in r["models"]]}))

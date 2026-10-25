@@ -54,3 +54,34 @@ This is **LIMITED / 4PL equivalence unresolved**, not PASS. A refit is unnecessa
 to diagnose the nonstationary R point; none was spent. If numerical agreement is
 required next, one R refit initialized from the saved Python physical solution
 is justified, with the same bounds/grid and physical-gradient reporting.
+
+## Prepared single R warm-start diagnostic (not yet executed)
+
+The existing manual workflow now downloads immutable run 40149576359's artifact
+and verifies its report/data/parameter/grid hashes against `m12_report.json`.
+It schedules **one R 4PL fit and zero Python fits**, using the saved complete
+12-item Python solution, not merely replacing M12. No retry, jitter, multistart,
+changed tolerance, changed bounds or changed optimizer is introduced.
+
+The explicit `matched-python-start` mode maps physical (a,b,c,u) to native
+(a1=a, intercept=-a*b, g=c, u=u). The R mirt `pars` values remain physical for
+g/u and are transformed internally by the package exactly as before, including
+0/1. The existing R runtime preflight now checks imported initialization and
+native values. The constant linear Jacobian's arithmetic check uses exact
+integer probe coordinates; the actual optimization starts are untouched.
+
+Command after downloading/extracting that artifact:
+`python validation/r_mirt_phase1/harness.py --output NEW_OUTPUT --models 4PL
+--matched --refit-4pl-from ORIGINAL/matched`.
+
+Raw initialization/configuration, stdout/stderr, new R estimates/curves,
+common-grid likelihood and signed difference from the unchanged Python fit,
+M12 parameters/curve/information differences/physical scores, convergence and
+boundary flags are artifacts. Python output is explicitly reused, with its
+original versions recorded. This is a dependent optimization diagnostic,
+**not a new independent validation experiment**. Agreement has no automatic
+PASS cutoff; original evidence is never overwritten.
+
+Actual execution/results remain PENDING until Actions runs. A missing/expired
+original artifact or failed checksum stops visibly rather than recalibrating
+Python or silently changing inputs.

@@ -1,8 +1,8 @@
-# Independent R mirt execution only; never reads Python fit results.
+# R mirt reference; explicit matched-python-start mode is a dependent diagnostic refit.
 # Rscript reference.R MODEL input.csv output_directory
 args <- commandArgs(trailingOnly=TRUE)
 stopifnot(length(args) %in% c(3L,4L))
-matched <- length(args)==4L && args[4]=="matched"
+matched <- length(args)==4L && args[4] %in% c("matched","matched-python-start")
 if (!requireNamespace("mirt", quietly=TRUE)) quit(status=42L)
 suppressPackageStartupMessages(library(mirt))
 set.seed(20261024)
@@ -27,7 +27,9 @@ if (model %in% c("Rasch", "RSM")) {
 }
 if (matched) {
   source("validation/r_mirt_phase1/matched_ml.R")
-  fit <- do.call(mirt, matched_ml(dat,model,sv,out))
+  initialization <- if(args[4]=="matched-python-start") file.path(out,"python_initialization.csv") else NULL
+  stopifnot(is.null(initialization) || model=="4PL")
+  fit <- do.call(mirt, matched_ml(dat,model,sv,out,initialization=initialization))
   actual_prior <- as.numeric(unlist(extract.mirt(fit,"Prior")))
   expected_prior <- read.csv(file.path(out,"integration.csv"))$weight
   write.csv(data.frame(weight=actual_prior),file.path(out,"actual_R_prior.csv"),row.names=FALSE)
