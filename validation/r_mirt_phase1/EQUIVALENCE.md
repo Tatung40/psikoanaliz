@@ -87,3 +87,25 @@ numerical endpoint-equivalence contract. Then match GH nodes/weights and ML
 settings in validation only. Same tolerance numbers alone do not prove identical
 convergence criteria. The new callback must also pass an actual R 1.48 smoke
 check before use. Status remains NOT COMPARABLE; no scientific PASS asserted.
+
+## Runtime verification pending
+
+`runtime_preflight.R` is a no-fit check against installed R mirt **1.48**:
+namespace API inspection, coupled-bound callback with actual `pars='values'`
+fixed/free layouts, endpoint conversion and boundary probability comparisons.
+It writes raw CSVs and session information. It does not invoke an optimizer,
+certify derivatives or establish full matched-ML equivalence.
+
+Correction/qualification: the real-number finite-logit observation above is
+**not itself proof of a floating-point obstruction**. R may return exactly
+0/1 after underflow/rounding. Actual endpoint behavior must be tested rather
+than presumed. The preflight asserts endpoint equality explicitly and fails
+if absent; success alone still does not authorize a scientific PASS.
+
+Execution of this preflight is PENDING: this workspace has no Rscript and its
+GitHub CLI credential is unusable. No new fits, numerical endpoint evidence,
+or matched-fit discrepancies were produced. Original results remain intact.
+Run from repository root in the provisioned R environment:
+`Rscript validation/r_mirt_phase1/runtime_preflight.R preflight-output`
+Retain outputs/failures. If successful, verify optimizer callback integration,
+shared quadrature/density and boundary derivatives before the two single fits.
