@@ -41,7 +41,7 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
         raise ValueError("estimation must be 'ML' or 'MAP'.")
     if estimation == "MAP" and model not in ("3PL", "4PL"):
         raise ValueError("MAP (library default priors) is enabled only for 3PL/4PL, where it was validated.")
-    if model not in SUPPORTED:
+    if model not in SUPPORTED and model != "Rasch":
         raise ValueError(f"Unsupported model: {model}")
     if model in UNSUPPORTED_PUBLIC_MODELS:
         raise ValueError("Python mirt 1.2.0 fit_mirt API RSM modelini desteklemiyor. RSM için desteklenen bağımsız bir kütüphane motoru gereklidir.")
@@ -87,7 +87,8 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
         mirt=import_module("mirt")
     except ImportError as ex:
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
-    kwargs={"model":model}
+    # Rasch is the fixed-discrimination library 1PL, not the shared-free-a option.
+    kwargs={"model":"1PL" if model=="Rasch" else model}
     if common_discrimination:
         # Documented public equality API; legacy library 1PL remains fixed-a by default.
         kwargs.update(model="2PL",constraints=[{"parameter":"discrimination","items":list(range(x.shape[1]))}])
