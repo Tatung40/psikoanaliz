@@ -106,10 +106,22 @@ for(model in c("GRM","PCM")) {
     if(model=="GRM") {q[ix['a1']]<-a;q[ix[paste0('d',1:m)]]<--a*b}
     else q[ix[paste0('d',1:m)]]<--cumsum(b)
     residual <- as.numeric(A%*%q[free])-rhs
-    if(model=="GRM" && a %in% c(.1,5)) {
-      cat("GRM boundary witness diagnostics: ",file=stderr())
-      dput(list(a=a,b=b,native=q[ix[paste0('d',1:m)]],
-        positive=which(residual>0),residual=residual[residual>0]),file=stderr())
+    if(model=="GRM") {
+      # Evaluate the SAME inequalities in factored physical coordinates. At
+      # a=.1,b=-6, A%*%(-a*b) can leave +5.55e-17 from coordinate/product
+      # roundoff. No epsilon is allowed in the feasibility decision.
+      factored <- c(a-5,.1-a,as.vector(rbind(-a*(b+6),a*(b-6))),a*(1e-6-diff(b)))
+      first <- seq_along(factored)
+      # Existing algebra-only all.equal criterion; NOT a fitted-bound tolerance.
+      check("GRM witness native/physical inequality algebra",equal(residual[first],factored))
+      feasible <- all(factored<=0) && all(residual[-first]<=0)
+      path <- file.path(out,"GRM_boundary_witnesses.csv")
+      record <- data.frame(a=a,b1=b[1],b2=b[2],b3=b[3],
+        raw_native_max=max(residual),factored_max=max(factored),
+        algebra_roundoff=max(abs(residual[first]-factored)),feasible=feasible)
+      if(file.exists(path)) record <- rbind(read.csv(path),record)
+      write.csv(record,path,row.names=FALSE)
+      return(feasible)
     }
     all(residual<=0)
   }
@@ -117,6 +129,10 @@ for(model in c("GRM","PCM")) {
   if(model=="GRM") check("GRM ordering/slope witnesses",!witness(1,c(0,0,1)) && !witness(5.1,c(-1,0,1)) &&
     witness(.1,c(-6,0,6)) && witness(5,c(-6,0,6)))
   else check("PCM steps need not be ordered",witness(1,c(.5,-.5,.2)))
+  if(model=="GRM") check("GRM adjacent outside-bound values remain infeasible",
+    !witness(.1,c(-6,0,6+6*.Machine$double.eps)) &&
+    !witness(.1*(1-.Machine$double.eps),c(-6,0,6)) &&
+    !witness(5*(1+.Machine$double.eps),c(-6,0,6)))
   curves <- list()
   for(i in seq_len(ncol(x))) {
     rows <- which(sv$item==colnames(x)[i])
