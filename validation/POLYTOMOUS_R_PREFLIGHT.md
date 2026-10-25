@@ -78,3 +78,34 @@ convergence at fitted estimates and scientific discrepancy criteria remain open.
 **Next action:** execute the driver once in the provisioned R1.48/Python environment,
 inspect its R check files and report, and stop on any mismatch. Only a separate
 subsequent authorization should schedule independent GRM/PCM fits.
+
+## Manual GitHub Actions (PR65 branch only)
+
+Workflow entry: **Independent R mirt validation**, file `r-mirt-validation.yml`.
+Run display name: **GRM/PCM no-fit preflight (audit/polytomous-r-strategy)**.
+The existing default-branch registration path is reused, avoiding a second
+workflow/bootstrap. This branch's definition executes only the existing no-fit
+preflight; PR63's separate branch definition is unchanged.
+
+Actions → Independent R mirt validation → Run workflow → choose
+**audit/polytomous-r-strategy** → Run workflow. CLI equivalent:
+
+```sh
+gh workflow run r-mirt-validation.yml --repo Tatung40/psikoanaliz --ref audit/polytomous-r-strategy
+```
+
+Do not select validation-r-mirt-phase1: that branch has a different, fitting
+workflow. No workflow was dispatched as part of this implementation task.
+
+The job reuses setup-python/pip caching and r-lib R/dependency caching, pins R
+mirt1.48, and installs only the Python packages needed by this preflight. Cache
+hits depend on GitHub's branch-scoping rules; sibling-branch caches are not
+promised. The pinned helper commit is fetched shallowly only when absent,
+verified before dependency setup, and never checked out or modified.
+
+The driver executes once. Its existing R1.48 checks remain authoritative. CI
+fails on FAIL, missing R execution, missing checks, any scientific_pass=true,
+or any nonzero fit/simulation count. It never invokes the binary harness CLI.
+All diagnostic files upload even after failure, including report.json and R
+stdout/stderr; placeholders explicitly say NOT EXECUTED if setup fails before
+the driver. No successful R execution or scientific validation is claimed here.
