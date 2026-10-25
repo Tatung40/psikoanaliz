@@ -1,3 +1,5 @@
+> Historical audit record. Final classification and later evidence: [README.md](README.md). Earlier pending/unknown statements retain their original scope.
+
 # Exact R mirt 1.48 convergence rule and prospective traces
 
 Versioned source inspected (no new R execution or fit):

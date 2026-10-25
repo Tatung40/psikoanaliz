@@ -1,3 +1,5 @@
+> Historical audit record. Final classification and later evidence: [README.md](README.md). Earlier pending/unknown statements retain their original scope.
+
 # 4PL M12: boundary stagnation evidence; no new fit
 
 Source: real matched run **40149576359**, commit 2b3f675, artifact **12581672043**.

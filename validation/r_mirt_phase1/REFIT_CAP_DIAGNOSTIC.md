@@ -1,3 +1,5 @@
+> Historical audit record. Final classification and later evidence: [README.md](README.md). Earlier pending/unknown statements retain their original scope.
+
 # Single R 4PL refit: NOT CONVERGED
 
 Real run **40150750060**, commit faf7d5a, artifact **12582730224**.

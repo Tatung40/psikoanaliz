@@ -1,3 +1,5 @@
+> Historical audit record. Final classification and later evidence: [README.md](README.md). Earlier pending/unknown statements retain their original scope.
+
 # Targeted 3PL/4PL audit: NOT COMPARABLE
 
 Evidence: real R run 40146456589, commit 0364494, artifact 12581207421.
