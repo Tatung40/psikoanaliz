@@ -232,7 +232,7 @@ with st.sidebar:
     with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
-        for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
+        for m in ("Rasch","1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
             st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
@@ -1195,7 +1195,10 @@ elif selected_page == "12. Kullanım Kılavuzu":
 elif selected_page.startswith("MTK: Python mirt "):
     from ui.irt_python_library_view import render as render_python_library
     py_model = selected_page.replace("MTK: Python mirt ", "", 1)
-    py_data = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if py_model in ("GRM","PCM","GPCM","NRM"):
+        py_data = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
+    else:
+        py_data = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if py_data is None:
         st.warning("Önce veri yükleyin.")
     else:

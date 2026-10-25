@@ -25,13 +25,18 @@ class PythonMirtResult:
 ESTIMATIONS = ("ML", "MAP")
 
 
-def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
+def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False):
     """One public fit call; no implicit engine fallback or unsupported inference.
+
+    common_discrimination=True explicitly fits a shared free a via the public
+    2PL equality-constraint API. The default library 1PL (a=1) is unchanged.
 
     estimation="MAP" (3PL/4PL only) uses Python mirt's documented library default item priors
     (mirt.estimation.priors.default_priors: a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)).
     They were not tuned to any result; see validation/evidence/p1_3pl4pl for the pre-registered study.
     """
+    if common_discrimination and (model!="1PL" or estimation!="ML"):
+        raise ValueError("Common discrimination requires explicit 1PL ML specification.")
     if estimation not in ESTIMATIONS:
         raise ValueError("estimation must be 'ML' or 'MAP'.")
     if estimation == "MAP" and model not in ("3PL", "4PL"):
@@ -83,6 +88,9 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
     except ImportError as ex:
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
     kwargs={"model":model}
+    if common_discrimination:
+        # Documented public equality API; legacy library 1PL remains fixed-a by default.
+        kwargs.update(model="2PL",constraints=[{"parameter":"discrimination","items":list(range(x.shape[1]))}])
     if cats is not None:kwargs["n_categories"]=cats
     if model=="NRM":
         # Python mirt 1.2.0 defect: se_method="auto" labels NRM SEs "oakes" but returns values ~0.45x the
