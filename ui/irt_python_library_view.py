@@ -83,19 +83,33 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
     if report.curves.empty:return
-    import plotly.graph_objects as go
+    # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
+    import matplotlib
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
     selected=st.selectbox('Grafik maddesi',cols,key=f'python_mirt_plot_item_{model}')
     shown=report.curves[report.curves.Madde==str(selected)]
     if model in BINARY:shown=shown[shown.Kategori=='1']
-    figure=go.Figure()
-    for category,group in shown.groupby('Kategori',sort=False):figure.add_scatter(x=group.Theta,y=group.Olasılık,name=f'Kategori {category}',mode='lines')
-    figure.update_layout(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',xaxis_title='θ',yaxis_title='Olasılık')
-    st.plotly_chart(figure,use_container_width=True)
+    fig,ax=plt.subplots(figsize=(7,4))
+    for category,group in shown.groupby('Kategori',sort=False):
+        ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
+    ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
+           xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
+    ax.grid(alpha=.2)
+    if len(shown['Kategori'].unique())>1:ax.legend()
+    fig.tight_layout()
+    try:st.pyplot(fig,use_container_width=True)
+    finally:plt.close(fig)
     st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
     if report.information.empty:return
     info=report.information
     for title,col in [('Madde bilgi fonksiyonu',f'I_{selected}'),('Test bilgi fonksiyonu','Test bilgisi'),('Koşullu standart hata','SEM(θ)')]:
-        figure=go.Figure();figure.add_scatter(x=info['θ'],y=info[col],mode='lines',name=title)
-        figure.update_layout(title=title,xaxis_title='θ',yaxis_title=col);st.plotly_chart(figure,use_container_width=True)
+        fig,ax=plt.subplots(figsize=(7,4))
+        ax.plot(info['θ'],info[col])
+        ax.set(title=title,xlabel='Theta',ylabel=col)
+        ax.grid(alpha=.2)
+        fig.tight_layout()
+        try:st.pyplot(fig,use_container_width=True)
+        finally:plt.close(fig)
     st.caption('SEM(θ)=1/√I_test(θ), parametre standart hatası veya kişi posterior SS değildir.')
     st.download_button('Madde/test bilgisi ve SEM — CSV',_csv(info),f'{model}_information.csv','text/csv',key=f'python_mirt_information_csv_{model}',on_click='ignore')
