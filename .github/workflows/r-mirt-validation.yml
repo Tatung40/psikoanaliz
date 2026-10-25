@@ -82,7 +82,7 @@ jobs:
           assert set(r['comparisons'])=={'GRM','PCM'}, r
           PY
       - name: Lightweight GRM tests before any calibration
-        if: env.VALIDATION_MODE == 'grm-fit'
+        if: github.event_name == 'pull_request' || inputs.mode == 'grm-fit'
         run: |
           python -m pip install pytest
           python -m pytest -q tests/test_grm_r_comparison.py
