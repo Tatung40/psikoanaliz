@@ -76,6 +76,14 @@ for(model in c("GRM","PCM")) {
     source("validation/grm_initial_values.R")
     source("tests/test_grm_initial_values.R")
     check("GRM native initialization survives CSV replay",test_grm_initial_values(x,sv,out))
+  } else {
+    source("validation/grm_initial_values.R")
+    replay <- read.csv(file.path(out,"PCM_configured_layout.csv"),check.names=FALSE)
+    restored <- restore_grm_initial_values(x,replay,itemtype="gpcm")
+    check("PCM native initialization survives CSV replay",
+      identical(attributes(restored),attributes(sv)) &&
+      identical(vapply(restored,class,character(1)),vapply(sv,class,character(1))) &&
+      identical(restored$value,as.double(replay$value)) && identical(restored$est,as.logical(replay$est)))
   }
   free <- which(sv$est);A <- matrix(numeric(),nrow=0,ncol=length(free));rhs <- numeric()
   add <- function(rows,coeff,value=0) {

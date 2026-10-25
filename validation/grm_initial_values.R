@@ -1,6 +1,6 @@
 # Documented mirt initialization: keep the native table; never replay a CSV as pars.
-restore_grm_initial_values <- function(data, saved) {
-  sv <- mirt::mirt(data,1,itemtype="graded",pars="values",verbose=FALSE)
+restore_grm_initial_values <- function(data, saved, itemtype="graded") {
+  sv <- mirt::mirt(data,1,itemtype=itemtype,pars="values",verbose=FALSE)
   stopifnot(identical(names(sv),names(saved)),nrow(sv)==nrow(saved))
   # Everything except existing starts/free flags must remain exactly unchanged.
   for(column in setdiff(names(sv),c("value","est"))) {

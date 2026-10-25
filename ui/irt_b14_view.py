@@ -6,6 +6,7 @@ Python mirt are reported as experimental, never mixed with native B13.
 import io
 import pandas as pd
 import streamlit as st
+from ui.irt_python_library_view import _data_fingerprint
 from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
 from reports.irt_b14_narrative import guided_report
 from reports.irt_b14_audit import interpretation_audit
@@ -31,6 +32,13 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         categories=None
         st.info("GRM/PCM/GPCM/RSM için 0,1,2,3… gibi sıralı kısmi puanlar gerekli. "
                 "A–E seçenek etiketleri bu modellerde başarı düzeyi olarak varsayılmaz.")
+    if model=="PCM":
+        st.caption("PCM: ortak ayırt edicilik a=1 sabittir; θ~N(0,1). Adımlar sıralı olmak zorunda değildir. GPCM'de madde eğimleri serbesttir.")
+    identity=(model,tuple(cols),tuple(categories or ()),_data_fingerprint(data.loc[:,cols]))
+    stale_keys=("b14_current","b14_diagnostics","b14_compare","b14_zip")
+    if st.session_state.get("b14_analysis_identity")!=identity:
+        for key in stale_keys:st.session_state.pop(key,None)
+        st.session_state["b14_analysis_identity"]=identity
     result=None
     if not cols or len(cols)<3:
         st.warning("En az üç madde seçin.")
@@ -74,20 +82,22 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
                     "Tam RSM analizi (ortak adımlar, SH, bilgi, kişi kestirimleri, uyum, RSM–PCM testi) için "
                     "kenar çubuğundaki 'RSM — Derecelendirme Ölçeği Modeli' sayfasını kullanın.")
         if st.button("Python mirt ile B14 pilot analizi",key="b14_run",type="primary",disabled=numeric is None or model=="RSM"):
+            for key in stale_keys:st.session_state.pop(key,None)
             try:
                 with st.spinner("Çok kategorili model kalibre ediliyor"):
                     result=fit_b14(subset,model,categories=categories)
                 st.session_state["b14_current"]={"model":model,"columns":tuple(cols),
-                    "datahash":int(pd.util.hash_pandas_object(subset,index=True).sum()),
+                    "identity":identity,
                     "result":result}
             except Exception as e:
                 st.error(f"Kestirim başarısız: {e}")
         saved=st.session_state.get("b14_current")
-        if saved and saved["model"]==model and saved["columns"]==tuple(cols) and saved["datahash"]==int(pd.util.hash_pandas_object(subset,index=True).sum()):
+        if saved and saved.get("identity")==identity:
             result=saved["result"]
     if result is not None:
         st.warning(result["status"])
         fit=result["result"]
+        if not bool(fit.converged):st.error("Kestirim yakınsamadı; gösterilen sonuçlar geçicidir, başarılı analiz değildir.")
         st.write("Model:",model,"| Motor:",result["engine"],"| N:",result["N"],"| Madde:",result["k"])
         try:
             summary=fit.coef_with_se()

@@ -48,7 +48,8 @@ def summary_metadata(result):
           "Bilimsel durum":result["status"],"N":result["N"],"Madde sayısı":result["k"],
           "Kategori sayısı":len(result["labels"]),"Etiketler":", ".join(result["labels"])}
     for name,attr in (("Yakınsama","converged"),("logLik","log_likelihood"),
-                      ("Parametre sayısı","n_parameters"),("Yineleme","n_iterations")):
+                      ("Parametre sayısı","n_parameters"),("Yineleme","n_iterations"),
+                      ("AIC","aic"),("BIC","bic")):
         try:
             value=getattr(raw,attr)
             if isinstance(value,(str,int,float,bool,np.integer,np.floating,np.bool_)):

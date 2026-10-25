@@ -1,4 +1,4 @@
-"""Opt-in single GRM calibration pair. No retries, simulations or other models."""
+"""Reusable opt-in GRM/PCM calibration pair. One model/attempt; no retries or simulations."""
 import argparse
 import contextlib
 import hashlib
@@ -15,8 +15,21 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from validation.poly_r_preflight import ROOT,helpers,HARNESS_COMMIT
 
 
-def marginal(data,a,b,theta,weights):
+def marginal(data,a,b,theta,weights,model="GRM"):
     """Stable GRM respondent MML and physical score; never clips probabilities."""
+    if model=="PCM":
+        if not np.array_equal(a,np.ones(len(a))):raise ValueError('PCM requires fixed a=1')
+        logits=theta[:,None,None]*np.arange(b.shape[1]+1)-np.concatenate([np.zeros((len(a),1)),np.cumsum(b,axis=1)],axis=1)
+        lp=logits-logsumexp(logits,axis=2,keepdims=True)
+        onehot=np.eye(b.shape[1]+1)[data]
+        joint=np.einsum('njc,qjc->nq',onehot,lp)+np.log(weights)
+        norms=logsumexp(joint,axis=1)
+        post=np.exp(joint-norms[:,None])
+        counts=np.einsum('nq,njc->qjc',post,onehot)
+        residual=counts.sum(2,keepdims=True)*np.exp(lp)-counts
+        gb=residual[:,:,::-1].cumsum(2)[:,:,::-1][:,:,1:].sum(0)
+        return float(norms.sum()),dict(a=np.zeros(len(a)),b=gb)
+    if model!="GRM":raise ValueError('Only GRM/PCM supported')
     z=a[None,:,None]*(theta[:,None,None]-b[None,:,:])
     ls=log_expit(z)
     middle=ls[:,:,:-1]+np.log(-np.expm1(ls[:,:,1:]-ls[:,:,:-1]))
@@ -33,7 +46,7 @@ def marginal(data,a,b,theta,weights):
     return float(norms.sum()),dict(a=ga,b=gb)
 
 
-def python_contract(preflight):
+def python_contract(preflight,model="GRM"):
     import mirt
     from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS
     from mirt.estimation._graded_order import THRESHOLD_GAP
@@ -45,7 +58,8 @@ def python_contract(preflight):
     q=GaussHermiteQuadrature(n_points=61,n_dimensions=1)
     if not np.array_equal(q.nodes[:,0],grid.theta) or not np.array_equal(q.weights,grid.weight):
         raise ValueError('Python GH grid does not exactly match prepared nodes/weights')
-    seed=pd.read_csv(preflight/'GRM_physical.csv',float_precision='round_trip')
+    if model=='PCM' and _ITEM_PARAMETER_BOUNDS['steps']!=(-6.,6.):raise ValueError('PCM step bounds differ')
+    seed=pd.read_csv(preflight/f'{model}_physical.csv',float_precision='round_trip')
     return grid,seed
 
 
@@ -65,27 +79,30 @@ def standard_normal_population(fit):
                 mean=0,variance=1)
 
 
-def python_once(data,seed):
+def python_once(data,seed,model="GRM"):
     import mirt
-    start=dict(discrimination=seed.a.to_numpy(),thresholds=seed[['b1','b2','b3']].to_numpy())
-    fit=mirt.fit_mirt(data.to_numpy(int),model='GRM',n_factors=1,n_categories=4,estimation='EM',
+    start=(dict(steps=seed[['b1','b2','b3']].to_numpy()) if model=='PCM' else
+           dict(discrimination=seed.a.to_numpy(),thresholds=seed[['b1','b2','b3']].to_numpy()))
+    fit=mirt.fit_mirt(data.to_numpy(int),model=model,n_factors=1,n_categories=4,estimation='EM',
         n_quadpts=61,max_iter=3000,tol=1e-8,priors=None,accelerate='none',
         start_values=start,compute_standard_errors=False)
     population=standard_normal_population(fit)
     if not np.isfinite([fit.log_likelihood,fit.aic,fit.bic]).all():raise ValueError('Nonfinite Python fit diagnostics')
     if getattr(fit,'log_posterior',None) is not None:raise ValueError('Unexpected Python item prior')
+    steps=fit.model.steps if model=='PCM' else fit.model.thresholds
     p=pd.DataFrame(dict(item=data.columns,a=fit.model.discrimination,
-        **{f'b{i+1}':fit.model.thresholds[:,i] for i in range(3)}))
+        **{f'b{i+1}':steps[:,i] for i in range(3)}))
     meta=dict(converged=bool(fit.converged),iterations=int(fit.n_iterations),
         loglik=float(fit.log_likelihood),aic=float(fit.aic),bic=float(fit.bic),
         criterion='absolute marginal logLik increment <1e-8',**population)
     return fit,p,meta
 
 
-def execute(preflight,output,allow_fit=False,rscript=None):
+def execute(preflight,output,allow_fit=False,rscript=None,model="GRM"):
+    if model not in ("GRM","PCM"):raise ValueError("Only GRM/PCM supported")
     preflight,output=Path(preflight).resolve(),Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     if (output/'fit_started').exists():raise ValueError('Retry refused: use of this fit attempt already recorded')
-    result=dict(model='GRM',status='NOT EXECUTED',scientific_pass=False,simulations=0,
+    result=dict(model=model,runtime_python=sys.version,status='NOT EXECUTED',scientific_pass=False,simulations=0,
         source_sha256={n:hashlib.sha256((ROOT/'validation'/n).read_bytes()).hexdigest() for n in ('grm_r_comparison.py','grm_r_comparison.R')},
         fit_calls=dict(R=0,python=0),execution=dict(R='NOT EXECUTED',python='NOT EXECUTED'))
     def save(): (output/'report.json').write_text(json.dumps(result,indent=2,default=str,allow_nan=False)+'\n')
@@ -98,17 +115,18 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         fixture=ROOT/h.SOURCES['GRM']
         if data.shape!=(500,8) or not data.equals(pd.read_csv(fixture)) or hashlib.sha256(fixture.read_bytes()).hexdigest()!=prior['fixture_sha256']:
             raise ValueError('Dataset differs from verified fixture')
-        grid,seed=python_contract(preflight)
+        grid,seed=python_contract(preflight,model)
         if list(seed.item)!=list(data.columns):raise ValueError('Starting item order differs')
         result.update(settings=dict(D=1,ML=True,priors=None,mean=0,variance=1,GH_points=61,
             max_iter=3000,numeric_tol=1e-8,acceleration='none',SE=False,
-            bounds=dict(a=[.1,5],b=[-6,6],minimum_threshold_gap=1e-6),
+            bounds=(dict(a=[1,1],b=[-6,6],threshold_ordering=False) if model=="PCM" else
+                    dict(a=[.1,5],b=[-6,6],minimum_threshold_gap=1e-6)),
             python_stop='absolute logLik increment',R_stop='native a/intercept parameter change',
             starting_parameters=seed.to_dict('records')),
             pinned_helpers=dict(commit=HARNESS_COMMIT,sha256=digest),
             versions={k:importlib.metadata.version(k) for k in ('mirt','numpy','scipy','pandas')},
             input_sha256={n:hashlib.sha256((preflight/n).read_bytes()).hexdigest() for n in
-                ('report.json','data.csv','integration.csv','evaluation_grid.csv','GRM_physical.csv','GRM_configured_layout.csv','GRM_constraints.csv')})
+                ('report.json','data.csv','integration.csv','evaluation_grid.csv',f'{model}_physical.csv',f'{model}_configured_layout.csv',f'{model}_constraints.csv')})
         executable=rscript or shutil.which('Rscript')
         if not allow_fit or not executable:
             result['reason']='Prepared only; --execute opt-in and an actual Rscript runtime are required';save();return result
@@ -116,18 +134,18 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         (output/'pr63_optimizer_trace.R').write_text(trace.stdout)
         result['trace_helper_sha256']=hashlib.sha256(trace.stdout.encode()).hexdigest()
         (output/'fit_started').write_text('One attempt only; no retries\n')
-        command=[executable,str(ROOT/'validation/grm_r_comparison.R'),str(preflight),str(output),'EXECUTE_GRM_ONCE']
+        command=[executable,str(ROOT/'validation/grm_r_comparison.R'),str(preflight),str(output),f'EXECUTE_{model}_ONCE',model]
         r=subprocess.run(command,capture_output=True,text=True,timeout=1800)
         (output/'R_stdout.log').write_text(r.stdout);(output/'R_stderr.log').write_text(r.stderr)
         result['execution']['R']='EXECUTED'
         result['fit_calls']['R']=int((output/'R_fit_invoked').exists())
         if r.returncode:raise ValueError(f'R fit process exit {r.returncode}')
         rm=pd.read_csv(output/'R_metadata.csv').iloc[0].to_dict()
-        if str(rm['version'])!='1.48' or rm['model']!='GRM' or rm['mean']!=0 or rm['variance']!=1 or not np.isfinite([rm['loglik'],rm['aic'],rm['bic']]).all():raise ValueError('R metadata/specification mismatch; raw CSV preserved')
+        if str(rm['version'])!='1.48' or rm['model']!=model or rm['mean']!=0 or rm['variance']!=1 or not np.isfinite([rm['loglik'],rm['aic'],rm['bic']]).all():raise ValueError('R metadata/specification mismatch; raw CSV preserved')
         result['R']=rm
         with (output/'Python_stdout.log').open('w') as stdout,(output/'Python_stderr.log').open('w') as stderr:
             result['fit_calls']['python']=1;result['execution']['python']='EXECUTED'
-            with contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):fit,pp,pm=python_once(data,seed)
+            with contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):fit,pp,pm=python_once(data,seed,model)
         pp.to_csv(output/'Python_parameters.csv',index=False);result['python']=pm
         rp=pd.read_csv(output/'R_parameters.csv').set_index('item').loc[data.columns].reset_index()
         evaluation=pd.read_csv(preflight/'evaluation_grid.csv');theta=evaluation.theta.to_numpy()
@@ -152,21 +170,25 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         parameter_frames={}
         for engine,p in [('python',pp),('R',rp)]:
             a=p.a.to_numpy();b=p[['b1','b2','b3']].to_numpy()
-            if not np.isfinite(np.c_[a,b]).all() or np.any(a<=0) or np.any(np.diff(b,axis=1)<=0):raise ValueError('Invalid GRM estimates')
-            ll,score=marginal(data.to_numpy(int),a,b,grid.theta.to_numpy(),grid.weight.to_numpy())
+            if not np.isfinite(np.c_[a,b]).all() or np.any(a<=0):raise ValueError('Invalid estimates')
+            if model=='GRM' and np.any(np.diff(b,axis=1)<=0):raise ValueError('Unordered GRM thresholds')
+            if model=='PCM' and not np.array_equal(a,np.ones(len(a))):raise ValueError('PCM discrimination differs from 1')
+            ll,score=marginal(data.to_numpy(int),a,b,grid.theta.to_numpy(),grid.weight.to_numpy(),model)
             result['common_grid_loglik'][engine]=ll
             result['physical_scores'][engine]=dict(a=score['a'].tolist(),b=score['b'].tolist(),
                 native_a=(score['a']-(score['b']*b/a[:,None]).sum(1)).tolist(),native_d=(-score['b']/a[:,None]).tolist())
+            if model=='PCM':
+                result['physical_scores'][engine]=dict(b=score['b'].tolist(),native_d=np.c_[-score['b'][:,:-1]+score['b'][:,1:],-score['b'][:,-1]].tolist(),a='FIXED')
             records=[]
             for i,item in enumerate(data.columns):
-                values=[('a lower',.1-a[i]),('a upper',a[i]-5)]
+                values=([('a fixed',abs(a[i]-1))] if model=='PCM' else [('a lower',.1-a[i]),('a upper',a[i]-5)])
                 for j in range(3):values.extend([(f'b{j+1} lower',-6-b[i,j]),(f'b{j+1} upper',b[i,j]-6)])
-                values.extend([(f'b{j+1} to b{j+2} gap',1e-6-b[i,j+1]+b[i,j]) for j in range(2)])
+                if model=='GRM':values.extend([(f'b{j+1} to b{j+2} gap',1e-6-b[i,j+1]+b[i,j]) for j in range(2)])
                 records.extend([dict(item=item,constraint=k,residual=float(v)) for k,v in values])
             pd.DataFrame(records).to_csv(output/f'{engine}_physical_constraints.csv',index=False)
             residual=np.array([r['residual'] for r in records])
             result['constraint_diagnostics'][engine]=dict(max_violation=float(max(0.,residual.max())),
-                near_active_residuals=np.flatnonzero(abs(residual)<=1e-6).tolist(),
+                near_active_residuals=np.flatnonzero((abs(residual)<=1e-6)&np.array([r['constraint']!='a fixed' for r in records])).tolist(),
                 note='1e-6 proximity label only; exact positive violations remain failures')
             # Match R and Python coordinates: one a, three physical thresholds per item.
             parameters=[dict(a=float(av),b=bv.tolist()) for av,bv in zip(a,b)]
@@ -174,14 +196,20 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         result['comparisons']['parameters']=h.compare_parameters(parameter_frames['python'],parameter_frames['R'])
         result['comparisons']['common_grid_loglik']=h.discrepancies([result['common_grid_loglik']['python']],[result['common_grid_loglik']['R']])
         if any(isinstance(v,dict) and v.get('status') in ('FAIL','NOT COMPARABLE') for v in result['comparisons'].values()):raise ValueError('Invalid numerical comparison')
-        if fit.n_parameters!=32 or int(rm['n_parameters'])!=32:raise ValueError('Free parameter counts differ')
+        parameter_pair=parameter_frames['python'].merge(parameter_frames['R'],on=['item','parameter','component'],suffixes=('_python','_R'),validate='one_to_one')
+        parameter_pair['estimated']=(parameter_pair.parameter!='a') if model=='PCM' else True
+        parameter_pair['absolute_difference']=abs(parameter_pair.value_python-parameter_pair.value_R)
+        parameter_pair['relative_difference']=np.divide(parameter_pair.absolute_difference,abs(parameter_pair.value_R),out=np.full(len(parameter_pair),np.nan),where=parameter_pair.value_R!=0)
+        parameter_pair.to_csv(output/'parameter_comparison.csv',index=False)
+        k=24 if model=='PCM' else 32
+        if fit.n_parameters!=k or int(rm['n_parameters'])!=k:raise ValueError('Free parameter counts differ')
         result['fit_statistic_definitions']={}
         for engine,meta in [('python',pm),('R',rm)]:
             ll=result['common_grid_loglik'][engine]
-            result['fit_statistic_definitions'][engine]=dict(N=len(data),k=32,
-                common_grid_AIC=-2*ll+2*32,common_grid_BIC=-2*ll+np.log(len(data))*32,
-                native_AIC_identity_residual=meta['aic']-(-2*meta['loglik']+2*32),
-                native_BIC_identity_residual=meta['bic']-(-2*meta['loglik']+np.log(len(data))*32),
+            result['fit_statistic_definitions'][engine]=dict(N=len(data),k=k,
+                common_grid_AIC=-2*ll+2*k,common_grid_BIC=-2*ll+np.log(len(data))*k,
+                native_AIC_identity_residual=meta['aic']-(-2*meta['loglik']+2*k),
+                native_BIC_identity_residual=meta['bic']-(-2*meta['loglik']+np.log(len(data))*k),
                 native_minus_common_loglik=meta['loglik']-ll)
         result['R_minus_python_common_grid_loglik']=result['common_grid_loglik']['R']-result['common_grid_loglik']['python']
         result['status']='MEASURED / NOT CERTIFIED'
@@ -199,6 +227,6 @@ def execute(preflight,output,allow_fit=False,rscript=None):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--preflight',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--execute',action='store_true')
-    a=p.parse_args();r=execute(a.preflight,a.output,a.execute);print(r['status'])
+    p=argparse.ArgumentParser();p.add_argument('--preflight',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--execute',action='store_true');p.add_argument('--model',choices=['GRM','PCM'],default='GRM')
+    a=p.parse_args();r=execute(a.preflight,a.output,a.execute,model=a.model);print(r['status'])
     if r['status'] in ('FAIL','NOT CONVERGED'):raise SystemExit(1)
