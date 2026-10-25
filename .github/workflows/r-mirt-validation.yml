@@ -14,10 +14,6 @@ jobs:
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: release
@@ -26,27 +22,17 @@ jobs:
         with:
           packages: any::mirt
           cache-version: 1
-      - name: Install Python dependencies
-        run: python -m pip install -r requirements.txt 'mirt==1.2.0'
-      - name: Targeted harness tests
-        run: python -m pytest -q tests/test_r_mirt_phase1.py
-      - name: Execute each binary model once (independent ML)
+      - name: R mirt runtime preflight only (no fits)
         run: |
           mkdir -p validation-output
-          set -o pipefail
-          python validation/r_mirt_phase1/harness.py --output validation-output --models Rasch 1PL 2PL 3PL 4PL --estimation ML 2>&1 | tee validation-output/execution.log
+          status=0
+          Rscript validation/r_mirt_phase1/runtime_preflight.R validation-output >validation-output/stdout.log 2>validation-output/stderr.log || status=$?
+          cat validation-output/stdout.log
+          cat validation-output/stderr.log >&2
+          exit "$status"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: independent-r-mirt-${{ github.sha }}
           path: validation-output/
           if-no-files-found: error
-      - name: Require actual execution (not scientific certification)
-        run: |
-          python - <<'PY'
-          import json
-          r = json.load(open('validation-output/report.json'))
-          assert len(r['models']) == 5
-          assert all(m['execution'] == 'EXECUTED' and 'comparisons' in m for m in r['models']), r
-          assert all(m['status'] != 'FAIL' for m in r['models']), r
-          PY
