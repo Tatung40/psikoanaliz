@@ -108,6 +108,12 @@ for(model in c("GRM","PCM")) {
   check(paste(model,"constraint Jacobian"),equal(A,numeric_A))
   colnames(A) <- paste(sv$item[free],sv$name[free],sv$parnum[free],sep=":")
   write.csv(cbind(as.data.frame(A),rhs=rhs),file.path(out,paste0(model,"_constraints.csv")),row.names=FALSE)
+  replay_constraints <- read.csv(file.path(out,paste0(model,"_constraints.csv")),check.names=FALSE)
+  optimizer_A <- optimizer_constraint_matrix(replay_constraints,colnames(A))
+  check(paste(model,"CSV optimizer Jacobian is double with unchanged values"),
+    is.double(optimizer_A) && equal(optimizer_A,A))
+  if(model=="PCM") check("PCM integer CSV Jacobian regression",
+    is.integer(as.matrix(replay_constraints[,colnames(A),drop=FALSE])) && is.double(optimizer_A))
   # Feasible and deliberately infeasible witnesses, without clipping or sorting.
   witness <- function(a,b) {
     q<-sv$value;ix<-which(sv$item==colnames(x)[1]);ix<-setNames(ix,sv$name[ix])

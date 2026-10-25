@@ -23,7 +23,7 @@ stopifnot(identical(as.numeric(sv$parnum),as.numeric(seq_len(nrow(sv)))),length(
   all(!sv$est[sv$name %in% c("MEAN_1","COV_11")]),
   sv$value[sv$name=="MEAN_1"]==0,sv$value[sv$name=="COV_11"]==1,
   nrow(grid)==61,all(grid$weight>0),isTRUE(all.equal(sum(grid$weight),1)))
-A <- as.matrix(constraints[,labels,drop=FALSE]);rhs <- constraints$rhs
+A <- optimizer_constraint_matrix(constraints,labels);rhs <- constraints$rhs
 stopifnot(all(as.numeric(A%*%sv$value[free])-rhs<=0))
 # Confirm complete common conventional starts in native coordinates.
 for(i in seq_len(8L)) {

@@ -22,3 +22,11 @@ restore_grm_initial_values <- function(data, saved, itemtype="graded") {
   sv$est[] <- as.logical(saved$est)
   sv
 }
+
+# CSV's all-integral PCM coefficients must remain double at the NLopt C boundary.
+optimizer_constraint_matrix <- function(table, labels) {
+  A <- as.matrix(table[,labels,drop=FALSE])
+  storage.mode(A) <- "double"
+  stopifnot(all(is.finite(A)))
+  A
+}
