@@ -65,6 +65,10 @@ jobs:
         run: |
           set -o pipefail
           python validation/poly_r_preflight.py --output preflight-output 2>&1 | tee preflight-output/driver.log
+          result=${PIPESTATUS[0]}
+          cat preflight-output/report.json
+          cat preflight-output/R_stderr.log
+          exit "$result"
       - name: Require actual R preflight; reject scientific certification
         run: |
           python - <<'PY'
@@ -87,6 +91,10 @@ jobs:
         run: |
           set -o pipefail
           python validation/grm_r_comparison.py --preflight preflight-output --output preflight-output/grm-fit --execute 2>&1 | tee preflight-output/grm-fit-driver.log
+          result=${PIPESTATUS[0]}
+          cat preflight-output/grm-fit/report.json
+          cat preflight-output/grm-fit/R_stderr.log
+          exit "$result"
       - name: Require complete GRM executions, never scientific PASS
         if: env.VALIDATION_MODE == 'grm-fit'
         run: |
