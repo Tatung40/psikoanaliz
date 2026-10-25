@@ -69,6 +69,14 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     import ui.irt_python_library_view as view
     model,frame,outcome,labels,report=calibrated
     calls=[]
+    rendered_figures=[]
+    original_pyplot=view.st.pyplot
+    def capture_pyplot(fig,*args,**kwargs):
+        assert fig is not None and len(fig.axes)==1
+        assert len(fig.axes[0].lines)>=1
+        rendered_figures.append(fig)
+        return original_pyplot(fig,*args,**kwargs)
+    monkeypatch.setattr(view.st,'pyplot',capture_pyplot)
     def fitted(x,**kwargs):
         np.testing.assert_array_equal(x,frame.to_numpy())
         assert kwargs['common_discrimination']==(model=='1PL')
@@ -83,11 +91,11 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run();assert not at.exception
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
-    assert len(at.dataframe)==2 and len(at.get('imgs'))==4
+    assert len(at.dataframe)==2 and len(rendered_figures)==4
     assert len(at.get('download_button'))==4
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     pd.testing.assert_frame_equal(at.dataframe[1].value,report.parameters)
-    at.run();assert len(calls)==1 and len(at.dataframe)==2
+    at.run();assert len(calls)==1 and len(at.dataframe)==2 and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False
@@ -100,7 +108,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     changed=data.copy();changed.iloc[0,0]=labels[(frame.iloc[0,0]+1)%4] if model=='NRM' else (frame.iloc[0,0]+1)%(2 if model in BINARY else 4)
     at.session_state['raw_df']=changed;at.session_state['scored_df']=changed
     at.run();assert not at.exception
-    assert not at.dataframe and not at.get('imgs') and not at.get('download_button')
+    assert not at.dataframe and not at.get('download_button')
     # Invalid input also clears every output rather than retaining the previous fit.
     at.session_state[f'python_mirt_fit_{model}']={'key':None,'outcome':outcome}
     at.multiselect(key=f'python_mirt_cols_{model}').set_value(list(frame.columns[:2])).run()
@@ -143,7 +151,7 @@ render(x,items=list(x),model=model)
     at.session_state[f'python_mirt_fit_{model}']={'key':(), 'outcome':object()}
     at.run();at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception and any('intentional calibration failure' in e.value for e in at.error)
-    assert not at.dataframe and not at.get('imgs') and not at.get('download_button')
+    assert not at.dataframe and not at.get('download_button')
     assert f'python_mirt_fit_{model}' not in at.session_state
 
 
