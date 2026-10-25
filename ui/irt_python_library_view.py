@@ -22,7 +22,7 @@ def _csv(frame):return safe_frame(frame).to_csv(index=False).encode('utf-8-sig')
 def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     if model not in MODELS:st.error('Desteklenmeyen model');return
     st.subheader(f'Python mirt Kütüphanesi — {model}')
-    st.caption('Python mirt 1.2.0 | Hesaplanmış betimsel çıktılar; bağımsız bilimsel sertifika veya formel DIF değildir.')
+    st.caption('Python mirt 1.2.0 | Sonuç ekranı sürümü: nine-model-report-v2 | Bağımsız bilimsel sertifika veya formel DIF değildir.')
     choices=[c for c in data.columns if c not in (id_col,group_col)]
     cols=st.multiselect('Madde sütunları',choices,default=[c for c in items if c in choices] or choices[:10],key=f'python_mirt_cols_{model}')
     estimation='ML';categories=None;labels=()
@@ -61,7 +61,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         try:
             with st.spinner('Python mirt kestirimi çalışıyor'):
-                outcome=fit_python_mirt(x.to_numpy(),model='1PL' if model=='Rasch' else model,
+                outcome=fit_python_mirt(x.to_numpy(),model=model,
                     n_categories=categories,estimation=estimation,common_discrimination=model=='1PL')
             saved=dict(key=key,outcome=outcome)
             st.session_state[f'python_mirt_fit_{model}']=saved
