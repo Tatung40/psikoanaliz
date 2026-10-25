@@ -1,0 +1,173 @@
+"""Opt-in single GRM calibration pair. No retries, simulations or other models."""
+import argparse
+import contextlib
+import hashlib
+import importlib.metadata
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import numpy as np
+import pandas as pd
+from scipy.special import log_expit,logsumexp
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from validation.poly_r_preflight import ROOT,helpers,HARNESS_COMMIT
+
+
+def marginal(data,a,b,theta,weights):
+    """Stable GRM respondent MML and physical score; never clips probabilities."""
+    z=a[None,:,None]*(theta[:,None,None]-b[None,:,:])
+    ls=log_expit(z)
+    middle=ls[:,:,:-1]+np.log(-np.expm1(ls[:,:,1:]-ls[:,:,:-1]))
+    lp=np.concatenate([log_expit(-z[:,:,:1]),middle,ls[:,:,-1:]],axis=2)
+    onehot=np.eye(b.shape[1]+1)[data]
+    joint=np.einsum('njc,qjc->nq',onehot,lp)+np.log(weights)
+    norms=logsumexp(joint,axis=1)
+    post=np.exp(joint-norms[:,None])
+    counts=np.einsum('nq,njc->qjc',post,onehot)
+    ld=ls+log_expit(-z)
+    pair=counts[:,:,:-1]*np.exp(ld-lp[:,:,:-1])-counts[:,:,1:]*np.exp(ld-lp[:,:,1:])
+    gb=a[:,None]*pair.sum(0)
+    ga=-np.sum(pair*(theta[:,None,None]-b[None,:,:]),axis=(0,2))
+    return float(norms.sum()),dict(a=ga,b=gb)
+
+
+def python_contract(preflight):
+    import mirt
+    from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS
+    from mirt.estimation._graded_order import THRESHOLD_GAP
+    from mirt.estimation.quadrature import GaussHermiteQuadrature
+    if importlib.metadata.version('mirt')!='1.2.0':raise ValueError('Python mirt must be 1.2.0')
+    if (_ITEM_PARAMETER_BOUNDS['discrimination'],_ITEM_PARAMETER_BOUNDS['thresholds'],THRESHOLD_GAP)!=((.1,5.),(-6.,6.),1e-6):
+        raise ValueError('Python constraints differ')
+    grid=pd.read_csv(preflight/'integration.csv',float_precision='round_trip')
+    q=GaussHermiteQuadrature(n_points=61,n_dimensions=1)
+    if not np.array_equal(q.nodes[:,0],grid.theta) or not np.array_equal(q.weights,grid.weight):
+        raise ValueError('Python GH grid does not exactly match prepared nodes/weights')
+    seed=pd.read_csv(preflight/'GRM_physical.csv',float_precision='round_trip')
+    return grid,seed
+
+
+def python_once(data,seed):
+    import mirt
+    start=dict(discrimination=seed.a.to_numpy(),thresholds=seed[['b1','b2','b3']].to_numpy())
+    fit=mirt.fit_mirt(data.to_numpy(int),model='GRM',n_categories=4,estimation='EM',
+        n_quadpts=61,max_iter=3000,tol=1e-8,priors=None,accelerate='none',
+        start_values=start,compute_standard_errors=False)
+    if not np.array_equal(np.asarray(fit.latent_mean).reshape(-1),[0.]) or not np.array_equal(fit.latent_covariance,[[1.]]):
+        raise ValueError('Python latent distribution differs')
+    if not np.isfinite([fit.log_likelihood,fit.aic,fit.bic]).all():raise ValueError('Nonfinite Python fit diagnostics')
+    if getattr(fit,'log_posterior',None) is not None:raise ValueError('Unexpected Python item prior')
+    p=pd.DataFrame(dict(item=data.columns,a=fit.model.discrimination,
+        **{f'b{i+1}':fit.model.thresholds[:,i] for i in range(3)}))
+    meta=dict(converged=bool(fit.converged),iterations=int(fit.n_iterations),
+        loglik=float(fit.log_likelihood),aic=float(fit.aic),bic=float(fit.bic),
+        criterion='absolute marginal logLik increment <1e-8',mean=0,variance=1)
+    return fit,p,meta
+
+
+def execute(preflight,output,allow_fit=False,rscript=None):
+    preflight,output=Path(preflight).resolve(),Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
+    if (output/'fit_started').exists():raise ValueError('Retry refused: use of this fit attempt already recorded')
+    result=dict(model='GRM',status='NOT EXECUTED',scientific_pass=False,simulations=0,
+        source_sha256={n:hashlib.sha256((ROOT/'validation'/n).read_bytes()).hexdigest() for n in ('grm_r_comparison.py','grm_r_comparison.R')},
+        fit_calls=dict(R=0,python=0),execution=dict(R='NOT EXECUTED',python='NOT EXECUTED'))
+    def save(): (output/'report.json').write_text(json.dumps(result,indent=2,default=str,allow_nan=False)+'\n')
+    save()
+    try:
+        prior=json.loads((preflight/'report.json').read_text())
+        if prior['status']!='PREFLIGHT CHECKED / NOT SCIENTIFICALLY VALIDATED' or prior['R_execution']!='EXECUTED' or not all(x['checked'] for x in prior['R_checks']):
+            raise ValueError('Successful actual R preflight required')
+        data=pd.read_csv(preflight/'data.csv');h,digest=helpers()
+        fixture=ROOT/h.SOURCES['GRM']
+        if data.shape!=(500,8) or not data.equals(pd.read_csv(fixture)) or hashlib.sha256(fixture.read_bytes()).hexdigest()!=prior['fixture_sha256']:
+            raise ValueError('Dataset differs from verified fixture')
+        grid,seed=python_contract(preflight)
+        if list(seed.item)!=list(data.columns):raise ValueError('Starting item order differs')
+        result.update(settings=dict(D=1,ML=True,priors=None,mean=0,variance=1,GH_points=61,
+            max_iter=3000,numeric_tol=1e-8,acceleration='none',SE=False,
+            bounds=dict(a=[.1,5],b=[-6,6],minimum_threshold_gap=1e-6),
+            python_stop='absolute logLik increment',R_stop='native a/intercept parameter change',
+            starting_parameters=seed.to_dict('records')),
+            pinned_helpers=dict(commit=HARNESS_COMMIT,sha256=digest),
+            versions={k:importlib.metadata.version(k) for k in ('mirt','numpy','scipy','pandas')},
+            input_sha256={n:hashlib.sha256((preflight/n).read_bytes()).hexdigest() for n in
+                ('report.json','data.csv','integration.csv','evaluation_grid.csv','GRM_physical.csv','GRM_configured_layout.csv','GRM_constraints.csv')})
+        executable=rscript or shutil.which('Rscript')
+        if not allow_fit or not executable:
+            result['reason']='Prepared only; --execute opt-in and an actual Rscript runtime are required';save();return result
+        trace=subprocess.run(['git','show',HARNESS_COMMIT+':validation/r_mirt_phase1/optimizer_trace.R'],cwd=ROOT,capture_output=True,text=True,check=True)
+        (output/'pr63_optimizer_trace.R').write_text(trace.stdout)
+        result['trace_helper_sha256']=hashlib.sha256(trace.stdout.encode()).hexdigest()
+        (output/'fit_started').write_text('One attempt only; no retries\n')
+        command=[executable,str(ROOT/'validation/grm_r_comparison.R'),str(preflight),str(output),'EXECUTE_GRM_ONCE']
+        r=subprocess.run(command,capture_output=True,text=True,timeout=1800)
+        (output/'R_stdout.log').write_text(r.stdout);(output/'R_stderr.log').write_text(r.stderr)
+        result['execution']['R']='EXECUTED'
+        result['fit_calls']['R']=int((output/'R_fit_invoked').exists())
+        if r.returncode:raise ValueError(f'R fit process exit {r.returncode}')
+        rm=pd.read_csv(output/'R_metadata.csv').iloc[0].to_dict()
+        if str(rm['version'])!='1.48' or rm['model']!='GRM' or rm['mean']!=0 or rm['variance']!=1 or not np.isfinite([rm['loglik'],rm['aic'],rm['bic']]).all():raise ValueError('R metadata/specification mismatch; raw CSV preserved')
+        result['R']=rm
+        with (output/'Python_stdout.log').open('w') as stdout,(output/'Python_stderr.log').open('w') as stderr:
+            result['fit_calls']['python']=1;result['execution']['python']='EXECUTED'
+            with contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):fit,pp,pm=python_once(data,seed)
+        pp.to_csv(output/'Python_parameters.csv',index=False);result['python']=pm
+        rp=pd.read_csv(output/'R_parameters.csv').set_index('item').loc[data.columns].reset_index()
+        evaluation=pd.read_csv(preflight/'evaluation_grid.csv');theta=evaluation.theta.to_numpy()
+        P=fit.model.probability(theta);info=np.column_stack([fit.model.information(theta,item_idx=i) for i in range(8)])
+        py=pd.DataFrame([dict(item=str(item),node=q,theta=t,category=c,probability=P[q,i,c],information=info[q,i])
+            for i,item in enumerate(data.columns) for q,t in enumerate(theta) for c in range(4)])
+        py.to_csv(output/'Python_curves.csv',index=False)
+        result['comparisons']=h.compare_curves(py,pd.read_csv(output/'R_curves.csv'))
+        if result['comparisons'].get('status')=='FAIL':raise ValueError('Curve key/schema mismatch')
+        # Compare actual probability/info arrays by keys without a scientific cutoff.
+        pair=py.merge(pd.read_csv(output/'R_curves.csv'),on=['item','node','category'],suffixes=('_python','_R'),validate='one_to_one')
+        if len(pair)!=len(py):raise ValueError('Curve key mismatch')
+        result['comparisons']['item_information']=h.discrepancies(pair.information_python,pair.information_R)
+        result['common_grid_loglik']={};result['physical_scores']={};result['constraint_diagnostics']={}
+        parameter_frames={}
+        for engine,p in [('python',pp),('R',rp)]:
+            a=p.a.to_numpy();b=p[['b1','b2','b3']].to_numpy()
+            if not np.isfinite(np.c_[a,b]).all() or np.any(a<=0) or np.any(np.diff(b,axis=1)<=0):raise ValueError('Invalid GRM estimates')
+            ll,score=marginal(data.to_numpy(int),a,b,grid.theta.to_numpy(),grid.weight.to_numpy())
+            result['common_grid_loglik'][engine]=ll
+            result['physical_scores'][engine]=dict(a=score['a'].tolist(),b=score['b'].tolist(),
+                native_a=(score['a']-(score['b']*b/a[:,None]).sum(1)).tolist(),native_d=(-score['b']/a[:,None]).tolist())
+            records=[]
+            for i,item in enumerate(data.columns):
+                values=[('a lower',.1-a[i]),('a upper',a[i]-5)]
+                for j in range(3):values.extend([(f'b{j+1} lower',-6-b[i,j]),(f'b{j+1} upper',b[i,j]-6)])
+                values.extend([(f'b{j+1} to b{j+2} gap',1e-6-b[i,j+1]+b[i,j]) for j in range(2)])
+                records.extend([dict(item=item,constraint=k,residual=float(v)) for k,v in values])
+            pd.DataFrame(records).to_csv(output/f'{engine}_physical_constraints.csv',index=False)
+            residual=np.array([r['residual'] for r in records])
+            result['constraint_diagnostics'][engine]=dict(max_violation=float(max(0.,residual.max())),
+                near_active_residuals=np.flatnonzero(abs(residual)<=1e-6).tolist(),
+                note='1e-6 proximity label only; exact positive violations remain failures')
+            # Match R and Python coordinates: one a, three physical thresholds per item.
+            parameters=[dict(a=float(av),b=bv.tolist()) for av,bv in zip(a,b)]
+            parameter_frames[engine]=h.parameter_frame(data.columns,parameters)
+        result['comparisons']['parameters']=h.compare_parameters(parameter_frames['python'],parameter_frames['R'])
+        result['comparisons']['common_grid_loglik']=h.discrepancies([result['common_grid_loglik']['python']],[result['common_grid_loglik']['R']])
+        if any(isinstance(v,dict) and v.get('status') in ('FAIL','NOT COMPARABLE') for v in result['comparisons'].values()):raise ValueError('Invalid numerical comparison')
+        result['R_minus_python_common_grid_loglik']=result['common_grid_loglik']['R']-result['common_grid_loglik']['python']
+        result['status']='MEASURED / NOT CERTIFIED'
+        if any(x['max_violation']>0 for x in result['constraint_diagnostics'].values()):raise ValueError('Positive physical constraint violation')
+        if not bool(rm['converged']) or not pm['converged']:result.update(status='NOT CONVERGED',reason='At least one backend did not converge')
+        result['limitations']=['Different optimizer/stopping criteria; convergence flags are not proof of stationarity/global optimality.','No calibrated scientific discrepancy cutoff or SE/CI equivalence.']
+    except subprocess.TimeoutExpired as error:
+        result.update(status='FAIL',reason='R timeout; no retry')
+        result['execution']['R']='EXECUTED';result['fit_calls']['R']=int((output/'R_fit_invoked').exists())
+        for name,value in [('R_stdout.log',error.stdout),('R_stderr.log',error.stderr)]:
+            (output/name).write_text(value.decode(errors='replace') if isinstance(value,bytes) else value or '')
+    except Exception as error:
+        result.update(status='FAIL',reason=f'{type(error).__name__}: {error}')
+    save();return result
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--preflight',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--execute',action='store_true')
+    a=p.parse_args();r=execute(a.preflight,a.output,a.execute);print(r['status'])
+    if r['status'] in ('FAIL','NOT CONVERGED'):raise SystemExit(1)
