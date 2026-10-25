@@ -64,7 +64,7 @@ matched_ml <- function(dat, model, sv, out, initialization=NULL) {
   write.csv(sv,file.path(out,"configured_values.csv"),row.names=FALSE)
   list(data=dat,model=1,itemtype=model,pars=sv,method="EM",quadpts=61,
     TOL=1e-8,accelerate="none",SE=FALSE,verbose=FALSE,optimizer="nloptr",
-    technical=list(NCYCLES=3000,customTheta=matrix(grid$theta,ncol=1),
+    technical=list(NCYCLES=3000,storeEMhistory=TRUE,customTheta=matrix(grid$theta,ncol=1),
       customPriorFun=function(Theta,Etable) grid$weight),
     nloptr_args=list(lb=lower[free],ub=upper[free],
       eval_g_ineq=callback,
@@ -72,5 +72,5 @@ matched_ml <- function(dat, model, sv, out, initialization=NULL) {
         # mirt's internal est is named; names do not change coordinate order.
         stopifnot(identical(unname(which(optim_args$est)),unname(free))); jac
       },
-      opts=list(algorithm="NLOPT_LD_SLSQP",xtol_rel=1e-8,maxeval=3000)))
+      opts=list(algorithm="NLOPT_LD_SLSQP",xtol_rel=1e-8,maxeval=3000,print_level=1)))
 }

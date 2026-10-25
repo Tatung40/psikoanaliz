@@ -80,4 +80,21 @@ test_named_optimizer_layout <- function() {
   }
 }
 test_named_optimizer_layout()
+# Targeted regression: installed stopping rule and history ordering at the cap.
+source("validation/r_mirt_phase1/optimizer_trace.R")
+test_convergence_trace_rule <- function() {
+  rule <- getFromNamespace("hasConverged","mirt")
+  p0 <- c(a1=0,d=0,g=-999,u=999)
+  p1 <- c(a1=1e-9,d=0,g=-998,u=998)
+  stopifnot(rule(p0,p1,1e-8)) # Logit moves of 1 become zero physical endpoint changes.
+  at_threshold <- p0; at_threshold["a1"] <- 1e-8
+  stopifnot(!rule(p0,at_threshold,1e-8)) # Strict '<', not '<='.
+  completed <- convergence_trace_pair(rbind(p0,p0,p1),p1,2L)
+  early_break <- convergence_trace_pair(rbind(p0,p0),p1,2L)
+  stopifnot(identical(completed,early_break),
+            identical(completed$previous,as.numeric(p0)),
+            identical(completed$current,as.numeric(p1)))
+  stopifnot(is.null(convergence_trace_pair(rbind(p0,p0,p0),p1,2L)))
+}
+test_convergence_trace_rule()
 writeLines("PREFLIGHT ONLY: no optimizer invocation or matched fits; endpoint equality does not certify gradient/likelihood/optimizer equivalence.",file.path(out,"status.txt"))

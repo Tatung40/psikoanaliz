@@ -252,7 +252,7 @@ def run(output, models=("1PL","2PL"), estimation="ML", rscript=None, matched=Fal
         reference_script_sha256=hashlib.sha256(Path(__file__).with_name("reference.R").read_bytes()).hexdigest(),
         harness_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         matched_source_sha256={name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
-            for name in ("matched_ml.R","physical_b_constraint.R")} if matched else {},
+            for name in ("matched_ml.R","physical_b_constraint.R","optimizer_trace.R")} if matched else {},
         python_public_fit_signature=str(inspect.signature(mirt.fit_mirt)),
         python=sys.version.split()[0], versions={n:importlib.metadata.version(n) for n in ("numpy","scipy","pandas","mirt")},
         models=records, notice="Only actual R executions count as independent comparisons. No default PASS tolerance. Existing historical R fixtures are not new executions.")

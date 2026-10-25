@@ -59,3 +59,8 @@ to outer EM versus inner SLSQP progress.
 stationarity, optimizer convergence and global optimality are unresolved. No
 iterations, tolerances, algorithms, bounds, inference gates or production code
 were changed. No speculative repeated fit is warranted from this evidence.
+
+Source-audit qualification: see CONVERGENCE_TRACE.md. R 1.48 forcibly reports
+converged=false at the cycle cap even if the final parameter-change check passes.
+Without the missing final pair, its actual satisfaction is unresolved; neither
+the gradient nor the between-solution likelihood difference determines it.

@@ -30,6 +30,8 @@ if (matched) {
   initialization <- if(args[4]=="matched-python-start") file.path(out,"python_initialization.csv") else NULL
   stopifnot(is.null(initialization) || model=="4PL")
   fit <- do.call(mirt, matched_ml(dat,model,sv,out,initialization=initialization))
+  source("validation/r_mirt_phase1/optimizer_trace.R")
+  write_optimizer_trace(fit,out)
   actual_prior <- as.numeric(unlist(extract.mirt(fit,"Prior")))
   expected_prior <- read.csv(file.path(out,"integration.csv"))$weight
   write.csv(data.frame(weight=actual_prior),file.path(out,"actual_R_prior.csv"),row.names=FALSE)
