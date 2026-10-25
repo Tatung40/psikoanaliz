@@ -64,6 +64,7 @@ jobs:
       - name: Execute GRM/PCM no-fit preflight ONCE
         run: |
           set -o pipefail
+          set +e
           python validation/poly_r_preflight.py --output preflight-output 2>&1 | tee preflight-output/driver.log
           result=${PIPESTATUS[0]}
           cat preflight-output/report.json
