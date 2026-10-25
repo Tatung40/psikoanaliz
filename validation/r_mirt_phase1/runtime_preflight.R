@@ -47,4 +47,27 @@ for (model in c("3PL","4PL")) {
   }
 }
 write.csv(do.call(rbind,checks),file.path(out,"coupled_bounds.csv"),row.names=FALSE)
+# Regression for run 40149159575: named optimizer flags must preserve the same
+# Jacobian, while a genuinely different free-coordinate layout must still fail.
+source("validation/r_mirt_phase1/matched_ml.R")
+test_named_optimizer_layout <- function() {
+  td <- tempfile("jacobian-layout-",tmpdir=out); dir.create(td)
+  on.exit(unlink(td,recursive=TRUE))
+  # Configuration-only test grid, never used for a fit.
+  write.csv(data.frame(theta=seq(-4,4,length.out=61),weight=rep(1/61,61)),
+            file.path(td,"integration.csv"),row.names=FALSE)
+  for(model in c("3PL","4PL")) {
+    values <- mirt::mirt(dat,1,itemtype=model,pars="values",verbose=FALSE)
+    cfg <- matched_ml(dat,model,values,td)
+    flags <- cfg$pars$est
+    named <- setNames(flags,cfg$pars$name)
+    fn <- cfg$nloptr_args$eval_jac_g_ineq
+    p <- cfg$pars$value[flags]
+    stopifnot(identical(fn(p,list(est=flags)),fn(p,list(est=named))))
+    changed <- named; changed[which(changed)[1]] <- FALSE
+    changed[which(!named)[1]] <- TRUE
+    stopifnot(inherits(try(fn(p,list(est=changed)),silent=TRUE),"try-error"))
+  }
+}
+test_named_optimizer_layout()
 writeLines("PREFLIGHT ONLY: no optimizer invocation or matched fits; endpoint equality does not certify gradient/likelihood/optimizer equivalence.",file.path(out,"status.txt"))

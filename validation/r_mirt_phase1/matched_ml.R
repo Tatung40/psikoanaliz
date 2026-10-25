@@ -49,7 +49,8 @@ matched_ml <- function(dat, model, sv, out) {
     nloptr_args=list(lb=lower[free],ub=upper[free],
       eval_g_ineq=callback,
       eval_jac_g_ineq=function(p,optim_args) {
-        stopifnot(identical(which(optim_args$est),free)); jac
+        # mirt's internal est is named; names do not change coordinate order.
+        stopifnot(identical(unname(which(optim_args$est)),unname(free))); jac
       },
       opts=list(algorithm="NLOPT_LD_SLSQP",xtol_rel=1e-8,maxeval=3000)))
 }
