@@ -67,6 +67,7 @@ def wait_idle(page, timeout=180_000):
 
 
 def download(page, label, outdir):
+    wait_idle(page)
     with page.expect_download(timeout=60_000) as d:
         page.get_by_role("button", name=label).first.click()
     target = Path(outdir) / d.value.suggested_filename
@@ -86,13 +87,15 @@ def ordinal_data(seed=1, n=500, k=8, C=4):
     return pd.DataFrame(x, columns=[f"I{j + 1}" for j in range(k)])
 
 
-def flow_polytomous(browser, outdir, log):
+def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
     import mirt
     data = ordinal_data(); csv = outdir / "poly_ordinal.csv"; data.to_csv(csv, index=False)
     nominal = data.replace({0: "A", 1: "B", 2: "C", 3: "D"}); ncsv = outdir / "poly_nominal.csv"
     nominal.to_csv(ncsv, index=False)
     records = []
     for model, src, frame in (("GRM", csv, data), ("PCM", csv, data), ("GPCM", csv, data), ("NRM", ncsv, nominal)):
+        if model not in models:
+            continue
         rec = {"flow": "B14 polytomous", "model": model, "status": "FAILED"}
         try:
             with Server(log) as srv:
@@ -111,14 +114,14 @@ def flow_polytomous(browser, outdir, log):
                 path = download(page, "Madde parametrelerini CSV indir", outdir / model)
                 got = pd.read_csv(path)
                 from core.irt_python_mirt_adapter import fit_python_mirt  # the application's engine path
-                ref = fit_python_mirt(np.asarray(frame.replace({"A": 0, "B": 1, "C": 2, "D": 3}), int), model=model,
-                                      n_categories=4).fit.coef_with_se().reset_index()
+                ref_fit = fit_python_mirt(np.asarray(frame.replace({"A": 0, "B": 1, "C": 2, "D": 3}), int), model=model,
+                                      n_categories=4).fit
+                ref = ref_fit.coef_with_se().reset_index()
                 num = [c for c in ref.columns if pd.api.types.is_numeric_dtype(ref[c])]
                 diff = float(np.nanmax(np.abs(got[num].to_numpy(float) - ref[num].to_numpy(float))))
                 ppath = download(page, "Kişi yeteneklerini CSV indir", outdir / model)
                 xpath = download(page, "B14 tüm tablolar Excel", outdir / model)
                 coded = np.asarray(frame.replace({"A": 0, "B": 1, "C": 2, "D": 3}), int)
-                ref_fit = fit_python_mirt(coded, model=model, n_categories=4).fit
                 theta_ref = np.asarray(mirt.fscores(ref_fit, coded, method="EAP").theta, float).reshape(-1)
                 dtheta = float(np.abs(pd.read_csv(ppath)["θ"].to_numpy() - theta_ref).max())
                 sheets = pd.read_excel(xpath, sheet_name=None)
