@@ -1,8 +1,8 @@
 name: Independent R mirt validation
-run-name: GRM validation ${{ github.event_name == 'push' && 'grm-fit' || inputs.mode || 'preflight' }} (${{ github.ref_name }})
+run-name: GRM validation ${{ github.event_name == 'pull_request' && 'grm-fit' || inputs.mode || 'preflight' }} (${{ github.ref_name }})
 on:
-  push:
-    branches: [audit/polytomous-r-strategy]
+  pull_request:
+    branches: [main]
     paths: ['.github/workflows/r-mirt-validation.yml']
   workflow_dispatch:
     inputs:
@@ -37,7 +37,7 @@ jobs:
             printf '%s\n' '{"model":"GRM","status":"NOT EXECUTED","scientific_pass":false,"fit_calls":{"R":0,"python":0}}' > preflight-output/grm-fit/report.json
             touch preflight-output/grm-fit/R_stdout.log preflight-output/grm-fit/R_stderr.log preflight-output/grm-fit/Python_stdout.log preflight-output/grm-fit/Python_stderr.log
           fi
-          test "$GITHUB_REF_NAME" = audit/polytomous-r-strategy
+          test "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" = audit/polytomous-r-strategy
       - name: Verify pinned PR63 helper (fetch only if absent)
         run: |
           if ! git cat-file -e "$PR63_VALIDATION_COMMIT:validation/r_mirt_phase1/harness.py" 2>/dev/null; then
