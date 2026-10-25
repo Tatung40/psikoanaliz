@@ -100,3 +100,29 @@ calibration. It emits `GRM_initialization_classes.csv`. **R regression/runtime
 initialization NOT EXECUTED locally**: Rscript unavailable. The next manually
 approved mode=grm-fit run executes this regression before the same one-fit pair.
 The original failed artifact is unchanged; no retry was launched here.
+
+### Regression failure40165561042: inactive prior missing-value representation
+
+The first strict immutable-field mismatch is **prior_1**; prior_2 has the same
+issue. R mirt1.48 `06-LoadPars.R` constructs graded items with
+`prior_1=rep(NaN,...)`, `prior_2=rep(NaN,...)`, `prior.type=0` (exported as none).
+The preserved artifact CSV has NA in these fields. R read.csv infers logical
+all-NA columns; our numeric conversion yields NA_real_. Native and converted
+vectors are both double, unnamed with no relevant attributes, but
+`identical(NaN, NA_real_)` is false. This is an unused-hyperparameter sentinel
+representation difference, not a change to bounds or fitted parameter values.
+
+The correction normalizes only a local comparison copy when both native/saved
+prior.type are exactly none and both entries are missing, solely in prior_1/2.
+The returned native table retains its NaNs, all column classes and complete
+attributes. Finite values, categorical fields, prior types, constraints and all
+other immutable fields remain exact comparisons. Starts/est flags are unchanged;
+no numerical tolerance is introduced or relaxed. Future failures name the column.
+
+The no-fit R regression now preserves input type/NaN diagnostics before replay,
+checks original NaN versus CSV NA, full native attributes/classes, exact copied
+starts/flags and retained prior sentinels, and rejects finite prior changes or
+prior.type=norm. **R regression NOT EXECUTED locally: no Rscript**. No fits were
+run and no artifact from either failed run was modified. Run mode=preflight first
+on the next manual Actions invocation; do not repeat calibration merely to test
+this correction.
