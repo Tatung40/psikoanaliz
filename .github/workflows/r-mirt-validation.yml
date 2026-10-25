@@ -14,13 +14,19 @@ jobs:
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: release
           use-public-rspm: true
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::mirt
+          packages: |
+            any::mirt@1.48
+            any::nloptr
           cache-version: 1
       - name: R mirt runtime preflight only (no fits)
         run: |
@@ -30,9 +36,25 @@ jobs:
           cat validation-output/stdout.log
           cat validation-output/stderr.log >&2
           exit "$status"
+      - name: Install cached Python dependencies
+        run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Targeted harness checks
+        run: python -m pytest -q tests/test_r_mirt_phase1.py tests/test_r_mirt_equivalence_audit.py
+      - name: Single matched-target ML fits (3PL and 4PL only)
+        run: |
+          set -o pipefail
+          python validation/r_mirt_phase1/harness.py --output validation-output/matched --models 3PL 4PL --matched 2>&1 | tee validation-output/matched-execution.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: independent-r-mirt-${{ github.sha }}
           path: validation-output/
           if-no-files-found: error
+      - name: Require complete converged executions (not scientific PASS)
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('validation-output/matched/report.json'))
+          assert len(r['models'])==2
+          assert all(m['execution']=='EXECUTED' and 'common_grid_loglik' in m and m['status']!='FAIL' for m in r['models']), r
+          PY

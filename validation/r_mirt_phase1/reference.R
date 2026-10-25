@@ -1,7 +1,8 @@
 # Independent R mirt execution only; never reads Python fit results.
 # Rscript reference.R MODEL input.csv output_directory
 args <- commandArgs(trailingOnly=TRUE)
-stopifnot(length(args) == 3L)
+stopifnot(length(args) %in% c(3L,4L))
+matched <- length(args)==4L && args[4]=="matched"
 if (!requireNamespace("mirt", quietly=TRUE)) quit(status=42L)
 suppressPackageStartupMessages(library(mirt))
 set.seed(20261024)
@@ -24,9 +25,19 @@ if (model %in% c("Rasch", "RSM")) {
   sv$value[sv$name == "MEAN_1"] <- 0; sv$est[sv$name == "MEAN_1"] <- FALSE
   sv$est[sv$name == "COV_11"] <- TRUE
 }
+if (matched) {
+  source("validation/r_mirt_phase1/matched_ml.R")
+  fit <- do.call(mirt, matched_ml(dat,model,sv,out))
+  actual_prior <- as.numeric(unlist(extract.mirt(fit,"Prior")))
+  expected_prior <- read.csv(file.path(out,"integration.csv"))$weight
+  write.csv(data.frame(weight=actual_prior),file.path(out,"actual_R_prior.csv"),row.names=FALSE)
+  stopifnot(length(actual_prior)==61, max(abs(actual_prior-expected_prior))<1e-14,
+            extract.mirt(fit,"logPrior")==0)
+} else {
 fit <- mirt(dat, 1, itemtype=type, pars=sv, method="EM", quadpts=61,
             TOL=1e-8, technical=list(NCYCLES=3000), SE=TRUE,
             SE.type="Richardson", verbose=FALSE)
+}
 theta <- seq(-4, 4, length.out=81)
 orientation <- 1
 if (model == "NRM") {
@@ -78,6 +89,6 @@ meta <- data.frame(engine="R mirt", version=as.character(packageVersion("mirt"))
   # by stats::AIC/BIC. Use the diagnostics stored by the fitted R model.
   converged=extract.mirt(fit,"converged"), loglik=extract.mirt(fit,"logLik"),
   aic=extract.mirt(fit,"AIC"), bic=extract.mirt(fit,"BIC"), orientation=orientation,
-  variance=as.numeric(coef(fit,simplify=TRUE)$cov), points=61, tolerance=1e-8, seed=20261024)
+  variance=as.numeric(coef(fit,simplify=TRUE)$cov), iterations=extract.mirt(fit,"iterations"), matched_profile=matched, points=61, tolerance=1e-8, seed=20261024)
 write.csv(meta,file.path(out,"metadata.csv"),row.names=FALSE)
 capture.output(sessionInfo(),file=file.path(out,"sessionInfo.txt"))

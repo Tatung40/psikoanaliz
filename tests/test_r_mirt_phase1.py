@@ -116,3 +116,58 @@ def test_r_metadata_uses_mirt_diagnostics_not_stats_generics():
     for field in ('logLik', 'AIC', 'BIC'):
         assert f'extract.mirt(fit,"{field}")' in source
     assert 'aic=AIC(fit)' not in source and 'bic=BIC(fit)' not in source
+
+
+@pytest.mark.parametrize('model',['3PL','4PL'])
+def test_matched_profile_configures_public_ml_without_production_edits(monkeypatch,model):
+    from types import SimpleNamespace
+    import mirt
+    class Model:
+        def probability(self,theta): return np.full((len(theta),3),.4)
+        def information(self,theta,item_idx): return np.full(len(theta),.24)
+    fit=SimpleNamespace(model=Model(),converged=True,log_likelihood=-10.,aic=32.,bic=34.,
+        coef=lambda:pd.DataFrame(dict(discrimination=[1.]*3,difficulty=[0.]*3,
+            guessing=[.2]*3,upper=[.95 if model=='4PL' else 1.]*3)))
+    calls=[]
+    def fit_once(data,**kwargs):
+        calls.append(kwargs);return fit
+    monkeypatch.setattr(mirt,'fit_mirt',fit_once)
+    H.python_fit(pd.DataFrame(np.zeros((10,3)),columns=list('ABC')),model,matched=True)
+    assert len(calls)==1
+    settings=calls[0]
+    assert settings['n_quadpts']==61 and settings['max_iter']==3000 and settings['tol']==1e-8
+    assert settings['priors'] is None and settings['accelerate']=='none'
+    assert not settings['compute_standard_errors']
+    assert np.all(settings['start_values']['guessing']==.2)
+    assert ('upper' in settings['start_values']) == (model=='4PL')
+
+
+def test_matched_profile_rejects_unmatched_models_and_map(tmp_path):
+    for models,est in [(['2PL'],'ML'),(['3PL'],'MAP')]:
+        with pytest.raises(ValueError,match='ML 3PL/4PL only'):
+            H.run(tmp_path,models,estimation=est,matched=True)
+
+
+@pytest.mark.parametrize('outside',[False,True])
+def test_matched_report_common_likelihood_and_bound_failures(tmp_path,monkeypatch,outside):
+    from types import SimpleNamespace
+    source=tmp_path/'fixture.csv'
+    pd.DataFrame([[0,1,0],[1,0,1],[1,1,0]],columns=list('ABC')).to_csv(source,index=False)
+    monkeypatch.setitem(H.SOURCES,'4PL',str(source))
+    params=[dict(a=5.1 if outside else 1.,b=0.,c=.2,d=.95)]*3
+    curves=pd.DataFrame(dict(item=['A','A'],node=[0,0],theta=[-4.,-4.],category=[0,1],probability=[.8,.2],information=[.16,.16]))
+    meta=dict(converged=True,loglik=-10.,aic=44.,bic=40.,variance=1.)
+    def process(args,**kwargs):
+        assert args[-1]=='matched'
+        out=H.Path(args[-2]);assert len(pd.read_csv(out/'integration.csv'))==61
+        curves.to_csv(out/'curves.csv',index=False)
+        H.parameter_frame(list('ABC'),params).to_csv(out/'parameters.csv',index=False)
+        pd.DataFrame([dict(meta,engine='R mirt',version='mock-only',model='4PL',D=1,estimation='ML',matched_profile=True)]).to_csv(out/'metadata.csv',index=False)
+        return SimpleNamespace(returncode=0,stdout='mock',stderr='')
+    monkeypatch.setattr(H.subprocess,'run',process)
+    monkeypatch.setattr(H,'python_fit',lambda *a,**kw:(curves,meta,params))
+    r=H.run(tmp_path/'out',['4PL'],rscript='mock-R',matched=True)
+    m=r['models'][0]
+    assert m['comparisons']['common_grid_loglik']['max_absolute']==0
+    assert (m['status']=='FAIL')==outside
+    assert m['status']!='PASS'

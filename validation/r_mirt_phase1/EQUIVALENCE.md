@@ -109,3 +109,43 @@ Run from repository root in the provisioned R environment:
 `Rscript validation/r_mirt_phase1/runtime_preflight.R preflight-output`
 Retain outputs/failures. If successful, verify optimizer callback integration,
 shared quadrature/density and boundary derivatives before the two single fits.
+
+## Matched-target ML profile (prepared; fits pending)
+
+Actual R preflight succeeded in run **40148199743**, commit 6f073e6, artifact
+12581480765. It reports exact floating-point equality at physical 0/1 and for
+the tested boundary probabilities; near-zero interior round trips differed by
+6.13e-322 and 5.42e-31. This supersedes a blanket endpoint obstruction claim.
+
+The opt-in `harness.py --matched --models 3PL 4PL` now configures validation only:
+normal mean0/variance1, D=1, no priors; identical SciPy-generated 61-point GH
+nodes/weights supplied to R via customTheta/customPriorFun; 3000 EM cycles,
+numeric tolerance 1e-8 and no EM acceleration. Starts are a=1,b=0,c=.2 and
+4PL u=.95 (3PL u fixed1), supplied independently before either fit.
+Python public mirt 1.2.0 settings and its actual bound constants are checked.
+R mirt 1.48 uses NLOPT_LD_SLSQP with logit-coordinate box bounds and analytic
+linear-constraint Jacobian: -6a<=d<=6a, a∈[.1,5], g∈[0,.5], u∈[.5,1].
+`nloptr_args`/internal `solnp_args` forwarding was verified in versioned
+`EMstep.utils.R`; the callback uses the actual compressed free vector layout.
+SE computation is disabled for this diagnostic comparison, in both engines.
+
+**Stopping criteria are not exactly equivalent:** Python uses absolute marginal
+logLik increment, R uses parameter change (EMstep.group.R hasConverged).
+The numeric tolerance/cap match, but this is a matched *target/grid/bounds*
+comparison, not identical optimization or proof of equal stationarity. SLSQP
+versus Python's item optimizers, internal logit versus physical-coordinate
+gradients, probability flooring and floating-point behavior remain limitations.
+No private optimizer replacement or changed production defaults were used.
+Convergence flags alone cannot establish equal maxima, especially at boundaries.
+
+The existing manual workflow first requires runtime_preflight.R, then performs
+at most one R and one Python fit per model, without retries/multistarts. It
+preserves raw R output, configured bounds/starts, GH grid, version/settings,
+per-engine curves/parameters, common-grid logLik, discrepancies by parameter,
+and boundary flags. Any out-of-box fit or nonconvergence remains FAIL; all
+artifacts upload even on failure. Within 1e-6 is only a boundary-proximity
+label, never a numerical acceptance tolerance. Old reports are untouched.
+Actual matched-fit execution and numerical results remain **PENDING** until
+this new workflow is dispatched and its artifacts inspected. No PASS threshold
+has been introduced. Command: `python validation/r_mirt_phase1/harness.py
+--output OUTPUT --models 3PL 4PL --matched`.
