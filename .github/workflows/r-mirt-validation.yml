@@ -1,6 +1,9 @@
 name: Independent R mirt validation
-run-name: GRM validation ${{ inputs.mode || 'preflight' }} (${{ github.ref_name }})
+run-name: GRM validation ${{ github.event_name == 'push' && 'grm-fit' || inputs.mode || 'preflight' }} (${{ github.ref_name }})
 on:
+  push:
+    branches: [audit/polytomous-r-strategy]
+    paths: ['.github/workflows/r-mirt-validation.yml']
   workflow_dispatch:
     inputs:
       mode:
@@ -20,7 +23,7 @@ jobs:
       OMP_NUM_THREADS: '1'
       RAYON_NUM_THREADS: '1'
       PYTHONPATH: .
-      VALIDATION_MODE: ${{ inputs.mode || 'preflight' }}
+      VALIDATION_MODE: ${{ github.event_name == 'push' && 'grm-fit' || inputs.mode || 'preflight' }}
       PR63_VALIDATION_COMMIT: 18d1bcf72c85a174ad278ae4d8ea925b412c0275
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +57,7 @@ jobs:
         with:
           packages: |
             any::mirt@1.48
-            ${{ inputs.mode == 'grm-fit' && 'any::nloptr' || '' }}
+            ${{ (github.event_name == 'push' || inputs.mode == 'grm-fit') && 'any::nloptr' || '' }}
           cache-version: 1
       - name: Install only preflight Python dependencies
         run: python -m pip install numpy scipy pandas 'mirt==1.2.0'
@@ -75,17 +78,17 @@ jobs:
           assert set(r['comparisons'])=={'GRM','PCM'}, r
           PY
       - name: Lightweight GRM tests before any calibration
-        if: inputs.mode == 'grm-fit'
+        if: env.VALIDATION_MODE == 'grm-fit'
         run: |
           python -m pip install pytest
           python -m pytest -q tests/test_grm_r_comparison.py
       - name: ONE independent R and Python GRM calibration
-        if: inputs.mode == 'grm-fit'
+        if: env.VALIDATION_MODE == 'grm-fit'
         run: |
           set -o pipefail
           python validation/grm_r_comparison.py --preflight preflight-output --output preflight-output/grm-fit --execute 2>&1 | tee preflight-output/grm-fit-driver.log
       - name: Require complete GRM executions, never scientific PASS
-        if: inputs.mode == 'grm-fit'
+        if: env.VALIDATION_MODE == 'grm-fit'
         run: |
           python - <<'PY'
           import json
@@ -99,6 +102,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: grm-${{ inputs.mode || 'preflight' }}-${{ github.sha }}-${{ github.run_attempt }}
+          name: grm-${{ env.VALIDATION_MODE }}-${{ github.sha }}-${{ github.run_attempt }}
           path: preflight-output/
           if-no-files-found: error
