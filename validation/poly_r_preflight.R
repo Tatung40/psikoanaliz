@@ -72,6 +72,11 @@ for(model in c("GRM","PCM")) {
   }
   check(paste(model,"no item priors"),all(sv$prior.type=="none"))
   write.csv(sv,file.path(out,paste0(model,"_configured_layout.csv")),row.names=FALSE)
+  if(model=="GRM") {
+    source("validation/grm_initial_values.R")
+    source("tests/test_grm_initial_values.R")
+    check("GRM native initialization survives CSV replay",test_grm_initial_values(x,sv,out))
+  }
   free <- which(sv$est);A <- matrix(numeric(),nrow=0,ncol=length(free));rhs <- numeric()
   add <- function(rows,coeff,value=0) {
     row <- numeric(length(free));idx <- match(rows,free)

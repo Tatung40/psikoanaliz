@@ -79,3 +79,24 @@ A prepare-only invocation against the successful saved preflight verified the
 fixture, exact Python GH arrays, bounds and complete starts; it recorded both
 fit-call counts as zero. Actual calibrations remain **NOT EXECUTED** until the
 opt-in Actions run occurs. No simulations, full regression or local R install.
+
+## Initialization class fix (failed run40164834396)
+
+The preserved R stderr is: `pars input does not contain the appropriate classes,
+which should match pars = 'values'`. R1.48 `utils.R::UpdatePrepList` checks each
+column class against its native `ReturnPars` table. Reading the exported CSV
+changes numeric/integer/all-NA column types (notably parnum and prior columns)
+and loses `mirt_df`/itemtype attributes. It is not a model/constraint mismatch.
+
+`restore_grm_initial_values` now calls the documented no-fit `pars='values'`
+initializer for the identical data/model, verifies all immutable column values,
+and assigns only the existing CSV starts and free flags into that native table.
+Native column classes and attributes remain intact; constraints, starts, bounds,
+quadrature and stopping rules are unchanged. No fits are added by initialization.
+
+One R preflight regression reproduces the CSV class-validation failure and checks
+restored column classes, complete attributes, starts and est flags, without any
+calibration. It emits `GRM_initialization_classes.csv`. **R regression/runtime
+initialization NOT EXECUTED locally**: Rscript unavailable. The next manually
+approved mode=grm-fit run executes this regression before the same one-fit pair.
+The original failed artifact is unchanged; no retry was launched here.
