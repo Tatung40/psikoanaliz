@@ -1,0 +1,14 @@
+# Registration only. The validation implementation lives on validation-r-mirt-phase1.
+name: Independent R mirt validation
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  select-validation-branch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Stop registration-only execution
+        run: |
+          echo '::error::Registration only: select validation-r-mirt-phase1 in Run workflow to execute R mirt validation. This definition performs no validation.'
+          exit 1
