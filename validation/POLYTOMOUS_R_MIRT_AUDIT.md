@@ -30,6 +30,15 @@ PCM also exists inside native RSM as its nested LR alternative: item steps∈[-1
 with the same free-variance/default latent specification. That is not the B14
 unit-variance PCM target and must not silently substitute for it.
 
+A native LR risk follows from those boxes: the implemented RSM region is not
+**globally nested** in the implemented PCM box. For C=4, δ=7.9 and free
+τ=(-5.9,-5.9) imply last τ=11.8 and a last physical step19.7, outside PCM's ±14,
+even though free RSM coordinates are interior. `rsm_vs_pcm` checks convergence
+and achieved likelihood ordering, but not this full feasible-set inclusion.
+Existing interior-design evidence is not a blanket LR-validity proof; do not
+transfer that LR claim to independent validation without checking the fitted
+physical steps and the intended null neighborhood. No estimator was changed.
+
 ### Probability and information equations (unidimensional, D=1)
 
 Let categories be c=0,…,C−1, L(z)=logistic(z), P0 baseline implicit where appropriate.
