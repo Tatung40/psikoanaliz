@@ -48,3 +48,42 @@ causes. SE/CI equivalence remains unvalidated. Production settings/gates unchang
 
 Reproduce after extracting the original artifact into SOURCE:
 `python -m validation.r_mirt_phase1.equivalence_audit --source SOURCE --output audit.json`
+
+## Final feasibility check (base f4b9617)
+
+Correction to the earlier scope: the **existing box-only reference** cannot
+express the physical b bounds, but R mirt itself supports general inequalities.
+The actual R evidence uses mirt 1.48. Its versioned source was inspected:
+
+- https://github.com/cran/mirt/blob/1.48/R/EMstep.utils.R : `Mstep.optim`
+  calls `nloptr::nloptr(..., eval_g_ineq=solnp_args$eval_g_ineq, ...)` and
+  passes `optim_args` containing `longpars` and `est`. The public
+  `nloptr_args` is routed internally to this `solnp_args` structure.
+- https://github.com/cran/mirt/blob/1.48/R/utils.R : g/u values and bounds
+  are converted with `logit`; exact 0 and 1 are replaced with -999 and 999,
+  respectively; probability transformation is `plogis`.
+
+`physical_b_constraint.R` supplies the feasible coupled inequality callback:
+for positive a, b=-d/a in [-6,6] iff d-6a<=0 and -d-6a<=0. It reconstructs
+fixed/free coordinates through `optim_args` rather than incorrectly treating
+parnum as an index into the compressed free vector. No use of this candidate
+callback or claim of R runtime verification is made in this commit.
+
+The bound correspondence in native coordinates would be a in [.1,5],
+d in [-6a,6a], g in [0,.5], and u in [.5,1] (3PL fixes u=1).
+Python uses P=g+(u-g)*expit(a*(theta-b)), with physical optimization coordinates.
+R's finite logit-coordinate domain does not mathematically include the same
+closed g/u endpoints: plogis(-999)>0 and plogis(999)<1 over the reals. Floating
+point rounding/underflow may produce endpoints, but must not silently be called
+an exact smooth reparameterization; endpoint solutions are present in the
+original 4PL evidence. This is an obstruction for the **built-in finite-logit
+profile**, not a proof that no R mirt custom-item implementation can match it.
+
+Therefore no verified full matched profile exists yet; **zero new fits** were
+run. The historical common-grid numbers above remain historical and unchanged.
+Before spending fit compute, validate either a physical-coordinate R custom
+item (including boundary probabilities/derivatives), or explicitly justify a
+numerical endpoint-equivalence contract. Then match GH nodes/weights and ML
+settings in validation only. Same tolerance numbers alone do not prove identical
+convergence criteria. The new callback must also pass an actual R 1.48 smoke
+check before use. Status remains NOT COMPARABLE; no scientific PASS asserted.
