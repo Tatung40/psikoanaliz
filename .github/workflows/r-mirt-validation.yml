@@ -23,7 +23,7 @@ jobs:
       OMP_NUM_THREADS: '1'
       RAYON_NUM_THREADS: '1'
       PYTHONPATH: .
-      VALIDATION_MODE: ${{ github.event_name == 'push' && 'grm-fit' || inputs.mode || 'preflight' }}
+      VALIDATION_MODE: ${{ github.event_name == 'pull_request' && 'grm-fit' || inputs.mode || 'preflight' }}
       PR63_VALIDATION_COMMIT: 18d1bcf72c85a174ad278ae4d8ea925b412c0275
     steps:
       - uses: actions/checkout@v4
@@ -90,10 +90,12 @@ jobs:
         if: github.event_name == 'pull_request' || inputs.mode == 'grm-fit'
         run: |
           set -o pipefail
+          set +e
           python validation/grm_r_comparison.py --preflight preflight-output --output preflight-output/grm-fit --execute 2>&1 | tee preflight-output/grm-fit-driver.log
           result=${PIPESTATUS[0]}
-          cat preflight-output/grm-fit/report.json
-          cat preflight-output/grm-fit/R_stderr.log
+          cat preflight-output/grm-fit/report.json || true
+          cat preflight-output/grm-fit/R_stderr.log || true
+          cat preflight-output/grm-fit/Python_stderr.log || true
           exit "$result"
       - name: Require complete GRM executions, never scientific PASS
         if: github.event_name == 'pull_request' || inputs.mode == 'grm-fit'
