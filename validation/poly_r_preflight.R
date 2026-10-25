@@ -105,7 +105,13 @@ for(model in c("GRM","PCM")) {
     q<-sv$value;ix<-which(sv$item==colnames(x)[1]);ix<-setNames(ix,sv$name[ix])
     if(model=="GRM") {q[ix['a1']]<-a;q[ix[paste0('d',1:m)]]<--a*b}
     else q[ix[paste0('d',1:m)]]<--cumsum(b)
-    all(as.numeric(A%*%q[free])-rhs<=0)
+    residual <- as.numeric(A%*%q[free])-rhs
+    if(model=="GRM" && a %in% c(.1,5)) {
+      cat("GRM boundary witness diagnostics: ",file=stderr())
+      dput(list(a=a,b=b,native=q[ix[paste0('d',1:m)]],
+        positive=which(residual>0),residual=residual[residual>0]),file=stderr())
+    }
+    all(residual<=0)
   }
   check(paste(model,"physical box witnesses"),witness(1,c(-6,0,6)) && !witness(1,c(-6,0,6.1)))
   if(model=="GRM") check("GRM ordering/slope witnesses",!witness(1,c(0,0,1)) && !witness(5.1,c(-1,0,1)) &&
