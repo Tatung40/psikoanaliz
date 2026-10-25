@@ -89,3 +89,23 @@ simulations. A full application regression is unnecessary: no existing app/core 
 Next: use an already provisioned R+mirt runtime; execute 1PL/2PL, inspect version/session,
 parameter constraints, quadrature and maxima, then calibrate justified acceptance criteria
 before extending comparisons. Pin the actual R environment after that first real run.
+
+## Manual binary R execution
+
+`.github/workflows/r-mirt-validation.yml` is manual-only (`workflow_dispatch`). It
+provisions official CRAN R `mirt` using `r-lib/actions` with dependency caching,
+then runs Rasch, 1PL, 2PL, 3PL and 4PL once each through this harness (ML).
+Python dependencies are cached too. Raw R outputs, software/settings metadata,
+Python estimates/curves, discrepancies and execution logs are retained in the
+`independent-r-mirt-<commit>` artifact, including failed runs. No Monte Carlo runs.
+Workflow success means execution/convergence checks succeeded, **not scientific
+PASS**: tolerances, optimizer/quadrature/bound equivalence and SE/CI remain subject
+to the contract above. The committed `pending_report.json` is historical preparation,
+not the result of this workflow. Consult the artifact tied to the actual commit.
+
+```sh
+gh workflow run r-mirt-validation.yml --repo Tatung40/psikoanaliz --ref validation-r-mirt-phase1
+```
+
+If dispatch is unavailable (credentials or default-branch workflow discovery),
+execution remains PENDING; do not relabel any model as independently validated.
