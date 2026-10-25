@@ -175,6 +175,8 @@ with st.sidebar:
 
     st.button("📋 Betimsel İstatistikler", use_container_width=True,
               on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
+    st.button("❓ Kayıp Veri Atama", use_container_width=True,
+              on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
 
     st.markdown("---")
     st.markdown("### I. Klasik Test Kuramı (KTK)")
