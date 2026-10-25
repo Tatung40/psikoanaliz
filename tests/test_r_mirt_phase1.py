@@ -107,3 +107,12 @@ def test_successful_process_requires_real_output_and_never_auto_certifies(tmp_pa
     assert m["status"]==("SKIPPED" if converged else "FAIL")
     assert m["comparisons"]["item_parameters"]["max_absolute"]==0
     assert m["se_ci"]["status"]=="NOT COMPARABLE"
+
+
+def test_r_metadata_uses_mirt_diagnostics_not_stats_generics():
+    # R mirt logLik() is bare numeric: stats AIC/BIC produce length-zero values.
+    from pathlib import Path
+    source = (Path(__file__).resolve().parents[1] / 'validation/r_mirt_phase1/reference.R').read_text()
+    for field in ('logLik', 'AIC', 'BIC'):
+        assert f'extract.mirt(fit,"{field}")' in source
+    assert 'aic=AIC(fit)' not in source and 'bic=BIC(fit)' not in source

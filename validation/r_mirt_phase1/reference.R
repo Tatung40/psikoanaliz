@@ -74,8 +74,10 @@ V <- tryCatch(vcov(fit), error=function(e) NULL)
 if (!is.null(V)) write.csv(V, file.path(out,"raw_vcov.csv"))
 meta <- data.frame(engine="R mirt", version=as.character(packageVersion("mirt")),
   R_version=R.version.string, model=model, itemtype=type, estimation="ML", D=1,
-  converged=extract.mirt(fit,"converged"), loglik=as.numeric(logLik(fit)),
-  aic=AIC(fit), bic=BIC(fit), orientation=orientation,
+  # mirt logLik() returns a bare numeric, without the df attribute required
+  # by stats::AIC/BIC. Use the diagnostics stored by the fitted R model.
+  converged=extract.mirt(fit,"converged"), loglik=extract.mirt(fit,"logLik"),
+  aic=extract.mirt(fit,"AIC"), bic=extract.mirt(fit,"BIC"), orientation=orientation,
   variance=as.numeric(coef(fit,simplify=TRUE)$cov), points=61, tolerance=1e-8, seed=20261024)
 write.csv(meta,file.path(out,"metadata.csv"),row.names=FALSE)
 capture.output(sessionInfo(),file=file.path(out,"sessionInfo.txt"))
