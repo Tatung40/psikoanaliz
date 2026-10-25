@@ -51,3 +51,19 @@ def test_unexecuted_preflight_stops_before_any_calibration(tmp_path,monkeypatch)
     monkeypatch.setattr(mirt,'fit_mirt',lambda *a,**kw:pytest.fail('fit forbidden'))
     r=G.execute(pre,tmp_path/'out',allow_fit=True,rscript='mock-R')
     assert r['status']=='FAIL' and r['fit_calls']==dict(R=0,python=0) and not r['scientific_pass']
+
+
+@pytest.mark.parametrize('mean,cov',[(None,None),([0.],None),(None,[[1.]]),([0.],[[1.]])])
+def test_documented_standard_normal_sentinels(mean,cov):
+    from types import SimpleNamespace
+    p=G.standard_normal_population(SimpleNamespace(latent_mean=mean,latent_covariance=cov))
+    assert p['mean']==0 and p['variance']==1
+    assert (p['raw_latent_mean'] is None)==(mean is None)
+    assert (p['raw_latent_covariance'] is None)==(cov is None)
+
+
+@pytest.mark.parametrize('mean,cov',[([.01],None),(None,[[1.01]]),([[0.]],[[1.]]),([0.],[1.]),([np.nan],None)])
+def test_actual_scale_mismatch_is_never_reinterpreted(mean,cov):
+    from types import SimpleNamespace
+    with pytest.raises(ValueError,match='latent distribution differs'):
+        G.standard_normal_population(SimpleNamespace(latent_mean=mean,latent_covariance=cov))

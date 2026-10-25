@@ -49,21 +49,36 @@ def python_contract(preflight):
     return grid,seed
 
 
+def standard_normal_population(fit):
+    """mirt1.2.0 FitResult: None means zero mean / identity covariance.
+
+    The documented default is normalized, never an estimated scale change.
+    Missing attributes or explicitly nonstandard/malformed scales still fail.
+    """
+    raw_mean,raw_cov=fit.latent_mean,fit.latent_covariance
+    mean=np.zeros(1) if raw_mean is None else np.asarray(raw_mean,float)
+    cov=np.eye(1) if raw_cov is None else np.asarray(raw_cov,float)
+    if not np.array_equal(mean,[0.]) or not np.array_equal(cov,[[1.]]):
+        raise ValueError('Python latent distribution differs')
+    return dict(raw_latent_mean=None if raw_mean is None else mean.tolist(),
+                raw_latent_covariance=None if raw_cov is None else cov.tolist(),
+                mean=0,variance=1)
+
+
 def python_once(data,seed):
     import mirt
     start=dict(discrimination=seed.a.to_numpy(),thresholds=seed[['b1','b2','b3']].to_numpy())
-    fit=mirt.fit_mirt(data.to_numpy(int),model='GRM',n_categories=4,estimation='EM',
+    fit=mirt.fit_mirt(data.to_numpy(int),model='GRM',n_factors=1,n_categories=4,estimation='EM',
         n_quadpts=61,max_iter=3000,tol=1e-8,priors=None,accelerate='none',
         start_values=start,compute_standard_errors=False)
-    if not np.array_equal(np.asarray(fit.latent_mean).reshape(-1),[0.]) or not np.array_equal(fit.latent_covariance,[[1.]]):
-        raise ValueError('Python latent distribution differs')
+    population=standard_normal_population(fit)
     if not np.isfinite([fit.log_likelihood,fit.aic,fit.bic]).all():raise ValueError('Nonfinite Python fit diagnostics')
     if getattr(fit,'log_posterior',None) is not None:raise ValueError('Unexpected Python item prior')
     p=pd.DataFrame(dict(item=data.columns,a=fit.model.discrimination,
         **{f'b{i+1}':fit.model.thresholds[:,i] for i in range(3)}))
     meta=dict(converged=bool(fit.converged),iterations=int(fit.n_iterations),
         loglik=float(fit.log_likelihood),aic=float(fit.aic),bic=float(fit.bic),
-        criterion='absolute marginal logLik increment <1e-8',mean=0,variance=1)
+        criterion='absolute marginal logLik increment <1e-8',**population)
     return fit,p,meta
 
 
@@ -126,6 +141,13 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         pair=py.merge(pd.read_csv(output/'R_curves.csv'),on=['item','node','category'],suffixes=('_python','_R'),validate='one_to_one')
         if len(pair)!=len(py):raise ValueError('Curve key mismatch')
         result['comparisons']['item_information']=h.discrepancies(pair.information_python,pair.information_R)
+        cumulative=pair.sort_values(['item','node','category']).copy()
+        for engine in ('python','R'):
+            cumulative[engine]=cumulative.groupby(['item','node'])['probability_'+engine].transform(lambda p:p.iloc[::-1].cumsum().iloc[::-1])
+        cut=cumulative.category>0
+        result['comparisons']['cumulative_ICC']=h.discrepancies(cumulative.loc[cut,'python'],cumulative.loc[cut,'R'])
+        for field in ('loglik','aic','bic'):
+            result['comparisons']['native_'+field]=h.discrepancies([pm[field]],[rm[field]])
         result['common_grid_loglik']={};result['physical_scores']={};result['constraint_diagnostics']={}
         parameter_frames={}
         for engine,p in [('python',pp),('R',rp)]:
@@ -152,6 +174,15 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         result['comparisons']['parameters']=h.compare_parameters(parameter_frames['python'],parameter_frames['R'])
         result['comparisons']['common_grid_loglik']=h.discrepancies([result['common_grid_loglik']['python']],[result['common_grid_loglik']['R']])
         if any(isinstance(v,dict) and v.get('status') in ('FAIL','NOT COMPARABLE') for v in result['comparisons'].values()):raise ValueError('Invalid numerical comparison')
+        if fit.n_parameters!=32 or int(rm['n_parameters'])!=32:raise ValueError('Free parameter counts differ')
+        result['fit_statistic_definitions']={}
+        for engine,meta in [('python',pm),('R',rm)]:
+            ll=result['common_grid_loglik'][engine]
+            result['fit_statistic_definitions'][engine]=dict(N=len(data),k=32,
+                common_grid_AIC=-2*ll+2*32,common_grid_BIC=-2*ll+np.log(len(data))*32,
+                native_AIC_identity_residual=meta['aic']-(-2*meta['loglik']+2*32),
+                native_BIC_identity_residual=meta['bic']-(-2*meta['loglik']+np.log(len(data))*32),
+                native_minus_common_loglik=meta['loglik']-ll)
         result['R_minus_python_common_grid_loglik']=result['common_grid_loglik']['R']-result['common_grid_loglik']['python']
         result['status']='MEASURED / NOT CERTIFIED'
         if any(x['max_violation']>0 for x in result['constraint_diagnostics'].values()):raise ValueError('Positive physical constraint violation')

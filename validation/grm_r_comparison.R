@@ -73,6 +73,7 @@ for(i in seq_len(8L)) {
 write.csv(do.call(rbind,curves),file.path(out,"R_curves.csv"),row.names=FALSE)
 write.csv(data.frame(engine="R mirt",version=as.character(packageVersion("mirt")),
   R_version=R.version.string,model="GRM",converged=extract.mirt(fit,"converged"),
+  n_parameters=length(free),n_persons=nrow(data),
   iterations=extract.mirt(fit,"iterations"),loglik=extract.mirt(fit,"logLik"),
   aic=extract.mirt(fit,"AIC"),bic=extract.mirt(fit,"BIC"),mean=0,variance=1,
   criterion="all native parameter changes strictly below 1e-8; cap forces false"),
