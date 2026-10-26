@@ -77,6 +77,9 @@ def test_installed_bounds_and_preregistered_criteria():
 def test_r_parameter_table_preserves_native_attributes():
  source=Path('validation/mirt_stage1/reference.R').read_text()
  assert 'native_attributes<-attributes(sv)' in source
- assert 'identical(attributes(sv),native_attributes)' in source
+ assert 'same_attributes(sv,native_attributes)' in source
+ assert 'identical(observed[[n]],expected[[n]])' in source
+ assert 'native_column_classes' in source
+ assert "!same_attributes(bad,native_attributes)" in source
  assert "inherits(sv,'mirtValues')" not in source
  assert "sv<-do.call(mirt,c(base,list(pars='values')))" in source

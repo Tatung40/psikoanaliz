@@ -27,6 +27,12 @@ base<-list(data=dat,model=spec,itemtype=type,verbose=FALSE)
 if(!is.null(group))base$customGroup<-group
 sv<-do.call(mirt,c(base,list(pars='values')))
 native_attributes<-attributes(sv)
+native_column_classes<-vapply(sv,function(x)paste(class(x),collapse='/'),'')
+same_attributes<-function(x,expected){
+ observed<-attributes(x)
+ identical(sort(names(observed)),sort(names(expected))) &&
+ all(vapply(names(expected),function(n)identical(observed[[n]],expected[[n]]),logical(1)))
+}
 capture.output(dput(native_attributes),file=file.path(out,'parameter_table_attributes.txt'))
 stopifnot(is.data.frame(sv),all(sv$prior.type=='none'))
 for(i in seq_len(J)){
@@ -69,7 +75,11 @@ if(mode=='fit'){
  opts$optimizer<-'nloptr';nl<-list(lb=low,ub=up,opts=list(algorithm='NLOPT_LD_SLSQP',xtol_rel=1e-8,maxeval=1000))
  if(nrow(A)){nl$eval_g_ineq<-callback;nl$eval_jac_g_ineq<-jac};opts$nloptr_args<-nl
 }
-stopifnot(identical(attributes(sv),native_attributes))
+capture.output(dput(attributes(sv)),file=file.path(out,'configured_attributes.txt'))
+stopifnot(same_attributes(sv,native_attributes),
+ same_attributes(sv,native_attributes[rev(seq_along(native_attributes))]),
+ identical(vapply(sv,function(x)paste(class(x),collapse='/'),''),native_column_classes))
+bad<-sv;attr(bad,'itemtype')<-'tampered';stopifnot(!same_attributes(bad,native_attributes))
 write.csv(sv,file.path(out,'configured_values.csv'),row.names=FALSE)
 fit<-do.call(mirt,opts);final<-mod2values(fit);write.csv(final,file.path(out,'raw_parameters.csv'),row.names=FALSE)
 eta<-if(cfg$correlated)final$value[final$name=='eta12'] else 0;stopifnot(length(eta)==1)
