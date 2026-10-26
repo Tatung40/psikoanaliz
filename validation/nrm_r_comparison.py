@@ -90,7 +90,7 @@ def execute(preflight,output,allow_fit=False,rscript=None):
         r['execution']['python']='EXECUTED';r['fit_calls']['python']=1
         with (out/'Python_stdout.log').open('w') as stdout,(out/'Python_stderr.log').open('w') as stderr:
             with contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):
-            fit=EMEstimator(n_quadpts=61,max_iter=3000,tol=1e-10,item_optim_ftol=_PRECISE_ITEM_FTOL,compute_standard_errors=False,item_priors=None,accelerate='none').fit(model,x.to_numpy(int),start=dict(slopes=A,intercepts=D))
+                fit=EMEstimator(n_quadpts=61,max_iter=3000,tol=1e-10,item_optim_ftol=_PRECISE_ITEM_FTOL,compute_standard_errors=False,item_priors=None,accelerate='none').fit(model,x.to_numpy(int),start=dict(slopes=A,intercepts=D))
         population=standard_normal_population(fit)
         rawA=fit.model.slopes.copy();rawD=fit.model.intercepts.copy();sgn=orientation(rawA,A)
         frame(x.columns,rawA,rawD).to_csv(out/'Python_raw_parameters.csv',index=False)
