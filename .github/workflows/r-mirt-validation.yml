@@ -1,14 +1,119 @@
-# Registration only. The validation implementation lives on validation-r-mirt-phase1.
 name: Independent R mirt validation
+run-name: Polytomous validation ${{ github.event_name == 'pull_request' && (github.head_ref == 'validation/gpcm-r-mirt' && 'gpcm-fit' || github.head_ref == 'validation/pcm-r-mirt' && 'pcm-fit' || 'grm-fit') || inputs.mode || 'preflight' }} (${{ github.ref_name }})
 on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/r-mirt-validation.yml', 'validation/grm*', 'validation/poly_r_preflight*', 'tests/test_pcm_r_comparison.py']
   workflow_dispatch:
-permissions: {}
+    inputs:
+      mode:
+        description: Preflight only, or ONE independent GRM/PCM/GPCM calibration per engine
+        type: choice
+        options: [preflight, grm-fit, pcm-fit, gpcm-fit]
+        default: preflight
+        required: true
+permissions:
+  contents: read
 jobs:
-  select-validation-branch:
+  grm-pcm-preflight:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+      VALIDATION_MODE: ${{ github.event_name == 'pull_request' && (github.head_ref == 'validation/gpcm-r-mirt' && 'gpcm-fit' || github.head_ref == 'validation/pcm-r-mirt' && 'pcm-fit' || 'grm-fit') || inputs.mode || 'preflight' }}
+      VALIDATION_MODEL: ${{ (github.head_ref == 'validation/gpcm-r-mirt' || inputs.mode == 'gpcm-fit') && 'GPCM' || (github.head_ref == 'validation/pcm-r-mirt' || inputs.mode == 'pcm-fit') && 'PCM' || 'GRM' }}
+      PR63_VALIDATION_COMMIT: 18d1bcf72c85a174ad278ae4d8ea925b412c0275
     steps:
-      - name: Stop registration-only execution
+      - uses: actions/checkout@v4
+      - name: Initialize failure-preserving diagnostics and verify branch
         run: |
-          echo '::error::Registration only: select validation-r-mirt-phase1 in Run workflow to execute R mirt validation. This definition performs no validation.'
-          exit 1
+          mkdir -p preflight-output
+          printf '%s\n' '{"status":"NOT EXECUTED","R_execution":"NOT EXECUTED","scientific_pass":false,"fits":0,"simulations":0}' > preflight-output/report.json
+          touch preflight-output/R_stdout.log preflight-output/R_stderr.log
+          if [ "$VALIDATION_MODE" != preflight ]; then
+            mkdir -p preflight-output/$VALIDATION_MODE
+            printf '{"model":"%s","status":"NOT EXECUTED","scientific_pass":false,"fit_calls":{"R":0,"python":0}}\n' "$VALIDATION_MODEL" > preflight-output/$VALIDATION_MODE/report.json
+            touch preflight-output/$VALIDATION_MODE/R_stdout.log preflight-output/$VALIDATION_MODE/R_stderr.log preflight-output/$VALIDATION_MODE/Python_stdout.log preflight-output/$VALIDATION_MODE/Python_stderr.log
+          fi
+          case "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" in audit/polytomous-r-strategy|validation/pcm-r-mirt|validation/gpcm-r-mirt) ;; *) exit 1 ;; esac
+      - name: Verify pinned PR63 helper (fetch only if absent)
+        run: |
+          if ! git cat-file -e "$PR63_VALIDATION_COMMIT:validation/r_mirt_phase1/harness.py" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$PR63_VALIDATION_COMMIT"
+          fi
+          git cat-file -e "$PR63_VALIDATION_COMMIT:validation/r_mirt_phase1/harness.py"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            ${{ (github.event_name == 'pull_request' || inputs.mode == 'grm-fit' || inputs.mode == 'pcm-fit' || inputs.mode == 'gpcm-fit') && 'any::nloptr' || '' }}
+          cache-version: 1
+      - name: Install only preflight Python dependencies
+        run: python -m pip install numpy scipy pandas 'mirt==1.2.0'
+      - name: Execute GRM/PCM/GPCM no-fit preflight ONCE
+        run: |
+          set -o pipefail
+          set +e
+          python validation/poly_r_preflight.py --output preflight-output 2>&1 | tee preflight-output/driver.log
+          result=${PIPESTATUS[0]}
+          cat preflight-output/report.json
+          cat preflight-output/R_stderr.log
+          exit "$result"
+      - name: Require actual R preflight; reject scientific certification
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('preflight-output/report.json'))
+          assert r['R_execution']=='EXECUTED', r
+          assert r['status']=='PREFLIGHT CHECKED / NOT SCIENTIFICALLY VALIDATED', r
+          assert r['scientific_pass'] is False and r['fits']==r['simulations']==0, r
+          assert str(r['R_metadata']['mirt_version'])=='1.48', r
+          assert r['R_checks'] and all(c['checked'] is True for c in r['R_checks']), r
+          assert set(r['comparisons'])=={'GRM','PCM','GPCM'}, r
+          PY
+      - name: Lightweight GRM/PCM/GPCM tests before any calibration
+        if: github.event_name == 'pull_request' || inputs.mode == 'grm-fit' || inputs.mode == 'pcm-fit' || inputs.mode == 'gpcm-fit'
+        run: |
+          python -m pip install pytest
+          python -m pytest -q tests/test_grm_r_comparison.py tests/test_pcm_r_comparison.py tests/test_gpcm_validation.py tests/test_irt_person_abilities.py
+      - name: ONE independent R and Python calibration
+        if: github.event_name == 'pull_request' || inputs.mode == 'grm-fit' || inputs.mode == 'pcm-fit' || inputs.mode == 'gpcm-fit'
+        run: |
+          set -o pipefail
+          set +e
+          python validation/grm_r_comparison.py --model "$VALIDATION_MODEL" --preflight preflight-output --output preflight-output/$VALIDATION_MODE --execute 2>&1 | tee preflight-output/calibration-driver.log
+          result=${PIPESTATUS[0]}
+          cat preflight-output/$VALIDATION_MODE/report.json || true
+          cat preflight-output/$VALIDATION_MODE/R_stderr.log || true
+          cat preflight-output/$VALIDATION_MODE/Python_stderr.log || true
+          exit "$result"
+      - name: Require complete executions, never scientific PASS
+        if: github.event_name == 'pull_request' || inputs.mode == 'grm-fit' || inputs.mode == 'pcm-fit' || inputs.mode == 'gpcm-fit'
+        run: |
+          python - <<'PY'
+          import json,os
+          r=json.load(open('preflight-output/'+os.environ['VALIDATION_MODE']+'/report.json'))
+          assert r['model']==os.environ['VALIDATION_MODEL'] and r['scientific_pass'] is False, r
+          assert r['status']=='MEASURED / NOT CERTIFIED', r
+          assert r['fit_calls']=={'R':1,'python':1}, r
+          assert r['execution']=={'R':'EXECUTED','python':'EXECUTED'}, r
+          assert r['R']['converged'] and r['python']['converged'], r
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: poly-${{ env.VALIDATION_MODE }}-${{ github.sha }}-${{ github.run_attempt }}
+          path: preflight-output/
+          if-no-files-found: error

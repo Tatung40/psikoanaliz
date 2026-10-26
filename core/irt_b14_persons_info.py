@@ -19,6 +19,8 @@ def person_scores(result, method="EAP"):
     import mirt
     if method not in ("EAP", "MAP"):
         raise ValueError("Yöntem EAP veya MAP olmalıdır.")
+    if not bool(result["result"].converged):
+        raise ValueError("Kalibrasyon yakınsamadı; kişi kestirimi üretilmez.")
     x = np.asarray(result["coded"], int)
     sc = mirt.fscores(result["result"], x, method=method)
     theta = np.asarray(sc.theta, float).reshape(-1); se = np.asarray(sc.standard_error, float).reshape(-1)
