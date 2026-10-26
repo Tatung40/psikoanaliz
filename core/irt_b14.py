@@ -34,12 +34,14 @@ def prepare_polytomous(data,model,*,categories=None):
             raise ValueError("Sıralı kategoriler sayısal ve eksiksiz olmalı.")
         raw=x.to_numpy(float)
         if not np.array_equal(raw,np.floor(raw)) or (raw<0).any():
-            raise ValueError("Sıralı yanıtlar 0'dan başlayan tamsayı olmalı.")
-        maximum=int(raw.max())
-        if maximum<2 or maximum>19:
+            raise ValueError("Sıralı yanıtlar negatif olmayan tamsayı olmalı.")
+        origin=int(raw.min());maximum=int(raw.max())
+        if origin not in (0,1):
+            raise ValueError("Sıralı kategoriler 0 veya 1'den başlamalı.")
+        if not 3<=maximum-origin+1<=20:
             raise ValueError("Sıralı modeller 3–20 yanıt kategorisi gerektirir.")
-        labels=tuple(str(i) for i in range(maximum+1))
-        x=x.astype(int)
+        labels=tuple(str(i) for i in range(origin,maximum+1))
+        x=(x-origin).astype(int)
     expected=set(range(len(labels)))
     observed=set(np.unique(x.to_numpy()))
     if observed!=expected:

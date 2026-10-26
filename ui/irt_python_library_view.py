@@ -65,7 +65,9 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     elif model not in BINARY:
         numeric=data[cols].apply(pd.to_numeric,errors='coerce') if cols else pd.DataFrame()
         maximum=numeric.max().max() if not numeric.empty else 2
-        inferred=int(maximum)+1 if pd.notna(maximum) and np.isfinite(maximum) else 3
+        minimum=numeric.min().min() if not numeric.empty else 0
+        origin=1 if minimum==1 else 0
+        inferred=int(maximum)-origin+1 if pd.notna(maximum) and np.isfinite(maximum) else 3
         categories=int(st.number_input('Kategori sayısı',min_value=3,max_value=20,value=max(3,min(20,inferred)),step=1,key=f'python_mirt_categories_{model}'))
     try:
         if len(cols)<3:raise ValueError('En az üç madde seçin.')
@@ -74,7 +76,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             if not np.isfinite(x.to_numpy(float)).all() or not x.isin([0,1]).all().all():raise ValueError('Eksiksiz 0/1 yanıtlar gerekli; otomatik atama yapılmadı.')
         else:
             x,observed=prepare_polytomous(data[cols],model,categories=labels if model=='NRM' else None)
-            if len(observed)!=categories:raise ValueError('Seçilen kategori sayısı verinin 0..C−1 kodlarıyla uyuşmuyor.')
+            if len(observed)!=categories:raise ValueError('Seçilen kategori sayısı gözlenen etiketlerle uyuşmuyor.')
             labels=observed
     except Exception as e:
         st.session_state.pop(f"python_mirt_fit_{model}", None)
