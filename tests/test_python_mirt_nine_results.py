@@ -91,13 +91,13 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run();assert not at.exception
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
-    assert len(at.dataframe)==3 and len(rendered_figures)==4
-    assert len(at.get('download_button'))==6
+    assert len(at.dataframe)==4 and len(rendered_figures)==4
+    assert len(at.get('download_button'))==7
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
-    pd.testing.assert_frame_equal(at.dataframe[1].value,report.parameters)
-    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[2].value.columns)
-    assert len(at.dataframe[2].value)==len(frame)
-    at.run();assert len(calls)==1 and len(at.dataframe)==3 and len(rendered_figures)==8
+    pd.testing.assert_frame_equal(at.dataframe[2].value,report.parameters)
+    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[3].value.columns)
+    assert len(at.dataframe[3].value)==len(frame)
+    at.run();assert len(calls)==1 and len(at.dataframe)==4 and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False
@@ -105,7 +105,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run()
     assert any('Kestirim yakınsamadı' in e.value for e in at.error)
     assert not any('Kestirim yakınsadı' in e.value for e in at.success)
-    assert not at.dataframe[1].value.Yakınsama.any()
+    assert len(at.dataframe)==2 and not at.dataframe[1].value.Yakınsama.any()
     at.session_state[f'python_mirt_fit_{model}']['outcome']=outcome
     changed=data.copy();changed.iloc[0,0]=labels[(frame.iloc[0,0]+1)%4] if model=='NRM' else (frame.iloc[0,0]+1)%(2 if model in BINARY else 4)
     at.session_state['raw_df']=changed;at.session_state['scored_df']=changed
@@ -161,3 +161,53 @@ render(x,items=list(x),model=model)
 def test_common_discrimination_requires_explicit_1pl_ml(model,estimation):
     with pytest.raises(ValueError,match='Common discrimination'):
         fit_python_mirt(np.ones((30,3)),model=model,estimation=estimation,common_discrimination=True)
+
+
+@pytest.mark.parametrize('settings', [
+    {'max_iter': 500, 'tol': 1e-4, 'n_quadpts': 21},
+    {'max_iter': 650, 'tol': 1e-5, 'n_quadpts': 31},
+])
+def test_real_rasch_solver_settings_change_engine_configuration(settings):
+    """Real-library calibration: settings must reach the public API and produce finite fits."""
+    from unittest.mock import patch
+    import mirt
+    x=pd.read_csv('tests/fixtures/irt_b10/data_irt1pl_ok.csv').iloc[:150,:5].to_numpy(dtype=int)
+    native=mirt.fit_mirt
+    captured=[]
+    def record(data, **kwargs):
+        captured.append(dict(kwargs))
+        return native(data, **kwargs)
+    with patch('mirt.fit_mirt',side_effect=record):
+        result=fit_python_mirt(x,model='Rasch',solver_settings=settings)
+    assert len(captured)==1
+    assert all(captured[0][name]==value for name,value in settings.items())
+    assert np.isfinite(result.fit.log_likelihood)
+    assert np.isfinite(result.fit.aic)
+    assert result.fit.n_iterations <= settings['max_iter']
+
+
+def test_real_rasch_wright_map_library_and_person_locations(calibrated):
+    """Rasch map must use the library's native plotting API and real EAP estimates."""
+    model,frame,outcome,labels,report=calibrated
+    if model!='Rasch':
+        pytest.skip('Wright Map gate currently enabled only for Rasch')
+    assert outcome.fit.converged and not report.errors
+    import mirt
+    from core.irt_person_abilities import person_abilities
+    import matplotlib
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
+    people=person_abilities(frame.to_numpy(),report.curves,model=model)
+    theta=people['Yetenek (θ)'].to_numpy(dtype=float)
+    assert len(theta)==len(frame) and np.isfinite(theta).all()
+    fig,ax=plt.subplots()
+    try:
+        actual=mirt.plot_person_item_map(outcome.fit,theta,ax=ax)
+        assert actual is ax
+        assert len(fig.axes)>=2
+        locations=np.asarray(outcome.fit.model.parameters['difficulty'],dtype=float)
+        assert len(locations)==len(frame.columns)
+        plotted=fig.axes[1].collections[0].get_offsets()[:,1]
+        np.testing.assert_allclose(plotted,locations,atol=1e-12)
+    finally:
+        plt.close(fig)

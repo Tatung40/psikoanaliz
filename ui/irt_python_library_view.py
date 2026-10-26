@@ -26,6 +26,39 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     st.caption('Python mirt 1.2.0 | Sonuç ekranı sürümü: nine-model-report-v2 | Bağımsız bilimsel sertifika veya formel DIF değildir.')
     choices=[c for c in data.columns if c not in (id_col,group_col)]
     cols=st.multiselect('Madde sütunları',choices,default=[c for c in items if c in choices] or choices[:10],key=f'python_mirt_cols_{model}')
+    # Display-only controls: never alter calibration or claim unsupported solver settings.
+    with st.expander('Çıktılar ve raporlama — SPSS tarzı seçimler',expanded=False):
+        st.caption('Varsayılan: tüm mevcut çıktılar. Seçimler yalnızca görünümü ve dışa aktarımı etkiler; model kalibrasyonunu değiştirmez.')
+        output_names={
+            'summary':'Model özeti, LogLik, AIC/BIC ve yakınsama',
+            'parameters':'Madde parametreleri',
+            'persons':'Birey EAP yetenekleri ve posterior SH',
+            'curves':'Madde/kategori tepki eğrileri',
+            'information':'Madde ve test bilgisi, koşullu SEM',
+            'comparison':'Aynı veri üzerinde model karşılaştırması (ML AIC/BIC)',
+            'itemfit':'Madde uyumu: Infit, Outfit, S-X² (kütüphane API)',
+        }
+        outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
+                 for name,label in output_names.items()}
+    solver_settings=None
+    with st.expander('Gelişmiş kestirim ayarları — Python mirt 1.2.0',expanded=False):
+        st.caption('Standart mod kütüphane varsayılanları: max_iter=500, tol=0.0001, n_quadpts=21. Gelişmiş mod gerçek fit_mirt API parametrelerini değiştirir.')
+        advanced=st.checkbox('Gelişmiş sayısal ayarları etkinleştir',value=False,key=f'python_mirt_solver_advanced_{model}')
+        if advanced:
+            iterations=int(st.number_input('Maksimum EM iterasyonu (max_iter)',min_value=10,max_value=5000,value=500,step=50,key=f'python_mirt_max_iter_{model}',help='Yakınsama gerçekleşmezse üst sınırı artırabilirsiniz; tek başına doğru kestirimi garanti etmez.'))
+            tolerance=float(st.number_input('EM yakınsama toleransı (tol)',min_value=1e-10,max_value=1e-2,value=1e-4,format='%.8f',key=f'python_mirt_tol_{model}',help='Daha küçük tolerans daha sıkı yakınsama koşuludur; hesaplama süresini artırabilir.'))
+            quadrature=int(st.number_input('Gauss-Hermite nokta sayısı (n_quadpts)',min_value=5,max_value=121,value=21,step=2,key=f'python_mirt_quadpts_{model}',help='Marjinal integrasyon hassasiyeti ve hesaplama maliyetini etkiler.'))
+            solver_settings=dict(max_iter=iterations,tol=tolerance,n_quadpts=quadrature)
+        st.caption('Değişiklikler yeniden kestirim gerektirir. Parametreler yalnızca Python mirt fit_mirt fonksiyonuna iletilir.')
+    with st.expander('Grafik ve çıktı ayrıntıları',expanded=False):
+        st.caption('Varsayılan seçimler mevcut raporun bütün grafiklerini korur. Seçimler hesaplamayı değil yalnızca sunumu etkiler.')
+        chart_options={
+            'item_info':'Madde bilgi fonksiyonu (IIF)',
+            'test_info':'Test bilgi fonksiyonu (TIF)',
+            'sem':'Koşullu ölçme standart hatası SEM(θ)',
+        }
+        charts={name:st.checkbox(label,value=True,key=f'python_mirt_chart_{model}_{name}')
+                for name,label in chart_options.items()}
     estimation='ML';categories=None;labels=()
     if model=='Rasch':st.info('Rasch: a=1; θ~N(0,1). Yerel serbest-σ Rasch ekranından ayrıdır.')
     if model=='1PL':st.info('1PL: ortak a serbest; 2PL üzerinde belgelenmiş eşitlik kısıtı. Rasch sekmesinde a=1 sabittir.')
@@ -52,7 +85,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     except Exception as e:
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         st.error(f'Veri ön kontrolü: {e}');return
-    key=(tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,'nine-model-report-v1')
+    key=(tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,tuple(sorted((solver_settings or {}).items())),'nine-model-report-v2')
     saved=st.session_state.get(f'python_mirt_fit_{model}')
     if saved is not None and (not isinstance(saved,dict) or saved.get('key')!=key):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
@@ -62,13 +95,44 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         try:
             with st.spinner('Python mirt kestirimi çalışıyor'):
-                outcome=fit_python_mirt(x.to_numpy(),model=model,
-                    n_categories=categories,estimation=estimation,common_discrimination=model=='1PL')
+                fit_kwargs=dict(model=model,n_categories=categories,estimation=estimation,
+                                common_discrimination=model=='1PL')
+                if solver_settings is not None:fit_kwargs['solver_settings']=solver_settings
+                outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
             saved=dict(key=key,outcome=outcome)
             st.session_state[f'python_mirt_fit_{model}']=saved
         except Exception as e:
             saved=None;st.error(f'Kestirim yapılamadı: {e}')
     if saved is None:return
+    # A comparison pool is populated only with actual converged ML fits on identical
+    # item data and identical category coding. MAP is not compared by ordinary AIC/BIC.
+    pool=st.session_state.setdefault('python_mirt_comparison_pool',{})
+    pool_key=(_data_fingerprint(x),tuple(cols),tuple(labels),categories)
+    if estimation=='ML':
+        try:
+            from core.irt_library_diagnostics import library_fit_diagnostics
+            diag=library_fit_diagnostics(saved['outcome'].fit)
+            if diag['converged'] and all(np.isfinite(float(diag[z])) for z in ('log_likelihood','aic','bic')):
+                pool[(pool_key,model)]={'Model':model,'N':len(x),'Madde':len(cols),
+                    'LogLik':float(diag['log_likelihood']),'AIC':float(diag['aic']),
+                    'BIC':float(diag['bic']),'Parametre':int(diag['n_parameters'])}
+        except (ValueError,TypeError,KeyError,AttributeError):
+            pool.pop((pool_key,model),None)
+    if outputs['comparison']:
+        st.markdown('### Python model karşılaştırması')
+        st.caption('Yalnızca bu oturumda aynı madde verisi, kategori kodlaması ve ML yöntemiyle yakınsamış modeller karşılaştırılır. MAP için klasik AIC/BIC karşılaştırması sunulmaz. Düşük AIC/BIC göreli uyumu gösterir, bilimsel geçerlik kanıtı değildir.')
+        compatible=[v for (k,_),v in pool.items() if k==pool_key]
+        if estimation!='ML':
+            st.info('MAP analizi klasik ML AIC/BIC karşılaştırmasına dahil edilmez.')
+        elif len(compatible)<2:
+            st.info('Karşılaştırma için aynı veriyle en az iki ML modeli çalıştırın.')
+        else:
+            comparison=pd.DataFrame(compatible).sort_values(['AIC','Model']).reset_index(drop=True)
+            comparison['ΔAIC']=comparison['AIC']-comparison['AIC'].min()
+            comparison['ΔBIC']=comparison['BIC']-comparison['BIC'].min()
+            st.dataframe(comparison,hide_index=True)
+            st.download_button('Model karşılaştırması — CSV',_csv(comparison),'model_comparison.csv',
+                               'text/csv',key=f'python_mirt_compare_csv_{model}',on_click='ignore')
     theta=np.linspace(-4,4,161)
     report=build_report(saved['outcome'],model=model,items=cols,labels=labels,theta=theta)
     if report.metadata['Yakınsama'] is True:st.success('Kestirim yakınsadı; bilimsel sertifika anlamına gelmez.')
@@ -76,18 +140,38 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     else:st.error('Yakınsama durumu doğrulanamadı; sonuç kesinleştirilemez.')
     for warning in report.warnings:st.warning(warning)
     for error in report.errors:st.error(error)
+    if outputs['itemfit']:
+        st.markdown('### Madde uyumu — Python mirt itemfit')
+        st.caption('Infit ve Outfit MNSQ, S-X²: Python mirt 1.2.0 kamuya açık itemfit API. Yalnızca yakınsamış modelde gösterilir. Model ailesine göre istatistik desteği değişebilir; desteklenmeyen sonuçlar uydurulmaz.')
+        if report.metadata.get('Yakınsama') is not True or report.errors:
+            st.warning('Yakınsama veya rapor hatası nedeniyle madde uyumu hesaplanmadı.')
+        else:
+            try:
+                import mirt
+                fit_table=mirt.itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),
+                                       statistics=['infit','outfit','S_X2'])
+                fit_frame=safe_frame(fit_table)
+                if fit_frame.empty:
+                    st.info('Kütüphane bu model için madde uyum tablosu döndürmedi.')
+                else:
+                    st.dataframe(fit_frame,hide_index=True,use_container_width=True)
+                    st.download_button('Madde uyumu — CSV',_csv(fit_frame),f'{model}_itemfit.csv',
+                                       'text/csv',key=f'python_mirt_itemfit_csv_{model}',on_click='ignore')
+            except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
+                st.warning(f'Kütüphane madde uyumu hesaplayamadı: {exc}')
     summary=pd.DataFrame([report.metadata])
-    st.markdown('### Model özeti');st.dataframe(summary,hide_index=True)
-    st.download_button('Model özeti — CSV',_csv(summary),f'{model}_summary.csv','text/csv',key=f'python_mirt_summary_csv_{model}',on_click='ignore')
-    if not report.parameters.empty:
+    if outputs['summary']:
+        st.markdown('### Model özeti');st.dataframe(summary,hide_index=True)
+    if outputs['summary']:st.download_button('Model özeti — CSV',_csv(summary),f'{model}_summary.csv','text/csv',key=f'python_mirt_summary_csv_{model}',on_click='ignore')
+    if outputs['parameters'] and not report.parameters.empty:
         st.markdown('### Madde parametreleri');st.dataframe(safe_frame(report.parameters),hide_index=True)
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
-    st.markdown('### Birey Yetenek Kestirimleri (θ)')
-    st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
-    if report.metadata.get('Yakınsama') is not True or report.errors:
+    if outputs['persons']:st.markdown('### Birey Yetenek Kestirimleri (θ)')
+    if outputs['persons']:st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
+    if outputs['persons'] and (report.metadata.get('Yakınsama') is not True or report.errors):
         st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
-    elif not report.curves.empty:
+    elif outputs['persons'] and not report.curves.empty:
         try:
             ids=data.loc[x.index,id_col].to_numpy() if id_col in data.columns else None
             people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
@@ -105,7 +189,29 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                                key=f'python_mirt_persons_xlsx_{model}',on_click='ignore')
         except (ValueError,TypeError,KeyError,IndexError) as exc:
             st.error(f'Birey yetenek kestirimleri hesaplanamadı: {exc}')
+    # Library-native Wright map. Conservative scientific gate: Rasch only;
+    # other families remain disabled pending model-specific independent validation.
+    if model=='Rasch' and report.metadata.get('Yakınsama') is True and not report.errors:
+        with st.expander('Wright Map — Rasch (Python mirt)',expanded=False):
+            if st.checkbox('Kütüphane Wright Map grafiğini göster',value=False,key='python_mirt_wright_Rasch'):
+                try:
+                    import mirt
+                    import matplotlib
+                    matplotlib.use('Agg')
+                    from matplotlib import pyplot as plt
+                    persons=person_abilities(x.to_numpy(),report.curves,model=model)
+                    theta_person=persons['Yetenek (θ)'].to_numpy(dtype=float)
+                    fig,ax=plt.subplots(figsize=(9,6))
+                    try:
+                        mirt.plot_person_item_map(saved['outcome'].fit,theta_person,ax=ax)
+                        st.pyplot(fig)
+                    finally:plt.close(fig)
+                except (AttributeError,ValueError,TypeError,ImportError,RuntimeError) as exc:
+                    st.warning(f'Python mirt Wright Map üretilemedi: {exc}')
+    elif model!='Rasch':
+        st.caption('Wright Map: bu model için bağımsız bilimsel doğrulama kapısı henüz açılmadı.')
     if report.curves.empty:return
+    if not outputs['curves'] and not outputs['information']:return
     # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
     import matplotlib
     matplotlib.use('Agg')
@@ -113,20 +219,22 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     selected=st.selectbox('Grafik maddesi',cols,key=f'python_mirt_plot_item_{model}')
     shown=report.curves[report.curves.Madde==str(selected)]
     if model in BINARY:shown=shown[shown.Kategori=='1']
-    fig,ax=plt.subplots(figsize=(7,4))
-    for category,group in shown.groupby('Kategori',sort=False):
-        ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
-    ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
-           xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
-    ax.grid(alpha=.2)
-    if len(shown['Kategori'].unique())>1:ax.legend()
-    fig.tight_layout()
-    try:st.pyplot(fig,use_container_width=True)
-    finally:plt.close(fig)
-    st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
-    if report.information.empty:return
+    if outputs['curves']:
+        fig,ax=plt.subplots(figsize=(7,4))
+        for category,group in shown.groupby('Kategori',sort=False):
+            ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
+        ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
+               xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
+        ax.grid(alpha=.2)
+        if len(shown['Kategori'].unique())>1:ax.legend()
+        fig.tight_layout()
+        try:st.pyplot(fig,use_container_width=True)
+        finally:plt.close(fig)
+        st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
+    if not outputs['information'] or report.information.empty:return
     info=report.information
-    for title,col in [('Madde bilgi fonksiyonu',f'I_{selected}'),('Test bilgi fonksiyonu','Test bilgisi'),('Koşullu standart hata','SEM(θ)')]:
+    for chart_key,title,col in [('item_info','Madde bilgi fonksiyonu',f'I_{selected}'),('test_info','Test bilgi fonksiyonu','Test bilgisi'),('sem','Koşullu standart hata','SEM(θ)')]:
+        if not charts[chart_key]:continue
         fig,ax=plt.subplots(figsize=(7,4))
         ax.plot(info['θ'],info[col])
         ax.set(title=title,xlabel='Theta',ylabel=col)

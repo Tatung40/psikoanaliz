@@ -27,7 +27,7 @@ class PythonMirtResult:
 ESTIMATIONS = ("ML", "MAP")
 
 
-def solver_settings(*, max_iter=500, tol=1e-4, n_quadpts=21):
+def normalize_solver_settings(*, max_iter=500, tol=1e-4, n_quadpts=21):
     """Exact public mirt.fit_mirt defaults; reject silent coercion/nonfinite values."""
     for name,value in (("max_iter",max_iter),("n_quadpts",n_quadpts)):
         if isinstance(value,(bool,np.bool_)) or not isinstance(value,Integral) or value<1:
@@ -37,8 +37,12 @@ def solver_settings(*, max_iter=500, tol=1e-4, n_quadpts=21):
     return dict(max_iter=int(max_iter),tol=float(tol),n_quadpts=int(n_quadpts))
 
 
+# Keep Phase2 public helper compatibility.
+solver_settings=normalize_solver_settings
+
+
 def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False,
-                    max_iter=500, tol=1e-4, n_quadpts=21):
+                    max_iter=500, tol=1e-4, n_quadpts=21, solver_settings=None):
     """One public fit call; no implicit engine fallback or unsupported inference.
 
     common_discrimination=True explicitly fits a shared free a via the public
@@ -48,7 +52,21 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
     (mirt.estimation.priors.default_priors: a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)).
     They were not tuned to any result; see validation/evidence/p1_3pl4pl for the pre-registered study.
     """
-    settings=solver_settings(max_iter=max_iter,tol=tol,n_quadpts=n_quadpts)
+    settings=normalize_solver_settings(max_iter=max_iter,tol=tol,n_quadpts=n_quadpts)
+    if solver_settings is not None:
+        if not isinstance(solver_settings,dict) or set(solver_settings)-{"max_iter","tol","n_quadpts"}:
+            raise ValueError("Unsupported Python mirt solver option.")
+        if settings!=normalize_solver_settings():
+            raise ValueError("Use scalar settings or solver_settings, not both.")
+        # Preserve PR73's documented dictionary API bounds; Phase2 scalars also
+        # support intentional low-iteration diagnostics through the public API.
+        for name,value in solver_settings.items():
+            if name in ("max_iter","n_quadpts"):
+                if type(value) is not int or not (10<=value<=5000 if name=="max_iter" else 5<=value<=121):
+                    raise ValueError(f"Invalid {name} solver setting.")
+            elif isinstance(value,bool) or not isinstance(value,(int,float)) or not np.isfinite(value) or not 1e-10<=value<=1e-2:
+                raise ValueError("Invalid tol solver setting.")
+        settings=normalize_solver_settings(**dict(settings,**solver_settings))
     if common_discrimination and (model!="1PL" or estimation!="ML"):
         raise ValueError("Common discrimination requires explicit 1PL ML specification.")
     if estimation not in ESTIMATIONS:
