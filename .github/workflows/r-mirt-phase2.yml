@@ -1,0 +1,73 @@
+name: Independent R mirt Phase 2 — polytomous execution
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'One scientific model per run'
+        type: choice
+        required: true
+        options:
+          - GRM
+          - PCM
+          - GPCM
+          - NRM
+          - RSM
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::mirt@1.48
+          cache-version: 2
+      - name: Install Python scientific dependencies
+        run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Harness regression
+        run: python -m pytest -q tests/test_r_mirt_phase1.py tests/test_r_mirt_equivalence_audit.py
+      - name: One independent R/Python fit (no automatic retries)
+        shell: bash
+        run: |
+          mkdir -p validation-output
+          set -o pipefail
+          python validation/r_mirt_phase1/harness.py --output validation-output --models "${{ inputs.model }}" 2>&1 | tee validation-output/execution.log
+      - name: Preserve raw audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r-mirt-phase2-${{ inputs.model }}-${{ github.sha }}-${{ github.run_id }}
+          path: validation-output/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Enforce scientific-status honesty
+        if: success()
+        run: |
+          python - <<'PY'
+          import json,os
+          model=os.environ['SELECTED_MODEL']
+          report=json.load(open('validation-output/report.json'))
+          matching=[m for m in report['models'] if m['model']==model]
+          assert len(matching)==1, report
+          m=matching[0]
+          assert m['execution']=='EXECUTED', m
+          assert m['status']!='FAIL', m
+          assert m['status']!='PASS', 'Scientific tolerances not preregistered'
+          print('R and Python executed. No automatic scientific certification.')
+          PY
+        env:
+          SELECTED_MODEL: ${{ inputs.model }}
