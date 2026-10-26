@@ -53,8 +53,8 @@ def test_gpcm_person_ui_ids_exports_and_invalid_calibration(fitted,monkeypatch):
     at=AppTest.from_file(str(Path('app.py').resolve()),default_timeout=120)
     for k,v in dict(raw_df=data,scored_df=None,item_cols=list(x.columns),id_col='ID',group_col=None,is_dichotomous=False,nav_page='MTK: Python mirt GPCM').items():at.session_state[k]=v
     at.run();at.button(key='python_mirt_start_GPCM').click().run()
-    assert not at.exception and len(at.dataframe)==3
-    assert at.dataframe[2].value.Birey.tolist()==ids
+    assert not at.exception and len(at.dataframe)==4  # PR73 adds the item-fit table.
+    assert at.dataframe[3].value.Birey.tolist()==ids
     for label,blob in downloads.items():
         parsed=pd.read_excel(io.BytesIO(blob)) if label.endswith('Excel') else pd.read_csv(io.BytesIO(blob))
         pd.testing.assert_frame_equal(parsed,people,check_dtype=False,check_exact=False,rtol=1e-12,atol=1e-12)
