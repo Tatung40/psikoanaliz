@@ -189,6 +189,27 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                                key=f'python_mirt_persons_xlsx_{model}',on_click='ignore')
         except (ValueError,TypeError,KeyError,IndexError) as exc:
             st.error(f'Birey yetenek kestirimleri hesaplanamadı: {exc}')
+    # Library-native Wright map. Conservative scientific gate: Rasch only;
+    # other families remain disabled pending model-specific independent validation.
+    if model=='Rasch' and report.metadata.get('Yakınsama') is True and not report.errors:
+        with st.expander('Wright Map — Rasch (Python mirt)',expanded=False):
+            if st.checkbox('Kütüphane Wright Map grafiğini göster',value=False,key='python_mirt_wright_Rasch'):
+                try:
+                    import mirt
+                    import matplotlib
+                    matplotlib.use('Agg')
+                    from matplotlib import pyplot as plt
+                    persons=person_abilities(x.to_numpy(),report.curves,model=model)
+                    theta_person=persons['Yetenek (θ)'].to_numpy(dtype=float)
+                    fig,ax=plt.subplots(figsize=(9,6))
+                    try:
+                        mirt.plot_person_item_map(saved['outcome'].fit,theta_person,ax=ax)
+                        st.pyplot(fig)
+                    finally:plt.close(fig)
+                except (AttributeError,ValueError,TypeError,ImportError,RuntimeError) as exc:
+                    st.warning(f'Python mirt Wright Map üretilemedi: {exc}')
+    elif model!='Rasch':
+        st.caption('Wright Map: bu model için bağımsız bilimsel doğrulama kapısı henüz açılmadı.')
     if report.curves.empty:return
     if not outputs['curves'] and not outputs['information']:return
     # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
