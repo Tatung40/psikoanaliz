@@ -12,6 +12,7 @@ import streamlit as st
 
 from core import dimensionality as dm
 from core import local_fit as lf
+from core.python_mirt_dif import fingerprint
 from reports.excel_export import sanitize_excel_cell
 
 PAGE_DIM = "Boyutluluk ve Faktör Analizi"
@@ -19,7 +20,11 @@ PAGE_LOCAL = "Yerel Bağımsızlık ve Madde Uyumu"
 
 
 def _safe(df):
-    return df.map(sanitize_excel_cell) if hasattr(df, "map") else df
+    out = df.map(sanitize_excel_cell)
+    out.columns = out.columns.map(sanitize_excel_cell)
+    out.index = out.index.map(lambda v: tuple(map(sanitize_excel_cell, v)) if isinstance(v, tuple) else sanitize_excel_cell(v))
+    out.index.names = [sanitize_excel_cell(n) for n in out.index.names]
+    return out
 
 
 def _xlsx(tables):
@@ -87,19 +92,26 @@ def _heat(df, title, zmin=-1, zmax=1):
 DIM_METHOD = """YÖNTEM: Korelasyon türü veri türüne göre seçilir (0/1 → tetrakorik, 3-10 kategori → polikorik,
 sürekli → Pearson). Polikorik/tetrakorik: iki aşamalı ML; boş hücrelerde 0.5 düzeltmesi; pozitif tanımlı
 olmayan matris özdeğer kırpma ile düzeltilir ve raporlanır. KMO ve Bartlett seçilen matris üzerinden
-hesaplanır (polikorik matriste Bartlett yaklaşıktır). Paralel analiz: sütun permütasyonu, aynı korelasyon
+hesaplanır. Bartlett p yalnız sürekli veri üzerinde eksiksiz, düzeltilmemiş Pearson matrisi için verilir; normal dağılım varsayılır. Paralel analiz: sütun permütasyonu, aynı korelasyon
 türü, %95 nicelik. AFA: temel eksen faktörleştirme (PAF); döndürme varimax/promax.
 SINIRLILIKLAR: Tek boyutluluk özeti betimseldir; evrensel kesme puanı kullanılmaz. Heywood durumu
 (h² ≥ 1) uyarı olarak gösterilir. Eksik veri: ikili-çiftli (pairwise) korelasyon."""
 
 LOCAL_METHOD = """YÖNTEM: Yen-Q3 (WLE/EAP kişi kestirimleri ile artık korelasyonu), merkezlenmiş Q3 (Q3 − ortalama Q3),
 tek faktörlü PAF artık korelasyonları. Madde uyumu: Orlando-Thissen S-X² (mirt uyumlu); BH-FDR.
-SERTİFİKA: 1PL/2PL S-X² p ve FDR kararları CERTIFIED (sabit parametre altın testleri + simülasyon).
-3PL/4PL: istatistik gösterilir, p/FDR EXPERIMENTAL / NOT CERTIFIED; karar üretilmez.
+SERTİFİKA: NOT CERTIFIED. 1PL/2PL asimptotik p/BH-FDR keşifseldir; sabit-parametre referansı tam kestirim zincirini sertifikalandırmaz.
+3PL/4PL veya yakınsamayan kestirim: p/FDR kapalı, EXPERIMENTAL / NOT CERTIFIED; karar üretilmez.
 Çok kategorili modeller: S-X² uygulanmamıştır, ekran kapatılır.
 SINIRLILIKLAR: Q3 için evrensel kesme puanı uydurulmaz; isteğe bağlı parametrik bootstrap veri temelli kritik
 değer verir. S-X², Pearson X² ve M2 farklı istatistiklerdir; burada yalnızca S-X² raporlanır.
 S-X² tam (eksiksiz) veri gerektirir."""
+
+
+def _invalidate(data, settings, prefix):
+    key = fingerprint(data, settings)
+    if st.session_state.get(prefix + "_key") != key:
+        st.session_state.pop(prefix + "_result", None)
+        st.session_state[prefix + "_key"] = key
 
 
 def render_dimensionality(data, item_cols):
@@ -115,7 +127,9 @@ def render_dimensionality(data, item_cols):
     rotation = c[1].selectbox("Döndürme", ["promax", "varimax"], key="dim_rot")
     nf = c[2].number_input("Faktör sayısı (0 = paralel analiz)", 0, max(len(items) - 1, 1), 0, key="dim_nf")
     reps = c[3].number_input("Paralel analiz tekrar", 10, 500, 50, key="dim_reps")
+    _invalidate(data, (tuple(items), method, rotation, int(nf), int(reps), 2026), "dim")
     if st.button("Boyutluluk analizini çalıştır", key="dim_run", type="primary"):
+        st.session_state.pop("dim_result", None)
         try:
             with st.spinner("Hesaplanıyor..."):
                 st.session_state["dim_result"] = dm.dimensionality_analysis(
@@ -172,6 +186,7 @@ def render_local_fit(data, item_cols):
     items = [c for c in item_cols if c in data.columns]
     df = data[items].apply(pd.to_numeric, errors="coerce")
     if dm.data_type(df) != "binary":
+        st.session_state.pop("lf_result", None)
         st.error("Bu ekran yalnızca 0/1 puanlanmış veriyi destekler. Çok kategorili modeller için S-X² "
                  "uygulanmamıştır; geçersiz çıkarım üretilmemesi için analiz kapatıldı.")
         return
@@ -180,9 +195,11 @@ def render_local_fit(data, item_cols):
     person = c[1].selectbox("Kişi kestirimi (Q3)", ["WLE", "EAP"], key="lf_person")
     alpha = c[2].number_input("α (FDR)", 0.001, 0.2, 0.05, key="lf_alpha")
     boot = c[3].number_input("Q3 bootstrap (0 = kapalı)", 0, 200, 0, key="lf_boot")
-    if model not in lf.CERTIFIED_SX2:
+    if model not in lf.ASYMPTOTIC_SX2:
         st.warning(f"{model}: S-X² p/FDR çıkarımları {lf.EXPERIMENTAL}; karar üretilmez.")
+    _invalidate(data, (tuple(items), model, person, float(alpha), int(boot), 2026), "lf")
     if st.button("Analizi çalıştır", key="lf_run", type="primary"):
+        st.session_state.pop("lf_result", None)
         try:
             with st.spinner("Kestirim ve tanılar hesaplanıyor..."):
                 st.session_state["lf_result"] = lf.run(df, model, float(alpha), person, int(boot))
@@ -213,7 +230,7 @@ def render_local_fit(data, item_cols):
     else:
         it = res["itemfit"]
         if not res["certified"]:
-            tab3.error(f"{lf.EXPERIMENTAL}: p ve FDR değerleri karar için kullanılmamalıdır.")
+            tab3.warning("NOT CERTIFIED: 1PL/2PL p/BH-FDR keşifseldir; 3PL/4PL ve yakınsamayan kestirimlerde p/karar kapalıdır.")
         tab3.dataframe(it.round(4), use_container_width=True)
         tables["sx2_madde_uyumu"] = it
         sel = tab4.selectbox("Madde", list(res["obs_exp"]), key="lf_item")
@@ -227,7 +244,7 @@ def render_local_fit(data, item_cols):
         tab4.dataframe(g.round(4))
         allg = pd.concat({k: v for k, v in res["obs_exp"].items()}, names=["Madde", "satır"])
         tables["gozlenen_beklenen"] = allg
-        pngs[f"gozlenen_beklenen_{sel}"] = _png_lines(g["Grup"], {"Gözlenen": g["Gözlenen oran"], "Beklenen": g["Beklenen oran"]},
+        pngs["gozlenen_beklenen"] = _png_lines(g["Grup"], {"Gözlenen": g["Gözlenen oran"], "Beklenen": g["Beklenen oran"]},
                                                       f"{sel} S-X² tanı", "Puan grubu", "P(1)")
     st.subheader("Raporlar"); st.text(LOCAL_METHOD)
     _downloads("yerel_bagimsizlik_madde_uyumu", tables, pngs, LOCAL_METHOD)

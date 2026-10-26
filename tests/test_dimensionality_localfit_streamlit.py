@@ -35,6 +35,24 @@ def _run(page, run_key):
         at.number_input(key="dim_reps").set_value(10)
     at.run(); assert not at.exception
     assert not at.error
+    assert len(at.get('download_button')) >= 5
+    prefix='dim' if run_key=='dim_run' else 'lf'
+    result=at.session_state[prefix+'_result'];key=at.session_state[prefix+'_key']
+    original=at.session_state['scored_df'].copy()
+    changed=original.copy();changed.iloc[0,0]=1-changed.iloc[0,0]
+    at.session_state['scored_df']=changed;at.run()
+    assert not at.exception and not at.get('download_button') and prefix+'_result' not in at.session_state
+    at.session_state['scored_df']=original
+    at.session_state[prefix+'_result']=result;at.session_state[prefix+'_key']=key
+    at.run();assert len(at.get('download_button')) >= 5
+    if prefix=='dim':at.selectbox(key='dim_rot').set_value('varimax').run()
+    else:at.selectbox(key='lf_model').set_value('3PL').run()
+    assert not at.exception and not at.get('download_button') and prefix+'_result' not in at.session_state
+    # Restore a valid cached result for the caller's existing output assertions.
+    if prefix=='dim':at.selectbox(key='dim_rot').set_value('promax')
+    else:at.selectbox(key='lf_model').set_value('2PL')
+    at.session_state[prefix+'_result']=result;at.session_state[prefix+'_key']=key
+    at.run()
     return at
 
 
@@ -52,3 +70,17 @@ def test_local_fit_disabled_for_polytomous():
     df = pd.DataFrame(np.random.default_rng(0).integers(0, 4, (200, 5)).astype(float), columns=list("ABCDE"))
     at = _app(df, "Yerel Bağımsızlık ve Madde Uyumu"); at.run()
     assert not at.exception and any("S-X²" in e.value for e in at.error)
+
+
+def test_exports_escape_item_labels_and_keep_inference_closed():
+    import io,zipfile
+    from openpyxl import load_workbook
+    from ui.dimensionality_localfit_view import _safe,_xlsx,_zip,LOCAL_METHOD
+    frame=pd.DataFrame({'=COLUMN':['=VALUE',None],'p':[float('nan'),float('nan')]},index=['=ITEM','normal'])
+    safe=_safe(frame)
+    assert safe.columns[0].startswith("'") and safe.index[0].startswith("'")
+    book=_xlsx({'S-X2':frame});ws=load_workbook(io.BytesIO(book)).active
+    assert all(c.data_type!='f' for row in ws for c in row)
+    assert pd.read_excel(io.BytesIO(book)).p.isna().all()
+    package=_zip({'report.xlsx':book,'report.csv':safe.to_csv().encode(),'METHOD.txt':LOCAL_METHOD.encode()})
+    with zipfile.ZipFile(io.BytesIO(package)) as z:assert 'NOT CERTIFIED' in z.read('METHOD.txt').decode()

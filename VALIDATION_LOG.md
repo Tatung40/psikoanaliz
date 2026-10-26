@@ -68,3 +68,5 @@ $$D = p_{üst} - p_{alt}$$
 - BH-FDR ↔ statsmodels.multipletests. Yerel bağımlı çift ilk sırada; uyumsuz madde FDR ile işaretlendi; doğru 2PL altında FDR işareti yok (tek tohum).
 - 3PL/4PL S-X² çıkarımı ve çok kategorili S-X²: doğrulanmadı → EXPERIMENTAL / NOT CERTIFIED veya kapalı.
 - Testler: tests/test_dimensionality_localfit.py, tests/test_dimensionality_localfit_streamlit.py (AppTest).
+
+- Entegrasyon güvenliği: tam kestirim zinciri için sertifika iddiası yok; 1PL/2PL asimptotik p/BH-FDR keşifseldir. 3PL/4PL ve yakınsamayan kestirimlerde p/karar kapalıdır. Bootstrap refitleri de Python mirt kullanır. Veri/ayar değişimi eski raporları temizler. Bartlett p yalnız sürekli, eksiksiz verinin düzeltilmemiş Pearson matrisi için; promax işaret değişiminde Phi birlikte dönüştürülür.

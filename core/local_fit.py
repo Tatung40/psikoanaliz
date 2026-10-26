@@ -3,13 +3,10 @@
 - Yerel bağımsızlık: Yen-Q3, merkezlenmiş Q3 (Q3 - ortalama Q3; Christensen vd.,
   2017) ve tek faktörlü PAF artık korelasyonları. Evrensel kesme puanı yoktur;
   isteğe bağlı parametrik bootstrap ile veri temelli kritik değer üretilir.
-- Madde uyumu: Orlando-Thissen S-X² (mirt uyumlu; sabit parametre altın testleri
-  1PL-4PL için geçer). Çıkarım politikası:
-    * 1PL/2PL: p ve BH-FDR raporlanır (CERTIFIED: sabit parametre altın testi +
-      simülasyon tip-I hata denetimi).
-    * 3PL/4PL: istatistik hesaplanır, fakat kestirilen c/d sınır parametreleri
-      altında ki-kare referans dağılımı doğrulanmadığından p/FDR
-      `EXPERIMENTAL / NOT CERTIFIED` olarak işaretlenir ve karar üretilmez.
+- Madde uyumu: Orlando-Thissen S-X² (sabit-parametre 2PL referans testi mevcut). Çıkarım politikası:
+    * 1PL/2PL: asimptotik p ve BH-FDR keşifseldir; sabit-parametre
+      referans kontrolü tam kestirim zincirinin sertifikası değildir.
+    * 3PL/4PL veya yakınsamayan kestirim: p/FDR ve karar kapalıdır.
     * Çok kategorili modeller: S-X² uygulanmamıştır; analiz kapatılır.
   S-X², Pearson X² ve M2 farklı istatistiklerdir; burada yalnızca S-X² vardır.
 """
@@ -22,7 +19,7 @@ from core.irt_itemfit import sx2_mirt_compatible
 from core.irt_q3 import q3_analysis
 from core.dimensionality import correlation_matrix, paf
 
-CERTIFIED_SX2 = ("1PL", "2PL")
+ASYMPTOTIC_SX2 = ("1PL", "2PL")
 SUPPORTED = ("1PL", "2PL", "3PL", "4PL")
 EXPERIMENTAL = "EXPERIMENTAL / NOT CERTIFIED"
 
@@ -43,20 +40,21 @@ def bh_fdr(p):
     return out
 
 
-def item_fit(data, item_table, model, alpha=0.05, mincell=1.0):
+def item_fit(data, item_table, model, alpha=0.05, mincell=1.0, *, converged=True):
     if model not in SUPPORTED:
         raise ValueError("S-X² yalnızca iki kategorili 1PL/2PL/3PL/4PL için uygulanmıştır.")
     table, groups = sx2_mirt_compatible(data, item_table, model, mincell=mincell, return_tables=True)
     table["p (BH-FDR)"] = bh_fdr(table["p"])
-    certified = model in CERTIFIED_SX2
-    if certified:
+    eligible = model in ASYMPTOTIC_SX2 and converged
+    if eligible:
         table["Karar"] = np.where(table["p (BH-FDR)"].isna(), "Hesaplanamadı",
                                   np.where(table["p (BH-FDR)"] < alpha, "Uyumsuz (FDR)", "Uyumlu"))
-        table["Sertifika"] = "CERTIFIED"
+        table["Sertifika"] = "NUMERICAL REFERENCE CHECKED / NOT CERTIFIED"
     else:
+        table[["p", "p (BH-FDR)"]] = np.nan
         table["Karar"] = "Karar üretilmedi"
         table["Sertifika"] = EXPERIMENTAL
-    return table, groups, certified
+    return table, groups, False
 
 
 def local_independence(data, item_table, model, person_method="WLE", bootstrap=0, seed=2026,
@@ -66,7 +64,12 @@ def local_independence(data, item_table, model, person_method="WLE", bootstrap=0
     if model in ("3PL", "4PL"):
         kw["c"] = item_table["c"].to_numpy(float)
         kw["d"] = item_table["d"].to_numpy(float)
-    q3 = q3_analysis(data, a, b, model, person_method=person_method, bootstrap=bootstrap,
+    def primary_refit(frame):
+        result = fit_python_mirt(frame, model=model)
+        params = python_mirt_binary_parameters(result.fit, model=model, item_names=list(frame.columns))
+        values = tuple(params[name].to_numpy(float) for name in ("a", "b", "c", "d"))
+        return (*values, bool(result.fit.converged)) if model in ("3PL", "4PL") else (*values[:2], bool(result.fit.converged))
+    q3 = q3_analysis(data, a, b, model, person_method=person_method, bootstrap=bootstrap if converged else 0, refit=primary_refit,
                      seed=seed, converged=converged, **kw)
     cor = correlation_matrix(data, "auto")
     R = cor["R"].to_numpy()
@@ -78,8 +81,8 @@ def local_independence(data, item_table, model, person_method="WLE", bootstrap=0
     pairs["Artık korelasyon (1F)"] = [rmap.get((r["Madde 1"], r["Madde 2"]),
                                        rmap.get((r["Madde 2"], r["Madde 1"]))) for _, r in pairs.iterrows()]
     boot = q3.get("bootstrap")
-    if isinstance(boot, dict) and boot.get("critical") is not None:
-        pairs["Bootstrap kritik değerini aşar"] = pairs["Düzeltilmiş Q3"] > boot["critical"]
+    if isinstance(boot, dict) and boot.get("max_quantile_95") is not None:
+        pairs["Bootstrap kritik değerini aşar"] = pairs["Düzeltilmiş Q3"] > boot["max_quantile_95"]
     return {"q3": q3, "pairs": pairs, "residuals": pd.DataFrame(resid, index=names, columns=names),
             "correlation_method": cor["method"]}
 
@@ -93,10 +96,10 @@ def run(data, model="2PL", alpha=0.05, person_method="WLE", bootstrap=0, seed=20
                          "modeller için S-X² uygulanmamıştır.")
     res = fit_python_mirt(data, model=model)           # birincil kalibrasyon motoru (Python mirt)
     items = python_mirt_binary_parameters(res.fit, model=model, item_names=list(data.columns))
-    converged = bool(getattr(res.fit, "converged", True))
+    converged = bool(getattr(res.fit, "converged", False))
     fit = {"converged": converged, "engine": res.engine, "engine_status": res.scientific_status}
     li = local_independence(data, items, model, person_method, bootstrap, seed, converged)
-    fit_tab, groups, certified = item_fit(data.dropna(), items, model, alpha) if data.notna().all().all() \
+    fit_tab, groups, certified = item_fit(data.dropna(), items, model, alpha, converged=converged) if data.notna().all().all() \
         else (None, {}, False)
     note = None if fit_tab is not None else "S-X² eksik veri içeren matriste hesaplanmaz (tam veri gerekir)."
     return {"model": model, "fit": fit, "items": items, "local": li, "itemfit": fit_tab,

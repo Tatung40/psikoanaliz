@@ -129,7 +129,7 @@ def test_misfitting_item_flagged_with_fdr():
     t = res["itemfit"].set_index("Madde")
     assert t.loc["M12", "Karar"] == "Uyumsuz (FDR)"
     assert t["p"].idxmin() == "M12"
-    assert res["certified"] and len(res["obs_exp"]["M12"]) >= 2
+    assert not res["certified"] and len(res["obs_exp"]["M12"]) >= 2
 
 
 def test_3pl_inference_not_certified_and_polytomous_disabled():
@@ -144,3 +144,56 @@ def test_no_fdr_flags_under_true_2pl():
     df = _sim2pl(1500, np.linspace(.8, 2, 12), np.linspace(-1.5, 1.5, 12), 41)
     res = lf.run(df, "2PL")
     assert (res["itemfit"]["Karar"] == "Uyumsuz (FDR)").sum() == 0
+
+
+@pytest.mark.parametrize('model',['1PL','2PL','3PL','4PL'])
+def test_itemfit_inference_guards_preserve_statistics(model):
+    data=_sim2pl(300,np.ones(8),np.linspace(-1,1,8),74)
+    pars=pd.DataFrame(dict(a=np.ones(8),b=np.linspace(-1,1,8),c=np.zeros(8),d=np.ones(8)))
+    table,_,cert=lf.item_fit(data,pars,model,converged=False)
+    assert not cert and table[['p','p (BH-FDR)']].isna().all().all()
+    assert (table.Karar=='Karar üretilmedi').all()
+    if model in ('3PL','4PL'):
+        table,_,cert=lf.item_fit(data,pars,model)
+        assert not cert and table[['p','p (BH-FDR)']].isna().all().all()
+
+
+def test_bootstrap_stays_on_primary_engine(monkeypatch):
+    import core.irt_q3 as q3
+    data=_sim2pl(150,np.ones(5),np.linspace(-1,1,5),75)
+    original=lf.fit_python_mirt;calls=[]
+    def measured(*a,**kw):
+        calls.append(kw['model']);return original(*a,**kw)
+    def legacy(*a,**kw):raise AssertionError('Legacy bootstrap refit reached')
+    monkeypatch.setattr(lf,'fit_python_mirt',measured)
+    monkeypatch.setattr(q3,'default_refit',legacy)
+    res=lf.run(data,'2PL',bootstrap=2)
+    assert calls==['2PL']*3
+    assert res['local']['q3']['bootstrap']['used']==2
+    assert 'Bootstrap kritik değerini aşar' in res['local']['pairs']
+
+
+def test_promax_signs_preserve_reconstructed_covariance(monkeypatch):
+    data=pd.DataFrame(np.random.default_rng(76).normal(size=(120,6)))
+    original=dm.promax;expected=[]
+    def signed(L):
+        pattern,phi=original(L)
+        signs=np.ones(pattern.shape[1]);signs[0]=-np.sign(pattern[:,0].sum())
+        pattern=pattern*signs;phi=phi*np.outer(signs,signs)
+        expected.append(pattern@phi@pattern.T)
+        return pattern,phi
+    monkeypatch.setattr(dm,'promax',signed)
+    result=dm.dimensionality_analysis(data,'pearson',n_factors=2,pa_reps=2)
+    L=result['loadings'][['F1','F2']].to_numpy();phi=result['factor_correlations'].to_numpy()
+    np.testing.assert_allclose(L@phi@L.T,expected[0],atol=1e-12,rtol=1e-12)
+
+
+def test_bartlett_and_zero_factor_interpretation(monkeypatch):
+    data=_sim2pl(150,np.ones(4),np.linspace(-1,1,4),77)
+    result=dm.dimensionality_analysis(data,'tetrachoric',n_factors=1,pa_reps=2)
+    assert not result['bartlett_inference'] and np.isnan(result['bartlett']['p'])
+    monkeypatch.setattr(dm,'parallel_analysis',lambda *a,**k:(pd.DataFrame(),0,2))
+    continuous=pd.DataFrame(np.random.default_rng(78).normal(size=(150,4)))
+    result=dm.dimensionality_analysis(continuous,'pearson',n_factors=1,pa_reps=2)
+    assert result['bartlett_inference'] and np.isfinite(result['bartlett']['p'])
+    assert 'hiçbir boyutun' in result['unidimensionality']['Karar']

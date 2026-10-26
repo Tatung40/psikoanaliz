@@ -20,5 +20,5 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 
 ## Boyutluluk, yerel bağımsızlık ve madde uyumu ekranları
 - `core/dimensionality.py`: Pearson/tetrakorik/polikorik (iki aşamalı ML), KMO, Bartlett, paralel analiz (permütasyon), PAF, varimax/promax, tek boyutluluk özeti.
-- `core/local_fit.py`: Yen-Q3, merkezlenmiş Q3, 1F artık korelasyonları, S-X² + BH-FDR, gözlenen/beklenen tabloları. 1PL/2PL CERTIFIED; 3PL/4PL p/FDR EXPERIMENTAL / NOT CERTIFIED; çok kategorili kapalı.
+- `core/local_fit.py`: Yen-Q3, merkezlenmiş Q3, 1F artık korelasyonları, S-X² + BH-FDR, gözlenen/beklenen tabloları. 1PL/2PL asimptotik p/FDR keşifsel (NOT CERTIFIED); 3PL/4PL ve yakınsamayan kestirimlerde p/FDR kapalı; çok kategorili kapalı.
 - `ui/dimensionality_localfit_view.py`: iki sol menü ekranı; CSV/XLSX/PNG/ZIP + yöntem/sınırlılık metni.

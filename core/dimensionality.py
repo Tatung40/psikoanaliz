@@ -254,6 +254,8 @@ def dimensionality_analysis(df, method="auto", n_factors=None, rotation="promax"
     n = int(df.dropna().shape[0]) if df.notna().all(axis=1).any() else int(df.notna().sum().min())
     kmo_all, kmo_items = kmo(R)
     bart = bartlett(R, n)
+    bart_valid = cor["method"] == "pearson" and cor["data_type"] == "continuous" and np.isfinite(df.to_numpy()).all() and not cor["smoothed"]
+    if not bart_valid: bart = (bart[0], bart[1], np.nan)
     eig = np.sort(np.linalg.eigvalsh(R))[::-1]
     pa_table, suggested, used = parallel_analysis(df, cor["method"], pa_reps, seed=seed)
     m = int(n_factors or max(suggested, 1))
@@ -263,7 +265,9 @@ def dimensionality_analysis(df, method="auto", n_factors=None, rotation="promax"
         L, _ = varimax(L)
     elif m > 1 and rotation == "promax":
         L, phi = promax(L)
-    L = L * np.sign(L.sum(0) + 1e-300)
+    signs = np.sign(L.sum(0) + 1e-300)
+    L = L * signs
+    phi = phi * np.outer(signs, signs)
     cols = list(df.columns)
     loadings = pd.DataFrame(L, index=cols, columns=[f"F{i+1}" for i in range(m)])
     loadings["h²"] = h2
@@ -277,12 +281,13 @@ def dimensionality_analysis(df, method="auto", n_factors=None, rotation="promax"
         "Paralel analiz önerisi": int(suggested),
         "Tek faktör artık korelasyonu |r| ort.": float(np.abs(resid[iu]).mean()),
         "Tek faktör artık korelasyonu |r| en büyük": float(np.abs(resid[iu]).max()),
-        "Karar": ("Paralel analiz tek baskın boyutu destekliyor." if suggested <= 1 else
+        "Karar": ("Paralel analiz tek baskın boyutu destekliyor." if suggested == 1 else
+                  "Paralel analiz hiçbir boyutun korunmasını desteklemiyor." if suggested == 0 else
                   f"Paralel analiz {suggested} boyut öneriyor; tek boyutluluk varsayımı desteklenmiyor."),
     }
     return {"correlation": cor, "n": n, "kmo": kmo_all,
             "kmo_items": pd.Series(kmo_items, index=cols, name="KMO (MSA)"),
-            "bartlett": dict(zip(("χ²", "sd", "p"), bart)), "eigenvalues": eig,
+            "bartlett": dict(zip(("χ²", "sd", "p"), bart)), "bartlett_inference": bool(bart_valid), "eigenvalues": eig,
             "parallel": pa_table, "pa_reps_used": used, "n_factors": m, "rotation": rotation if m > 1 else "yok",
             "loadings": loadings, "factor_correlations": pd.DataFrame(phi, index=loadings.columns[:m],
                                                                     columns=loadings.columns[:m]),
