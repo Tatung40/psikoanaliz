@@ -40,9 +40,16 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         }
         outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
                  for name,label in output_names.items()}
-    with st.expander('Gelişmiş kestirim ayarları — motor yetenekleri',expanded=False):
-        st.info('Python mirt 1.2.0 adaptöründe iterasyon, tolerans ve quadrature için doğrulanmış kamuya açık parametre eşlemesi henüz yoktur. Bu ayarlar etkisiz kaydırıcılar olarak gösterilmez; kütüphane varsayılanları korunur.')
-        st.caption('Öneri: başlangıçta motorun belgelenmiş varsayılanlarını koruyun. Yakınsama başarısızsa veriyi, tanımlanabilirliği ve model karmaşıklığını inceleyin. Desteklenen sayısal ayarlar API doğrulamasından sonra açılacaktır.')
+    solver_settings=None
+    with st.expander('Gelişmiş kestirim ayarları — Python mirt 1.2.0',expanded=False):
+        st.caption('Standart mod kütüphane varsayılanları: max_iter=500, tol=0.0001, n_quadpts=21. Gelişmiş mod gerçek fit_mirt API parametrelerini değiştirir.')
+        advanced=st.checkbox('Gelişmiş sayısal ayarları etkinleştir',value=False,key=f'python_mirt_solver_advanced_{model}')
+        if advanced:
+            iterations=int(st.number_input('Maksimum EM iterasyonu (max_iter)',min_value=10,max_value=5000,value=500,step=50,key=f'python_mirt_max_iter_{model}',help='Yakınsama gerçekleşmezse üst sınırı artırabilirsiniz; tek başına doğru kestirimi garanti etmez.'))
+            tolerance=float(st.number_input('EM yakınsama toleransı (tol)',min_value=1e-10,max_value=1e-2,value=1e-4,format='%.8f',key=f'python_mirt_tol_{model}',help='Daha küçük tolerans daha sıkı yakınsama koşuludur; hesaplama süresini artırabilir.'))
+            quadrature=int(st.number_input('Gauss-Hermite nokta sayısı (n_quadpts)',min_value=5,max_value=121,value=21,step=2,key=f'python_mirt_quadpts_{model}',help='Marjinal integrasyon hassasiyeti ve hesaplama maliyetini etkiler.'))
+            solver_settings=dict(max_iter=iterations,tol=tolerance,n_quadpts=quadrature)
+        st.caption('Değişiklikler yeniden kestirim gerektirir. Parametreler yalnızca Python mirt fit_mirt fonksiyonuna iletilir.')
     with st.expander('Grafik ve çıktı ayrıntıları',expanded=False):
         st.caption('Varsayılan seçimler mevcut raporun bütün grafiklerini korur. Seçimler hesaplamayı değil yalnızca sunumu etkiler.')
         chart_options={
@@ -78,7 +85,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     except Exception as e:
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         st.error(f'Veri ön kontrolü: {e}');return
-    key=(tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,'nine-model-report-v1')
+    key=(tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,tuple(sorted((solver_settings or {}).items())),'nine-model-report-v2')
     saved=st.session_state.get(f'python_mirt_fit_{model}')
     if saved is not None and (not isinstance(saved,dict) or saved.get('key')!=key):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
@@ -88,8 +95,10 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         try:
             with st.spinner('Python mirt kestirimi çalışıyor'):
-                outcome=fit_python_mirt(x.to_numpy(),model=model,
-                    n_categories=categories,estimation=estimation,common_discrimination=model=='1PL')
+                fit_kwargs=dict(model=model,n_categories=categories,estimation=estimation,
+                                common_discrimination=model=='1PL')
+                if solver_settings is not None:fit_kwargs['solver_settings']=solver_settings
+                outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
             saved=dict(key=key,outcome=outcome)
             st.session_state[f'python_mirt_fit_{model}']=saved
         except Exception as e:
