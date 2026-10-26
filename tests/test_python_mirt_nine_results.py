@@ -91,11 +91,13 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run();assert not at.exception
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
-    assert len(at.dataframe)==2 and len(rendered_figures)==4
-    assert len(at.get('download_button'))==4
+    assert len(at.dataframe)==3 and len(rendered_figures)==4
+    assert len(at.get('download_button'))==6
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     pd.testing.assert_frame_equal(at.dataframe[1].value,report.parameters)
-    at.run();assert len(calls)==1 and len(at.dataframe)==2 and len(rendered_figures)==8
+    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[2].value.columns)
+    assert len(at.dataframe[2].value)==len(frame)
+    at.run();assert len(calls)==1 and len(at.dataframe)==3 and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False
