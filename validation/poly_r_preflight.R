@@ -28,7 +28,7 @@ check("R accepts explicit GH nodes and prior weights",equal(opts$technical$custo
 # This verifies configuration consumption, NOT an EM likelihood execution.
 write.csv(data.frame(check="EM integration execution",status="NOT EXECUTED"),file.path(out,"R_GH_scope.csv"),row.names=FALSE)
 
-for(model in c("GRM","PCM")) {
+for(model in c("GRM","PCM","GPCM")) {
   type <- if(model=="GRM") "graded" else "gpcm"
   # Official no-fit initialization; returns the values table before estimation.
   sv <- mirt(x,1,itemtype=type,pars="values",verbose=FALSE)
@@ -49,14 +49,21 @@ for(model in c("GRM","PCM")) {
     } else {
       check(paste(model,i,"score anchors"),identical(sv$value[rows[sv$name[rows] %in% paste0("ak",0:m)]],as.numeric(0:m)) &&
         !any(sv$est[rows[sv$name[rows] %in% c(paste0("ak",0:m),"d0")]]))
-      sv$value[rows] <- c(1,0:m,0,-cumsum(b));sv$est[rows[1]] <- FALSE
-      check(paste(model,i,"PCM discrimination fixed"),sv$value[rows[1]]==1 && !sv$est[rows[1]])
+      sv$value[rows] <- c(a,0:m,0,-a*cumsum(b));sv$est[rows[1]] <- model=="GPCM"
+      check(paste(model,i,"discrimination constraint"),
+        if(model=="PCM") sv$value[rows[1]]==1 && !sv$est[rows[1]] else a>=.1 && a<=5 && sv$est[rows[1]])
     }
     # Forward/inverse Jacobians: physical thresholds/steps versus native intercepts.
     if(model=="GRM") {
       forward <- function(v) c(v[1],-v[1]*v[-1])
       physical <- c(a,b);J <- rbind(c(1,rep(0,m)),cbind(-b,diag(-a,m)))
       inverse <- rbind(c(1,rep(0,m)),cbind((-a*b)/a^2,diag(-1/a,m)))
+    } else if(model=="GPCM") {
+      forward <- function(v) c(v[1],-v[1]*cumsum(v[-1]))
+      physical <- c(a,b);L <- lower.tri(matrix(0,m,m),diag=TRUE)*1
+      J <- rbind(c(1,rep(0,m)),cbind(-cumsum(b),-a*L))
+      inverse_steps <- -diag(m)/a;inverse_steps[cbind(2:m,1:(m-1))] <- 1/a
+      inverse <- rbind(c(1,rep(0,m)),cbind(-b/a,inverse_steps))
     } else {
       forward <- function(v) -cumsum(v)
       physical <- b;J <- -lower.tri(matrix(0,m,m),diag=TRUE)*1
@@ -78,9 +85,9 @@ for(model in c("GRM","PCM")) {
     check("GRM native initialization survives CSV replay",test_grm_initial_values(x,sv,out))
   } else {
     source("validation/grm_initial_values.R")
-    replay <- read.csv(file.path(out,"PCM_configured_layout.csv"),check.names=FALSE)
+    replay <- read.csv(file.path(out,paste0(model,"_configured_layout.csv")),check.names=FALSE)
     restored <- restore_grm_initial_values(x,replay,itemtype="gpcm")
-    check("PCM native initialization survives CSV replay",
+    check(paste(model,"native initialization survives CSV replay"),
       identical(attributes(restored),attributes(sv)) &&
       identical(vapply(restored,class,character(1)),vapply(sv,class,character(1))) &&
       identical(restored$value,as.double(replay$value)) && identical(restored$est,as.logical(replay$est)))
@@ -97,6 +104,12 @@ for(model in c("GRM","PCM")) {
       ai <- ix[["a1"]];add(ai,1,5);add(ai,-1,-.1)
       for(d in ds) {add(c(d,ai),c(1,-6));add(c(d,ai),c(-1,-6))}
       for(s in 1:(m-1)) add(c(ds[s+1],ds[s],ai),c(1,-1,1e-6))
+    } else if(model=="GPCM") {
+      ai <- ix[["a1"]];add(ai,1,5);add(ai,-1,-.1)
+      for(s in 1:m) {
+        rows <- if(s==1) ds[s] else c(ds[s],ds[s-1]);coeff <- if(s==1) 1 else c(1,-1)
+        add(c(rows,ai),c(coeff,-6));add(c(rows,ai),c(-coeff,-6))
+      }
     } else for(s in 1:m) {
       rows <- if(s==1) ds[s] else c(ds[s],ds[s-1]);coeff <- if(s==1) 1 else c(1,-1)
       add(rows,coeff,6);add(rows,-coeff,6)
@@ -118,18 +131,22 @@ for(model in c("GRM","PCM")) {
   witness <- function(a,b) {
     q<-sv$value;ix<-which(sv$item==colnames(x)[1]);ix<-setNames(ix,sv$name[ix])
     if(model=="GRM") {q[ix['a1']]<-a;q[ix[paste0('d',1:m)]]<--a*b}
-    else q[ix[paste0('d',1:m)]]<--cumsum(b)
+    else {
+      if(model=="GPCM") q[ix['a1']]<-a
+      q[ix[paste0('d',1:m)]]<--a*cumsum(b)
+    }
     residual <- as.numeric(A%*%q[free])-rhs
-    if(model=="GRM") {
+    if(model %in% c("GRM","GPCM")) {
       # Evaluate the SAME inequalities in factored physical coordinates. At
       # a=.1,b=-6, A%*%(-a*b) can leave +5.55e-17 from coordinate/product
       # roundoff. No epsilon is allowed in the feasibility decision.
-      factored <- c(a-5,.1-a,as.vector(rbind(-a*(b+6),a*(b-6))),a*(1e-6-diff(b)))
+      factored <- c(a-5,.1-a,as.vector(rbind(-a*(b+6),a*(b-6))))
+      if(model=="GRM") factored <- c(factored,a*(1e-6-diff(b)))
       first <- seq_along(factored)
       # Existing algebra-only all.equal criterion; NOT a fitted-bound tolerance.
-      check("GRM witness native/physical inequality algebra",equal(residual[first],factored))
+      check(paste(model,"witness native/physical inequality algebra"),equal(residual[first],factored))
       feasible <- all(factored<=0) && all(residual[-first]<=0)
-      path <- file.path(out,"GRM_boundary_witnesses.csv")
+      path <- file.path(out,paste0(model,"_boundary_witnesses.csv"))
       record <- data.frame(a=a,b1=b[1],b2=b[2],b3=b[3],
         raw_native_max=max(residual),factored_max=max(factored),
         algebra_roundoff=max(abs(residual[first]-factored)),feasible=feasible)
@@ -142,8 +159,10 @@ for(model in c("GRM","PCM")) {
   check(paste(model,"physical box witnesses"),witness(1,c(-6,0,6)) && !witness(1,c(-6,0,6.1)))
   if(model=="GRM") check("GRM ordering/slope witnesses",!witness(1,c(0,0,1)) && !witness(5.1,c(-1,0,1)) &&
     witness(.1,c(-6,0,6)) && witness(5,c(-6,0,6)))
-  else check("PCM steps need not be ordered",witness(1,c(.5,-.5,.2)))
-  if(model=="GRM") check("GRM adjacent outside-bound values remain infeasible",
+  else check(paste(model,"steps need not be ordered"),witness(1,c(.5,-.5,.2)))
+  if(model=="GPCM") check("GPCM slope endpoints and outside witness",
+    witness(.1,c(-6,0,6)) && witness(5,c(-6,0,6)) && !witness(5.1,c(-1,0,1)))
+  if(model %in% c("GRM","GPCM")) check(paste(model,"adjacent outside-bound values remain infeasible"),
     !witness(.1,c(-6,0,6+6*.Machine$double.eps)) &&
     !witness(.1*(1-.Machine$double.eps),c(-6,0,6)) &&
     !witness(5*(1+.Machine$double.eps),c(-6,0,6)))
@@ -162,9 +181,9 @@ for(model in c("GRM","PCM")) {
       derivative <- a*S*(1-S);dP<-derivative[,1:C]-derivative[,2:(C+1)]
       info<-rowSums(dP^2/expected)
     } else {
-      logits <- outer(theta$theta,0:m)+matrix(c(0,-cumsum(b)),nrow(theta),C,byrow=TRUE)
+      logits <- a*(outer(theta$theta,0:m)+matrix(c(0,-cumsum(b)),nrow(theta),C,byrow=TRUE))
       E <- exp(logits-apply(logits,1,max));expected <- E/rowSums(E)
-      mean <- as.numeric(expected%*%(0:m));info<-rowSums(expected*(matrix(0:m,nrow(theta),C,byrow=TRUE)-mean)^2)
+      mean <- as.numeric(expected%*%(0:m));info<-a^2*rowSums(expected*(matrix(0:m,nrow(theta),C,byrow=TRUE)-mean)^2)
     }
     check(paste(model,i,"R category probabilities"),equal(P,expected) && all(is.finite(P)) && all(P>=0) && equal(rowSums(P),rep(1,nrow(P))))
     check(paste(model,i,"R item information"),equal(as.numeric(I),info) && all(is.finite(I)))

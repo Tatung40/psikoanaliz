@@ -84,13 +84,22 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
     st.markdown('### Birey Yetenek Kestirimleri (θ)')
-    st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
+    st.caption('N(0,1) önseli üzerinden EAP; SH(θ) posterior SS’dir, bilgi fonksiyonu SEM’i değildir. '+('GPCM: tam normal GH61 quadrature.' if model=='GPCM' else '161 noktalı [-4,4] ızgara.'))
+    if model=='NRM':st.caption('Nominal kategori kodlarının toplamı başarı puanı değildir; ham puan boş bırakılır.')
     if report.metadata.get('Yakınsama') is not True or report.errors:
         st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
     elif not report.curves.empty:
         try:
-            ids=data.loc[x.index,id_col].to_numpy() if id_col in data.columns else None
-            people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
+            ids=data[id_col].to_numpy(copy=True) if id_col in data.columns else None
+            ability_curves=report.curves;quadrature=None
+            if model=='GPCM':
+                from mirt.estimation.quadrature import GaussHermiteQuadrature
+                from core.irt_b14_model_curves import fitted_category_curves
+                q=GaussHermiteQuadrature(n_points=61,n_dimensions=1)
+                quadrature=(q.nodes[:,0],q.weights)
+                ability_curves=fitted_category_curves(dict(result=saved['outcome'].fit,k=len(cols),items=cols,labels=labels),q.nodes[:,0])
+            people=person_abilities(x,ability_curves,model=model,identifiers=ids,
+                item_names=cols,category_labels=labels or ('0','1'),quadrature=quadrature)
             st.dataframe(safe_frame(people).round(4),hide_index=True,use_container_width=True)
             st.download_button('Birey yetenekleri — CSV',_csv(people),
                                f'{model}_person_theta.csv','text/csv',

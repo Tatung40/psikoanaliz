@@ -10,7 +10,7 @@ def test_missing_r_records_not_executed_and_never_fits(tmp_path,monkeypatch):
     r=P.run(tmp_path)
     assert r['status']==r['R_execution']=='NOT EXECUTED'
     assert r['fits']==r['simulations']==0 and r['scientific_pass'] is False
-    assert set(r['python_checks'])=={'GRM','PCM'}
+    assert set(r['python_checks'])=={'GRM','PCM','GPCM'}
     assert r['GH']['estimator_integration']=='NOT EXECUTED'
     assert (tmp_path/'integration.csv').exists()
     pcm=P.pd.read_csv(tmp_path/'PCM_physical.csv')

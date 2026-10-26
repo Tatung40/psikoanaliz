@@ -41,13 +41,14 @@ def probes(data, output):
     theta=np.unique(np.r_[nodes,np.linspace(-4,4,81),-1.,1.])
     pd.DataFrame(dict(node=np.arange(len(theta)),theta=theta)).to_csv(output/'evaluation_grid.csv',index=False)
     curves={};diagnostics={}
-    for name in ('GRM','PCM'):
+    for name in ('GRM','PCM','GPCM'):
         b=np.linspace(-1,1,k)[:,None]+np.array([-1.,0.,1.])
-        a=np.linspace(.8,1.8,k) if name=='GRM' else np.ones(k)
-        if name=='PCM': b[0]=[.5,-.5,.2]  # Unordered steps are legitimate, never sort.
-        model=(mirt.GradedResponseModel if name=='GRM' else mirt.PartialCreditModel)(k,C)
+        a=np.ones(k) if name=='PCM' else np.linspace(.8,1.8,k)
+        if name in ('PCM','GPCM'): b[0]=[.5,-.5,.2]  # Unordered steps are legitimate, never sort.
+        model={'GRM':mirt.GradedResponseModel,'PCM':mirt.PartialCreditModel,'GPCM':mirt.GeneralizedPartialCredit}[name](k,C)
         if name=='GRM':model.set_parameters(discrimination=a,thresholds=b)
-        else:model.set_parameters(steps=b)
+        elif name=='PCM':model.set_parameters(steps=b)
+        else:model.set_parameters(discrimination=a,steps=b)
         pd.DataFrame(dict(item=x.columns,a=a,b1=b[:,0],b2=b[:,1],b3=b[:,2])).to_csv(output/f'{name}_physical.csv',index=False)
         P=model.probability(theta);I=np.column_stack([model.information(theta,item_idx=i) for i in range(k)])
         frame=pd.DataFrame([dict(item=str(item),node=q,theta=t,category=c,probability=float(P[q,i,c]),information=float(I[q,i]))
