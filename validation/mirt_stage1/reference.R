@@ -1,7 +1,7 @@
 # R mirt 1.48 independent fixed-parameter preflight / ONE ML fit.
 args <- commandArgs(TRUE);stopifnot(length(args)==2)
 suppressPackageStartupMessages(library(mirt));stopifnot(as.character(packageVersion('mirt'))=='1.48')
-root<-args[1];mode<-args[2];stopifnot(mode %in% c('preflight','fit'))
+root<-args[1];mode<-args[2];stopifnot(mode %in% c('preflight','fit','evaluate_saved'))
 cfg<-jsonlite::fromJSON(file.path(root,'settings.json'));out<-file.path(root,mode)
 dir.create(out,showWarnings=FALSE,recursive=TRUE);set.seed(cfg$seed)
 dat<-read.csv(file.path(root,'data.csv'),check.names=FALSE)
@@ -18,7 +18,9 @@ if(cfg$correlated){
  den<-function(obj,Theta){
   stopifnot(identical(dim(Theta),dim(nodes)),max(abs(Theta-nodes))<1e-12)
   S<-covariance(obj@par[1]);if(abs(S[1,2])>=1)return(rep(1e-300,nrow(Theta)))
-  logmass<-log(grid$weight)+mvtnorm::dmvnorm(Theta,sigma=S,log=TRUE)-mvtnorm::dmvnorm(Theta,log=TRUE)
+  rho<-S[1,2];x<-Theta[,1];y<-Theta[,2]
+  ratio<- -.5*log1p(-rho*rho)+(2*rho*x*y-rho*rho*(x*x+y*y))/(2*(1-rho*rho))
+  logmass<-log(grid$weight)+ratio
   exp(logmass)
  }
  group<-createGroup(par=c(eta12=if(mode=='preflight')atanh(.25) else 0),est=TRUE,den=den,nfact=Q,standardize=FALSE)
@@ -55,7 +57,13 @@ if(!cfg$correlated){
  sv$value[covs]<-vapply(sv$name[covs],function(n){ij<-as.integer(strsplit(sub('COV_','',n),'')[[1]]);as.numeric(ij[1]==ij[2])},0.)
  sv$est[grepl('^(MEAN|COV)_',sv$name)]<-FALSE
 }
-if(mode=='preflight')sv$est[]<-FALSE
+source_free_parameters<-NA_integer_
+if(mode=='evaluate_saved'){
+ saved<-read.csv(file.path(root,'fit','raw_parameters.csv'),check.names=FALSE)
+ for(n in c('group','item','class','name','parnum'))stopifnot(identical(as.character(saved[[n]]),as.character(sv[[n]])))
+ source_free_parameters<-sum(saved$est);sv$value[]<-saved$value
+}
+if(mode!='fit')sv$est[]<-FALSE
 # Exact GRM physical bounds b=-d/sum(a) in [-6,6] and gap >=1e-6.
 A<-matrix(0,0,nrow(sv))
 if(cfg$model=='GRM')for(i in seq_len(J)){
@@ -68,7 +76,7 @@ stopifnot(!nrow(A) || max(A%*%sv$value)<=0)
 free<-which(sv$est);low<-sv$lbound[free];up<-sv$ubound[free]
 callback<-function(p,optim_args){full<-optim_args$longpars;full[optim_args$est]<-p;as.numeric(A%*%full)}
 jac<-function(p,optim_args)A[,which(optim_args$est),drop=FALSE]
-technical<-list(NCYCLES=if(mode=='preflight')1 else cfg$max_iter,customTheta=nodes,storeEMhistory=TRUE)
+technical<-list(NCYCLES=if(mode!='fit')1 else cfg$max_iter,customTheta=nodes,storeEMhistory=TRUE)
 if(!cfg$correlated)technical$customPriorFun<-function(Theta,Etable)grid$weight
 opts<-c(base,list(pars=sv,method='EM',SE=FALSE,accelerate='none',TOL=cfg$tol,technical=technical))
 if(mode=='fit'){
@@ -114,8 +122,9 @@ if(mode=='fit'){
 }
 valid<-(!nrow(A) || max(A%*%final$value)<1e-7) && min(eigen(S,symmetric=TRUE)$values)>0 && abs(tanh(eta))<1
 meta<-list(version=as.character(packageVersion('mirt')),R=R.version.string,model=cfg$model,dimensions=Q,
- execution=if(mode=='fit')'CALIBRATION' else 'FIXED PARAMETERS / NO M-STEP',converged=extract.mirt(fit,'converged'),
+ execution=if(mode=='fit')'CALIBRATION' else if(mode=='evaluate_saved')'SAVED ESTIMATES / NO M-STEP' else 'FIXED PARAMETERS / NO M-STEP',
+ source_free_parameters=source_free_parameters,converged=extract.mirt(fit,'converged'),
  logLik=extract.mirt(fit,'logLik'),AIC=extract.mirt(fit,'AIC'),BIC=extract.mirt(fit,'BIC'),iterations=extract.mirt(fit,'iterations'),
  covariance=S,constraints_valid=valid,logPrior=extract.mirt(fit,'logPrior'),correlation='Fisher-coordinate Gaussian customGroup, F1-F2 only')
-jsonlite::write_json(meta,file.path(out,'metadata.json'),auto_unbox=TRUE,pretty=TRUE)
+jsonlite::write_json(meta,file.path(out,'metadata.json'),auto_unbox=TRUE,pretty=TRUE,digits=NA)
 capture.output(sessionInfo(),file=file.path(out,'sessionInfo.txt'))

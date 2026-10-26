@@ -133,8 +133,34 @@ def run(name,out):
  (out/'report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
  return result
 
+def recover(name,prior,out):
+ """No new calibration: reevaluate retained native R estimates at full precision."""
+ source=prior/name;original=json.loads((source/'report.json').read_text())
+ cfg=original['settings'];criteria=json.loads((ROOT/'criteria.json').read_text())
+ if cfg['criteria_sha256']!=hashlib.sha256((ROOT/'criteria.json').read_bytes()).hexdigest():
+  raise ValueError('Cannot reuse evidence after criterion changes')
+ if not (original['Python']['converged'] and original['R']['converged']):raise ValueError('Only converged retained fits can be reused')
+ if any(v['status']!='PASS' for k,v in original['comparison'].items() if k!='R_native_LL'):
+  raise ValueError('Original discrepancies other than rounded R metadata remain')
+ if hashlib.sha256((source/'data.csv').read_bytes()).hexdigest()!=cfg['data_sha256']:
+  raise ValueError('Original data hash mismatch')
+ shutil.copytree(source,out,dirs_exist_ok=True)
+ shutil.copy2(out/'report.json',out/'original_report.json')
+ result=original.copy();result['provenance']='Retained converged calibration; only native saved-parameter likelihood reevaluated, NO M-STEP'
+ try:
+  target=r_run(out,'evaluate_saved');precise=json.loads((target/'metadata.json').read_text())
+  check=discrepancies([original['common_grid_logLik']['R']],[precise['logLik']],criteria['native_common_logLik'])
+  result['comparison']=dict(original['comparison'])
+  result['comparison']['R_native_LL']=dict(check,source='Saved native estimates, fixed-parameter R evaluation; original rounded field retained in original_report.json')
+  result['R_saved_estimate_evaluation']=precise
+  result['status']='NUMERICALLY VALIDATED / NOT CERTIFIED' if check['status']=='PASS' and precise['constraints_valid'] else 'NUMERICAL DISAGREEMENT / NOT CERTIFIED'
+ except Exception as e:result['status']='BLOCKED';result['blocker']=str(e)
+ (out/'report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
+ return result
+
+
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
- reports=[run(name,args.output/name) for name in PROFILES]
+ parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);args=parser.parse_args()
+ reports=[recover(name,args.reuse,args.output/name) if args.reuse and name in ('GRM_2D','2PL_3D') else run(name,args.output/name) for name in PROFILES]
  print(json.dumps([dict(profile=r['profile'],status=r['status'],blocker=r.get('blocker')) for r in reports],indent=2))
  sys.exit(0 if all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 1)

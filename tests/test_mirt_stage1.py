@@ -83,3 +83,37 @@ def test_r_parameter_table_preserves_native_attributes():
  assert "!same_attributes(bad,native_attributes)" in source
  assert "inherits(sv,'mirtValues')" not in source
  assert "sv<-do.call(mirt,c(base,list(pars='values')))" in source
+
+
+def test_r_metadata_precision_and_gaussian_ratio():
+ source=Path('validation/mirt_stage1/reference.R').read_text()
+ assert 'digits=NA' in source and 'mvtnorm::' not in source
+ assert 'source_free_parameters' in source and "mode!='fit')sv$est[]<-FALSE" in source
+ from scipy.stats import multivariate_normal
+ points=np.array([[-2.,1.],[0.,0.],[.2,-.6]])
+ for rho in (-.4,0.,.25):
+  x,y=points.T
+  ratio=-.5*np.log1p(-rho*rho)+(2*rho*x*y-rho*rho*(x*x+y*y))/(2*(1-rho*rho))
+  expected=multivariate_normal.logpdf(points,cov=[[1,rho],[rho,1]])-multivariate_normal.logpdf(points,cov=np.eye(2))
+  np.testing.assert_allclose(ratio,expected,atol=1e-14)
+
+
+def test_recovery_keeps_original_failure_and_never_refits(tmp_path,monkeypatch):
+ """Harness isolation only: mocked reevaluation is not scientific R evidence."""
+ import hashlib
+ import validation.mirt_stage1.compare as harness
+ source=tmp_path/'prior'/'GRM_2D';source.mkdir(parents=True)
+ content=b'A,B\n0,1\n';(source/'data.csv').write_bytes(content)
+ original=dict(profile='GRM_2D',settings=dict(criteria_sha256=hashlib.sha256((harness.ROOT/'criteria.json').read_bytes()).hexdigest(),data_sha256=hashlib.sha256(content).hexdigest()),
+  Python=dict(converged=True),R=dict(converged=True),comparison=dict(other=dict(status='PASS'),R_native_LL=dict(status='FAIL')),
+  common_grid_logLik=dict(R=-123.1234567890123))
+ (source/'report.json').write_text(json.dumps(original))
+ def nofit(*a,**k):raise AssertionError('Unexpected recalibration')
+ def fixed(root,mode):
+  assert mode=='evaluate_saved';target=root/mode;target.mkdir()
+  (target/'metadata.json').write_text(json.dumps(dict(logLik=original['common_grid_logLik']['R'],constraints_valid=True)))
+  return target
+ monkeypatch.setattr(harness,'fit',nofit);monkeypatch.setattr(harness,'r_run',fixed)
+ result=harness.recover('GRM_2D',tmp_path/'prior',tmp_path/'recovered')
+ assert result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED'
+ assert json.loads((tmp_path/'recovered'/'original_report.json').read_text())['comparison']['R_native_LL']['status']=='FAIL'

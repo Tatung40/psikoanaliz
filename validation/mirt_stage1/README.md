@@ -18,3 +18,9 @@ PYTHONPATH=. python validation/mirt_stage1/compare.py --output validation-output
 ```
 
 The primary engine is always the existing Python mirt public API. No new calibration algorithm is introduced. Next executable step: run the independent R workflow on the draft PR; inspect per-profile mapping, convergence, numerical discrepancies and retained logs before enabling the UI or further model families.
+
+## Observed run 40381541591 (preserved)
+
+Actual independent calibration converged for orthogonal 2PL 3D and GRM 2D. Their common-grid likelihood differences were 1.62e-7 / 3.26e-7, max slope differences .000205 / .000065, max probability differences .0000132 / .0000227; EAP, posterior SD and information also met the unchanged preregistered numerical criteria. The final native-R likelihood check failed because jsonlite's default four-decimal serialization rounded metadata, not because the actual likelihoods disagreed. Correlated preflights stopped on an unnecessary missing `mvtnorm` import. Both original reports and errors remain in the run artifact.
+
+Follow-up preserves the successful calibrations: download the original 534KB artifact, reconstruct fixed R objects from their saved native parameter values (all estimation flags FALSE), and reevaluate native likelihood at full JSON precision. No second calibration of these profiles. The original failed report is copied unchanged to `original_report.json`. Correlated profiles alone execute their first calibration after a base-R Gaussian density-ratio preflight. The density-ratio equation is tested independently against SciPy; no new package or tolerance change is needed. Source-free-parameter count and fixed-evaluation provenance are retained explicitly.
