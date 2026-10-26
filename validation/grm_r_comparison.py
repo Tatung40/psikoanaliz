@@ -85,9 +85,19 @@ def python_once(data,seed,model="GRM"):
     import mirt
     start={('thresholds' if model=='GRM' else 'steps'):seed[['b1','b2','b3']].to_numpy()}
     if model!='PCM':start['discrimination']=seed.a.to_numpy()
-    fit=mirt.fit_mirt(data.to_numpy(int),model=model,n_factors=1,n_categories=4,estimation='EM',
-        n_quadpts=61,max_iter=3000,tol=1e-8,priors=None,accelerate='none',
-        start_values=start,compute_standard_errors=False)
+    if model=='GPCM':
+        # Use the existing library precise-M-step policy (also used for GRM).
+        # Validation profile only; no production default or EM criterion changes.
+        from mirt.estimation.em import EMEstimator,_PRECISE_ITEM_FTOL
+        if _PRECISE_ITEM_FTOL!=1e-10:raise ValueError('Precise item optimizer policy changed')
+        estimator=EMEstimator(n_quadpts=61,max_iter=3000,tol=1e-8,
+            item_optim_ftol=_PRECISE_ITEM_FTOL,compute_standard_errors=False,
+            accelerate='none',item_priors=None)
+        fit=estimator.fit(mirt.GeneralizedPartialCredit(len(data.columns),4),data.to_numpy(int),start=start)
+    else:
+        fit=mirt.fit_mirt(data.to_numpy(int),model=model,n_factors=1,n_categories=4,estimation='EM',
+            n_quadpts=61,max_iter=3000,tol=1e-8,priors=None,accelerate='none',
+            start_values=start,compute_standard_errors=False)
     population=standard_normal_population(fit)
     if not np.isfinite([fit.log_likelihood,fit.aic,fit.bic]).all():raise ValueError('Nonfinite Python fit diagnostics')
     if getattr(fit,'log_posterior',None) is not None:raise ValueError('Unexpected Python item prior')
@@ -129,6 +139,7 @@ def execute(preflight,output,allow_fit=False,rscript=None,model="GRM"):
             versions={k:importlib.metadata.version(k) for k in ('mirt','numpy','scipy','pandas')},
             input_sha256={n:hashlib.sha256((preflight/n).read_bytes()).hexdigest() for n in
                 ('report.json','data.csv','integration.csv','evaluation_grid.csv',f'{model}_physical.csv',f'{model}_configured_layout.csv',f'{model}_constraints.csv')})
+        if model=='GPCM':result['settings']['python_item_optim_ftol']=1e-10
         executable=rscript or shutil.which('Rscript')
         if not allow_fit or not executable:
             result['reason']='Prepared only; --execute opt-in and an actual Rscript runtime are required';save();return result

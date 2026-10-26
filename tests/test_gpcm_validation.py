@@ -65,3 +65,20 @@ def test_impossible_patterns_and_nominal_order_fail_closed():
     with pytest.raises(ValueError,match='kod sırası'):person_abilities(x,c,model='NRM',quadrature=q)
     got=person_abilities(x,c,model='NRM',category_labels=['Z','B','A','K'],quadrature=q)
     assert got['Ham puan'].isna().all()
+
+
+def test_gpcm_validation_uses_existing_precise_policy_once(monkeypatch):
+    from types import SimpleNamespace
+    from mirt.estimation.em import EMEstimator,_PRECISE_ITEM_FTOL
+    calls=[]
+    def fitted(estimator,model,data,**kw):
+        calls.append((estimator.item_optim_ftol,estimator.tol,kw['start']))
+        model.set_parameters(**kw['start'])
+        return SimpleNamespace(model=model,latent_mean=None,latent_covariance=None,
+            log_likelihood=-10.,aic=44.,bic=45.,n_iterations=1,converged=True)
+    monkeypatch.setattr(EMEstimator,'fit',fitted)
+    seed=pd.DataFrame(dict(a=[.8,1.2,1.7],b1=[.5]*3,b2=[-.5]*3,b3=[.2]*3))
+    G.python_once(pd.DataFrame([[0,1,2]]),seed,'GPCM')
+    assert len(calls)==1 and calls[0][:2]==(_PRECISE_ITEM_FTOL,1e-8)
+    assert calls[0][2]['discrimination'].tolist()==seed.a.tolist()
+    assert set(calls[0][2])=={'steps','discrimination'}
