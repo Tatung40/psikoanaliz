@@ -26,9 +26,10 @@ def fit_binary(data, model, *, engine="eser", **options):
     if engine=="python_mirt":
         if model=="Rasch":
             raise ValueError("Rasch free-latent-SD identification differs from Python mirt 1PL; use native Rasch")
-        if options:
-            raise ValueError("Python mirt adapter does not yet support these configuration options")
-        fit=fit_python_mirt(data,model=model)
+        unknown=set(options)-{"max_iter","tol","n_quadpts"}
+        if unknown:
+            raise ValueError("Unsupported Python mirt options: "+", ".join(sorted(unknown)))
+        fit=fit_python_mirt(data,model=model,**options)
         return BinaryFit(model,engine,fit,"EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED",
                          ("Python mirt results: only execution smoke-tested; inferential claims withheld.",))
     if model=="Rasch":
