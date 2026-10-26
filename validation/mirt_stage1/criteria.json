@@ -1,0 +1,16 @@
+{
+  "status": "PREREGISTERED_NUMERICAL_ONLY",
+  "scope": "positive-loading identified CFA; numerical cross-engine reproducibility, not population inference certification",
+  "mapping_probability": 1e-10,
+  "mapping_information": 1e-8,
+  "mapping_prior_mass": 1e-12,
+  "calibration_parameters": 0.001,
+  "calibration_covariance": 0.001,
+  "calibration_probability": 0.0001,
+  "calibration_information": 0.001,
+  "calibration_EAP": 0.001,
+  "calibration_posterior_SD": 0.001,
+  "common_logLik": 0.001,
+  "native_common_logLik": 0.000001,
+  "rationale": "Strict engineering reproducibility targets declared before fits: parameter/trait differences below 0.001 latent/logit unit, probability below 0.01 percentage point, total logLik below 0.001. These do not certify Type-I error, CI coverage, global optimality or quadrature accuracy; no threshold will be tuned to observed differences."
+}
