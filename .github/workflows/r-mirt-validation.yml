@@ -1,14 +1,67 @@
-# Registration only. The validation implementation lives on validation-r-mirt-phase1.
 name: Independent R mirt validation
 on:
   workflow_dispatch:
-permissions: {}
+permissions:
+  contents: read
+  actions: read
 jobs:
-  select-validation-branch:
+  compare:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 45
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
     steps:
-      - name: Stop registration-only execution
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::nloptr
+          cache-version: 1
+      - name: R mirt runtime preflight only (no fits)
         run: |
-          echo '::error::Registration only: select validation-r-mirt-phase1 in Run workflow to execute R mirt validation. This definition performs no validation.'
-          exit 1
+          mkdir -p validation-output
+          status=0
+          Rscript validation/r_mirt_phase1/runtime_preflight.R validation-output >validation-output/stdout.log 2>validation-output/stderr.log || status=$?
+          cat validation-output/stdout.log
+          cat validation-output/stderr.log >&2
+          exit "$status"
+      - name: Install cached Python dependencies
+        run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Targeted harness checks
+        run: python -m pytest -q tests/test_r_mirt_phase1.py tests/test_r_mirt_equivalence_audit.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: independent-r-mirt-2b3f675c736741030dcb13c177afbddd6372c02b
+          run-id: 40149576359
+          github-token: ${{ github.token }}
+          path: original-evidence
+      - name: ONE R 4PL diagnostic refit from preserved Python solution
+        run: |
+          set -o pipefail
+          python validation/r_mirt_phase1/harness.py --output validation-output/refit --models 4PL --matched --refit-4pl-from original-evidence/matched 2>&1 | tee validation-output/refit-execution.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-r-mirt-${{ github.sha }}
+          path: validation-output/
+          if-no-files-found: error
+      - name: Require complete converged executions (not scientific PASS)
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('validation-output/refit/report.json'))
+          assert len(r['models'])==1 and r['models'][0]['model']=='4PL'
+          assert all(m['execution']=='EXECUTED' and 'common_grid_loglik' in m and m['status']!='FAIL' for m in r['models']), r
+          PY

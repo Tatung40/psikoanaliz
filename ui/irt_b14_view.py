@@ -177,6 +177,7 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         st.markdown("**Model ve kestirim bilgileri**")
         st.dataframe(tables["Meta"],hide_index=True,use_container_width=True)
         left,right=st.columns(2)
+        # Downloads must not rerun the page and replace the generated XLSX media URL.
         left.download_button("B14 tüm tablolar Excel",export_xlsx(tables),
             "B14_rapor.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",key="b14_xlsx",on_click="ignore")
         if right.button("B14 ZIP paketini hazırla",key="b14_zip_make"):

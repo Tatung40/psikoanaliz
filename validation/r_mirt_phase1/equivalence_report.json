@@ -1,0 +1,288 @@
+{
+  "status": "NOT COMPARABLE",
+  "refitted": false,
+  "original_report_sha256": "65d77a5ac1b159c5a25a4ec35931721814d74f78ec116e0c8584813cd0400db7",
+  "software": {
+    "python": "3.11.17",
+    "packages": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pandas": "3.1.0",
+      "mirt": "1.2.0"
+    }
+  },
+  "reason": "Physical b bounds imply coupled R intercept/slope constraints; existing box-bound reference cannot express the identical feasible region. No partial alignment is certified.",
+  "grid": {
+    "method": "Gauss-Hermite N(0,1)",
+    "points": 61,
+    "D": 1
+  },
+  "models": [
+    {
+      "model": "3PL",
+      "status": "NOT COMPARABLE",
+      "original_convergence": {
+        "python": true,
+        "R": true
+      },
+      "original_diagnostics": {
+        "python": {
+          "converged": true,
+          "loglik": -22596.28229356395,
+          "aic": 45264.5645871279,
+          "bic": 45480.7938195633,
+          "variance": 1.0
+        },
+        "R": {
+          "engine": "R mirt",
+          "version": 1.48,
+          "R_version": "R version 4.6.1 (2026-06-24)",
+          "model": "3PL",
+          "itemtype": "3PL",
+          "estimation": "ML",
+          "D": 1,
+          "converged": true,
+          "loglik": -22596.2901299434,
+          "aic": 45264.5802598867,
+          "bic": 45480.8094923221,
+          "orientation": 1,
+          "variance": 1,
+          "points": 61,
+          "tolerance": 1e-08,
+          "seed": 20261024
+        }
+      },
+      "common_grid_loglik": {
+        "python": -22596.292577229775,
+        "R": -22596.290189186773,
+        "python_minus_R": -0.0023880430017015897
+      },
+      "parameters": {
+        "a": {
+          "status": "SKIPPED",
+          "max_absolute": 0.05097985385595161,
+          "mean_absolute": 0.00850830254802698,
+          "max_relative": 0.014112322817685789,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        },
+        "b": {
+          "status": "SKIPPED",
+          "max_absolute": 0.02036691306607774,
+          "mean_absolute": 0.0031536578832573915,
+          "max_relative": 0.060831426675231684,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        },
+        "c": {
+          "status": "SKIPPED",
+          "max_absolute": 0.009916264055944674,
+          "mean_absolute": 0.0014060850124847299,
+          "max_relative": 0.0914906134331094,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        },
+        "d": {
+          "status": "SKIPPED",
+          "max_absolute": 0.0,
+          "mean_absolute": 0.0,
+          "max_relative": 0.0,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        }
+      },
+      "ICC": {
+        "status": "SKIPPED",
+        "max_absolute": 0.009394745882380318,
+        "mean_absolute": 0.0005113011464570161,
+        "max_relative": 0.0822153017467844,
+        "tolerance": null,
+        "reason": "Tolerance requires scientific calibration"
+      },
+      "information": {
+        "status": "SKIPPED",
+        "max_absolute": 0.04603280108685759,
+        "mean_absolute": 0.006120558893011265,
+        "max_relative": 0.17653057914768178,
+        "tolerance": null,
+        "reason": "Tolerance requires scientific calibration"
+      },
+      "boundary_or_outside_python_box": {
+        "python": [],
+        "R": []
+      },
+      "source_sha256": {
+        "3PL/python_parameters.csv": "c25bff1bd0bf68c9680e982f6f3f3614bb3d0238de8a586ed7b972b972c98c16",
+        "3PL/R_cy63di0b/parameters.csv": "75111fdcb25381aed32221e64f59b7b091598a9031b8a0d3194c383295838abe",
+        "3PL/data.csv": "d087c3b50cd4d1deb1ae2c7908cc80203387911e1f0102dc52049365296f5dd2"
+      }
+    },
+    {
+      "model": "4PL",
+      "status": "NOT COMPARABLE",
+      "original_convergence": {
+        "python": true,
+        "R": true
+      },
+      "original_diagnostics": {
+        "python": {
+          "converged": true,
+          "loglik": -23272.484399621637,
+          "aic": 46640.968799243274,
+          "bic": 46929.27444249049,
+          "variance": 1.0
+        },
+        "R": {
+          "engine": "R mirt",
+          "version": 1.48,
+          "R_version": "R version 4.6.1 (2026-06-24)",
+          "model": "4PL",
+          "itemtype": "4PL",
+          "estimation": "ML",
+          "D": 1,
+          "converged": true,
+          "loglik": -23272.2997041558,
+          "aic": 46640.5994083117,
+          "bic": 46928.9050515589,
+          "orientation": 1,
+          "variance": 1,
+          "points": 61,
+          "tolerance": 1e-08,
+          "seed": 20261024
+        }
+      },
+      "common_grid_loglik": {
+        "python": -23272.585335017575,
+        "R": -23272.39581385957,
+        "python_minus_R": -0.1895211580049363
+      },
+      "parameters": {
+        "a": {
+          "status": "SKIPPED",
+          "max_absolute": 12.4648953644237,
+          "mean_absolute": 1.0864381138887043,
+          "max_relative": 0.7137114253667338,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        },
+        "b": {
+          "status": "SKIPPED",
+          "max_absolute": 0.10272241985266084,
+          "mean_absolute": 0.030088180868279402,
+          "max_relative": 0.18904128183077484,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        },
+        "c": {
+          "status": "SKIPPED",
+          "max_absolute": 0.018272983034072543,
+          "mean_absolute": 0.003911859612978383,
+          "max_relative": 1.0,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        },
+        "d": {
+          "status": "SKIPPED",
+          "max_absolute": 0.056252734881059197,
+          "mean_absolute": 0.008981481088105286,
+          "max_relative": 0.05797000552787397,
+          "tolerance": null,
+          "reason": "Tolerance requires scientific calibration"
+        }
+      },
+      "ICC": {
+        "status": "SKIPPED",
+        "max_absolute": 0.09631964562755574,
+        "mean_absolute": 0.0038952564482654774,
+        "max_relative": 0.19575453617305386,
+        "tolerance": null,
+        "reason": "Tolerance requires scientific calibration"
+      },
+      "information": {
+        "status": "SKIPPED",
+        "max_absolute": 6.1174434343557795,
+        "mean_absolute": 0.1743363887364127,
+        "max_relative": 0.6986080034256447,
+        "tolerance": null,
+        "reason": "Tolerance requires scientific calibration"
+      },
+      "boundary_or_outside_python_box": {
+        "python": [
+          {
+            "item": "M9",
+            "parameter": "a",
+            "value": 5.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M1",
+            "parameter": "c",
+            "value": 0.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M2",
+            "parameter": "c",
+            "value": 0.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M10",
+            "parameter": "c",
+            "value": 0.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M1",
+            "parameter": "d",
+            "value": 1.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M3",
+            "parameter": "d",
+            "value": 1.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M5",
+            "parameter": "d",
+            "value": 1.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M6",
+            "parameter": "d",
+            "value": 1.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M8",
+            "parameter": "d",
+            "value": 1.0,
+            "outside_python_box": false
+          },
+          {
+            "item": "M10",
+            "parameter": "d",
+            "value": 1.0,
+            "outside_python_box": false
+          }
+        ],
+        "R": [
+          {
+            "item": "M9",
+            "parameter": "a",
+            "value": 17.4648953644237,
+            "outside_python_box": true
+          }
+        ]
+      },
+      "source_sha256": {
+        "4PL/python_parameters.csv": "422a6bce85c9b504367d8bddaabecacf873ba2be33cc65e7167753e337dd6663",
+        "4PL/R_je1a40xa/parameters.csv": "0cd51226d32ad064a6009fc05703f2f9d9b1ceabe6f294b52d37179448437f37",
+        "4PL/data.csv": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c"
+      }
+    }
+  ]
+}
