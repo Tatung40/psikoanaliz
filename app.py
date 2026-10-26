@@ -177,6 +177,10 @@ with st.sidebar:
               on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
     st.button("❓ Kayıp Veri Atama", use_container_width=True,
               on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
+    st.button("🧭 Boyutluluk ve Faktör Analizi", key="nav_dimensionality", use_container_width=True,
+              on_click=navigate_to, args=("Boyutluluk ve Faktör Analizi",))
+    st.button("🔗 Yerel Bağımsızlık ve Madde Uyumu", key="nav_local_fit", use_container_width=True,
+              on_click=navigate_to, args=("Yerel Bağımsızlık ve Madde Uyumu",))
 
     st.markdown("---")
     st.markdown("### I. Klasik Test Kuramı (KTK)")
@@ -1492,6 +1496,13 @@ elif selected_page == "MTK: 3PL/4PL Bootstrap DIF":
     src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if src is None: st.warning("Önce 0/1 puanlanmış yanıt verisi yükleyin.")
     else: render_dif34_boot(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
+elif selected_page in ("Boyutluluk ve Faktör Analizi", "Yerel Bağımsızlık ve Madde Uyumu"):
+    render_academic_header()
+    from ui import dimensionality_localfit_view as dlv
+    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
+    if src is None: st.warning("Önce puanlanmış yanıt verisi yükleyin.")
+    elif selected_page == dlv.PAGE_DIM: dlv.render_dimensionality(src, list(st.session_state.item_cols))
+    else: dlv.render_local_fit(src, list(st.session_state.item_cols))
 elif selected_page == "MTK: Gözlenen Puan DIF":
     render_academic_header()
     from ui.dif_classical_view import render as render_classical_dif

@@ -17,3 +17,8 @@ Tüm önemli değişiklikler bu dosyada kronolojik olarak listelenir.
 - **Arayüz ve Görselleştirme:** 12 interaktif Plotly grafiği ve 12 sekmeli tam Türkçe Streamlit arayüzü (`app.py`).
 - **Raporlama:** Çok sayfalı Excel (.xlsx) ve APA 7 Word (.docx) rapor ihracı.
 - **Örnek Veri Setleri:** 4 sentetik veri seti oluşturuldu.
+
+## Boyutluluk, yerel bağımsızlık ve madde uyumu ekranları
+- `core/dimensionality.py`: Pearson/tetrakorik/polikorik (iki aşamalı ML), KMO, Bartlett, paralel analiz (permütasyon), PAF, varimax/promax, tek boyutluluk özeti.
+- `core/local_fit.py`: Yen-Q3, merkezlenmiş Q3, 1F artık korelasyonları, S-X² + BH-FDR, gözlenen/beklenen tabloları. 1PL/2PL asimptotik p/FDR keşifsel (NOT CERTIFIED); 3PL/4PL ve yakınsamayan kestirimlerde p/FDR kapalı; çok kategorili kapalı.
+- `ui/dimensionality_localfit_view.py`: iki sol menü ekranı; CSV/XLSX/PNG/ZIP + yöntem/sınırlılık metni.

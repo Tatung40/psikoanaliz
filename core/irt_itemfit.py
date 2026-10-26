@@ -69,7 +69,7 @@ def _collapse_cells(obs,expected,mincell=1.0):
     return obs,expected,""
 
 
-def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0):
+def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0,return_tables=False):
     """S-X² aligned with mirt's unidimensional dichotomous implementation.
 
     Computes with fitted item parameters held fixed; this does NOT verify that
@@ -99,7 +99,7 @@ def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0):
     scores=x.sum(axis=1)
     item_par={"1PL":1,"2PL":2,"3PL":3,"4PL":4}[model]
     names=list(data.columns) if isinstance(data,pd.DataFrame) else list(item_table["Madde"])
-    results=[]
+    results=[];tables={}
     for j in range(k):
         other=_sumscore_lik(np.delete(probs,j,axis=1))
         expected=np.column_stack((
@@ -112,6 +112,8 @@ def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0):
         obs=obs[1:k]
         expected*=obs.sum(axis=1)[:,None]
         obs,expected,reason=_collapse_cells(obs,expected,mincell)
+        if return_tables:
+            tables[names[j]]=pd.DataFrame({"Grup":np.arange(1,len(obs)+1),"Gözlenen (1)":obs[:,1],"Beklenen (1)":expected[:,1],"n":obs.sum(1),"Gözlenen oran":obs[:,1]/np.maximum(obs.sum(1),1e-300),"Beklenen oran":expected[:,1]/np.maximum(obs.sum(1),1e-300)})
         groups=len(obs)
         df=int(np.count_nonzero(~np.isnan(expected))-groups-item_par)
         if reason or df<=0:
@@ -129,4 +131,5 @@ def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0):
                         "p":pvalue,"RMSEA.S-X²":rmsea,
                         "Puan grubu":groups,
                         "Durum":reason or "Hesaplandı"})
-    return pd.DataFrame(results)
+    out=pd.DataFrame(results)
+    return (out,tables) if return_tables else out
