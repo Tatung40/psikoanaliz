@@ -3,11 +3,12 @@
 Primary external library calibration; raw fit preserved for model-specific inspection.
 No claim that R parameter agreement or standard errors are validated.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from numbers import Integral, Real
 from importlib import import_module
 import numpy as np
 
-SUPPORTED = frozenset(("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"))
+SUPPORTED = frozenset(("Rasch","1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"))
 UNSUPPORTED_PUBLIC_MODELS = frozenset(("RSM",))
 POLY = frozenset(("GRM","PCM","GPCM","RSM","NRM"))
 
@@ -21,17 +22,30 @@ class PythonMirtResult:
     fit: object
     scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
     estimation: str = "ML"
+    solver_settings: dict = field(default_factory=dict)
 
 ESTIMATIONS = ("ML", "MAP")
 
 
-def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
+def solver_settings(*, max_iter=500, tol=1e-4, n_quadpts=21):
+    """Exact public mirt.fit_mirt defaults; reject silent coercion/nonfinite values."""
+    for name,value in (("max_iter",max_iter),("n_quadpts",n_quadpts)):
+        if isinstance(value,(bool,np.bool_)) or not isinstance(value,Integral) or value<1:
+            raise ValueError(f"{name} must be a positive integer")
+    if isinstance(tol,(bool,np.bool_)) or not isinstance(tol,Real) or not np.isfinite(tol) or tol<=0:
+        raise ValueError("tol must be finite and positive")
+    return dict(max_iter=int(max_iter),tol=float(tol),n_quadpts=int(n_quadpts))
+
+
+def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML",
+                    max_iter=500, tol=1e-4, n_quadpts=21):
     """One public fit call; no implicit engine fallback or unsupported inference.
 
     estimation="MAP" (3PL/4PL only) uses Python mirt's documented library default item priors
     (mirt.estimation.priors.default_priors: a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)).
     They were not tuned to any result; see validation/evidence/p1_3pl4pl for the pre-registered study.
     """
+    settings=solver_settings(max_iter=max_iter,tol=tol,n_quadpts=n_quadpts)
     if estimation not in ESTIMATIONS:
         raise ValueError("estimation must be 'ML' or 'MAP'.")
     if estimation == "MAP" and model not in ("3PL", "4PL"):
@@ -82,7 +96,8 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
         mirt=import_module("mirt")
     except ImportError as ex:
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
-    kwargs={"model":model}
+    # Python Rasch: fixed a=1, N(0,1), unlike the separate native free-SD Rasch.
+    kwargs={"model":"1PL" if model=="Rasch" else model,**settings}
     if cats is not None:kwargs["n_categories"]=cats
     if model=="NRM":
         # Python mirt 1.2.0 defect: se_method="auto" labels NRM SEs "oakes" but returns values ~0.45x the
@@ -93,4 +108,4 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML"):
         from mirt.estimation.priors import default_priors
         kwargs["priors"]=default_priors(model)
     result=mirt.fit_mirt(x.astype(int),**kwargs)
-    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation)
+    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings)
