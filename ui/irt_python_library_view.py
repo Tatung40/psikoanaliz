@@ -7,6 +7,7 @@ from core.irt_python_mirt_adapter import fit_python_mirt
 from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
+from core.irt_person_abilities import person_abilities
 
 
 def _data_fingerprint(frame):
@@ -82,6 +83,37 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.markdown('### Madde parametreleri');st.dataframe(safe_frame(report.parameters),hide_index=True)
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
+    st.markdown('### Birey Yetenek Kestirimleri (θ)')
+    st.caption('N(0,1) önseli üzerinden EAP; SH(θ) posterior SS’dir, bilgi fonksiyonu SEM’i değildir. '+('GPCM: tam normal GH61 quadrature.' if model=='GPCM' else '161 noktalı [-4,4] ızgara.'))
+    if model=='NRM':st.caption('Nominal kategori kodlarının toplamı başarı puanı değildir; ham puan boş bırakılır.')
+    if report.metadata.get('Yakınsama') is not True or report.errors:
+        st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
+    elif not report.curves.empty:
+        try:
+            ids=data[id_col].to_numpy(copy=True) if id_col in data.columns else None
+            ability_curves=report.curves;quadrature=None
+            if model=='GPCM':
+                from mirt.estimation.quadrature import GaussHermiteQuadrature
+                from core.irt_b14_model_curves import fitted_category_curves
+                q=GaussHermiteQuadrature(n_points=61,n_dimensions=1)
+                quadrature=(q.nodes[:,0],q.weights)
+                ability_curves=fitted_category_curves(dict(result=saved['outcome'].fit,k=len(cols),items=cols,labels=labels),q.nodes[:,0])
+            people=person_abilities(x,ability_curves,model=model,identifiers=ids,
+                item_names=cols,category_labels=labels or ('0','1'),quadrature=quadrature)
+            st.dataframe(safe_frame(people).round(4),hide_index=True,use_container_width=True)
+            st.download_button('Birey yetenekleri — CSV',_csv(people),
+                               f'{model}_person_theta.csv','text/csv',
+                               key=f'python_mirt_persons_csv_{model}',on_click='ignore')
+            import io
+            output=io.BytesIO()
+            with pd.ExcelWriter(output,engine='openpyxl') as writer:
+                safe_frame(people).to_excel(writer,index=False,sheet_name='Birey Yetenekleri')
+            st.download_button('Birey yetenekleri — Excel',output.getvalue(),
+                               f'{model}_person_theta.xlsx',
+                               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                               key=f'python_mirt_persons_xlsx_{model}',on_click='ignore')
+        except (ValueError,TypeError,KeyError,IndexError) as exc:
+            st.error(f'Birey yetenek kestirimleri hesaplanamadı: {exc}')
     if report.curves.empty:return
     # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
     import matplotlib

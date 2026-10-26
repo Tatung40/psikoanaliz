@@ -1,0 +1,56 @@
+{
+  "status": "NOT EXECUTED",
+  "R_execution": "NOT EXECUTED",
+  "scientific_pass": false,
+  "fits": 0,
+  "simulations": 0,
+  "seed": 20261024,
+  "fixture": "validation/evidence/p5_browser/poly_ordinal.csv",
+  "fixture_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+  "reused_harness_commit": "18d1bcf72c85a174ad278ae4d8ea925b412c0275",
+  "reused_harness_sha256": "0fd83018905d210d747a0fb9529dc9919d77f52676d19753afb3a43ca22d1fe5",
+  "python_versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0"
+  },
+  "python_checks": {
+    "GRM": {
+      "mapping_max_absolute": 4.440892098500626e-16,
+      "probability_sum_error": 2.220446049250313e-16,
+      "category_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "estimation": "NONE",
+      "n_parameters_probed": 32
+    },
+    "PCM": {
+      "mapping_max_absolute": 4.440892098500626e-16,
+      "probability_sum_error": 4.440892098500626e-16,
+      "category_codes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "estimation": "NONE",
+      "n_parameters_probed": 32
+    }
+  },
+  "R_checks": "PENDING",
+  "script_sha256": {
+    "poly_r_preflight.py": "6628e22f2470db95db25d990c44ccb1174f93fcb0cdb5224a40a0c4c9c68f998",
+    "poly_r_preflight.R": "08fc352fb9711cafb5a6381b25fc9ca1bbed18bdd8b037d889ecfc347bbf94ae"
+  },
+  "algebra_roundoff_rtol": 1.4901161193847656e-08,
+  "notice": "Fixed-probe numerical equality uses R all.equal default sqrt(eps), NOT a scientific fit acceptance tolerance. No scientific PASS without independent fits.",
+  "GH": {
+    "points": 61,
+    "distribution": "N(0,1)",
+    "estimator_integration": "NOT EXECUTED"
+  }
+}
