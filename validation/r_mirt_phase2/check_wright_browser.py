@@ -29,11 +29,12 @@ def main(output):
             page.set_content(html,wait_until='load')
             page.wait_for_function("document.getElementById('wright')._fullLayout !== undefined")
             page.locator('#wright .scatterlayer .trace .point').first.wait_for()
-            actual=page.evaluate("""() => {let g=document.getElementById('wright');return {
+            trace_script="""() => {let g=document.getElementById('wright');return {
                 y:Array.from(g._fullData[1].y), names:Array.from(g._fullData[1].text), counts:Array.from(g._fullData[0].x),
                 range:g._fullLayout.yaxis.range, axes:g._fullData.map(t=>t.yaxis||'y'),
                 itemMarkers:g.querySelectorAll('.scatterlayer .trace .point').length,
-                bars:g.querySelectorAll('.barlayer .point').length}}""")
+                bars:g.querySelectorAll('.barlayer .point').length}}"""
+            actual=page.evaluate(trace_script)
             assert not errors,errors
             assert actual['axes']==['y','y'] and actual['names']==items.Madde.tolist()
             np.testing.assert_allclose(actual['y'],items.b,rtol=1e-12,atol=1e-12)
@@ -41,6 +42,28 @@ def main(output):
             assert actual['itemMarkers']==len(items) and np.count_nonzero(counts)<=actual['bars']<=len(hist)
             assert actual['range'][0]<min(theta.min(),items.b.min()) and actual['range'][1]>max(theta.max(),items.b.max())
             page.screenshot(path=str(out/'rasch_wright.png'),full_page=True)
+            # Real public LSAT6 is a separate actual fit; only aggregates saved.
+            real=json.loads((root/'lsat6_summary.json').read_text())
+            ri=pd.read_csv(root/'lsat6_items.csv');rh=pd.read_csv(root/'lsat6_histogram.csv')
+            rf=pio.from_json((root/'lsat6_wright.json').read_text())
+            assert real['status']=='PASS' and real['converged'] is True and real['fits']==1
+            assert real['respondent_rows_saved'] is False and real['N']==1000 and len(ri)==5
+            assert ri.b.is_monotonic_increasing and int(rh['Kişi sayısı'].sum())==real['N']
+            np.testing.assert_allclose(rf.data[1].y,ri.b,rtol=1e-12,atol=1e-12)
+            np.testing.assert_array_equal(-np.asarray(rf.data[0].x),rh['Kişi sayısı'])
+            np.testing.assert_allclose(rf.data[0].y,rh.Merkez,rtol=1e-12,atol=1e-12)
+            page.set_content(pio.to_html(rf,include_plotlyjs=True,full_html=True,div_id='wright'),wait_until='load')
+            page.wait_for_function("document.getElementById('wright')._fullLayout !== undefined")
+            page.locator('#wright .scatterlayer .trace .point').first.wait_for()
+            ra=page.evaluate(trace_script)
+            assert not errors,errors
+            assert ra['axes']==['y','y'] and ra['names']==ri.Madde.tolist() and ra['itemMarkers']==5
+            np.testing.assert_allclose(ra['y'],ri.b,rtol=1e-12,atol=1e-12)
+            np.testing.assert_array_equal(-np.asarray(ra['counts']),rh['Kişi sayısı'])
+            assert np.count_nonzero(rh['Kişi sayısı'])<=ra['bars']<=len(rh)
+            assert ra['range'][0]<min(real['theta_min'],ri.b.min()) and ra['range'][1]>max(real['theta_max'],ri.b.max())
+            page.screenshot(path=str(out/'lsat6_wright.png'),full_page=True)
+            report['real_LSAT6']=dict(persons=real['N'],items=len(ri),source=real['source'],data_sha256=real['data_sha256'],rendered=ra)
             browser.close()
         report.update(status='PASS',persons=len(persons),items=len(items),histogram_count=int(counts.sum()),rendered=actual)
     except Exception:
