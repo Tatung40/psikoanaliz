@@ -26,6 +26,21 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     st.caption('Python mirt 1.2.0 | Sonuç ekranı sürümü: nine-model-report-v2 | Bağımsız bilimsel sertifika veya formel DIF değildir.')
     choices=[c for c in data.columns if c not in (id_col,group_col)]
     cols=st.multiselect('Madde sütunları',choices,default=[c for c in items if c in choices] or choices[:10],key=f'python_mirt_cols_{model}')
+    # Display-only controls: never alter calibration or claim unsupported solver settings.
+    with st.expander('Çıktılar ve raporlama — SPSS tarzı seçimler',expanded=False):
+        st.caption('Varsayılan: tüm mevcut çıktılar. Seçimler yalnızca görünümü ve dışa aktarımı etkiler; model kalibrasyonunu değiştirmez.')
+        output_names={
+            'summary':'Model özeti, LogLik, AIC/BIC ve yakınsama',
+            'parameters':'Madde parametreleri',
+            'persons':'Birey EAP yetenekleri ve posterior SH',
+            'curves':'Madde/kategori tepki eğrileri',
+            'information':'Madde ve test bilgisi, koşullu SEM',
+        }
+        outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
+                 for name,label in output_names.items()}
+    with st.expander('Gelişmiş kestirim ayarları — motor yetenekleri',expanded=False):
+        st.info('Python mirt 1.2.0 adaptöründe iterasyon, tolerans ve quadrature için doğrulanmış kamuya açık parametre eşlemesi henüz yoktur. Bu ayarlar etkisiz kaydırıcılar olarak gösterilmez; kütüphane varsayılanları korunur.')
+        st.caption('Öneri: başlangıçta motorun belgelenmiş varsayılanlarını koruyun. Yakınsama başarısızsa veriyi, tanımlanabilirliği ve model karmaşıklığını inceleyin. Desteklenen sayısal ayarlar API doğrulamasından sonra açılacaktır.')
     estimation='ML';categories=None;labels=()
     if model=='Rasch':st.info('Rasch: a=1; θ~N(0,1). Yerel serbest-σ Rasch ekranından ayrıdır.')
     if model=='1PL':st.info('1PL: ortak a serbest; 2PL üzerinde belgelenmiş eşitlik kısıtı. Rasch sekmesinde a=1 sabittir.')
@@ -77,17 +92,18 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     for warning in report.warnings:st.warning(warning)
     for error in report.errors:st.error(error)
     summary=pd.DataFrame([report.metadata])
-    st.markdown('### Model özeti');st.dataframe(summary,hide_index=True)
-    st.download_button('Model özeti — CSV',_csv(summary),f'{model}_summary.csv','text/csv',key=f'python_mirt_summary_csv_{model}',on_click='ignore')
-    if not report.parameters.empty:
+    if outputs['summary']:
+        st.markdown('### Model özeti');st.dataframe(summary,hide_index=True)
+    if outputs['summary']:st.download_button('Model özeti — CSV',_csv(summary),f'{model}_summary.csv','text/csv',key=f'python_mirt_summary_csv_{model}',on_click='ignore')
+    if outputs['parameters'] and not report.parameters.empty:
         st.markdown('### Madde parametreleri');st.dataframe(safe_frame(report.parameters),hide_index=True)
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
-    st.markdown('### Birey Yetenek Kestirimleri (θ)')
-    st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
-    if report.metadata.get('Yakınsama') is not True or report.errors:
+    if outputs['persons']:st.markdown('### Birey Yetenek Kestirimleri (θ)')
+    if outputs['persons']:st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
+    if outputs['persons'] and (report.metadata.get('Yakınsama') is not True or report.errors):
         st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
-    elif not report.curves.empty:
+    elif outputs['persons'] and not report.curves.empty:
         try:
             ids=data.loc[x.index,id_col].to_numpy() if id_col in data.columns else None
             people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
@@ -106,6 +122,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         except (ValueError,TypeError,KeyError,IndexError) as exc:
             st.error(f'Birey yetenek kestirimleri hesaplanamadı: {exc}')
     if report.curves.empty:return
+    if not outputs['curves'] and not outputs['information']:return
     # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
     import matplotlib
     matplotlib.use('Agg')
@@ -113,18 +130,19 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     selected=st.selectbox('Grafik maddesi',cols,key=f'python_mirt_plot_item_{model}')
     shown=report.curves[report.curves.Madde==str(selected)]
     if model in BINARY:shown=shown[shown.Kategori=='1']
-    fig,ax=plt.subplots(figsize=(7,4))
-    for category,group in shown.groupby('Kategori',sort=False):
-        ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
-    ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
-           xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
-    ax.grid(alpha=.2)
-    if len(shown['Kategori'].unique())>1:ax.legend()
-    fig.tight_layout()
-    try:st.pyplot(fig,use_container_width=True)
-    finally:plt.close(fig)
-    st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
-    if report.information.empty:return
+    if outputs['curves']:
+        fig,ax=plt.subplots(figsize=(7,4))
+        for category,group in shown.groupby('Kategori',sort=False):
+            ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
+        ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
+               xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
+        ax.grid(alpha=.2)
+        if len(shown['Kategori'].unique())>1:ax.legend()
+        fig.tight_layout()
+        try:st.pyplot(fig,use_container_width=True)
+        finally:plt.close(fig)
+        st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
+    if not outputs['information'] or report.information.empty:return
     info=report.information
     for title,col in [('Madde bilgi fonksiyonu',f'I_{selected}'),('Test bilgi fonksiyonu','Test bilgisi'),('Koşullu standart hata','SEM(θ)')]:
         fig,ax=plt.subplots(figsize=(7,4))
