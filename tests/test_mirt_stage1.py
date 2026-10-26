@@ -155,3 +155,31 @@ def test_canonical_nominal_gauge_and_exploratory_guard(tmp_path):
  pat=np.ones((8,2),int);pat[:2]=np.tril(np.ones((2,2),int))
  assert structure(pat,exploratory=True)
  with pytest.raises(ValueError):structure(pat,correlated=True,exploratory=True)
+
+
+@pytest.mark.parametrize('name',['NRM_2D','Bifactor_4D','GPCM_5D','2PL_EFA_2D','GRM_EFA_2D'])
+def test_refinement_preserves_data_criteria_and_common_item_start(name,tmp_path):
+ from validation.mirt_stage1.compare import inputs,native_outputs
+ prior=tmp_path/'prior';source=prior/name
+ cfg,data,engine,grid=inputs(name,source)
+ np.savez(source/'python_parameters.npz',**engine.parameters,covariance=np.eye(cfg['q']))
+ (source/'report.json').write_text(json.dumps(dict(settings=cfg,status='UNIT TEST FIXED OBJECT / NO CALIBRATION')))
+ out=tmp_path/'next'/name;next_cfg,next_data,next_engine,_=inputs(name,out,prior)
+ pd.testing.assert_frame_equal(data,next_data)
+ assert cfg['criteria_sha256']==next_cfg['criteria_sha256'] and cfg['data_sha256']==next_cfg['data_sha256']
+ assert next_cfg['tol']<cfg['tol'] and next_cfg['max_iter']==3000
+ theta=np.array([[-.5]*cfg['q'],[.5]*cfg['q']])
+ np.testing.assert_array_equal(engine.probability(theta),next_engine.probability(theta))
+ start=pd.read_csv(out/'start.csv');a=start.filter(regex='^a[1-5]$').to_numpy()
+ if cfg['model']=='NRM':np.testing.assert_allclose(a.reshape(cfg['k'],4,cfg['q']),engine.parameters['slopes'])
+ elif cfg['model']=='Bifactor':np.testing.assert_allclose(a,engine.get_loading_matrix())
+ else:np.testing.assert_allclose(a,engine.parameters['slopes' if cfg['model']=='2PL' else 'discrimination'])
+ assert json.loads((out/'original_report.json').read_text())['status']=='UNIT TEST FIXED OBJECT / NO CALIBRATION'
+
+
+def test_r_nominal_uses_public_derivative_free_optimizer():
+ # R1.48 native d_nominal2 omits the category-score gradient block.
+ # Identical fixed probabilities cannot establish equivalence of its analytic M-step.
+ source=Path('validation/mirt_stage1/reference.R').read_text()
+ assert "if(nominal)'NLOPT_LN_BOBYQA' else 'NLOPT_LD_SLSQP'" in source
+ assert "xtol_rel=1e-8,maxeval=1000" in source

@@ -1,0 +1,1939 @@
+{
+  "run": "https://github.com/Tatung40/psikoanaliz/actions/runs/40394398251",
+  "artifact_id": 12686782455,
+  "reports": [
+    {
+      "profile": "Bifactor_4D",
+      "status": "NOT CONVERGED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "Bifactor_4D",
+        "model": "Bifactor",
+        "q": 4,
+        "k": 9,
+        "pattern": [
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            1
+          ]
+        ],
+        "correlated": false,
+        "covariance_mode": "pair",
+        "exploratory": false,
+        "groups": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          2,
+          2,
+          2
+        ],
+        "syntax": "F1 = 1,2,3,4,5,6,7,8,9\nF2 = 1,2,3\nF3 = 4,5,6\nF4 = 7,8,9",
+        "N": 600,
+        "seed": 20261135,
+        "n_quadpts": 7,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "8de8cd85eff15108512090c0ca510b46be4c54dd5be02bc9ad5ffb58921693ec"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 3.3306690738754696e-16,
+          "mean_absolute": 1.3260997238578258e-16,
+          "max_relative": 1.543409834250703e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 2.7755575615628914e-16,
+          "mean_absolute": 8.288123274111412e-18,
+          "max_relative": 2.357606595026875e-15,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 5.0306980803327406e-17,
+          "mean_absolute": 8.367057396153431e-19,
+          "max_relative": 4.572288174350059e-15,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": false,
+        "logLik": -3490.7956964177315,
+        "AIC": 7035.591392835463,
+        "BIC": 7154.308493526299,
+        "n_parameters": 27,
+        "iterations": 1000
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "Bifactor",
+        "dimensions": 4,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": false,
+        "logLik": -3490.79569641468,
+        "AIC": 7035.59139282937,
+        "BIC": 7154.3084935202,
+        "iterations": 1000,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "PASS",
+          "max_absolute": 0.0000015628696021785515,
+          "mean_absolute": 7.502753279147672e-8,
+          "max_relative": 5.056096328056738e-7,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "PASS",
+          "max_absolute": 6.011978903597281e-7,
+          "mean_absolute": 6.970596213293819e-8,
+          "max_relative": 3.6833397877267997e-7,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 2.860029622020477e-7,
+          "mean_absolute": 1.3255838354151886e-8,
+          "max_relative": 0.00000508767171383046,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.0000020182984084016198,
+          "mean_absolute": 7.457090887409639e-9,
+          "max_relative": 0.000004444983940804679,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 1.6974987393503227e-7,
+          "mean_absolute": 2.6846749445383865e-8,
+          "max_relative": 0.0000024708656267712853,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 8.485962144089143e-8,
+          "mean_absolute": 1.6884992263752063e-8,
+          "max_relative": 1.1644461969301856e-7,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 3.0468072509393096e-9,
+          "mean_absolute": 3.0468072509393096e-9,
+          "max_relative": 8.728116784565639e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 4.547473508864641e-13,
+          "mean_absolute": 4.547473508864641e-13,
+          "max_relative": 1.302703997696364e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 4.092726157978177e-12,
+          "mean_absolute": 4.092726157978177e-12,
+          "max_relative": 1.1724335979277509e-15,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -3490.795696417731,
+        "R": -3490.7956964146842
+      }
+    },
+    {
+      "profile": "Rasch_2D",
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "Rasch_2D",
+        "model": "Rasch",
+        "q": 2,
+        "k": 10,
+        "pattern": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "correlated": false,
+        "covariance_mode": "pair",
+        "exploratory": false,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,4,9,10\nF2 = 5,6,7,8,9,10",
+        "N": 400,
+        "seed": 20261128,
+        "n_quadpts": 15,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "304d7aefb0092ec8fa40bd24aa2a7cb255bc01065b5ccd1062bbe46cef9addcd"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 4.579669976578771e-16,
+          "mean_absolute": 2.5265283692337764e-16,
+          "max_relative": 3.841910834810758e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 4.996003610813204e-16,
+          "mean_absolute": 1.1163909303175185e-16,
+          "max_relative": 4.758389373610559e-15,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 3.469446951953614e-16,
+          "mean_absolute": 3.93221682582986e-18,
+          "max_relative": 8.613972866408965e-15,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -2590.440531302448,
+        "AIC": 5200.881062604896,
+        "BIC": 5240.795708075976,
+        "n_parameters": 10,
+        "iterations": 18
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "Rasch",
+        "dimensions": 2,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": true,
+        "logLik": -2590.44053125461,
+        "AIC": 5200.88106250922,
+        "BIC": 5240.7957079803,
+        "iterations": 28,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "PASS",
+          "max_absolute": 0.00002838236597080268,
+          "mean_absolute": 0.000016913660509319804,
+          "max_relative": 0.00031925068956429996,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.000006451655531036771,
+          "mean_absolute": 0.0000024419535014074964,
+          "max_relative": 0.000028127789998358265,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.0000027303373603404513,
+          "mean_absolute": 5.344586441135534e-7,
+          "max_relative": 0.00002787361670510616,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.000009448817568522005,
+          "mean_absolute": 0.000008399120649744832,
+          "max_relative": 0.00027235966581395715,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 7.530461624272178e-7,
+          "mean_absolute": 2.4965384580119543e-7,
+          "max_relative": 0.0000010098228935900059,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 4.783896656590514e-8,
+          "mean_absolute": 4.783896656590514e-8,
+          "max_relative": 1.8467502337084023e-11,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 9.094947017729282e-13,
+          "mean_absolute": 9.094947017729282e-13,
+          "max_relative": 3.510965377508354e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -2590.440531302448,
+        "R": -2590.440531254609
+      }
+    },
+    {
+      "profile": "NRM_2D",
+      "status": "NUMERICAL DISAGREEMENT / NOT CERTIFIED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "NRM_2D",
+        "model": "NRM",
+        "q": 2,
+        "k": 10,
+        "pattern": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "correlated": "full",
+        "covariance_mode": "full",
+        "exploratory": false,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,4,9,10\nF2 = 5,6,7,8,9,10\nCOV = F1*F2",
+        "N": 400,
+        "seed": 20261132,
+        "n_quadpts": 15,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "e43e687f10bf1231ba1c386a4d68bba4fc5dd22f81d31f92690e5e550e742454"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 4.996003610813204e-16,
+          "mean_absolute": 1.0044048925905713e-16,
+          "max_relative": 3.2202775936126386e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 1.0440204256667585e-11,
+          "mean_absolute": 4.894467740052594e-13,
+          "max_relative": 5.860485469137468e-11,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 4.163336342344337e-16,
+          "mean_absolute": 4.618696589333736e-18,
+          "max_relative": 2.105422082779696e-14,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -5323.2002685856805,
+        "AIC": 10780.400537171361,
+        "BIC": 11047.828661827596,
+        "n_parameters": 67,
+        "iterations": 73
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "NRM",
+        "dimensions": 2,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": true,
+        "logLik": -5348.16665917783,
+        "AIC": 10830.3333183557,
+        "BIC": 11097.7614430119,
+        "iterations": 64,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0.336769709844506
+          ],
+          [
+            0.336769709844506,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R native gpcm_mats probabilities + checked two-step numerical Fisher"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "FAIL",
+          "max_absolute": 1.086931023186632,
+          "mean_absolute": 0.12867260964873423,
+          "max_relative": 1.5333074380144407,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "FAIL",
+          "max_absolute": 0.4365390020431321,
+          "mean_absolute": 0.07571207285138928,
+          "max_relative": 1.8070472026514364,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "FAIL",
+          "max_absolute": 0.00781256832196392,
+          "mean_absolute": 0.00390628416098196,
+          "max_relative": 0.02267257725363815,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "FAIL",
+          "max_absolute": 0.43477541768837946,
+          "mean_absolute": 0.04123119729605253,
+          "max_relative": 0.963386399335175,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "FAIL",
+          "max_absolute": 0.39915078062265263,
+          "mean_absolute": 0.029315918160098185,
+          "max_relative": 1.8053314694359563,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "FAIL",
+          "max_absolute": 0.5648669321197315,
+          "mean_absolute": 0.1720360948178824,
+          "max_relative": 1.7159353071534114,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "FAIL",
+          "max_absolute": 0.11613430086289311,
+          "mean_absolute": 0.051107722721066035,
+          "max_relative": 0.1556546950977173,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "FAIL",
+          "max_absolute": 24.966390592149764,
+          "mean_absolute": 24.966390592149764,
+          "max_relative": 0.004668214770253219,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -5323.2002685856805,
+        "R": -5348.16665917783
+      }
+    },
+    {
+      "profile": "PCM_2D",
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "PCM_2D",
+        "model": "PCM",
+        "q": 2,
+        "k": 10,
+        "pattern": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "correlated": false,
+        "covariance_mode": "pair",
+        "exploratory": false,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,4,9,10\nF2 = 5,6,7,8,9,10",
+        "N": 400,
+        "seed": 20261129,
+        "n_quadpts": 15,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "abd75510b029d1267168d547834d1855cf3a3bc8fb0e8b82dc39a8c311bfb132"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 4.440892098500626e-16,
+          "mean_absolute": 1.6063540328692952e-16,
+          "max_relative": 3.302497678400436e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 2.220446049250313e-16,
+          "mean_absolute": 4.3483735131151964e-17,
+          "max_relative": 5.937151475220188e-16,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 3.469446951953614e-16,
+          "mean_absolute": 3.93221682582986e-18,
+          "max_relative": 8.613972866408965e-15,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -4919.971249158865,
+        "AIC": 9899.94249831773,
+        "BIC": 10019.68643473097,
+        "n_parameters": 30,
+        "iterations": 35
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "PCM",
+        "dimensions": 2,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": true,
+        "logLik": -4919.97124902684,
+        "AIC": 9899.94249805368,
+        "BIC": 10019.6864344669,
+        "iterations": 58,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "PASS",
+          "max_absolute": 0.00004583181501915945,
+          "mean_absolute": 0.00002425037860250857,
+          "max_relative": 0.0006681033016762445,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.000012079378505669425,
+          "mean_absolute": 0.0000032860971598147124,
+          "max_relative": 0.00011675346488717126,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.0000054779251738024115,
+          "mean_absolute": 0.0000012499191234889728,
+          "max_relative": 0.00003558625353370429,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.000016978836670344943,
+          "mean_absolute": 0.00001575694201886007,
+          "max_relative": 0.00021966226348443533,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.0000013044369140957635,
+          "mean_absolute": 6.03780023221423e-7,
+          "max_relative": 0.000002855303250596451,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 1.3202588888816535e-7,
+          "mean_absolute": 1.3202588888816535e-7,
+          "max_relative": 2.6834687074794786e-11,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 9.094947017729282e-13,
+          "mean_absolute": 9.094947017729282e-13,
+          "max_relative": 1.8485772695375492e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -4919.971249158865,
+        "R": -4919.971249026839
+      }
+    },
+    {
+      "profile": "GPCM_3D",
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "GPCM_3D",
+        "model": "GPCM",
+        "q": 3,
+        "k": 14,
+        "pattern": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ]
+        ],
+        "correlated": "full",
+        "covariance_mode": "full",
+        "exploratory": false,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,4,13,14\nF2 = 5,6,7,8\nF3 = 9,10,11,12\nCOV = F1*F2*F3",
+        "N": 400,
+        "seed": 20261131,
+        "n_quadpts": 15,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "63d9cb1fa89c654d4fac65ff3b0bce374723b4dbdd02813448c8f93e729fce11"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 4.163336342344337e-16,
+          "mean_absolute": 1.446325698095663e-16,
+          "max_relative": 1.8374109018459505e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 8.881784197001252e-16,
+          "mean_absolute": 5.551115123125783e-17,
+          "max_relative": 9.58555829037386e-16,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 3.469446951953614e-17,
+          "mean_absolute": 3.102753086121158e-19,
+          "max_relative": 2.585605054903117e-14,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -6896.353383919779,
+        "AIC": 13910.706767839558,
+        "BIC": 14146.203176118928,
+        "n_parameters": 59,
+        "iterations": 43
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "GPCM",
+        "dimensions": 3,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": true,
+        "logLik": -6896.35338370244,
+        "AIC": 13910.7067674049,
+        "BIC": 14146.2031756843,
+        "iterations": 70,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0.212840993940449,
+            0.167012432721396
+          ],
+          [
+            0.212840993940449,
+            1,
+            0.199254565205266
+          ],
+          [
+            0.167012432721396,
+            0.199254565205266,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "PASS",
+          "max_absolute": 0.00017713191581991694,
+          "mean_absolute": 0.000005165969091035029,
+          "max_relative": 0.0000923349655621196,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "PASS",
+          "max_absolute": 0.00017628556656745786,
+          "mean_absolute": 0.00002219009445804441,
+          "max_relative": 0.0016456378195172333,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0.0000022862372581200496,
+          "mean_absolute": 7.115598208120824e-7,
+          "max_relative": 0.000010741411503389838,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.00002622012294739573,
+          "mean_absolute": 0.000002724188198926409,
+          "max_relative": 0.0011093520408495077,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.00021907999181736137,
+          "mean_absolute": 0.0000010638607630290496,
+          "max_relative": 0.00012186370775814877,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.00005604198115183312,
+          "mean_absolute": 0.000013330585275579936,
+          "max_relative": 0.0005629757281835178,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.000010579682118150302,
+          "mean_absolute": 0.0000027715694530747645,
+          "max_relative": 0.00002460536783551291,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 2.173374014091678e-7,
+          "mean_absolute": 2.173374014091678e-7,
+          "max_relative": 3.151482954976368e-11,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 1.8189894035458565e-12,
+          "mean_absolute": 1.8189894035458565e-12,
+          "max_relative": 2.637610491139444e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -6896.353383919779,
+        "R": -6896.3533837024415
+      }
+    },
+    {
+      "profile": "2PL_EFA_2D",
+      "status": "NOT CONVERGED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "2PL_EFA_2D",
+        "model": "2PL",
+        "q": 2,
+        "k": 10,
+        "pattern": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "correlated": false,
+        "covariance_mode": "pair",
+        "exploratory": true,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,4,5,6,7,8,9,10\nF2 = 2,3,4,5,6,7,8,9,10",
+        "N": 400,
+        "seed": 20261134,
+        "n_quadpts": 15,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "12f576c597c77570c4b82ed6fc387e7a7a4571a18ee1b4de2a7d1d1167b6e45a"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 3.3306690738754696e-16,
+          "mean_absolute": 9.555435146838913e-17,
+          "max_relative": 5.005652717594125e-16,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 2.636779683484747e-16,
+          "mean_absolute": 1.1402915648754212e-16,
+          "max_relative": 2.401281260491321e-15,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 3.469446951953614e-16,
+          "mean_absolute": 3.93221682582986e-18,
+          "max_relative": 8.613972866408965e-15,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -2428.625114205871,
+        "AIC": 4915.250228411742,
+        "BIC": 5031.002700277873,
+        "n_parameters": 29,
+        "iterations": 988
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "2PL",
+        "dimensions": 2,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": false,
+        "logLik": -2428.62511404805,
+        "AIC": 4915.2502280961,
+        "BIC": 5031.00269996224,
+        "iterations": 1000,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "PASS",
+          "max_absolute": 0.00005456046096774525,
+          "mean_absolute": 0.00002880073016370277,
+          "max_relative": 0.00011273755491543027,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "PASS",
+          "max_absolute": 0.000025203539845808365,
+          "mean_absolute": 0.000004695215703860722,
+          "max_relative": 0.00006365789730383851,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.00003941890347070043,
+          "mean_absolute": 0.00000796914634800528,
+          "max_relative": 0.00016223886698230896,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.00005028429370090848,
+          "mean_absolute": 0.000006824002113764997,
+          "max_relative": 0.00031876674930121857,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.000029857917532682965,
+          "mean_absolute": 0.00001394859333812208,
+          "max_relative": 0.0002049344119660668,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.000016258152619852417,
+          "mean_absolute": 0.0000073523702395737744,
+          "max_relative": 0.000026721419365982787,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 1.578191586304456e-7,
+          "mean_absolute": 1.578191586304456e-7,
+          "max_relative": 6.498292293335294e-11,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 1.8189894035458565e-12,
+          "mean_absolute": 1.8189894035458565e-12,
+          "max_relative": 7.489790799840452e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -2428.625114205871,
+        "R": -2428.6251140480517
+      }
+    },
+    {
+      "profile": "GRM_EFA_2D",
+      "status": "NUMERICAL DISAGREEMENT / NOT CERTIFIED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "GRM_EFA_2D",
+        "model": "GRM",
+        "q": 2,
+        "k": 10,
+        "pattern": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        "correlated": false,
+        "covariance_mode": "pair",
+        "exploratory": true,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,4,5,6,7,8,9,10\nF2 = 2,3,4,5,6,7,8,9,10",
+        "N": 400,
+        "seed": 20261145,
+        "n_quadpts": 15,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "b544e67911b4bd9d621ac3328d086410a802b58163466b7c25d187b61ba0d728"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 4.718447854656915e-16,
+          "mean_absolute": 1.3769728991290068e-16,
+          "max_relative": 2.0384246425953288e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 4.440892098500626e-16,
+          "mean_absolute": 2.687664905446733e-16,
+          "max_relative": 2.273378482504001e-15,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 3.469446951953614e-16,
+          "mean_absolute": 3.93221682582986e-18,
+          "max_relative": 8.613972866408965e-15,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -4814.053729707533,
+        "AIC": 9726.107459415067,
+        "BIC": 9921.689222223358,
+        "n_parameters": 49,
+        "iterations": 470
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "GRM",
+        "dimensions": 2,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": true,
+        "logLik": -4814.05372640335,
+        "AIC": 9726.1074528067,
+        "BIC": 9921.68921561499,
+        "iterations": 568,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "PASS",
+          "max_absolute": 0.0005756028108776512,
+          "mean_absolute": 0.00024998780039528213,
+          "max_relative": 0.0018083622819965726,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "PASS",
+          "max_absolute": 0.00027751026909594856,
+          "mean_absolute": 0.000047634033653980446,
+          "max_relative": 0.01016964936355644,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "FAIL",
+          "max_absolute": 0.0003486574929988384,
+          "mean_absolute": 0.000050052349237645755,
+          "max_relative": 0.0018199775314354935,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.00046815825864920946,
+          "mean_absolute": 0.00009391694012494974,
+          "max_relative": 0.004405469709299663,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.00028991821959600816,
+          "mean_absolute": 0.00012506434172013394,
+          "max_relative": 0.017802769585060163,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.00012750772066161264,
+          "mean_absolute": 0.00008923690297439786,
+          "max_relative": 0.0002644006618700013,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 0.000003304183337604627,
+          "mean_absolute": 0.000003304183337604627,
+          "max_relative": 6.863619567049088e-10,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -4814.053729707533,
+        "R": -4814.05372640335
+      }
+    },
+    {
+      "profile": "GPCM_5D",
+      "status": "NUMERICAL DISAGREEMENT / NOT CERTIFIED",
+      "R_execution": "CALIBRATION EXECUTED",
+      "Python_execution": "EXECUTED",
+      "settings": {
+        "name": "GPCM_5D",
+        "model": "GPCM",
+        "q": 5,
+        "k": 17,
+        "pattern": [
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "correlated": false,
+        "covariance_mode": "pair",
+        "exploratory": false,
+        "groups": null,
+        "syntax": "F1 = 1,2,3,16,17\nF2 = 4,5,6,16,17\nF3 = 7,8,9,16,17\nF4 = 10,11,12,16,17\nF5 = 13,14,15,16,17",
+        "N": 200,
+        "seed": 20261134,
+        "n_quadpts": 5,
+        "max_iter": 1000,
+        "tol": 1e-7,
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "ee13e3dd0fa63aef397d301d0564f197cc25151bf95ebb0db847383cec88694b"
+      },
+      "preflight": {
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 6.106226635438361e-16,
+          "mean_absolute": 1.437889027221604e-16,
+          "max_relative": 2.65464612671608e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 8.881784197001252e-16,
+          "mean_absolute": 3.1995548858086e-17,
+          "max_relative": 2.4419926103087755e-15,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 2.7755575615628914e-17,
+          "mean_absolute": 2.0003967336646796e-19,
+          "max_relative": 4.825923926174154e-15,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "engine": "Python mirt 1.2.0",
+        "python": "3.11.17",
+        "converged": true,
+        "logLik": -4168.479307048937,
+        "AIC": 8488.958614097874,
+        "BIC": 8739.630733955524,
+        "n_parameters": 76,
+        "iterations": 346
+      },
+      "R": {
+        "version": "1.48",
+        "R": "R version 4.6.1 (2026-06-24)",
+        "model": "GPCM",
+        "dimensions": 5,
+        "execution": "CALIBRATION",
+        "source_free_parameters": "NA",
+        "converged": true,
+        "logLik": -4168.47929937483,
+        "AIC": 8488.95859874967,
+        "BIC": 8739.63071860732,
+        "iterations": 162,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1
+          ]
+        ],
+        "orientation": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "constraints_valid": true,
+        "information_reference": "R mirt iteminfo matrix"
+      },
+      "comparison": {
+        "slopes": {
+          "status": "FAIL",
+          "max_absolute": 0.0011347275223156927,
+          "mean_absolute": 0.00011182675641421411,
+          "max_relative": 0.0006294914564818823,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "intercepts": {
+          "status": "FAIL",
+          "max_absolute": 0.0017200784293760485,
+          "mean_absolute": 0.0001712864143178444,
+          "max_relative": 0.001686514037602784,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "FAIL",
+          "max_absolute": 0.0002105643866660012,
+          "mean_absolute": 0.000012402740329748658,
+          "max_relative": 0.024812125574241686,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "FAIL",
+          "max_absolute": 0.0031783899415938066,
+          "mean_absolute": 0.00003348763362550907,
+          "max_relative": 0.005663270346298772,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.0005227491025969755,
+          "mean_absolute": 0.00005865233130987954,
+          "max_relative": 0.0022292287048866094,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.00034251218495134905,
+          "mean_absolute": 0.000038115557224800004,
+          "max_relative": 0.001010770809696578,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 0.000007674104381294455,
+          "mean_absolute": 0.000007674104381294455,
+          "max_relative": 1.8409841613745028e-9,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 2.7284841053187847e-12,
+          "mean_absolute": 2.7284841053187847e-12,
+          "max_relative": 6.5455143455504e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -4168.479307048937,
+        "R": -4168.479299374832
+      }
+    }
+  ]
+}

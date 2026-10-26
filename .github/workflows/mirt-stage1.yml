@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - 'core/irt_multidim.py'
+      - 'ui/irt_multidim_view.py'
+      - 'reports/irt_multidim_report.py'
+      - 'tests/test_mirt_stage1.py'
+      - 'tests/test_mirt_multidim_ui.py'
       - 'validation/mirt_stage1/**'
       - '.github/workflows/mirt-stage1.yml'
   workflow_dispatch:
@@ -38,17 +42,17 @@ jobs:
           cache-version: 2
       - name: Python dependencies (existing environment specification)
         run: python -m pip install -r requirements.txt 'mirt==1.2.0'
-      - name: Focused no-calibration checks
-        run: python -m pytest -q tests/test_mirt_stage1.py
+      - name: Focused API, mathematical and actual Streamlit checks
+        run: python -m pytest -q tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py
       - name: Reuse retained converged fits (no recalibration)
         uses: actions/download-artifact@v4
         with:
-          name: mirt-stage1-abe435663c32af99ae063e7114cc03d248d7b8af-40383677441
-          run-id: 40383677441
+          name: mirt-stage1-3d26e996889cd325c6f887928dc12cb2fae21ed9-40394398251
+          run-id: 40394398251
           github-token: ${{ github.token }}
           path: original-evidence
       - name: Retain Stage 1; independent expansion preflights and pairs (no retries)
-        run: python validation/mirt_stage1/compare.py --output validation-output/mirt-stage1 --reuse original-evidence/mirt-stage1 --expand
+        run: python validation/mirt_stage1/compare.py --output validation-output/mirt-stage1 --reuse original-evidence/mirt-stage1 --expand --refine-failed
       - name: Compact diagnostics even after failure
         if: always()
         shell: bash

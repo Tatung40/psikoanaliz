@@ -87,7 +87,7 @@ def _canonical(f,covariance,pattern,model):
  return f,covariance,signs
 
 
-def fit(data,model,pattern,*,correlated=False,n_quadpts=15,max_iter=1000,tol=1e-7,labels=None,exploratory=False):
+def fit(data,model,pattern,*,correlated=False,n_quadpts=15,max_iter=1000,tol=1e-7,labels=None,exploratory=False,start_values=None):
  import mirt
  if model not in MODELS:raise ValueError('Desteklenmeyen MIRT ailesi')
  data=pd.DataFrame(data);groups=None
@@ -117,7 +117,7 @@ def fit(data,model,pattern,*,correlated=False,n_quadpts=15,max_iter=1000,tol=1e-
  covariance=np.eye(q)
  if model=='Bifactor':
   result=mirt.bfactor(x,groups,n_quadpts=n_quadpts,max_iter=max_iter,tol=tol,compute_standard_errors=False,
-   start_values=dict(general_loadings=np.full(len(x.columns),.7),specific_loadings=np.full(len(x.columns),.5),intercepts=np.zeros(len(x.columns))))
+   start_values=start_values if start_values is not None else dict(general_loadings=np.full(len(x.columns),.7),specific_loadings=np.full(len(x.columns),.5),intercepts=np.zeros(len(x.columns))))
  elif model=='NRM':
   from mirt.models.polytomous import NominalResponseModel
   from mirt.estimation.latent_density import FactorCovarianceDensity
@@ -132,7 +132,7 @@ def fit(data,model,pattern,*,correlated=False,n_quadpts=15,max_iter=1000,tol=1e-
    density=FactorCovarianceDensity(q,free=free)
   estimator=mirt.EMEstimator(**settings,latent_density=density,compute_standard_errors=False,
    item_optim_ftol=1e-10,item_optim_maxiter=200)
-  result=estimator.fit(engine,x.to_numpy(),start=dict(slopes=nominal_start(pattern,len(labels)),intercepts=np.zeros((x.shape[1],len(labels)))))
+  result=estimator.fit(engine,x.to_numpy(),start=start_values if start_values is not None else dict(slopes=nominal_start(pattern,len(labels)),intercepts=np.zeros((x.shape[1],len(labels)))))
  else:
   unit=model in ('Rasch','1PL (a=1)','PCM');binary=model in ('2PL','Rasch','1PL (a=1)')
   family='2PL' if binary else 'GRM' if model=='GRM' else 'GPCM'
@@ -141,7 +141,7 @@ def fit(data,model,pattern,*,correlated=False,n_quadpts=15,max_iter=1000,tol=1e-
   start={key:slopes,'intercepts':np.zeros(len(pattern))} if binary else {
    key:slopes,'thresholds' if model=='GRM' else 'steps':np.tile(np.linspace(-1,1,len(labels)-1),(len(pattern),1))}
   result=mirt.fit_mirt(x,model=family,spec=mirt.mirt_model(syntax,item_names=list(x.columns)),
-   n_factors=q,n_categories=len(labels) if not binary else None,start_values=start,
+   n_factors=q,n_categories=len(labels) if not binary else None,start_values=start_values if start_values is not None else start,
    fixed={key:True} if unit else None,priors=None,compute_standard_errors=False,accelerate='none',**settings)
   actual=np.asarray(result.model.parameters[key])
   if np.any(actual[~pattern]!=0) or np.any(actual[pattern]<=0):raise ValueError('Yük yapısı/işaret tanımlaması bozuldu')
@@ -156,7 +156,7 @@ def fit(data,model,pattern,*,correlated=False,n_quadpts=15,max_iter=1000,tol=1e-
 
 
 def report(outcome,person_ids=None):
- import mirt
+ import mirt,platform
  f=outcome['fit'];x=outcome['coded'];q=outcome['pattern'].shape[1];k=x.shape[1]
  covariance=outcome['covariance'];params=f.model.parameters
  if outcome['model']=='NRM':
@@ -175,12 +175,28 @@ def report(outcome,person_ids=None):
     table[f'b{j+1}']=params[key][:,j];table[f'd{j+1}']=-a.sum(1)*params[key][:,j]
  frames={'Parameters':table if outcome['model']=='NRM' else table.reset_index(names='Item'),
   'Pattern':pd.DataFrame(outcome['pattern'].astype(int),index=x.columns,columns=[f'F{j+1}' for j in range(q)]).reset_index(names='Item'),
-  'Covariance':pd.DataFrame(covariance,columns=[f'F{j+1}' for j in range(q)]).reset_index(names='Factor')}
- metadata=dict(Model=outcome['model'],Status=STATUS,Engine='Python mirt '+mirt.__version__,
+  'Covariance':pd.DataFrame(covariance,index=[f'F{j+1}' for j in range(q)],columns=[f'F{j+1}' for j in range(q)]).reset_index(names='Factor')}
+ metadata=dict(Model=outcome['model'],Status=STATUS,Engine='Python mirt '+mirt.__version__,Python=platform.python_version(),Estimation='Marginal ML; no item priors',
+  Identification='Zero means, unit latent variances; declared structural zeros; canonical sign gauge',
+  Stopping='Python EM: absolute observed marginal logLik change < tol; not a gradient test',
   N=len(x),Items=k,Dimensions=q,Converged=bool(f.converged),Iterations=f.n_iterations,LogLik=f.log_likelihood,
   AIC=f.aic,BIC=f.bic,Parameters=f.n_parameters,Syntax=outcome['syntax'],Labels=outcome['labels'],
   Orientation=outcome.get('orientation'),Exploratory=outcome.get('exploratory',False),SE='disabled: multidimensional auto complete_data is not observed-information SE',
   Limitations=LIMITATION,**outcome['settings'])
+ metadata['Gradient_diagnostics']='Not exposed by public FitResult; no stationarity/global-optimum claim'
+ from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS
+ boundary=[]
+ masks=f.model.free_parameter_masks
+ for key,value in params.items():
+  value=np.asarray(value);lower,upper=_ITEM_PARAMETER_BOUNDS.get(key,(-6.,6.))
+  for index in np.ndindex(value.shape):
+   if not masks[key][index]:continue
+   v=float(value[index]);gap=min(v-lower,upper-v)
+   boundary.append(dict(Parameter=key,Coordinate=str(index),Value=v,Lower=lower,Upper=upper,
+    Distance_to_bound=gap,At_bound=bool(gap<=np.sqrt(np.finfo(float).eps)*max(1,abs(v)))))
+ frames['Boundaries']=pd.DataFrame(boundary)
+ frames['Categories']=pd.DataFrame([dict(Item=item,Code=c,Label=str(label),Frequency=int((x[item]==c).sum())) for item in x for c,label in enumerate(outcome['labels'])])
+ metadata['At_box_bound']=any(row['At_bound'] for row in boundary)
  frames['Summary']=pd.DataFrame([dict(Setting=n,Value=str(v)) for n,v in metadata.items()])
  if not f.converged:return dict(metadata=metadata,tables=frames)
  ids=list(x.index) if person_ids is None else list(person_ids)
@@ -207,7 +223,7 @@ def report(outcome,person_ids=None):
  np.testing.assert_allclose(total,information.sum(1),atol=1e-10)
  rows=[]
  for n,matrix in enumerate(total):
-  eig=np.linalg.eigvalsh(matrix);stable=eig.min()>np.finfo(float).eps*q*max(eig.max(),1)
+  eig=np.linalg.eigvalsh(matrix);stable=eig.min()>np.sqrt(np.finfo(float).eps)*max(eig.max(),1)
   sem=np.sqrt(np.diag(np.linalg.solve(matrix,np.eye(q)))) if stable else np.full(q,np.nan)
   rows.append(dict(Node=n,Theta1=grid[n,0],Theta2=grid[n,1],Stable=bool(stable),**{f'Joint_Fisher_SEM_F{j+1}':sem[j] for j in range(q)}))
  frames['SEM']=pd.DataFrame(rows)

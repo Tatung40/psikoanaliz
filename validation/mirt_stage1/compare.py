@@ -58,7 +58,7 @@ def likelihood(data,p,weight):
  return float(logsumexp(log+np.log(weight),axis=1).sum())
 
 
-def inputs(name,out):
+def inputs(name,out,refine_from=None):
  cfg=profile(name);out.mkdir(parents=True,exist_ok=True);q=cfg['q'];pattern=np.array(cfg['pattern'])
  from mirt.models.multidimensional import MultidimensionalModel
  from mirt.models.polytomous import GradedResponseModel,GeneralizedPartialCredit,NominalResponseModel
@@ -83,6 +83,24 @@ def inputs(name,out):
  data=pd.DataFrame(mirt.simdata(model=engine,n_persons=cfg['N'],theta=theta,seed=cfg['seed']),columns=[f'M{i+1}' for i in range(cfg['k'])])
  data.to_csv(out/'data.csv',index=False)
  cfg['data_sha256']=hashlib.sha256((out/'data.csv').read_bytes()).hexdigest()
+ if refine_from is not None:
+  source=refine_from/name;old=json.loads((source/'report.json').read_text())
+  if old['settings']['data_sha256']!=cfg['data_sha256'] or old['settings']['criteria_sha256']!=cfg['criteria_sha256']:raise ValueError('Refinement data/criteria mismatch')
+  shutil.copy2(source/'report.json',out/'original_report.json')
+  shutil.copy2(source/'python_parameters.npz',out/'python_start.npz')
+  values=dict(np.load(out/'python_start.npz'));values.pop('covariance',None);engine.set_parameters(**values)
+  cfg.update(max_iter=3000,tol=1e-9,initialization='Saved complete Python item solution; latent covariance reset to identity in BOTH engines',
+   source_run=40394398251,start_sha256=hashlib.sha256((out/'python_start.npz').read_bytes()).hexdigest())
+  a=engine.get_loading_matrix() if model=='Bifactor' else values['slopes' if model in BINARY or model=='NRM' else 'discrimination']
+  if model=='NRM':
+   table=pd.DataFrame(a.reshape(-1,q),columns=[f'a{j+1}' for j in range(q)]);table['d']=values['intercepts'].reshape(-1)
+  else:
+   table=pd.DataFrame(a,columns=[f'a{j+1}' for j in range(q)])
+   if model in BINARY:table['d']=values['intercepts']
+   else:
+    d=-a.sum(1)[:,None]*values['thresholds' if model=='GRM' else 'steps']
+    for c in range(3):table[f'd{c+1}']=d[:,c]
+  table.to_csv(out/'start.csv',index=False,float_format='%.17g')
  (out/'settings.json').write_text(json.dumps(cfg,indent=2)+'\n')
  grid=GaussHermiteQuadrature(cfg['n_quadpts'],q)
  pd.DataFrame(np.column_stack((grid.nodes,grid.weights)),columns=[f'T{i+1}' for i in range(q)]+['weight']).to_csv(out/'integration.csv',index=False,float_format='%.17g')
@@ -111,8 +129,8 @@ def arrays(directory,cfg):
  return p,info
 
 
-def run(name,out):
- criteria=json.loads((ROOT/'criteria.json').read_text());cfg,data,engine,grid=inputs(name,out)
+def run(name,out,refine_from=None):
+ criteria=json.loads((ROOT/'criteria.json').read_text());cfg,data,engine,grid=inputs(name,out,refine_from)
  result=dict(profile=name,status='BLOCKED',R_execution='NOT EXECUTED',Python_execution='NOT EXECUTED',settings=cfg)
  try:
   if not shutil.which('Rscript'):raise RuntimeError('Independent R runtime unavailable')
@@ -120,10 +138,11 @@ def run(name,out):
   result['R_execution']='PREFLIGHT ATTEMPTED'
   pre=r_run(out,'preflight');result['R_execution']='FIXED PARAMETER PREFLIGHT EXECUTED'
   unit=cfg['model'] in ('Rasch','PCM');start_a=np.array(cfg['pattern'])*(1 if unit else 1.2)
-  if cfg['model']=='Bifactor':engine.set_parameters(general_loadings=np.full(cfg['k'],.7),specific_loadings=np.full(cfg['k'],.5),intercepts=np.zeros(cfg['k']))
-  elif cfg['model'] in BINARY:engine.set_parameters(slopes=start_a,intercepts=np.zeros(cfg['k']))
-  elif cfg['model']=='NRM':engine.set_parameters(slopes=nominal_start(cfg['pattern'],4),intercepts=np.zeros((cfg['k'],4)))
-  else:engine.set_parameters(**{'discrimination':start_a,'thresholds' if cfg['model']=='GRM' else 'steps':np.tile(np.linspace(-1,1,3),(cfg['k'],1))})
+  if refine_from is None:
+   if cfg['model']=='Bifactor':engine.set_parameters(general_loadings=np.full(cfg['k'],.7),specific_loadings=np.full(cfg['k'],.5),intercepts=np.zeros(cfg['k']))
+   elif cfg['model'] in BINARY:engine.set_parameters(slopes=start_a,intercepts=np.zeros(cfg['k']))
+   elif cfg['model']=='NRM':engine.set_parameters(slopes=nominal_start(cfg['pattern'],4),intercepts=np.zeros((cfg['k'],4)))
+   else:engine.set_parameters(**{'discrimination':start_a,'thresholds' if cfg['model']=='GRM' else 'steps':np.tile(np.linspace(-1,1,3),(cfg['k'],1))})
   trace=pd.read_csv(out/'trace.csv').to_numpy();p,I=native_outputs(engine,trace);rp,rI=arrays(pre,cfg)
   cov=np.eye(cfg['q'])
   if cfg['correlated']:
@@ -134,7 +153,7 @@ def run(name,out):
   result['preflight']=checks
   if any(c['status']!='PASS' for c in checks.values()):raise RuntimeError('NOT COMPARABLE: fixed-parameter mapping/weights failed; no calibration attempted')
   result['Python_execution']='CALIBRATION ATTEMPTED'
-  outcome=fit(data,cfg['model'],cfg['groups'] if cfg['model']=='Bifactor' else cfg['pattern'],correlated=cfg['correlated'],exploratory=cfg.get('exploratory',False),labels=['0','1','2','3'] if cfg['model']=='NRM' else None,n_quadpts=cfg['n_quadpts'],max_iter=cfg['max_iter'],tol=cfg['tol'])
+  outcome=fit(data,cfg['model'],cfg['groups'] if cfg['model']=='Bifactor' else cfg['pattern'],correlated=cfg['correlated'],exploratory=cfg.get('exploratory',False),labels=['0','1','2','3'] if cfg['model']=='NRM' else None,start_values={k:v for k,v in np.load(out/'python_start.npz').items() if k!='covariance'} if refine_from else None,n_quadpts=cfg['n_quadpts'],max_iter=cfg['max_iter'],tol=cfg['tol'])
   f=outcome['fit'];result['Python_execution']='EXECUTED'
   np.savez(out/'python_parameters.npz',**f.model.parameters,covariance=outcome['covariance'])
   py=dict(engine='Python mirt '+mirt.__version__,python=platform.python_version(),converged=bool(f.converged),logLik=f.log_likelihood,AIC=f.aic,BIC=f.bic,n_parameters=f.n_parameters,iterations=f.n_iterations)
@@ -199,8 +218,8 @@ def recover(name,prior,out):
 
 
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);parser.add_argument('--expand',action='store_true');args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);parser.add_argument('--expand',action='store_true');parser.add_argument('--refine-failed',action='store_true');args=parser.parse_args()
  names=PHASE1+EXPANSION if args.expand else PHASE1
- reports=[recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else run(name,args.output/name) for name in names]
+ reports=[recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else run(name,args.output/name,args.reuse if args.refine_failed else None) for name in names]
  print(json.dumps([dict(profile=r['profile'],status=r['status'],blocker=r.get('blocker')) for r in reports],indent=2))
  sys.exit(0 if all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 1)

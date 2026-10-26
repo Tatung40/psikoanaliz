@@ -235,6 +235,8 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
         st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
                   use_container_width=True,on_click=navigate_to,args=("MTK: 3PL/4PL Bootstrap DIF",))
+    st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
+              on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
     with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
@@ -1200,6 +1202,10 @@ elif selected_page == "12. Kullanım Kılavuzu":
 # =============================================================================
 # SAYFA 14: RASCH ANALİZİ (İKİLİ, MML)
 # =============================================================================
+elif selected_page == "Çok Boyutlu MTK (MIRT)":
+    from ui.irt_multidim_view import render as render_multidim
+    render_multidim(st.session_state.raw_df, st.session_state.item_cols, st.session_state.id_col)
+
 elif selected_page == "MTK: Python mirt DIF":
     from ui.python_mirt_dif_view import render as render_python_mirt_dif
     render_python_mirt_dif(st.session_state.raw_df,st.session_state.item_cols,

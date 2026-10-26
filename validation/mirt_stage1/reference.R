@@ -54,10 +54,12 @@ same_attributes<-function(x,expected){
 }
 capture.output(dput(native_attributes),file=file.path(out,'parameter_table_attributes.txt'))
 stopifnot(is.data.frame(sv),all(sv$prior.type=='none'))
+warm<-if(file.exists(file.path(root,'start.csv')))read.csv(file.path(root,'start.csv')) else NULL
 A<-matrix(0,0,nrow(sv))
 for(i in seq_len(J)){
  ai<-which(sv$item==colnames(dat)[i] & grepl('^a[1-5]$',sv$name));stopifnot(length(ai)==Q)
  a0<-if(cfg$model=='Bifactor')pattern[i,]*c(.7,rep(.5,Q-1)) else pattern[i,]*(if(unit || nominal)1 else 1.2)
+ if(!is.null(warm) && !nominal)a0<-as.numeric(unlist(warm[i,paste0('a',seq_len(Q))],use.names=FALSE))
  sv$value[ai]<-a0;sv$est[ai]<-pattern[i,]!=0 & !unit & !nominal
  sv$lbound[ai]<-ifelse(pattern[i,]!=0,if(cfg$model=='Bifactor')-6 else .1,0)
  sv$ubound[ai]<-ifelse(pattern[i,]!=0,if(cfg$model=='Bifactor')6 else 5,0)
@@ -84,6 +86,11 @@ for(i in seq_len(J)){
   }
   if(graded)for(c in seq_len(length(ds)-1)){row<-numeric(nrow(sv));row[ai]<-1e-6;row[ds[c+1]]<-1;row[ds[c]]<- -1;A<-rbind(A,row)}
  }
+ if(!is.null(warm)){
+  if(nominal){rows<-((i-1)*4+1):(i*4);sv$value[ak]<-as.vector(as.matrix(warm[rows,paste0('a',seq_len(Q)),drop=FALSE]));sv$value[ds]<-warm$d[rows]}
+  else if(binary)sv$value[ds]<-warm$d[i]
+  else {d<-as.numeric(unlist(warm[i,paste0('d',1:3)],use.names=FALSE));sv$value[ds]<-if(graded)d else c(0,cumsum(d))}
+ }
 }
 if(!correlated){
  sv$value[grepl('^MEAN_',sv$name)]<-0;covs<-which(grepl('^COV_',sv$name))
@@ -105,7 +112,7 @@ technical<-list(NCYCLES=if(mode!='fit')1 else cfg$max_iter,customTheta=nodes,sto
 if(!correlated)technical$customPriorFun<-function(Theta,Etable)grid$weight
 opts<-c(base,list(pars=sv,method='EM',SE=FALSE,accelerate='none',TOL=cfg$tol,technical=technical))
 if(mode=='fit'){
- opts$optimizer<-'nloptr';nl<-list(lb=sv$lbound[free],ub=sv$ubound[free],opts=list(algorithm='NLOPT_LD_SLSQP',xtol_rel=1e-8,maxeval=1000))
+ opts$optimizer<-'nloptr';nl<-list(lb=sv$lbound[free],ub=sv$ubound[free],opts=list(algorithm=if(nominal)'NLOPT_LN_BOBYQA' else 'NLOPT_LD_SLSQP',xtol_rel=1e-8,maxeval=1000))
  if(nrow(A)){nl$eval_g_ineq<-callback;nl$eval_jac_g_ineq<-jac};opts$nloptr_args<-nl
 }
 capture.output(dput(attributes(sv)),file=file.path(out,'configured_attributes.txt'))
@@ -167,6 +174,7 @@ for(i in seq_len(J)){
   pars[[i]]<-as.data.frame(as.list(c(setNames(a,paste0('a',seq_len(Q))),setNames(d,if(binary)'d' else paste0('d',seq_along(d))))))
  }
 }
+meta$optimizer<-if(nominal)'R nloptr BOBYQA: native matrix score derivatives are absent in mirt 1.48' else 'R nloptr SLSQP'
 meta$information_reference<-if(nominal)'R native gpcm_mats probabilities + checked two-step numerical Fisher' else 'R mirt iteminfo matrix'
 write.csv(do.call(rbind,curves),file.path(out,'probabilities.csv'),row.names=FALSE)
 write.csv(do.call(rbind,information),file.path(out,'information.csv'),row.names=FALSE)
