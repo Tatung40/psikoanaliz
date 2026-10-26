@@ -7,7 +7,7 @@ from core.irt_python_mirt_adapter import fit_python_mirt
 from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
-from core.irt_person_abilities import person_abilities
+from core.irt_person_abilities import person_abilities, library_person_abilities
 
 
 def _data_fingerprint(frame):
@@ -38,8 +38,11 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             'comparison':'Aynı veri üzerinde model karşılaştırması (ML AIC/BIC)',
             'itemfit':'Madde uyumu: Infit, Outfit, S-X² (kütüphane API)',
         }
-        outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
+        outputs={name:st.checkbox(label,value=not(model=='NRM' and name=='itemfit'),disabled=model=='NRM' and name=='itemfit',key=f'python_mirt_output_{model}_{name}')
                  for name,label in output_names.items()}
+    if model=='NRM':
+        st.caption('NRM nominaldir: Infit/Outfit/S-X² ve ordinal Wright Map bu profilde doğrulanmadığı için sunulmaz.')
+        st.checkbox('Wright Map — NRM için uygulanmaz',value=False,disabled=True,key='python_mirt_wright_NRM')
     with st.expander('Gelişmiş kestirim ayarları — motor yetenekleri',expanded=False):
         st.info('Python mirt 1.2.0 adaptöründe iterasyon, tolerans ve quadrature için doğrulanmış kamuya açık parametre eşlemesi henüz yoktur. Bu ayarlar etkisiz kaydırıcılar olarak gösterilmez; kütüphane varsayılanları korunur.')
         st.caption('Öneri: başlangıçta motorun belgelenmiş varsayılanlarını koruyun. Yakınsama başarısızsa veriyi, tanımlanabilirliği ve model karmaşıklığını inceleyin. Desteklenen sayısal ayarlar API doğrulamasından sonra açılacaktır.')
@@ -131,7 +134,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     else:st.error('Yakınsama durumu doğrulanamadı; sonuç kesinleştirilemez.')
     for warning in report.warnings:st.warning(warning)
     for error in report.errors:st.error(error)
-    if outputs['itemfit']:
+    if outputs['itemfit'] and model!='NRM':
         st.markdown('### Madde uyumu — Python mirt itemfit')
         st.caption('Infit ve Outfit MNSQ, S-X²: Python mirt 1.2.0 kamuya açık itemfit API. Yalnızca yakınsamış modelde gösterilir. Model ailesine göre istatistik desteği değişebilir; desteklenmeyen sonuçlar uydurulmaz.')
         if report.metadata.get('Yakınsama') is not True or report.errors:
@@ -160,7 +163,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
     if outputs['persons']:
         st.markdown('### Birey Yetenek Kestirimleri (θ)')
-        st.caption('N(0,1) önseli üzerinden EAP; SH(θ) posterior SS’dir, bilgi fonksiyonu SEM’i değildir. '+('GPCM: tam normal GH61 quadrature.' if model=='GPCM' else '161 noktalı [-4,4] ızgara.'))
+        st.caption('N(0,1) önseli üzerinden EAP; SH(θ) posterior SS’dir, bilgi fonksiyonu SEM’i değildir. '+('Tam normal GH61 quadrature.' if model in ('GPCM','NRM') else '161 noktalı [-4,4] ızgara.'))
         if model=='NRM':st.caption('Nominal kategori kodlarının toplamı başarı puanı değildir; ham puan boş bırakılır.')
     if outputs['persons'] and (report.metadata.get('Yakınsama') is not True or report.errors):
         st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
@@ -174,8 +177,9 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                 q=GaussHermiteQuadrature(n_points=61,n_dimensions=1)
                 quadrature=(q.nodes[:,0],q.weights)
                 ability_curves=fitted_category_curves(dict(result=saved['outcome'].fit,k=len(cols),items=cols,labels=labels),q.nodes[:,0])
-            people=person_abilities(x,ability_curves,model=model,identifiers=ids,
-                item_names=cols,category_labels=labels or ('0','1'),quadrature=quadrature)
+            people=(library_person_abilities(saved['outcome'].fit,x,model=model,identifiers=ids) if model=='NRM' else
+                person_abilities(x,ability_curves,model=model,identifiers=ids,
+                    item_names=cols,category_labels=labels or ('0','1'),quadrature=quadrature))
             st.dataframe(safe_frame(people).round(4),hide_index=True,use_container_width=True)
             st.download_button('Birey yetenekleri — CSV',_csv(people),
                                f'{model}_person_theta.csv','text/csv',

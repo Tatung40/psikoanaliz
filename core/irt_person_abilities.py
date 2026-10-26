@@ -65,3 +65,20 @@ def person_abilities(responses, curves, *, model, identifiers=None, item_names=N
         out[i]=mean,np.sqrt(w@((grid-mean)**2))
     return pd.DataFrame({'Birey':ids.to_numpy(),'Ham puan':x.sum(1).astype(int) if model!='NRM' else pd.NA,
         'Yetenek (θ)':out[:,0],'SH (θ)':out[:,1],'Yöntem':'EAP','Model':model})
+
+
+def library_person_abilities(fit, responses, *, model, identifiers=None):
+    """Use the supported mirt scoring API; nominal category codes are not scores."""
+    import mirt
+    x=np.asarray(responses,float)
+    if not fit.converged or x.ndim!=2 or not np.isfinite(x).all() or np.any(x<0) or not np.array_equal(x,np.floor(x)):
+        raise ValueError('Yakınsamış model ve geçerli kategori kodları gerekli.')
+    ids=pd.Series(list(identifiers) if identifiers is not None else np.arange(1,len(x)+1))
+    if len(ids)!=len(x) or ids.isna().any() or ids.duplicated().any():
+        raise ValueError('Kişi kimlikleri eksiksiz ve benzersiz olmalı.')
+    scores=mirt.fscores(fit,x.astype(int),method='EAP',n_quadpts=61,person_ids=ids.tolist())
+    theta=np.asarray(scores.theta).reshape(-1);sd=np.asarray(scores.standard_error).reshape(-1)
+    if not np.array_equal(scores.person_ids,ids) or theta.shape!=(len(x),) or sd.shape!=theta.shape or not np.isfinite(np.r_[theta,sd]).all() or np.any(sd<=0):
+        raise ValueError('Kütüphane kişi kestirimleri veya kimlik sırası geçersiz.')
+    return pd.DataFrame({'Birey':ids.to_numpy(),'Ham puan':pd.NA if model=='NRM' else x.sum(1),
+        'Yetenek (θ)':theta,'SH (θ)':sd,'Yöntem':'EAP','Model':model})

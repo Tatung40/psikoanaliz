@@ -110,7 +110,22 @@ def python_once(data,seed,model="GRM"):
     return fit,p,meta
 
 
+def run_r_process(command,output,timeout=1800):
+    """Shared failure-preserving R invocation for every model adapter."""
+    try:
+        r=subprocess.run(command,capture_output=True,text=True,timeout=timeout)
+        (output/'R_stdout.log').write_text(r.stdout);(output/'R_stderr.log').write_text(r.stderr)
+        return r
+    except subprocess.TimeoutExpired as e:
+        for name,value in [('R_stdout.log',e.stdout),('R_stderr.log',e.stderr)]:
+            (output/name).write_text(value.decode(errors='replace') if isinstance(value,bytes) else value or '')
+        raise
+
+
 def execute(preflight,output,allow_fit=False,rscript=None,model="GRM"):
+    if model=="NRM":
+        from validation.nrm_r_comparison import execute as execute_nrm
+        return execute_nrm(preflight,output,allow_fit,rscript)
     if model not in ("GRM","PCM","GPCM"):raise ValueError("Only GRM/PCM supported")
     preflight,output=Path(preflight).resolve(),Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     if (output/'fit_started').exists():raise ValueError('Retry refused: use of this fit attempt already recorded')
@@ -148,8 +163,7 @@ def execute(preflight,output,allow_fit=False,rscript=None,model="GRM"):
         result['trace_helper_sha256']=hashlib.sha256(trace.stdout.encode()).hexdigest()
         (output/'fit_started').write_text('One attempt only; no retries\n')
         command=[executable,str(ROOT/'validation/grm_r_comparison.R'),str(preflight),str(output),f'EXECUTE_{model}_ONCE',model]
-        r=subprocess.run(command,capture_output=True,text=True,timeout=1800)
-        (output/'R_stdout.log').write_text(r.stdout);(output/'R_stderr.log').write_text(r.stderr)
+        r=run_r_process(command,output)
         result['execution']['R']='EXECUTED'
         result['fit_calls']['R']=int((output/'R_fit_invoked').exists())
         if r.returncode:raise ValueError(f'R fit process exit {r.returncode}')
@@ -261,6 +275,6 @@ def execute(preflight,output,allow_fit=False,rscript=None,model="GRM"):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--preflight',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--execute',action='store_true');p.add_argument('--model',choices=['GRM','PCM','GPCM'],default='GRM')
+    p=argparse.ArgumentParser();p.add_argument('--preflight',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--execute',action='store_true');p.add_argument('--model',choices=['GRM','PCM','GPCM','NRM'],default='GRM')
     a=p.parse_args();r=execute(a.preflight,a.output,a.execute,model=a.model);print(r['status'])
     if r['status'] in ('FAIL','NOT CONVERGED'):raise SystemExit(1)

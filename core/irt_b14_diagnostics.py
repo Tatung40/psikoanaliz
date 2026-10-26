@@ -16,6 +16,9 @@ def _frame(value):
     raise ValueError("Diagnostic output cannot be interpreted reliably.")
 
 def model_diagnostics(result):
+    if result.get("model")=="NRM":
+        return pd.DataFrame([{"Tanı":"Nominal madde uyumu","Durum":"Doğrulanmış uygun API yok",
+            "Not":"Infit/Outfit ve toplam puan temelli S-X² nominal kategori kodlarına uygulanmaz; değer uydurulmaz."}]),{}
     import mirt
     responses=np.asarray(result["coded"],dtype=int)
     fit=result["result"]
