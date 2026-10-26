@@ -16,7 +16,8 @@
 import numpy as np
 import pandas as pd
 
-from core.irt import fit_irt
+from core.irt_python_mirt_adapter import fit_python_mirt
+from core.irt_python_mirt_parameters import python_mirt_binary_parameters
 from core.irt_itemfit import sx2_mirt_compatible
 from core.irt_q3 import q3_analysis
 from core.dimensionality import correlation_matrix, paf
@@ -90,9 +91,11 @@ def run(data, model="2PL", alpha=0.05, person_method="WLE", bootstrap=0, seed=20
     if not set(vals).issubset({0.0, 1.0}):
         raise ValueError("Bu ekran yalnızca 0/1 puanlanmış veriyi destekler; çok kategorili "
                          "modeller için S-X² uygulanmamıştır.")
-    fit = fit_irt(data, model=model)
-    items = fit["items"]
-    li = local_independence(data, items, model, person_method, bootstrap, seed, bool(fit["converged"]))
+    res = fit_python_mirt(data, model=model)           # birincil kalibrasyon motoru (Python mirt)
+    items = python_mirt_binary_parameters(res.fit, model=model, item_names=list(data.columns))
+    converged = bool(getattr(res.fit, "converged", True))
+    fit = {"converged": converged, "engine": res.engine, "engine_status": res.scientific_status}
+    li = local_independence(data, items, model, person_method, bootstrap, seed, converged)
     fit_tab, groups, certified = item_fit(data.dropna(), items, model, alpha) if data.notna().all().all() \
         else (None, {}, False)
     note = None if fit_tab is not None else "S-X² eksik veri içeren matriste hesaplanmaz (tam veri gerekir)."

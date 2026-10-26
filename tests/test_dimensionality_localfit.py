@@ -134,7 +134,7 @@ def test_misfitting_item_flagged_with_fdr():
 
 def test_3pl_inference_not_certified_and_polytomous_disabled():
     df = _sim2pl(800, np.full(8, 1.4), np.linspace(-1, 1, 8), 13)
-    tab, groups, cert = lf.item_fit(df, lf.fit_irt(df, "3PL")["items"], "3PL")
+    tab, groups, cert = lf.item_fit(df, lf.python_mirt_binary_parameters(lf.fit_python_mirt(df, model="3PL").fit, model="3PL", item_names=list(df.columns)), "3PL")
     assert not cert and (tab["Sertifika"] == lf.EXPERIMENTAL).all() and (tab["Karar"] == "Karar üretilmedi").all()
     with pytest.raises(ValueError):
         lf.run(pd.DataFrame(np.random.default_rng(0).integers(0, 4, (100, 5)).astype(float)), "2PL")

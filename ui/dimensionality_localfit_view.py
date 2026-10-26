@@ -193,6 +193,7 @@ def render_local_fit(data, item_cols):
         return
     if not res["fit"]["converged"]:
         st.warning("MTK kestirimi yakınsamadı; tanılar yorumlanırken dikkat edin.")
+    st.caption(f"Kalibrasyon motoru: {res['fit']['engine']} — durum: {res['fit']['engine_status']}")
     li = res["local"]; q3 = li["q3"]
     m = st.columns(3)
     m[0].metric("Ortalama Q3", f"{q3['mean_q3']:.3f}")
