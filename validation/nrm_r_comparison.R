@@ -19,7 +19,14 @@ for(i in seq_len(8L)) {
   sv$value[rows] <- c(1,A0[i,],D0[i,])
   sv$est[rows] <- c(FALSE,FALSE,rep(TRUE,3),FALSE,rep(TRUE,3))
 }
-stopifnot(identical(attributes(sv),original_attributes),identical(vapply(sv,class,character(1)),original_classes))
+# Reuse the proven native-table initializer rather than relying on data.frame
+# subassignment to retain mirt_df attribute order/representations.
+capture.output(list(before=original_attributes,after=attributes(sv)),file=file.path(out,"R_initialization_attributes.txt"))
+source("validation/grm_initial_values.R")
+saved_values <- sv$value;saved_est <- sv$est
+sv <- restore_grm_initial_values(x,sv,itemtype="nominal")
+stopifnot(identical(attributes(sv),original_attributes),identical(vapply(sv,class,character(1)),original_classes),
+          identical(sv$value,as.double(saved_values)),identical(sv$est,as.logical(saved_est)))
 free <- which(sv$est);stopifnot(length(free)==48,all(sv$prior.type=="none"))
 stopifnot(sv$value[sv$name=="MEAN_1"]==0,sv$value[sv$name=="COV_11"]==1,!any(sv$est[sv$name %in% c("MEAN_1","COV_11")]))
 lower <- ifelse(grepl("^ak",sv$name[free]),-5.,-6.);upper <- -lower
@@ -48,6 +55,7 @@ stopifnot(file.create(file.path(out,"R_fit_invoked")))
 fit <- mirt(x,1,itemtype="nominal",pars=sv,method="EM",quadpts=61,optimizer="nloptr",TOL=1e-8,accelerate="none",SE=FALSE,verbose=FALSE,
  technical=list(NCYCLES=3000,customTheta=matrix(grid$theta,ncol=1),customPriorFun=function(Theta,Etable) grid$weight,storeEMhistory=TRUE,storeEtable=TRUE),
  nloptr_args=list(lb=as.numeric(lower),ub=as.numeric(upper),opts=list(algorithm="NLOPT_LD_LBFGS",xtol_rel=1e-10,ftol_rel=1e-12,maxeval=3000)))
+source(file.path(out,"pr63_optimizer_trace.R"));write_optimizer_trace(fit,out)
 raw <- mod2values(fit);stopifnot(sum(raw$est)==48L);write.csv(raw,file.path(out,"R_raw_parameters.csv"),row.names=FALSE)
 AA <- DD <- matrix(0,8,4)
 for(i in seq_len(8L)) {

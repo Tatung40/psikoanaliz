@@ -1,5 +1,5 @@
 """NRM-specific adapter for PR72's independent reference workflow; no estimator."""
-import hashlib,importlib.metadata,json,shutil,sys
+import contextlib,hashlib,importlib.metadata,json,shutil,subprocess,sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -74,17 +74,23 @@ def execute(preflight,output,allow_fit=False,rscript=None):
             source_sha256={f:hashlib.sha256((ROOT/'validation'/f).read_bytes()).hexdigest() for f in ('nrm_r_comparison.py','nrm_r_comparison.R')})
         exe=rscript or shutil.which('Rscript')
         if not allow_fit or not exe:r['reason']='Actual R execution required';save();return r
+        trace=subprocess.run(['git','show',HARNESS_COMMIT+':validation/r_mirt_phase1/optimizer_trace.R'],cwd=ROOT,capture_output=True,text=True,check=True)
+        (out/'pr63_optimizer_trace.R').write_text(trace.stdout)
+        r['trace_helper_sha256']=hashlib.sha256(trace.stdout.encode()).hexdigest()
         (out/'fit_started').write_text('One fit per engine; no retry\n')
         r['execution']['R']='EXECUTED'
         reference=run_r_process([exe,str(ROOT/'validation/nrm_r_comparison.R'),str(pre),str(out),'EXECUTE_NRM_ONCE'],out)
         r['execution']['R']='EXECUTED';r['fit_calls']['R']=int((out/'R_fit_invoked').exists())
         if reference.returncode:raise ValueError(f'R process exit {reference.returncode}; see preserved stderr')
         r['R']=pd.read_csv(out/'R_metadata.csv').iloc[0].to_dict()
+        if str(r['R']['version'])!='1.48' or r['R']['mean']!=0 or r['R']['variance']!=1:raise ValueError('R metadata/specification mismatch')
         import mirt
         from mirt.estimation.em import EMEstimator,_PRECISE_ITEM_FTOL
         if _PRECISE_ITEM_FTOL!=1e-10:raise ValueError('Precise solver policy differs')
         r['execution']['python']='EXECUTED';r['fit_calls']['python']=1
-        fit=EMEstimator(n_quadpts=61,max_iter=3000,tol=1e-10,item_optim_ftol=_PRECISE_ITEM_FTOL,compute_standard_errors=False,item_priors=None,accelerate='none').fit(model,x.to_numpy(int),start=dict(slopes=A,intercepts=D))
+        with (out/'Python_stdout.log').open('w') as stdout,(out/'Python_stderr.log').open('w') as stderr:
+            with contextlib.redirect_stdout(stdout),contextlib.redirect_stderr(stderr):
+            fit=EMEstimator(n_quadpts=61,max_iter=3000,tol=1e-10,item_optim_ftol=_PRECISE_ITEM_FTOL,compute_standard_errors=False,item_priors=None,accelerate='none').fit(model,x.to_numpy(int),start=dict(slopes=A,intercepts=D))
         population=standard_normal_population(fit)
         rawA=fit.model.slopes.copy();rawD=fit.model.intercepts.copy();sgn=orientation(rawA,A)
         frame(x.columns,rawA,rawD).to_csv(out/'Python_raw_parameters.csv',index=False)
