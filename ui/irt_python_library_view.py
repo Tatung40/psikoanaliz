@@ -35,6 +35,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             'persons':'Birey EAP yetenekleri ve posterior SH',
             'curves':'Madde/kategori tepki eğrileri',
             'information':'Madde ve test bilgisi, koşullu SEM',
+            'comparison':'Aynı veri üzerinde model karşılaştırması (ML AIC/BIC)',
         }
         outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
                  for name,label in output_names.items()}
@@ -84,6 +85,35 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         except Exception as e:
             saved=None;st.error(f'Kestirim yapılamadı: {e}')
     if saved is None:return
+    # A comparison pool is populated only with actual converged ML fits on identical
+    # item data and identical category coding. MAP is not compared by ordinary AIC/BIC.
+    pool=st.session_state.setdefault('python_mirt_comparison_pool',{})
+    pool_key=(_data_fingerprint(x),tuple(cols),tuple(labels),categories)
+    if estimation=='ML':
+        try:
+            from core.irt_library_diagnostics import library_fit_diagnostics
+            diag=library_fit_diagnostics(saved['outcome'].fit)
+            if diag['converged'] and all(np.isfinite(float(diag[z])) for z in ('log_likelihood','aic','bic')):
+                pool[(pool_key,model)]={'Model':model,'N':len(x),'Madde':len(cols),
+                    'LogLik':float(diag['log_likelihood']),'AIC':float(diag['aic']),
+                    'BIC':float(diag['bic']),'Parametre':int(diag['n_parameters'])}
+        except (ValueError,TypeError,KeyError,AttributeError):
+            pool.pop((pool_key,model),None)
+    if outputs['comparison']:
+        st.markdown('### Python model karşılaştırması')
+        st.caption('Yalnızca bu oturumda aynı madde verisi, kategori kodlaması ve ML yöntemiyle yakınsamış modeller karşılaştırılır. MAP için klasik AIC/BIC karşılaştırması sunulmaz. Düşük AIC/BIC göreli uyumu gösterir, bilimsel geçerlik kanıtı değildir.')
+        compatible=[v for (k,_),v in pool.items() if k==pool_key]
+        if estimation!='ML':
+            st.info('MAP analizi klasik ML AIC/BIC karşılaştırmasına dahil edilmez.')
+        elif len(compatible)<2:
+            st.info('Karşılaştırma için aynı veriyle en az iki ML modeli çalıştırın.')
+        else:
+            comparison=pd.DataFrame(compatible).sort_values(['AIC','Model']).reset_index(drop=True)
+            comparison['ΔAIC']=comparison['AIC']-comparison['AIC'].min()
+            comparison['ΔBIC']=comparison['BIC']-comparison['BIC'].min()
+            st.dataframe(comparison,hide_index=True)
+            st.download_button('Model karşılaştırması — CSV',_csv(comparison),'model_comparison.csv',
+                               'text/csv',key=f'python_mirt_compare_csv_{model}',on_click='ignore')
     theta=np.linspace(-4,4,161)
     report=build_report(saved['outcome'],model=model,items=cols,labels=labels,theta=theta)
     if report.metadata['Yakınsama'] is True:st.success('Kestirim yakınsadı; bilimsel sertifika anlamına gelmez.')
