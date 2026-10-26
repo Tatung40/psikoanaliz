@@ -36,6 +36,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             'curves':'Madde/kategori tepki eğrileri',
             'information':'Madde ve test bilgisi, koşullu SEM',
             'comparison':'Aynı veri üzerinde model karşılaştırması (ML AIC/BIC)',
+            'itemfit':'Madde uyumu: Infit, Outfit, S-X² (kütüphane API)',
         }
         outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
                  for name,label in output_names.items()}
@@ -130,6 +131,25 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     else:st.error('Yakınsama durumu doğrulanamadı; sonuç kesinleştirilemez.')
     for warning in report.warnings:st.warning(warning)
     for error in report.errors:st.error(error)
+    if outputs['itemfit']:
+        st.markdown('### Madde uyumu — Python mirt itemfit')
+        st.caption('Infit ve Outfit MNSQ, S-X²: Python mirt 1.2.0 kamuya açık itemfit API. Yalnızca yakınsamış modelde gösterilir. Model ailesine göre istatistik desteği değişebilir; desteklenmeyen sonuçlar uydurulmaz.')
+        if report.metadata.get('Yakınsama') is not True or report.errors:
+            st.warning('Yakınsama veya rapor hatası nedeniyle madde uyumu hesaplanmadı.')
+        else:
+            try:
+                import mirt
+                fit_table=mirt.itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),
+                                       statistics=['infit','outfit','S_X2'])
+                fit_frame=safe_frame(fit_table)
+                if fit_frame.empty:
+                    st.info('Kütüphane bu model için madde uyum tablosu döndürmedi.')
+                else:
+                    st.dataframe(fit_frame,hide_index=True,use_container_width=True)
+                    st.download_button('Madde uyumu — CSV',_csv(fit_frame),f'{model}_itemfit.csv',
+                                       'text/csv',key=f'python_mirt_itemfit_csv_{model}',on_click='ignore')
+            except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
+                st.warning(f'Kütüphane madde uyumu hesaplayamadı: {exc}')
     summary=pd.DataFrame([report.metadata])
     if outputs['summary']:
         st.markdown('### Model özeti');st.dataframe(summary,hide_index=True)
