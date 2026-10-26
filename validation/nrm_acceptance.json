@@ -1,0 +1,27 @@
+{
+  "scope": "Predeclared computational reproducibility budgets, not calibrated clinical or population-wide equivalence limits",
+  "decision_if_all_pass": "MEASURED / NOT CERTIFIED",
+  "decision_if_any_fail": "BLOCKED",
+  "rationale": {
+    "parameters": "Three-decimal baseline-category logit coefficient resolution",
+    "probabilities_information_SD": "Four-decimal absolute probability, per-item information and posterior-SD resolution",
+    "theta": "One thousandth of the fixed unit latent SD",
+    "loglik": "Five-decimal marginal log-likelihood resolution; AIC/BIC inherit twice this budget at equal N/k",
+    "SEM": "One thousandth relative error on the declared reporting range; undefined central SEM blocks comparison",
+    "range": "All traces retained; reporting acceptance evaluated at theta in [-4,4], matching the existing UI range",
+    "identity": "Existing sqrt(machine epsilon) algebra-only identity rule inherited from PR65/72"
+  },
+  "max_absolute": {
+    "parameters": 0.001,
+    "loglik": 0.00001,
+    "probabilities": 0.0001,
+    "item_information": 0.0001,
+    "EAP_theta": 0.001,
+    "posterior_SD": 0.0001
+  },
+  "TIF_budget": "number_of_items * item_information budget",
+  "SEM_max_relative": 0.001,
+  "aic_bic_budget": "2 * loglik budget",
+  "theta_range": [-4, 4],
+  "no_threshold_relaxation": true
+}
