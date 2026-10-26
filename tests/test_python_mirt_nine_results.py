@@ -105,7 +105,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run()
     assert any('Kestirim yakınsamadı' in e.value for e in at.error)
     assert not any('Kestirim yakınsadı' in e.value for e in at.success)
-    assert not at.dataframe[2].value.Yakınsama.any()
+    assert len(at.dataframe)==2 and not at.dataframe[1].value.Yakınsama.any()
     at.session_state[f'python_mirt_fit_{model}']['outcome']=outcome
     changed=data.copy();changed.iloc[0,0]=labels[(frame.iloc[0,0]+1)%4] if model=='NRM' else (frame.iloc[0,0]+1)%(2 if model in BINARY else 4)
     at.session_state['raw_df']=changed;at.session_state['scored_df']=changed
