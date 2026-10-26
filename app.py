@@ -232,7 +232,7 @@ with st.sidebar:
     with st.expander("Python mirt Kütüphanesi — MTK"):
         st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
                    "DIF'in yerel uygulamalarıyla karıştırmayın.")
-        for m in ("1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
+        for m in ("Rasch","1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
             st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
@@ -1711,7 +1711,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.session_state.nav_page = f"MTK: {selected_model}"
                 st.rerun()
             st.caption("Etkin kestirim motoru: Python mirt 1.2.0. "
-                       "Desteklenmeyen optimizasyon ayarları gösterilmez.")
+                       "Sayısal çözücü ayarları doğrudan kütüphaneye aktarılır.")
+        from ui.irt_solver_controls import solver_controls
+        with st.sidebar:
+            solver_options=solver_controls(f"py_mirt_solver_{model}")
         st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
                    "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
                    "bu çıktılar araştırma amaçlıdır.")
@@ -1776,7 +1779,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     )
                     fingerprint_external = (
                         tuple(irt_columns), external_data.shape,
-                        int(pd.util.hash_pandas_object(external_data, index=True).sum()), estimation)
+                        int(pd.util.hash_pandas_object(external_data, index=True).sum()), estimation, tuple(sorted(solver_options.items())))
                     with st.spinner("Deneysel Python mirt kestirimi hesaplanıyor…"):
                         missing_count = int(external_data.isna().sum().sum())
                         if missing_count:
@@ -1788,7 +1791,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             )
                         external_fit = fit_python_mirt(
                             external_data.to_numpy(), model=model, estimation=estimation,
-                            n_categories=(int(external_data.to_numpy().max()) + 1)
+                            **solver_options, n_categories=(int(external_data.to_numpy().max()) + 1)
                             if model in ("GRM", "PCM", "GPCM", "NRM") else None)
                     if "python_mirt_experimental_results" not in st.session_state:
                         st.session_state.python_mirt_experimental_results = {}
@@ -1805,7 +1808,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             current_external_data = target.loc[:, irt_columns]
             current_external_fingerprint = (
                 tuple(irt_columns), current_external_data.shape,
-                int(pd.util.hash_pandas_object(current_external_data, index=True).sum()), estimation)
+                int(pd.util.hash_pandas_object(current_external_data, index=True).sum()), estimation, tuple(sorted(solver_options.items())))
             if previous_external["fingerprint"] == current_external_fingerprint:
                 external_fit = previous_external["fit"]
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
