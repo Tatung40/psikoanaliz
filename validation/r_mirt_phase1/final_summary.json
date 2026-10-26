@@ -1,0 +1,147 @@
+{
+  "status": "LIMITED NUMERICAL EVIDENCE; NO SCIENTIFIC PASS",
+  "models": {
+    "Rasch": {
+      "status": "NUMERICAL AGREEMENT OBSERVED / NOT CERTIFIED",
+      "scientific_pass": false,
+      "shape": [
+        1000,
+        10
+      ],
+      "source": "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+      "source_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "data_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "R_converged": true,
+      "python_converged": true,
+      "max_absolute_parameter_difference": 1.2756567229210702e-06,
+      "max_absolute_ICC_difference": 3.188955857158504e-07,
+      "max_absolute_test_information_difference": 5.554912296812375e-07,
+      "max_absolute_loglik_difference": 1.352327672066167e-08,
+      "likelihood_comparison": "engine-reported likelihoods; quadrature not fully matched",
+      "independent_estimation": true
+    },
+    "1PL": {
+      "status": "NUMERICAL AGREEMENT OBSERVED / NOT CERTIFIED",
+      "scientific_pass": false,
+      "shape": [
+        1000,
+        10
+      ],
+      "source": "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+      "source_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "data_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "R_converged": true,
+      "python_converged": true,
+      "max_absolute_parameter_difference": 0.00044167675377398963,
+      "max_absolute_ICC_difference": 0.00011038461580992198,
+      "max_absolute_test_information_difference": 0.00026668902823545615,
+      "max_absolute_loglik_difference": 5.14906669195625e-05,
+      "likelihood_comparison": "engine-reported likelihoods; quadrature not fully matched",
+      "independent_estimation": true
+    },
+    "2PL": {
+      "status": "NUMERICAL AGREEMENT OBSERVED / NOT CERTIFIED",
+      "scientific_pass": false,
+      "shape": [
+        1200,
+        10
+      ],
+      "source": "tests/fixtures/irt_b10/data_irt2pl_ok.csv",
+      "source_sha256": "669d236e25b2245279ee8232652e103cd97a973939513292720926a8f998fc62",
+      "data_sha256": "669d236e25b2245279ee8232652e103cd97a973939513292720926a8f998fc62",
+      "R_converged": true,
+      "python_converged": true,
+      "max_absolute_parameter_difference": 0.0009226107758000257,
+      "max_absolute_ICC_difference": 0.0003366629255630027,
+      "max_absolute_test_information_difference": 0.001333776267244513,
+      "max_absolute_loglik_difference": 1.2731336937576998e-05,
+      "likelihood_comparison": "engine-reported likelihoods; quadrature not fully matched",
+      "independent_estimation": true
+    },
+    "3PL": {
+      "status": "NUMERICAL AGREEMENT OBSERVED / NOT CERTIFIED",
+      "scientific_pass": false,
+      "shape": [
+        3000,
+        12
+      ],
+      "source": "tests/fixtures/irt_b11/data_irt3pl_ok.csv",
+      "source_sha256": "d087c3b50cd4d1deb1ae2c7908cc80203387911e1f0102dc52049365296f5dd2",
+      "data_sha256": "d087c3b50cd4d1deb1ae2c7908cc80203387911e1f0102dc52049365296f5dd2",
+      "R_converged": true,
+      "python_converged": true,
+      "max_absolute_parameter_difference": 0.00023530645731678623,
+      "max_absolute_ICC_difference": 0.00010914086706470538,
+      "max_absolute_test_information_difference": 9.439247059095379e-05,
+      "max_absolute_loglik_difference": 1.5370096662081778e-07,
+      "likelihood_comparison": "shared 61-GH grid",
+      "independent_estimation": true
+    },
+    "4PL": {
+      "status": "PARTIAL NUMERICAL AGREEMENT / NOT CONVERGED / NOT CERTIFIED",
+      "scientific_pass": false,
+      "shape": [
+        3000,
+        12
+      ],
+      "source": "tests/fixtures/irt_b11/data_irt4pl_ok.csv",
+      "source_sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c",
+      "data_sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c",
+      "R_converged": false,
+      "python_converged": true,
+      "max_absolute_parameter_difference": 0.06462178410624686,
+      "max_absolute_ICC_difference": 0.008999803978314125,
+      "max_absolute_test_information_difference": 0.012541054168385468,
+      "max_absolute_loglik_difference": 0.0002288126379426103,
+      "likelihood_comparison": "shared 61-GH grid",
+      "independent_estimation": false
+    }
+  },
+  "software": {
+    "R": "R version 4.6.1 (2026-06-24)",
+    "R_mirt": "1.48",
+    "python": "3.11.17",
+    "python_packages": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pandas": "3.1.0",
+      "mirt": "1.2.0"
+    }
+  },
+  "source_reports": [
+    {
+      "run": 40146456589,
+      "artifact": 12581207421,
+      "commit": "0364494",
+      "sha256": "65d77a5ac1b159c5a25a4ec35931721814d74f78ec116e0c8584813cd0400db7"
+    },
+    {
+      "run": 40149576359,
+      "artifact": 12581672043,
+      "commit": "2b3f675",
+      "sha256": "ac2a2aa9e7973b85577f286dfe61dc5bba83e954e555db4352595785163a92a3"
+    },
+    {
+      "run": 40151828898,
+      "artifact": 12582966948,
+      "commit": "498be38",
+      "sha256": "3fe8a4f44dd32afab73a8c24ae44fa2539750f725f740bb36f6383c7c78f1ad2"
+    }
+  ],
+  "four_PL_information": {
+    "evidence": "observed_information/report.json",
+    "min_active_face_eigenvalue": 0.03789104170780179,
+    "scaled_condition_number": 2349.496999537627,
+    "M12_weakest_squared_loading": 0.9913851224508123,
+    "new_fits": 0
+  },
+  "limitations": [
+    "Fixture-specific numerical agreement, not statistical certification or calibrated acceptance thresholds.",
+    "Rasch/1PL/2PL quadrature/optimizer and parameter bounds not fully aligned.",
+    "3PL matched target/grid/bounds; stopping criteria and optimizers differ.",
+    "4PL warm start reused full Python solution: dependent diagnostic, not independent fit validation.",
+    "4PL convergence failed: 29/50 changes not below 1e-8; maximum change 2.164495e-6.",
+    "Positive definite local Hessian does not prove structural identifiability or global optimality.",
+    "SE/CI, MAP equivalence and external generalization not certified."
+  ]
+}

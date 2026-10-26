@@ -1,5 +1,7 @@
 name: MTK scientific gates
 on:
+  push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 jobs:
@@ -33,10 +35,19 @@ jobs:
       - name: Real browser end-to-end (RSM, DIF, GRM/PCM/GPCM/NRM)
         timeout-minutes: 20
         run: python validation/browser_e2e_polytomous_dif.py --output /tmp/browser && python -c "import json;assert json.load(open('/tmp/browser/result.json'))['status']=='PASS'"
+      - name: Real browser Rasch Wright Map (saved calibration; zero new fits)
+        if: github.head_ref == 'validation-r-mirt-phase2-nine-models' || github.ref_name == 'validation-r-mirt-phase2-nine-models' || github.head_ref == 'integration/73-75-main' || github.ref == 'refs/heads/main'
+        timeout-minutes: 3
+        run: python validation/r_mirt_phase2/check_wright_browser.py --output /tmp/phase2-wright-browser
+      - name: Real app SPSS solver and Rasch integration (73 + 75)
+        timeout-minutes: 6
+        run: python validation/browser_e2e_integration_73_75.py --output /tmp/integration-73-75-browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mtk-scientific-gates
           path: |
+            /tmp/phase2-wright-browser
+            /tmp/integration-73-75-browser
             /tmp/browser
             /tmp/p*/

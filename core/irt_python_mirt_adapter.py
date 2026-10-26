@@ -3,7 +3,8 @@
 Primary external library calibration; raw fit preserved for model-specific inspection.
 No claim that R parameter agreement or standard errors are validated.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from numbers import Integral, Real
 from importlib import import_module
 import numpy as np
 
@@ -21,11 +22,27 @@ class PythonMirtResult:
     fit: object
     scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
     estimation: str = "ML"
+    solver_settings: dict = field(default_factory=dict)
 
 ESTIMATIONS = ("ML", "MAP")
 
 
-def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False):
+def normalize_solver_settings(*, max_iter=500, tol=1e-4, n_quadpts=21):
+    """Exact public mirt.fit_mirt defaults; reject silent coercion/nonfinite values."""
+    for name,value in (("max_iter",max_iter),("n_quadpts",n_quadpts)):
+        if isinstance(value,(bool,np.bool_)) or not isinstance(value,Integral) or value<1:
+            raise ValueError(f"{name} must be a positive integer")
+    if isinstance(tol,(bool,np.bool_)) or not isinstance(tol,Real) or not np.isfinite(tol) or tol<=0:
+        raise ValueError("tol must be finite and positive")
+    return dict(max_iter=int(max_iter),tol=float(tol),n_quadpts=int(n_quadpts))
+
+
+# Keep Phase2 public helper compatibility.
+solver_settings=normalize_solver_settings
+
+
+def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False,
+                    max_iter=500, tol=1e-4, n_quadpts=21, solver_settings=None):
     """One public fit call; no implicit engine fallback or unsupported inference.
 
     common_discrimination=True explicitly fits a shared free a via the public
@@ -35,6 +52,21 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
     (mirt.estimation.priors.default_priors: a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)).
     They were not tuned to any result; see validation/evidence/p1_3pl4pl for the pre-registered study.
     """
+    settings=normalize_solver_settings(max_iter=max_iter,tol=tol,n_quadpts=n_quadpts)
+    if solver_settings is not None:
+        if not isinstance(solver_settings,dict) or set(solver_settings)-{"max_iter","tol","n_quadpts"}:
+            raise ValueError("Unsupported Python mirt solver option.")
+        if settings!=normalize_solver_settings():
+            raise ValueError("Use scalar settings or solver_settings, not both.")
+        # Preserve PR73's documented dictionary API bounds; Phase2 scalars also
+        # support intentional low-iteration diagnostics through the public API.
+        for name,value in solver_settings.items():
+            if name in ("max_iter","n_quadpts"):
+                if type(value) is not int or not (10<=value<=5000 if name=="max_iter" else 5<=value<=121):
+                    raise ValueError(f"Invalid {name} solver setting.")
+            elif isinstance(value,bool) or not isinstance(value,(int,float)) or not np.isfinite(value) or not 1e-10<=value<=1e-2:
+                raise ValueError("Invalid tol solver setting.")
+        settings=normalize_solver_settings(**dict(settings,**solver_settings))
     if common_discrimination and (model!="1PL" or estimation!="ML"):
         raise ValueError("Common discrimination requires explicit 1PL ML specification.")
     if estimation not in ESTIMATIONS:
@@ -88,7 +120,7 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
     except ImportError as ex:
         raise ImportError("Optional Python mirt missing: install mirt==1.2.0.") from ex
     # Rasch is the fixed-discrimination library 1PL, not the shared-free-a option.
-    kwargs={"model":"1PL" if model=="Rasch" else model}
+    kwargs={"model":"1PL" if model=="Rasch" else model,**settings}
     if common_discrimination:
         # Documented public equality API; legacy library 1PL remains fixed-a by default.
         kwargs.update(model="2PL",constraints=[{"parameter":"discrimination","items":list(range(x.shape[1]))}])
@@ -102,4 +134,4 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
         from mirt.estimation.priors import default_priors
         kwargs["priors"]=default_priors(model)
     result=mirt.fit_mirt(x.astype(int),**kwargs)
-    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation)
+    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings)

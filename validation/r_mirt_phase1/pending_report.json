@@ -1,0 +1,292 @@
+{
+  "status": "PENDING",
+  "Rscript": null,
+  "reference_script_sha256": "5d806ef070709745c3340cdb3ffbefbd9fd6ed892508d1ec34806141c7f2475e",
+  "harness_sha256": "61bce11d7fcfe4dc4183e9fef40e3f7ac220190946d32d363ecea22b45a4b7a3",
+  "python_public_fit_signature": "(data: 'NDArray[np.int_] | Any', model: '_ItemFamily | Sequence[_ItemFamily]' = '2PL', n_factors: 'int' = 1, n_categories: 'int | Sequence[int] | None' = None, estimation: \"Literal['EM', 'MHRM', 'MCMC', 'Gibbs']\" = 'EM', n_quadpts: 'int' = 21, max_iter: 'int' = 500, tol: 'float' = 0.0001, verbose: 'bool' = False, item_names: 'list[str] | None' = None, use_rust: 'bool' = True, compute_standard_errors: 'bool' = True, start_values: 'Mapping[str, ArrayLike] | None' = None, fixed: 'Mapping[str, ArrayLike] | None' = None, priors: 'PriorSpecification | Mapping[str, Prior] | None' = None, se_method: \"Literal['auto', 'oakes', 'crossprod', 'sandwich', 'complete_data']\" = 'auto', spec: 'ModelSpec | str | None' = None, accelerate: \"Literal['none', 'squarem']\" = 'none', constraints: 'EqualityConstraints | None' = None) -> 'FitResult'",
+  "python": "3.11.17",
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0",
+    "mirt": "1.2.0"
+  },
+  "models": [
+    {
+      "model": "1PL",
+      "source": "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+      "source_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "data_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "shape": [
+        1000,
+        10
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "Rasch",
+      "source": "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+      "source_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "data_sha256": "74283d7cab49a6dc76bf0927c65c4508efebbf89eb250e1e5d4e7dc56b132353",
+      "shape": [
+        1000,
+        10
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,sigma\u00b2), mean0/slope1/sigma free",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "2PL",
+      "source": "tests/fixtures/irt_b10/data_irt2pl_ok.csv",
+      "source_sha256": "669d236e25b2245279ee8232652e103cd97a973939513292720926a8f998fc62",
+      "data_sha256": "669d236e25b2245279ee8232652e103cd97a973939513292720926a8f998fc62",
+      "shape": [
+        1200,
+        10
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "3PL",
+      "source": "tests/fixtures/irt_b11/data_irt3pl_ok.csv",
+      "source_sha256": "d087c3b50cd4d1deb1ae2c7908cc80203387911e1f0102dc52049365296f5dd2",
+      "data_sha256": "d087c3b50cd4d1deb1ae2c7908cc80203387911e1f0102dc52049365296f5dd2",
+      "shape": [
+        3000,
+        12
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "4PL",
+      "source": "tests/fixtures/irt_b11/data_irt4pl_ok.csv",
+      "source_sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c",
+      "data_sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c",
+      "shape": [
+        3000,
+        12
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "GRM",
+      "source": "validation/evidence/p5_browser/poly_ordinal.csv",
+      "source_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "data_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "shape": [
+        500,
+        8
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "PCM",
+      "source": "validation/evidence/p5_browser/poly_ordinal.csv",
+      "source_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "data_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "shape": [
+        500,
+        8
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "GPCM",
+      "source": "validation/evidence/p5_browser/poly_ordinal.csv",
+      "source_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "data_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "shape": [
+        500,
+        8
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "NRM",
+      "source": "validation/evidence/p5_browser/poly_nominal.csv",
+      "source_sha256": "57c76ec6ab74e79a92da3e9b83369dfe1e59aca3cfd622a956ad9ca452320af6",
+      "data_sha256": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+      "shape": [
+        500,
+        8
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": {
+          "A": 0,
+          "B": 1,
+          "C": 2,
+          "D": 3
+        },
+        "latent": "N(0,1)",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    },
+    {
+      "model": "RSM",
+      "source": "validation/evidence/p5_browser/rsm.csv",
+      "source_sha256": "10244e4a6cd474b54b0cabfa5de28ce9f13a4cd31deb967046499903440fe7a2",
+      "data_sha256": "10244e4a6cd474b54b0cabfa5de28ce9f13a4cd31deb967046499903440fe7a2",
+      "shape": [
+        600,
+        8
+      ],
+      "status": "SKIPPED",
+      "execution": "PENDING",
+      "settings": {
+        "D": 1,
+        "estimation": "ML",
+        "seed": 20261024,
+        "category_map": null,
+        "latent": "N(0,sigma\u00b2), mean0/slope1/sigma free",
+        "scoring": "unchanged 0..C-1; NRM labels unordered",
+        "R_quadrature": 61,
+        "R_tol": 1e-08
+      },
+      "se_ci": {
+        "status": "NOT COMPARABLE",
+        "reason": "Full covariance transformation and ML/MAP equivalence not yet audited"
+      },
+      "reason": "Rscript unavailable; no R execution and no Python recalibration"
+    }
+  ],
+  "notice": "Only actual R executions count as independent comparisons. No default PASS tolerance. Existing historical R fixtures are not new executions."
+}

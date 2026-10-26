@@ -1,0 +1,115 @@
+{
+  "status": "PASS",
+  "app": "app.py",
+  "data": "existing controlled Rasch fixture",
+  "persons": 1000,
+  "items": 10,
+  "controls_verified": [
+    "Model \u00f6zeti, LogLik, AIC/BIC ve yak\u0131nsama",
+    "Madde parametreleri",
+    "Birey EAP yetenekleri ve posterior SH",
+    "Madde/kategori tepki e\u011frileri",
+    "Madde ve test bilgisi, ko\u015fullu SEM",
+    "Ayn\u0131 veri \u00fczerinde model kar\u015f\u0131la\u015ft\u0131rmas\u0131 (ML AIC/BIC)",
+    "Madde uyumu: Infit, Outfit, S-X\u00b2 (k\u00fct\u00fcphane API)"
+  ],
+  "solver_settings": {
+    "max_iter": 700,
+    "tol": 1e-06,
+    "n_quadpts": 31
+  },
+  "wright": {
+    "items": [
+      -1.8244015835829201,
+      -1.4590065982527733,
+      -0.6183685227743614,
+      -0.5717921975009281,
+      -0.2784329946011718,
+      0.24655337493515725,
+      0.6026352639692744,
+      1.4356710192129327,
+      1.565262145487957,
+      1.972781034907161
+    ],
+    "names": [
+      "M1",
+      "M2",
+      "M4",
+      "M3",
+      "M5",
+      "M6",
+      "M7",
+      "M9",
+      "M8",
+      "M10"
+    ],
+    "counts": [
+      0,
+      0,
+      0,
+      -17,
+      0,
+      -60,
+      0,
+      0,
+      -90,
+      0,
+      -139,
+      0,
+      -163,
+      0,
+      0,
+      -164,
+      0,
+      -114,
+      0,
+      -119,
+      0,
+      -52,
+      0,
+      0,
+      -63,
+      0,
+      -19,
+      0,
+      0,
+      0
+    ],
+    "axes": [
+      "y",
+      "y"
+    ]
+  },
+  "parameter_values_unchanged_by_output_controls": true,
+  "invalid_settings_withheld": true,
+  "application_source_commit": "eb54654f458480c27555ca1d6071d93e535095df",
+  "full_regression_attempt": {
+    "passed": 1015,
+    "failed": 1,
+    "skipped": 10,
+    "seconds": 1027.87,
+    "failure": "obsolete mock expectation omitted explicit unchanged solver defaults",
+    "corrected_subset_passed": 2,
+    "complete_green_release_gate": "required in exact-head integration CI"
+  },
+  "source_sha256": {
+    "core/irt_python_mirt_adapter.py": "bf321da5fb2648210b375740823b38ea5384feffcdb455c66e170f0d1e4d9abc",
+    "core/irt_python_mirt_report.py": "3dc04e6c8c2fe9dfa3dfd30365d076dca568e92429b5607daaafd6cd48c284bd",
+    "ui/irt_python_library_view.py": "c068063dd359aee7eb90aa25f7c4b27f288bea4af581610a0787275466c64459",
+    "ui/irt_solver_controls.py": "9782a04da46344d63e7e66e7284c7683f79c2bb6c28714709b4a7c0bf372043c",
+    "core/irt_rasch_wright.py": "53119ffab658fc5390bf32b7c66fb0d5d871a9c71b770b7d003e563ee6e4e4e2",
+    "validation/browser_e2e_integration_73_75.py": "7178d0f3d7e34a8289aecaaf55d667e52b8119aec209a7465321cb18a70d6356"
+  },
+  "screenshots": {
+    "default_rasch_spss.png": "b50179d116c2b32a27db599d4f30be740cdbe9af5459e368d9c70e9eceb318d1",
+    "advanced_solver_app.png": "d1d516ff7293c1a1f00478452e6462711f64152b2502b37d6d502c943ab92462",
+    "invalid_solver_app.png": "97c343fcd1375062e3f152baa57e03a72bdc44e3f9ef0101ae2dc202f75d104f",
+    "rasch_wright_app.png": "d3626fddf32877cccc485a5d96f37ebe884c70b1841b2e1d31e2ef83b0f39efc"
+  },
+  "deployment": {
+    "documented_target": "main / app.py",
+    "live_binding_verified": false,
+    "health_preflight": "URLError: Tunnel connection failed: 403 Forbidden",
+    "production_success_claimed": false
+  }
+}

@@ -11,7 +11,8 @@ def test_rasch_routes_to_fixed_discrimination_library_1pl(monkeypatch):
     x = np.array([[0, 1, 0], [1, 0, 1], [1, 1, 0], [0, 0, 1]])
     result = adapter.fit_python_mirt(x, model="Rasch")
     assert result.model == "Rasch"
-    assert calls == [{"model": "1PL"}]
+    assert calls == [{"model": "1PL", "max_iter":500, "tol":1e-4, "n_quadpts":21}]
+    assert result.solver_settings == {"max_iter":500, "tol":1e-4, "n_quadpts":21}
 
 
 def test_free_shared_discrimination_stays_separate(monkeypatch):
