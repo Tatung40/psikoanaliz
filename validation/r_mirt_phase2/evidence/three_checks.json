@@ -12,7 +12,7 @@
     "ui/irt_solver_controls.py": "274a3b0c704c8e573d0e4106e190c3c111edc830bddc9b05c4705e63782dd802",
     "ui/irt_python_library_view.py": "06011d54c678ec3affc9ddc4b96ff6258498abfb4779466108a99689df30de2e",
     "validation/r_mirt_phase2/check_real_rasch.py": "fc84c936fccf024a133a54edb05264b3c0b44720e10033681e527e615a5f1e2b",
-    "validation/r_mirt_phase2/check_wright_browser.py": "6ee9cb3a7b7cf316847d37f5b98a6ee585eef1f047d45f8787e5ae2bef9d8d4e"
+    "validation/r_mirt_phase2/check_wright_browser.py": "29c9798c9028157b1b328255f2dac41ef0ce0aabcb76d234d49244c1d11a41ae"
   },
   "full_regression": {
     "passed": 947,
@@ -711,5 +711,10 @@
       "n_parameters": 36,
       "max_information_identity_error": 6.893596804502522e-11
     }
-  ]
+  ],
+  "post_full_regression_validation_only": {
+    "Plotly6_serialization_tests_passed": 2,
+    "production_code_changed": false,
+    "new_fits": 0
+  }
 }

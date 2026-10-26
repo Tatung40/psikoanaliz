@@ -59,3 +59,5 @@ Yeniden üretim (aynı ortam/bağımlılıklarla):
     PYTHONPATH=. OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 RAYON_NUM_THREADS=1 python -m pytest -q
 
 Kalan sınırlar: yerel piksel ortamı; Rasch/1PL alias kapsamı; eksik veride açık ret; işlevsel PASS'tan bilimsel/klinik sertifikasyon çıkarılmaması. main veya diğer dallar değiştirilmez; merge/deploy yapılmaz.
+
+Ek fitsiz uyumluluk kontrolü: Plotly 6, JSON sayısal dizilerini Python tarafında dtype/bdata nesneleri olarak geri okur. Doğrulama betiği bu gerçek biçimi açıkça çözer; kontrollü ve LSAT6 grafikleri için iki hedefli regresyon testi geçti. Kalibrasyon/uygulama kodu ve grafik değerleri değişmedi; ek fit veya ikinci tam regresyon yapılmadı.

@@ -1,15 +1,28 @@
 """Render already calibrated Rasch plot data; absolutely no model fit."""
-import argparse,json,traceback
+import argparse,base64,json,traceback
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly.io as pio
-from playwright.sync_api import sync_playwright
+
+
+def vector(value):
+    """Plotly6 round-trips typed arrays as dtype/bdata objects in Python."""
+    if isinstance(value,dict):
+        if set(value)!={'dtype','bdata'}:raise ValueError('Unexpected Plotly vector encoding')
+        dtype=np.dtype(value['dtype'])
+        if dtype.kind not in 'fiu':raise ValueError('Nonnumeric Plotly vector')
+        return np.frombuffer(base64.b64decode(value['bdata'],validate=True),dtype=dtype)
+    result=np.asarray(value)
+    if result.ndim!=1:raise ValueError('Plotly vector must be one-dimensional')
+    return result
+
 
 def main(output):
     out=Path(output);out.mkdir(parents=True,exist_ok=True)
     report=dict(status='FAIL',fits=0)
     try:
+        from playwright.sync_api import sync_playwright
         root=Path(__file__).parent/'evidence'
         fig=pio.from_json((root/'rasch_wright.json').read_text())
         persons=pd.read_csv(root/'rasch_persons.csv');items=pd.read_csv(root/'rasch_items.csv');hist=pd.read_csv(root/'rasch_histogram.csv')
@@ -17,9 +30,9 @@ def main(output):
         counts,_=np.histogram(theta,bins=edges)
         np.testing.assert_array_equal(hist['Kişi sayısı'],counts)
         assert items.b.is_monotonic_increasing and len(persons)==1000 and len(items)==10
-        np.testing.assert_allclose(fig.data[1].y,items.b,rtol=1e-12,atol=1e-12)
-        np.testing.assert_allclose(fig.data[0].y,hist.Merkez,rtol=1e-12,atol=1e-12)
-        np.testing.assert_array_equal(-np.asarray(fig.data[0].x),counts)
+        np.testing.assert_allclose(vector(fig.data[1].y),items.b,rtol=1e-12,atol=1e-12)
+        np.testing.assert_allclose(vector(fig.data[0].y),hist.Merkez,rtol=1e-12,atol=1e-12)
+        np.testing.assert_array_equal(-vector(fig.data[0].x),counts)
         assert list(fig.data[1].text)==items.Madde.tolist()
         html=pio.to_html(fig,include_plotlyjs=True,full_html=True,div_id='wright')
         with sync_playwright() as p:
@@ -49,9 +62,9 @@ def main(output):
             assert real['status']=='PASS' and real['converged'] is True and real['fits']==1
             assert real['respondent_rows_saved'] is False and real['N']==1000 and len(ri)==5
             assert ri.b.is_monotonic_increasing and int(rh['Kişi sayısı'].sum())==real['N']
-            np.testing.assert_allclose(rf.data[1].y,ri.b,rtol=1e-12,atol=1e-12)
-            np.testing.assert_array_equal(-np.asarray(rf.data[0].x),rh['Kişi sayısı'])
-            np.testing.assert_allclose(rf.data[0].y,rh.Merkez,rtol=1e-12,atol=1e-12)
+            np.testing.assert_allclose(vector(rf.data[1].y),ri.b,rtol=1e-12,atol=1e-12)
+            np.testing.assert_array_equal(-vector(rf.data[0].x),rh['Kişi sayısı'])
+            np.testing.assert_allclose(vector(rf.data[0].y),rh.Merkez,rtol=1e-12,atol=1e-12)
             page.set_content(pio.to_html(rf,include_plotlyjs=True,full_html=True,div_id='wright'),wait_until='load')
             page.wait_for_function("document.getElementById('wright')._fullLayout !== undefined")
             page.locator('#wright .scatterlayer .trace .point').first.wait_for()
