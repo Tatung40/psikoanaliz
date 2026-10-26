@@ -98,6 +98,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     assert len(at.dataframe[2].value)==len(frame)
     assert at.dataframe[2].value['Birey'].tolist()==list(range(1,len(frame)+1))
     assert at.dataframe[2].value['SH (θ)'].gt(0).all()
+    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[2].value.columns)
     at.run();assert len(calls)==1 and len(at.dataframe)==3 and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
