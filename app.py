@@ -238,6 +238,8 @@ with st.sidebar:
             st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
+        st.button("⚖️ Python mirt — DIF Analizleri",key="nav_python_mirt_dif",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: Python mirt DIF",))
         st.caption("RSM: Python mirt fit_mirt API'sinde yok; tam RSM analizi için 'RSM — Derecelendirme Ölçeği Modeli' sayfasını kullanın.")
         st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
                   key="nav_irt_b14",use_container_width=True,
@@ -1194,6 +1196,11 @@ elif selected_page == "12. Kullanım Kılavuzu":
 # =============================================================================
 # SAYFA 14: RASCH ANALİZİ (İKİLİ, MML)
 # =============================================================================
+elif selected_page == "MTK: Python mirt DIF":
+    from ui.python_mirt_dif_view import render as render_python_mirt_dif
+    render_python_mirt_dif(st.session_state.raw_df,st.session_state.item_cols,
+                           st.session_state.id_col,st.session_state.group_col)
+
 elif selected_page.startswith("MTK: Python mirt "):
     from ui.irt_python_library_view import render as render_python_library
     py_model = selected_page.replace("MTK: Python mirt ", "", 1)

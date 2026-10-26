@@ -1,0 +1,151 @@
+{
+  "status": "NOT CERTIFIED",
+  "R_execution": "NOT EXECUTED",
+  "engine": "Python mirt 1.2.0",
+  "design": "2PL intercept-only, explicit fixed anchors; 12-seed diagnostic, not FDR validation",
+  "alpha": 0.05,
+  "repetitions": 12,
+  "valid": 12,
+  "failures": 0,
+  "diagnostic_rejections": 1,
+  "diagnostic_rejection_rate": 0.08333333333333333,
+  "exact_binomial_CI95": [
+    0.0021075932318602264,
+    0.38479616515094406
+  ],
+  "rows": [
+    {
+      "seed": 20261026,
+      "converged": true,
+      "LR": 2.9541742367337065,
+      "df": 1,
+      "diagnostic_chi2_p": 0.08565605223872959,
+      "H0_logLik": -2137.203832227731,
+      "H1_logLik": -2135.726745109364,
+      "N": 600,
+      "data_sha256": "7abe5617725e0d05c614fea3fa28461d22d3b3060e0fc16996b113481a181460"
+    },
+    {
+      "seed": 20261027,
+      "converged": true,
+      "LR": 1.399178837047657,
+      "df": 1,
+      "diagnostic_chi2_p": 0.23686110845249495,
+      "H0_logLik": -2187.2341038929426,
+      "H1_logLik": -2186.5345144744188,
+      "N": 600,
+      "data_sha256": "2860185c5080a9bea5faaa5aeffa74cf65bb7672f308abf2f5c77ba1f3de9515"
+    },
+    {
+      "seed": 20261028,
+      "converged": true,
+      "LR": 4.434331936766739,
+      "df": 1,
+      "diagnostic_chi2_p": 0.0352230020357251,
+      "H0_logLik": -1922.3889354771266,
+      "H1_logLik": -1920.1717695087432,
+      "N": 600,
+      "data_sha256": "62a318fb8b985b6defe00c199b219c7984c3c6e6f8bafa5ff71ee0abe7c88054"
+    },
+    {
+      "seed": 20261029,
+      "converged": true,
+      "LR": 0.013427707412120071,
+      "df": 1,
+      "diagnostic_chi2_p": 0.9077492435512247,
+      "H0_logLik": -2235.5520186744966,
+      "H1_logLik": -2235.5453048207905,
+      "N": 600,
+      "data_sha256": "9ead48e57f4148f61e88e40dae464cee081c63a6278169c23bc4afdb48a9c23c"
+    },
+    {
+      "seed": 20261030,
+      "converged": true,
+      "LR": 2.1152524415924745,
+      "df": 1,
+      "diagnostic_chi2_p": 0.1458380041641826,
+      "H0_logLik": -1995.9443521508247,
+      "H1_logLik": -1994.8867259300284,
+      "N": 600,
+      "data_sha256": "75cdefcb1820b43c3a3d9bd8927a7c2e0aaf7ada73f7916ad2ed3cb85eaf9f28"
+    },
+    {
+      "seed": 20261031,
+      "converged": true,
+      "LR": 0.007639643419679487,
+      "df": 1,
+      "diagnostic_chi2_p": 0.9303495524494847,
+      "H0_logLik": -2269.22255424805,
+      "H1_logLik": -2269.2187344263402,
+      "N": 600,
+      "data_sha256": "c520f79c89b3b5dd9446d43bf176dd726924ca59ca470c709165d17a96e300af"
+    },
+    {
+      "seed": 20261032,
+      "converged": true,
+      "LR": 3.0449296802553363,
+      "df": 1,
+      "diagnostic_chi2_p": 0.08098962332803138,
+      "H0_logLik": -2141.3379322084447,
+      "H1_logLik": -2139.815467368317,
+      "N": 600,
+      "data_sha256": "47192fb3893b488fca16ec606b91b7bc011df2e81b6c25430ab9f481a2a3793d"
+    },
+    {
+      "seed": 20261033,
+      "converged": true,
+      "LR": 1.7221656920673922,
+      "df": 1,
+      "diagnostic_chi2_p": 0.18941451138230303,
+      "H0_logLik": -2279.4417973149657,
+      "H1_logLik": -2278.580714468932,
+      "N": 600,
+      "data_sha256": "84480f3bde2c4b43348939d9242582036062dbdf42532158f3c69ad585e8624c"
+    },
+    {
+      "seed": 20261034,
+      "converged": true,
+      "LR": 0.6334092383149255,
+      "df": 1,
+      "diagnostic_chi2_p": 0.4261075336705107,
+      "H0_logLik": -2286.909652132248,
+      "H1_logLik": -2286.5929475130906,
+      "N": 600,
+      "data_sha256": "968359c0e21508547eb59037d0f1d47a0b3a71925bda31b1f272a64a5d574593"
+    },
+    {
+      "seed": 20261035,
+      "converged": true,
+      "LR": 0.10949517920380458,
+      "df": 1,
+      "diagnostic_chi2_p": 0.7407196005610519,
+      "H0_logLik": -2342.1860077719757,
+      "H1_logLik": -2342.131260182374,
+      "N": 600,
+      "data_sha256": "4deda77345b80f718cda4f680030f45a95a8bb56e389dce41ca2a8e7a89832c1"
+    },
+    {
+      "seed": 20261036,
+      "converged": true,
+      "LR": 1.3844667152679904,
+      "df": 1,
+      "diagnostic_chi2_p": 0.23934176611340494,
+      "H0_logLik": -2085.511233158396,
+      "H1_logLik": -2084.818999800762,
+      "N": 600,
+      "data_sha256": "d1104ec08013e40b1c8648edaf27785d3e3dfb7daee8c7cbf9d1500ed3f1f055"
+    },
+    {
+      "seed": 20261037,
+      "converged": true,
+      "LR": 0.6426923154531323,
+      "df": 1,
+      "diagnostic_chi2_p": 0.42273754901714056,
+      "H0_logLik": -2153.782438277696,
+      "H1_logLik": -2153.4610921199696,
+      "N": 600,
+      "data_sha256": "65991a6d69a41010660af8fc4b95446618217f0b1bd61b15842d8512b0cbb56f"
+    }
+  ],
+  "limitation": "Not independent R validation; small conditional-size diagnostic; cannot certify Type-I/FDR, other models or data-driven anchors. Production p/q remain disabled."
+}

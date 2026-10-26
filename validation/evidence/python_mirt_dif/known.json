@@ -1,0 +1,2480 @@
+{
+  "metadata": {
+    "Model": "2PL",
+    "Engine": "Python mirt 1.2.0",
+    "Python": "3.11.17",
+    "Status": "NOT CERTIFIED",
+    "Design": "Explicit-anchor add; selected families free on all nonanchors",
+    "Reference": "'R'",
+    "Focal": "'F'",
+    "N_reference": 1200,
+    "N_focal": 800,
+    "Excluded_other_groups": 0,
+    "Items": [
+      "M1",
+      "M2",
+      "M3",
+      "M4",
+      "M5",
+      "M6",
+      "M7",
+      "M8",
+      "M9",
+      "M10",
+      "M11",
+      "M12"
+    ],
+    "Anchors": [
+      "M1",
+      "M2",
+      "M4",
+      "M5",
+      "M6",
+      "M8",
+      "M9",
+      "M10",
+      "M11",
+      "M12"
+    ],
+    "Studied": [
+      "M3",
+      "M7"
+    ],
+    "Category_labels": [
+      "0",
+      "1"
+    ],
+    "Parameters": [
+      "intercepts",
+      "discrimination"
+    ],
+    "Requested_correction": "fdr_bh",
+    "Correction_applied": false,
+    "Alpha": 0.05,
+    "Inference": false,
+    "max_iter": 500,
+    "tol": 1e-05,
+    "n_quadpts": 41,
+    "Data_SHA256": "ed29f110d5fde2aff71a8b959fd4a0919896008f705cc4baebb07bb442460470",
+    "fit_multigroup_signature": "(data: 'NDArray[np.int_] | Any', groups: 'NDArray', model: '_ItemFamily | Sequence[_ItemFamily]' = '2PL', invariance: \"Literal['configural', 'metric', 'scalar', 'strict'] | InvarianceSpec\" = 'configural', n_categories: 'int | Sequence[int] | None' = None, n_quadpts: 'int' = 21, max_iter: 'int' = 500, tol: 'float' = 0.0001, verbose: 'bool' = False, reference_group: 'int | str | None' = None, free_items: 'dict[str, list[int]] | None' = None, item_names: 'list[str] | None' = None) -> 'MultigroupFitResult'",
+    "multigroup_dif_signature": "(data: 'NDArray[np.int_] | Any', groups: 'NDArray[Any]', model: 'str' = '2PL', *, items: 'Sequence[int | str] | None' = None, anchors: 'Sequence[int | str] | None' = None, scheme: 'DIFScheme' = 'drop', parameters: 'Sequence[DIFParameterFamily]' = ('discrimination', 'intercepts'), p_adjust: 'PValueAdjustment' = 'none', alpha: 'float' = 0.05, n_categories: 'int | Sequence[int] | None' = None, n_quadpts: 'int' = 21, max_iter: 'int' = 500, tol: 'float' = 0.0001, reference_group: 'int | str | None' = None, max_rounds: 'int' = 10, n_jobs: 'int' = 1) -> 'Any'",
+    "Limitations": "NOT CERTIFIED: bağımsız R çok gruplu DIF doğrulaması ve tasarıma özgü Tip-I/FDR kalibrasyonu yok. Çok gruplu Hessian/SE tanısı public API tarafından üretilmiyor; Optimizasyon sınırı tanısı yok; global optimum veya tam tanımlanabilirlik iddiası yok. p/q, karar ve Wald kapalıdır. LR, eğriler ve parametre farkları betimseldir. Çapaların değişmezliği varsayılır; otomatik çapa seçimi yapılmaz. NRM kategori kodları başarı sırası değildir. Eğim testi tek başına saf nonuniform DIF kanıtı değildir; uniform test eşit eğim varsayar. 3PL/4PL c/u gruplarda eşittir; önceki bootstrap çıkarım kapıları aynen korunur."
+  },
+  "tables": {
+    "DIF": [
+      {
+        "Item": "M3",
+        "LR": 48.96747793279064,
+        "df": 2,
+        "p": null,
+        "q": null,
+        "Decision": "ÇIKARIM KAPALI",
+        "Delta_AIC": 44.96747793279064,
+        "Delta_BIC": 33.765673013705964,
+        "Reason": "Hessian/SE düzenliliği bağımsız doğrulanmadı; p/q kapalı"
+      },
+      {
+        "Item": "M7",
+        "LR": 52.00308238405705,
+        "df": 2,
+        "p": null,
+        "q": null,
+        "Decision": "ÇIKARIM KAPALI",
+        "Delta_AIC": 48.00308238405705,
+        "Delta_BIC": 36.80127746497237,
+        "Reason": "Hessian/SE düzenliliği bağımsız doğrulanmadı; p/q kapalı"
+      }
+    ],
+    "Fit": [
+      {
+        "Fit": "H1",
+        "LogLik": -12666.084547660626,
+        "AIC": 25392.169095321253,
+        "BIC": 25560.196169107516,
+        "Parameters": 30,
+        "Converged": true,
+        "Iterations": 54
+      },
+      {
+        "Fit": "H0:M3",
+        "LogLik": -12690.568286627022,
+        "AIC": 25437.136573254043,
+        "BIC": 25593.96184212122,
+        "Parameters": 28,
+        "Converged": true,
+        "Iterations": 55
+      },
+      {
+        "Fit": "H0:M7",
+        "LogLik": -12692.086088852655,
+        "AIC": 25440.17217770531,
+        "BIC": 25596.997446572488,
+        "Parameters": 28,
+        "Converged": true,
+        "Iterations": 53
+      }
+    ],
+    "Categories": [
+      {
+        "Grup": "reference",
+        "Madde": "M1",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 113,
+        "Yüzde": 9.416666666666666
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M1",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 1087,
+        "Yüzde": 90.58333333333333
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M2",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 261,
+        "Yüzde": 21.75
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M2",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 939,
+        "Yüzde": 78.25
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M3",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 232,
+        "Yüzde": 19.333333333333332
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M3",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 968,
+        "Yüzde": 80.66666666666667
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M4",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 403,
+        "Yüzde": 33.583333333333336
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M4",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 797,
+        "Yüzde": 66.41666666666667
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M5",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 423,
+        "Yüzde": 35.25
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M5",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 777,
+        "Yüzde": 64.75
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M6",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 544,
+        "Yüzde": 45.333333333333336
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M6",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 656,
+        "Yüzde": 54.666666666666664
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M7",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 606,
+        "Yüzde": 50.5
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M7",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 594,
+        "Yüzde": 49.5
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M8",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 746,
+        "Yüzde": 62.166666666666664
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M8",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 454,
+        "Yüzde": 37.833333333333336
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M9",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 816,
+        "Yüzde": 68.0
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M9",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 384,
+        "Yüzde": 32.0
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M10",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 915,
+        "Yüzde": 76.25
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M10",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 285,
+        "Yüzde": 23.75
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M11",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 945,
+        "Yüzde": 78.75
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M11",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 255,
+        "Yüzde": 21.25
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M12",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 929,
+        "Yüzde": 77.41666666666667
+      },
+      {
+        "Grup": "reference",
+        "Madde": "M12",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 271,
+        "Yüzde": 22.583333333333332
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M1",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 135,
+        "Yüzde": 16.875
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M1",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 665,
+        "Yüzde": 83.125
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M2",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 214,
+        "Yüzde": 26.75
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M2",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 586,
+        "Yüzde": 73.25
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M3",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 336,
+        "Yüzde": 42.0
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M3",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 464,
+        "Yüzde": 58.0
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M4",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 334,
+        "Yüzde": 41.75
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M4",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 466,
+        "Yüzde": 58.25
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M5",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 366,
+        "Yüzde": 45.75
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M5",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 434,
+        "Yüzde": 54.25
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M6",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 410,
+        "Yüzde": 51.25
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M6",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 390,
+        "Yüzde": 48.75
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M7",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 398,
+        "Yüzde": 49.75
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M7",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 402,
+        "Yüzde": 50.25
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M8",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 567,
+        "Yüzde": 70.875
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M8",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 233,
+        "Yüzde": 29.125
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M9",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 604,
+        "Yüzde": 75.5
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M9",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 196,
+        "Yüzde": 24.5
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M10",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 659,
+        "Yüzde": 82.375
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M10",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 141,
+        "Yüzde": 17.625
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M11",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 678,
+        "Yüzde": 84.75
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M11",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 122,
+        "Yüzde": 15.25
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M12",
+        "Kategori": "0",
+        "Kod": 0,
+        "Frekans": 635,
+        "Yüzde": 79.375
+      },
+      {
+        "Grup": "focal",
+        "Madde": "M12",
+        "Kategori": "1",
+        "Kod": 1,
+        "Frekans": 165,
+        "Yüzde": 20.625
+      }
+    ],
+    "Latent": [
+      {
+        "group": "focal",
+        "is_reference": false,
+        "mean": -0.375087492466073,
+        "variance": 1.06230439068047
+      },
+      {
+        "group": "reference",
+        "is_reference": true,
+        "mean": 0.0,
+        "variance": 1.0
+      }
+    ],
+    "Support": [
+      {
+        "Model": "Rasch",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": false,
+        "Inferential_p": false,
+        "Note": "Public multigroup 1PL a=1; ortak serbest a desteklenmiyor"
+      },
+      {
+        "Model": "1PL",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": false,
+        "Inferential_p": false,
+        "Note": "Public multigroup 1PL a=1; ortak serbest a desteklenmiyor"
+      },
+      {
+        "Model": "2PL",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": true,
+        "Inferential_p": false,
+        "Note": "Konum/eğim aileleri"
+      },
+      {
+        "Model": "3PL",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": true,
+        "Inferential_p": false,
+        "Note": "c/u DIF testi yok"
+      },
+      {
+        "Model": "4PL",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": true,
+        "Inferential_p": false,
+        "Note": "c/u DIF testi yok"
+      },
+      {
+        "Model": "GRM",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": true,
+        "Inferential_p": false,
+        "Note": "Konum/eğim aileleri"
+      },
+      {
+        "Model": "PCM",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": false,
+        "Inferential_p": false,
+        "Note": "PCM a=1"
+      },
+      {
+        "Model": "GPCM",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": true,
+        "Inferential_p": false,
+        "Note": "Konum/eğim aileleri"
+      },
+      {
+        "Model": "NRM",
+        "Calibration": true,
+        "LR": true,
+        "Wald": false,
+        "Slope_test": true,
+        "Inferential_p": false,
+        "Note": "NRM kategori0 A=D=0; nominal kontrastlar"
+      },
+      {
+        "Model": "RSM",
+        "Calibration": false,
+        "LR": false,
+        "Wald": false,
+        "Slope_test": false,
+        "Inferential_p": false,
+        "Note": "Public multigroup model factory RSM desteklemiyor"
+      }
+    ],
+    "Summary": [
+      {
+        "Setting": "Model",
+        "Value": "2PL"
+      },
+      {
+        "Setting": "Engine",
+        "Value": "Python mirt 1.2.0"
+      },
+      {
+        "Setting": "Python",
+        "Value": "3.11.17"
+      },
+      {
+        "Setting": "Status",
+        "Value": "NOT CERTIFIED"
+      },
+      {
+        "Setting": "Design",
+        "Value": "Explicit-anchor add; selected families free on all nonanchors"
+      },
+      {
+        "Setting": "Reference",
+        "Value": "'R'"
+      },
+      {
+        "Setting": "Focal",
+        "Value": "'F'"
+      },
+      {
+        "Setting": "N_reference",
+        "Value": "1200"
+      },
+      {
+        "Setting": "N_focal",
+        "Value": "800"
+      },
+      {
+        "Setting": "Excluded_other_groups",
+        "Value": "0"
+      },
+      {
+        "Setting": "Items",
+        "Value": "['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12']"
+      },
+      {
+        "Setting": "Anchors",
+        "Value": "['M1', 'M2', 'M4', 'M5', 'M6', 'M8', 'M9', 'M10', 'M11', 'M12']"
+      },
+      {
+        "Setting": "Studied",
+        "Value": "['M3', 'M7']"
+      },
+      {
+        "Setting": "Category_labels",
+        "Value": "('0', '1')"
+      },
+      {
+        "Setting": "Parameters",
+        "Value": "('intercepts', 'discrimination')"
+      },
+      {
+        "Setting": "Requested_correction",
+        "Value": "fdr_bh"
+      },
+      {
+        "Setting": "Correction_applied",
+        "Value": "False"
+      },
+      {
+        "Setting": "Alpha",
+        "Value": "0.05"
+      },
+      {
+        "Setting": "Inference",
+        "Value": "False"
+      },
+      {
+        "Setting": "max_iter",
+        "Value": "500"
+      },
+      {
+        "Setting": "tol",
+        "Value": "1e-05"
+      },
+      {
+        "Setting": "n_quadpts",
+        "Value": "41"
+      },
+      {
+        "Setting": "Data_SHA256",
+        "Value": "ed29f110d5fde2aff71a8b959fd4a0919896008f705cc4baebb07bb442460470"
+      },
+      {
+        "Setting": "fit_multigroup_signature",
+        "Value": "(data: 'NDArray[np.int_] | Any', groups: 'NDArray', model: '_ItemFamily | Sequence[_ItemFamily]' = '2PL', invariance: \"Literal['configural', 'metric', 'scalar', 'strict'] | InvarianceSpec\" = 'configural', n_categories: 'int | Sequence[int] | None' = None, n_quadpts: 'int' = 21, max_iter: 'int' = 500, tol: 'float' = 0.0001, verbose: 'bool' = False, reference_group: 'int | str | None' = None, free_items: 'dict[str, list[int]] | None' = None, item_names: 'list[str] | None' = None) -> 'MultigroupFitResult'"
+      },
+      {
+        "Setting": "multigroup_dif_signature",
+        "Value": "(data: 'NDArray[np.int_] | Any', groups: 'NDArray[Any]', model: 'str' = '2PL', *, items: 'Sequence[int | str] | None' = None, anchors: 'Sequence[int | str] | None' = None, scheme: 'DIFScheme' = 'drop', parameters: 'Sequence[DIFParameterFamily]' = ('discrimination', 'intercepts'), p_adjust: 'PValueAdjustment' = 'none', alpha: 'float' = 0.05, n_categories: 'int | Sequence[int] | None' = None, n_quadpts: 'int' = 21, max_iter: 'int' = 500, tol: 'float' = 0.0001, reference_group: 'int | str | None' = None, max_rounds: 'int' = 10, n_jobs: 'int' = 1) -> 'Any'"
+      },
+      {
+        "Setting": "Limitations",
+        "Value": "NOT CERTIFIED: bağımsız R çok gruplu DIF doğrulaması ve tasarıma özgü Tip-I/FDR kalibrasyonu yok. Çok gruplu Hessian/SE tanısı public API tarafından üretilmiyor; Optimizasyon sınırı tanısı yok; global optimum veya tam tanımlanabilirlik iddiası yok. p/q, karar ve Wald kapalıdır. LR, eğriler ve parametre farkları betimseldir. Çapaların değişmezliği varsayılır; otomatik çapa seçimi yapılmaz. NRM kategori kodları başarı sırası değildir. Eğim testi tek başına saf nonuniform DIF kanıtı değildir; uniform test eşit eğim varsayar. 3PL/4PL c/u gruplarda eşittir; önceki bootstrap çıkarım kapıları aynen korunur."
+      }
+    ],
+    "All_fit_parameters": [
+      {
+        "group": "focal",
+        "item": "M1",
+        "discrimination": 1.582662320459664,
+        "discrimination_se": null,
+        "difficulty": -1.89214614280955,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M2",
+        "discrimination": 1.11687967191695,
+        "discrimination_se": null,
+        "difficulty": -1.453577716258246,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M3",
+        "discrimination": 1.812818067777009,
+        "discrimination_se": null,
+        "difficulty": -0.65288783035492,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M4",
+        "discrimination": 0.788183755908388,
+        "discrimination_se": null,
+        "difficulty": -0.929147966327831,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M5",
+        "discrimination": 1.770470031408422,
+        "discrimination_se": null,
+        "difficulty": -0.523161760133669,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M6",
+        "discrimination": 0.960790157288428,
+        "discrimination_se": null,
+        "difficulty": -0.263153531498041,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M7",
+        "discrimination": 0.298081244775231,
+        "discrimination_se": null,
+        "difficulty": -0.409115830122432,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M8",
+        "discrimination": 1.491304447582337,
+        "discrimination_se": null,
+        "difficulty": 0.470723470681219,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M9",
+        "discrimination": 1.460467760644166,
+        "discrimination_se": null,
+        "difficulty": 0.711383175274961,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M10",
+        "discrimination": 1.321858385655526,
+        "discrimination_se": null,
+        "difficulty": 1.162884593823927,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M11",
+        "discrimination": 1.19940087760412,
+        "discrimination_se": null,
+        "difficulty": 1.398439245500088,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M12",
+        "discrimination": 0.831443708517134,
+        "discrimination_se": null,
+        "difficulty": 1.610072172190765,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M1",
+        "discrimination": 1.582662320459664,
+        "discrimination_se": null,
+        "difficulty": -1.89214614280955,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M2",
+        "discrimination": 1.11687967191695,
+        "discrimination_se": null,
+        "difficulty": -1.453577716258246,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M3",
+        "discrimination": 1.948068998362067,
+        "discrimination_se": null,
+        "difficulty": -1.159882645353316,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M4",
+        "discrimination": 0.788183755908388,
+        "discrimination_se": null,
+        "difficulty": -0.929147966327831,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M5",
+        "discrimination": 1.770470031408422,
+        "discrimination_se": null,
+        "difficulty": -0.523161760133669,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M6",
+        "discrimination": 0.960790157288428,
+        "discrimination_se": null,
+        "difficulty": -0.263153531498041,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M7",
+        "discrimination": 1.155435811688615,
+        "discrimination_se": null,
+        "difficulty": 0.023560872035857,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M8",
+        "discrimination": 1.491304447582337,
+        "discrimination_se": null,
+        "difficulty": 0.470723470681219,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M9",
+        "discrimination": 1.460467760644166,
+        "discrimination_se": null,
+        "difficulty": 0.711383175274961,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M10",
+        "discrimination": 1.321858385655526,
+        "discrimination_se": null,
+        "difficulty": 1.162884593823927,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M11",
+        "discrimination": 1.19940087760412,
+        "discrimination_se": null,
+        "difficulty": 1.398439245500088,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "item": "M12",
+        "discrimination": 0.831443708517134,
+        "discrimination_se": null,
+        "difficulty": 1.610072172190765,
+        "difficulty_se": null,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "item": "M1",
+        "discrimination": 1.535584713868839,
+        "discrimination_se": null,
+        "difficulty": -1.98470264863499,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M2",
+        "discrimination": 1.068384788872993,
+        "discrimination_se": null,
+        "difficulty": -1.544939526121907,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M3",
+        "discrimination": 1.941281798250595,
+        "discrimination_se": null,
+        "difficulty": -0.974534888445012,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M4",
+        "discrimination": 0.766495403599071,
+        "discrimination_se": null,
+        "difficulty": -0.990849375848612,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M5",
+        "discrimination": 1.68851205925216,
+        "discrimination_se": null,
+        "difficulty": -0.575584527201341,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M6",
+        "discrimination": 0.923727336735484,
+        "discrimination_se": null,
+        "difficulty": -0.306637038490562,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M7",
+        "discrimination": 0.284607989823688,
+        "discrimination_se": null,
+        "difficulty": -0.512008561955642,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M8",
+        "discrimination": 1.441629963882035,
+        "discrimination_se": null,
+        "difficulty": 0.451186971722923,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M9",
+        "discrimination": 1.417192257872424,
+        "discrimination_se": null,
+        "difficulty": 0.697391256701226,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M10",
+        "discrimination": 1.280201151050809,
+        "discrimination_se": null,
+        "difficulty": 1.163218605416297,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M11",
+        "discrimination": 1.168113495549565,
+        "discrimination_se": null,
+        "difficulty": 1.400443982377732,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M12",
+        "discrimination": 0.803184364477771,
+        "discrimination_se": null,
+        "difficulty": 1.62898170572139,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M1",
+        "discrimination": 1.535584713868839,
+        "discrimination_se": null,
+        "difficulty": -1.98470264863499,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M2",
+        "discrimination": 1.068384788872993,
+        "discrimination_se": null,
+        "difficulty": -1.544939526121907,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M3",
+        "discrimination": 1.941281798250595,
+        "discrimination_se": null,
+        "difficulty": -0.974534888445012,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M4",
+        "discrimination": 0.766495403599071,
+        "discrimination_se": null,
+        "difficulty": -0.990849375848612,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M5",
+        "discrimination": 1.68851205925216,
+        "discrimination_se": null,
+        "difficulty": -0.575584527201341,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M6",
+        "discrimination": 0.923727336735484,
+        "discrimination_se": null,
+        "difficulty": -0.306637038490562,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M7",
+        "discrimination": 1.166748528203645,
+        "discrimination_se": null,
+        "difficulty": 0.023381707804629,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M8",
+        "discrimination": 1.441629963882035,
+        "discrimination_se": null,
+        "difficulty": 0.451186971722923,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M9",
+        "discrimination": 1.417192257872424,
+        "discrimination_se": null,
+        "difficulty": 0.697391256701226,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M10",
+        "discrimination": 1.280201151050809,
+        "discrimination_se": null,
+        "difficulty": 1.163218605416297,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M11",
+        "discrimination": 1.168113495549565,
+        "discrimination_se": null,
+        "difficulty": 1.400443982377732,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "item": "M12",
+        "discrimination": 0.803184364477771,
+        "discrimination_se": null,
+        "difficulty": 1.62898170572139,
+        "difficulty_se": null,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "item": "M1",
+        "discrimination": 1.620389406721254,
+        "discrimination_se": null,
+        "difficulty": -1.835244831654158,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M2",
+        "discrimination": 1.157313645448601,
+        "discrimination_se": null,
+        "difficulty": -1.400217576319273,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M3",
+        "discrimination": 1.944427289367216,
+        "discrimination_se": null,
+        "difficulty": -0.604539018612921,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M4",
+        "discrimination": 0.807687017770554,
+        "discrimination_se": null,
+        "difficulty": -0.898369738786247,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M5",
+        "discrimination": 1.828071196822326,
+        "discrimination_se": null,
+        "difficulty": -0.503079133240272,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M6",
+        "discrimination": 0.989871136742201,
+        "discrimination_se": null,
+        "difficulty": -0.248877001563672,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M7",
+        "discrimination": 0.721784735858849,
+        "discrimination_se": null,
+        "difficulty": -0.124422290130044,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M8",
+        "discrimination": 1.520369400720795,
+        "discrimination_se": null,
+        "difficulty": 0.467632548024412,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M9",
+        "discrimination": 1.483864779862817,
+        "discrimination_se": null,
+        "difficulty": 0.705098092032322,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M10",
+        "discrimination": 1.359676345760281,
+        "discrimination_se": null,
+        "difficulty": 1.139915635618038,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M11",
+        "discrimination": 1.220912936483034,
+        "discrimination_se": null,
+        "difficulty": 1.37932273443332,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "focal",
+        "item": "M12",
+        "discrimination": 0.855997793565923,
+        "discrimination_se": null,
+        "difficulty": 1.573337195140987,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M1",
+        "discrimination": 1.620389406721254,
+        "discrimination_se": null,
+        "difficulty": -1.835244831654158,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M2",
+        "discrimination": 1.157313645448601,
+        "discrimination_se": null,
+        "difficulty": -1.400217576319273,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M3",
+        "discrimination": 1.94833370023468,
+        "discrimination_se": null,
+        "difficulty": -1.160138068810705,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M4",
+        "discrimination": 0.807687017770554,
+        "discrimination_se": null,
+        "difficulty": -0.898369738786247,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M5",
+        "discrimination": 1.828071196822326,
+        "discrimination_se": null,
+        "difficulty": -0.503079133240272,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M6",
+        "discrimination": 0.989871136742201,
+        "discrimination_se": null,
+        "difficulty": -0.248877001563672,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M7",
+        "discrimination": 0.721784735858849,
+        "discrimination_se": null,
+        "difficulty": -0.124422290130044,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M8",
+        "discrimination": 1.520369400720795,
+        "discrimination_se": null,
+        "difficulty": 0.467632548024412,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M9",
+        "discrimination": 1.483864779862817,
+        "discrimination_se": null,
+        "difficulty": 0.705098092032322,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M10",
+        "discrimination": 1.359676345760281,
+        "discrimination_se": null,
+        "difficulty": 1.139915635618038,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M11",
+        "discrimination": 1.220912936483034,
+        "discrimination_se": null,
+        "difficulty": 1.37932273443332,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "item": "M12",
+        "discrimination": 0.855997793565923,
+        "discrimination_se": null,
+        "difficulty": 1.573337195140987,
+        "difficulty_se": null,
+        "Fit": "H0:M7"
+      }
+    ],
+    "All_fit_latent": [
+      {
+        "group": "focal",
+        "is_reference": false,
+        "mean": -0.375087492466073,
+        "variance": 1.06230439068047,
+        "Fit": "H1"
+      },
+      {
+        "group": "reference",
+        "is_reference": true,
+        "mean": 0.0,
+        "variance": 1.0,
+        "Fit": "H1"
+      },
+      {
+        "group": "focal",
+        "is_reference": false,
+        "mean": -0.476139185209114,
+        "variance": 1.164350900576042,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "reference",
+        "is_reference": true,
+        "mean": 0.0,
+        "variance": 1.0,
+        "Fit": "H0:M3"
+      },
+      {
+        "group": "focal",
+        "is_reference": false,
+        "mean": -0.34300702700156,
+        "variance": 0.939327919426528,
+        "Fit": "H0:M7"
+      },
+      {
+        "group": "reference",
+        "is_reference": true,
+        "mean": 0.0,
+        "variance": 1.0,
+        "Fit": "H0:M7"
+      }
+    ],
+    "Parameters": [
+      {
+        "Group": "focal",
+        "Item": "M1",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.582662320459664
+      },
+      {
+        "Group": "focal",
+        "Item": "M1",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -1.89214614280955
+      },
+      {
+        "Group": "focal",
+        "Item": "M2",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.11687967191695
+      },
+      {
+        "Group": "focal",
+        "Item": "M2",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -1.453577716258246
+      },
+      {
+        "Group": "focal",
+        "Item": "M3",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.812818067777009
+      },
+      {
+        "Group": "focal",
+        "Item": "M3",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.65288783035492
+      },
+      {
+        "Group": "focal",
+        "Item": "M4",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.788183755908388
+      },
+      {
+        "Group": "focal",
+        "Item": "M4",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.929147966327831
+      },
+      {
+        "Group": "focal",
+        "Item": "M5",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.770470031408422
+      },
+      {
+        "Group": "focal",
+        "Item": "M5",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.523161760133669
+      },
+      {
+        "Group": "focal",
+        "Item": "M6",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.960790157288428
+      },
+      {
+        "Group": "focal",
+        "Item": "M6",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.263153531498041
+      },
+      {
+        "Group": "focal",
+        "Item": "M7",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.298081244775231
+      },
+      {
+        "Group": "focal",
+        "Item": "M7",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.409115830122432
+      },
+      {
+        "Group": "focal",
+        "Item": "M8",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.491304447582337
+      },
+      {
+        "Group": "focal",
+        "Item": "M8",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 0.470723470681219
+      },
+      {
+        "Group": "focal",
+        "Item": "M9",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.460467760644166
+      },
+      {
+        "Group": "focal",
+        "Item": "M9",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 0.711383175274961
+      },
+      {
+        "Group": "focal",
+        "Item": "M10",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.321858385655526
+      },
+      {
+        "Group": "focal",
+        "Item": "M10",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 1.162884593823927
+      },
+      {
+        "Group": "focal",
+        "Item": "M11",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.19940087760412
+      },
+      {
+        "Group": "focal",
+        "Item": "M11",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 1.398439245500088
+      },
+      {
+        "Group": "focal",
+        "Item": "M12",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.831443708517134
+      },
+      {
+        "Group": "focal",
+        "Item": "M12",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 1.610072172190765
+      },
+      {
+        "Group": "reference",
+        "Item": "M1",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.582662320459664
+      },
+      {
+        "Group": "reference",
+        "Item": "M1",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -1.89214614280955
+      },
+      {
+        "Group": "reference",
+        "Item": "M2",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.11687967191695
+      },
+      {
+        "Group": "reference",
+        "Item": "M2",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -1.453577716258246
+      },
+      {
+        "Group": "reference",
+        "Item": "M3",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.948068998362067
+      },
+      {
+        "Group": "reference",
+        "Item": "M3",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -1.159882645353316
+      },
+      {
+        "Group": "reference",
+        "Item": "M4",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.788183755908388
+      },
+      {
+        "Group": "reference",
+        "Item": "M4",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.929147966327831
+      },
+      {
+        "Group": "reference",
+        "Item": "M5",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.770470031408422
+      },
+      {
+        "Group": "reference",
+        "Item": "M5",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.523161760133669
+      },
+      {
+        "Group": "reference",
+        "Item": "M6",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.960790157288428
+      },
+      {
+        "Group": "reference",
+        "Item": "M6",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": -0.263153531498041
+      },
+      {
+        "Group": "reference",
+        "Item": "M7",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.155435811688615
+      },
+      {
+        "Group": "reference",
+        "Item": "M7",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 0.023560872035857
+      },
+      {
+        "Group": "reference",
+        "Item": "M8",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.491304447582337
+      },
+      {
+        "Group": "reference",
+        "Item": "M8",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 0.470723470681219
+      },
+      {
+        "Group": "reference",
+        "Item": "M9",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.460467760644166
+      },
+      {
+        "Group": "reference",
+        "Item": "M9",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 0.711383175274961
+      },
+      {
+        "Group": "reference",
+        "Item": "M10",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.321858385655526
+      },
+      {
+        "Group": "reference",
+        "Item": "M10",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 1.162884593823927
+      },
+      {
+        "Group": "reference",
+        "Item": "M11",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 1.19940087760412
+      },
+      {
+        "Group": "reference",
+        "Item": "M11",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 1.398439245500088
+      },
+      {
+        "Group": "reference",
+        "Item": "M12",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "Value": 0.831443708517134
+      },
+      {
+        "Group": "reference",
+        "Item": "M12",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "Value": 1.610072172190765
+      }
+    ],
+    "Contrasts": [
+      {
+        "Item": "M1",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -1.89214614280955,
+        "reference": -1.89214614280955,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M1",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.582662320459664,
+        "reference": 1.582662320459664,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M10",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": 1.162884593823927,
+        "reference": 1.162884593823927,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M10",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.321858385655526,
+        "reference": 1.321858385655526,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M11",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": 1.398439245500088,
+        "reference": 1.398439245500088,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M11",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.19940087760412,
+        "reference": 1.19940087760412,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M12",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": 1.610072172190765,
+        "reference": 1.610072172190765,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M12",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 0.831443708517134,
+        "reference": 0.831443708517134,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M2",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -1.453577716258246,
+        "reference": -1.453577716258246,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M2",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.11687967191695,
+        "reference": 1.11687967191695,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M3",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -0.65288783035492,
+        "reference": -1.159882645353316,
+        "Focal_minus_reference": 0.506994814998396
+      },
+      {
+        "Item": "M3",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.812818067777009,
+        "reference": 1.948068998362067,
+        "Focal_minus_reference": -0.135250930585059
+      },
+      {
+        "Item": "M4",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -0.929147966327831,
+        "reference": -0.929147966327831,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M4",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 0.788183755908388,
+        "reference": 0.788183755908388,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M5",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -0.523161760133669,
+        "reference": -0.523161760133669,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M5",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.770470031408422,
+        "reference": 1.770470031408422,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M6",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -0.263153531498041,
+        "reference": -0.263153531498041,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M6",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 0.960790157288428,
+        "reference": 0.960790157288428,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M7",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": -0.409115830122432,
+        "reference": 0.023560872035857,
+        "Focal_minus_reference": -0.432676702158288
+      },
+      {
+        "Item": "M7",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 0.298081244775231,
+        "reference": 1.155435811688615,
+        "Focal_minus_reference": -0.857354566913383
+      },
+      {
+        "Item": "M8",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": 0.470723470681219,
+        "reference": 0.470723470681219,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M8",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.491304447582337,
+        "reference": 1.491304447582337,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M9",
+        "Parameter": "difficulty",
+        "Coordinate": "()",
+        "focal": 0.711383175274961,
+        "reference": 0.711383175274961,
+        "Focal_minus_reference": 0.0
+      },
+      {
+        "Item": "M9",
+        "Parameter": "discrimination",
+        "Coordinate": "()",
+        "focal": 1.460467760644166,
+        "reference": 1.460467760644166,
+        "Focal_minus_reference": 0.0
+      }
+    ],
+    "Effect": [
+      {
+        "Item": "M1",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M10",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M11",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M12",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M2",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M3",
+        "Max_abs_probability_difference_on_grid": 0.23470587714054
+      },
+      {
+        "Item": "M4",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M5",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M6",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M7",
+        "Max_abs_probability_difference_on_grid": 0.298825609612405
+      },
+      {
+        "Item": "M8",
+        "Max_abs_probability_difference_on_grid": 0.0
+      },
+      {
+        "Item": "M9",
+        "Max_abs_probability_difference_on_grid": 0.0
+      }
+    ],
+    "DTF": [
+      {
+        "Theta": -4.0,
+        "focal": 0.471842568726281,
+        "reference": 0.2276199898144,
+        "Focal_minus_reference": 0.244222578911881
+      },
+      {
+        "Theta": -3.9,
+        "focal": 0.50042513851661,
+        "reference": 0.252027774601138,
+        "Focal_minus_reference": 0.248397363915472
+      },
+      {
+        "Theta": -3.8,
+        "focal": 0.531604352400415,
+        "reference": 0.279176802391057,
+        "Focal_minus_reference": 0.252427550009358
+      },
+      {
+        "Theta": -3.7,
+        "focal": 0.565652004986296,
+        "reference": 0.309375703225774,
+        "Focal_minus_reference": 0.256276301760522
+      },
+      {
+        "Theta": -3.6,
+        "focal": 0.602863976494515,
+        "reference": 0.3429633093741,
+        "Focal_minus_reference": 0.259900667120415
+      },
+      {
+        "Theta": -3.5,
+        "focal": 0.643560266651362,
+        "reference": 0.380309675552188,
+        "Focal_minus_reference": 0.263250591099175
+      },
+      {
+        "Theta": -3.4,
+        "focal": 0.688084250150878,
+        "reference": 0.421816444946226,
+        "Focal_minus_reference": 0.266267805204652
+      },
+      {
+        "Theta": -3.3,
+        "focal": 0.736800935032174,
+        "reference": 0.467916335967968,
+        "Focal_minus_reference": 0.268884599064206
+      },
+      {
+        "Theta": -3.2,
+        "focal": 0.790094002772813,
+        "reference": 0.519071507469682,
+        "Focal_minus_reference": 0.27102249530313
+      },
+      {
+        "Theta": -3.1,
+        "focal": 0.84836143415018,
+        "reference": 0.575770562808398,
+        "Focal_minus_reference": 0.272590871341781
+      },
+      {
+        "Theta": -3.0,
+        "focal": 0.912009590626277,
+        "reference": 0.638523985443133,
+        "Focal_minus_reference": 0.273485605183144
+      },
+      {
+        "Theta": -2.9,
+        "focal": 0.981445739429036,
+        "reference": 0.707857869589821,
+        "Focal_minus_reference": 0.273587869839215
+      },
+      {
+        "Theta": -2.8,
+        "focal": 1.05706918967035,
+        "reference": 0.784305923481261,
+        "Focal_minus_reference": 0.272763266189089
+      },
+      {
+        "Theta": -2.7,
+        "focal": 1.139261444907094,
+        "reference": 0.868399875573619,
+        "Focal_minus_reference": 0.270861569333475
+      },
+      {
+        "Theta": -2.6,
+        "focal": 1.228376055970175,
+        "reference": 0.960658587030977,
+        "Focal_minus_reference": 0.267717468939198
+      },
+      {
+        "Theta": -2.5,
+        "focal": 1.32472913533794,
+        "reference": 1.061576331001345,
+        "Focal_minus_reference": 0.263152804336595
+      },
+      {
+        "Theta": -2.4,
+        "focal": 1.428591704619669,
+        "reference": 1.171610789232218,
+        "Focal_minus_reference": 0.25698091538745
+      },
+      {
+        "Theta": -2.3,
+        "focal": 1.540185104695564,
+        "reference": 1.29117128412972,
+        "Focal_minus_reference": 0.249013820565845
+      },
+      {
+        "Theta": -2.2,
+        "focal": 1.65968051676776,
+        "reference": 1.420607572818036,
+        "Focal_minus_reference": 0.239072943949724
+      },
+      {
+        "Theta": -2.1,
+        "focal": 1.787203161383954,
+        "reference": 1.560199192236487,
+        "Focal_minus_reference": 0.227003969147468
+      },
+      {
+        "Theta": -2.0,
+        "focal": 1.922840960381084,
+        "reference": 1.710144951957159,
+        "Focal_minus_reference": 0.212696008423924
+      },
+      {
+        "Theta": -1.9,
+        "focal": 2.066656448882696,
+        "reference": 1.870551899503023,
+        "Focal_minus_reference": 0.196104549379674
+      },
+      {
+        "Theta": -1.8,
+        "focal": 2.218699688414406,
+        "reference": 2.041423153614714,
+        "Focal_minus_reference": 0.177276534799693
+      },
+      {
+        "Theta": -1.7,
+        "focal": 2.379019103452519,
+        "reference": 2.222644592273414,
+        "Focal_minus_reference": 0.156374511179105
+      },
+      {
+        "Theta": -1.6,
+        "focal": 2.547666803534764,
+        "reference": 2.413971502185433,
+        "Focal_minus_reference": 0.133695301349331
+      },
+      {
+        "Theta": -1.5,
+        "focal": 2.724695271488739,
+        "reference": 2.615017677039932,
+        "Focal_minus_reference": 0.109677594448807
+      },
+      {
+        "Theta": -1.4,
+        "focal": 2.910143392661931,
+        "reference": 2.82525054810386,
+        "Focal_minus_reference": 0.08489284455807
+      },
+      {
+        "Theta": -1.3,
+        "focal": 3.104011613425593,
+        "reference": 3.043996088621959,
+        "Focal_minus_reference": 0.060015524803634
+      },
+      {
+        "Theta": -1.2,
+        "focal": 3.306228321608182,
+        "reference": 3.270456011276755,
+        "Focal_minus_reference": 0.035772310331427
+      },
+      {
+        "Theta": -1.1,
+        "focal": 3.516611942760703,
+        "reference": 3.503737276504705,
+        "Focal_minus_reference": 0.012874666255998
+      },
+      {
+        "Theta": -1.0,
+        "focal": 3.734835215794777,
+        "reference": 3.742890904536039,
+        "Focal_minus_reference": -0.008055688741262
+      },
+      {
+        "Theta": -0.9,
+        "focal": 3.960399063060107,
+        "reference": 3.986954680261574,
+        "Focal_minus_reference": -0.026555617201467
+      },
+      {
+        "Theta": -0.8,
+        "focal": 4.192622900000588,
+        "reference": 4.234993523215877,
+        "Focal_minus_reference": -0.042370623215289
+      },
+      {
+        "Theta": -0.7,
+        "focal": 4.430655916114583,
+        "reference": 4.486132314555461,
+        "Focal_minus_reference": -0.055476398440878
+      },
+      {
+        "Theta": -0.6,
+        "focal": 4.673510051755268,
+        "reference": 4.739578226544163,
+        "Focal_minus_reference": -0.066068174788895
+      },
+      {
+        "Theta": -0.5,
+        "focal": 4.92011088494429,
+        "reference": 4.994632010766743,
+        "Focal_minus_reference": -0.074521125822454
+      },
+      {
+        "Theta": -0.4,
+        "focal": 5.16935860756695,
+        "reference": 5.250689348378574,
+        "Focal_minus_reference": -0.081330740811624
+      },
+      {
+        "Theta": -0.3,
+        "focal": 5.420188902760571,
+        "reference": 5.507233942779771,
+        "Focal_minus_reference": -0.0870450400192
+      },
+      {
+        "Theta": -0.2,
+        "focal": 5.67162358356141,
+        "reference": 5.763823871670956,
+        "Focal_minus_reference": -0.092200288109546
+      },
+      {
+        "Theta": -0.1,
+        "focal": 5.922803309401733,
+        "reference": 6.020072427992946,
+        "Focal_minus_reference": -0.097269118591213
+      },
+      {
+        "Theta": 0.0,
+        "focal": 6.172998797811379,
+        "reference": 6.275624741096859,
+        "Focal_minus_reference": -0.10262594328548
+      },
+      {
+        "Theta": 0.100000000000001,
+        "focal": 6.42160148598402,
+        "reference": 6.530131970206276,
+        "Focal_minus_reference": -0.108530484222256
+      },
+      {
+        "Theta": 0.2,
+        "focal": 6.66809837829511,
+        "reference": 6.783225542538019,
+        "Focal_minus_reference": -0.115127164242908
+      },
+      {
+        "Theta": 0.3,
+        "focal": 6.912038047398958,
+        "reference": 7.034494373804151,
+        "Focal_minus_reference": -0.122456326405192
+      },
+      {
+        "Theta": 0.4,
+        "focal": 7.152995205777732,
+        "reference": 7.283467957629617,
+        "Focal_minus_reference": -0.130472751851886
+      },
+      {
+        "Theta": 0.5,
+        "focal": 7.39054019549269,
+        "reference": 7.529607560476216,
+        "Focal_minus_reference": -0.139067364983526
+      },
+      {
+        "Theta": 0.6,
+        "focal": 7.624217714747611,
+        "reference": 7.772306646788067,
+        "Focal_minus_reference": -0.148088932040456
+      },
+      {
+        "Theta": 0.7,
+        "focal": 7.853536739237484,
+        "reference": 8.010900355834513,
+        "Focal_minus_reference": -0.15736361659703
+      },
+      {
+        "Theta": 0.800000000000001,
+        "focal": 8.07797143403501,
+        "reference": 8.2446826517244,
+        "Focal_minus_reference": -0.166711217689389
+      },
+      {
+        "Theta": 0.9,
+        "focal": 8.296971231989568,
+        "reference": 8.472928901041882,
+        "Focal_minus_reference": -0.175957669052314
+      },
+      {
+        "Theta": 1.0,
+        "focal": 8.509977319625206,
+        "reference": 8.694921215661958,
+        "Focal_minus_reference": -0.184943896036753
+      },
+      {
+        "Theta": 1.100000000000001,
+        "focal": 8.716442493954382,
+        "reference": 8.90997393037437,
+        "Focal_minus_reference": -0.193531436419988
+      },
+      {
+        "Theta": 1.2,
+        "focal": 8.915851592705632,
+        "reference": 9.117456972566544,
+        "Focal_minus_reference": -0.201605379860911
+      },
+      {
+        "Theta": 1.300000000000001,
+        "focal": 9.107740264086614,
+        "reference": 9.316815481737896,
+        "Focal_minus_reference": -0.209075217651282
+      },
+      {
+        "Theta": 1.4,
+        "focal": 9.291710540917624,
+        "reference": 9.507584702753203,
+        "Focal_minus_reference": -0.215874161835579
+      },
+      {
+        "Theta": 1.5,
+        "focal": 9.467442367954042,
+        "reference": 9.689399790567363,
+        "Focal_minus_reference": -0.22195742261332
+      },
+      {
+        "Theta": 1.6,
+        "focal": 9.63470080677872,
+        "reference": 9.862000654057274,
+        "Focal_minus_reference": -0.227299847278553
+      },
+      {
+        "Theta": 1.7,
+        "focal": 9.793339070454508,
+        "reference": 10.0252323073441,
+        "Focal_minus_reference": -0.231893236889592
+      },
+      {
+        "Theta": 1.800000000000001,
+        "focal": 9.943297821529601,
+        "reference": 10.179041398122143,
+        "Focal_minus_reference": -0.235743576592542
+      },
+      {
+        "Theta": 1.9,
+        "focal": 10.084601326184428,
+        "reference": 10.323469672339625,
+        "Focal_minus_reference": -0.238868346155197
+      },
+      {
+        "Theta": 2.0,
+        "focal": 10.21735112572794,
+        "reference": 10.45864514597133,
+        "Focal_minus_reference": -0.241294020243389
+      },
+      {
+        "Theta": 2.100000000000001,
+        "focal": 10.341717892879194,
+        "reference": 10.584771715968524,
+        "Focal_minus_reference": -0.24305382308933
+      },
+      {
+        "Theta": 2.2,
+        "focal": 10.457932105846806,
+        "reference": 10.7021178741814,
+        "Focal_minus_reference": -0.244185768334594
+      },
+      {
+        "Theta": 2.300000000000001,
+        "focal": 10.566274112667765,
+        "reference": 10.811005103078518,
+        "Focal_minus_reference": -0.244730990410753
+      },
+      {
+        "Theta": 2.4,
+        "focal": 10.667064081145018,
+        "reference": 10.911796438293285,
+        "Focal_minus_reference": -0.244732357148267
+      },
+      {
+        "Theta": 2.5,
+        "focal": 10.76065224289764,
+        "reference": 11.004885585638018,
+        "Focal_minus_reference": -0.244233342740378
+      },
+      {
+        "Theta": 2.6,
+        "focal": 10.847409749237269,
+        "reference": 11.09068688349887,
+        "Focal_minus_reference": -0.243277134261602
+      },
+      {
+        "Theta": 2.7,
+        "focal": 10.927720367030242,
+        "reference": 11.169626309426556,
+        "Focal_minus_reference": -0.241905942396315
+      },
+      {
+        "Theta": 2.800000000000001,
+        "focal": 11.001973159061325,
+        "reference": 11.242133645908138,
+        "Focal_minus_reference": -0.240160486846813
+      },
+      {
+        "Theta": 2.9,
+        "focal": 11.070556219453792,
+        "reference": 11.308635847709159,
+        "Focal_minus_reference": -0.238079628255367
+      },
+      {
+        "Theta": 3.0,
+        "focal": 11.133851472981686,
+        "reference": 11.36955159375912,
+        "Focal_minus_reference": -0.235700120777434
+      },
+      {
+        "Theta": 3.100000000000001,
+        "focal": 11.192230498847545,
+        "reference": 11.425286961081259,
+        "Focal_minus_reference": -0.233056462233714
+      },
+      {
+        "Theta": 3.2,
+        "focal": 11.246051304646468,
+        "reference": 11.476232126376646,
+        "Focal_minus_reference": -0.230180821730178
+      },
+      {
+        "Theta": 3.300000000000001,
+        "focal": 11.295655953738253,
+        "reference": 11.522758981292705,
+        "Focal_minus_reference": -0.227103027554453
+      },
+      {
+        "Theta": 3.4,
+        "focal": 11.341368937367054,
+        "reference": 11.565219538267712,
+        "Focal_minus_reference": -0.223850600900658
+      },
+      {
+        "Theta": 3.5,
+        "focal": 11.383496179523421,
+        "reference": 11.603945002989887,
+        "Focal_minus_reference": -0.220448823466466
+      },
+      {
+        "Theta": 3.6,
+        "focal": 11.422324565598556,
+        "reference": 11.639245394769945,
+        "Focal_minus_reference": -0.216920829171389
+      },
+      {
+        "Theta": 3.7,
+        "focal": 11.458121893348114,
+        "reference": 11.671409605504612,
+        "Focal_minus_reference": -0.213287712156498
+      },
+      {
+        "Theta": 3.800000000000001,
+        "focal": 11.491137154853158,
+        "reference": 11.700705799707329,
+        "Focal_minus_reference": -0.209568644854171
+      },
+      {
+        "Theta": 3.9,
+        "focal": 11.521601069665635,
+        "reference": 11.727382070948746,
+        "Focal_minus_reference": -0.20578100128311
+      },
+      {
+        "Theta": 4.0,
+        "focal": 11.549726801121048,
+        "reference": 11.751667282977015,
+        "Focal_minus_reference": -0.201940481855967
+      }
+    ]
+  }
+}
