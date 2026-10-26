@@ -26,7 +26,9 @@ if(cfg$correlated){
 base<-list(data=dat,model=spec,itemtype=type,verbose=FALSE)
 if(!is.null(group))base$customGroup<-group
 sv<-do.call(mirt,c(base,list(pars='values')))
-stopifnot(inherits(sv,'mirtValues'),all(sv$prior.type=='none'))
+native_attributes<-attributes(sv)
+capture.output(dput(native_attributes),file=file.path(out,'parameter_table_attributes.txt'))
+stopifnot(is.data.frame(sv),all(sv$prior.type=='none'))
 for(i in seq_len(J)){
  for(j in seq_len(Q)){
   at<-which(sv$item==colnames(dat)[i] & sv$name==paste0('a',j));stopifnot(length(at)==1)
@@ -67,6 +69,8 @@ if(mode=='fit'){
  opts$optimizer<-'nloptr';nl<-list(lb=low,ub=up,opts=list(algorithm='NLOPT_LD_SLSQP',xtol_rel=1e-8,maxeval=1000))
  if(nrow(A)){nl$eval_g_ineq<-callback;nl$eval_jac_g_ineq<-jac};opts$nloptr_args<-nl
 }
+stopifnot(identical(attributes(sv),native_attributes))
+write.csv(sv,file.path(out,'configured_values.csv'),row.names=FALSE)
 fit<-do.call(mirt,opts);final<-mod2values(fit);write.csv(final,file.path(out,'raw_parameters.csv'),row.names=FALSE)
 eta<-if(cfg$correlated)final$value[final$name=='eta12'] else 0;stopifnot(length(eta)==1)
 S<-covariance(eta)

@@ -88,6 +88,7 @@ def run(name,out):
  try:
   if not shutil.which('Rscript'):raise RuntimeError('Independent R runtime unavailable')
   # Fixed-parameter objects, no parameter M-step: verify mapping before calibrating.
+  result['R_execution']='PREFLIGHT ATTEMPTED'
   pre=r_run(out,'preflight');result['R_execution']='FIXED PARAMETER PREFLIGHT EXECUTED'
   start_a=np.array(cfg['pattern'])*1.2
   if cfg['model']=='2PL':engine.set_parameters(slopes=start_a,intercepts=np.zeros(cfg['k']))
