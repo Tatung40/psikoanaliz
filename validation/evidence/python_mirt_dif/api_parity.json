@@ -1,0 +1,9 @@
+{
+  "public_multigroup_dif_LR": 0.00022455238195107086,
+  "retained_pair_LR": 0.0002759918706942699,
+  "alternative_anchors_LR": 0.012375615978726273,
+  "status": "MEASURED / NOT CERTIFIED",
+  "parameters": "intercepts",
+  "n_quadpts": 21,
+  "tol": 1e-05
+}
