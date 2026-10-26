@@ -41,8 +41,8 @@ def test_fixed_parameter_mapping_and_information(name,tmp_path):
 
 def test_reject_unidentified_and_unsupported_models():
  with pytest.raises(ValueError,match='saf madde'):structure(np.tile([[1,1,0],[0,1,1],[1,0,1]],(3,1)))
- with pytest.raises(ValueError):structure(np.ones((9,5)))
- with pytest.raises(ValueError):fit(pd.DataFrame(np.ones((50,6))),'GPCM',np.ones((6,2)))
+ with pytest.raises(ValueError):structure(np.ones((18,6)))
+ with pytest.raises(ValueError):fit(pd.DataFrame(np.ones((50,6))),'3PL',np.ones((6,2)))
  matrix=support_matrix().set_index('Model')
  assert matrix.loc['2PL','Phase1'] and matrix.loc['GRM','Phase1']
  assert not matrix.loc['GPCM','Phase1'] and not matrix.loc['NRM','Phase1']
@@ -117,3 +117,41 @@ def test_recovery_keeps_original_failure_and_never_refits(tmp_path,monkeypatch):
  result=harness.recover('GRM_2D',tmp_path/'prior',tmp_path/'recovered')
  assert result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED'
  assert json.loads((tmp_path/'recovered'/'original_report.json').read_text())['comparison']['R_native_LL']['status']=='FAIL'
+
+
+@pytest.mark.parametrize('name',__import__('validation.mirt_stage1.compare',fromlist=['EXPANSION']).EXPANSION)
+def test_expansion_fixed_parameter_probabilities_information(name,tmp_path):
+ from scipy.special import logsumexp
+ cfg,data,engine,grid=inputs(name,tmp_path/name);q=cfg['q']
+ theta=np.array([[-.5]*q,[0.]*q,[.5]*q]);p=engine.probability(theta)
+ if p.ndim==2:p=np.stack((1-p,p),-1)
+ assert np.isfinite(p).all();np.testing.assert_allclose(p.sum(-1),1,atol=1e-14)
+ if cfg['model']=='NRM':logits=np.einsum('nq,jcq->njc',theta,engine.parameters['slopes'])+engine.parameters['intercepts']
+ elif cfg['model'] in ('PCM','GPCM'):
+  a=engine.parameters['discrimination'];steps=engine.parameters['steps']
+  logits=(theta@a.T)[:,:,None]*np.arange(4)-a.sum(1)[None,:,None]*np.column_stack((np.zeros(cfg['k']),np.cumsum(steps,axis=1)))
+ else:logits=None
+ if logits is not None:np.testing.assert_allclose(p,np.exp(logits-logsumexp(logits,axis=2,keepdims=True)),atol=1e-14)
+ h=1e-5;der=[]
+ for j in range(q):
+  delta=np.zeros(q);delta[j]=h;hi=engine.probability(theta+delta);lo=engine.probability(theta-delta)
+  if hi.ndim==2:hi=np.stack((1-hi,hi),-1);lo=np.stack((1-lo,lo),-1)
+  der.append((hi-lo)/(2*h))
+ g=np.stack(der,-1);manual=np.einsum('njcr,njcs,njc->njrs',g,g,1/p)
+ actual=np.stack([engine.item_information_matrix(theta,j) for j in range(cfg['k'])],1)
+ np.testing.assert_allclose(actual,manual,rtol=1e-6,atol=1e-8)
+ assert all(set(data[c])==set(range(2 if cfg['model'] in ('2PL','Rasch','Bifactor') else 4)) for c in data)
+
+
+def test_canonical_nominal_gauge_and_exploratory_guard(tmp_path):
+ from types import SimpleNamespace
+ from core.irt_multidim import _canonical
+ cfg,_,engine,_=inputs('NRM_2D',tmp_path/'nominal');pattern=np.array(cfg['pattern'],bool)
+ original=engine.parameters['slopes'].copy();engine.set_parameters(slopes=original*np.array([-1,1]))
+ native=SimpleNamespace(model=engine,latent_covariance=np.array([[1,.2],[.2,1]]))
+ changed,cov,signs=_canonical(native,native.latent_covariance,pattern,'NRM')
+ np.testing.assert_array_equal(signs,[-1,1]);np.testing.assert_array_equal(changed.model.parameters['slopes'],original)
+ assert cov[0,1]==-.2 and engine.parameters['slopes'][0,1,0]<0
+ pat=np.ones((8,2),int);pat[:2]=np.tril(np.ones((2,2),int))
+ assert structure(pat,exploratory=True)
+ with pytest.raises(ValueError):structure(pat,correlated=True,exploratory=True)

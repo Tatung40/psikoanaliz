@@ -24,3 +24,24 @@ The primary engine is always the existing Python mirt public API. No new calibra
 Actual independent calibration converged for orthogonal 2PL 3D and GRM 2D. Their common-grid likelihood differences were 1.62e-7 / 3.26e-7, max slope differences .000205 / .000065, max probability differences .0000132 / .0000227; EAP, posterior SD and information also met the unchanged preregistered numerical criteria. The final native-R likelihood check failed because jsonlite's default four-decimal serialization rounded metadata, not because the actual likelihoods disagreed. Correlated preflights stopped on an unnecessary missing `mvtnorm` import. Both original reports and errors remain in the run artifact.
 
 Follow-up preserves the successful calibrations: download the original 534KB artifact, reconstruct fixed R objects from their saved native parameter values (all estimation flags FALSE), and reevaluate native likelihood at full JSON precision. No second calibration of these profiles. The original failed report is copied unchanged to `original_report.json`. Correlated profiles alone execute their first calibration after a base-R Gaussian density-ratio preflight. The density-ratio equation is tested independently against SciPy; no new package or tolerance change is needed. Source-free-parameter count and fixed-evaluation provenance are retained explicitly.
+
+## Expansion after actual Stage 1 acceptance
+
+`phase1_evidence.json` retains the four actual converged R/Python reports.
+`--expand` reuses those estimates without recalibration and adds eight seeded
+profiles: unit-slope Rasch, unit-slope GPCM/PCM, correlated 3D and orthogonal
+5D GPCM, full nominal 2D, orthogonal 4D bifactor, and identified nonnegative
+triangular 2D exploratory 2PL/GRM. The exploratory scope is restricted; it is
+not unrestricted signed EFA. Higher-dimensional quadrature is coarse and is
+not a quadrature-accuracy certificate. Bifactor full tensor and reduced
+integration represent the same finite-grid sum. No model is certified.
+
+Full multidimensional NRM uses R native `gpcm_mats` with fixed unit item
+slopes and freely estimated category-by-factor scores (reference category
+zero), not R's rank-one nominal item. Nominal information is calculated from
+R native probabilities with two independently checked derivative steps;
+standard-score native `iteminfo` is unsuitable for this representation.
+Rasch/PCM use fixed unit loadings, not shared-free-discrimination 1PL.
+3PL/4PL and RSM remain disabled: the installed public API does not expose
+an equivalent multidimensional family/constraint. All previous criteria
+remain unchanged; preflight failure prevents a fit, and nonconvergence fails.

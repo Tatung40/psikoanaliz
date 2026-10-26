@@ -7,25 +7,43 @@ from scipy.special import logsumexp
 from scipy.stats import multivariate_normal
 import mirt
 from mirt.estimation.quadrature import GaussHermiteQuadrature
-from core.irt_multidim import fit,structure,STATUS
+from core.irt_multidim import fit,structure,STATUS,nominal_start
 from validation.r_mirt_phase1.harness import discrepancies
 
 ROOT=Path(__file__).resolve().parent
-PROFILES=('2PL_2D','2PL_3D','GRM_2D','GRM_3D')
+PHASE1=('2PL_2D','2PL_3D','GRM_2D','GRM_3D')
+EXPANSION=('Rasch_2D','PCM_2D','GPCM_3D','GPCM_5D','NRM_2D','Bifactor_4D','2PL_EFA_2D','GRM_EFA_2D')
+PROFILES=PHASE1
+BINARY=('2PL','Rasch','Bifactor')
 
 
 def profile(name):
- model,dim=name.split('_');q=int(dim[0]);k=4*q+2
+ parts=name.split('_');model=parts[0];q=int(parts[-1][0]);exploratory='EFA' in parts
+ k=4*q+2 if q<=3 else 3*q+2
  pattern=np.zeros((k,q),int)
- for j in range(q):pattern[j*4:(j+1)*4,j]=1
- within=(model,q) in (('2PL',3),('GRM',2))
+ size=4 if q<=3 else 3
+ for j in range(q):pattern[j*size:(j+1)*size,j]=1
+ within=(model,q) in (('2PL',3),('GRM',2),('Rasch',2),('PCM',2),('NRM',2),('GPCM',5))
  if within:pattern[-2:,:]=1
- else:
-  pattern[-2:,0]=1
+ else:pattern[-2:,0]=1
  correlated=not within
- return dict(name=name,model=model,q=q,k=k,pattern=pattern.tolist(),correlated=correlated,
-  syntax=structure(pattern,correlated),N=400,seed=20261026+q+(model=='GRM')*10,
-  n_quadpts=15,max_iter=1000,tol=1e-7,criteria_sha256=hashlib.sha256((ROOT/'criteria.json').read_bytes()).hexdigest())
+ if model in ('Rasch','PCM'):correlated=False
+ full=model in ('GPCM','NRM') and q<=3
+ if full:correlated='full'
+ groups=None
+ if model=='Bifactor':
+  groups=np.repeat(np.arange(q-1),3).tolist();k=len(groups)
+  pattern=np.column_stack((np.ones(k,int),np.array(groups)[:,None]==np.arange(q-1)))
+  correlated=False
+ if exploratory:
+  pattern[:,:]=1;pattern[:q,:]=np.tril(np.ones((q,q),int));correlated=False
+ syntax=structure(pattern,correlated,exploratory) if model!='Bifactor' else '\n'.join(f'F{j+1} = '+','.join(str(i+1) for i in np.flatnonzero(pattern[:,j])) for j in range(q))
+ return dict(name=name,model=model,q=q,k=k,pattern=pattern.astype(int).tolist(),correlated=correlated,
+  covariance_mode='full' if full else 'pair',exploratory=exploratory,groups=groups,syntax=syntax,
+  N=600 if model=='Bifactor' else 200 if q==5 else 400,
+  seed=20261026+q+(model=='GRM')*10+(EXPANSION.index(name)+100 if name in EXPANSION else 0),
+  n_quadpts=7 if model=='Bifactor' else 5 if q==5 else 15,max_iter=1000,tol=1e-7,
+  criteria_sha256=hashlib.sha256((ROOT/'criteria.json').read_bytes()).hexdigest())
 
 
 def masses(nodes,base,cov):
@@ -43,13 +61,24 @@ def likelihood(data,p,weight):
 def inputs(name,out):
  cfg=profile(name);out.mkdir(parents=True,exist_ok=True);q=cfg['q'];pattern=np.array(cfg['pattern'])
  from mirt.models.multidimensional import MultidimensionalModel
- from mirt.models.polytomous import GradedResponseModel
- engine=MultidimensionalModel(cfg['k'],q,model_type='confirmatory',loading_pattern=pattern) if cfg['model']=='2PL' else GradedResponseModel(cfg['k'],n_factors=q,n_categories=4)
- a=pattern*1.2;thresholds=np.tile(np.linspace(-1,1,3),(cfg['k'],1));d=np.linspace(-.7,.7,cfg['k'])
- if cfg['model']=='2PL':engine.set_parameters(slopes=a,intercepts=d)
- else:engine.set_parameters(discrimination=a,thresholds=thresholds)
+ from mirt.models.polytomous import GradedResponseModel,GeneralizedPartialCredit,NominalResponseModel
+ from mirt.models.bifactor import BifactorModel
+ model=cfg['model'];unit=model in ('Rasch','PCM')
+ if model=='Bifactor':engine=BifactorModel(cfg['k'],cfg['groups'])
+ elif model in BINARY:engine=MultidimensionalModel(cfg['k'],q,model_type='confirmatory',loading_pattern=pattern)
+ elif model=='NRM':engine=NominalResponseModel(cfg['k'],4,n_factors=q)
+ else:engine=(GradedResponseModel if model=='GRM' else GeneralizedPartialCredit)(cfg['k'],n_factors=q,n_categories=4)
+ a=pattern*(1 if unit else 1.2)
+ if cfg['exploratory']:a=pattern*(1+.3*np.sin((np.arange(cfg['k'])[:,None]+1)*(np.arange(q)[None,:]+1)))
+ thresholds=np.tile(np.linspace(-1,1,3)*(0.4 if q==5 else 1),(cfg['k'],1));d=np.linspace(-.7,.7,cfg['k'])
+ if model=='Bifactor':engine.set_parameters(general_loadings=np.linspace(.7,.95,cfg['k']),specific_loadings=np.tile([.8,.95,1.1],q-1),intercepts=d)
+ elif model in BINARY:engine.set_parameters(slopes=a,intercepts=d)
+ elif model=='NRM':engine.set_parameters(slopes=nominal_start(pattern,4),intercepts=np.tile([0,-.2,.2,.1],(cfg['k'],1)))
+ else:engine.set_parameters(**{'discrimination':a,'thresholds' if model=='GRM' else 'steps':thresholds})
  covariance=np.eye(q)
- if cfg['correlated']:covariance[0,1]=covariance[1,0]=.25
+ if cfg['correlated']:
+  if cfg['correlated']=='full':covariance[:,:]=.25;np.fill_diagonal(covariance,1)
+  else:covariance[0,1]=covariance[1,0]=.25
  theta=np.random.default_rng(cfg['seed']).multivariate_normal(np.zeros(q),covariance,cfg['N'])
  data=pd.DataFrame(mirt.simdata(model=engine,n_persons=cfg['N'],theta=theta,seed=cfg['seed']),columns=[f'M{i+1}' for i in range(cfg['k'])])
  data.to_csv(out/'data.csv',index=False)
@@ -77,7 +106,7 @@ def native_outputs(engine,theta):
 
 
 def arrays(directory,cfg):
- p=pd.read_csv(directory/'probabilities.csv').sort_values(['Node','Item','Category']).Probability.to_numpy().reshape(-1,cfg['k'],2 if cfg['model']=='2PL' else 4)
+ p=pd.read_csv(directory/'probabilities.csv').sort_values(['Node','Item','Category']).Probability.to_numpy().reshape(-1,cfg['k'],2 if cfg['model'] in BINARY else 4)
  info=pd.read_csv(directory/'information.csv').sort_values(['Node','Item','Row','Column']).Information.to_numpy().reshape(-1,cfg['k'],cfg['q'],cfg['q'])
  return p,info
 
@@ -90,18 +119,22 @@ def run(name,out):
   # Fixed-parameter objects, no parameter M-step: verify mapping before calibrating.
   result['R_execution']='PREFLIGHT ATTEMPTED'
   pre=r_run(out,'preflight');result['R_execution']='FIXED PARAMETER PREFLIGHT EXECUTED'
-  start_a=np.array(cfg['pattern'])*1.2
-  if cfg['model']=='2PL':engine.set_parameters(slopes=start_a,intercepts=np.zeros(cfg['k']))
-  else:engine.set_parameters(discrimination=start_a,thresholds=np.tile(np.linspace(-1,1,3),(cfg['k'],1)))
+  unit=cfg['model'] in ('Rasch','PCM');start_a=np.array(cfg['pattern'])*(1 if unit else 1.2)
+  if cfg['model']=='Bifactor':engine.set_parameters(general_loadings=np.full(cfg['k'],.7),specific_loadings=np.full(cfg['k'],.5),intercepts=np.zeros(cfg['k']))
+  elif cfg['model'] in BINARY:engine.set_parameters(slopes=start_a,intercepts=np.zeros(cfg['k']))
+  elif cfg['model']=='NRM':engine.set_parameters(slopes=nominal_start(cfg['pattern'],4),intercepts=np.zeros((cfg['k'],4)))
+  else:engine.set_parameters(**{'discrimination':start_a,'thresholds' if cfg['model']=='GRM' else 'steps':np.tile(np.linspace(-1,1,3),(cfg['k'],1))})
   trace=pd.read_csv(out/'trace.csv').to_numpy();p,I=native_outputs(engine,trace);rp,rI=arrays(pre,cfg)
   cov=np.eye(cfg['q'])
-  if cfg['correlated']:cov[0,1]=cov[1,0]=.25
+  if cfg['correlated']:
+   if cfg.get('covariance_mode')=='full':cov[:,:]=.25;np.fill_diagonal(cov,1)
+   else:cov[0,1]=cov[1,0]=.25
   checks=dict(probabilities=discrepancies(p,rp,criteria['mapping_probability']),information=discrepancies(I,rI,criteria['mapping_information']),
    prior=discrepancies(masses(grid.nodes,grid.weights,cov),pd.read_csv(pre/'prior.csv').weight.to_numpy(),criteria['mapping_prior_mass']))
   result['preflight']=checks
   if any(c['status']!='PASS' for c in checks.values()):raise RuntimeError('NOT COMPARABLE: fixed-parameter mapping/weights failed; no calibration attempted')
   result['Python_execution']='CALIBRATION ATTEMPTED'
-  outcome=fit(data,cfg['model'],cfg['pattern'],correlated=cfg['correlated'],n_quadpts=cfg['n_quadpts'],max_iter=cfg['max_iter'],tol=cfg['tol'])
+  outcome=fit(data,cfg['model'],cfg['groups'] if cfg['model']=='Bifactor' else cfg['pattern'],correlated=cfg['correlated'],exploratory=cfg.get('exploratory',False),labels=['0','1','2','3'] if cfg['model']=='NRM' else None,n_quadpts=cfg['n_quadpts'],max_iter=cfg['max_iter'],tol=cfg['tol'])
   f=outcome['fit'];result['Python_execution']='EXECUTED'
   np.savez(out/'python_parameters.npz',**f.model.parameters,covariance=outcome['covariance'])
   py=dict(engine='Python mirt '+mirt.__version__,python=platform.python_version(),converged=bool(f.converged),logLik=f.log_likelihood,AIC=f.aic,BIC=f.bic,n_parameters=f.n_parameters,iterations=f.n_iterations)
@@ -110,9 +143,14 @@ def run(name,out):
   actual=r_run(out,'fit');result['R_execution']='CALIBRATION EXECUTED'
   rmeta=json.loads((actual/'metadata.json').read_text());result['R']=rmeta
   rp,rI=arrays(actual,cfg);p,I=native_outputs(f.model,trace)
-  pars=pd.read_csv(actual/'parameters.csv');a=pars.filter(regex='^a[1-3]$').to_numpy()
+  pars=pd.read_csv(actual/'parameters.csv');a=pars.filter(regex='^a[1-5]$').to_numpy()
   d=pars.filter(regex='^d').to_numpy();params=f.model.parameters
-  pa=params['slopes' if cfg['model']=='2PL' else 'discrimination'];pd_=params['intercepts'][:,None] if cfg['model']=='2PL' else -pa.sum(1)[:,None]*params['thresholds']
+  if cfg['model']=='NRM':
+   pa=params['slopes'];pd_=params['intercepts'];a=a.reshape(cfg['k'],4,cfg['q']);d=d.reshape(cfg['k'],4)
+  else:
+   pa=f.model.get_loading_matrix() if cfg['model']=='Bifactor' else params['slopes' if cfg['model'] in BINARY else 'discrimination']
+   key='thresholds' if cfg['model']=='GRM' else 'steps'
+   pd_=params['intercepts'][:,None] if cfg['model'] in BINARY else -pa.sum(1)[:,None]*params[key]
   rcov=np.array(rmeta['covariance']);cov=outcome['covariance']
   rgrid=pd.read_csv(actual/'integration_probabilities.csv').sort_values(['Node','Item','Category']).Probability.to_numpy().reshape(len(grid.nodes),cfg['k'],-1)
   python_grid,_=native_outputs(f.model,grid.nodes)
@@ -145,7 +183,8 @@ def recover(name,prior,out):
  if hashlib.sha256((source/'data.csv').read_bytes()).hexdigest()!=cfg['data_sha256']:
   raise ValueError('Original data hash mismatch')
  shutil.copytree(source,out,dirs_exist_ok=True)
- shutil.copy2(out/'report.json',out/'original_report.json')
+ shutil.copy2(out/'report.json',out/'previous_report.json')
+ if not (out/'original_report.json').exists():shutil.copy2(out/'report.json',out/'original_report.json')
  result=original.copy();result['provenance']='Retained converged calibration; only native saved-parameter likelihood reevaluated, NO M-STEP'
  try:
   target=r_run(out,'evaluate_saved');precise=json.loads((target/'metadata.json').read_text())
@@ -160,7 +199,8 @@ def recover(name,prior,out):
 
 
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);args=parser.parse_args()
- reports=[recover(name,args.reuse,args.output/name) if args.reuse and name in ('GRM_2D','2PL_3D') else run(name,args.output/name) for name in PROFILES]
+ parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);parser.add_argument('--expand',action='store_true');args=parser.parse_args()
+ names=PHASE1+EXPANSION if args.expand else PHASE1
+ reports=[recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else run(name,args.output/name) for name in names]
  print(json.dumps([dict(profile=r['profile'],status=r['status'],blocker=r.get('blocker')) for r in reports],indent=2))
  sys.exit(0 if all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 1)
