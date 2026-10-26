@@ -28,10 +28,10 @@ def free_port():
 
 
 class Server:
-    def __init__(self, log):
-        self.port = free_port(); self.log = log
+    def __init__(self, log, python=None):
+        self.port = free_port(); self.log = log; self.python = python or sys.executable
     def __enter__(self):
-        self.proc = subprocess.Popen([sys.executable, "-m", "streamlit", "run", "app.py", f"--server.port={self.port}",
+        self.proc = subprocess.Popen([self.python, "-m", "streamlit", "run", "app.py", f"--server.port={self.port}",
                                       "--server.headless=true", "--server.fileWatcherType=none",
                                       "--browser.gatherUsageStats=false"], cwd=ROOT, stdout=self.log, stderr=self.log)
         end = time.monotonic() + 60

@@ -85,28 +85,32 @@ def test_rasch_ui_settings_invalidation_and_downloads(calibrated,monkeypatch):
     import streamlit as st
     from streamlit.testing.v1 import AppTest
     import ui.irt_python_library_view as view
-    x,outcome,ids,tables=calibrated;calls=[];exports={}
+    x,outcome,ids,tables=calibrated;calls=[];exports={};person_downloads={}
     def fit(data,**kwargs):
         calls.append(kwargs)
         return fit_python_mirt(data,**kwargs)
     monkeypatch.setattr(view,'fit_python_mirt',fit)
     original=st.download_button
     def capture(label,data,*args,**kwargs):
-        exports[kwargs.get('key')]=data
+        if str(kwargs.get('key','')).startswith('rasch_wright_'):exports[kwargs.get('key')]=data
+        if str(kwargs.get('key','')).startswith('python_mirt_persons_'):person_downloads[kwargs.get('key')]=data
         return original(label,data,*args,**kwargs)
     monkeypatch.setattr(st,'download_button',capture)
     data=x.copy();data.insert(0,'ID',ids);data.index=[4]*len(data)
     at=AppTest.from_file(str(Path('app.py').resolve()),default_timeout=120)
     for k,v in dict(raw_df=data,scored_df=None,item_cols=list(x.columns),id_col='ID',group_col=None,is_dichotomous=True,nav_page='MTK: Python mirt Rasch').items():at.session_state[k]=v
     at.run()
+    assert not at.checkbox(key='python_mirt_solver_advanced_Rasch').value
+    at.checkbox(key='python_mirt_solver_advanced_Rasch').check().run()
     prefix='python_mirt_solver_Rasch'
     at.number_input(key=prefix+'_n_quadpts').set_value(31)
     at.number_input(key=prefix+'_tol').set_value(1e-6)
     at.number_input(key=prefix+'_max_iter').set_value(700).run()
     at.button(key='python_mirt_start_Rasch').click().run()
+    at.checkbox(key='python_mirt_wright_Rasch').check().run()
     assert not at.exception and len(at.get('plotly_chart'))==1 and len(exports)==4
     assert calls[-1]['max_iter']==700 and calls[-1]['tol']==1e-6 and calls[-1]['n_quadpts']==31
-    saved=at.session_state['python_mirt_fit_Rasch'][0]
+    saved=at.session_state['python_mirt_fit_Rasch']['outcome']
     assert saved.solver_settings==dict(max_iter=700,tol=1e-6,n_quadpts=31) and saved.fit.converged
     expected=mirt.fscores(saved.fit,x.to_numpy(),method='EAP',n_quadpts=61)
     exported=pd.read_csv(io.BytesIO(exports['rasch_wright_persons']))
@@ -115,6 +119,7 @@ def test_rasch_ui_settings_invalidation_and_downloads(calibrated,monkeypatch):
     at.number_input(key=prefix+'_tol').set_value(1e-5).run()
     assert not at.get('plotly_chart') and not at.get('download_button')
     at.number_input(key=prefix+'_max_iter').set_value(1).run()
+    exports.clear();person_downloads.clear()
     at.button(key='python_mirt_start_Rasch').click().run()
-    assert not at.exception and not at.get('plotly_chart') and not at.get('download_button')
-    assert any('Yakınsamış' in e.value for e in at.warning)
+    assert not at.exception and not at.get('plotly_chart') and not exports and not person_downloads
+    assert any('yakınsamadı' in e.value for e in at.error)

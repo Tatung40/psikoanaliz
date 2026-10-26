@@ -8,6 +8,8 @@ from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
 from core.irt_person_abilities import person_abilities
+from ui.irt_solver_controls import solver_controls
+from core.irt_rasch_wright import rasch_wright_tables,wright_figure,wright_exports
 
 
 def _data_fingerprint(frame):
@@ -38,18 +40,10 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             'comparison':'Aynı veri üzerinde model karşılaştırması (ML AIC/BIC)',
             'itemfit':'Madde uyumu: Infit, Outfit, S-X² (kütüphane API)',
         }
-        outputs={name:st.checkbox(label,value=True,key=f'python_mirt_output_{model}_{name}')
+        outputs={name:st.checkbox(label,value=not (model=='NRM' and name=='itemfit'),disabled=model=='NRM' and name=='itemfit',key=f'python_mirt_output_{model}_{name}')
                  for name,label in output_names.items()}
-    solver_settings=None
-    with st.expander('Gelişmiş kestirim ayarları — Python mirt 1.2.0',expanded=False):
-        st.caption('Standart mod kütüphane varsayılanları: max_iter=500, tol=0.0001, n_quadpts=21. Gelişmiş mod gerçek fit_mirt API parametrelerini değiştirir.')
-        advanced=st.checkbox('Gelişmiş sayısal ayarları etkinleştir',value=False,key=f'python_mirt_solver_advanced_{model}')
-        if advanced:
-            iterations=int(st.number_input('Maksimum EM iterasyonu (max_iter)',min_value=10,max_value=5000,value=500,step=50,key=f'python_mirt_max_iter_{model}',help='Yakınsama gerçekleşmezse üst sınırı artırabilirsiniz; tek başına doğru kestirimi garanti etmez.'))
-            tolerance=float(st.number_input('EM yakınsama toleransı (tol)',min_value=1e-10,max_value=1e-2,value=1e-4,format='%.8f',key=f'python_mirt_tol_{model}',help='Daha küçük tolerans daha sıkı yakınsama koşuludur; hesaplama süresini artırabilir.'))
-            quadrature=int(st.number_input('Gauss-Hermite nokta sayısı (n_quadpts)',min_value=5,max_value=121,value=21,step=2,key=f'python_mirt_quadpts_{model}',help='Marjinal integrasyon hassasiyeti ve hesaplama maliyetini etkiler.'))
-            solver_settings=dict(max_iter=iterations,tol=tolerance,n_quadpts=quadrature)
-        st.caption('Değişiklikler yeniden kestirim gerektirir. Parametreler yalnızca Python mirt fit_mirt fonksiyonuna iletilir.')
+    solver_options=solver_controls(f"python_mirt_solver_{model}",advanced_key=f"python_mirt_solver_advanced_{model}")
+    if model=='NRM':st.caption('Nominal kategoriler için ordinal Infit/Outfit/S-X² sunulmaz.')
     with st.expander('Grafik ve çıktı ayrıntıları',expanded=False):
         st.caption('Varsayılan seçimler mevcut raporun bütün grafiklerini korur. Seçimler hesaplamayı değil yalnızca sunumu etkiler.')
         chart_options={
@@ -85,19 +79,22 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     except Exception as e:
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         st.error(f'Veri ön kontrolü: {e}');return
-    key=(tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,tuple(sorted((solver_settings or {}).items())),'nine-model-report-v2')
+    identity_hash=_data_fingerprint(data[[id_col]]) if id_col in data.columns else None
+    key=(identity_hash,tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,tuple(sorted(solver_options.items())),'nine-model-report-v2')
     saved=st.session_state.get(f'python_mirt_fit_{model}')
     if saved is not None and (not isinstance(saved,dict) or saved.get('key')!=key):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         st.info('Veri veya analiz ayarları değişti; eski sonuç temizlendi. Yeniden hesaplayın.')
         saved=None
+    pool_key=(_data_fingerprint(x),tuple(cols),tuple(labels),categories,tuple(sorted(solver_options.items())))
     if st.button('Python mirt ile hesapla',key=f'python_mirt_start_{model}'):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
+        st.session_state.setdefault('python_mirt_comparison_pool',{}).pop((pool_key,model),None)
         try:
             with st.spinner('Python mirt kestirimi çalışıyor'):
                 fit_kwargs=dict(model=model,n_categories=categories,estimation=estimation,
                                 common_discrimination=model=='1PL')
-                if solver_settings is not None:fit_kwargs['solver_settings']=solver_settings
+                fit_kwargs.update(solver_options)
                 outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
             saved=dict(key=key,outcome=outcome)
             st.session_state[f'python_mirt_fit_{model}']=saved
@@ -107,7 +104,6 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     # A comparison pool is populated only with actual converged ML fits on identical
     # item data and identical category coding. MAP is not compared by ordinary AIC/BIC.
     pool=st.session_state.setdefault('python_mirt_comparison_pool',{})
-    pool_key=(_data_fingerprint(x),tuple(cols),tuple(labels),categories)
     if estimation=='ML':
         try:
             from core.irt_library_diagnostics import library_fit_diagnostics
@@ -140,7 +136,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     else:st.error('Yakınsama durumu doğrulanamadı; sonuç kesinleştirilemez.')
     for warning in report.warnings:st.warning(warning)
     for error in report.errors:st.error(error)
-    if outputs['itemfit']:
+    if outputs['itemfit'] and model!='NRM':
         st.markdown('### Madde uyumu — Python mirt itemfit')
         st.caption('Infit ve Outfit MNSQ, S-X²: Python mirt 1.2.0 kamuya açık itemfit API. Yalnızca yakınsamış modelde gösterilir. Model ailesine göre istatistik desteği değişebilir; desteklenmeyen sonuçlar uydurulmaz.')
         if report.metadata.get('Yakınsama') is not True or report.errors:
@@ -159,6 +155,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                                        'text/csv',key=f'python_mirt_itemfit_csv_{model}',on_click='ignore')
             except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
                 st.warning(f'Kütüphane madde uyumu hesaplayamadı: {exc}')
+    rasch_tables=None
     summary=pd.DataFrame([report.metadata])
     if outputs['summary']:
         st.markdown('### Model özeti');st.dataframe(summary,hide_index=True)
@@ -168,13 +165,18 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
     if outputs['persons']:st.markdown('### Birey Yetenek Kestirimleri (θ)')
-    if outputs['persons']:st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
+    if outputs['persons']:st.caption('N(0,1) EAP; SH(θ) posterior SS’dir, bilgi SEM’i değildir. '+('Rasch: desteklenen mirt.fscores GH61 API.' if model=='Rasch' else '161 noktalı [-4,4] ızgara.'))
     if outputs['persons'] and (report.metadata.get('Yakınsama') is not True or report.errors):
         st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
     elif outputs['persons'] and not report.curves.empty:
         try:
-            ids=data.loc[x.index,id_col].to_numpy() if id_col in data.columns else None
-            people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
+            ids=data[id_col].to_numpy(copy=True) if id_col in data.columns else None
+            if model=='Rasch':
+                rasch_tables=rasch_wright_tables(saved['outcome'],x,item_names=cols,identifiers=ids)
+                raw_people=rasch_tables['persons']
+                people=pd.DataFrame({'Birey':raw_people.Birey,'Ham puan':x.to_numpy().sum(1),
+                    'Yetenek (θ)':raw_people['θ'],'SH (θ)':raw_people['Posterior SD'],'Yöntem':'EAP','Model':model})
+            else:people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
             st.dataframe(safe_frame(people).round(4),hide_index=True,use_container_width=True)
             st.download_button('Birey yetenekleri — CSV',_csv(people),
                                f'{model}_person_theta.csv','text/csv',
@@ -189,23 +191,21 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                                key=f'python_mirt_persons_xlsx_{model}',on_click='ignore')
         except (ValueError,TypeError,KeyError,IndexError) as exc:
             st.error(f'Birey yetenek kestirimleri hesaplanamadı: {exc}')
-    # Library-native Wright map. Conservative scientific gate: Rasch only;
+    # Canonical verified Phase2 Wright data; preserve PR73's opt-in UI gate. Conservative scientific gate: Rasch only;
     # other families remain disabled pending model-specific independent validation.
     if model=='Rasch' and report.metadata.get('Yakınsama') is True and not report.errors:
         with st.expander('Wright Map — Rasch (Python mirt)',expanded=False):
             if st.checkbox('Kütüphane Wright Map grafiğini göster',value=False,key='python_mirt_wright_Rasch'):
                 try:
-                    import mirt
-                    import matplotlib
-                    matplotlib.use('Agg')
-                    from matplotlib import pyplot as plt
-                    persons=person_abilities(x.to_numpy(),report.curves,model=model)
-                    theta_person=persons['Yetenek (θ)'].to_numpy(dtype=float)
-                    fig,ax=plt.subplots(figsize=(9,6))
-                    try:
-                        mirt.plot_person_item_map(saved['outcome'].fit,theta_person,ax=ax)
-                        st.pyplot(fig)
-                    finally:plt.close(fig)
+                    if rasch_tables is None:
+                        rasch_tables=rasch_wright_tables(saved['outcome'],x,item_names=cols,
+                            identifiers=data[id_col].to_numpy(copy=True) if id_col in data.columns else None)
+                    st.plotly_chart(wright_figure(rasch_tables),use_container_width=True)
+                    csv,excel=wright_exports(rasch_tables)
+                    for name in ('items','histogram'):st.dataframe(safe_frame(rasch_tables[name]),hide_index=True)
+                    for name,blob in csv.items():
+                        st.download_button(f'Wright {name} — CSV',blob,f'Rasch_wright_{name}.csv','text/csv',key=f'rasch_wright_{name}',on_click='ignore')
+                    st.download_button('Wright tabloları — Excel',excel,'Rasch_wright.xlsx',key='rasch_wright_excel',on_click='ignore')
                 except (AttributeError,ValueError,TypeError,ImportError,RuntimeError) as exc:
                     st.warning(f'Python mirt Wright Map üretilemedi: {exc}')
     elif model!='Rasch':

@@ -19,7 +19,7 @@ def calibrated(request):
               else 'tests/fixtures/irt_b10/data_irt1pl_ok.csv')
     else:path='validation/evidence/p5_browser/poly_ordinal.csv'
     frame=pd.read_csv(path).iloc[:300,:6].astype(int)
-    outcome=fit_python_mirt(frame.to_numpy(),model='1PL' if model=='Rasch' else model,
+    outcome=fit_python_mirt(frame.to_numpy(),model=model,
         n_categories=None if model in BINARY else 4,
         estimation='MAP' if model in ('3PL','4PL') else 'ML',common_discrimination=model=='1PL')
     labels=() if model in BINARY else tuple('ABCD') if model=='NRM' else tuple(range(4))
@@ -91,13 +91,14 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run();assert not at.exception
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
-    assert len(at.dataframe)==4 and len(rendered_figures)==4
-    assert len(at.get('download_button'))==7
+    assert len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==4
+    assert len(at.get('download_button'))==(6 if model=='NRM' else 7)
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
-    pd.testing.assert_frame_equal(at.dataframe[2].value,report.parameters)
-    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[3].value.columns)
-    assert len(at.dataframe[3].value)==len(frame)
-    at.run();assert len(calls)==1 and len(at.dataframe)==4 and len(rendered_figures)==8
+    parameter_index=1 if model=='NRM' else 2
+    pd.testing.assert_frame_equal(at.dataframe[parameter_index].value,report.parameters)
+    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[parameter_index+1].value.columns)
+    assert len(at.dataframe[parameter_index+1].value)==len(frame)
+    at.run();assert len(calls)==1 and len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False

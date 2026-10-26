@@ -63,6 +63,9 @@ def build_report(outcome, *, model, items, labels=(), theta=None):
     fit=outcome.fit
     report=LibraryReport(model,dict(Model=model,N=outcome.n_persons,Madde=outcome.n_items,
         Motor=outcome.engine,Kestirim=outcome.estimation,Yakınsama=None))
+    settings=getattr(outcome,'solver_settings',{})
+    for name in ('max_iter','tol','n_quadpts'):
+        if name in settings:report.metadata[name]=settings[name]
     try:
         diag=library_fit_diagnostics(fit)
         report.metadata.update(Yakınsama=diag['converged'],İterasyon=diag['iterations'],
