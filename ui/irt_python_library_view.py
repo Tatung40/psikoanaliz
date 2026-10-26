@@ -7,6 +7,7 @@ from core.irt_python_mirt_adapter import fit_python_mirt
 from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
+from core.irt_person_abilities import person_abilities
 
 
 def _data_fingerprint(frame):
@@ -82,6 +83,28 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.markdown('### Madde parametreleri');st.dataframe(safe_frame(report.parameters),hide_index=True)
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
+    st.markdown('### Birey Yetenek Kestirimleri (θ)')
+    st.caption('Modelin kestirilmiş kategori olasılıkları ve N(0,1) önseli üzerinden EAP. SH(θ) posterior standart sapmadır; SEM(θ) bilgi eğrisiyle aynı değildir. 161 noktalı [-4,4] ızgara kullanılır.')
+    if report.metadata.get('Yakınsama') is not True or report.errors:
+        st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
+    elif not report.curves.empty:
+        try:
+            ids=data.loc[x.index,id_col].to_numpy() if id_col in data.columns else None
+            people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
+            st.dataframe(safe_frame(people).round(4),hide_index=True,use_container_width=True)
+            st.download_button('Birey yetenekleri — CSV',_csv(people),
+                               f'{model}_person_theta.csv','text/csv',
+                               key=f'python_mirt_persons_csv_{model}',on_click='ignore')
+            import io
+            output=io.BytesIO()
+            with pd.ExcelWriter(output,engine='openpyxl') as writer:
+                safe_frame(people).to_excel(writer,index=False,sheet_name='Birey Yetenekleri')
+            st.download_button('Birey yetenekleri — Excel',output.getvalue(),
+                               f'{model}_person_theta.xlsx',
+                               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                               key=f'python_mirt_persons_xlsx_{model}',on_click='ignore')
+        except (ValueError,TypeError,KeyError,IndexError) as exc:
+            st.error(f'Birey yetenek kestirimleri hesaplanamadı: {exc}')
     if report.curves.empty:return
     # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
     import matplotlib
