@@ -1,0 +1,249 @@
+{
+  "model": "NRM",
+  "status": "MEASURED / NOT CERTIFIED",
+  "decision": "MEASURED / NOT CERTIFIED",
+  "scientific_pass": false,
+  "fit_calls": {
+    "R": 1,
+    "python": 1
+  },
+  "execution": {
+    "R": "EXECUTED",
+    "python": "EXECUTED"
+  },
+  "criteria": {
+    "scope": "Predeclared computational reproducibility budgets, not calibrated clinical or population-wide equivalence limits",
+    "decision_if_all_pass": "MEASURED / NOT CERTIFIED",
+    "decision_if_any_fail": "BLOCKED",
+    "rationale": {
+      "parameters": "Three-decimal baseline-category logit coefficient resolution",
+      "probabilities_information_SD": "Four-decimal absolute probability, per-item information and posterior-SD resolution",
+      "theta": "One thousandth of the fixed unit latent SD",
+      "loglik": "Five-decimal marginal log-likelihood resolution; AIC/BIC inherit twice this budget at equal N/k",
+      "SEM": "One thousandth relative error on the declared reporting range; undefined central SEM blocks comparison",
+      "range": "All traces retained; reporting acceptance evaluated at theta in [-4,4], matching the existing UI range",
+      "identity": "Existing sqrt(machine epsilon) algebra-only identity rule inherited from PR65/72"
+    },
+    "max_absolute": {
+      "parameters": 0.001,
+      "loglik": 0.00001,
+      "probabilities": 0.0001,
+      "item_information": 0.0001,
+      "EAP_theta": 0.001,
+      "posterior_SD": 0.0001
+    },
+    "TIF_budget": "number_of_items * item_information budget",
+    "SEM_max_relative": 0.001,
+    "aic_bic_budget": "2 * loglik budget",
+    "theta_range": [
+      -4,
+      4
+    ],
+    "no_threshold_relaxation": true
+  },
+  "criteria_sha256": "c2fe8f5c6ee61e183d87fceb7dff57eb42e02cd7538591b6dafc8b19e3161e13",
+  "runtime_python": "3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]",
+  "versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0"
+  },
+  "fixture": "validation/evidence/p5_browser/poly_nominal.csv",
+  "fixture_sha256": "57c76ec6ab74e79a92da3e9b83369dfe1e59aca3cfd622a956ad9ca452320af6",
+  "input_sha256": {
+    "data.csv": "26eede013ae59d64edc4190c06f15206b3289e8e7db742c08406ec7932ae20b8",
+    "integration.csv": "0fa8b15b0c82995e33a01b7f41d098ea4dbe65d3182726f5dcf08631a1d1d10b",
+    "evaluation_grid.csv": "16bdd7c8e8fc6316bf32c1bc422d8bc19f86207f0349e9678b488753aa6e71ee"
+  },
+  "settings": {
+    "model": "baseline-category NRM",
+    "D": 1,
+    "mean": 0,
+    "variance": 1,
+    "priors": null,
+    "GH": 61,
+    "ML": true,
+    "max_iter": 3000,
+    "R_parameter_tol": 1e-8,
+    "python_loglik_tol": 1e-10,
+    "python_item_ftol": 1e-10,
+    "acceleration": "none",
+    "SE": false
+  },
+  "source_sha256": {
+    "nrm_r_comparison.py": "a0ad21ebb4eda025a5619af0246a480a1ca3ee3409a06acf24c66431da144f4f",
+    "nrm_r_comparison.R": "ee0438c8d80be5c939d6ccec7002d1dc6c6c9ad83f5ba252d98468f6eb0fe0cb"
+  },
+  "trace_helper_sha256": "198e143da8cb0b4afe2f98b4be42501c274b43d50f207f0c1183f48a551abf9a",
+  "R": {
+    "engine": "R mirt",
+    "version": 1.48,
+    "R_version": "R version 4.6.1 (2026-06-24)",
+    "model": "NRM",
+    "converged": true,
+    "iterations": 80,
+    "n_parameters": 48,
+    "orientation": 1,
+    "mean": 0,
+    "variance": 1,
+    "loglik": -5016.86016914824,
+    "aic": 10129.7203382965,
+    "bic": 10332.0215270207
+  },
+  "python": {
+    "converged": true,
+    "iterations": 71,
+    "loglik": -5016.860169148529,
+    "aic": 10129.720338297058,
+    "bic": 10332.021527021323,
+    "n_parameters": 48,
+    "orientation": 1,
+    "raw_latent_mean": null,
+    "raw_latent_covariance": null,
+    "mean": 0,
+    "variance": 1
+  },
+  "common_grid_loglik": {
+    "python": -5016.860169148529,
+    "R": -5016.860169148238
+  },
+  "scores": {
+    "python": {
+      "A": 0.000022296225735426477,
+      "D": 0.000029497520203064885
+    },
+    "R": {
+      "A": 3.873141544556249e-7,
+      "D": 3.7835627908796406e-7
+    }
+  },
+  "constraints": {
+    "python": {
+      "max_violation": 0,
+      "boundary": false
+    },
+    "R": {
+      "max_violation": 0,
+      "boundary": false
+    }
+  },
+  "fit_statistic_definitions": {
+    "python": {
+      "N": 500,
+      "k": 48,
+      "native_minus_common_loglik": 0,
+      "AIC_identity_residual": 0,
+      "BIC_identity_residual": 0
+    },
+    "R": {
+      "N": 500,
+      "k": 48,
+      "native_minus_common_loglik": -1.8189894035458565e-12,
+      "AIC_identity_residual": 2.000888343900442e-11,
+      "BIC_identity_residual": -4.3655745685100555e-11
+    }
+  },
+  "comparisons": {
+    "probabilities": {
+      "status": "SKIPPED",
+      "max_absolute": 0.0000022311546302722363,
+      "mean_absolute": 8.713906479598288e-8,
+      "max_relative": 0.00009764610828912316,
+      "tolerance": null,
+      "reason": "Tolerance requires scientific calibration"
+    },
+    "theta_grid": {
+      "status": "SKIPPED",
+      "max_absolute": 4.973799150320701e-14,
+      "mean_absolute": 4.302803188611522e-15,
+      "max_relative": 4.718447854656868e-15,
+      "tolerance": null,
+      "reason": "Tolerance requires scientific calibration"
+    },
+    "test_information": {
+      "status": "SKIPPED",
+      "max_absolute": 0.000003958110319945973,
+      "mean_absolute": 0.0000011967771577050816,
+      "max_relative": 0.000012583926746831248,
+      "tolerance": null,
+      "reason": "Tolerance requires scientific calibration"
+    }
+  },
+  "metrics": {
+    "parameters": 0.000006417167653705036,
+    "loglik": 2.9103830456733704e-10,
+    "probabilities": 0.0000021787011537099943,
+    "item_information": 0.0000024244674565743196,
+    "test_information": 0.000003958110319945973,
+    "aic": 5.584297468885779e-10,
+    "bic": 6.220943760126829e-10,
+    "EAP_theta": 0.0000027714297357039896,
+    "posterior_SD": 3.586511800879322e-7
+  },
+  "person_scoring_identity": 5.995204332975845e-15,
+  "SEM_max_relative": 9.023184727147948e-7,
+  "acceptance": {
+    "parameters": {
+      "value": 0.000006417167653705036,
+      "limit": 0.001,
+      "passed": true
+    },
+    "loglik": {
+      "value": 2.9103830456733704e-10,
+      "limit": 0.00001,
+      "passed": true
+    },
+    "probabilities": {
+      "value": 0.0000021787011537099943,
+      "limit": 0.0001,
+      "passed": true
+    },
+    "item_information": {
+      "value": 0.0000024244674565743196,
+      "limit": 0.0001,
+      "passed": true
+    },
+    "EAP_theta": {
+      "value": 0.0000027714297357039896,
+      "limit": 0.001,
+      "passed": true
+    },
+    "posterior_SD": {
+      "value": 3.586511800879322e-7,
+      "limit": 0.0001,
+      "passed": true
+    },
+    "test_information": {
+      "value": 0.000003958110319945973,
+      "limit": 0.0008,
+      "passed": true
+    },
+    "aic": {
+      "value": 5.584297468885779e-10,
+      "limit": 0.00002,
+      "passed": true
+    },
+    "bic": {
+      "value": 6.220943760126829e-10,
+      "limit": 0.00002,
+      "passed": true
+    },
+    "SEM_relative": {
+      "value": 9.023184727147948e-7,
+      "limit": 0.001,
+      "passed": true
+    }
+  },
+  "numerical_budgets_passed": true,
+  "provenance": {
+    "source_commit": "fa27d5e2a61614c6575f481dc8b4523cc9587a66",
+    "tested_merge_commit": "18faa62199822b946734dfd23d9cfde2c65ae8f3",
+    "workflow_run": 40265350318,
+    "workflow_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/40265350318",
+    "artifact_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/40265350318/artifacts/12626292253",
+    "artifact_sha256": "777f09ea919c19b2654dadde50e2ee1c09552b07fdc8399413810eefd41c9c8a",
+    "preregistered_commit": "a6df444",
+    "raw_outputs": "Original artifact retains both raw/canonical estimates, all curves/person outputs, optimizer history, session metadata and stdout/stderr."
+  }
+}

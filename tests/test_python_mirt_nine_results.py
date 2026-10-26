@@ -91,13 +91,17 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run();assert not at.exception
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
-    assert len(at.dataframe)==3 and len(rendered_figures)==4
-    assert len(at.get('download_button'))==6
+    parameter_index=1 if model=='NRM' else 2
+    person_index=parameter_index+1
+    assert len(at.dataframe)==person_index+1 and len(rendered_figures)==4
+    assert len(at.get('download_button'))==(6 if model=='NRM' else 7)
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
-    pd.testing.assert_frame_equal(at.dataframe[1].value,report.parameters)
-    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[2].value.columns)
-    assert len(at.dataframe[2].value)==len(frame)
-    at.run();assert len(calls)==1 and len(at.dataframe)==3 and len(rendered_figures)==8
+    pd.testing.assert_frame_equal(at.dataframe[parameter_index].value,report.parameters)
+    assert len(at.dataframe[person_index].value)==len(frame)
+    assert at.dataframe[person_index].value['Birey'].tolist()==list(range(1,len(frame)+1))
+    assert at.dataframe[person_index].value['SH (θ)'].gt(0).all()
+    assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[person_index].value.columns)
+    at.run();assert len(calls)==1 and len(at.dataframe)==person_index+1 and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False
@@ -105,7 +109,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run()
     assert any('Kestirim yakınsamadı' in e.value for e in at.error)
     assert not any('Kestirim yakınsadı' in e.value for e in at.success)
-    assert not at.dataframe[1].value.Yakınsama.any()
+    assert len(at.dataframe)==2 and not at.dataframe[1].value.Yakınsama.any()
     at.session_state[f'python_mirt_fit_{model}']['outcome']=outcome
     changed=data.copy();changed.iloc[0,0]=labels[(frame.iloc[0,0]+1)%4] if model=='NRM' else (frame.iloc[0,0]+1)%(2 if model in BINARY else 4)
     at.session_state['raw_df']=changed;at.session_state['scored_df']=changed

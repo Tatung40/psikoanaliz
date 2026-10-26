@@ -9,6 +9,7 @@ def guided_report(result):
     nominal=model=="NRM"
     model_desc=("Nominal Tepki Modeli (NRM) seçenekleri sıralı başarı düzeyi kabul etmez."
         if nominal else f"{model} sıralı yanıt kategorilerini modeller; bir üst kategori daha yüksek puanı temsil eder.")
+    if model=="PCM":model_desc+=" Ortak ayırt edicilik a=1 sabittir ve gizil ölçek N(0,1) olarak tanımlıdır. Madde adımları sıralı olmak zorunda değildir; maddeye özgü serbest eğimler GPCM kapsamındadır."
     summary=[
         "# B14 Çok Kategorili MTK — Açıklamalı Analiz Raporu",
         f"**Model:** {model}  \\n**Motor:** {result['engine']}  \\n**Örneklem:** {n} kişi  \\n**Madde sayısı:** {k}  \\n**Kategori sayısı:** {len(labels)}",
