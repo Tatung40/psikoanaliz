@@ -25,6 +25,23 @@ capture.output(list(before=original_attributes,after=attributes(sv)),file=file.p
 source("validation/grm_initial_values.R")
 saved_values <- sv$value;saved_est <- sv$est
 sv <- restore_grm_initial_values(x,sv,itemtype="nominal")
+# $<-.data.frame can reorder the named attribute list. Require exact values
+# by attribute name, then restore the original order (not different semantics).
+restore_attributes <- function(table,expected) {
+  actual <- attributes(table)
+  stopifnot(setequal(names(actual),names(expected)))
+  for(name in names(expected)) stopifnot(identical(actual[[name]],expected[[name]]))
+  attributes(table) <- expected
+  table
+}
+message("Native attribute order: ",paste(names(original_attributes),collapse=","),
+        "; configured: ",paste(names(attributes(sv)),collapse=","))
+# No-fit regression: order alone is harmless; changed itemtype is not.
+probe <- sv;attributes(probe) <- rev(attributes(probe))
+stopifnot(identical(attributes(restore_attributes(probe,original_attributes)),original_attributes))
+bad <- sv;attr(bad,"itemtype") <- "graded"
+stopifnot(inherits(try(restore_attributes(bad,original_attributes),silent=TRUE),"try-error"))
+sv <- restore_attributes(sv,original_attributes)
 stopifnot(identical(attributes(sv),original_attributes),identical(vapply(sv,class,character(1)),original_classes),
           identical(sv$value,as.double(saved_values)),identical(sv$est,as.logical(saved_est)))
 free <- which(sv$est);stopifnot(length(free)==48,all(sv$prior.type=="none"))
