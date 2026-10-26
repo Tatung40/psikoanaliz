@@ -25,7 +25,7 @@ class PythonMirtResult:
 ESTIMATIONS = ("ML", "MAP")
 
 
-def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False):
+def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False, solver_settings=None):
     """One public fit call; no implicit engine fallback or unsupported inference.
 
     common_discrimination=True explicitly fits a shared free a via the public
@@ -101,5 +101,18 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
     if estimation=="MAP":
         from mirt.estimation.priors import default_priors
         kwargs["priors"]=default_priors(model)
+    if solver_settings is not None:
+        if not isinstance(solver_settings, dict):
+            raise ValueError("solver_settings must be a dictionary.")
+        allowed = {"max_iter", "tol", "n_quadpts"}
+        if set(solver_settings) - allowed:
+            raise ValueError("Unsupported Python mirt solver option.")
+        for name, value in solver_settings.items():
+            if name in ("max_iter", "n_quadpts"):
+                if type(value) is not int or not (10 <= value <= 5000 if name == "max_iter" else 5 <= value <= 121):
+                    raise ValueError(f"Invalid {name} solver setting.")
+            elif not isinstance(value, (int, float)) or isinstance(value, bool) or not np.isfinite(value) or not 1e-10 <= value <= 1e-2:
+                raise ValueError("Invalid tol solver setting.")
+            kwargs[name] = value
     result=mirt.fit_mirt(x.astype(int),**kwargs)
     return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation)
