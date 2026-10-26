@@ -42,6 +42,15 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     with st.expander('Gelişmiş kestirim ayarları — motor yetenekleri',expanded=False):
         st.info('Python mirt 1.2.0 adaptöründe iterasyon, tolerans ve quadrature için doğrulanmış kamuya açık parametre eşlemesi henüz yoktur. Bu ayarlar etkisiz kaydırıcılar olarak gösterilmez; kütüphane varsayılanları korunur.')
         st.caption('Öneri: başlangıçta motorun belgelenmiş varsayılanlarını koruyun. Yakınsama başarısızsa veriyi, tanımlanabilirliği ve model karmaşıklığını inceleyin. Desteklenen sayısal ayarlar API doğrulamasından sonra açılacaktır.')
+    with st.expander('Grafik ve çıktı ayrıntıları',expanded=False):
+        st.caption('Varsayılan seçimler mevcut raporun bütün grafiklerini korur. Seçimler hesaplamayı değil yalnızca sunumu etkiler.')
+        chart_options={
+            'item_info':'Madde bilgi fonksiyonu (IIF)',
+            'test_info':'Test bilgi fonksiyonu (TIF)',
+            'sem':'Koşullu ölçme standart hatası SEM(θ)',
+        }
+        charts={name:st.checkbox(label,value=True,key=f'python_mirt_chart_{model}_{name}')
+                for name,label in chart_options.items()}
     estimation='ML';categories=None;labels=()
     if model=='Rasch':st.info('Rasch: a=1; θ~N(0,1). Yerel serbest-σ Rasch ekranından ayrıdır.')
     if model=='1PL':st.info('1PL: ortak a serbest; 2PL üzerinde belgelenmiş eşitlik kısıtı. Rasch sekmesinde a=1 sabittir.')
@@ -174,7 +183,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
     if not outputs['information'] or report.information.empty:return
     info=report.information
-    for title,col in [('Madde bilgi fonksiyonu',f'I_{selected}'),('Test bilgi fonksiyonu','Test bilgisi'),('Koşullu standart hata','SEM(θ)')]:
+    for chart_key,title,col in [('item_info','Madde bilgi fonksiyonu',f'I_{selected}'),('test_info','Test bilgi fonksiyonu','Test bilgisi'),('sem','Koşullu standart hata','SEM(θ)')]:
+        if not charts[chart_key]:continue
         fig,ax=plt.subplots(figsize=(7,4))
         ax.plot(info['θ'],info[col])
         ax.set(title=title,xlabel='Theta',ylabel=col)
