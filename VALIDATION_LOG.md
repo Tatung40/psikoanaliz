@@ -59,3 +59,12 @@ $$D = p_{üst} - p_{alt}$$
 1. **İşletim Sistemi Bağımsızlığı:** Windows ve Linux (Debian tabanlı Streamlit Cloud) üzerinde test edilmiştir; `os.path.join` kullanılmıştır.
 2. **Bellek İçi Raporlama:** `openpyxl` ve `python-docx` dosya sistemine yazmadan `io.BytesIO` ile bellek üzerinden kullanıcıya indirilir.
 3. **Oturum İzolasyonu:** Streamlit `st.session_state` mimarisi sayesinde her tarayıcı sekmesi izole çalışır.
+
+## Boyutluluk / yerel bağımsızlık / madde uyumu doğrulaması
+- İkili normal CDF ↔ scipy.stats.multivariate_normal (|fark| < 1e-10, ρ=0.9999 dahil).
+- Tetrakorik ↔ bağımsız scipy-MVN ML (1e-4); polikorik nüfus ρ=0.6 geri kazanımı (N=20000, ±0.02).
+- PAF: tek faktörlü nüfus matrisinde yüklerin tam geri kazanımı (1e-5). KMO ↔ regresyon tabanlı kısmi korelasyonlar (1e-10). Bartlett formül/özdeşlik denetimi.
+- Paralel analiz: 1 ve 2 faktörlü simülasyonlar doğru sayıyı buldu; promax basit yapıyı ayırdı.
+- BH-FDR ↔ statsmodels.multipletests. Yerel bağımlı çift ilk sırada; uyumsuz madde FDR ile işaretlendi; doğru 2PL altında FDR işareti yok (tek tohum).
+- 3PL/4PL S-X² çıkarımı ve çok kategorili S-X²: doğrulanmadı → EXPERIMENTAL / NOT CERTIFIED veya kapalı.
+- Testler: tests/test_dimensionality_localfit.py, tests/test_dimensionality_localfit_streamlit.py (AppTest).
