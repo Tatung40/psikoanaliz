@@ -9,13 +9,14 @@ CONFIG={
  '3PL — genel pozitif CFA, c sabit (SciPy)':('3PL',False,False),
  '4PL — genel pozitif CFA, c/d sabit (SciPy)':('4PL',False,False),
  '3PL — 2D between-item, c serbest (SciPy)':('3PL',True,False),
+ '4PL — 2D between-item, c/d serbest (SciPy)':('4PL',True,True),
 }
 MODELS=tuple(CONFIG)
 
 def allowed_dimensions(model):return [2] if CONFIG[model][1] else [2,3]
 LIMITATION=('EXPERIMENTAL / NOT CERTIFIED. Ayrı SciPy marjinal ML bileşeni; Python mirt 1.2.0 genel 3PL/4PL API desteği değildir. '
  'Yalnız 2D/3D, pozitif CFA, boyut başına en az üç saf çapa, ortalama0/birim varyans; tam korelasyon matrisi kestirilir. '
- 'Model adındaki sabit c/d biliniyor varsayılır; serbest c yalnız doğrulanmış 2D between-item rotasındadır. Mevcut bağımsız R kabulü GH15 sayısal karşılaştırmasıdır; popülasyon geri kazanımı/Tip-I hata/GA kapsaması değildir. '
+ 'Model adındaki sabit c/d biliniyor varsayılır; serbest c/d yalnız doğrulanmış 2D between-item rotalarındadır. Mevcut bağımsız R kabulü GH15 sayısal karşılaştırmasıdır; popülasyon geri kazanımı/Tip-I hata/GA kapsaması değildir. '
  'SE/GA/p, LR ve doğrulanmamış MAP kapalıdır. EAP SD/tam posterior kovaryans ve Fisher SEM madde parametrelerine koşulludur. '
  'Sonlu GH önseli normalize edilir; quadrature doğruluğu veya küresel optimum garanti edilmez.')
 
@@ -25,7 +26,7 @@ def specification(data,model,pattern,correlated='full',exploratory=False,c=.2,u=
  if correlated!='full' or exploratory:raise ValueError('Genel rota yalnız tam ilişkili, tanımlanmış pozitif CFA; diğer yolları mevcut motorla seçin')
  x=pd.DataFrame(data)
  family,free_c,free_u=CONFIG[model];spec=engine.Specification(np.asarray(pattern),family,True,free_c,free_u,c=c,u=u)
- if free_c and (spec.q!=2 or not np.all(spec.pattern.sum(1)==1)):raise ValueError('Serbest c yalnız bağımsız doğrulanmış 2D between-item profilinde; 3D R doğrulaması BLOCKED')
+ if free_c and (spec.q!=2 or not np.all(spec.pattern.sum(1)==1)):raise ValueError('Serbest c/d yalnız bağımsız doğrulanmış 2D between-item profilinde; 3D R doğrulaması BLOCKED')
  if len(x.columns)!=spec.j or not x.columns.is_unique:raise ValueError('Madde/Q-matrix eşleşmesi veya benzersiz adlar geçersiz')
  if SURFACE_POINTS**2*spec.j*spec.q**2>250_000:raise ValueError('Rapor bellek bütçesi: en fazla 250000 bilgi matrisi satırı')
  return x,spec

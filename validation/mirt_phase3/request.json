@@ -1,36 +1,4 @@
 {
-  "stages": [
-    {
-      "name": "C_free_2D_precision",
-      "requires": [],
-      "cases": [
-        {
-          "name": "4PL_2D_between_free",
-          "family": "4PL",
-          "q": 2,
-          "within": false,
-          "free_c": true,
-          "free_u": true,
-          "resume_R": true
-        }
-      ]
-    }
-  ],
-  "prerequisite_evidence": "expansion_evidence.json",
-  "required_profiles": [
-    {
-      "family": "3PL",
-      "q": 2,
-      "within": false,
-      "free_c": true,
-      "free_u": false
-    },
-    {
-      "family": "4PL",
-      "q": 2,
-      "within": false,
-      "free_c": false,
-      "free_u": false
-    }
-  ]
+  "cases": [],
+  "status": "NOT REQUESTED; actual accepted and failed evidence preserved; no automatic recalibration"
 }

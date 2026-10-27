@@ -8,7 +8,7 @@ from streamlit.testing.v1 import AppTest
 from core import irt_multidim_general_report as general
 
 
-@pytest.mark.parametrize('variant',[0,1,2])
+@pytest.mark.parametrize('variant',[0,1,2,3])
 def test_actual_general_fit_id_posterior_exports_and_stale_inputs(monkeypatch,variant):
  import ui.irt_multidim_view as view
  data=pd.read_csv('validation/mirt_phase3/fixtures/2PL_2D.csv');items=list(data);data['ID']=[f'P{i}' for i in range(len(data))]
@@ -26,9 +26,9 @@ def test_actual_general_fit_id_posterior_exports_and_stale_inputs(monkeypatch,va
  assert not at.exception and not at.error,[e.value for e in at.error]
  assert len(calls)==1 and calls[0]['correlated']=='full' and calls[0]['tol']==1e-13
  result=at.session_state[view.KEY]['result'];meta=result['metadata'];tables=result['tables']
- assert meta['Converged'] and meta['Parameters']==(31 if variant==2 else 21) and 'SciPy' in meta['Engine']
+ assert meta['Converged'] and meta['Parameters']==[21,21,31,41][variant] and 'SciPy' in meta['Engine']
  assert tables['Pattern'].F1.tolist()==[1,1,1,1,0,0,0,0,1,1]
- assert abs(meta['LogLik']-[-2536.6369212147274,-2536.183910986355,-2527.1339764582062][variant])<1e-6
+ assert abs(meta['LogLik']-[-2536.6369212147274,-2536.183910986355,-2527.1339764582062,-2526.762503677404][variant])<1e-6
  assert meta['MAP']=='NOT VALIDATED / DISABLED' and 'MAP' not in tables
  assert tables['EAP'].ID.tolist()==data.ID.tolist()
  assert len(tables['PosteriorCovariance'])==len(data)*4
@@ -39,7 +39,7 @@ def test_actual_general_fit_id_posterior_exports_and_stale_inputs(monkeypatch,va
  with zipfile.ZipFile(io.BytesIO(bundle['zip'])) as archive:
   assert {'Parameters.csv','EAP.csv','OptimizerTrace.csv','Scores.csv'}.issubset(archive.namelist())
   note=archive.read('report.md').decode();assert 'NOT CERTIFIED' in note and 'SciPy' in note and 'no local estimator' not in note
- at.number_input(key='md_fixed_c').set_value(.21).run()
+ at.number_input(key='md_fixed_u' if variant==3 else 'md_fixed_c').set_value(.94 if variant==3 else .21).run()
  assert not at.exception and view.KEY not in at.session_state and not at.get('download_button') and len(calls)==1
 
 

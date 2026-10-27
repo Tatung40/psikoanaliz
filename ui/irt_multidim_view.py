@@ -17,7 +17,7 @@ def render(data=None,item_cols=(),id_col=None):
  st.subheader('🧬 Çok Boyutlu MTK (MIRT)')
  with st.expander('API ve bağımsız doğrulama kapsamı'):
   st.dataframe(support_matrix(),hide_index=True)
-  st.caption('Kayıtlı 2D/3D 2PL/GRM karşılaştırmaları sayısal kabul aldı; bilimsel sertifikasyon değildir. Diğer profillerin sonuçları validation/mirt_stage1 raporundadır.')
+  st.caption('Kayıtlı 2D/3D 2PL/GRM karşılaştırmaları sayısal kabul aldı; bilimsel sertifikasyon değildir. Native profiller validation/mirt_stage1; ayrı SciPy profil/kısıt/engel matrisi validation/mirt_phase3 raporundadır.')
  upload=st.file_uploader('MIRT verisi (CSV/XLSX)',type=['csv','xlsx'],key='md_file')
  if upload:
   try:data=pd.read_excel(io.BytesIO(upload.getvalue())) if upload.name.endswith('.xlsx') else pd.read_csv(io.BytesIO(upload.getvalue()))
@@ -36,7 +36,7 @@ def render(data=None,item_cols=(),id_col=None):
  if restricted or advanced:
   if restricted:st.warning(factorized.LIMITATION)
   c=st.number_input('Başlangıç alt asimptot c (kestirilir)' if advanced and general.CONFIG[model][1] else 'Sabit alt asimptot c (kestirilmez)',min_value=0.,max_value=.5,value=.2,step=.01,key='md_fixed_c')
-  if model.startswith('4PL'):u=st.number_input('Sabit üst asimptot d (kestirilmez)',min_value=.5,max_value=1.,value=.95,step=.01,key='md_fixed_u')
+  if model.startswith('4PL'):u=st.number_input('Başlangıç üst asimptot d (kestirilir)' if advanced and general.CONFIG[model][2] else 'Sabit üst asimptot d (kestirilmez)',min_value=.5,max_value=1.,value=.95,step=.01,key='md_fixed_u')
  dims=st.selectbox('Boyut sayısı',general.allowed_dimensions(model) if advanced else [2,3,4,5],key='md_dims')
  mode=st.selectbox('Yapı',['Doğrulayıcı','Keşfedici (pozitif, üçgen)'],key='md_mode')
  efa=mode.startswith('Keşfedici');corr=st.selectbox('Boyut korelasyonları',['Tümü'] if advanced else ['Ortogonal','Yalnız F1–F2','Tümü'],key='md_corr')

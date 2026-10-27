@@ -193,3 +193,53 @@ alongside the named-asymptote/strict-threshold no-fit regression checks.
 If this single precision continuation still fails native convergence, free
 4PL stays disabled; no further retries, larger iteration limit or relaxed
 threshold is scheduled. The3D free-c resource block also remains unchanged.
+
+## Final accepted scope and unresolved limits
+
+R precision run40499970808 converged after110 ADDITIONAL native EM cycles,
+using only its own saved R starting estimates and tighter inner precision.
+Python was NOT recalibrated. All original failed evidence remains unchanged.
+Installed native last-pair rule returned TRUE, maximum last change0, below
+unchanged1e-8; native convergence TRUE, not at the3000-cycle cap. Full internal
+and LL histories are artifact12732009146; the exact check is retained in
+free4_native_convergence.json. This does NOT prove that inner precision alone
+caused the original failure, exact stationarity, or a global optimum.
+
+2D between-item free4PL numerical gaps: parameters .000156941, P .0000144295,
+IIF .000184896, TIF .000156281, EAP .0000259781, SD .0000246301,
+common logLik7.45740e-9. Both active-tangent Hessians are positive and stable
+at two steps (min .079934/.079956; condition16086/16082). Active c=0/u=1
+bounds, conditional uncertainty and nonregular-inference limits remain.
+Outcome is **NUMERICALLY VALIDATED / NOT CERTIFIED** for this measured case,
+not a relabeling of the original NOT CONVERGED attempt.
+
+| Production route | Dimensions/structure | Independent measured status |
+|---|---|---|
+| Fixed-c3PL | 2D/3D; full correlations; between/within | All four profiles numerically accepted |
+| Fixed-c/u4PL | 2D/3D; full correlations; between/within | All four profiles numerically accepted |
+| Free-c3PL | 2D between-item ONLY | Native R/Python converged; numerical targets met |
+| Free-c/u4PL | 2D between-item ONLY | Native R precision/Python converged; numerical targets met |
+| Free-c3PL3D | DISABLED | R resource timeout600s; native convergence unknown |
+| Free4PL3D and free within-item2D | DISABLED | Prerequisites/independent calibration absent; NOT CERTIFIED |
+| General4D/5D, negative-loadings, exploratory, orthogonal general backend | DISABLED | Not independently validated in this component; older supported routes remain |
+| MAP / parameter SE/CI / LR/p / population certification | DISABLED | Independent scientific evidence absent |
+
+Every user analysis remains EXPERIMENTAL / NOT CERTIFIED. The registry
+eligibility regression checks EACH enabled family/dimension/structure/free-
+asymptote tuple against actual converged R/Python results, every unchanged
+comparison and criteria hash; original failed rows and the3D block cannot
+activate a route. No validation is inferred from a model name or CI alone.
+
+Final request is EMPTY/NOT REQUESTED. No accepted Phase1/2/3 profile is
+silently recalibrated on future CI. Existing R setup/cache/workflow is reused;
+the retained12 PR80 profiles are only reevaluated at saved estimates. Full
+raw diagnostics/artifacts have30-day retention; complete original failed
+outputs stay linked and compact persistent evidence/versions/hashes are
+committed. Unavailable evidence fails closed, not replaced by fabricated data.
+
+Validation of final integration: one manual full regression runs on the
+stable engine/three initial UI routes in the isolated worktree. The newly
+accepted fourth (free4PL) UI route and registry eligibility are checked with
+focused tests without restarting that suite. Existing main push CI runs the
+complete final source after merge. No second manual full regression or new
+Monte Carlo/accepted-model calibration is requested.

@@ -1,0 +1,10 @@
+{
+  "iterations": 110,
+  "reported_converged": true,
+  "exact_last_pair_satisfied": true,
+  "max_change": 0,
+  "at_cycle_cap": false,
+  "run": 40499970808,
+  "scope": "Exact installed mirt1.48 stopping rule; physical g/u conversion; no criterion override",
+  "full_history": "Preserved in artifact12732009146"
+}
