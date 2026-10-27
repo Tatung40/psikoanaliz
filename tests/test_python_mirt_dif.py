@@ -1,4 +1,5 @@
 """Real public-library fits and fail-closed UI/export regression."""
+from tests.reproducible_ui import scientific_downloads
 import io
 import json
 import zipfile
@@ -106,8 +107,9 @@ def test_ui_real_flow_stale_and_downloads(binary,monkeypatch):
     at.run();assert not at.exception
     at.selectbox(key='pmd_model').set_value('2PL').run()
     at.button(key='pmd_run').click().run();assert not at.exception and len(calls)==1
-    assert len(at.get('download_button'))==5
-    at.run();assert not at.exception and len(calls)==1 and len(at.get('download_button'))==5
+    assert len(scientific_downloads(at))==5
+    assert {b.key for b in at.get('download_button')} - {b.key for b in scientific_downloads(at)} == {'repro_py','repro_zip'}
+    at.run();assert not at.exception and len(calls)==1 and len(scientific_downloads(at))==5
     old=at.session_state[view.KEY]
     mutations=[('pmd_alpha',.04),('pmd_correction','holm'),('pmd_anchors',items[:3]),
                ('pmd_model','Rasch'),('pmd_test','Omnibus'),('pmd_group',items[0]),('pmd_reference','F'),('pmd_items',items[:3]),
@@ -118,7 +120,7 @@ def test_ui_real_flow_stale_and_downloads(binary,monkeypatch):
         fresh=AppTest.from_file(str(Path('app.py').resolve()),default_timeout=120)
         for k,v in dict(raw_df=d,scored_df=None,item_cols=items,id_col=None,group_col='Grup',nav_page='MTK: Python mirt DIF').items():fresh.session_state[k]=v
         fresh.run();fresh.selectbox(key='pmd_model').set_value('2PL').run();fresh.session_state[view.KEY]=dict(old);fresh.run()
-        assert len(fresh.get('download_button'))==5
+        assert len(scientific_downloads(fresh))==5
         widget=next(w for kind in ('number_input','selectbox','multiselect','checkbox') for w in fresh.get(kind) if w.key==control)
         widget.set_value(value).run()
         assert not fresh.exception and not fresh.get('download_button') and view.KEY not in fresh.session_state

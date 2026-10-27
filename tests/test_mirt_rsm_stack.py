@@ -1,4 +1,5 @@
 """Exact shared-step likelihood identity, fail-closed public API and actual UI."""
+from tests.reproducible_ui import scientific_downloads
 import io,zipfile
 from pathlib import Path
 import numpy as np
@@ -70,7 +71,7 @@ def test_actual_rsm_ui_global_steps_scores_exports_and_stale_labels():
  assert len(tables['Fit'])==1 and tables['Parameters'].SharedStepGroup.nunique()==1
  assert tables['EAP'].ID.tolist()==data.ID.tolist() and tables['MAP'].ID.tolist()==data.ID.tolist()
  np.testing.assert_allclose(meta['BIC'],-2*meta['LogLik']+14*np.log(120))
- bundle=at.session_state[view.KEY]['bundle'];assert len(at.get('download_button'))==5
+ bundle=at.session_state[view.KEY]['bundle'];assert len(scientific_downloads(at))==5
  with zipfile.ZipFile(io.BytesIO(bundle['zip'])) as z:
   assert {'SharedSteps.csv','StructuralRows.csv','EAP.csv','MAP.csv'}.issubset(z.namelist())
   assert 'NOT CERTIFIED' in z.read('report.md').decode()

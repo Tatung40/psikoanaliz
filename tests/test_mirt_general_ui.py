@@ -1,4 +1,5 @@
 """Actual general-CFA UI/calibration; not independent scientific evidence."""
+from tests.reproducible_ui import scientific_downloads
 import io,zipfile
 from pathlib import Path
 import pytest
@@ -33,7 +34,7 @@ def test_actual_general_fit_id_posterior_exports_and_stale_inputs(monkeypatch,va
  assert tables['EAP'].ID.tolist()==data.ID.tolist()
  assert len(tables['PosteriorCovariance'])==len(data)*4
  np.testing.assert_allclose(tables['Covariance'].iloc[:,1:].to_numpy().diagonal(),1,atol=1e-15)
- assert len(at.get('download_button'))==5
+ assert len(scientific_downloads(at))==5
  bundle=at.session_state[view.KEY]['bundle']
  assert 'PosteriorCovariance' in pd.ExcelFile(io.BytesIO(bundle['xlsx'])).sheet_names
  with zipfile.ZipFile(io.BytesIO(bundle['zip'])) as archive:

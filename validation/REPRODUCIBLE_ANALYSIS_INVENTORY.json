@@ -1,0 +1,266 @@
+[
+  {
+    "screen": "app.py",
+    "core_imports": [
+      "core.data_processing.check_duplicate_participants",
+      "core.data_processing.handle_missing_data",
+      "core.data_processing.inspect_dataset",
+      "core.data_processing.load_dataset",
+      "core.descriptives.describe_items",
+      "core.descriptives.describe_total",
+      "core.distractor_analysis.analyze_distractors_for_item",
+      "core.distractor_analysis.compute_all_items_distractors",
+      "core.group_analysis.compare_test_scores_by_group",
+      "core.group_analysis.compute_group_item_fairness",
+      "core.irt_binary_usage_policy.usage_status",
+      "core.irt_library_diagnostics.library_fit_diagnostics",
+      "core.irt_library_parameter_mapping.curves_from_normalized_table",
+      "core.irt_python_mirt_adapter.fit_python_mirt",
+      "core.irt_python_mirt_parameters.python_mirt_binary_parameters",
+      "core.item_analysis.compute_item_statistics",
+      "core.reliability.compute_reliability_indices",
+      "core.scoring.calculate_total_scores",
+      "core.scoring.reverse_score_items",
+      "core.scoring.score_dichotomous",
+      "core.test_statistics.compute_frequency_distribution",
+      "core.test_statistics.compute_standard_scores",
+      "core.test_statistics.compute_test_summary",
+      "core.validation.validate_analysis_inputs"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/charts.py",
+    "core_imports": [],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/components.py",
+    "core_imports": [],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/ctt_dual_report_view.py",
+    "core_imports": [
+      "core.ctt_dual_engine.compare_ctt",
+      "core.ctt_dual_engine.item_guidance"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/dif34_bootstrap_view.py",
+    "core_imports": [
+      "core.irt_dif34_bootstrap.bootstrap_dif_test"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/dif_classical_view.py",
+    "core_imports": [
+      "core.dif_classical.ADJUST_METHODS",
+      "core.dif_classical.dif_screen"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/dimensionality_localfit_view.py",
+    "core_imports": [
+      "core.dimensionality",
+      "core.local_fit",
+      "core.python_mirt_dif.fingerprint"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/grm_dif_view.py",
+    "core_imports": [
+      "core.grm_dif"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_assumptions_view.py",
+    "core_imports": [
+      "core.irt_assumptions.preflight"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_b10_view.py",
+    "core_imports": [
+      "core.irt_dif.dif_analysis",
+      "core.irt_globalfit.global_fit",
+      "core.irt_mg.as_matrix",
+      "core.irt_q3.eap",
+      "core.irt_q3.q3_analysis",
+      "core.irt_q3.wle"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_b11_view.py",
+    "core_imports": [
+      "core.irt_dif34.dif_analysis_34",
+      "core.irt_globalfit.global_fit_34",
+      "core.irt_mg.as_matrix",
+      "core.irt_mg34.default_bounds",
+      "core.irt_q3.eap",
+      "core.irt_q3.probabilities",
+      "core.irt_q3.q3_analysis",
+      "core.irt_q3.wle_general",
+      "core.irt_se_diagnostics.hessian_boundary_diagnostics"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_b13_view.py",
+    "core_imports": [
+      "core.irt.fit_irt",
+      "core.irt_b13_compare.compare_engines",
+      "core.irt_b13_curves.check_curves",
+      "core.irt_b13_curves.compute_curves",
+      "core.irt_b13_diagnostics.calculate_diagnostics",
+      "core.rasch.rasch_analysis"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_b14_view.py",
+    "core_imports": [
+      "core.irt_b14.MODELS",
+      "core.irt_b14.ORDINAL",
+      "core.irt_b14.fit_b14",
+      "core.irt_b14.prepare_polytomous",
+      "core.irt_b14_diagnostics.model_diagnostics",
+      "core.irt_b14_model_curves.fitted_category_curves",
+      "core.irt_b14_persons_info.information_table",
+      "core.irt_b14_persons_info.model_comparison",
+      "core.irt_b14_persons_info.person_scores",
+      "core.irt_b14_profiles.empirical_profiles"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_dif_multimodel_view.py",
+    "core_imports": [
+      "core.irt_dif_multimodel_screen.MODELS",
+      "core.irt_dif_multimodel_screen.screen_mtk_groups"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_multidim_view.py",
+    "core_imports": [
+      "core.irt_multidim.LIMITATION",
+      "core.irt_multidim.MODELS",
+      "core.irt_multidim.fit",
+      "core.irt_multidim.report",
+      "core.irt_multidim.structure",
+      "core.irt_multidim.support_matrix",
+      "core.irt_multidim_factorized",
+      "core.irt_multidim_general_report",
+      "core.irt_multidim_rsm_stack",
+      "core.python_mirt_dif.fingerprint"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_optimization.py",
+    "core_imports": [
+      "core.irt.fit_irt",
+      "core.irt_multistart.fit_irt_multistart"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_python_library_view.py",
+    "core_imports": [
+      "core.irt_b14.prepare_polytomous",
+      "core.irt_library_diagnostics.library_fit_diagnostics",
+      "core.irt_person_abilities.person_abilities",
+      "core.irt_python_mirt_adapter.fit_python_mirt",
+      "core.irt_python_mirt_report.BINARY",
+      "core.irt_python_mirt_report.MODELS",
+      "core.irt_python_mirt_report.build_report",
+      "core.irt_rasch_wright.rasch_wright_tables",
+      "core.irt_rasch_wright.wright_exports",
+      "core.irt_rasch_wright.wright_figure"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_rsm_view.py",
+    "core_imports": [
+      "core.irt_rsm"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/irt_solver_controls.py",
+    "core_imports": [],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/polytomous_dif_view.py",
+    "core_imports": [
+      "core.polytomous_dif"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/python_mirt_dif_view.py",
+    "core_imports": [
+      "core.python_mirt_dif.FAMILIES",
+      "core.python_mirt_dif.LIMITATION",
+      "core.python_mirt_dif.MODELS",
+      "core.python_mirt_dif.analyze",
+      "core.python_mirt_dif.fingerprint",
+      "core.python_mirt_dif.prepare",
+      "core.python_mirt_dif.support_matrix"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "ui/rasch_view.py",
+    "core_imports": [
+      "core.rasch.rasch_analysis",
+      "core.rasch_dif.dif_analysis",
+      "core.rasch_globalfit.global_fit",
+      "core.rasch_q3.q3_analysis"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  },
+  {
+    "screen": "pages/90_Kayip_Veri_Analizi_ve_Atama.py",
+    "core_imports": [
+      "core.missing_decision.assess_necessity",
+      "core.missing_imputation.METHODS",
+      "core.missing_imputation.apply",
+      "core.missing_imputation.diagnose"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED",
+    "R": "Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED"
+  }
+]
