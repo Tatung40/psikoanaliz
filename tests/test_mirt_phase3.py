@@ -70,3 +70,16 @@ def test_saturated_logistic_tails_use_exact_log_probabilities_without_clipping()
  data=pd.read_csv('tests/fixtures/irt_b11/data_irt3pl_ok.csv').iloc[:30,:11].to_numpy()
  value,score=engine.Objective(data,spec,15).evaluate(x)
  assert np.isfinite(value) and np.isfinite(score).all()
+
+
+def test_q_matrix_values_cannot_be_silently_coerced_to_boolean():
+ pattern=np.repeat(np.eye(2),3,axis=0);pattern[-1,0]=.3
+ with pytest.raises(ValueError,match='0/1'):engine.Specification(pattern)
+
+
+def test_unit_variance_representation_guard_is_machine_precision_only():
+ from pathlib import Path
+ source=Path('validation/mirt_phase3/reference.R').read_text()
+ assert 'all(diag(S)==1)' not in source and '8*.Machine$double.eps' in source
+ assert '!unit_diagonal(1+1e-12)' in source
+ assert source.index("'native_fit_status.json'")<source.index('unit_diagonal(diag(S))')

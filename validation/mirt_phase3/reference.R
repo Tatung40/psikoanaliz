@@ -42,8 +42,15 @@ if(mode=='fit'){
 }
 write.csv(sv,file.path(out,'configured_values.csv'),row.names=FALSE)
 fit<-do.call(mirt,opts);values<-mod2values(fit);write.csv(values,file.path(out,'raw_parameters.csv'),row.names=FALSE)
+jsonlite::write_json(list(converged=extract.mirt(fit,'converged'),iterations=extract.mirt(fit,'iterations'),logLik=extract.mirt(fit,'logLik'),AIC=extract.mirt(fit,'AIC'),BIC=extract.mirt(fit,'BIC')),file.path(out,'native_fit_status.json'),auto_unbox=TRUE,pretty=TRUE,digits=NA)
 actual_eta<-values$value[grepl('^eta',values$name)];S<-covariance(actual_eta)
-stopifnot(length(actual_eta)==nrow(pairs),all(abs(actual_eta)<=3+1e-12),all(diag(S)==1),min(eigen(S,symmetric=TRUE)$values)>0)
+# Normalization S_ii/(sqrt(S_ii)*sqrt(S_ii)) has one-ulp roundoff.
+# Preserve exact values; only this mathematical identity uses machine epsilon.
+unit_diagonal<-function(x)all(abs(x-1)<=8*.Machine$double.eps)
+stopifnot(unit_diagonal(1+.Machine$double.eps),!unit_diagonal(1+1e-12))
+representation<-list(diagonal=sprintf('%.17g',diag(S)),max_diagonal_error=max(abs(diag(S)-1)),machine_allowance=8*.Machine$double.eps)
+jsonlite::write_json(representation,file.path(out,'covariance_representation.json'),auto_unbox=TRUE,pretty=TRUE,digits=NA)
+stopifnot(length(actual_eta)==nrow(pairs),all(abs(actual_eta)<=3+1e-12),unit_diagonal(diag(S)),min(eigen(S,symmetric=TRUE)$values)>0)
 pars<-list();curves<-list();information<-list();integration<-list()
 for(i in seq_len(J)){
  item<-extract.item(fit,i);prob<-probtrace(item,trace);info<-iteminfo(item,trace,multidim_matrix=TRUE);ip<-probtrace(item,nodes)

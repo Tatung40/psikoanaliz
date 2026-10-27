@@ -22,7 +22,9 @@ class Specification:
  u: float=1.
 
  def __post_init__(self):
-  self.pattern=np.asarray(self.pattern,bool);self.q=self.pattern.shape[1] if self.pattern.ndim==2 else 0
+  raw=np.asarray(self.pattern)
+  if not np.isin(raw,[0,1]).all():raise ValueError('CFA Q-matrix must contain only 0/1')
+  self.pattern=raw.astype(bool);self.q=self.pattern.shape[1] if self.pattern.ndim==2 else 0
   if self.q not in (2,3):raise ValueError('Phase3 only 2D/3D; 4D/5D NOT CERTIFIED')
   structure(self.pattern,False,False)
   if self.family not in ('2PL','3PL','4PL'):raise ValueError('Unsupported family')

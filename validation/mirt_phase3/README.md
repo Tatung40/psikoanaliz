@@ -59,3 +59,24 @@ means BLOCKED / NOT EXECUTED, never PASS. No R validation executed locally.
 Current status: Stage A retained NUMERICALLY VALIDATED / NOT CERTIFIED;
 new general fixed/free 3PL/4PL configurations PENDING actual R calibration.
 4D/5D explicitly UNSUPPORTED here. No new production capabilities claimed.
+
+## First actual execution and representation repair
+
+Run 40490151345: native R fixed-parameter probability/information/prior mapping
+passed (max errors 5.56e-16 / 4.86e-16 / 2.78e-16). The Python 2D fit
+actually converged in 55 iterations, LL -2536.636921214727, projected score
+3.31e-5. R fitting completed the call and wrote raw native estimates, then
+failed the exact `all(diag(S)==1)` assertion. Native convergence status was
+not yet recorded; therefore the first R fit is NOT accepted or called
+converged. Full raw estimates/error remain in artifact 12728852170.
+
+Normalized-Cholesky covariance has unit diagonal mathematically, while
+S_ii/(sqrt(S_ii)*sqrt(S_ii)) can differ by floating roundoff. Only that identity
+now uses eight machine epsilons, with full 17-digit values recorded. Runtime
+regression accepts one epsilon and rejects a 1e-12 change. No parameter,
+likelihood, optimizer, bound or preregistered scientific criterion changes.
+Native convergence/LL metadata is now written BEFORE subsequent assertions.
+The actual accepted Python 2D estimate is hash/settings checked and reused
+without recalibration; the original failed evidence is copied intact. R must
+run again because its original convergence metadata is unavailable. 3D has
+not run yet. No production/UI capability is enabled by this repair.

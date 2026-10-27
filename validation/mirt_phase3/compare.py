@@ -42,7 +42,7 @@ def pack_reference(spec,folder):
  return np.concatenate(parts),meta
 
 
-def run_case(family,q,free_c,free_u,out):
+def run_case(family,q,free_c,free_u,out,prior=None):
  out.mkdir(parents=True,exist_ok=True);data=pd.read_csv(ROOT/f'fixtures/2PL_{q}D.csv');J=len(data.columns)
  pattern=np.zeros((J,q),int)
  for d in range(q):pattern[d*4:(d+1)*4,d]=1
@@ -69,8 +69,17 @@ def run_case(family,q,free_c,free_u,out):
   checks=dict(probability=discrepancies(engine.probabilities(spec,px,theta),rp,criteria['mapping_probability']),information=discrepancies(engine.information(spec,px,theta),ri,criteria['mapping_information']),prior=discrepancies(obj.masses(px[-spec.n_cov:]),pd.read_csv(pre/'prior.csv').weight.to_numpy(),criteria['mapping_prior_mass']))
   result['preflight']=checks
   if any(v['status']!='PASS' for v in checks.values()):raise ValueError('NOT COMPARABLE: preflight mismatch; no fits')
-  py=engine.fit(data,spec,n_quadpts=15,tol=1e-13);x=py['parameters'];result['Python_execution']='ONE ACTUAL SCIPY MML FIT EXECUTED'
-  np.save(out/'python_parameters.npy',x);result['Python']={k:v for k,v in py.items() if k not in ('parameters','specification','objective')}
+  if prior is not None and (prior/'python_parameters.npy').exists():
+   old=json.loads((prior/'report.json').read_text());old_settings=old['settings']
+   for key in ('family','q','pattern','free_c','free_u','c','u','n_quadpts','data_sha256','criteria_sha256','start','bounds'):
+    if json.dumps(settings[key])!=json.dumps(old_settings[key]):raise ValueError('Retained fit settings mismatch: '+key)
+   shutil.copytree(prior,out/'original_evidence',dirs_exist_ok=True);x=np.load(prior/'python_parameters.npy');py=old['Python']
+   if abs(-obj.evaluate(x)[0]-py['logLik'])>criteria['native_common_logLik']:raise ValueError('Retained Python likelihood mismatch')
+   result['Python_execution']='RETAINED ACTUAL PYTHON FIT FROM 40490151345; NO RECALIBRATION';result['Python']=py
+  else:
+   py=engine.fit(data,spec,n_quadpts=15,tol=1e-13);x=py['parameters'];result['Python_execution']='ONE ACTUAL SCIPY MML FIT EXECUTED'
+   result['Python']={k:v for k,v in py.items() if k not in ('parameters','specification','objective')}
+  np.save(out/'python_parameters.npy',x)
   (out/'python_metadata.json').write_text(json.dumps(result['Python'],indent=2)+'\n')
   result['R_execution']='CALIBRATION ATTEMPTED';actual=r_run(out,'fit');rx,r=pack_reference(spec,actual);result['R_execution']='ONE ACTUAL INDEPENDENT R MIRT FIT EXECUTED';result['R']=r
   pp=engine.probabilities(spec,x,theta);pI=engine.information(spec,x,theta)
@@ -92,10 +101,10 @@ def run_case(family,q,free_c,free_u,out):
  (out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n');return result
 
 
-def execute(request,out):
+def execute(request,out,prior=None):
  cfg=json.loads(Path(request).read_text());reports=[]
  for case in cfg['cases']:
-  result=run_case(case['family'],case['q'],case['free_c'],case['free_u'],out/case['name'])
+  result=run_case(case['family'],case['q'],case['free_c'],case['free_u'],out/case['name'],None if prior is None else prior/case['name'])
   reports.append(result)
   if result['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':break
  record=dict(status='NUMERICALLY VALIDATED / NOT CERTIFIED' if reports and len(reports)==len(cfg['cases']) and all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 'FAIL' if reports else 'NOT REQUESTED',cases=reports)
@@ -103,5 +112,5 @@ def execute(request,out):
 
 
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--request',type=Path,default=ROOT/'request.json');parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();r=execute(args.request,args.output)
+ parser=argparse.ArgumentParser();parser.add_argument('--request',type=Path,default=ROOT/'request.json');parser.add_argument('--prior',type=Path,default=Path('original-evidence/mirt-phase3'));parser.add_argument('--output',type=Path,required=True);args=parser.parse_args();r=execute(args.request,args.output,args.prior)
  print('PHASE3_REPORT='+json.dumps(r));raise SystemExit(0 if r['status'] in ('NUMERICALLY VALIDATED / NOT CERTIFIED','NOT REQUESTED') else 1)
