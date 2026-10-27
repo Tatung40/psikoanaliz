@@ -72,6 +72,14 @@
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {
+    "screen": "ui/generalizability_view.py",
+    "core_imports": [
+      "core.generalizability",
+      "core.python_mirt_dif.fingerprint"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
     "screen": "ui/grm_dif_view.py",
     "core_imports": [
       "core.grm_dif"
