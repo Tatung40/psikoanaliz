@@ -129,6 +129,37 @@ def arrays(directory,cfg):
  return p,info
 
 
+def compare_pair(outcome,actual,cfg,data,grid,result,criteria):
+ f=outcome['fit'];trace=pd.read_csv(actual.parent/'trace.csv').to_numpy()
+ rmeta=json.loads((actual/'metadata.json').read_text());result['R']=rmeta
+ rp,rI=arrays(actual,cfg);p,I=native_outputs(f.model,trace)
+ pars=pd.read_csv(actual/'parameters.csv');a=pars.filter(regex='^a[1-5]$').to_numpy()
+ d=pars.filter(regex='^d').to_numpy();params=f.model.parameters
+ if cfg['model']=='NRM':
+  pa=params['slopes'];pd_=params['intercepts'];a=a.reshape(cfg['k'],4,cfg['q']);d=d.reshape(cfg['k'],4)
+ else:
+  pa=f.model.get_loading_matrix() if cfg['model']=='Bifactor' else params['slopes' if cfg['model'] in BINARY else 'discrimination']
+  key='thresholds' if cfg['model']=='GRM' else 'steps'
+  pd_=params['intercepts'][:,None] if cfg['model'] in BINARY else -pa.sum(1)[:,None]*params[key]
+ rcov=np.array(rmeta['covariance']);cov=outcome['covariance']
+ rgrid=pd.read_csv(actual/'integration_probabilities.csv').sort_values(['Node','Item','Category']).Probability.to_numpy().reshape(len(grid.nodes),cfg['k'],-1)
+ python_grid,_=native_outputs(f.model,grid.nodes)
+ pll=likelihood(data.to_numpy(),python_grid,masses(grid.nodes,grid.weights,cov));rll=likelihood(data.to_numpy(),rgrid,masses(grid.nodes,grid.weights,rcov))
+ score=mirt.fscores(f,data.to_numpy()[:16],method='EAP',n_quadpts=cfg['n_quadpts']);reap=pd.read_csv(actual/'eap.csv')
+ checks=dict(slopes=discrepancies(pa,a,criteria['calibration_parameters']),intercepts=discrepancies(pd_,d,criteria['calibration_parameters']),
+  covariance=discrepancies(cov,rcov,criteria['calibration_covariance']),probabilities=discrepancies(p,rp,criteria['calibration_probability']),
+  information=discrepancies(I,rI,criteria['calibration_information']),EAP=discrepancies(score.theta,reap.filter(regex='^F').to_numpy(),criteria['calibration_EAP']),
+  posterior_SD=discrepancies(score.standard_error,reap.filter(regex='^SD').to_numpy(),criteria['calibration_posterior_SD']),
+  common_logLik=discrepancies([pll],[rll],criteria['common_logLik']),Python_native_LL=discrepancies([pll],[f.log_likelihood],criteria['native_common_logLik']),
+  R_native_LL=discrepancies([rll],[rmeta['logLik']],criteria['native_common_logLik']))
+ result['comparison']=checks;result['common_grid_logLik']=dict(Python=pll,R=rll)
+ if not (f.converged and rmeta['converged']):result['status']='NOT CONVERGED'
+ elif any(c['status']!='PASS' for c in checks.values()):result['status']='NUMERICAL DISAGREEMENT / NOT CERTIFIED'
+ elif not rmeta['constraints_valid']:result['status']='NOT COMPARABLE'
+ else:result['status']='NUMERICALLY VALIDATED / NOT CERTIFIED'
+ return result
+
+
 def run(name,out,refine_from=None):
  criteria=json.loads((ROOT/'criteria.json').read_text());cfg,data,engine,grid=inputs(name,out,refine_from)
  result=dict(profile=name,status='BLOCKED',R_execution='NOT EXECUTED',Python_execution='NOT EXECUTED',settings=cfg)
@@ -160,32 +191,7 @@ def run(name,out,refine_from=None):
   (out/'python_metadata.json').write_text(json.dumps(py,indent=2)+'\n');result['Python']=py
   result['R_execution']='CALIBRATION ATTEMPTED'
   actual=r_run(out,'fit');result['R_execution']='CALIBRATION EXECUTED'
-  rmeta=json.loads((actual/'metadata.json').read_text());result['R']=rmeta
-  rp,rI=arrays(actual,cfg);p,I=native_outputs(f.model,trace)
-  pars=pd.read_csv(actual/'parameters.csv');a=pars.filter(regex='^a[1-5]$').to_numpy()
-  d=pars.filter(regex='^d').to_numpy();params=f.model.parameters
-  if cfg['model']=='NRM':
-   pa=params['slopes'];pd_=params['intercepts'];a=a.reshape(cfg['k'],4,cfg['q']);d=d.reshape(cfg['k'],4)
-  else:
-   pa=f.model.get_loading_matrix() if cfg['model']=='Bifactor' else params['slopes' if cfg['model'] in BINARY else 'discrimination']
-   key='thresholds' if cfg['model']=='GRM' else 'steps'
-   pd_=params['intercepts'][:,None] if cfg['model'] in BINARY else -pa.sum(1)[:,None]*params[key]
-  rcov=np.array(rmeta['covariance']);cov=outcome['covariance']
-  rgrid=pd.read_csv(actual/'integration_probabilities.csv').sort_values(['Node','Item','Category']).Probability.to_numpy().reshape(len(grid.nodes),cfg['k'],-1)
-  python_grid,_=native_outputs(f.model,grid.nodes)
-  pll=likelihood(data.to_numpy(),python_grid,masses(grid.nodes,grid.weights,cov));rll=likelihood(data.to_numpy(),rgrid,masses(grid.nodes,grid.weights,rcov))
-  score=mirt.fscores(f,data.to_numpy()[:16],method='EAP',n_quadpts=cfg['n_quadpts']);reap=pd.read_csv(actual/'eap.csv')
-  checks=dict(slopes=discrepancies(pa,a,criteria['calibration_parameters']),intercepts=discrepancies(pd_,d,criteria['calibration_parameters']),
-   covariance=discrepancies(cov,rcov,criteria['calibration_covariance']),probabilities=discrepancies(p,rp,criteria['calibration_probability']),
-   information=discrepancies(I,rI,criteria['calibration_information']),EAP=discrepancies(score.theta,reap.filter(regex='^F').to_numpy(),criteria['calibration_EAP']),
-   posterior_SD=discrepancies(score.standard_error,reap.filter(regex='^SD').to_numpy(),criteria['calibration_posterior_SD']),
-   common_logLik=discrepancies([pll],[rll],criteria['common_logLik']),Python_native_LL=discrepancies([pll],[f.log_likelihood],criteria['native_common_logLik']),
-   R_native_LL=discrepancies([rll],[rmeta['logLik']],criteria['native_common_logLik']))
-  result['comparison']=checks;result['common_grid_logLik']=dict(Python=pll,R=rll)
-  if not (f.converged and rmeta['converged']):result['status']='NOT CONVERGED'
-  elif any(c['status']!='PASS' for c in checks.values()):result['status']='NUMERICAL DISAGREEMENT / NOT CERTIFIED'
-  elif not rmeta['constraints_valid']:result['status']='NOT COMPARABLE'
-  else:result['status']='NUMERICALLY VALIDATED / NOT CERTIFIED'
+  result=compare_pair(outcome,actual,cfg,data,grid,result,criteria)
  except Exception as e:result['blocker']=str(e)
  (out/'report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
  return result
@@ -217,9 +223,48 @@ def recover(name,prior,out):
  return result
 
 
+def precision(name,prior,out):
+ """One public-library Python continuation; retain the actual converged R fit."""
+ if name not in ('Bifactor_4D','GRM_EFA_2D'):raise ValueError('Undiagnosed precision continuation prohibited')
+ source=prior/name;old=json.loads((source/'report.json').read_text());cfg=dict(old['settings'])
+ criteria=json.loads((ROOT/'criteria.json').read_text())
+ if cfg['criteria_sha256']!=hashlib.sha256((ROOT/'criteria.json').read_bytes()).hexdigest() or cfg['data_sha256']!=hashlib.sha256((source/'data.csv').read_bytes()).hexdigest():raise ValueError('Data/criteria changed')
+ if not (old['R']['converged'] and old['Python']['converged']):raise ValueError('Stationarity continuation requires retained converged fits')
+ shutil.copytree(source,out,dirs_exist_ok=True);shutil.copy2(out/'report.json',out/'precision_previous_report.json');shutil.copy2(out/'settings.json',out/'R_source_settings.json')
+ cfg.update(tol=1e-11,max_iter=3000,source_run=40399106868,initialization='Own saved Python item solution, no R parameters copied',
+  precision='Public EM item_optim_ftol=1e-14 for GRM; public bfactor M-step controls unchanged')
+ (out/'settings.json').write_text(json.dumps(cfg,indent=2)+'\n')
+ result=dict(profile=name,status='BLOCKED',settings=cfg,preflight=old['preflight'],
+  preflight_provenance='Retained actual R mapping at original documented common starts; no new preflight claimed',
+  Python_execution='CALIBRATION ATTEMPTED',R_execution='RETAINED INDEPENDENT CONVERGED CALIBRATION / NO NEW R FIT')
+ try:
+  data=pd.read_csv(out/'data.csv');start={k:v for k,v in np.load(out/'python_parameters.npz').items() if k!='covariance'}
+  if cfg['model']=='Bifactor':outcome=fit(data,'Bifactor',cfg['groups'],n_quadpts=cfg['n_quadpts'],max_iter=3000,tol=1e-11,start_values=start)
+  else:
+   from mirt.models.polytomous import GradedResponseModel
+   engine=GradedResponseModel(cfg['k'],4,n_factors=cfg['q'],item_names=list(data.columns))
+   engine.set_free_parameter_masks(dict(discrimination=np.array(cfg['pattern'],bool),thresholds=np.ones((cfg['k'],3),bool)))
+   estimator=mirt.EMEstimator(n_quadpts=cfg['n_quadpts'],max_iter=3000,tol=1e-11,item_optim_ftol=1e-14,item_optim_maxiter=200,compute_standard_errors=False,accelerate='none')
+   f=estimator.fit(engine,data.to_numpy(),start=start)
+   a=f.model.parameters['discrimination'];pattern=np.array(cfg['pattern'],bool)
+   if np.any(a[~pattern]!=0) or np.any(a[pattern]<.1) or np.any(a[pattern]>5):raise ValueError('Precision fit violated loading constraints')
+   b=f.model.parameters['thresholds']
+   if np.any(np.abs(b)>6+1e-12) or np.any(np.diff(b,axis=1)<1e-6-1e-12):raise ValueError('Precision fit violated threshold constraints')
+   outcome=dict(fit=f,covariance=np.eye(cfg['q']))
+  f=outcome['fit'];result['Python_execution']='EXECUTED'
+  np.savez(out/'python_parameters.npz',**f.model.parameters,covariance=outcome['covariance'])
+  result['Python']=dict(engine='Python mirt '+mirt.__version__,python=platform.python_version(),converged=bool(f.converged),logLik=f.log_likelihood,AIC=f.aic,BIC=f.bic,n_parameters=f.n_parameters,iterations=f.n_iterations)
+  (out/'python_metadata.json').write_text(json.dumps(result['Python'],indent=2)+'\n')
+  grid=GaussHermiteQuadrature(cfg['n_quadpts'],cfg['q'])
+  result=compare_pair(outcome,out/'fit',cfg,data,grid,result,criteria)
+ except Exception as e:result['blocker']=str(e)
+ (out/'report.json').write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
+ return result
+
+
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);parser.add_argument('--expand',action='store_true');parser.add_argument('--refine-failed',action='store_true');args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);parser.add_argument('--expand',action='store_true');parser.add_argument('--refine-failed',action='store_true');parser.add_argument('--python-precision',action='store_true');args=parser.parse_args()
  names=PHASE1+EXPANSION if args.expand else PHASE1
- reports=[recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else run(name,args.output/name,args.reuse if args.refine_failed else None) for name in names]
+ reports=[recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else precision(name,args.reuse,args.output/name) if args.python_precision else run(name,args.output/name,args.reuse if args.refine_failed else None) for name in names]
  print(json.dumps([dict(profile=r['profile'],status=r['status'],blocker=r.get('blocker')) for r in reports],indent=2))
  sys.exit(0 if all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 1)

@@ -183,3 +183,34 @@ def test_r_nominal_uses_public_derivative_free_optimizer():
  source=Path('validation/mirt_stage1/reference.R').read_text()
  assert "if(nominal)'NLOPT_LN_BOBYQA' else 'NLOPT_LD_SLSQP'" in source
  assert "xtol_rel=1e-8,maxeval=1000" in source
+
+
+@pytest.mark.parametrize('name',['Bifactor_4D','GRM_EFA_2D'])
+def test_python_precision_public_contract_and_no_r_refit(name,tmp_path,monkeypatch):
+ import validation.mirt_stage1.compare as harness
+ source=tmp_path/'prior'/name;cfg,data,engine,_=inputs(name,source)
+ np.savez(source/'python_parameters.npz',**engine.parameters,covariance=np.eye(cfg['q']))
+ # Test double only, never reference evidence or a scientific PASS.
+ old=dict(settings=cfg,Python=dict(converged=True),R=dict(converged=True),preflight={})
+ (source/'report.json').write_text(json.dumps(old))
+ def forbidden(*a,**kw):raise AssertionError('A new R fit is forbidden')
+ monkeypatch.setattr(harness,'r_run',forbidden)
+ calls=[]
+ if name.startswith('Bifactor'):
+  def sentinel(*a,**kw):calls.append(kw);raise RuntimeError('verified public bfactor boundary')
+  monkeypatch.setattr(harness,'fit',sentinel)
+ else:
+  class PublicEstimator:
+   def __init__(self,**kw):calls.append(kw)
+   def fit(self,model,observed,start):
+    np.testing.assert_array_equal(model.free_parameter_masks['discrimination'],np.array(cfg['pattern'],bool))
+    np.testing.assert_array_equal(observed,data.to_numpy())
+    np.testing.assert_array_equal(start['thresholds'],engine.parameters['thresholds'])
+    raise RuntimeError('verified public EM boundary')
+  monkeypatch.setattr(harness.mirt,'EMEstimator',PublicEstimator)
+ result=harness.precision(name,tmp_path/'prior',tmp_path/'out'/name)
+ assert len(calls)==1 and calls[0]['tol']==1e-11 and calls[0]['max_iter']==3000
+ if name.startswith('GRM'):assert calls[0]['item_optim_ftol']==1e-14 and not calls[0]['compute_standard_errors']
+ assert result['status']=='BLOCKED' and 'verified public' in result['blocker']
+ assert 'NO NEW R FIT' in result['R_execution']
+ assert (tmp_path/'out'/name/'precision_previous_report.json').exists()

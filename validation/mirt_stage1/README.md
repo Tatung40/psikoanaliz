@@ -100,3 +100,24 @@ before continuation. Already accepted profiles are never recalibrated.
 Local full regression: **1088 passed, 10 pre-existing skipped** (1255.89s).
 Focused adapter/refinement tests and actual Streamlit checks cover the final
 validation-only continuation and report controls separately.
+
+Run 40399106868 accepted NRM (R BOBYQA), GPCM 5D and triangular 2PL;
+all engines converged. Bifactor and triangular GRM converged but still missed
+unchanged probability targets (.000367 / .000173 > .0001). Selected physical
+common-grid score differences at two steps demonstrate remaining Python
+stationarity error, not merely a serialization or parameterization difference:
+BF .0001178 versus R .00000262; GRM .0007359 versus R .0000097
+(`remaining_score_diagnostic.json`; selected coordinates, not a full gradient).
+
+The final diagnosed `--python-precision` continuation reruns **only Python**
+for these two profiles, from each engine's own saved Python item estimates.
+The already converged independent R calibrations remain untouched. Outer
+stopping tightens to 1e-11, ceiling stays 3000. GRM uses the same public
+EMEstimator directly with its verified structural masks and public
+item_optim_ftol=1e-14, item_optim_maxiter=200; fit_mirt does not expose this
+M-step control. Bifactor uses the public bfactor API with its unchanged
+hardcoded M-step settings. No library internals are patched. The alternative
+public BL estimator has different default bifactor bounds and is deliberately
+not substituted. Failure of this last precision continuation remains a real
+scientific blocker; no threshold relaxation or speculative further fits.
+This remains warm-start numerical evidence, not certification.

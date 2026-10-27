@@ -47,12 +47,12 @@ jobs:
       - name: Reuse retained converged fits (no recalibration)
         uses: actions/download-artifact@v4
         with:
-          name: mirt-stage1-3d26e996889cd325c6f887928dc12cb2fae21ed9-40394398251
-          run-id: 40394398251
+          name: mirt-stage1-e1981fef3cd6d68e5f1dfbc3b095f1ee68c98e0e-40399106868
+          run-id: 40399106868
           github-token: ${{ github.token }}
           path: original-evidence
       - name: Retain Stage 1; independent expansion preflights and pairs (no retries)
-        run: python validation/mirt_stage1/compare.py --output validation-output/mirt-stage1 --reuse original-evidence/mirt-stage1 --expand --refine-failed
+        run: python validation/mirt_stage1/compare.py --output validation-output/mirt-stage1 --reuse original-evidence/mirt-stage1 --expand --python-precision
       - name: Compact diagnostics even after failure
         if: always()
         shell: bash
