@@ -11,6 +11,9 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+from core.reproducible import begin as begin_code_capture, finish as finish_code_capture, instrument as instrument_code_capture
+from ui.reproducible_view import render as render_reproducible_code
+
 # Core Modülleri
 from core.data_processing import (
     load_dataset,
@@ -282,6 +285,8 @@ with st.sidebar:
 # =============================================================================
 # SAYFA 1: ANA SAYFA
 # =============================================================================
+begin_code_capture(selected_page, globals(), st.session_state.get("_repro_history"))
+
 if selected_page == "1. Ana Sayfa":
     render_academic_header()
 
@@ -1204,15 +1209,18 @@ elif selected_page == "12. Kullanım Kılavuzu":
 # =============================================================================
 elif selected_page == "Çok Boyutlu MTK (MIRT)":
     from ui.irt_multidim_view import render as render_multidim
+    instrument_code_capture(globals())
     render_multidim(st.session_state.raw_df, st.session_state.item_cols, st.session_state.id_col)
 
 elif selected_page == "MTK: Python mirt DIF":
     from ui.python_mirt_dif_view import render as render_python_mirt_dif
+    instrument_code_capture(globals())
     render_python_mirt_dif(st.session_state.raw_df,st.session_state.item_cols,
                            st.session_state.id_col,st.session_state.group_col)
 
 elif selected_page.startswith("MTK: Python mirt "):
     from ui.irt_python_library_view import render as render_python_library
+    instrument_code_capture(globals())
     py_model = selected_page.replace("MTK: Python mirt ", "", 1)
     if py_model in ("GRM","PCM","GPCM","NRM"):
         py_data = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
@@ -1493,12 +1501,14 @@ elif selected_page == "MTK: Rasch":
 elif selected_page == "MTK: RSM":
     render_academic_header()
     from ui.irt_rsm_view import render as render_rsm
+    instrument_code_capture(globals())
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
     if src is None: st.warning("Önce 0,1,2,... sıralı puanlı yanıt verisi yükleyin.")
     else: render_rsm(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: 3PL/4PL Bootstrap DIF":
     render_academic_header()
     from ui.dif34_bootstrap_view import render as render_dif34_boot
+    instrument_code_capture(globals())
     src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if src is None: st.warning("Önce 0/1 puanlanmış yanıt verisi yükleyin.")
     else: render_dif34_boot(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
@@ -1512,23 +1522,27 @@ elif selected_page in ("Boyutluluk ve Faktör Analizi", "Yerel Bağımsızlık v
 elif selected_page == "MTK: Gözlenen Puan DIF":
     render_academic_header()
     from ui.dif_classical_view import render as render_classical_dif
+    instrument_code_capture(globals())
     src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if src is None: st.warning("Önce puanlanmış yanıt verisi yükleyin.")
     else: render_classical_dif(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Çok Kategorili Formel DIF":
     from ui.polytomous_dif_view import render as render_poly_dif
+    instrument_code_capture(globals())
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
     if src is None: st.warning("Önce yanıt verisi yükleyin.")
     else: render_poly_dif(src, st.session_state.item_cols, st.session_state.id_col, st.session_state.group_col)
 
 elif selected_page == "MTK: GRM Formel DIF":
     from ui.grm_dif_view import render as render_grm_dif
+    instrument_code_capture(globals())
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
     if src is None: st.warning("Önce sıralı puan verisi yükleyin.")
     else: render_grm_dif(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Çok Kategorili B14":
     render_academic_header()
     from ui.irt_b14_view import render as render_b14
+    instrument_code_capture(globals())
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
     if src is None:
         st.warning("Önce Veri Yükleme bölümünden kategorili yanıt dosyası yükleyin.")
@@ -1536,18 +1550,21 @@ elif selected_page == "MTK: Çok Kategorili B14":
         render_b14(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page == "MTK: Çok Modelli DIF Taraması":
     from ui.irt_dif_multimodel_view import render as render_multi_dif
+    instrument_code_capture(globals())
     dif_source=st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if dif_source is None:st.warning("Önce veri yükleyin.")
     else:render_multi_dif(dif_source,list(st.session_state.item_cols),st.session_state.id_col,st.session_state.group_col)
 elif selected_page == "KTK: Çift Motor Rapor":
     render_academic_header()
     from ui.ctt_dual_report_view import render as render_ctt_dual
+    instrument_code_capture(globals())
     src=st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if src is None:st.warning("Önce puanlanmış veri yükleyin.")
     else:render_ctt_dual(src,list(st.session_state.item_cols),st.session_state.id_col,st.session_state.group_col)
 elif selected_page == "MTK: Varsayım Denetimi":
     render_academic_header()
     from ui.irt_assumptions_view import render as render_irt_assumptions
+    instrument_code_capture(globals())
     src = st.session_state.raw_df if st.session_state.raw_df is not None else st.session_state.scored_df
     if src is None:
         st.warning("Önce yanıt verilerini yükleyin.")
@@ -1556,6 +1573,7 @@ elif selected_page == "MTK: Varsayım Denetimi":
 elif selected_page == "MTK: İkili Rapor":
     render_academic_header()
     from ui.irt_b13_view import render as render_b13
+    instrument_code_capture(globals())
     src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if src is None:
         st.warning("Önce veri dosyası yükleyin.")
@@ -1742,6 +1760,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             st.caption("Etkin kestirim motoru: Python mirt 1.2.0. "
                        "Sayısal çözücü ayarları doğrudan kütüphaneye aktarılır.")
         from ui.irt_solver_controls import solver_controls
+        instrument_code_capture(globals())
         with st.sidebar:
             solver_options=solver_controls(f"py_mirt_solver_{model}")
         st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
@@ -2033,3 +2052,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             st.session_state.pop("irt_b10", None)
         if "irt_b11" in st.session_state:
             st.session_state.pop("irt_b11", None)
+
+
+# Common syntax panel records only calls actually executed with current inputs.
+_code_recorder = finish_code_capture()
+st.session_state["_repro_history"] = _code_recorder
+render_reproducible_code(_code_recorder)

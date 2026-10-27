@@ -2,8 +2,12 @@
 import io
 import pandas as pd
 import streamlit as st
+from core.reproducible import begin as begin_code_capture, finish as finish_code_capture
+from ui.reproducible_view import render as render_reproducible_code
 from core.missing_imputation import diagnose, apply, METHODS
 from core.missing_decision import assess_necessity
+
+begin_code_capture("Eksik Veri ve Atama", globals())
 
 st.title("🧩 Kayıp Veri Analizi ve Atama")
 st.caption("PsikoAnaliz • scikit-learn destekli • yalnızca seçilen madde sütunlarında işlem yapar")
@@ -68,3 +72,5 @@ if source is not None:
                                    mime="text/csv")
         except (ValueError, TypeError) as exc:
             st.error(str(exc))
+
+render_reproducible_code(finish_code_capture())
