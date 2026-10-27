@@ -78,3 +78,17 @@ comparison tolerance is changed; original failed evidence is retained.
 Dense information export is capped at 250000 rows **before fitting** to bound
 Streamlit/openpyxl memory. This operational guard is independent of scientific
 criteria; factorization does not justify an unbounded dense q×q report.
+
+Actual 4PL run 40463908384: all three R fits converged; F1/F3 passed. Python
+F2 reached 1000 iterations without convergence. Its selected physical score
+at two finite-difference steps was .00021254, versus R .00000293
+(4PL_F2_score_diagnostic.json). This is residual optimization error in a weak
+slope direction, not evidence of structural nonidentifiability. A single
+public Python EM continuation uses its own saved F2 values, item ftol1e-14,
+outer tol1e-12/max3000 and unchanged data, GH61, bounds and fixed asymptotes.
+All three R calibrations and accepted F1/F3 values are retained without refits.
+Original failed outputs remain in the source artifact and original_report.json.
+The same source artifact contains the accepted 12 PR80 baseline profiles;
+their successful per-profile status is verified independently of the mixed
+run's overall failure. One artifact download supplies both retained baselines
+and the actual converged 4PL reference, avoiding duplicate downloads.

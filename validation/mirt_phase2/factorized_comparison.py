@@ -36,6 +36,22 @@ def r_run(family,block,mode):
  return out
 
 
+def compare_block(py,block,data,grid,criteria,d):
+ actual=block/'fit';theta=np.linspace(-4,4,81)[:,None]
+ r=json.loads((actual/'metadata.json').read_text());raw=pd.read_csv(actual/'parameters.csv')
+ params=py.model.parameters;pp=py.model.probability(theta);rp=pd.read_csv(actual/'curves.csv').sort_values(['Node','Item']);rgrid=pd.read_csv(actual/'integration_probabilities.csv').to_numpy()
+ pLL=likelihood(data.to_numpy(),py.model.probability(grid.nodes),grid.weights);rLL=likelihood(data.to_numpy(),rgrid,grid.weights)
+ score=mirt.fscores(py,data.iloc[:16].to_numpy(),method='EAP',n_quadpts=61);rs=pd.read_csv(actual/'scores.csv')
+ checks=dict(a=discrepancies(params['discrimination'],raw.a,criteria['calibration_parameters']),b=discrepancies(params['difficulty'],raw.b,criteria['calibration_parameters']),
+  probabilities=discrepancies(pp,rp.Probability.to_numpy().reshape(81,6),criteria['calibration_probability']),
+  information=discrepancies(py.model.information(theta),rp.Information.to_numpy().reshape(81,6),criteria['calibration_information']),
+  EAP=discrepancies(np.asarray(score.theta).reshape(-1),rs.EAP,criteria['calibration_EAP']),SD=discrepancies(np.asarray(score.standard_error).reshape(-1),rs.SD,criteria['calibration_posterior_SD']),
+  common_logLik=discrepancies([pLL],[rLL],criteria['common_logLik']),Python_native_LL=discrepancies([pLL],[py.log_likelihood],criteria['native_common_logLik']),R_native_LL=discrepancies([rLL],[r['logLik']],criteria['native_common_logLik']))
+ status='NUMERICALLY VALIDATED / NOT CERTIFIED' if py.converged and r['converged'] and all(c['status']=='PASS' for c in checks.values()) else 'NOT CONVERGED' if not (py.converged and r['converged']) else 'NUMERICAL DISAGREEMENT / NOT CERTIFIED'
+ record=dict(factor=d+1,status=status,comparison=checks,Python=dict(converged=bool(py.converged),iterations=py.n_iterations,logLik=py.log_likelihood,AIC=py.aic,BIC=py.bic,free_parameters=py.n_parameters),R=r)
+ (block/'report.json').write_text(json.dumps(record,indent=2)+'\n');return record
+
+
 def execute(family,out):
  out.mkdir(parents=True,exist_ok=True);data,pattern,provenance=dataset(family)
  criteria=json.loads(CRITERIA.read_text());model=next((v for v in engine.MODELS if v.startswith(family)),None)
@@ -73,17 +89,7 @@ def execute(family,out):
    (block/'python_metadata.json').write_text(json.dumps(record,indent=2)+'\n');result['Python_blocks'].append(record)
   for d,index,py in fitted['blocks']:
    block=out/f'F{d+1}';result['R_execution']=f'CALIBRATION ATTEMPTED F{d+1}'
-   actual=r_run(family,block,'fit');result['R_completed_blocks']=d+1;r=json.loads((actual/'metadata.json').read_text());raw=pd.read_csv(actual/'parameters.csv')
-   params=py.model.parameters;pp=py.model.probability(theta);rp=pd.read_csv(actual/'curves.csv').sort_values(['Node','Item']);rgrid=pd.read_csv(actual/'integration_probabilities.csv').to_numpy()
-   pLL=likelihood(data.iloc[:,index].to_numpy(),py.model.probability(grid.nodes),grid.weights);rLL=likelihood(data.iloc[:,index].to_numpy(),rgrid,grid.weights)
-   score=mirt.fscores(py,data.iloc[:16,index].to_numpy(),method='EAP',n_quadpts=61);rs=pd.read_csv(actual/'scores.csv')
-   checks=dict(a=discrepancies(params['discrimination'],raw.a,criteria['calibration_parameters']),b=discrepancies(params['difficulty'],raw.b,criteria['calibration_parameters']),
-    probabilities=discrepancies(pp,rp.Probability.to_numpy().reshape(81,6),criteria['calibration_probability']),
-    information=discrepancies(py.model.information(theta),rp.Information.to_numpy().reshape(81,6),criteria['calibration_information']),
-    EAP=discrepancies(np.asarray(score.theta).reshape(-1),rs.EAP,criteria['calibration_EAP']),SD=discrepancies(np.asarray(score.standard_error).reshape(-1),rs.SD,criteria['calibration_posterior_SD']),
-    common_logLik=discrepancies([pLL],[rLL],criteria['common_logLik']),Python_native_LL=discrepancies([pLL],[py.log_likelihood],criteria['native_common_logLik']),R_native_LL=discrepancies([rLL],[r['logLik']],criteria['native_common_logLik']))
-   status='NUMERICALLY VALIDATED / NOT CERTIFIED' if py.converged and r['converged'] and all(c['status']=='PASS' for c in checks.values()) else 'NOT CONVERGED' if not (py.converged and r['converged']) else 'NUMERICAL DISAGREEMENT / NOT CERTIFIED'
-   record=dict(factor=d+1,status=status,comparison=checks,Python=dict(converged=bool(py.converged),iterations=py.n_iterations,logLik=py.log_likelihood,AIC=py.aic,BIC=py.bic,free_parameters=py.n_parameters),R=r)
+   actual=r_run(family,block,'fit');result['R_completed_blocks']=d+1;record=compare_block(py,block,data.iloc[:,index],grid,criteria,d)
    (block/'report.json').write_text(json.dumps(record,indent=2)+'\n');result['blocks'].append(record)
   result['R_execution']='THREE UNIQUE INDEPENDENT BLOCK CALIBRATIONS EXECUTED'
   result['assemblies']=[dict(dimensions=q,status='NUMERICALLY VALIDATED / NOT CERTIFIED' if all(b['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for b in result['blocks'][:q]) else 'FAIL',
@@ -94,7 +100,32 @@ def execute(family,out):
  (out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n');return result
 
 
+def continue_four(prior,out):
+ """One justified Python F2 continuation; all R fits and accepted blocks retained."""
+ old=json.loads((prior/'report.json').read_text());cfg=old['settings'];criteria=json.loads(CRITERIA.read_text())
+ if cfg['family']!='4PL' or cfg['criteria_sha256']!=hashlib.sha256(CRITERIA.read_bytes()).hexdigest() or cfg['data_sha256']!=hashlib.sha256((prior/'data.csv').read_bytes()).hexdigest():raise ValueError('Continuation data/family/criteria mismatch')
+ if not all(b['R']['converged'] for b in old['blocks']) or any(old['blocks'][i]['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED' for i in (0,2)):raise ValueError('Reference/accepted blocks changed')
+ shutil.copytree(prior,out,dirs_exist_ok=True);shutil.copy2(out/'report.json',out/'original_report.json')
+ result=old;result['status']='BLOCKED';result['R_execution']='RETAINED THREE CONVERGED INDEPENDENT R FITS / NO NEW R FIT';result['Python_execution']='F2 CONTINUATION ATTEMPTED; F1/F3 RETAINED'
+ result['settings']['continuation']=dict(factor=2,source_run=40463908384,max_iter=3000,tol=1e-12,item_optim_ftol=1e-14,item_optim_maxiter=200,initialization='Own saved Python F2 fit; no R parameters copied')
+ try:
+  data=pd.read_csv(out/'data.csv');block=out/'F2';part=pd.read_csv(block/'data.csv');pd.testing.assert_frame_equal(part,data.iloc[:,6:12])
+  start=dict(np.load(block/'python_parameters.npz'));shutil.copy2(block/'python_parameters.npz',block/'previous_python_parameters.npz');shutil.copy2(block/'report.json',block/'previous_report.json')
+  native=FourParameterLogistic(6,item_names=list(part.columns));native.set_parameters(**start);native.set_free_parameter_masks(dict(guessing=np.zeros(6,bool),upper=np.zeros(6,bool)))
+  estimator=mirt.EMEstimator(n_quadpts=61,max_iter=3000,tol=1e-12,item_optim_ftol=1e-14,item_optim_maxiter=200,compute_standard_errors=False,accelerate='none')
+  py=estimator.fit(native,part.to_numpy(dtype=int),start=start)
+  if not np.array_equal(py.model.parameters['guessing'],np.full(6,.2)) or not np.array_equal(py.model.parameters['upper'],np.full(6,.95)):raise ValueError('Fixed asymptotes changed')
+  np.savez(block/'python_parameters.npz',**py.model.parameters)
+  record=compare_block(py,block,part,GaussHermiteQuadrature(61,1),criteria,1);record['previous_Python']=old['blocks'][1]['Python'];record['Python']['stopping']='Public EM absolute LL change <1e-12; item ftol1e-14; max3000'
+  (block/'report.json').write_text(json.dumps(record,indent=2)+'\n');result['blocks'][1]=record
+  result['Python_execution']='ONLY F2 PYTHON CONTINUATION EXECUTED; F1/F3 RETAINED'
+  result['assemblies']=[dict(dimensions=q,status='NUMERICALLY VALIDATED / NOT CERTIFIED' if all(b['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for b in result['blocks'][:q]) else 'FAIL',Python_logLik=sum(b['Python']['logLik'] for b in result['blocks'][:q]),R_logLik=sum(b['R']['logLik'] for b in result['blocks'][:q]),method='Exact product likelihood; reference and accepted blocks retained') for q in (2,3)]
+  result['status']='NUMERICALLY VALIDATED / NOT CERTIFIED' if all(a['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for a in result['assemblies']) else 'FAIL'
+ except Exception as exc:result['blocker']=str(exc)
+ (out/'settings.json').write_text(json.dumps(result['settings'],indent=2)+'\n');(out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n');return result
+
+
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--family',choices=['none','3PL','4PL'],default=(ROOT/'requested_family.txt').read_text().strip());parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--family',choices=['none','3PL','4PL','4PL_CONTINUE'],default=(ROOT/'requested_family.txt').read_text().strip());parser.add_argument('--prior',type=Path,default=Path('original-evidence/mirt-phase2-fit'));parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
  if args.family=='none':print('Phase 2 calibration NOT REQUESTED; no model validation claim');raise SystemExit(0)
- result=execute(args.family,args.output);print('PHASE2_REPORT='+json.dumps(result));raise SystemExit(0 if result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else 1)
+ result=continue_four(args.prior,args.output) if args.family=='4PL_CONTINUE' else execute(args.family,args.output);print('PHASE2_REPORT='+json.dumps(result));raise SystemExit(0 if result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else 1)

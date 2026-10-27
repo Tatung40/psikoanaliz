@@ -78,3 +78,30 @@ def test_report_resource_budget_rejects_before_estimation(monkeypatch):
  def forbidden(*a,**kw):raise AssertionError('Oversized report reached calibration')
  monkeypatch.setattr(module.mirt,'fit_mirt',forbidden)
  with pytest.raises(ValueError,match='Rapor bellek bütçesi'):module.fit(data,module.MODELS[0],pattern)
+
+
+def test_four_precision_preserves_data_masks_and_never_refits_r(tmp_path,monkeypatch):
+ import json,hashlib
+ from validation.mirt_phase2 import factorized_comparison as validation
+ # Test double only; never independent evidence or scientific PASS.
+ prior=tmp_path/'prior';prior.mkdir();data,_,_=validation.dataset('4PL');data=data.head(30)
+ data.to_csv(prior/'data.csv',index=False);settings=dict(family='4PL',criteria_sha256=hashlib.sha256(validation.CRITERIA.read_bytes()).hexdigest(),data_sha256=hashlib.sha256((prior/'data.csv').read_bytes()).hexdigest())
+ rows=[dict(status='NUMERICALLY VALIDATED / NOT CERTIFIED' if i!=1 else 'NOT CONVERGED',R=dict(converged=True),Python=dict(converged=i!=1)) for i in range(3)]
+ (prior/'report.json').write_text(json.dumps(dict(status='FAIL',settings=settings,blocks=rows)))
+ block=prior/'F2';block.mkdir();data.iloc[:,6:12].to_csv(block/'data.csv',index=False)
+ values=dict(discrimination=np.ones(6),difficulty=np.zeros(6),guessing=np.full(6,.2),upper=np.full(6,.95));np.savez(block/'python_parameters.npz',**values);(block/'report.json').write_text(json.dumps(rows[1]))
+ def forbidden(*a,**kw):raise AssertionError('R calibration forbidden')
+ monkeypatch.setattr(validation,'r_run',forbidden);calls=[]
+ class PublicEstimator:
+  def __init__(self,**kw):calls.append(kw)
+  def fit(self,model,observed,start):
+   assert not model.free_parameter_masks['guessing'].any() and not model.free_parameter_masks['upper'].any()
+   np.testing.assert_array_equal(model.parameters['upper'],values['upper'])
+   np.testing.assert_array_equal(start['difficulty'],values['difficulty'])
+   raise RuntimeError('verified public precision boundary')
+ monkeypatch.setattr(validation.mirt,'EMEstimator',PublicEstimator)
+ result=validation.continue_four(prior,tmp_path/'out')
+ assert len(calls)==1 and calls[0]['item_optim_ftol']==1e-14 and calls[0]['tol']==1e-12
+ assert result['status']=='BLOCKED' and result['blocker']=='verified public precision boundary'
+ assert 'NO NEW R FIT' in result['R_execution']
+ assert json.loads((tmp_path/'out/original_report.json').read_text())['status']=='FAIL'
