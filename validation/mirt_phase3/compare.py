@@ -20,15 +20,15 @@ def hessian(obj,x,bounds):
   def gradient(v):
    z=x.copy();z[idx]=v;return obj.evaluate(z)[1][idx]
   H=approx_derivative(gradient,x[idx],method='3-point',abs_step=step,bounds=(box[idx,0],box[idx,1]));matrices.append((H+H.T)/2)
- eigen=np.linalg.eigvalsh(matrices[1]);relative=float(np.linalg.norm(matrices[1]-matrices[0])/max(1,np.linalg.norm(matrices[1])))
- return dict(steps=[1e-4,5e-5],free_coordinates=idx.tolist(),excluded_active_coordinates=np.flatnonzero(~free).tolist(),smallest_eigenvalues=eigen[:5].tolist(),condition=float(np.max(abs(eigen))/max(np.min(abs(eigen)),np.finfo(float).tiny)),relative_step_difference=relative,
+ eigen=np.linalg.eigvalsh(matrices[1]);largest=float(np.max(abs(eigen)));smallest=float(np.min(abs(eigen)));condition=largest/smallest if smallest>np.finfo(float).tiny*max(1,largest) else None;relative=float(np.linalg.norm(matrices[1]-matrices[0])/max(1,np.linalg.norm(matrices[1])))
+ return dict(steps=[1e-4,5e-5],free_coordinates=idx.tolist(),excluded_active_coordinates=np.flatnonzero(~free).tolist(),smallest_eigenvalues=eigen[:5].tolist(),condition=condition,relative_step_difference=relative,
   interpretation='Diagnostic only: no SE/CI, global optimality or structural identification certificate')
 
 
 def r_run(root,mode):
  target=root/mode;target.mkdir(exist_ok=True)
  with (target/'stdout.log').open('w') as stdout,(target/'stderr.log').open('w') as stderr:
-  run=subprocess.run(['Rscript',str(ROOT/'reference.R'),str(root.resolve()),mode],stdout=stdout,stderr=stderr,timeout=1800)
+  run=subprocess.run(['Rscript',str(ROOT/'reference.R'),str(root.resolve()),mode],stdout=stdout,stderr=stderr,timeout=600)
  if run.returncode:raise RuntimeError(f'R {mode} error {run.returncode}; original stderr preserved')
  return target
 
@@ -42,21 +42,22 @@ def pack_reference(spec,folder):
  return np.concatenate(parts),meta
 
 
-def run_case(family,q,free_c,free_u,out,prior=None):
+def run_case(family,q,free_c,free_u,out,prior=None,within=None):
  out.mkdir(parents=True,exist_ok=True);data=pd.read_csv(ROOT/f'fixtures/2PL_{q}D.csv');J=len(data.columns)
  pattern=np.zeros((J,q),int)
  for d in range(q):pattern[d*4:(d+1)*4,d]=1
- pattern[-2:]=np.ones(q,int) if q==3 else np.array([1,0])
+ within=q==3 if within is None else within
+ pattern[-2:]=np.ones(q,int) if within else np.eye(q,dtype=int)[0]
  spec=engine.Specification(pattern,family,True,free_c,free_u,c=.2,u=.95 if family=='4PL' else 1.)
  obj=engine.Objective(data,spec,15);start,bounds=spec.start_bounds();criteria=json.loads(CRITERIA.read_text())
  data.to_csv(out/'data.csv',index=False);theta=np.vstack([np.zeros(q),np.eye(q),-np.eye(q),np.linspace(-3,3,31)[:,None]*np.ones(q)])
  pd.DataFrame(theta,columns=[f'F{d+1}' for d in range(q)]).to_csv(out/'trace.csv',index=False)
  integration=pd.DataFrame(obj.grid.nodes,columns=[f'F{d+1}' for d in range(q)]);integration['weight']=obj.grid.weights;integration.to_csv(out/'integration.csv',index=False,float_format='%.17g')
- settings=dict(family=family,q=q,pattern=pattern.tolist(),correlated=True,c=spec.c,u=spec.u,free_c=free_c,free_u=free_u,
+ settings=dict(family=family,q=q,within=bool(within),pattern=pattern.tolist(),correlated=True,c=spec.c,u=spec.u,free_c=free_c,free_u=free_u,
   Python=platform.python_version(),scipy=scipy.__version__,engine='NEW experimental SciPy component, NOT Python mirt native calibration',
   N=len(data),J=J,n_quadpts=15,seed=20261027,priors=None,identification='Mean0, unit variances, >=3 positive pure anchors/axis',
   correlation='Full normalized-Cholesky eta, lower-triangular row order; eta in [-3,3]',start=start.tolist(),bounds=bounds,
-  Python_stopping='L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained',R_stopping='mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8',
+  R_timeout_seconds=600,Python_stopping='L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained',R_stopping='mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8',
   criteria_sha256=hashlib.sha256(CRITERIA.read_bytes()).hexdigest(),data_sha256=hashlib.sha256((out/'data.csv').read_bytes()).hexdigest(),
   source='Retained PR80 2PL fixture; no new simulated responses; asymptote-model misspecification is not a recovery study')
  (out/'settings.json').write_text(json.dumps(settings,indent=2)+'\n')
@@ -102,12 +103,24 @@ def run_case(family,q,free_c,free_u,out,prior=None):
 
 
 def execute(request,out,prior=None):
- cfg=json.loads(Path(request).read_text());reports=[]
- for case in cfg['cases']:
-  result=run_case(case['family'],case['q'],case['free_c'],case['free_u'],out/case['name'],None if prior is None else prior/case['name'])
-  reports.append(result)
-  if result['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':break
- record=dict(status='NUMERICALLY VALIDATED / NOT CERTIFIED' if reports and len(reports)==len(cfg['cases']) and all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 'FAIL' if reports else 'NOT REQUESTED',cases=reports)
+ cfg=json.loads(Path(request).read_text());groups=cfg.get('stages',[dict(name='requested',requires=[],cases=cfg.get('cases',[]))]);records=[]
+ accepted={}
+ if 'retained' in cfg:
+  retained=json.loads((ROOT/cfg['retained']).read_text())
+  if retained['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':raise ValueError('Retained preceding stage not accepted')
+  accepted['B_initial']=True
+ for group in groups:
+  stage=dict(name=group['name'],status='BLOCKED',cases=[])
+  if not all(accepted.get(dependency,False) for dependency in group.get('requires',[])):
+   stage['reason']='Prerequisite numerical acceptance absent; NO FIT / NOT CERTIFIED'
+  else:
+   for case in group['cases']:
+    result=run_case(case['family'],case['q'],case['free_c'],case['free_u'],out/case['name'],None if prior is None else prior/case['name'],case.get('within'))
+    stage['cases'].append(result)
+    if result['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':break
+   stage['status']='NUMERICALLY VALIDATED / NOT CERTIFIED' if stage['cases'] and len(stage['cases'])==len(group['cases']) and all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in stage['cases']) else 'FAIL' if stage['cases'] else 'NOT REQUESTED'
+  accepted[group['name']]=stage['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED';records.append(stage)
+ record=dict(status='NUMERICALLY VALIDATED / NOT CERTIFIED' if records and all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in records) else 'NOT REQUESTED' if not any(g['cases'] for g in groups) else 'FAIL',stages=records)
  out.mkdir(parents=True,exist_ok=True);(out/'report.json').write_text(json.dumps(record,indent=2,allow_nan=False)+'\n');return record
 
 

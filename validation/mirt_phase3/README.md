@@ -80,3 +80,27 @@ The actual accepted Python 2D estimate is hash/settings checked and reused
 without recalibration; the original failed evidence is copied intact. R must
 run again because its original convergence metadata is unavailable. 3D has
 not run yet. No production/UI capability is enabled by this repair.
+
+## Actual initial fixed-c acceptance and expansion gate
+
+Run 40491591755 accepted BOTH fixed-c profiles, actual native R and Python
+converged; unchanged criteria all passed. 2D: maximum parameter difference
+2.80947e-5, common LL difference 9.45874e-10, tangent Hessian min eigenvalue
+.27943, condition449. 3D correlated within-item: parameter difference
+3.63907e-5, common LL difference 1.57161e-9, min eigenvalue .090758, condition
+1314. Two-step Hessian relative changes <5.7e-9; no active box bounds.
+Native Python stopping is relative-objective stagnation, with projected
+scores 3.31e-5 / 4.18e-4. These are numerical convergence diagnostics, not
+exact stationarity or certification. Full values/source settings retained in
+fixed_3PL_initial_evidence.json and the linked artifact. The R normalization
+identity guard now records actual 17-digit diagonal values.
+
+Next request stages are explicit: remaining fixed-c 3PL structures, then
+free-c 3PL; independently, fixed-asymptote 4PL after fixed-c 3PL acceptance;
+free 4PL only after free-c 3PL and fixed 4PL acceptance. Each stage stops its
+own dependent fits on failure, while mathematically independent stages may
+continue. Failed/BLOCKED stages keep the overall workflow red; no skip/PASS
+substitution. Accepted initial 3PL fits and all PR80/81 fits are NOT requested
+again. Each new R fit has a documented 600-second operational budget,
+without changing its algorithm, bounds, tolerance or 3000-cycle limit. A
+resource timeout is BLOCKED, not convergence or scientific acceptance.

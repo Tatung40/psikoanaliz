@@ -83,3 +83,17 @@ def test_unit_variance_representation_guard_is_machine_precision_only():
  assert 'all(diag(S)==1)' not in source and '8*.Machine$double.eps' in source
  assert '!unit_diagonal(1+1e-12)' in source
  assert source.index("'native_fit_status.json'")<source.index('unit_diagonal(diag(S))')
+
+
+def test_dependent_failure_blocks_following_fits_but_not_independent_stages(tmp_path,monkeypatch):
+ import json
+ from validation.mirt_phase3 import compare
+ case=dict(name='control',family='3PL',q=2,free_c=False,free_u=False)
+ request=tmp_path/'request.json';request.write_text(json.dumps(dict(stages=[dict(name='free',requires=[],cases=[case]),dict(name='dependent',requires=['free'],cases=[case]),dict(name='independent',requires=[],cases=[dict(case,name='other')])])))
+ calls=[]
+ def run(*a,**kw):calls.append(a);return dict(status='NOT CONVERGED')
+ monkeypatch.setattr(compare,'run_case',run)
+ result=compare.execute(request,tmp_path/'out')
+ assert len(calls)==2 and result['status']=='FAIL'
+ assert result['stages'][1]['status']=='BLOCKED' and not result['stages'][1]['cases']
+ assert result['stages'][2]['status']=='FAIL'

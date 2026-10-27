@@ -1,1 +1,118 @@
-{"stage":"B fixed-c first; A uses retained independent correlated 2PL calibration", "cases":[{"name":"3PL_2D_correlated_between","family":"3PL","q":2,"free_c":false,"free_u":false},{"name":"3PL_3D_correlated_within","family":"3PL","q":3,"free_c":false,"free_u":false}]}
+{
+  "retained": "fixed_3PL_initial_evidence.json",
+  "stages": [
+    {
+      "name": "B_fixed_expansion",
+      "requires": [
+        "B_initial"
+      ],
+      "cases": [
+        {
+          "name": "3PL_2D_within_fixed",
+          "family": "3PL",
+          "q": 2,
+          "within": true,
+          "free_c": false,
+          "free_u": false
+        },
+        {
+          "name": "3PL_3D_between_fixed",
+          "family": "3PL",
+          "q": 3,
+          "within": false,
+          "free_c": false,
+          "free_u": false
+        }
+      ]
+    },
+    {
+      "name": "B_free_c",
+      "requires": [
+        "B_fixed_expansion"
+      ],
+      "cases": [
+        {
+          "name": "3PL_2D_between_free",
+          "family": "3PL",
+          "q": 2,
+          "within": false,
+          "free_c": true,
+          "free_u": false
+        },
+        {
+          "name": "3PL_3D_within_free",
+          "family": "3PL",
+          "q": 3,
+          "within": true,
+          "free_c": true,
+          "free_u": false
+        }
+      ]
+    },
+    {
+      "name": "C_fixed",
+      "requires": [
+        "B_fixed_expansion"
+      ],
+      "cases": [
+        {
+          "name": "4PL_2D_between_fixed",
+          "family": "4PL",
+          "q": 2,
+          "within": false,
+          "free_c": false,
+          "free_u": false
+        },
+        {
+          "name": "4PL_2D_within_fixed",
+          "family": "4PL",
+          "q": 2,
+          "within": true,
+          "free_c": false,
+          "free_u": false
+        },
+        {
+          "name": "4PL_3D_between_fixed",
+          "family": "4PL",
+          "q": 3,
+          "within": false,
+          "free_c": false,
+          "free_u": false
+        },
+        {
+          "name": "4PL_3D_within_fixed",
+          "family": "4PL",
+          "q": 3,
+          "within": true,
+          "free_c": false,
+          "free_u": false
+        }
+      ]
+    },
+    {
+      "name": "C_free",
+      "requires": [
+        "B_free_c",
+        "C_fixed"
+      ],
+      "cases": [
+        {
+          "name": "4PL_2D_between_free",
+          "family": "4PL",
+          "q": 2,
+          "within": false,
+          "free_c": true,
+          "free_u": true
+        },
+        {
+          "name": "4PL_3D_within_free",
+          "family": "4PL",
+          "q": 3,
+          "within": true,
+          "free_c": true,
+          "free_u": true
+        }
+      ]
+    }
+  ]
+}
