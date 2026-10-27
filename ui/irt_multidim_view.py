@@ -9,6 +9,7 @@ from core import irt_multidim_factorized as factorized
 from core import irt_multidim_rsm_stack as rsm
 from core import irt_multidim_general_report as general
 from reports.irt_multidim_report import downloads,figure
+from ui.analysis_code_panel import render_mirt_code_panel
 
 KEY='mirt_multidim_result'
 
@@ -106,3 +107,5 @@ def render(data=None,item_cols=(),id_col=None):
   if saved.get('bundle_key')!=bundle_key:saved['bundle']=downloads(result,item,category);saved['bundle_key']=bundle_key
   for ext,mime in [('csv','text/csv'),('xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),('png','image/png'),('zip','application/zip'),('report','text/markdown')]:
    if saved['bundle'][ext] is not None:st.download_button('MIRT — '+ext.upper(),saved['bundle'][ext],'mirt_results.'+('md' if ext=='report' else ext),mime,key='md_download_'+ext)
+
+ render_mirt_code_panel(settings)
