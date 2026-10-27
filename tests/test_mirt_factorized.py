@@ -66,3 +66,15 @@ def test_actual_factorized_ui_scores_exports_and_stale_asymptote(monkeypatch,fam
   assert 'NOT CERTIFIED' in z.read('report.md').decode()
  at.number_input(key='md_fixed_u' if family=='4PL' else 'md_fixed_c').set_value(.94 if family=='4PL' else .21).run();assert not at.exception and not at.get('download_button') and view.KEY not in at.session_state
  assert len(calls)==1
+
+
+def test_report_resource_budget_rejects_before_estimation(monkeypatch):
+ # Estimation is cheap after factorization, but a dense IIF export is O(J*q²).
+ # This is an operational memory guard, not a statistical acceptance criterion.
+ data=pd.read_csv('tests/fixtures/irt_b11/data_irt3pl_ok.csv').iloc[:30,:12]
+ data=pd.concat([data.add_prefix(f'B{b}_') for b in range(3)],axis=1)
+ pattern=np.zeros((36,5),int)
+ for i in range(36):pattern[i,min(i*5//36,4)]=1
+ def forbidden(*a,**kw):raise AssertionError('Oversized report reached calibration')
+ monkeypatch.setattr(module.mirt,'fit_mirt',forbidden)
+ with pytest.raises(ValueError,match='Rapor bellek bütçesi'):module.fit(data,module.MODELS[0],pattern)

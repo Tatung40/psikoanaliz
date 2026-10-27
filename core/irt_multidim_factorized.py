@@ -6,7 +6,7 @@ import platform
 import numpy as np
 import pandas as pd
 import mirt
-from core.irt_multidim import STATUS,surface_tables
+from core.irt_multidim import STATUS,SURFACE_POINTS,surface_tables
 from core.irt_python_mirt_adapter import normalize_solver_settings
 
 MODELS=('3PL — bağımsız bloklar, c sabit','4PL — bağımsız bloklar, c ve d sabit')
@@ -22,6 +22,7 @@ LIMITATION=('EXPERIMENTAL / NOT CERTIFIED. Yalnız between-item, ortogonal, bağ
 def validate(data,pattern,correlated=False,exploratory=False,c=.2,u=1.):
  x=pd.DataFrame(data);p=np.asarray(pattern)
  if p.ndim!=2 or p.shape[1] not in (2,3,4,5) or p.shape[0]!=len(x.columns) or not np.isin(p,[0,1]).all():raise ValueError('2–5 boyutlu geçerli madde matrisi gerekli')
+ if SURFACE_POINTS**2*len(x.columns)*p.shape[1]**2>250_000:raise ValueError('Rapor bellek bütçesi: en fazla 250000 bilgi matrisi satırı; madde/boyut sayısını azaltın')
  if correlated or exploratory or not np.all(p.sum(1)==1):raise ValueError('Yalnız ortogonal between-item yapı: madde başına tam bir yük')
  if any(p[:,j].sum()<6 for j in range(p.shape[1])):raise ValueError('Boyut başına en az 6 madde gerekli; bu bilimsel yeterlilik sertifikası değildir')
  if len(x)<30 or x.isna().any().any() or not x.columns.is_unique or not x.isin([0,1]).all().all():raise ValueError('En az 30 kişi, benzersiz maddeler, eksiksiz 0/1 veri gerekli')

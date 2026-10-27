@@ -66,3 +66,15 @@ MultigroupEMEstimator._optimize_item indexes every parameter mask by item
 claimed. No independent per-factor RSM fits with different steps are passed
 off as a shared-step model. A genuine supported joint shared-step estimator
 is required before this route may be enabled.
+
+4PL first R preflight (run 40462716422) stopped before calibration on strict
+physical `u == .95` equality. Original CSV records every u=.95 with estimation
+flags FALSE. The corrected guard records full 17-digit values and differences,
+checks unchanged fixed flags strictly, and allows only 8 machine epsilons for
+physical logit/inverse-logit representations. An R runtime regression rejects
+a 1e-12 perturbation. No data, asymptote target, optimizer, bound or scientific
+comparison tolerance is changed; original failed evidence is retained.
+
+Dense information export is capped at 250000 rows **before fitting** to bound
+Streamlit/openpyxl memory. This operational guard is independent of scientific
+criteria; factorization does not justify an unbounded dense q×q report.

@@ -10,6 +10,7 @@ from core.irt_b14 import prepare_polytomous
 from core.irt_python_mirt_adapter import normalize_solver_settings
 
 STATUS='EXPERIMENTAL / NOT CERTIFIED'
+SURFACE_POINTS=17
 MODELS=('Rasch','1PL (a=1)','2PL','GRM','PCM','GPCM','NRM','Bifactor')
 LIMITATION=('Bağımsız R kabulü yalnız kayıtlı profiller içindir; yeni veride sonuç EXPERIMENTAL / NOT CERTIFIED. '
  'Ortalama 0, varyans 1; doğrulayıcı yapıda boyut başına ≥3 saf madde. '
@@ -216,7 +217,7 @@ def surface_tables(engine,items,labels,q):
  """Existing native curve/information reporting, reusable without calibration."""
  k=len(items);frames={}
  # Shared F1/F2 surface; all other dimensions held exactly at zero.
- grid=np.array(list(itertools.product(np.linspace(-3,3,17),repeat=2)))
+ grid=np.array(list(itertools.product(np.linspace(-3,3,SURFACE_POINTS),repeat=2)))
  theta=np.zeros((len(grid),q));theta[:,:2]=grid
  p=np.asarray(engine.probability(theta))
  if p.ndim==2:p=np.stack((1-p,p),-1)

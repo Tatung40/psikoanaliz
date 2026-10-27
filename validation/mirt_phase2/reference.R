@@ -36,6 +36,16 @@ meta<-list(R=R.version.string,mirt=as.character(packageVersion('mirt')),model=mo
  converged=extract.mirt(fit,'converged'),logLik=extract.mirt(fit,'logLik'),AIC=extract.mirt(fit,'AIC'),BIC=extract.mirt(fit,'BIC'),iterations=extract.mirt(fit,'iterations'),
  fixed_c=.2,fixed_u=if(model=='4PL').95 else 1,mean=final_values$value[final_values$name=='MEAN_1'],variance=final_values$value[final_values$name=='COV_11'],D=1,priors=extract.mirt(fit,'logPrior'),
  bounds=list(a=c(.1,5),b=c(-6,6)),quadrature=61,stopping='R maximum parameter change <1e-8; maximum 3000 EM cycles')
-stopifnot(meta$priors==0,all(raw[,'g']==.2),all(raw[,'u']==meta$fixed_u),min(raw[,'a1'])>=.1,max(raw[,'a1'])<=5,max(abs(-raw[,'d']/raw[,'a1']))<=6+1e-7)
+# Only physical floating representations use an 8-epsilon guard. Estimation
+# flags, classes and all scientific comparison criteria remain strict.
+roundtrip_tol<-8*.Machine$double.eps
+same_physical<-function(x,target)all(is.finite(x)) && all(abs(x-target)<=roundtrip_tol)
+stopifnot(same_physical(.95+.Machine$double.eps,.95),!same_physical(.95+1e-12,.95))
+representation<-list(type=typeof(raw[,'u']),class=class(raw[,'u']),
+ actual_u=sprintf('%.17g',raw[,'u']),expected_u=sprintf('%.17g',meta$fixed_u),
+ max_c_difference=max(abs(raw[,'g']-.2)),max_u_difference=max(abs(raw[,'u']-meta$fixed_u)),
+ allowance=roundtrip_tol,all_asymptotes_fixed=!any(final_values$est[final_values$name %in% c('g','u')]))
+jsonlite::write_json(representation,file.path(out,'asymptote_representation.json'),auto_unbox=TRUE,pretty=TRUE,digits=NA)
+stopifnot(meta$priors==0,representation$all_asymptotes_fixed,same_physical(raw[,'g'],.2),same_physical(raw[,'u'],meta$fixed_u),min(raw[,'a1'])>=.1,max(raw[,'a1'])<=5,max(abs(-raw[,'d']/raw[,'a1']))<=6+1e-7)
 jsonlite::write_json(meta,file.path(out,'metadata.json'),auto_unbox=TRUE,pretty=TRUE,digits=NA)
 capture.output(sessionInfo(),file=file.path(out,'sessionInfo.txt'))
