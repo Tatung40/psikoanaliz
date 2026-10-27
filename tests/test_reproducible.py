@@ -15,7 +15,6 @@ import pytest
 from core import descriptives
 from core.reproducible import (Recorder, Unsupported, begin, bundle, decode, encode,
                                finish, public_call, python_code, recorded)
-from core.reproducible_r import r_code
 
 
 def sample():
@@ -50,9 +49,7 @@ def test_standalone_zip_executes_actual_prepared_data_outside_repository(tmp_pat
     code = python_code(manifest)
     compile(code, 'analysis.py', 'exec')
     assert manifest['status'] == 'GENERATED / UNVERIFIED'
-    r, reason = r_code(manifest)
-    assert r and reason is None
-    with zipfile.ZipFile(io.BytesIO(bundle(manifest, code, r))) as archive:
+    with zipfile.ZipFile(io.BytesIO(bundle(manifest, code))) as archive:
         archive.extractall(tmp_path)
     # Add comparison only in the test; no production execution/VERIFIED claim.
     script = tmp_path / 'analysis.py'
@@ -63,7 +60,8 @@ def test_standalone_zip_executes_actual_prepared_data_outside_repository(tmp_pat
     actual = pd.read_json(tmp_path / 'actual.json', orient='split')
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
     pd.testing.assert_frame_equal(pd.read_json(tmp_path / 'correlation.json', orient='split'), sample().corr())
-    assert (tmp_path / 'analysis.R').is_file()
+    assert not list(tmp_path.rglob('*.R'))
+    assert not (tmp_path / 'runtime/core/reproducible_r.py').exists()
     assert 'NOT INSTALLED' not in (tmp_path / 'requirements-repro.txt').read_text()
 
 
@@ -121,10 +119,6 @@ def test_opaque_configuration_is_unsupported_not_fabricated():
         encode(pd.Categorical(['A', 'B']))
 
 
-def test_unmatched_r_engine_never_substituted():
-    manifest = {'calls': [{'module': 'core.irt_multidim', 'function': 'fit', 'arguments': encode({'data': sample(), 'model': 'GRM'})}]}
-    code, reason = r_code(manifest)
-    assert code is None and 'not established' in reason
 
 
 def test_r_real_execution_and_basic_result_comparison(tmp_path):
@@ -132,12 +126,12 @@ def test_r_real_execution_and_basic_result_comparison(tmp_path):
         if os.environ.get('REQUIRE_REPRO_R') == '1':
             pytest.fail('Required actual R runtime is missing')
         pytest.skip('NOT EXECUTED: actual R runtime unavailable')
-    rec, expected = captured(sample())
-    code, reason = r_code(rec.manifest())
-    assert reason is None
-    script = tmp_path / 'analysis.R'
-    script.write_text(code)
-    run = subprocess.run(['Rscript', str(script)], cwd=tmp_path, capture_output=True, text=True, timeout=30)
+    frame = sample()
+    expected = descriptives.describe_items(frame)
+    data = tmp_path / 'data.csv'
+    frame.to_csv(data, index=False)
+    script = Path(__file__).resolve().parents[1] / 'validation/descriptive_reference.R'
+    run = subprocess.run(['Rscript', str(script), str(data), str(tmp_path)], cwd=tmp_path, capture_output=True, text=True, timeout=30)
     (tmp_path / 'R.stdout.log').write_text(run.stdout)
     (tmp_path / 'R.stderr.log').write_text(run.stderr)
     assert run.returncode == 0, run.stderr
@@ -163,13 +157,15 @@ render(finish())
 '''
     at = AppTest.from_string(script).run(timeout=30)
     assert not at.exception
-    assert any(t.label == '</> Python / R Kodları' for t in at.tabs)
+    assert any(t.label == '</> Python Kodları' for t in at.tabs)
     before = at.code[0].value
     assert 'GENERATED / UNVERIFIED' in before
     at.number_input[0].set_value(8).run(timeout=30)
     assert not at.exception and at.code[0].value != before
     buttons = at.get('download_button')
-    assert len(buttons) == 3
+    assert {b.key for b in buttons} == {'repro_py', 'repro_zip'}
+    assert len(at.code) == 1
+    assert not any(t.label == 'R' for t in at.tabs)
     assert all('analysis' in b.proto.url or b.proto.url for b in buttons)
 
 
@@ -217,13 +213,6 @@ def test_inventory_is_current_and_includes_missing_data_page():
     assert any(r['screen'].startswith('pages/') for r in expected)
 
 
-def test_r_unmapped_column_labels_do_not_break_original_analysis():
-    frame = sample()
-    frame.columns = [1, 2]
-    rec, actual = captured(frame)
-    assert len(actual) == 2
-    r, reason = r_code(rec.manifest())
-    assert r is None and 'UNSUPPORTED' in reason
 
 
 def test_real_app_descriptives_current_settings_and_input_change():
@@ -236,7 +225,7 @@ def test_real_app_descriptives_current_settings_and_input_change():
         at.session_state[key] = value
     at.run()
     assert not at.exception, [str(e) for e in at.exception]
-    assert any(t.label == '</> Python / R Kodları' for t in at.tabs)
+    assert any(t.label == '</> Python Kodları' for t in at.tabs)
     code = next(c.value for c in at.code if 'MANIFEST = ' in c.value)
     assert 'describe_items' in code and 'describe_total' in code
     changed = frame.copy()
@@ -280,8 +269,6 @@ def test_inline_library_correlation_records_actual_api_and_settings():
     pd.testing.assert_frame_equal(actual, sample().corr())
     assert rec.calls[0]['module'] == 'pandas' and rec.calls[0]['function'] == 'DataFrame.corr'
     compile(python_code(rec.manifest()), 'analysis.py', 'exec')
-    r, reason = r_code(rec.manifest())
-    assert r and reason is None and 'pairwise.complete.obs' in r
 
 
 def test_ui_only_inference_gate_cannot_be_bypassed_by_script():
