@@ -44,7 +44,7 @@ def test_no_fit_audit_reports_real_blockers_and_not_scientific_pass(monkeypatch)
 
 def test_baseline_workflow_retains_all_accepted_fits_without_precision_refits():
  source=Path('.github/workflows/mirt-stage1.yml').read_text()
- assert 'run-id: 40471554619' in source
+ assert 'run-id: 40499970808' in source
  assert '--python-precision' not in source and '--refine-failed' not in source
  assert '--reuse original-evidence/mirt-stage1 --expand' in source
  assert 'tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py' in source

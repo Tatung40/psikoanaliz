@@ -34,7 +34,8 @@ def support_matrix():
   ('RSM',False,'RSM constructor is 1D; EM rejects additive LinearConstraint/ConstraintSet')]])
  from core.irt_multidim_factorized import MODELS as restricted
  from core.irt_multidim_rsm_stack import MODELS as stacked
- return pd.concat([result,pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact independent 1D block composition only; fixed asymptotes; no correlated/within-item model') for m in restricted]),pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact structural-row composition; ONE public scalar RSM fit, globally shared estimated steps; orthogonal between-item only') for m in stacked])],ignore_index=True)
+ from core.irt_multidim_general_report import MODELS as advanced
+ return pd.concat([result,pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact independent 1D block composition only; fixed asymptotes; no correlated/within-item model') for m in restricted]),pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact structural-row composition; ONE public scalar RSM fit, globally shared estimated steps; orthogonal between-item only') for m in stacked]),pd.DataFrame([dict(Model=m,Multidimensional_API=False,Phase1=False,Status=STATUS,Note='Separate SciPy component, not Python mirt native API; model label specifies validated dimension/structure/asymptote scope; positive CFA, full correlation') for m in advanced])],ignore_index=True)
 
 
 def structure(pattern,correlated=False,exploratory=False):

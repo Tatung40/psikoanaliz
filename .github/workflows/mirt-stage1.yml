@@ -11,6 +11,12 @@ on:
       - 'tests/test_mirt_phase2_capabilities.py'
       - 'tests/test_mirt_factorized.py'
       - 'validation/mirt_phase2/**'
+      - 'validation/mirt_phase3/**'
+      - 'tests/test_mirt_phase3.py'
+      - 'tests/test_mirt_general_ui.py'
+      - 'tests/test_mirt_phase3_eligibility.py'
+      - 'core/irt_multidim_general.py'
+      - 'core/irt_multidim_general_report.py'
       - 'core/irt_multidim_factorized.py'
       - 'core/irt_multidim_rsm_stack.py'
       - 'tests/test_mirt_rsm_stack.py'
@@ -50,20 +56,24 @@ jobs:
       - name: Python dependencies (existing environment specification)
         run: python -m pip install -r requirements.txt 'mirt==1.2.0'
       - name: Focused API, mathematical and actual Streamlit checks
-        run: python -m pytest -q tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py tests/test_mirt_phase2_capabilities.py tests/test_mirt_factorized.py tests/test_mirt_rsm_stack.py
+        run: python -m pytest -q tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py tests/test_mirt_phase2_capabilities.py tests/test_mirt_factorized.py tests/test_mirt_rsm_stack.py tests/test_mirt_phase3.py tests/test_mirt_general_ui.py tests/test_mirt_phase3_eligibility.py
       - name: Phase 2 capability audit (no fits)
         run: python validation/mirt_phase2/capability_audit.py --output validation-output/mirt-phase2/capability_audit.json
       - name: Reuse retained converged fits (no recalibration)
         uses: actions/download-artifact@v4
         with:
-          name: mirt-stage1-608e0f57a863c16eaa279e36342945ef66c8b67c-40471554619
-          run-id: 40471554619
+          name: mirt-stage1-452db8fc6dde0028964c998064020f6713d20c24-40499970808
+          run-id: 40499970808
           github-token: ${{ github.token }}
           path: original-evidence
       - name: Verify all 12 retained profiles at fixed parameters (no recalibration)
         run: python validation/mirt_stage1/compare.py --output validation-output/mirt-stage1 --reuse original-evidence/mirt-stage1 --expand
       - name: Opt-in independent Phase 2 calibration (no automatic retries)
         run: python validation/mirt_phase2/factorized_comparison.py --output validation-output/mirt-phase2-fit
+      - name: Phase 3 actual R API contract (no IRT fits)
+        run: Rscript validation/mirt_phase3/runtime_contract.R validation-output/mirt-phase3-runtime
+      - name: Phase 3 opt-in independent general-CFA comparison
+        run: python validation/mirt_phase3/compare.py --output validation-output/mirt-phase3
       - name: Compact diagnostics even after failure
         if: always()
         shell: bash

@@ -1,0 +1,1142 @@
+{
+  "run": "https://github.com/Tatung40/psikoanaliz/actions/runs/40491591755",
+  "commit": "2d214324467479636dafab3d24cff08fcca829a9",
+  "artifact_id": 12728329268,
+  "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+  "cases": [
+    {
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "settings": {
+        "family": "3PL",
+        "q": 2,
+        "pattern": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "correlated": true,
+        "c": 0.2,
+        "u": 1,
+        "free_c": false,
+        "free_u": false,
+        "Python": "3.11.17",
+        "scipy": "1.17.1",
+        "engine": "NEW experimental SciPy component, NOT Python mirt native calibration",
+        "N": 400,
+        "J": 10,
+        "n_quadpts": 15,
+        "seed": 20261027,
+        "priors": null,
+        "identification": "Mean0, unit variances, >=3 positive pure anchors/axis",
+        "correlation": "Full normalized-Cholesky eta, lower-triangular row order; eta in [-3,3]",
+        "start": [
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bounds": [
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -3,
+            3
+          ]
+        ],
+        "Python_stopping": "L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained",
+        "R_stopping": "mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8",
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "6881cfd01256a9c35c67b42f0a479e4922c19c637e026e2a973a59a55cb5c35a",
+        "source": "Retained PR80 2PL fixture; no new simulated responses; asymptote-model misspecification is not a recovery study"
+      },
+      "R_execution": "ONE ACTUAL INDEPENDENT R MIRT FIT EXECUTED",
+      "Python_execution": "RETAINED ACTUAL PYTHON FIT FROM 40490151345; NO RECALIBRATION",
+      "certification": "NOT CERTIFIED",
+      "preflight": {
+        "probability": {
+          "status": "PASS",
+          "max_absolute": 5.551115123125783e-16,
+          "mean_absolute": 1.750143240207712e-16,
+          "max_relative": 1.534144805867712e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 4.85722573273506e-16,
+          "mean_absolute": 3.592925532708908e-17,
+          "max_relative": 7.0177943628935394e-15,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 2.7755575615628914e-16,
+          "mean_absolute": 4.07357177984886e-18,
+          "max_relative": 1.478318750947999e-14,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "converged": true,
+        "iterations": 55,
+        "logLik": -2536.6369212147274,
+        "AIC": 5115.273842429455,
+        "BIC": 5199.094597918723,
+        "diagnostics": {
+          "engine": "SciPy direct fixed-grid marginal ML; NOT Python mirt calibration",
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+          "objective_calls": 115,
+          "gradient": [
+            0.00001413828159598887,
+            -0.00000899887565793083,
+            -0.000024846850314815537,
+            0.00001968145203742712,
+            0.000005901037109146053,
+            -0.0000021908721772386776,
+            -0.000010968219689633644,
+            0.00002388688516188633,
+            -0.00002858704834844989,
+            -0.000009943339184121383,
+            0.000011419270577092045,
+            -0.0000015575726759575132,
+            0.00001159034836915103,
+            0.00003300562750824594,
+            -0.00001015625027780913,
+            0.000012088185325961725,
+            9.05207337131677e-8,
+            7.040180323888093e-7,
+            -0.000010913656048385654,
+            -0.0000024381059954729936,
+            0.00000598413995902237
+          ],
+          "projected_score_max": 0.00003300562750824594,
+          "active_bounds": [],
+          "trace": "Preserved in original workflow artifact",
+          "Hessian": "NOT COMPUTED; no SE/CI/LR; local numerical convergence only",
+          "certification": "NOT CERTIFIED"
+        }
+      },
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "family": "3PL",
+        "converged": true,
+        "iterations": 82,
+        "logLik": -2536.63692121378,
+        "AIC": 5115.27384242756,
+        "BIC": 5199.09459791683,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0.123138162747654
+          ],
+          [
+            0.123138162747654,
+            1
+          ]
+        ],
+        "eta": 0.124082487948132,
+        "mapping": "P=g+(u-g)*logistic(A theta+delta), D=1; normalized fixed GH density ratio",
+        "mean": [
+          0,
+          0
+        ],
+        "identification": "Unit factor variances, positive pure anchors, named CFA axes",
+        "constraints_valid": true
+      },
+      "comparison": {
+        "parameters": {
+          "status": "PASS",
+          "max_absolute": 0.000028094687713586808,
+          "mean_absolute": 0.000005993914520145892,
+          "max_relative": 0.000009094876310275568,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 5.8137025540916376e-8,
+          "mean_absolute": 2.9068512770458188e-8,
+          "max_relative": 4.721284144871975e-7,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.0000018455914470028034,
+          "mean_absolute": 2.528327651115442e-7,
+          "max_relative": 0.000005710883674018382,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.000029349422414171045,
+          "mean_absolute": 3.795624735228573e-7,
+          "max_relative": 0.0001520095848740947,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "TIF": {
+          "status": "PASS",
+          "max_absolute": 0.00003003117009381384,
+          "mean_absolute": 0.0000019372989717535635,
+          "max_relative": 0.000008842294351337532,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.000007551693059715259,
+          "mean_absolute": 7.743775405633232e-7,
+          "max_relative": 0.0011648228596647088,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.000002422704158955291,
+          "mean_absolute": 3.322495287225169e-7,
+          "max_relative": 0.000003986772414279704,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 9.458744898438454e-10,
+          "mean_absolute": 9.458744898438454e-10,
+          "max_relative": 3.728852489424823e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 1.3642420526593924e-12,
+          "mean_absolute": 1.3642420526593924e-12,
+          "max_relative": 5.378152628980115e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "AIC": {
+          "status": "PASS",
+          "max_absolute": 1.8944774637930095e-9,
+          "mean_absolute": 1.8944774637930095e-9,
+          "max_relative": 3.703569979145523e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "BIC": {
+          "status": "PASS",
+          "max_absolute": 1.8926584743894637e-9,
+          "mean_absolute": 1.8926584743894637e-9,
+          "max_relative": 3.640361679795409e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -2536.6369212147274,
+        "R": -2536.6369212137815
+      },
+      "Hessian": {
+        "Python": {
+          "steps": [
+            0.0001,
+            0.00005
+          ],
+          "free_coordinates": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "excluded_active_coordinates": [],
+          "smallest_eigenvalues": [
+            0.27943054772613046,
+            0.8746364313008002,
+            1.0661142239113486,
+            1.2906123582893305,
+            1.49810438568266
+          ],
+          "condition": 448.54562409110355,
+          "relative_step_difference": 5.478057760051078e-9,
+          "interpretation": "Diagnostic only: no SE/CI, global optimality or structural identification certificate"
+        },
+        "R": {
+          "steps": [
+            0.0001,
+            0.00005
+          ],
+          "free_coordinates": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "excluded_active_coordinates": [],
+          "smallest_eigenvalues": [
+            0.2794408586220821,
+            0.8746384138303298,
+            1.0660617107270223,
+            1.2905609152319466,
+            1.4981066916299617
+          ],
+          "condition": 448.5290770251636,
+          "relative_step_difference": 5.475626744695594e-9,
+          "interpretation": "Diagnostic only: no SE/CI, global optimality or structural identification certificate"
+        }
+      },
+      "R_physical_score": [
+        8.56493139203824e-7,
+        -6.081242271570132e-8,
+        -2.2251415692767923e-7,
+        6.655100605354377e-7,
+        0.000001407104992406211,
+        -0.0000015068596013371968,
+        1.8387871303731666e-7,
+        -4.5163116796437905e-8,
+        -1.9504037824881685e-7,
+        3.934535179845501e-8,
+        -6.103865357155936e-7,
+        -1.3987469952705817e-7,
+        -3.934759188390193e-9,
+        9.959258022187622e-7,
+        -7.991818111732654e-8,
+        8.509752134144595e-8,
+        1.1554624693805881e-7,
+        -9.320785134804895e-8,
+        -9.136992831306154e-9,
+        -3.75377337743744e-8,
+        5.469237324316763e-7
+      ]
+    },
+    {
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "settings": {
+        "family": "3PL",
+        "q": 3,
+        "pattern": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            1,
+            1
+          ],
+          [
+            1,
+            1,
+            1
+          ]
+        ],
+        "correlated": true,
+        "c": 0.2,
+        "u": 1,
+        "free_c": false,
+        "free_u": false,
+        "Python": "3.11.17",
+        "scipy": "1.17.1",
+        "engine": "NEW experimental SciPy component, NOT Python mirt native calibration",
+        "N": 400,
+        "J": 14,
+        "n_quadpts": 15,
+        "seed": 20261027,
+        "priors": null,
+        "identification": "Mean0, unit variances, >=3 positive pure anchors/axis",
+        "correlation": "Full normalized-Cholesky eta, lower-triangular row order; eta in [-3,3]",
+        "start": [
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bounds": [
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            0.1,
+            5
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -6,
+            6
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            -3,
+            3
+          ],
+          [
+            -3,
+            3
+          ]
+        ],
+        "Python_stopping": "L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained",
+        "R_stopping": "mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8",
+        "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+        "data_sha256": "c84e92e941514950b7ddcb4f17e60be105d740ba5abeaf12deb9d98c6f5d5906",
+        "source": "Retained PR80 2PL fixture; no new simulated responses; asymptote-model misspecification is not a recovery study"
+      },
+      "R_execution": "ONE ACTUAL INDEPENDENT R MIRT FIT EXECUTED",
+      "Python_execution": "ONE ACTUAL SCIPY MML FIT EXECUTED",
+      "certification": "NOT CERTIFIED",
+      "preflight": {
+        "probability": {
+          "status": "PASS",
+          "max_absolute": 5.551115123125783e-16,
+          "mean_absolute": 1.7947214307850276e-16,
+          "max_relative": 2.355800757412359e-15,
+          "tolerance": 1e-10,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 4.85722573273506e-16,
+          "mean_absolute": 3.4124273488936167e-17,
+          "max_relative": 1.3093470314276388e-12,
+          "tolerance": 1e-8,
+          "reason": ""
+        },
+        "prior": {
+          "status": "PASS",
+          "max_absolute": 3.9898639947466563e-17,
+          "mean_absolute": 3.1090040970188185e-19,
+          "max_relative": 2.158098922846134e-14,
+          "tolerance": 1e-12,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "converged": true,
+        "iterations": 75,
+        "logLik": -3586.3344126421644,
+        "AIC": 7242.668825284329,
+        "BIC": 7382.370084433108,
+        "diagnostics": {
+          "engine": "SciPy direct fixed-grid marginal ML; NOT Python mirt calibration",
+          "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+          "objective_calls": 161,
+          "gradient": [
+            0.000006965034770788879,
+            0.000001161894040623835,
+            0.0000016541162216442122,
+            0.000008823762690860295,
+            -0.000017309720370654597,
+            0.000016780337456771916,
+            0.000008206899714032003,
+            4.803254370855925e-7,
+            0.00005419503653245549,
+            2.6197776313535465e-7,
+            -0.000019807712319087624,
+            0.000004624065309652523,
+            0.000004453750743492728,
+            -0.000024119685073630935,
+            0.000004946519621624923,
+            -0.00005548172670033328,
+            -0.000030278561521797474,
+            0.000050537867175606375,
+            -0.0000062261939592579135,
+            -0.000016150288180191593,
+            0.000019831100778331495,
+            0.00002195359883861196,
+            -0.000006050550029744314,
+            -0.000009157769572050063,
+            0.0000157907000522332,
+            -0.000015157692498740433,
+            -0.000008711133870128253,
+            -0.000004000965389519629,
+            0.000002562587827163072,
+            0.000004436318868428708,
+            -0.000023876860447365353,
+            -0.000003273515265224326,
+            -0.00041804194912796916,
+            -0.00006078971360728908,
+            0.0000736222135349188
+          ],
+          "projected_score_max": 0.00041804194912796916,
+          "active_bounds": [],
+          "trace": "Preserved in original workflow artifact",
+          "Hessian": "NOT COMPUTED; no SE/CI/LR; local numerical convergence only",
+          "certification": "NOT CERTIFIED"
+        }
+      },
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "family": "3PL",
+        "converged": true,
+        "iterations": 179,
+        "logLik": -3586.33441264059,
+        "AIC": 7242.66882528119,
+        "BIC": 7382.37008442997,
+        "logPrior": 0,
+        "covariance": [
+          [
+            1,
+            0.133713003083562,
+            -0.0306230076100916
+          ],
+          [
+            0.133713003083562,
+            1,
+            0.173104390133168
+          ],
+          [
+            -0.0306230076100916,
+            0.173104390133168,
+            1
+          ]
+        ],
+        "eta": [
+          0.134924613010601,
+          -0.0311396802856361,
+          0.181821534598473
+        ],
+        "mapping": "P=g+(u-g)*logistic(A theta+delta), D=1; normalized fixed GH density ratio",
+        "mean": [
+          0,
+          0,
+          0
+        ],
+        "identification": "Unit factor variances, positive pure anchors, named CFA axes",
+        "constraints_valid": true
+      },
+      "comparison": {
+        "parameters": {
+          "status": "PASS",
+          "max_absolute": 0.00003639070278005363,
+          "mean_absolute": 0.0000038104614863576834,
+          "max_relative": 0.00002957870507700998,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "covariance": {
+          "status": "PASS",
+          "max_absolute": 0.000003884347431204471,
+          "mean_absolute": 0.0000012491097276415595,
+          "max_relative": 0.000029049885513206258,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.0000017807252241652805,
+          "mean_absolute": 1.9863348730967535e-7,
+          "max_relative": 0.0000031373478860430325,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.000056939911182496417,
+          "mean_absolute": 1.1976696947917258e-7,
+          "max_relative": 0.00022898996041220706,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "TIF": {
+          "status": "PASS",
+          "max_absolute": 0.0000547881411101514,
+          "mean_absolute": 8.656336515350559e-7,
+          "max_relative": 0.000010877196046966488,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.0000050762961014104435,
+          "mean_absolute": 0.0000012792913804727,
+          "max_relative": 0.03975069338806161,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "posterior_SD": {
+          "status": "PASS",
+          "max_absolute": 0.0000018184151586719821,
+          "mean_absolute": 3.935532086953482e-7,
+          "max_relative": 0.000002472808847371165,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 1.57160684466362e-9,
+          "mean_absolute": 1.57160684466362e-9,
+          "max_relative": 4.382209420079619e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 2.7284841053187847e-12,
+          "mean_absolute": 2.7284841053187847e-12,
+          "max_relative": 7.608002465419339e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "AIC": {
+          "status": "PASS",
+          "max_absolute": 3.1386662158183753e-9,
+          "mean_absolute": 3.1386662158183753e-9,
+          "max_relative": 4.3335768782651184e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "BIC": {
+          "status": "PASS",
+          "max_absolute": 3.1377567211166024e-9,
+          "mean_absolute": 3.1377567211166024e-9,
+          "max_relative": 4.2503378796100423e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        }
+      },
+      "common_grid_logLik": {
+        "Python": -3586.3344126421644,
+        "R": -3586.3344126405927
+      },
+      "Hessian": {
+        "Python": {
+          "steps": [
+            0.0001,
+            0.00005
+          ],
+          "free_coordinates": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34
+          ],
+          "excluded_active_coordinates": [],
+          "smallest_eigenvalues": [
+            0.09075836018165595,
+            1.1248701829832477,
+            1.7454481115728573,
+            2.2113018444456407,
+            2.429762914856087
+          ],
+          "condition": 1314.2946765455968,
+          "relative_step_difference": 5.639776324195249e-9,
+          "interpretation": "Diagnostic only: no SE/CI, global optimality or structural identification certificate"
+        },
+        "R": {
+          "steps": [
+            0.0001,
+            0.00005
+          ],
+          "free_coordinates": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34
+          ],
+          "excluded_active_coordinates": [],
+          "smallest_eigenvalues": [
+            0.09076181512861005,
+            1.1248504537296122,
+            1.745404096695494,
+            2.211298081963969,
+            2.4297855957351526
+          ],
+          "condition": 1314.244030672588,
+          "relative_step_difference": 5.6406027267503135e-9,
+          "interpretation": "Diagnostic only: no SE/CI, global optimality or structural identification certificate"
+        }
+      },
+      "R_physical_score": [
+        -5.999623495906189e-7,
+        -1.7342480862632242e-7,
+        8.673554574615335e-7,
+        -0.0000065729275495334614,
+        -5.737069891733576e-9,
+        1.5436980631968983e-7,
+        7.452658794372532e-7,
+        4.0020731945305023e-8,
+        -1.0623276545824369e-7,
+        3.538041560894386e-7,
+        3.399916205440626e-8,
+        2.9758040997623887e-7,
+        7.447612038022169e-7,
+        3.1676883409868776e-7,
+        2.694721977472481e-7,
+        2.2298805598110895e-9,
+        -1.1662735135836484e-7,
+        3.2155269311253647e-7,
+        -0.0000015097722923358649,
+        -0.0000015038280749094253,
+        2.162290551214103e-7,
+        -8.782873938592682e-7,
+        5.357373981398234e-8,
+        2.8314077059447675e-7,
+        0.0000012729491754123662,
+        2.725999532829531e-7,
+        1.9071977707377693e-7,
+        2.412284536263418e-7,
+        7.252387091294262e-7,
+        0.0000035627950559126233,
+        -1.361440389823996e-7,
+        -0.000003343360117841767,
+        -0.00000537456647078594,
+        -0.000017168306435277454,
+        0.000007456850529571164
+      ]
+    }
+  ]
+}

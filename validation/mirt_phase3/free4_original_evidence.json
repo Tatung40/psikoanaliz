@@ -1,0 +1,696 @@
+{
+  "run": "https://github.com/Tatung40/psikoanaliz/actions/runs/40497502818",
+  "commit": "18d52c63297b2ea98b043252c9fdf9328c3e9b76",
+  "artifact_id": 12730957695,
+  "status": "FAIL",
+  "stages": [
+    {
+      "name": "C_free_2D",
+      "status": "FAIL",
+      "cases": [
+        {
+          "status": "NOT CONVERGED",
+          "settings": {
+            "family": "4PL",
+            "q": 2,
+            "within": false,
+            "pattern": [
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "correlated": true,
+            "c": 0.2,
+            "u": 0.95,
+            "free_c": true,
+            "free_u": true,
+            "Python": "3.11.17",
+            "scipy": "1.17.1",
+            "engine": "NEW experimental SciPy component, NOT Python mirt native calibration",
+            "N": 400,
+            "J": 10,
+            "n_quadpts": 15,
+            "seed": 20261027,
+            "priors": null,
+            "identification": "Mean0, unit variances, >=3 positive pure anchors/axis",
+            "correlation": "Full normalized-Cholesky eta, lower-triangular row order; eta in [-3,3]",
+            "start": [
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              1.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.2,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0.95,
+              0
+            ],
+            "bounds": [
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                0.1,
+                5
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                -6,
+                6
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0,
+                0.5
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                0.5,
+                1
+              ],
+              [
+                -3,
+                3
+              ]
+            ],
+            "R_timeout_seconds": 600,
+            "Python_stopping": "L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained",
+            "R_stopping": "mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8",
+            "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+            "data_sha256": "6881cfd01256a9c35c67b42f0a479e4922c19c637e026e2a973a59a55cb5c35a",
+            "score_reference": "Common-GH posterior from actual R native probabilities/prior; R fscores NOT EXECUTED",
+            "source": "Retained PR80 2PL fixture; no new simulated responses; asymptote-model misspecification is not a recovery study"
+          },
+          "R_execution": "ONE ACTUAL INDEPENDENT R MIRT FIT EXECUTED",
+          "Python_execution": "ONE ACTUAL SCIPY MML FIT EXECUTED",
+          "certification": "NOT CERTIFIED",
+          "preflight": {
+            "probability": {
+              "status": "PASS",
+              "max_absolute": 7.771561172376096e-16,
+              "mean_absolute": 2.544261098099317e-16,
+              "max_relative": 1.766683528836002e-15,
+              "tolerance": 1e-10,
+              "reason": ""
+            },
+            "information": {
+              "status": "PASS",
+              "max_absolute": 6.938893903907228e-16,
+              "mean_absolute": 3.5079963625308764e-17,
+              "max_relative": 5.941739573221024e-15,
+              "tolerance": 1e-8,
+              "reason": ""
+            },
+            "prior": {
+              "status": "PASS",
+              "max_absolute": 2.7755575615628914e-16,
+              "mean_absolute": 4.073571779877582e-18,
+              "max_relative": 1.478318750947999e-14,
+              "tolerance": 1e-12,
+              "reason": ""
+            }
+          },
+          "Python": {
+            "converged": true,
+            "iterations": 489,
+            "logLik": -2526.762503677404,
+            "AIC": 5135.525007354808,
+            "BIC": 5299.175053786235,
+            "diagnostics": {
+              "engine": "SciPy direct fixed-grid marginal ML; NOT Python mirt calibration",
+              "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+              "objective_calls": 986,
+              "gradient": [
+                -0.000042100066680594836,
+                -0.0000351334203443525,
+                -0.00000896419514847273,
+                0.00006266692445613351,
+                -0.00007252551265877592,
+                0.000024030572928234205,
+                0.000023258372101032268,
+                -0.000048378322753241075,
+                0.000013374724329832817,
+                0.00002170930736895335,
+                0.00003542336857651294,
+                0.0000417325415850395,
+                0.0000325004362797062,
+                0.00006832091479127718,
+                0.00003612343034222236,
+                0.000027789121861563132,
+                -0.000022947560828241966,
+                0.0000812514934837442,
+                0.00004751525004264003,
+                0.00007700239393346309,
+                -0.00005807705904547389,
+                0.8502696557254421,
+                0.4122954879821775,
+                1.1135054616202167,
+                1.6605801173841659,
+                -0.00003698528775305469,
+                0.2498960218641212,
+                0.5954941257887401,
+                -0.000021152048328632464,
+                9.696448663225236e-7,
+                -1.1680435860738,
+                0.00001924508545758137,
+                -0.7850483252550133,
+                -0.35838744095879793,
+                0.000017586853841291667,
+                -0.9339587819793288,
+                0.000025756583280247905,
+                -0.2563284281746603,
+                -4.661650507301672,
+                -5.71482956355193,
+                0.0000952047990741517
+              ],
+              "projected_score_max": 0.0000952047990741517,
+              "active_bounds": [
+                21,
+                22,
+                23,
+                24,
+                26,
+                27,
+                30,
+                32,
+                33,
+                35,
+                37,
+                38,
+                39
+              ],
+              "trace": "Preserved in original workflow artifact",
+              "Hessian": "NOT COMPUTED; no SE/CI/LR; local numerical convergence only",
+              "certification": "NOT CERTIFIED"
+            }
+          },
+          "R": {
+            "R": "R version 4.6.1 (2026-06-24)",
+            "mirt": "1.48",
+            "family": "4PL",
+            "converged": false,
+            "iterations": 3000,
+            "logLik": -2526.76250369691,
+            "AIC": 5135.52500739382,
+            "BIC": 5299.17505382525,
+            "logPrior": 0,
+            "covariance": [
+              [
+                1,
+                0.156295016684027
+              ],
+              [
+                0.156295016684027,
+                1
+              ]
+            ],
+            "eta": 0.158239716825101,
+            "mapping": "P=g+(u-g)*logistic(A theta+delta), D=1; normalized fixed GH density ratio",
+            "mean": [
+              0,
+              0
+            ],
+            "identification": "Unit factor variances, positive pure anchors, named CFA axes",
+            "constraints_valid": true
+          },
+          "comparison": {
+            "parameters": {
+              "status": "PASS",
+              "max_absolute": 0.0003205194603707606,
+              "mean_absolute": 0.000038258363618337384,
+              "max_relative": 1,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "covariance": {
+              "status": "PASS",
+              "max_absolute": 4.0116162627890084e-7,
+              "mean_absolute": 2.0058081313945042e-7,
+              "max_relative": 0.0000025666949259803153,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "probabilities": {
+              "status": "PASS",
+              "max_absolute": 0.00008363352499241028,
+              "mean_absolute": 0.000005149864341478755,
+              "max_relative": 0.000646779468253281,
+              "tolerance": 0.0001,
+              "reason": ""
+            },
+            "information": {
+              "status": "PASS",
+              "max_absolute": 0.0001907367568780849,
+              "mean_absolute": 0.000004004013892906263,
+              "max_relative": 0.0030391876287100194,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "TIF": {
+              "status": "PASS",
+              "max_absolute": 0.00016765968693288613,
+              "mean_absolute": 0.000022041543603234896,
+              "max_relative": 0.0007853959234327188,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "EAP": {
+              "status": "PASS",
+              "max_absolute": 0.00009646262439411135,
+              "mean_absolute": 0.000011857580937595872,
+              "max_relative": 0.061382637786504046,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "posterior_SD": {
+              "status": "PASS",
+              "max_absolute": 0.00007026020328737559,
+              "mean_absolute": 0.000010628187659402072,
+              "max_relative": 0.00010569289144932432,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "common_logLik": {
+              "status": "PASS",
+              "max_absolute": 1.9508206605678424e-8,
+              "mean_absolute": 1.9508206605678424e-8,
+              "max_relative": 7.720633251892856e-12,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "R_native_LL": {
+              "status": "PASS",
+              "max_absolute": 2.2737367544323206e-12,
+              "mean_absolute": 2.2737367544323206e-12,
+              "max_relative": 8.99861681145581e-16,
+              "tolerance": 0.000001,
+              "reason": ""
+            },
+            "Python_native_LL": {
+              "status": "PASS",
+              "max_absolute": 0,
+              "mean_absolute": 0,
+              "max_relative": 0,
+              "tolerance": 0.000001,
+              "reason": ""
+            },
+            "AIC": {
+              "status": "PASS",
+              "max_absolute": 3.9011865737847984e-8,
+              "mean_absolute": 3.9011865737847984e-8,
+              "max_relative": 7.596470795426184e-12,
+              "tolerance": 0.001,
+              "reason": ""
+            },
+            "BIC": {
+              "status": "PASS",
+              "max_absolute": 3.90145942219533e-8,
+              "mean_absolute": 3.90145942219533e-8,
+              "max_relative": 7.362390150480181e-12,
+              "tolerance": 0.001,
+              "reason": ""
+            }
+          },
+          "common_grid_logLik": {
+            "Python": -2526.762503677404,
+            "R": -2526.762503696912
+          },
+          "Hessian": {
+            "Python": {
+              "steps": [
+                0.0001,
+                0.00005
+              ],
+              "free_coordinates": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                25,
+                28,
+                29,
+                31,
+                34,
+                36,
+                40
+              ],
+              "excluded_active_coordinates": [
+                21,
+                22,
+                23,
+                24,
+                26,
+                27,
+                30,
+                32,
+                33,
+                35,
+                37,
+                38,
+                39
+              ],
+              "smallest_eigenvalues": [
+                0.07993383502853235,
+                0.08900827006111424,
+                0.2682648358025263,
+                0.583824234201317,
+                0.6080881057713345
+              ],
+              "condition": 16086.139875135126,
+              "relative_step_difference": 1.4476635307242386e-7,
+              "interpretation": "Diagnostic only: no SE/CI, global optimality or structural identification certificate"
+            },
+            "R": {
+              "steps": [
+                0.0001,
+                0.00005
+              ],
+              "free_coordinates": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                25,
+                28,
+                29,
+                31,
+                34,
+                36,
+                40
+              ],
+              "excluded_active_coordinates": [
+                21,
+                22,
+                23,
+                24,
+                26,
+                27,
+                30,
+                32,
+                33,
+                35,
+                37,
+                38,
+                39
+              ],
+              "smallest_eigenvalues": [
+                0.07995619111535159,
+                0.08902193812509504,
+                0.2681910504532291,
+                0.5838248903210553,
+                0.6080282935214985
+              ],
+              "condition": 16081.762178343577,
+              "relative_step_difference": 1.4476740592143913e-7,
+              "interpretation": "Diagnostic only: no SE/CI, global optimality or structural identification certificate"
+            }
+          },
+          "R_physical_score": [
+            -4.051636392989789e-7,
+            6.288787276996347e-8,
+            -1.9859001024598966e-7,
+            3.602394256813785e-7,
+            -4.341506088941854e-7,
+            -0.0000017878155503297443,
+            -0.0000010212882593216228,
+            1.865202554405839e-8,
+            -1.6427288452969263e-8,
+            2.0501373894944064e-9,
+            -0.0000012983868499527829,
+            -4.124078467169895e-7,
+            -0.0000012851087767650804,
+            0.000007847373032702765,
+            -3.3806274412262263e-7,
+            0.0000012866076576005447,
+            -0.0000015100223897029774,
+            -7.516322045747095e-8,
+            -1.5671572291253878e-7,
+            -3.52287974613416e-7,
+            0.00001732684948566613,
+            0.8500548968907292,
+            0.41229807029772564,
+            1.113443776454478,
+            1.6599604254112446,
+            -0.00003171415472350665,
+            0.25018011930464834,
+            0.5952878914085021,
+            -0.0000011206625113614268,
+            -0.0000021869347514387492,
+            -1.1679544685942005,
+            -0.0000014165786485502652,
+            -0.7850458485511291,
+            -0.3585826979250676,
+            0.0000040537533863706025,
+            -0.934106841344731,
+            0.00040687705314952497,
+            -0.25665730389920555,
+            -4.662583773760967,
+            -5.7152927454607925,
+            -0.000007315871159894901
+          ]
+        }
+      ]
+    }
+  ]
+}

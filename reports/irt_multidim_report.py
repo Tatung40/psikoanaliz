@@ -27,8 +27,9 @@ def figure(result,item,category):
 
 def downloads(result,item=None,category=None):
  tables=result['tables'];m=result['metadata']
+ method=('Independent SciPy direct fixed-grid marginal ML; separate experimental estimator. ' if m.get('Backend')=='SCIPY_GENERAL' else 'Marginal ML, normal latent distribution, declared fixed zero loadings; no local estimator. ')
  note=('# Multidimensional IRT / '+m['Status']+'\n\n'+m['Limitations']+
-  '\n\nMarginal ML, normal latent distribution, declared fixed zero loadings; no local estimator. '
+  '\n\n'+method+
   'Convergence is a numerical stopping result, not evidence of global optimality or model fit. '
   'EAP posterior SD is not a parameter SE. Joint Fisher SEM uses the inverse full test '
   'information matrix and is suppressed at numerical singularities. No SE/CI/p, S-X², '

@@ -1,0 +1,52 @@
+{
+  "status": "NOT CONVERGED",
+  "R_converged": false,
+  "R_iterations": 3000,
+  "max_physical_gradient": 5.7152927454607925,
+  "max_projected_gradient": 0.00040687705314952497,
+  "max_logit_coordinate_gradient": 1.4298837109069294e-05,
+  "R_c": [
+    0.00608793431145508,
+    1.06293892966235e-11,
+    1.75537527713324e-20,
+    6.70952966721543e-20,
+    7.5120801745352e-44,
+    0.101904878556001,
+    1.13741155043274e-11,
+    9.91666356499258e-45,
+    0.279814685466529,
+    0.146381274490634
+  ],
+  "R_u": [
+    0.999999999999996,
+    0.774598955037402,
+    0.99999999999833,
+    1.0,
+    0.843019699850058,
+    1.0,
+    0.963526812709112,
+    0.999999999999289,
+    0.999999999999926,
+    0.999999999997785
+  ],
+  "active_coordinates": [
+    21,
+    22,
+    23,
+    24,
+    26,
+    27,
+    30,
+    32,
+    33,
+    35,
+    37,
+    38,
+    39
+  ],
+  "native_history": "NOT SAVED; exact final physical-asymptote/native parameter-change pair cannot be reconstructed; no convergence override",
+  "interpretation": "Small common-objective disagreement does not override native R NOT CONVERGED",
+  "native_rule": "mirt 1.48 hasConverged converts named g/u logits with plogis and requires ALL absolute changes <1e-8",
+  "precision_diagnosis": "SLSQP xtol_rel1e-8 permits a/d coordinate changes up to5e-8 at |a|<=5, exceeding outer1e-8. Inner precision floor is a hypothesis, not a confirmed history-based cause.",
+  "BL_alternative": "CORRECTED: original-pars access does not prove frozen covariance; C++ reloadPars mutates S4 objects. No BL fit performed. Bounded BL dispatcher is checked separately against actual R runtime."
+}
