@@ -1,0 +1,1 @@
+{"stage":"B fixed-c first; A uses retained independent correlated 2PL calibration", "cases":[{"name":"3PL_2D_correlated_between","family":"3PL","q":2,"free_c":false,"free_u":false},{"name":"3PL_3D_correlated_within","family":"3PL","q":3,"free_c":false,"free_u":false}]}

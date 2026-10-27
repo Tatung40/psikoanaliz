@@ -1,0 +1,127 @@
+{
+  "profile": "2PL_2D",
+  "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+  "Python": {
+    "engine": "Python mirt 1.2.0",
+    "python": "3.11.17",
+    "converged": true,
+    "logLik": -2528.9452577886314,
+    "AIC": 5099.890515577263,
+    "BIC": 5183.711271066531,
+    "n_parameters": 21,
+    "iterations": 30
+  },
+  "R": {
+    "version": "1.48",
+    "R": "R version 4.6.1 (2026-06-24)",
+    "model": "2PL",
+    "dimensions": 2,
+    "execution": "CALIBRATION",
+    "source_free_parameters": "NA",
+    "converged": true,
+    "logLik": -2528.9452576821,
+    "AIC": 5099.8905153642,
+    "BIC": 5183.71127085346,
+    "iterations": 53,
+    "covariance": [
+      [
+        1,
+        0.144071894494625
+      ],
+      [
+        0.144071894494625,
+        1
+      ]
+    ],
+    "constraints_valid": true,
+    "logPrior": 0,
+    "correlation": "Fisher-coordinate Gaussian customGroup, F1-F2 only"
+  },
+  "comparison": {
+    "slopes": {
+      "status": "PASS",
+      "max_absolute": 0.00013598977659246003,
+      "mean_absolute": 1.3248791110814784e-05,
+      "max_relative": 8.831446278679755e-05,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "intercepts": {
+      "status": "PASS",
+      "max_absolute": 7.8175372888456e-06,
+      "mean_absolute": 1.1082061588491617e-06,
+      "max_relative": 8.569492618457894e-05,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "covariance": {
+      "status": "PASS",
+      "max_absolute": 8.127590840512067e-06,
+      "mean_absolute": 4.063795420256033e-06,
+      "max_relative": 5.6413437673059047e-05,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "probabilities": {
+      "status": "PASS",
+      "max_absolute": 1.1447584326584881e-05,
+      "mean_absolute": 1.8425686703730492e-06,
+      "max_relative": 0.0002600756991157931,
+      "tolerance": 0.0001,
+      "reason": ""
+    },
+    "information": {
+      "status": "PASS",
+      "max_absolute": 0.00010469634270526829,
+      "mean_absolute": 1.7997484729986973e-06,
+      "max_relative": 0.00017662118990473963,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "EAP": {
+      "status": "PASS",
+      "max_absolute": 5.6559051904880864e-05,
+      "mean_absolute": 1.4930337313131929e-05,
+      "max_relative": 0.00278525392582746,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "posterior_SD": {
+      "status": "PASS",
+      "max_absolute": 5.5602630112394635e-06,
+      "mean_absolute": 9.88287083954209e-07,
+      "max_relative": 8.555474749554783e-06,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "common_logLik": {
+      "status": "PASS",
+      "max_absolute": 1.0653366189217195e-07,
+      "mean_absolute": 1.0653366189217195e-07,
+      "max_relative": 4.212572872586711e-11,
+      "tolerance": 0.001,
+      "reason": ""
+    },
+    "Python_native_LL": {
+      "status": "PASS",
+      "max_absolute": 0.0,
+      "mean_absolute": 0.0,
+      "max_relative": 0.0,
+      "tolerance": 1e-06,
+      "reason": ""
+    },
+    "R_native_LL": {
+      "status": "PASS",
+      "max_absolute": 2.2737367544323206e-12,
+      "mean_absolute": 2.2737367544323206e-12,
+      "max_relative": 8.990850029376712e-16,
+      "tolerance": 1e-06,
+      "reason": "",
+      "source": "Saved native estimates, fixed-parameter R evaluation; original rounded field retained in original_report.json"
+    }
+  },
+  "source_run": 40474120724,
+  "artifact_id": 12719014050,
+  "data_sha256": "6881cfd01256a9c35c67b42f0a479e4922c19c637e026e2a973a59a55cb5c35a",
+  "note": "Stage A correlated 2PL accepted independent calibration retained; NO RECALIBRATION"
+}
