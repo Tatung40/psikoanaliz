@@ -86,6 +86,11 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
+      - name: Use primary Ubuntu archive for R system packages
+        run: |
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            printf '%s\n' 'https://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+          fi
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: '4.6.1'
