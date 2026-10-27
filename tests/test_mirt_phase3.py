@@ -113,3 +113,12 @@ def test_independent_prerequisites_are_profile_specific_and_block_missing_r(tmp_
  request.write_text(json.dumps(original))
  with pytest.raises(ValueError,match='per-profile acceptance'):compare.execute(request,tmp_path/'blocked')
  assert len(calls)==1
+
+
+def test_reference_precision_continuation_changes_no_model_or_outer_threshold():
+ from pathlib import Path
+ script=Path('validation/mirt_phase3/reference.R').read_text()
+ assert "stopifnot(identical(saved$est,sv$est));sv$value[]<-saved$value" in script
+ assert 'TOL=1e-8' in script and "else 3000" in script
+ assert "cfg$R_item_xtol" in script and 'write_optimizer_trace(fit,out)' in script
+ assert "!rule(p0,p1,1e-8)" in script and "getFromNamespace('BL.LL','mirt')" in script

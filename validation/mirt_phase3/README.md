@@ -156,3 +156,40 @@ General 4D/5D are closed: the validated GH15 tensor would require50625/759375
 nodes, above the4000-node and20M response/node operational budgets. Lowering
 quadrature simply to activate them is not scientific validation. All PR80/81
 native and exact-composition models remain available unchanged.
+
+## Free-4PL original result and one diagnostic precision continuation
+
+Run40497502818: actual 2D free-c/u Python fit converged (489 iterations),
+R reached3000 cycles and explicitly did NOT converge. Every numerical gap
+nevertheless met the unchanged targets: parameters .000320519, P .0000836335,
+IIF .000190737, common LL1.95082e-8; reduced Hessian min .079934, condition
+16086. Outcome remains **NOT CONVERGED / NOT CERTIFIED**, not PASS. Original
+actual evidence is free4_original_evidence.json/artifact12730957695.
+Boundary diagnostics retain max physical score5.7153, projected/KKT score
+.000406877 and transformed-logit score .0000142988. Large unprojected scores
+at valid active bounds do not by themselves imply an improving feasible
+step. Conversely, small likelihood gaps never override native nonconvergence.
+
+Actual mirt1.48 hasConverged converts NAMED g/u logits using plogis, then
+requires ALL absolute parameter changes <1e-8; it is not simply a raw-logit
+change rule. Original EM history was not saved, so the exact failing final
+coordinate/cause is UNKNOWN. A precision-floor hypothesis is consistent with
+SLSQP xtol_rel1e-8 allowing a/d changes as large as5e-8 at slope bounds5,
+above the outer1e-8 criterion. This is a hypothesis, not a fabricated trace.
+
+ONE R-only diagnostic continuation now uses its OWN saved native estimates,
+SLSQP xtol_rel1e-10, unchanged outer1e-8/max3000, the same600s budget,
+ML/no priors/GH15/data/parameter bounds. Python's actual converged fit is
+retained without recalibration. This tightens an inner solver; no scientific
+target is relaxed. Existing optimizer_trace.R records full internal/LL history
+and the exact last physical convergence pair against the installed rule.
+Native status/estimates are saved BEFORE subsequent diagnostics.
+
+No speculative BL alternative fit is run: actual mirt1.48 utils.R BL.LL
+reloads candidate pars2 but its custom-density branch reads the original pars
+group object, so free custom-covariance updates are not represented in that
+objective. That route is NOT COMPARABLE here. Runtime source bodies are saved
+alongside the named-asymptote/strict-threshold no-fit regression checks.
+If this single precision continuation still fails native convergence, free
+4PL stays disabled; no further retries, larger iteration limit or relaxed
+threshold is scheduled. The3D free-c resource block also remains unchanged.

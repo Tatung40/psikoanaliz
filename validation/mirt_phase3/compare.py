@@ -42,7 +42,7 @@ def pack_reference(spec,folder):
  return np.concatenate(parts),meta
 
 
-def run_case(family,q,free_c,free_u,out,prior=None,within=None):
+def run_case(family,q,free_c,free_u,out,prior=None,within=None,r_resume=False):
  out.mkdir(parents=True,exist_ok=True);data=pd.read_csv(ROOT/f'fixtures/2PL_{q}D.csv');J=len(data.columns)
  pattern=np.zeros((J,q),int)
  for d in range(q):pattern[d*4:(d+1)*4,d]=1
@@ -57,10 +57,15 @@ def run_case(family,q,free_c,free_u,out,prior=None,within=None):
   Python=platform.python_version(),scipy=scipy.__version__,engine='NEW experimental SciPy component, NOT Python mirt native calibration',
   N=len(data),J=J,n_quadpts=15,seed=20261027,priors=None,identification='Mean0, unit variances, >=3 positive pure anchors/axis',
   correlation='Full normalized-Cholesky eta, lower-triangular row order; eta in [-3,3]',start=start.tolist(),bounds=bounds,
-  R_timeout_seconds=600,Python_stopping='L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained',R_stopping='mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8',
+  R_item_xtol=1e-10 if r_resume else 1e-8,R_timeout_seconds=600,Python_stopping='L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained',R_stopping='mirt EM max parameter change <1e-8, max3000, SLSQP xtol'+('1e-10 (precision continuation)' if r_resume else '1e-8'),
   criteria_sha256=hashlib.sha256(CRITERIA.read_bytes()).hexdigest(),data_sha256=hashlib.sha256((out/'data.csv').read_bytes()).hexdigest(),
   score_reference='Common-GH posterior from actual R native probabilities/prior; R fscores NOT EXECUTED',
   source='Retained PR80 2PL fixture; no new simulated responses; asymptote-model misspecification is not a recovery study')
+ if r_resume:
+  if prior is None or not (prior/'fit/raw_parameters.csv').exists():raise ValueError('Own R saved initialization unavailable')
+  old=json.loads((prior/'report.json').read_text())
+  if old['status']!='NOT CONVERGED' or old['R']['converged'] or any(v['status']!='PASS' for v in old['comparison'].values()):raise ValueError('Precision continuation prerequisites absent')
+  settings['R_initialization']=str((prior/'fit/raw_parameters.csv').resolve());settings['R_initialization_sha256']=hashlib.sha256((prior/'fit/raw_parameters.csv').read_bytes()).hexdigest();settings['original_R']=old['R'];settings['R_source_run']=40497502818
  (out/'settings.json').write_text(json.dumps(settings,indent=2)+'\n')
  result=dict(status='BLOCKED',settings=settings,R_execution='NOT EXECUTED',Python_execution='NOT EXECUTED',certification='NOT CERTIFIED')
  try:
@@ -78,7 +83,7 @@ def run_case(family,q,free_c,free_u,out,prior=None,within=None):
     if json.dumps(settings[key])!=json.dumps(old_settings[key]):raise ValueError('Retained fit settings mismatch: '+key)
    shutil.copytree(prior,out/'original_evidence',dirs_exist_ok=True);x=np.load(prior/'python_parameters.npy');py=old['Python']
    if abs(-obj.evaluate(x)[0]-py['logLik'])>criteria['native_common_logLik']:raise ValueError('Retained Python likelihood mismatch')
-   result['Python_execution']='RETAINED ACTUAL PYTHON FIT FROM 40490151345; NO RECALIBRATION';result['Python']=py
+   result['Python_execution']='RETAINED ACTUAL PYTHON FIT; NO RECALIBRATION';result['Python']=py
   else:
    result['Python_execution']='CALIBRATION ATTEMPTED'
    py=engine.fit(data,spec,n_quadpts=15,tol=1e-13);x=py['parameters'];result['Python_execution']='ONE ACTUAL SCIPY MML FIT EXECUTED'
@@ -126,7 +131,7 @@ def execute(request,out,prior=None):
    stage['reason']='Prerequisite numerical acceptance absent; NO FIT / NOT CERTIFIED'
   else:
    for case in group['cases']:
-    result=run_case(case['family'],case['q'],case['free_c'],case['free_u'],out/case['name'],None if prior is None else prior/case['name'],case.get('within'))
+    result=run_case(case['family'],case['q'],case['free_c'],case['free_u'],out/case['name'],None if prior is None else prior/case['name'],case.get('within'),case.get('resume_R',False))
     stage['cases'].append(result)
     if result['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':break
    stage['status']='NUMERICALLY VALIDATED / NOT CERTIFIED' if stage['cases'] and len(stage['cases'])==len(group['cases']) and all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in stage['cases']) else 'FAIL' if stage['cases'] else 'NOT REQUESTED'

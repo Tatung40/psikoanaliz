@@ -1,7 +1,7 @@
 {
   "stages": [
     {
-      "name": "C_free_2D",
+      "name": "C_free_2D_precision",
       "requires": [],
       "cases": [
         {
@@ -10,7 +10,8 @@
           "q": 2,
           "within": false,
           "free_c": true,
-          "free_u": true
+          "free_u": true,
+          "resume_R": true
         }
       ]
     }
