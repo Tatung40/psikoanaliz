@@ -163,7 +163,11 @@ with st.sidebar:
 
     # Kategori bazlı gezinme: seçili sayfa oturum boyunca korunur.
     if "nav_page" not in st.session_state:
-        st.session_state.nav_page = "1. Ana Sayfa"
+        # A new server session (reconnect, idle timeout or app restart) restores the page
+        # from the URL instead of silently jumping to the home page. Data are never stored there.
+        _restored_page = st.query_params.get("sayfa")
+        st.session_state.nav_page = _restored_page or "1. Ana Sayfa"
+        st.session_state["_session_restored"] = bool(_restored_page and _restored_page != "1. Ana Sayfa")
 
     def navigate_to(page):
         st.session_state.nav_page = page
@@ -265,6 +269,8 @@ with st.sidebar:
                   on_click=navigate_to, args=(page,))
 
     selected_page = st.session_state.nav_page
+    if st.query_params.get("sayfa") != selected_page:
+        st.query_params["sayfa"] = selected_page
 
     st.markdown("---")
     st.markdown("### 🔐 Veri Gizliliği")
@@ -286,6 +292,11 @@ with st.sidebar:
 # SAYFA 1: ANA SAYFA
 # =============================================================================
 begin_code_capture(selected_page, globals(), st.session_state.get("_repro_history"))
+
+if st.session_state.pop("_session_restored", False) and st.session_state.raw_df is None:
+    st.warning("Sunucu oturumu yenilendi (bağlantı kesintisi, uzun hareketsizlik veya uygulamanın yeniden "
+               "başlatılması). Bulunduğunuz sayfa korundu; gizlilik gereği veriler ve analiz sonuçları sunucuda "
+               "saklanmadığı için veriyi yeniden yükleyip analizi tekrar çalıştırın.")
 
 if selected_page == "1. Ana Sayfa":
     render_academic_header()
@@ -2055,6 +2066,11 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         if "irt_b11" in st.session_state:
             st.session_state.pop("irt_b11", None)
 
+
+else:
+    # Unknown page name (e.g. an outdated URL): fall back to the home page explicitly.
+    st.session_state.nav_page = "1. Ana Sayfa"
+    st.rerun()
 
 # Common syntax panel records only calls actually executed with current inputs.
 _code_recorder = finish_code_capture()
