@@ -1,5 +1,5 @@
 # Optional validation-only R mirt 1.48 configuration; no production defaults.
-matched_ml <- function(dat, model, sv, out, initialization=NULL) {
+matched_ml <- function(dat, model, sv, out, initialization=NULL, fixed_asymptotes=FALSE) {
   stopifnot(model %in% c("3PL","4PL"), as.character(packageVersion("mirt"))=="1.48",
             requireNamespace("nloptr",quietly=TRUE))
   source("validation/r_mirt_phase1/physical_b_constraint.R")
@@ -25,9 +25,10 @@ matched_ml <- function(dat, model, sv, out, initialization=NULL) {
       }
     }
   }
+  if(fixed_asymptotes) sv$est[sv$name %in% c("g","u")] <- FALSE
   sv$value[sv$name=="MEAN_1"] <- 0; sv$value[sv$name=="COV_11"] <- 1
   sv$est[sv$name %in% c("MEAN_1","COV_11")] <- FALSE
-  stopifnot(all(sv$est == (sv$name %in% c("a1","d","g",if(model=="4PL") "u"))))
+  stopifnot(all(sv$est == (sv$name %in% c("a1","d",if(!fixed_asymptotes) "g",if(model=="4PL" && !fixed_asymptotes) "u"))))
   boxes <- list(a1=c(.1,5),d=c(-30,30),g=c(0,.5),u=c(.5,1))
   for(n in names(boxes)) {
     sv$lbound[sv$name==n] <- boxes[[n]][1]

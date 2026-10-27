@@ -14,7 +14,7 @@ MODELS=('Rasch','1PL (a=1)','2PL','GRM','PCM','GPCM','NRM','Bifactor')
 LIMITATION=('Bağımsız R kabulü yalnız kayıtlı profiller içindir; yeni veride sonuç EXPERIMENTAL / NOT CERTIFIED. '
  'Ortalama 0, varyans 1; doğrulayıcı yapıda boyut başına ≥3 saf madde. '
  'Rasch/1PL(a=1), 2PL üzerinde; PCM, GPCM üzerinde sabit birim yüklerle kurulur. '
- 'Ortak serbest-a 1PL, çok boyutlu 3PL/4PL/RSM desteklenmez. '
+ 'Genel/korelasyonlu/within-item 3PL/4PL ve çok boyutlu RSM API’si yoktur; 3PL/4PL yalnız açıkça etiketli bağımsız blok yolunda bulunabilir. '
  'Parametre SE/GA/p, S-X²/M2 ve biçimsel model karşılaştırması kapalıdır. '
  'EAP SD posterior belirsizliğidir; Fisher SEM farklıdır. '
  'Nominal kategori kodları başarı sırası değildir; Wright Map/DTF yoktur. '
@@ -22,15 +22,17 @@ LIMITATION=('Bağımsız R kabulü yalnız kayıtlı profiller içindir; yeni ve
 
 
 def support_matrix():
- return pd.DataFrame([dict(Model=m,Multidimensional_API=api,Phase1=m in ('2PL','GRM'),
-   Status=STATUS if api else 'DISABLED',Note=note)
+ result=pd.DataFrame([dict(Model=m,Multidimensional_API=api,Phase1=m in ('2PL','GRM'),
+   Status=STATUS if api else 'UNSUPPORTED' if m in ('3PL','4PL','RSM') else 'DISABLED',Note=note)
   for m,api,note in [('2PL',True,'Public slope/intercept CFA'),('GRM',True,'d_k=-sum(a)*b_k'),
   ('GPCM',True,'Public multidimensional GPCM'),('NRM',True,'Public NRM + fixed loading masks; R full nominal via gpcm_mats'),
   ('Rasch',True,'2PL with all slopes fixed to loading pattern'),('1PL (a=1)',True,'Same fixed-unit model as Rasch; not shared-free-a'),
   ('PCM',True,'GPCM with discrimination fixed to loading pattern'),('Bifactor',True,'Public bfactor; 3–4 specific groups, ≥3 items each'),
   ('1PL common free a',False,'Cross-coordinate shared-slope equality not in public constraints'),
   ('3PL',False,'Family rejects >1 factor'),('4PL',False,'Family rejects >1 factor'),
-  ('RSM',False,'Multidimensional shared-step+location constraint not exposed')]])
+  ('RSM',False,'RSM constructor is 1D; EM rejects additive LinearConstraint/ConstraintSet')]])
+ from core.irt_multidim_factorized import MODELS as restricted
+ return pd.concat([result,pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact independent 1D block composition only; fixed asymptotes; no correlated/within-item model') for m in restricted])],ignore_index=True)
 
 
 def structure(pattern,correlated=False,exploratory=False):
@@ -206,20 +208,27 @@ def report(outcome,person_ids=None):
   if method=='EAP':
    for j in range(q):rows[f'Posterior_SD_F{j+1}']=np.asarray(score.standard_error)[:,j]
   frames[method]=rows
+ frames.update(surface_tables(f.model,list(x.columns),outcome['labels'],q))
+ return dict(metadata=metadata,tables=frames)
+
+
+def surface_tables(engine,items,labels,q):
+ """Existing native curve/information reporting, reusable without calibration."""
+ k=len(items);frames={}
  # Shared F1/F2 surface; all other dimensions held exactly at zero.
  grid=np.array(list(itertools.product(np.linspace(-3,3,17),repeat=2)))
  theta=np.zeros((len(grid),q));theta[:,:2]=grid
- p=np.asarray(f.model.probability(theta))
+ p=np.asarray(engine.probability(theta))
  if p.ndim==2:p=np.stack((1-p,p),-1)
- if p.shape!=(len(theta),k,len(outcome['labels'])) or not np.isfinite(p).all() or not np.allclose(p.sum(-1),1,atol=1e-10):
+ if p.shape!=(len(theta),k,len(labels)) or not np.isfinite(p).all() or not np.allclose(p.sum(-1),1,atol=1e-10):
   raise ValueError('Geçersiz çok boyutlu kategori olasılıkları')
  frames['Curves']=pd.DataFrame([dict(Node=n,Theta1=grid[n,0],Theta2=grid[n,1],Item=item,Category=label,Probability=p[n,j,c])
-  for n in range(len(theta)) for j,item in enumerate(x.columns) for c,label in enumerate(outcome['labels'])])
- information=np.stack([f.model.item_information_matrix(theta,j) for j in range(k)],axis=1)
+  for n in range(len(theta)) for j,item in enumerate(items) for c,label in enumerate(labels)])
+ information=np.stack([engine.item_information_matrix(theta,j) for j in range(k)],axis=1)
  if not np.isfinite(information).all():raise ValueError('Geçersiz Fisher bilgi matrisi')
  frames['IIF']=pd.DataFrame([dict(Node=n,Item=item,Row=r+1,Column=c+1,Information=information[n,j,r,c])
-  for n in range(len(theta)) for j,item in enumerate(x.columns) for r in range(q) for c in range(q)])
- total=f.model.test_information_matrix(theta)
+  for n in range(len(theta)) for j,item in enumerate(items) for r in range(q) for c in range(q)])
+ total=engine.test_information_matrix(theta)
  np.testing.assert_allclose(total,information.sum(1),atol=1e-10)
  rows=[]
  for n,matrix in enumerate(total):
@@ -228,4 +237,4 @@ def report(outcome,person_ids=None):
   rows.append(dict(Node=n,Theta1=grid[n,0],Theta2=grid[n,1],Stable=bool(stable),**{f'Joint_Fisher_SEM_F{j+1}':sem[j] for j in range(q)}))
  frames['SEM']=pd.DataFrame(rows)
  frames['TIF']=pd.DataFrame([dict(Node=n,Row=r+1,Column=c+1,Information=total[n,r,c]) for n in range(len(theta)) for r in range(q) for c in range(q)])
- return dict(metadata=metadata,tables=frames)
+ return frames
