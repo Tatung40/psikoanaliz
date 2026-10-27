@@ -1,0 +1,209 @@
+{
+  "scope": "Native full multidimensional constructors only; excludes exact independent 1D block composition",
+  "engine": "Python mirt",
+  "version": "1.2.0",
+  "python": "3.11.17",
+  "calibration_executed": false,
+  "R_execution": "NOT EXECUTED",
+  "R_runtime": "R VALIDATION BLOCKED: Rscript unavailable locally",
+  "R_comparison": "NOT COMPARABLE for native full multidimensional constructors; restricted composition is validated separately",
+  "accepted_baseline": {
+    "run": 40453192278,
+    "profiles": 12,
+    "status": "Retained PR80 evidence; no recalibration"
+  },
+  "models": [
+    {
+      "model": "3PL",
+      "class_name": "mirt.models.dichotomous.ThreeParameterLogistic",
+      "constructor_signature": "(n_items: int, n_factors: int = 1, item_names: list[str] | None = None) -> None",
+      "supports_multidimensional": false,
+      "source_sha256": "5d703468ec91006e0db050e78e8ac96cf20d0f69e65af325a9d2e3eb89ea3606",
+      "scalar_control": {
+        "dimensions": 1,
+        "constructed": true,
+        "calibrated": false
+      },
+      "conditions": [
+        {
+          "dimensions": 2,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "3PL only supports unidimensional models (n_factors=2, model_type='3PL')"
+        },
+        {
+          "dimensions": 3,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "3PL only supports unidimensional models (n_factors=3, model_type='3PL')"
+        },
+        {
+          "dimensions": 4,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "3PL only supports unidimensional models (n_factors=4, model_type='3PL')"
+        },
+        {
+          "dimensions": 5,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "3PL only supports unidimensional models (n_factors=5, model_type='3PL')"
+        }
+      ],
+      "status": "UNSUPPORTED"
+    },
+    {
+      "model": "4PL",
+      "class_name": "mirt.models.dichotomous.FourParameterLogistic",
+      "constructor_signature": "(n_items: int, n_factors: int = 1, item_names: list[str] | None = None) -> None",
+      "supports_multidimensional": false,
+      "source_sha256": "b5be546472e867cd8a5916401e90676107edb21fe6f93a3401877d45ed900d87",
+      "scalar_control": {
+        "dimensions": 1,
+        "constructed": true,
+        "calibrated": false
+      },
+      "conditions": [
+        {
+          "dimensions": 2,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "4PL only supports unidimensional models (n_factors=2, model_type='4PL')"
+        },
+        {
+          "dimensions": 3,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "4PL only supports unidimensional models (n_factors=3, model_type='4PL')"
+        },
+        {
+          "dimensions": 4,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "4PL only supports unidimensional models (n_factors=4, model_type='4PL')"
+        },
+        {
+          "dimensions": 5,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "MirtModelError",
+          "reason": "4PL only supports unidimensional models (n_factors=5, model_type='4PL')"
+        }
+      ],
+      "status": "UNSUPPORTED"
+    },
+    {
+      "model": "RSM",
+      "class_name": "mirt.models.polytomous.RatingScaleModel",
+      "constructor_signature": "(n_items: int, n_categories: int | list[int], n_factors: int = 1, item_names: list[str] | None = None) -> None",
+      "supports_multidimensional": false,
+      "source_sha256": "429368264193a183bfc066358cc8a0fa73c0ce2d92cb0d86b4e759a0bbfb36c8",
+      "scalar_control": {
+        "dimensions": 1,
+        "constructed": true,
+        "calibrated": false
+      },
+      "conditions": [
+        {
+          "dimensions": 2,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "ValueError",
+          "reason": "RSM only supports unidimensional analysis"
+        },
+        {
+          "dimensions": 3,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "ValueError",
+          "reason": "RSM only supports unidimensional analysis"
+        },
+        {
+          "dimensions": 4,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "ValueError",
+          "reason": "RSM only supports unidimensional analysis"
+        },
+        {
+          "dimensions": 5,
+          "structures": [
+            "between-item",
+            "within-item"
+          ],
+          "calibration_executed": false,
+          "status": "UNSUPPORTED",
+          "exception": "ValueError",
+          "reason": "RSM only supports unidimensional analysis"
+        }
+      ],
+      "status": "UNSUPPORTED"
+    }
+  ],
+  "RSM_constraint_probes": [
+    {
+      "api": "LinearConstraint",
+      "status": "REJECTED BEFORE FIT",
+      "exception": "MirtValidationError",
+      "reason": "constraints[0]: LinearConstraint is not an equality constraint; hold coordinates at a value with fixed= and start_values= (parameter='constraints')"
+    },
+    {
+      "api": "ConstraintSet",
+      "status": "REJECTED BEFORE FIT",
+      "exception": "MirtValidationError",
+      "reason": "constraints: constraints must be a sequence of constraint groups, for example [{'parameter': 'discrimination', 'items': [0, 1, 2]}] (parameter='constraints')"
+    }
+  ],
+  "base_constructor_guard_sha256": "61237103dcf07c9f7c206f9fc49753a9eaddffaa7a6f5b2823ca83c0bae59f42"
+}
