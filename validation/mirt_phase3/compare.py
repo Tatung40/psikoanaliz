@@ -59,11 +59,13 @@ def run_case(family,q,free_c,free_u,out,prior=None,within=None):
   correlation='Full normalized-Cholesky eta, lower-triangular row order; eta in [-3,3]',start=start.tolist(),bounds=bounds,
   R_timeout_seconds=600,Python_stopping='L-BFGS-B ftol1e-13 / gtol1e-7 / max2000; actual message and score retained',R_stopping='mirt EM max parameter change <1e-8, max3000, SLSQP xtol1e-8',
   criteria_sha256=hashlib.sha256(CRITERIA.read_bytes()).hexdigest(),data_sha256=hashlib.sha256((out/'data.csv').read_bytes()).hexdigest(),
+  score_reference='Common-GH posterior from actual R native probabilities/prior; R fscores NOT EXECUTED',
   source='Retained PR80 2PL fixture; no new simulated responses; asymptote-model misspecification is not a recovery study')
  (out/'settings.json').write_text(json.dumps(settings,indent=2)+'\n')
  result=dict(status='BLOCKED',settings=settings,R_execution='NOT EXECUTED',Python_execution='NOT EXECUTED',certification='NOT CERTIFIED')
  try:
   if not shutil.which('Rscript'):raise RuntimeError('R VALIDATION BLOCKED: Rscript unavailable')
+  result['R_execution']='PREFLIGHT ATTEMPTED'
   pre=r_run(out,'preflight');result['R_execution']='FIXED PARAMETER PREFLIGHT EXECUTED';px=start.copy();px[-spec.n_cov:]=.2
   rp=pd.read_csv(pre/'probabilities.csv').sort_values(['Node','Item']).Probability.to_numpy().reshape(len(theta),J)
   ri=pd.read_csv(pre/'information.csv').sort_values(['Node','Item','Row','Column']).Information.to_numpy().reshape(len(theta),J,q,q)
@@ -78,6 +80,7 @@ def run_case(family,q,free_c,free_u,out,prior=None,within=None):
    if abs(-obj.evaluate(x)[0]-py['logLik'])>criteria['native_common_logLik']:raise ValueError('Retained Python likelihood mismatch')
    result['Python_execution']='RETAINED ACTUAL PYTHON FIT FROM 40490151345; NO RECALIBRATION';result['Python']=py
   else:
+   result['Python_execution']='CALIBRATION ATTEMPTED'
    py=engine.fit(data,spec,n_quadpts=15,tol=1e-13);x=py['parameters'];result['Python_execution']='ONE ACTUAL SCIPY MML FIT EXECUTED'
    result['Python']={k:v for k,v in py.items() if k not in ('parameters','specification','objective')}
   np.save(out/'python_parameters.npy',x)
@@ -105,6 +108,14 @@ def run_case(family,q,free_c,free_u,out,prior=None,within=None):
 def execute(request,out,prior=None):
  cfg=json.loads(Path(request).read_text());groups=cfg.get('stages',[dict(name='requested',requires=[],cases=cfg.get('cases',[]))]);records=[]
  accepted={}
+ if 'required_profiles' in cfg:
+  previous=json.loads((ROOT/cfg['prerequisite_evidence']).read_text())
+  profiles=[case for stage in previous['stages'] for case in stage['cases']]
+  for required in cfg['required_profiles']:
+   matches=[case for case in profiles if all(case['settings'][key]==value for key,value in required.items())]
+   if len(matches)!=1:raise ValueError('Required independent per-profile acceptance missing')
+   case=matches[0]
+   if case['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED' or not case['Python']['converged'] or not case.get('R',{}).get('converged') or not case['R']['constraints_valid'] or any(v['status']!='PASS' for v in case['comparison'].values()) or case['settings']['criteria_sha256']!=hashlib.sha256(CRITERIA.read_bytes()).hexdigest():raise ValueError('Required independent per-profile acceptance missing')
  if 'retained' in cfg:
   retained=json.loads((ROOT/cfg['retained']).read_text())
   if retained['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':raise ValueError('Retained preceding stage not accepted')

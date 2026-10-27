@@ -97,3 +97,19 @@ def test_dependent_failure_blocks_following_fits_but_not_independent_stages(tmp_
  assert len(calls)==2 and result['status']=='FAIL'
  assert result['stages'][1]['status']=='BLOCKED' and not result['stages'][1]['cases']
  assert result['stages'][2]['status']=='FAIL'
+
+
+def test_independent_prerequisites_are_profile_specific_and_block_missing_r(tmp_path,monkeypatch):
+ import json
+ from validation.mirt_phase3 import compare
+ original=dict(prerequisite_evidence='expansion_evidence.json',required_profiles=[dict(family='3PL',q=2,within=False,free_c=True,free_u=False)],stages=[dict(name='C_free_2D',requires=[],cases=[dict(name='control',family='4PL',q=2,free_c=True,free_u=True)])])
+ # Routing contract only: no mocked estimate is independent scientific evidence.
+ calls=[]
+ def fake(*a,**kw):calls.append(a);return dict(status='NOT CONVERGED')
+ monkeypatch.setattr(compare,'run_case',fake)
+ request=tmp_path/'r.json';request.write_text(json.dumps(original));result=compare.execute(request,tmp_path/'out')
+ assert len(calls)==1 and result['status']=='FAIL'
+ original['required_profiles'][0].update(q=3,within=True)
+ request.write_text(json.dumps(original))
+ with pytest.raises(ValueError,match='per-profile acceptance'):compare.execute(request,tmp_path/'blocked')
+ assert len(calls)==1

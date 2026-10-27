@@ -5,8 +5,9 @@
 Python mirt 1.2.0 rejects multidimensional 3PL/4PL. No guard is patched and
 no new capability is attributed to that package. The user explicitly authorized
 an independent Python scientific component where the public API is insufficient.
-`engine.py` is a NEW SciPy validation prototype, not the production estimator;
-no UI/model registration changes are made before independent acceptance.
+`engine.py` initially supplied a NEW isolated SciPy validation prototype;
+only independently accepted scopes are promoted to the explicitly named
+experimental production component below. No native-library capability is invented.
 Prior PR80/81 estimators, Phase2 exact compositions and inference gates remain
 unchanged. Correlated 2PL Stage A reuses actual accepted R calibration evidence
 in stage_A_evidence.json; no accepted profile is refitted.
@@ -56,8 +57,8 @@ Failure stops the dependent stage, preserves inputs, versions, hashes, logs,
 parameter values and diagnostic reports, and fails CI visibly. R unavailable
 means BLOCKED / NOT EXECUTED, never PASS. No R validation executed locally.
 
-Current status: Stage A retained NUMERICALLY VALIDATED / NOT CERTIFIED;
-new general fixed/free 3PL/4PL configurations PENDING actual R calibration.
+Stage A and subsequently accepted per-profile results are NUMERICALLY
+VALIDATED / NOT CERTIFIED; the final scope and resource blockers are below.
 4D/5D explicitly UNSUPPORTED here. No new production capabilities claimed.
 
 ## First actual execution and representation repair
@@ -104,3 +105,54 @@ substitution. Accepted initial 3PL fits and all PR80/81 fits are NOT requested
 again. Each new R fit has a documented 600-second operational budget,
 without changing its algorithm, bounds, tolerance or 3000-cycle limit. A
 resource timeout is BLOCKED, not convergence or scientific acceptance.
+
+## Expansion outcome and production scope (actual evidence)
+
+Run 40493446306: all four fixed-c 3PL structure/dimension combinations and
+all four fixed-c/u 4PL combinations are now independently numerically
+accepted (initial cases retained, not recalibrated). Actual 2D between-item
+free-c 3PL also converged in Python/R (267/1202 iterations), with maximum
+parameter difference .000342845, probability .0000304860, information
+.000372706 and common LL 2.73221e-8. Its reduced/tangent Hessian is positive
+(min .11923, condition10703); active c=0 boundaries are reported. No regular
+SE/CI/Wald or Type-I-error certification follows.
+
+**The overall expansion run FAILED and is preserved as FAIL.** 3D within-item
+free-c Python fitting converged (734 iterations, LL -3573.059780112164), but
+native R did not finish within 600 seconds. R convergence is UNKNOWN, not
+PASS or declared NOT CONVERGED. This is RESOURCE BLOCKED / NOT CERTIFIED;
+no speculative rerun, increased budget or relaxed tolerance is requested.
+The original dependent free-4PL stage did not execute. Complete mixed-success
+records are in expansion_evidence.json/artifact12729839040. Model support is
+based on individual actual accepted profiles, not the mixed run's label.
+
+A separate single 2D free-4PL comparison is requested because the required 2D
+free-c 3PL and fixed 4PL profiles DID pass. The request checks both exact
+profiles, convergence, constraints, every numerical comparison and unchanged
+criteria hash before fitting. It does not bypass the 3D prerequisite: no 3D
+free-4PL fit is requested and that route remains disabled.
+
+The byte-identical independently fitted Python engine moves to
+core/irt_multidim_general.py; validation/mirt_phase3/engine.py is a compatibility
+import, not a second implementation. The new experimental production adapter
+exposes only accepted fixed 3PL/4PL positive CFA (2D/3D, full correlations,
+between/within-item) and 2D BETWEEN-item free-c 3PL. It rejects unverified
+free-c dimensions/cross-loadings before calibration. Native Python mirt
+constructors remain unsupported and unchanged. Backend attribution is explicit
+in UI, support matrix, method report and downloads. No local-estimator claim
+is falsely attributed to Python mirt.
+
+The existing UI/report layout is reused: true native optimizer status/trace,
+physical scores/boundaries, A/delta/c/u, full latent correlations, original IDs,
+EAP/conditional full posterior covariance, IIF/TIF/Fisher SEM, curves and
+CSV/XLSX/PNG/ZIP. GH15 and registered solver defaults are the general-route
+defaults. MAP is explicitly NOT VALIDATED/DISABLED; interactive Hessian/parameter
+SE/CI/LR remain unavailable, rather than fabricated. Nonconvergence suppresses
+person scores, information/curves and PNG. Any relevant data/settings change
+invalidates all results/downloads. Report rows are capped at250000 BEFORE
+fitting to limit Streamlit/openpyxl memory; fit budget remains20M N*J*nodes.
+
+General 4D/5D are closed: the validated GH15 tensor would require50625/759375
+nodes, above the4000-node and20M response/node operational budgets. Lowering
+quadrature simply to activate them is not scientific validation. All PR80/81
+native and exact-composition models remain available unchanged.
