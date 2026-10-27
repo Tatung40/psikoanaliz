@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from core.reproducible import begin as begin_code_capture, finish as finish_code_capture, instrument as instrument_code_capture
+from core.reproducible import begin as begin_code_capture, finish as finish_code_capture, instrument as instrument_code_capture, public_call as record_public_call
 from ui.reproducible_view import render as render_reproducible_code
 
 # Core Modülleri
@@ -981,7 +981,9 @@ elif selected_page == "9. Bilimsel Grafikler":
             st.plotly_chart(plot_alpha_if_deleted(st.session_state.item_summary, overall_alpha), use_container_width=True)
 
         with tab_g4:
-            corr_mat = target_df[item_cols].apply(pd.to_numeric, errors="coerce").corr()
+            corr_mat = record_public_call("pandas", "DataFrame.corr",
+                                          target_df[item_cols].apply(pd.to_numeric, errors="coerce"),
+                                          method="pearson", min_periods=1, numeric_only=False)
             st.plotly_chart(plot_correlation_heatmap(corr_mat), use_container_width=True)
 
 

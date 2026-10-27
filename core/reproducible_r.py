@@ -58,7 +58,7 @@ def _r_code(manifest):
     for call in manifest['calls']:
         name, module = call['function'], call['module']
         try:
-            args = decode(call['arguments'])
+            args = decode(call['arguments'], reference_snapshots=True)
         except (IndexError, KeyError, Unsupported):
             return None, f'{module}.{name}: dependent opaque engine result has no verified R mapping'
         if module == 'core.descriptives' and name == 'describe_items':
@@ -72,6 +72,14 @@ def _r_code(manifest):
                       'print(list(n=length(scores), excluded=nrow(x)-nrow(complete), description=describe(data.frame(Total=scores))))',
                       'if(length(scores)) print(quantile(scores, c(.25,.75), type=7))',
                       'write.csv(data.frame(score=scores), "total_scores.csv", row.names=FALSE)']
+            analyses += 1
+        elif module == 'pandas' and name == 'DataFrame.corr':
+            if args['method'] != 'pearson' or args['min_periods'] != 1 or args['numeric_only']:
+                return None, 'Unsupported correlation settings; no approximate R recipe'
+            lines += ['x <- numeric_frame(' + literal(args['self']) + ')',
+                      'x[] <- lapply(x, function(v) { v[!is.finite(v)] <- NA_real_; v })',
+                      'result <- cor(x, use="pairwise.complete.obs", method="pearson")',
+                      'print(result)', 'write.csv(result, "correlation.csv")']
             analyses += 1
         elif module == 'core.scoring' and name == 'calculate_total_scores':
             x = args['df'][args['item_columns']]

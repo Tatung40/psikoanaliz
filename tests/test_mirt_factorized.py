@@ -1,4 +1,5 @@
 """Public-library factorization mathematics and real Streamlit route."""
+from tests.reproducible_ui import scientific_downloads
 import io,itertools,zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -59,7 +60,7 @@ def test_actual_factorized_ui_scores_exports_and_stale_asymptote(monkeypatch,fam
  assert (result['tables']['Fit'].Free_parameters==12).all()
  assert result['tables']['EAP'].ID.tolist()==data.ID.tolist()
  np.testing.assert_allclose(result['metadata']['LogLik'],result['tables']['Fit'].LogLik.sum())
- assert len(at.get('download_button'))==5
+ assert len(scientific_downloads(at))==5
  bundle=at.session_state[view.KEY]['bundle']
  with zipfile.ZipFile(io.BytesIO(bundle['zip'])) as z:
   assert 'Fit.csv' in z.namelist() and 'EAP.csv' in z.namelist()

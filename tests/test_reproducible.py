@@ -14,7 +14,7 @@ import pytest
 
 from core import descriptives
 from core.reproducible import (Recorder, Unsupported, begin, bundle, decode, encode,
-                               finish, python_code, recorded)
+                               finish, public_call, python_code, recorded)
 from core.reproducible_r import r_code
 
 
@@ -28,6 +28,7 @@ def captured(frame):
     try:
         result = descriptives.describe_items(frame)
         descriptives.describe_total(frame)
+        public_call('pandas', 'DataFrame.corr', frame, method='pearson', min_periods=1, numeric_only=False)
     finally:
         finish()
     return rec, result
@@ -55,12 +56,13 @@ def test_standalone_zip_executes_actual_prepared_data_outside_repository(tmp_pat
         archive.extractall(tmp_path)
     # Add comparison only in the test; no production execution/VERIFIED claim.
     script = tmp_path / 'analysis.py'
-    script.write_text(code + '\nresults[0].to_json("actual.json", orient="split", double_precision=15)\n')
+    script.write_text(code + '\nresults[0].to_json("actual.json", orient="split", double_precision=15)\nresults[2].to_json("correlation.json", orient="split", double_precision=15)\n')
     env = dict(os.environ, PYTHONPATH='')
     run = subprocess.run([sys.executable, str(script)], cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30)
     assert run.returncode == 0, run.stderr
     actual = pd.read_json(tmp_path / 'actual.json', orient='split')
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
+    pd.testing.assert_frame_equal(pd.read_json(tmp_path / 'correlation.json', orient='split'), sample().corr())
     assert (tmp_path / 'analysis.R').is_file()
     assert 'NOT INSTALLED' not in (tmp_path / 'requirements-repro.txt').read_text()
 
@@ -141,6 +143,8 @@ def test_r_real_execution_and_basic_result_comparison(tmp_path):
     assert run.returncode == 0, run.stderr
     actual = pd.read_csv(tmp_path / 'describe_items.csv')
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False, rtol=1e-12, atol=1e-12)
+    correlation = pd.read_csv(tmp_path / 'correlation.csv', index_col=0)
+    pd.testing.assert_frame_equal(correlation, sample().corr(), check_dtype=False, rtol=1e-12, atol=1e-12)
 
 
 def test_streamlit_code_panel_actual_inputs_and_supported_downloads():
@@ -266,3 +270,75 @@ dimensionality.data_type(pd.DataFrame({'M1':[0,1], 'M2':[1,0]}))
 render(finish())
 ''').run()
     assert not at.exception and not at.get('download_button')
+
+
+def test_inline_library_correlation_records_actual_api_and_settings():
+    from core.reproducible import public_call
+    rec = begin('correlation')
+    actual = public_call('pandas', 'DataFrame.corr', sample(), method='pearson', min_periods=1, numeric_only=False)
+    finish()
+    pd.testing.assert_frame_equal(actual, sample().corr())
+    assert rec.calls[0]['module'] == 'pandas' and rec.calls[0]['function'] == 'DataFrame.corr'
+    compile(python_code(rec.manifest()), 'analysis.py', 'exec')
+    r, reason = r_code(rec.manifest())
+    assert r and reason is None and 'pairwise.complete.obs' in r
+
+
+def test_ui_only_inference_gate_cannot_be_bypassed_by_script():
+    rec = Recorder('3PL/4PL bootstrap DIF')
+    rec.calls.append({'module': 'core.irt_dif34_bootstrap', 'function': 'bootstrap_dif_test', 'arguments': encode({'data': sample(), 'model': '4PL'})})
+    manifest = rec.manifest()
+    assert manifest['status'] == 'UNSUPPORTED' and python_code(manifest) is None
+    assert any('suppressed p-values' in reason for reason in manifest['unsupported'])
+
+
+def test_general_mirt_specification_is_preflight_not_a_completed_fit():
+    from core import irt_multidim_general_report as general
+    frame = pd.read_csv(Path(__file__).resolve().parents[1] / 'validation/mirt_phase3/fixtures/2PL_2D.csv')
+    pattern = np.zeros((10, 2), int)
+    pattern[:6, 0] = 1
+    pattern[6:, 1] = 1
+    rec = begin('MIRT preflight')
+    try:
+        general.specification(frame, general.MODELS[0], pattern, 'full', False, .2, 1.)
+    finally:
+        finish()
+    assert rec.calls and rec.manifest()['status'] == 'UNSUPPORTED'
+    assert python_code(rec.manifest()) is None
+
+
+def test_replay_uses_live_producer_not_saved_parameter_snapshot(tmp_path):
+    rec = begin('library pipeline')
+    copied = public_call('pandas', 'DataFrame.copy', sample())
+    public_call('pandas', 'DataFrame.corr', copied, method='pearson', min_periods=1, numeric_only=False)
+    finish()
+    manifest = rec.manifest()
+    second = dict(manifest['calls'][1]['arguments']['values'])['self']
+    assert second['@'] == 'ref' and second['path'] == [0]
+    # Deliberately edit the *input*, not expected scientific outcomes. A fresh
+    # producer must feed its consumer; replay cannot silently use old values.
+    changed = sample()
+    changed.iloc[0, 0] = 12.
+    first = decode(manifest['calls'][0]['arguments'])
+    first['self'] = changed
+    manifest['calls'][0]['arguments'] = encode(first)
+    code = python_code(manifest)
+    with zipfile.ZipFile(io.BytesIO(bundle(manifest, code))) as archive:
+        archive.extractall(tmp_path)
+    script = tmp_path / 'analysis.py'
+    script.write_text(code + '\nresults[1].to_json("correlation.json", orient="split", double_precision=15)\n')
+    run = subprocess.run([sys.executable, str(script)], cwd=tmp_path, env=dict(os.environ, PYTHONPATH=''), capture_output=True, text=True, timeout=30)
+    assert run.returncode == 0, run.stderr
+    pd.testing.assert_frame_equal(pd.read_json(tmp_path / 'correlation.json', orient='split'), changed.corr())
+    assert not np.allclose(changed.corr(), sample().corr())
+
+
+def test_inplace_value_change_invalidates_mutable_producer_reference():
+    rec = begin('mutable pipeline')
+    copied = public_call('pandas', 'DataFrame.copy', sample())
+    copied.iloc[0, 0] = 12.
+    public_call('pandas', 'DataFrame.corr', copied, method='pearson', min_periods=1, numeric_only=False)
+    finish()
+    arguments = rec.calls[1]['arguments']
+    assert dict(arguments['values'])['self']['@'] == 'frame'
+    pd.testing.assert_frame_equal(decode(arguments)['self'], copied)

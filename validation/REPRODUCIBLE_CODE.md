@@ -15,11 +15,12 @@ including KTK, reliability, dimensionality/PAF, local fit, all existing IRT/MIRT
 and DIF paths and missing-data analysis **when their actual arguments can be
 faithfully serialized**. Unsupported categorical dtypes, opaque objects without
 producer provenance, or other unmapped inputs suppress code rather than guessing.
+The 3PL/4PL bootstrap-DIF core is explicitly UNSUPPORTED for code export until its UI-only inference gate can be reproduced; raw p-values suppressed by the UI are never exported through a replay script.
 Cached opaque outcomes are replayable only when their actual producer was
 recorded in the preceding same-page run. Otherwise the panel says UNSUPPORTED.
 
 Native R currently covers item/complete-case total descriptives, total scoring
-(strict/partial/zero rules) and frequency distributions. A complete matched
+(strict/partial/zero rules) frequency distributions and pairwise Pearson correlation (the existing inline pandas call is recorded). A complete matched
 native-R recipe for reliability, AFA, IRT, MIRT, DIF or imputation is **UNSUPPORTED**.
 No MAP/ML, polychoric, factor-rotation or identification equivalence is implied.
 Existing independent R validation evidence remains separate and unchanged.

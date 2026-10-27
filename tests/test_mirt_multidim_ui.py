@@ -1,4 +1,5 @@
 """Actual library flow once; reuse that result for stale-input checks."""
+from tests.reproducible_ui import scientific_downloads
 import io,zipfile
 from pathlib import Path
 import numpy as np
@@ -26,7 +27,7 @@ def test_mirt_actual_ui_and_stale_downloads(tmp_path,monkeypatch):
  assert len(calls)==1
  saved=at.session_state[view.KEY];result=saved['result']
  assert result['metadata']['Converged'],result['metadata']
- assert len(at.get('download_button'))==5
+ assert len(scientific_downloads(at))==5
  assert result['tables']['EAP'].ID.tolist()==data.ID.tolist()
  assert np.isfinite(result['tables']['MAP'].filter(regex='^F').to_numpy()).all()
  assert not any('SE_' in c for c in result['tables']['MAP'])
@@ -35,7 +36,7 @@ def test_mirt_actual_ui_and_stale_downloads(tmp_path,monkeypatch):
  with zipfile.ZipFile(io.BytesIO(bundle['zip'])) as z:
   assert {'metadata.json','results.xlsx','report.md','surfaces.png','TIF.csv'}<=set(z.namelist())
   assert 'NOT CERTIFIED' in z.read('report.md').decode()
- at.run();assert len(calls)==1 and len(at.get('download_button'))==5
+ at.run();assert len(calls)==1 and len(scientific_downloads(at))==5
  for control,value in [('md_model','GRM'),('md_dims',3),('md_corr','Tümü'),('md_iter',100),('md_tol',1e-6),('md_quad_2',15),('md_items',items[:-1]),('md_mode','Keşfedici (pozitif, üçgen)')]:
   fresh=page();fresh.session_state[view.KEY]=dict(saved);fresh.run();assert fresh.get('download_button')
   widget=next(w for kind in ('selectbox','number_input','multiselect') for w in fresh.get(kind) if w.key==control)

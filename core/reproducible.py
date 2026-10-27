@@ -6,11 +6,13 @@ The recorder is session-local; wrappers remain inert outside a capture context.
 from contextvars import ContextVar
 from functools import wraps
 import hashlib
+import importlib
 import importlib.metadata
 import inspect
 import io
 import json
 import math
+import re
 import subprocess
 from functools import lru_cache
 from pathlib import Path
@@ -26,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PREFLIGHT_ONLY = frozenset({
     'fingerprint', 'data_type', 'prepare', 'prepare_polytomous', 'prepare_data',
     'validate', 'validate_inputs', 'validate_analysis_inputs', 'screen_items',
-    'structure', 'support_matrix', 'group_candidates', 'category_mapping',
+    'structure', 'specification', 'support_matrix', 'group_candidates', 'category_mapping',
 })
 
 
@@ -37,8 +39,16 @@ class Unsupported(ValueError):
 def encode(value, references=None):
     """Lossless JSON representation; no pickle, repr/eval or lossy float CSV."""
     references = references or {}
-    if id(value) in references and not isinstance(value, (pd.DataFrame, pd.Series, np.ndarray)):
-        return {'@': 'ref', 'path': references[id(value)]}
+    if id(value) in references:
+        reference = references[id(value)]
+        if isinstance(reference, dict):
+            snapshot = encode(value)
+            # In-place data edits invalidate the producer reference, even when
+            # the object's identity, columns and shape are unchanged.
+            if snapshot != reference['snapshot']:
+                return snapshot
+            return {'@': 'ref', 'path': reference['path'], 'snapshot': snapshot}
+        return {'@': 'ref', 'path': reference}
     if value is None or isinstance(value, (str, bool, int)):
         return value
     if value is pd.NA:
@@ -80,11 +90,15 @@ def encode(value, references=None):
     raise Unsupported(f'{type(value).__module__}.{type(value).__name__}: no faithful public serialization')
 
 
-def decode(value, results=()):
+def decode(value, results=(), *, reference_snapshots=False):
     if not isinstance(value, dict) or '@' not in value:
         return value
     tag = value['@']
     if tag == 'ref':
+        if reference_snapshots:
+            if 'snapshot' not in value:
+                raise Unsupported('Opaque producer has no native-R data snapshot')
+            return decode(value['snapshot'], reference_snapshots=True)
         result = results[value['path'][0]]
         for key in value['path'][1:]:
             result = result[key]
@@ -96,10 +110,10 @@ def decode(value, results=()):
     if tag == 'timestamp':
         return pd.Timestamp(value['value'])
     if tag in ('list', 'tuple'):
-        items = [decode(v, results) for v in value['values']]
+        items = [decode(v, results, reference_snapshots=reference_snapshots) for v in value['values']]
         return tuple(items) if tag == 'tuple' else items
     if tag == 'dict':
-        return {decode(k, results): decode(v, results) for k, v in value['values']}
+        return {decode(k, results, reference_snapshots=reference_snapshots): decode(v, results, reference_snapshots=reference_snapshots) for k, v in value['values']}
     if tag == 'index':
         return pd.Index(decode(value['values']), dtype=value['dtype'], name=decode(value['name']))
     if tag == 'frame':
@@ -125,6 +139,14 @@ def _has_data(value):
 
 
 def _remember(value, path, refs, keep):
+    if isinstance(value, (pd.DataFrame, pd.Series, np.ndarray)):
+        try:
+            snapshot = encode(value)
+        except (Unsupported, TypeError, ValueError, RecursionError, OverflowError):
+            return
+        refs[id(value)] = {'path': path, 'snapshot': snapshot}
+        keep.append(value)
+        return
     if id(value) in refs:
         return
     # Keep object references alive: Python may otherwise reuse their identities.
@@ -179,7 +201,7 @@ class Recorder:
         self.imported[old_index] = index
         return index
 
-    def invoke(self, function, args, kwargs):
+    def invoke(self, function, args, kwargs, identity=None):
         token = _BUSY.set(True)
         try:
             payload, error, relevant = None, None, True
@@ -198,7 +220,8 @@ class Recorder:
                     self.errors.append(f'{function.__module__}.{function.__name__}: {error}')
                 else:
                     i = len(self.calls)
-                    self.calls.append({'module': function.__module__, 'function': function.__name__, **payload})
+                    module, name = identity or (function.__module__, function.__name__)
+                    self.calls.append({'module': module, 'function': name, **payload})
                     _remember(result, [i], self.references, self.keep)
             return result
         finally:
@@ -206,13 +229,18 @@ class Recorder:
 
     def manifest(self):
         versions = {}
-        for package in ('numpy', 'pandas', 'scipy', 'statsmodels', 'mirt', 'streamlit'):
+        requirements = (ROOT / 'requirements.txt').read_text().splitlines()
+        packages = [re.split(r'[<>=!~\[; ]', line.strip())[0] for line in requirements
+                    if line.strip() and not line.lstrip().startswith('#')]
+        for package in packages:
             try:
                 versions[package] = importlib.metadata.version(package)
             except importlib.metadata.PackageNotFoundError:
                 versions[package] = 'NOT INSTALLED'
         completed = any(call['function'] not in PREFLIGHT_ONLY for call in self.calls)
         errors = list(self.errors)
+        if any(call['module'] == 'core.irt_dif34_bootstrap' for call in self.calls):
+            errors.append('UNSUPPORTED: bootstrap DIF inference is gated by the UI; a raw-core replay must not expose suppressed p-values.')
         if not completed:
             errors.append('No completed calculation: preflight-only calls cannot export an analysis recipe.')
         return {'schema': 1, 'page': self.page, 'source_commit': source_commit(), 'runtime_sha256': runtime_hashes(),
@@ -261,6 +289,17 @@ def begin(page, namespace=None, previous=None):
     _ACTIVE.set(recorder)
     instrument(namespace)
     return recorder
+
+
+def public_call(module, name, *args, **kwargs):
+    """Record an existing library operation used inline, without reimplementing it."""
+    function = importlib.import_module(module)
+    for part in name.split('.'):
+        function = getattr(function, part)
+    recorder = _ACTIVE.get()
+    if recorder is None or _BUSY.get():
+        return function(*args, **kwargs)
+    return recorder.invoke(function, args, kwargs, identity=(module, name))
 
 
 def finish():
@@ -335,7 +374,9 @@ for relative, expected in MANIFEST["runtime_sha256"].items():
 sys.path.insert(0, str(RUNTIME))
 results = []
 for call in MANIFEST["calls"]:
-    function = getattr(importlib.import_module(call["module"]), call["function"])
+    function = importlib.import_module(call["module"])
+    for part in call["function"].split("."):
+        function = getattr(function, part)
     bound = inspect.signature(function).bind_partial()
     bound.arguments.update(decode(call["arguments"], results))
     result = function(*bound.args, **bound.kwargs)
