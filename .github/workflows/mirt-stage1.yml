@@ -70,6 +70,8 @@ jobs:
         run: python validation/mirt_stage1/compare.py --output validation-output/mirt-stage1 --reuse original-evidence/mirt-stage1 --expand
       - name: Opt-in independent Phase 2 calibration (no automatic retries)
         run: python validation/mirt_phase2/factorized_comparison.py --output validation-output/mirt-phase2-fit
+      - name: Phase 3 actual R API contract (no IRT fits)
+        run: Rscript validation/mirt_phase3/runtime_contract.R validation-output/mirt-phase3-runtime
       - name: Phase 3 opt-in independent general-CFA comparison
         run: python validation/mirt_phase3/compare.py --output validation-output/mirt-phase3
       - name: Compact diagnostics even after failure

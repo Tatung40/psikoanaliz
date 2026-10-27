@@ -30,3 +30,11 @@ def test_registry_eligibility_requires_real_convergence_and_exact_scope():
  assert trace['reported_converged'] and trace['exact_last_pair_satisfied'] and trace['max_change']<1e-8
  # Missing R convergence on the genuine3D resource block NEVER becomes support.
  assert ('3PL',3,True,True,False) not in accepted and ('4PL',3,True,True,True) not in accepted
+
+
+def test_runtime_contract_is_explicitly_not_irt_validation():
+ source=Path('validation/mirt_phase3/runtime_contract.R').read_text()
+ assert 'IRT_fits_executed=FALSE' in source
+ assert "optimizer(.1,function(p)sum((p-.2)^2),method='nlminb'" in source
+ assert 'mirt(' not in source and 'mirt::mirt' not in source
+ assert 'reloadPars C++ mutates S4 objects' in source

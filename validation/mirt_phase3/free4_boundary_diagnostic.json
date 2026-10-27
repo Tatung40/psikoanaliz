@@ -48,5 +48,5 @@
   "interpretation": "Small common-objective disagreement does not override native R NOT CONVERGED",
   "native_rule": "mirt 1.48 hasConverged converts named g/u logits with plogis and requires ALL absolute changes <1e-8",
   "precision_diagnosis": "SLSQP xtol_rel1e-8 permits a/d coordinate changes up to5e-8 at |a|<=5, exceeding outer1e-8. Inner precision floor is a hypothesis, not a confirmed history-based cause.",
-  "BL_alternative": "NOT COMPARABLE for this free custom-group covariance: mirt1.48 BL.LL reloads candidate pars2 but reads custom prior from original pars; no BL fit requested"
+  "BL_alternative": "CORRECTED: original-pars access does not prove frozen covariance; C++ reloadPars mutates S4 objects. No BL fit performed. Bounded BL dispatcher is checked separately against actual R runtime."
 }

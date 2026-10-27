@@ -185,10 +185,10 @@ target is relaxed. Existing optimizer_trace.R records full internal/LL history
 and the exact last physical convergence pair against the installed rule.
 Native status/estimates are saved BEFORE subsequent diagnostics.
 
-No speculative BL alternative fit is run: actual mirt1.48 utils.R BL.LL
-reloads candidate pars2 but its custom-density branch reads the original pars
-group object, so free custom-covariance updates are not represented in that
-objective. That route is NOT COMPARABLE here. Runtime source bodies are saved
+No speculative BL alternative fit is run. An initial R-layer interpretation
+that custom-group covariance was frozen is WITHDRAWN: src/Misc.cpp reloadPars
+mutates the S4 parameter objects in place. Reading the original pars reference
+alone does not demonstrate a frozen covariance or non-equivalence. Runtime source bodies are saved
 alongside the named-asymptote/strict-threshold no-fit regression checks.
 If this single precision continuation still fails native convergence, free
 4PL stays disabled; no further retries, larger iteration limit or relaxed
@@ -243,3 +243,11 @@ accepted fourth (free4PL) UI route and registry eligibility are checked with
 focused tests without restarting that suite. Existing main push CI runs the
 complete final source after merge. No second manual full regression or new
 Monte Carlo/accepted-model calibration is requested.
+
+
+Correction audit: runtime_contract.R (NO IRT FITS) checks the actually resolved
+mirt1.48 optim namespace and its bounded BL dispatch using only a scalar
+quadratic API probe. EM.group selects method="nlminb" for finite bounds;
+compatibility must be established in the installed namespace, not guessed
+from an R-only code slice. This does not certify BL calibration or replace any
+actual EM evidence. Exact runtime diagnostics are workflow artifacts.
