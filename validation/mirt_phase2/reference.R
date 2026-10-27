@@ -13,6 +13,7 @@ if(mode=='preflight'){
  opts$pars$est[]<-FALSE;opts$optimizer<-NULL;opts$nloptr_args<-NULL;opts$technical$NCYCLES<-1
 }
 fit<-do.call(mirt,opts)
+final_values<-mod2values(fit);stopifnot(all(final_values$value[final_values$name=='MEAN_1']==0),all(final_values$value[final_values$name=='COV_11']==1),!any(final_values$est[grepl('^(MEAN|COV)_',final_values$name)]))
 actual_prior<-as.numeric(unlist(extract.mirt(fit,'Prior')));expected_prior<-read.csv(file.path(root,'integration.csv'))$weight
 stopifnot(length(actual_prior)==61,max(abs(actual_prior-expected_prior))<1e-14)
 write.csv(mod2values(fit),file.path(out,'raw_parameters.csv'),row.names=FALSE)
@@ -33,7 +34,7 @@ if(mode=='fit'){
 }
 meta<-list(R=R.version.string,mirt=as.character(packageVersion('mirt')),model=model,mode=mode,
  converged=extract.mirt(fit,'converged'),logLik=extract.mirt(fit,'logLik'),AIC=extract.mirt(fit,'AIC'),BIC=extract.mirt(fit,'BIC'),iterations=extract.mirt(fit,'iterations'),
- fixed_c=.2,fixed_u=if(model=='4PL').95 else 1,mean=0,variance=1,D=1,priors=extract.mirt(fit,'logPrior'),
+ fixed_c=.2,fixed_u=if(model=='4PL').95 else 1,mean=final_values$value[final_values$name=='MEAN_1'],variance=final_values$value[final_values$name=='COV_11'],D=1,priors=extract.mirt(fit,'logPrior'),
  bounds=list(a=c(.1,5),b=c(-6,6)),quadrature=61,stopping='R maximum parameter change <1e-8; maximum 3000 EM cycles')
 stopifnot(meta$priors==0,all(raw[,'g']==.2),all(raw[,'u']==meta$fixed_u),min(raw[,'a1'])>=.1,max(raw[,'a1'])<=5,max(abs(-raw[,'d']/raw[,'a1']))<=6+1e-7)
 jsonlite::write_json(meta,file.path(out,'metadata.json'),auto_unbox=TRUE,pretty=TRUE,digits=NA)

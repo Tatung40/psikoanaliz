@@ -7,15 +7,15 @@ but the public EM fitter rejects both it and ConstraintSet. Projection of
 unconstrained GPCM estimates is not Andrich RSM ML. General within-item or
 correlated-factor target models remain UNSUPPORTED; no class flag is patched.
 
-A distinct, explicitly restricted route is mathematically available for 3PL:
-known fixed c, between-item single loadings and independent N(0,1) factors.
+A distinct, explicitly restricted route is mathematically available for 3PL/4PL:
+known fixed c (and fixed u for 4PL), between-item single loadings and independent N(0,1) factors.
 The joint likelihood factors exactly into independent 1D marginal likelihoods.
 Public fit_mirt, fscores and native information methods perform every
 psychometric calculation. The adapter only dispatches/assembles blocks;
 zero cross-information follows from independence, not from an approximation.
 Fixed c is assumed known, not estimated. No free/shared-estimated asymptotes,
-SE/CI/p, formal LR or global-optimum certification. 4PL is not enabled before
-3PL independent acceptance. General RSM shared **estimated** steps couple the
+SE/CI/p, formal LR or global-optimum certification. 3PL independent acceptance preceded activation of 4PL. Both native full
+multidimensional constructors remain unsupported; these are explicit compositions. General RSM shared **estimated** steps couple the
 blocks and cannot be obtained from independent RSM fits with different steps.
 
 Predeclared acceptance targets are reused unchanged from
@@ -48,3 +48,21 @@ and evaluated with **all R item estimation flags FALSE**. No Python/R baseline
 recalibration occurs. Prior original failures and independent reference evidence
 are preserved. Workflow artifacts include complete Phase 2 settings, composite
 data, hashes, native estimates, convergence, scores, curves and R logs.
+
+## Actual 3PL acceptance and RSM boundary
+
+Run 40460608345: all three unique blocks converged independently in Python and
+R, satisfying unchanged numerical targets. Joint logLik differences were
+3.468e-9 (2D) / 3.756e-9 (3D); compact actual evidence is 3PL_evidence.json.
+The 4PL request uses the same methodology with c=.2/u=.95 fixed, not estimated.
+All estimated parameters are block-specific, so argmax of the sum of block
+log-likelihoods separates. Merely factoring likelihood terms is insufficient
+if unknown parameters (such as RSM common steps) are shared across blocks.
+
+The generic public MultigroupModel also does not supply a verified RSM
+workaround: RSM has a global threshold mask of length 3 for six items, while
+MultigroupEMEstimator._optimize_item indexes every parameter mask by item
+(index 3 is already out of bounds). No multigroup/RSM fit is attempted or
+claimed. No independent per-factor RSM fits with different steps are passed
+off as a shared-step model. A genuine supported joint shared-step estimator
+is required before this route may be enabled.

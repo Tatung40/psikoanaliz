@@ -40,20 +40,22 @@ def test_restricted_structure_and_asymptote_gates_before_fit(monkeypatch):
  with pytest.raises(ValueError,match='between-item'):module.fit(data,module.MODELS[0],cross)
 
 
-def test_actual_factorized_ui_scores_exports_and_stale_asymptote(monkeypatch):
+@pytest.mark.parametrize('family',['3PL','4PL'])
+def test_actual_factorized_ui_scores_exports_and_stale_asymptote(monkeypatch,family):
  from streamlit.testing.v1 import AppTest
  from reports.irt_multidim_report import downloads
  import ui.irt_multidim_view as view
- data=pd.read_csv('tests/fixtures/irt_b11/data_irt3pl_ok.csv').iloc[:120,:12].copy();items=list(data)
+ data=pd.read_csv(f'tests/fixtures/irt_b11/data_irt{family.lower()}_ok.csv').iloc[:120,:12].copy();items=list(data)
  data['ID']=[f'C{i}' for i in range(len(data))];calls=[];actual=module.fit
  def counted(*a,**kw):calls.append(kw);return actual(*a,**kw)
  monkeypatch.setattr(module,'fit',counted)
  at=AppTest.from_file(str(Path('app.py').resolve()),default_timeout=180)
  for k,v in dict(raw_df=data,scored_df=None,item_cols=items,id_col='ID',nav_page='Çok Boyutlu MTK (MIRT)').items():at.session_state[k]=v
- at.run();at.selectbox(key='md_model').set_value(module.MODELS[0]).run();assert not at.exception
+ at.run();at.selectbox(key='md_model').set_value(next(m for m in module.MODELS if m.startswith(family))).run();assert not at.exception
  at.button(key='md_run').click().run();assert not at.exception and len(calls)==1
  result=at.session_state[view.KEY]['result'];assert result['metadata']['Converged'],result['metadata']
  assert (result['tables']['Parameters'].c==.2).all()
+ assert (result['tables']['Parameters'].d==(.95 if family=='4PL' else 1.)).all()
  assert (result['tables']['Fit'].Free_parameters==12).all()
  assert result['tables']['EAP'].ID.tolist()==data.ID.tolist()
  np.testing.assert_allclose(result['metadata']['LogLik'],result['tables']['Fit'].LogLik.sum())
@@ -62,5 +64,5 @@ def test_actual_factorized_ui_scores_exports_and_stale_asymptote(monkeypatch):
  with zipfile.ZipFile(io.BytesIO(bundle['zip'])) as z:
   assert 'Fit.csv' in z.namelist() and 'EAP.csv' in z.namelist()
   assert 'NOT CERTIFIED' in z.read('report.md').decode()
- at.number_input(key='md_fixed_c').set_value(.21).run();assert not at.exception and not at.get('download_button') and view.KEY not in at.session_state
+ at.number_input(key='md_fixed_u' if family=='4PL' else 'md_fixed_c').set_value(.94 if family=='4PL' else .21).run();assert not at.exception and not at.get('download_button') and view.KEY not in at.session_state
  assert len(calls)==1

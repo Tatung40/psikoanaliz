@@ -9,7 +9,7 @@ import mirt
 from core.irt_multidim import STATUS,surface_tables
 from core.irt_python_mirt_adapter import normalize_solver_settings
 
-MODELS=('3PL — bağımsız bloklar, c sabit',)
+MODELS=('3PL — bağımsız bloklar, c sabit','4PL — bağımsız bloklar, c ve d sabit')
 LIMITATION=('EXPERIMENTAL / NOT CERTIFIED. Yalnız between-item, ortogonal, bağımsız N(0,1) boyutlar. '
  'Her madde tek boyuta yüklenir; pozitif a, sabit c (ve 4PL için sabit üst asimptot). '
  'Ortak olabilirlik bağımsız blok olabilirliklerinin çarpımıdır; ayrı library fitleri tam ortak ML verir. '
@@ -77,7 +77,7 @@ def report(outcome,person_ids=None):
  metadata=dict(Model=outcome['model'],Status=STATUS,Engine='Python mirt '+mirt.__version__,Python=platform.python_version(),N=len(x),Items=len(x.columns),Dimensions=q,
   Converged=bool(fit_frame.Converged.all()),LogLik=ll,AIC=2*npar-2*ll,BIC=np.log(len(x))*npar-2*ll,Parameters=npar,Labels=outcome['labels'],
   Likelihood='Exact product of independent orthogonal between-item marginal likelihoods',Covariance='Fixed identity; not estimated',
-  Estimation='Marginal ML; no item priors',Fixed_c=outcome['c'],Fixed_u=outcome['u'],Limitations=LIMITATION,**outcome['settings'])
+  Estimation='Marginal ML; no item priors',Hessian='NOT COMPUTED; SE/CI/Wald suppressed',MAP_diagnostics='Public scalar API point estimates; optimizer status unexposed; no MAP SE',Fixed_c=outcome['c'],Fixed_u=outcome['u'],Limitations=LIMITATION,**outcome['settings'])
  frames.update(Parameters=pd.DataFrame(rows),Fit=fit_frame,Boundaries=pd.DataFrame(bounds),
   Pattern=pd.DataFrame(p.astype(int),index=x.columns,columns=[f'F{j+1}' for j in range(q)]).reset_index(names='Item'),
   Covariance=pd.DataFrame(np.eye(q),index=[f'F{j+1}' for j in range(q)],columns=[f'F{j+1}' for j in range(q)]).reset_index(names='Factor'),
@@ -89,8 +89,13 @@ def report(outcome,person_ids=None):
    scores=pd.DataFrame({'ID':ids})
    for d,index,f in blocks:
     native=mirt.fscores(f,x.iloc[:,index].to_numpy(),method=method,n_quadpts=outcome['settings']['n_quadpts'],person_ids=ids)
-    scores[f'F{d+1}']=np.asarray(native.theta).reshape(-1)
-    if method=='EAP':scores[f'Posterior_SD_F{d+1}']=np.asarray(native.standard_error).reshape(-1)
+    values=np.asarray(native.theta).reshape(-1)
+    if len(values)!=len(x) or not np.isfinite(values).all():raise ValueError('Geçersiz kişi puanı; raporlama engellendi')
+    scores[f'F{d+1}']=values
+    if method=='EAP':
+     sd=np.asarray(native.standard_error).reshape(-1)
+     if len(sd)!=len(x) or not np.isfinite(sd).all() or np.any(sd<0):raise ValueError('Geçersiz posterior SD; raporlama engellendi')
+     scores[f'Posterior_SD_F{d+1}']=sd
    frames[method]=scores
   frames.update(surface_tables(Curves(blocks,p),list(x.columns),outcome['labels'],q))
  return dict(metadata=metadata,tables=frames)
