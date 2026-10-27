@@ -17,8 +17,7 @@ def inventory():
             if isinstance(node, ast.ImportFrom) and node.module and (node.module == 'core' or node.module.startswith('core.')) and 'reproducible' not in node.module:
                 imports.extend(node.module + '.' + alias.name for alias in node.names)
         records.append({'screen': str(path.relative_to(ROOT)), 'core_imports': sorted(set(imports)),
-                        'python': 'Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED',
-                        'R': 'Native descriptive/frequency/total-score recipes only; other engines UNSUPPORTED'})
+                        'python': 'Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED'})
     return records
 
 

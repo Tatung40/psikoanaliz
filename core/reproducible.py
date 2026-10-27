@@ -47,7 +47,7 @@ def encode(value, references=None):
             # the object's identity, columns and shape are unchanged.
             if snapshot != reference['snapshot']:
                 return snapshot
-            return {'@': 'ref', 'path': reference['path'], 'snapshot': snapshot}
+            return {'@': 'ref', 'path': reference['path']}
         return {'@': 'ref', 'path': reference}
     if value is None or isinstance(value, (str, bool, int)):
         return value
@@ -90,15 +90,11 @@ def encode(value, references=None):
     raise Unsupported(f'{type(value).__module__}.{type(value).__name__}: no faithful public serialization')
 
 
-def decode(value, results=(), *, reference_snapshots=False):
+def decode(value, results=()):
     if not isinstance(value, dict) or '@' not in value:
         return value
     tag = value['@']
     if tag == 'ref':
-        if reference_snapshots:
-            if 'snapshot' not in value:
-                raise Unsupported('Opaque producer has no native-R data snapshot')
-            return decode(value['snapshot'], reference_snapshots=True)
         result = results[value['path'][0]]
         for key in value['path'][1:]:
             result = result[key]
@@ -110,10 +106,10 @@ def decode(value, results=(), *, reference_snapshots=False):
     if tag == 'timestamp':
         return pd.Timestamp(value['value'])
     if tag in ('list', 'tuple'):
-        items = [decode(v, results, reference_snapshots=reference_snapshots) for v in value['values']]
+        items = [decode(v, results) for v in value['values']]
         return tuple(items) if tag == 'tuple' else items
     if tag == 'dict':
-        return {decode(k, results, reference_snapshots=reference_snapshots): decode(v, results, reference_snapshots=reference_snapshots) for k, v in value['values']}
+        return {decode(k, results): decode(v, results) for k, v in value['values']}
     if tag == 'index':
         return pd.Index(decode(value['values']), dtype=value['dtype'], name=decode(value['name']))
     if tag == 'frame':
@@ -387,14 +383,12 @@ print("Execution complete; numerical verification requires comparison to origina
 '''
 
 
-def bundle(manifest, python, r=None):
+def bundle(manifest, python):
     """Offline calculation sources + exact inputs. Never uploads user data."""
     output = io.BytesIO()
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
         archive.writestr('analysis.py', python)
         archive.writestr('analysis-input.json', json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2))
-        if r:
-            archive.writestr('analysis.R', r)
         requirements = (ROOT / 'requirements.txt').read_text()
         pinned = '\n'.join(f'{k}=={v}' for k, v in manifest['packages'].items() if v != 'NOT INSTALLED')
         archive.writestr('requirements-repro.txt', requirements + '\n# Captured runtime versions\n' + pinned + '\n')
@@ -406,5 +400,5 @@ def bundle(manifest, python, r=None):
                          'Do not reapply category coding, filtering or missing-value preprocessing.\n'
                          'Install requirements-repro.txt in a virtual environment. No packages are installed automatically.\n'
                          'Python reuses the bundled PsikoAnaliz engine; this is not an independent reference.\n'
-                         'Code generation is not scientific validation. R may be unsupported.\n')
+                         'Code generation is not scientific validation.\n')
     return output.getvalue()
