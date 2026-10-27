@@ -130,6 +130,6 @@ if __name__=='__main__':
  if args.family=='none':print('Phase 2 calibration NOT REQUESTED; no model validation claim');raise SystemExit(0)
  if args.family=='RSM':
   from validation.mirt_phase2.rsm_comparison import execute as rsm_execute
-  result=rsm_execute(args.output)
+  result=rsm_execute(args.output,args.prior)
  else:result=continue_four(args.prior,args.output) if args.family=='4PL_CONTINUE' else execute(args.family,args.output)
  print('PHASE2_REPORT='+json.dumps(result));raise SystemExit(0 if result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else 1)

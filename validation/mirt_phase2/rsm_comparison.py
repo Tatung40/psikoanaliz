@@ -52,7 +52,18 @@ def score_diagnostic(params,data,p,grid):
  return dict(status='DIAGNOSTIC ONLY; not a convergence/SE certification',steps=values)
 
 
-def execute_case(q,n,root):
+
+def restore_saved_python(values,metadata,data,pattern):
+ """Public fixed-parameter reevaluation only; never update an accepted estimate."""
+ model=RatingScaleModel(len(data.columns),len(values['thresholds'])+1,item_names=list(data));model.set_parameters(**values);masks=model.free_parameter_masks
+ model.set_free_parameter_masks({key:np.zeros_like(mask,dtype=bool) for key,mask in masks.items()})
+ evaluated=mirt.EMEstimator(n_quadpts=61,max_iter=1,tol=1e-10,compute_standard_errors=False,accelerate='none').fit(model,engine.stack_responses(data,pattern),start=values)
+ for key in values:np.testing.assert_array_equal(model.parameters[key],values[key])
+ if abs(evaluated.log_likelihood-metadata['logLik'])>json.loads(CRITERIA.read_text())['native_common_logLik']:raise ValueError('Saved Python likelihood mismatch')
+ model.set_free_parameter_masks(masks)
+ return mirt.FitResult(model=model,log_likelihood=metadata['logLik'],n_iterations=metadata['iterations'],converged=metadata['converged'],standard_errors={},aic=metadata['AIC'],bic=metadata['Native_stacked_BIC'],n_observations=len(data)*pattern.shape[1],n_parameters=metadata['free_parameters'],latent_mean=np.zeros(1),latent_covariance=np.eye(1))
+
+def execute_case(q,n,root,prior=None):
  root.mkdir(parents=True,exist_ok=True);data,p,provenance=dataset(q,n);C=int(data.max().max())+1;J=len(p);grid=GaussHermiteQuadrature(61,1);theta=np.linspace(-4,4,81)[:,None]
  criteria=json.loads(CRITERIA.read_text());settings=dict(family='RSM',dimensions=q,N=n,categories=C,items=J,stacked_N=n*q,D=1,latent='Independent N(0,1)',mean=0,variance=1,priors=None,
   n_quadpts=61,Python='mirt '+mirt.__version__,python=platform.python_version(),max_iter=1000,tol=1e-10,item_optim_ftol=1e-13,item_optim_maxiter=200,acceleration='none',
@@ -75,7 +86,17 @@ def execute_case(q,n,root):
   prechecks=dict(probabilities=discrepancies(fixed.probability(theta),P,criteria['mapping_probability']),information=discrepancies(native_information(fixed,theta),I,criteria['mapping_information']))
   result['preflight']=prechecks
   if any(c['status']!='PASS' for c in prechecks.values()):raise ValueError('NOT COMPARABLE: native R/Python RSM probability/information mismatch')
-  outcome=engine.fit(data,engine.NAME,p,n_quadpts=61,max_iter=1000,tol=1e-10);py=outcome['fit'];result['Python_execution']='ONE JOINT GLOBAL SHARED-STEP CALIBRATION EXECUTED'
+  if prior is not None and (prior/'python_parameters.npz').exists():
+   old=json.loads((prior/'report.json').read_text());old_settings=old['settings'];py_meta=old['Python']
+   for key in ('data_sha256','stacked_sha256','criteria_sha256','n_quadpts','tol','max_iter','start','bounds','identification'):
+    if settings[key]!=old_settings[key]:raise ValueError('Saved Python settings mismatch: '+key)
+   if hashlib.sha256((prior/'data.csv').read_bytes()).hexdigest()!=settings['data_sha256'] or not py_meta['converged']:raise ValueError('Saved Python data/convergence mismatch')
+   shutil.copytree(prior,root/'original_evidence',dirs_exist_ok=True)
+   py=restore_saved_python(dict(np.load(prior/'python_parameters.npz')),py_meta,data,p)
+   result['Python_fixed_evaluation']='Public EM: ALL coordinates fixed, one GH evaluation, bit-identical parameters; no parameter optimization'
+   result['Python_execution']='RETAINED CONVERGED JOINT FIT FROM RUN 40470531009; NO NEW PYTHON FIT'
+  else:
+   outcome=engine.fit(data,engine.NAME,p,n_quadpts=61,max_iter=1000,tol=1e-10);py=outcome['fit'];result['Python_execution']='ONE JOINT GLOBAL SHARED-STEP CALIBRATION EXECUTED'
   np.savez(root/'python_parameters.npz',**py.model.parameters)
   py_meta=dict(converged=bool(py.converged),iterations=py.n_iterations,logLik=py.log_likelihood,AIC=py.aic,BIC_original_N=-2*py.log_likelihood+py.n_parameters*np.log(n),Native_stacked_BIC=py.bic,free_parameters=py.n_parameters)
   result['Python']=py_meta;(root/'python_metadata.json').write_text(json.dumps(py_meta,indent=2)+'\n')
@@ -107,10 +128,10 @@ def execute_case(q,n,root):
  (root/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n');return result
 
 
-def execute(out):
+def execute(out,prior=None):
  out.mkdir(parents=True,exist_ok=True);reports=[]
  for q,n in [(2,200),(3,150)]:
-  record=execute_case(q,n,out/f'RSM_{q}D');reports.append(record)
+  record=execute_case(q,n,out/f'RSM_{q}D',None if prior is None else prior/f'RSM_{q}D');reports.append(record)
   if record['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':break
  result=dict(family='RSM',status='NUMERICALLY VALIDATED / NOT CERTIFIED' if len(reports)==2 and all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 'FAIL',profiles=reports,certification='NOT CERTIFIED')
  (out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n');return result

@@ -148,3 +148,19 @@ LR/model-fit claims stay disabled. EAP SD / Fisher SEM are conditional on fitted
 item parameters and exclude calibration uncertainty; MAP is provided by the
 native Python library but not independently certified. Dense report and
 structural-row computation budgets fail before fitting.
+
+RSM first run 40470531009 passed mapping/information preflight and the Python
+2D fit converged in 121 iterations (LL -3187.126636462431). R fitting then
+failed the final COV_11=1 assertion. R mirt 1.48 model.elements passes
+Rasch=all(itemtype in Rasch/rsm/Tutz/PC1PL) to LoadGroupPars, which sets the
+variance estimation flag TRUE. This default was unsuitable for our declared
+fixed N(0,1) scale. The validation now explicitly fixes MEAN_1=0/COV_11=1
+BEFORE fitting, retains native group defaults and raw values even if a later
+assertion fails. No observed data, bound, target scale or acceptance criterion
+changed. The off-scale R attempt is NOT accepted and its original artifact is
+retained (12718178692). The already converged Python 2D parameters/metadata
+are hash-checked and restored through a public fixed-parameter EM
+reevaluation (ALL estimation masks FALSE; bit-identical parameters, no
+optimization) for native scoring; the original convergence/iterations remain
+unchanged, not replaced by the reevaluation status. No recalibration; 3D had not been executed. Original failed reports are copied
+into original_evidence and the source run remains accessible.

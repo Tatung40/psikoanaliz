@@ -24,11 +24,18 @@ for(i in seq_len(J)){
   sv$value[index]<-k-1;sv$lbound[index]<- -6;sv$ubound[index]<-6;sv$est[index]<-k!=1
  }
 }
+# Native RSM selects Rasch scaling and frees COV_11 by default
+# (model.elements -> LoadGroupPars); override to the predeclared N(0,1).
+write.csv(sv[grepl('^(MEAN|COV)_',sv$name),],file.path(out,'native_group_defaults.csv'),row.names=FALSE)
+sv$value[sv$name=='MEAN_1']<-0;sv$value[sv$name=='COV_11']<-1
+sv$est[grepl('^(MEAN|COV)_',sv$name)]<-FALSE
+stopifnot(all(sv$value[sv$name=='MEAN_1']==0),all(sv$value[sv$name=='COV_11']==1),!any(sv$est[grepl('^(MEAN|COV)_',sv$name)]))
 if(mode=='preflight')sv$est[]<-FALSE
 stopifnot(setequal(names(attributes(sv)),names(attrs)),all(vapply(names(attrs),function(k)identical(attr(sv,k),attrs[[k]]),logical(1))))
 base$pars<-sv;base$method<-'EM';base$TOL<-1e-8;base$SE<-FALSE;base$accelerate<-'none';base$optimizer<-'L-BFGS-B'
 base$technical<-list(internal_constraints=FALSE,customTheta=matrix(nodes,ncol=1),customPriorFun=function(Theta,...)weights,NCYCLES=if(mode=='fit')3000 else 1)
-fit<-do.call(mirt,base);values<-mod2values(fit);raw<-coef(fit,simplify=TRUE,IRTpars=FALSE)$items
+write.csv(sv,file.path(out,'configured_values.csv'),row.names=FALSE)
+fit<-do.call(mirt,base);values<-mod2values(fit);write.csv(values,file.path(out,'raw_parameters.csv'),row.names=FALSE);raw<-coef(fit,simplify=TRUE,IRTpars=FALSE)$items
 stopifnot(all(values$value[values$name=='MEAN_1']==0),all(values$value[values$name=='COV_11']==1),!any(values$est[grepl('^(MEAN|COV)_',values$name)]),all(raw[,'a1']==1),all(raw[,'b1']==0))
 steps<-raw[,paste0('b',seq_len(C-1)),drop=FALSE]
 stopifnot(max(abs(sweep(steps,2,steps[1,],'-')))<8*.Machine$double.eps,max(abs(raw[,'c']))<=6,max(abs(steps))<=6)

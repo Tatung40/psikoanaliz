@@ -104,3 +104,31 @@ def test_rsm_no_r_means_blocked_without_python_fit(tmp_path,monkeypatch):
  assert "itemtype='rsm'" in source and 'internal_constraints=FALSE' in source
  assert "'CONSTRAIN = '" in source and "sv$est[index]<-k!=1" in source
  assert 'identical(attr(sv,k),attrs[[k]])' in source
+
+
+def test_rsm_native_rasch_variance_is_fixed_before_both_r_paths():
+ source=Path('validation/mirt_phase2/rsm_reference.R').read_text()
+ # Native rsm defaults to estimating variance (actual run 40470531009).
+ # Guard the intended fixed latent scale, not a posthoc variance rescaling.
+ fixed="sv$value[sv$name=='COV_11']<-1"
+ flags="sv$est[grepl('^(MEAN|COV)_',sv$name)]<-FALSE"
+ assert fixed in source and flags in source
+ assert source.index(fixed)<source.index('fit<-do.call(mirt,base)')
+ assert source.index(flags)<source.index("if(mode=='preflight')sv$est[]<-FALSE")
+ assert "file.path(out,'raw_parameters.csv')" in source.split('stopifnot(all(values$value')[0]
+
+
+def test_public_fixed_evaluation_restores_scoring_without_updating_parameters():
+ import mirt
+ from validation.mirt_phase2.rsm_comparison import restore_saved_python
+ data,p=data_pattern(2,30);model=RatingScaleModel(12,4);values=model.parameters
+ grid=GaussHermiteQuadrature(61,1);stacked=engine.stack_responses(data,p)
+ ll=float(logsumexp(model.log_likelihood_batch(stacked,grid.nodes)+np.log(grid.weights),axis=1).sum())
+ # Container restoration contract only; this mock metadata is NOT evidence
+ # that these fixed parameters were calibrated or scientifically accepted.
+ metadata=dict(logLik=ll,iterations=123,converged=True,AIC=-2*ll+28,Native_stacked_BIC=-2*ll+14*np.log(60),free_parameters=14)
+ restored=restore_saved_python(values,metadata,data,p)
+ assert restored.n_iterations==123 and restored.n_parameters==14 and restored.model.is_fitted
+ for key in values:np.testing.assert_array_equal(restored.model.parameters[key],values[key])
+ result=mirt.fscores(restored,data.iloc[:2].to_numpy(),method='EAP',n_quadpts=61)
+ assert np.isfinite(result.theta).all() and np.isfinite(result.standard_error).all()
