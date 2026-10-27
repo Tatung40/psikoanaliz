@@ -15,8 +15,9 @@ psychometric calculation. The adapter only dispatches/assembles blocks;
 zero cross-information follows from independence, not from an approximation.
 Fixed c is assumed known, not estimated. No free/shared-estimated asymptotes,
 SE/CI/p, formal LR or global-optimum certification. 3PL independent acceptance preceded activation of 4PL. Both native full
-multidimensional constructors remain unsupported; these are explicit compositions. General RSM shared **estimated** steps couple the
-blocks and cannot be obtained from independent RSM fits with different steps.
+multidimensional constructors remain unsupported; these are explicit compositions. RSM shared **estimated** steps couple the
+parameter optimization and cannot be obtained from independent RSM fits with different steps.
+The exact single joint shared-step route below avoids that obstruction.
 
 Predeclared acceptance targets are reused unchanged from
 `validation/mirt_stage1/criteria.json`. Fixtures reuse existing 3000×12
@@ -43,13 +44,13 @@ permissions. Accepted families are not requested again on later commits.
 CLI: `PYTHONPATH=. python validation/mirt_phase2/factorized_comparison.py
 --family 3PL --output validation-output/mirt-phase2-fit`.
 
-The 12 accepted PR80 profiles are downloaded from successful run 40453192278
+The 12 accepted PR80 profiles are retained from successful run 40468300257
 and evaluated with **all R item estimation flags FALSE**. No Python/R baseline
 recalibration occurs. Prior original failures and independent reference evidence
 are preserved. Workflow artifacts include complete Phase 2 settings, composite
 data, hashes, native estimates, convergence, scores, curves and R logs.
 
-## Actual 3PL acceptance and RSM boundary
+## Actual 3PL/4PL acceptance and native API boundary
 
 Run 40460608345: all three unique blocks converged independently in Python and
 R, satisfying unchanged numerical targets. Joint logLik differences were
@@ -64,8 +65,8 @@ workaround: RSM has a global threshold mask of length 3 for six items, while
 MultigroupEMEstimator._optimize_item indexes every parameter mask by item
 (index 3 is already out of bounds). No multigroup/RSM fit is attempted or
 claimed. No independent per-factor RSM fits with different steps are passed
-off as a shared-step model. A genuine supported joint shared-step estimator
-is required before this route may be enabled.
+off as a shared-step model. The scalar structural-row joint fit below reuses the genuine supported
+shared-step EM estimator instead; it does not use the broken multigroup route.
 
 4PL first R preflight (run 40462716422) stopped before calibration on strict
 physical `u == .95` equality. Original CSV records every u=.95 with estimation
@@ -92,3 +93,58 @@ The same source artifact contains the accepted 12 PR80 baseline profiles;
 their successful per-profile status is verified independently of the mixed
 run's overall failure. One artifact download supplies both retained baselines
 and the actual converged 4PL reference, avoiding duplicate downloads.
+
+
+Actual 4PL continuation run 40468300257: F2 converged after 264 additional
+public Python EM iterations; all unchanged criteria passed against the retained
+converged R reference. Maximum F2 a difference .0003585073, probability
+.00001669887, information .0004567116, common logLik 2.95222e-9.
+Joint 2D/3D logLik differences 3.65e-9 / 4.03e-9. This is numerical
+reproducibility for fixed known c=.2/u=.95, not validation of estimated
+asymptotes, global optimality, Type-I error or parameter CI coverage.
+Compact provenance/results: 4PL_evidence.json; original failures preserved.
+
+## Genuine globally shared-step Andrich RSM (restricted composition)
+
+Let each item load with unit slope on exactly one independent N(0,1) factor.
+For each original person, create q structural rows: axis d contains only that
+axis's responses; all other cells are missing (-1 Python / NA R). Every
+observed response occurs exactly once. The observed marginal likelihood is
+product_n product_d integral product_(j in d) P_j(x_nj | theta_d, beta_j, tau)
+phi(theta_d) dtheta_d. This equals the qD likelihood **for all common tau**.
+One public RatingScaleModel / EMEstimator fits ALL structural rows jointly,
+with ONE globally estimated tau vector. The step M-step pools ALL dimensions;
+there are no independent per-factor RSM fits and no GPCM proxy/parameter
+projection. Subject correlation across factors is excluded by the model.
+A parameter covariance is NOT assumed block diagonal: estimated shared steps
+couple item estimates even though conditional person information is diagonal.
+
+Canonical gauge: tau_1=0 fixed, beta_j and remaining C-2 tau values estimated;
+J+C-2 free parameters, all free physical bounds [-6,6]. Andrich steps need NOT
+be ordered (GRM ordering is not imposed). Native R mirt 1.48 itemtype='rsm'
+uses gpcmIRT kernel increments theta-b_k+c_j: R b_k=tau_k and c_j=-beta_j.
+technical internal_constraints=FALSE disables its alternate origin constraint;
+explicit CONSTRAIN groups tie b2... across ALL items, a1=1 and b1=0 fixed.
+This mapping/constraints/GH61 identity must pass an actual fixed-parameter R
+preflight before either engine's registered comparison fit is run.
+
+Reproducible command (R mirt 1.48 required):
+`PYTHONPATH=. python validation/mirt_phase2/factorized_comparison.py --family RSM --output validation-output/mirt-phase2-fit`.
+The existing 500x8 ordinal fixture supplies disjoint row blocks with a fixed
+permutation seed 20261027; 2D N200/J12 and 3D N150/J18 composite datasets,
+original categories unchanged. One Python and one R joint fit per case;
+no baseline/3PL/4PL refits. GH61, ML/no priors, fixed normal mean0/variance1,
+matched starts/physical boxes/gauge; same unchanged preregistered criteria.
+Full native values, constraints, versions, settings/hashes, logs, two-step
+physical score diagnostics, probability/info/EAP/SD/logLik/AIC/BIC differences
+and boundary flags are artifacts. AIC uses J+C-2; common BIC uses ORIGINAL N,
+native structural-row BIC using N*q retained separately and explicitly named.
+
+RSM runtime validation is PENDING until an actual successful artifact is
+recorded. No Python-only tests certify R equivalence. All user analyses remain
+EXPERIMENTAL / NOT CERTIFIED; q4/q5 have fixed-parameter no-fit identity tests
+only. Correlated, within-item, exploratory RSM, parameter SE/CI/p and formal
+LR/model-fit claims stay disabled. EAP SD / Fisher SEM are conditional on fitted
+item parameters and exclude calibration uncertainty; MAP is provided by the
+native Python library but not independently certified. Dense report and
+structural-row computation budgets fail before fitting.

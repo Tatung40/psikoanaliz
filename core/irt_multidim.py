@@ -33,7 +33,8 @@ def support_matrix():
   ('3PL',False,'Family rejects >1 factor'),('4PL',False,'Family rejects >1 factor'),
   ('RSM',False,'RSM constructor is 1D; EM rejects additive LinearConstraint/ConstraintSet')]])
  from core.irt_multidim_factorized import MODELS as restricted
- return pd.concat([result,pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact independent 1D block composition only; fixed asymptotes; no correlated/within-item model') for m in restricted])],ignore_index=True)
+ from core.irt_multidim_rsm_stack import MODELS as stacked
+ return pd.concat([result,pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact independent 1D block composition only; fixed asymptotes; no correlated/within-item model') for m in restricted]),pd.DataFrame([dict(Model=m,Multidimensional_API=True,Phase1=False,Status=STATUS,Note='Exact structural-row composition; ONE public scalar RSM fit, globally shared estimated steps; orthogonal between-item only') for m in stacked])],ignore_index=True)
 
 
 def structure(pattern,correlated=False,exploratory=False):

@@ -1,0 +1,376 @@
+{
+  "run": "https://github.com/Tatung40/psikoanaliz/actions/runs/40468300257",
+  "scope": "Exact orthogonal between-item; c=.2/u=.95 fixed; own-Python F2 precision continuation only; retained independent R calibrations",
+  "assemblies": [
+    {
+      "dimensions": 2,
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "Python_logLik": -4685.976097183171,
+      "R_logLik": -4685.97609717952,
+      "method": "Exact product likelihood; reference and accepted blocks retained"
+    },
+    {
+      "dimensions": 3,
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "Python_logLik": -7101.116401758215,
+      "R_logLik": -7101.1164017541805,
+      "method": "Exact product likelihood; reference and accepted blocks retained"
+    }
+  ],
+  "blocks": [
+    {
+      "factor": 1,
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "comparison": {
+        "a": {
+          "status": "PASS",
+          "max_absolute": 0.000018748255360190313,
+          "mean_absolute": 0.000005066403850543614,
+          "max_relative": 0.000010937913007055974,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "b": {
+          "status": "PASS",
+          "max_absolute": 0.0000015450474617484389,
+          "mean_absolute": 8.701225938980336e-7,
+          "max_relative": 0.00000609407326492406,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.0000021362843108940766,
+          "mean_absolute": 3.4567228954589605e-7,
+          "max_relative": 0.0000066808400736747935,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.000009297630576499127,
+          "mean_absolute": 4.208091151205131e-7,
+          "max_relative": 0.0001313633572603075,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.000004984199484026064,
+          "mean_absolute": 0.000002037794370139635,
+          "max_relative": 0.000125264421379996,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "SD": {
+          "status": "PASS",
+          "max_absolute": 0.0000012293175019051361,
+          "mean_absolute": 4.6716390219442294e-7,
+          "max_relative": 0.0000015287955164809245,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 7.044036465231329e-10,
+          "mean_absolute": 7.044036465231329e-10,
+          "max_relative": 2.9294832814971684e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 4.547473508864641e-13,
+          "mean_absolute": 4.547473508864641e-13,
+          "max_relative": 1.8912093489329686e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 4.547473508864641e-12,
+          "mean_absolute": 4.547473508864641e-12,
+          "max_relative": 1.8912093489335188e-15,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "converged": true,
+        "iterations": 83,
+        "logLik": -2404.5320585107893,
+        "AIC": 4833.064117021579,
+        "BIC": 4885.827272884172,
+        "free_parameters": 12
+      },
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "model": "4PL",
+        "mode": "fit",
+        "converged": true,
+        "logLik": -2404.53205851009,
+        "AIC": 4833.06411702017,
+        "BIC": 4885.82727288276,
+        "iterations": 75,
+        "fixed_c": 0.2,
+        "fixed_u": 0.95,
+        "mean": 0,
+        "variance": 1,
+        "D": 1,
+        "priors": 0,
+        "bounds": {
+          "a": [
+            0.1,
+            5
+          ],
+          "b": [
+            -6,
+            6
+          ]
+        },
+        "quadrature": 61,
+        "stopping": "R maximum parameter change <1e-8; maximum 3000 EM cycles"
+      }
+    },
+    {
+      "factor": 2,
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "comparison": {
+        "a": {
+          "status": "PASS",
+          "max_absolute": 0.00035850725774722036,
+          "mean_absolute": 0.00006434287674997319,
+          "max_relative": 0.00008178910700079908,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "b": {
+          "status": "PASS",
+          "max_absolute": 0.000044936658477379154,
+          "mean_absolute": 0.00001950449462712056,
+          "max_relative": 0.000017343996678291246,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.000016698867531750317,
+          "mean_absolute": 0.0000013808968010148075,
+          "max_relative": 0.00003745280951783211,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.00045671161325433474,
+          "mean_absolute": 0.0000054738901406024094,
+          "max_relative": 0.0030508302622293333,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.000010735591586846782,
+          "mean_absolute": 0.000006086630052890701,
+          "max_relative": 0.00006473778874800948,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "SD": {
+          "status": "PASS",
+          "max_absolute": 0.000006300423572080938,
+          "mean_absolute": 0.000002660868566005392,
+          "max_relative": 0.000008662325000855456,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 2.952219801954925e-9,
+          "mean_absolute": 2.952219801954925e-9,
+          "max_relative": 1.2940136825240213e-12,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "converged": true,
+        "iterations": 264,
+        "logLik": -2281.4440386723822,
+        "AIC": 4586.8880773447645,
+        "BIC": 4639.651233207358,
+        "free_parameters": 12,
+        "stopping": "Public EM absolute LL change <1e-12; item ftol1e-14; max3000"
+      },
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "model": "4PL",
+        "mode": "fit",
+        "converged": true,
+        "logLik": -2281.44403866943,
+        "AIC": 4586.88807733886,
+        "BIC": 4639.65123320145,
+        "iterations": 650,
+        "fixed_c": 0.2,
+        "fixed_u": 0.95,
+        "mean": 0,
+        "variance": 1,
+        "D": 1,
+        "priors": 0,
+        "bounds": {
+          "a": [
+            0.1,
+            5
+          ],
+          "b": [
+            -6,
+            6
+          ]
+        },
+        "quadrature": 61,
+        "stopping": "R maximum parameter change <1e-8; maximum 3000 EM cycles"
+      },
+      "previous_Python": {
+        "converged": false,
+        "iterations": 1000,
+        "logLik": -2281.444039611362,
+        "AIC": 4586.888079222724,
+        "BIC": 4639.651235085317,
+        "free_parameters": 12
+      }
+    },
+    {
+      "factor": 3,
+      "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+      "comparison": {
+        "a": {
+          "status": "PASS",
+          "max_absolute": 0.000010098774668954036,
+          "mean_absolute": 0.000003880121913139393,
+          "max_relative": 0.000006618956336345648,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "b": {
+          "status": "PASS",
+          "max_absolute": 9.433497182298467e-7,
+          "mean_absolute": 4.966236898500583e-7,
+          "max_relative": 0.000003955768870047385,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "probabilities": {
+          "status": "PASS",
+          "max_absolute": 0.0000012713461899904743,
+          "mean_absolute": 2.8584856149160935e-7,
+          "max_relative": 0.000003229388378891437,
+          "tolerance": 0.0001,
+          "reason": ""
+        },
+        "information": {
+          "status": "PASS",
+          "max_absolute": 0.000004498796462304444,
+          "mean_absolute": 3.2338814598056116e-7,
+          "max_relative": 0.00007200612871690531,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "EAP": {
+          "status": "PASS",
+          "max_absolute": 0.0000029934579441337483,
+          "mean_absolute": 0.000001047464020391452,
+          "max_relative": 0.0000562038731686757,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "SD": {
+          "status": "PASS",
+          "max_absolute": 7.265791784893949e-7,
+          "mean_absolute": 2.844579490915433e-7,
+          "max_relative": 9.632404688320663e-7,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "common_logLik": {
+          "status": "PASS",
+          "max_absolute": 3.8198777474462986e-10,
+          "mean_absolute": 3.8198777474462986e-10,
+          "max_relative": 1.5816380274927444e-13,
+          "tolerance": 0.001,
+          "reason": ""
+        },
+        "Python_native_LL": {
+          "status": "PASS",
+          "max_absolute": 0,
+          "mean_absolute": 0,
+          "max_relative": 0,
+          "tolerance": 0.000001,
+          "reason": ""
+        },
+        "R_native_LL": {
+          "status": "PASS",
+          "max_absolute": 1.8189894035458565e-12,
+          "mean_absolute": 1.8189894035458565e-12,
+          "max_relative": 7.531609654728546e-16,
+          "tolerance": 0.000001,
+          "reason": ""
+        }
+      },
+      "Python": {
+        "converged": true,
+        "iterations": 50,
+        "logLik": -2415.140304575044,
+        "AIC": 4854.280609150088,
+        "BIC": 4907.043765012681,
+        "free_parameters": 12
+      },
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "model": "4PL",
+        "mode": "fit",
+        "converged": true,
+        "logLik": -2415.14030457466,
+        "AIC": 4854.28060914932,
+        "BIC": 4907.04376501192,
+        "iterations": 52,
+        "fixed_c": 0.2,
+        "fixed_u": 0.95,
+        "mean": 0,
+        "variance": 1,
+        "D": 1,
+        "priors": 0,
+        "bounds": {
+          "a": [
+            0.1,
+            5
+          ],
+          "b": [
+            -6,
+            6
+          ]
+        },
+        "quadrature": 61,
+        "stopping": "R maximum parameter change <1e-8; maximum 3000 EM cycles"
+      }
+    }
+  ]
+}

@@ -126,6 +126,10 @@ def continue_four(prior,out):
 
 
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--family',choices=['none','3PL','4PL','4PL_CONTINUE'],default=(ROOT/'requested_family.txt').read_text().strip());parser.add_argument('--prior',type=Path,default=Path('original-evidence/mirt-phase2-fit'));parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--family',choices=['none','3PL','4PL','4PL_CONTINUE','RSM'],default=(ROOT/'requested_family.txt').read_text().strip());parser.add_argument('--prior',type=Path,default=Path('original-evidence/mirt-phase2-fit'));parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
  if args.family=='none':print('Phase 2 calibration NOT REQUESTED; no model validation claim');raise SystemExit(0)
- result=continue_four(args.prior,args.output) if args.family=='4PL_CONTINUE' else execute(args.family,args.output);print('PHASE2_REPORT='+json.dumps(result));raise SystemExit(0 if result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else 1)
+ if args.family=='RSM':
+  from validation.mirt_phase2.rsm_comparison import execute as rsm_execute
+  result=rsm_execute(args.output)
+ else:result=continue_four(args.prior,args.output) if args.family=='4PL_CONTINUE' else execute(args.family,args.output)
+ print('PHASE2_REPORT='+json.dumps(result));raise SystemExit(0 if result['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else 1)

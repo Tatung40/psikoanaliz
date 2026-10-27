@@ -12,6 +12,8 @@ on:
       - 'tests/test_mirt_factorized.py'
       - 'validation/mirt_phase2/**'
       - 'core/irt_multidim_factorized.py'
+      - 'core/irt_multidim_rsm_stack.py'
+      - 'tests/test_mirt_rsm_stack.py'
       - 'validation/r_mirt_phase1/matched_ml.R'
       - 'validation/mirt_stage1/**'
       - '.github/workflows/mirt-stage1.yml'
@@ -48,14 +50,14 @@ jobs:
       - name: Python dependencies (existing environment specification)
         run: python -m pip install -r requirements.txt 'mirt==1.2.0'
       - name: Focused API, mathematical and actual Streamlit checks
-        run: python -m pytest -q tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py tests/test_mirt_phase2_capabilities.py tests/test_mirt_factorized.py
+        run: python -m pytest -q tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py tests/test_mirt_phase2_capabilities.py tests/test_mirt_factorized.py tests/test_mirt_rsm_stack.py
       - name: Phase 2 capability audit (no fits)
         run: python validation/mirt_phase2/capability_audit.py --output validation-output/mirt-phase2/capability_audit.json
       - name: Reuse retained converged fits (no recalibration)
         uses: actions/download-artifact@v4
         with:
-          name: mirt-stage1-0a29db93a8bebda82e363439b9b9f81deeb9e856-40463908384
-          run-id: 40463908384
+          name: mirt-stage1-a255f11e986d960110e93bff9f6d03e8f2651bf0-40468300257
+          run-id: 40468300257
           github-token: ${{ github.token }}
           path: original-evidence
       - name: Verify all 12 retained profiles at fixed parameters (no recalibration)
