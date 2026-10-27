@@ -262,9 +262,17 @@ def precision(name,prior,out):
  return result
 
 
+def reuse_accepted(names,prior,out):
+ """Fail closed on missing/rejected baseline evidence; NEVER fallback to fits."""
+ for name in names:
+  record=json.loads((prior/name/'report.json').read_text())
+  if record['status']!='NUMERICALLY VALIDATED / NOT CERTIFIED':raise ValueError('Baseline reuse requires accepted evidence: '+name)
+ return [recover(name,prior,out/name) for name in names]
+
+
 if __name__=='__main__':
  parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--reuse',type=Path);parser.add_argument('--expand',action='store_true');parser.add_argument('--refine-failed',action='store_true');parser.add_argument('--python-precision',action='store_true');args=parser.parse_args()
  names=PHASE1+EXPANSION if args.expand else PHASE1
- reports=[recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else precision(name,args.reuse,args.output/name) if args.python_precision else run(name,args.output/name,args.reuse if args.refine_failed else None) for name in names]
+ reports=reuse_accepted(names,args.reuse,args.output) if args.reuse and not (args.python_precision or args.refine_failed) else [recover(name,args.reuse,args.output/name) if args.reuse and (args.reuse/name/'report.json').exists() and json.loads((args.reuse/name/'report.json').read_text())['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' else precision(name,args.reuse,args.output/name) if args.python_precision else run(name,args.output/name,args.reuse if args.refine_failed else None) for name in names]
  print(json.dumps([dict(profile=r['profile'],status=r['status'],blocker=r.get('blocker')) for r in reports],indent=2))
  sys.exit(0 if all(r['status']=='NUMERICALLY VALIDATED / NOT CERTIFIED' for r in reports) else 1)

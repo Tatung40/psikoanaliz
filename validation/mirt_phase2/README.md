@@ -140,8 +140,9 @@ physical score diagnostics, probability/info/EAP/SD/logLik/AIC/BIC differences
 and boundary flags are artifacts. AIC uses J+C-2; common BIC uses ORIGINAL N,
 native structural-row BIC using N*q retained separately and explicitly named.
 
-RSM runtime validation is PENDING until an actual successful artifact is
-recorded. No Python-only tests certify R equivalence. All user analyses remain
+Actual RSM run 40471554619 accepted both 2D/3D comparisons; compact
+measured evidence is RSM_evidence.json. No Python-only test is used to
+certify R equivalence. All user analyses remain
 EXPERIMENTAL / NOT CERTIFIED; q4/q5 have fixed-parameter no-fit identity tests
 only. Correlated, within-item, exploratory RSM, parameter SE/CI/p and formal
 LR/model-fit claims stay disabled. EAP SD / Fisher SEM are conditional on fitted
@@ -164,3 +165,45 @@ reevaluation (ALL estimation masks FALSE; bit-identical parameters, no
 optimization) for native scoring; the original convergence/iterations remain
 unchanged, not replaced by the reevaluation status. No recalibration; 3D had not been executed. Original failed reports are copied
 into original_evidence and the source run remains accessible.
+
+
+## Final measured scope
+
+| Family | Actual independent comparison | Scope / remaining limits |
+|---|---|---|
+| 3PL | 2D/3D numerically accepted; 40460608345 | Known fixed c=.2, independent between-item; generic MD constructor unsupported |
+| 4PL | 2D/3D numerically accepted; 40468300257 | Known fixed c=.2/u=.95; one justified own-Python F2 continuation, all R fits retained |
+| Andrich RSM | 2D/3D numerically accepted; 40471554619 | ONE globally estimated shared-step vector, fixed unit single loadings; exact structural-row representation |
+| PR80 12 profiles | Accepted evidence retained and reevaluated only | No Python/R recalibration; missing/rejected evidence now fails closed |
+| q4/q5 restricted additions | EXPERIMENTAL / NOT CERTIFIED | Fixed-parameter no-fit likelihood/information proofs only; no R calibration claim |
+| Correlated / within-item / exploratory 3PL/4PL/RSM | UNSUPPORTED | Public native constructors reject MD; exact composition requires independence/single loading |
+
+RSM 2D: Python/R converged in 121/105 EM iterations, joint LL
+-3187.126636462431 / -3187.12663646206. RSM 3D: 122/114 iterations,
+LL -3593.274687719281 / -3593.27468771892. Across both, maxima:
+b difference 2.14691e-6; shared-step difference 9.89783e-7; category
+probability 7.26593e-7; IIF 1.22680e-6; TIF 6.58723e-6; EAP 1.33173e-6;
+posterior SD 9.94792e-8; conditional SEM 2.88089e-6; common LL 3.65617e-10.
+AIC/common-original-N BIC differences <7.4e-10. No active physical bound.
+Two-step score diagnostics are stable: maximum Python score 1.16549e-4,
+R 9.59517e-7. Absolute-LL Python stopping and parameter-change R stopping
+are distinct; these scores are not new acceptance criteria or proof of exact
+stationarity. No Hessian/SE/CI/inference or global-optimum claim follows.
+Numerical acceptance uses UNCHANGED preregistered criteria, not observed-gap
+tuning. These results do not assess population recovery, Type-I error,
+coverage, fit of the fixture to RSM, or robustness to model misspecification.
+
+Final versioned request is `none`: no accepted Phase2 family is automatically
+refitted. Opt-in CLI commands remain reproducible and do not retry themselves.
+Workflow source 40471554619 retains all 12 accepted PR80 profiles plus all RSM
+inputs/outputs and original failure evidence. Artifact retention is 30 days;
+expired/unavailable retained evidence must be restored explicitly, never
+silently replaced by a new fit. Persistent compact evidence and hashes remain
+committed; complete raw outputs, versions, constraints and R logs are attached
+as Actions artifacts at the linked runs.
+
+Local full regression (before the isolated RSM addition): 1120 passed,
+10 existing skipped. New/affected RSM checks were targeted locally; actual
+R/Python workflow focused suite: 65 passed. Final branch CI checks and
+post-merge main's existing automatic full regression verify the integrated
+source; no second manual full suite or old R calibration is requested.

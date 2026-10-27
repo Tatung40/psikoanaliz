@@ -44,7 +44,16 @@ def test_no_fit_audit_reports_real_blockers_and_not_scientific_pass(monkeypatch)
 
 def test_baseline_workflow_retains_all_accepted_fits_without_precision_refits():
  source=Path('.github/workflows/mirt-stage1.yml').read_text()
- assert 'run-id: 40470531009' in source
+ assert 'run-id: 40471554619' in source
  assert '--python-precision' not in source and '--refine-failed' not in source
  assert '--reuse original-evidence/mirt-stage1 --expand' in source
  assert 'tests/test_mirt_stage1.py tests/test_mirt_multidim_ui.py' in source
+
+
+def test_incomplete_or_rejected_baseline_cannot_trigger_recalibration(tmp_path,monkeypatch):
+ from validation.mirt_stage1 import compare
+ def forbidden(*a,**kw):raise AssertionError('Baseline evidence caused new calibration/evaluation')
+ for name in ('run','precision','recover'):monkeypatch.setattr(compare,name,forbidden)
+ with pytest.raises(FileNotFoundError):compare.reuse_accepted(['missing'],tmp_path,tmp_path/'out')
+ source=tmp_path/'failed';source.mkdir();(source/'report.json').write_text(json.dumps(dict(status='FAIL')))
+ with pytest.raises(ValueError,match='accepted evidence'):compare.reuse_accepted(['failed'],tmp_path,tmp_path/'out')
