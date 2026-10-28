@@ -33,8 +33,11 @@ parametreleri birbiri yerine geçirilmez. NRM kategori eğimleri sıralı değil
 
 Her örnekte seed, N/k, üretici parametreler, kategori anlamı, NumPy/mirt sürümü
 ve gerektiğinde boyut yükleri/korelasyonları kaydedilir. Veriler ihtiyaç halinde
-üretilir; açılışta bütün matrisler veya kalibrasyonlar oluşturulmaz. İndirme
-önbelleği yalnız sekiz sentetik örneğe ait byte dizilerini tutar; kişisel veri
+üretilir; açılışta bütün matrisler veya kalibrasyonlar oluşturulmaz.
+Çekilişlerde yetenek RNG'si yeniden başlatılmaz: yanıt akışı
+`SeedSequence([call_seed,104729])` ile ayrılır; grup/madde seed ofsetleri de
+kaynakta ve üretim bilgisinde açıkça belirtilir.
+İndirme önbelleği yalnız sekiz sentetik örneğe ait byte dizilerini tutar; kişisel veri
 global önbelleğe alınmaz. Her `materialize` çağrısı yeni ve düzenlenebilir
 frame döndürür. Büyük statik veri eklenmez.
 

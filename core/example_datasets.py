@@ -107,7 +107,7 @@ def available(page):
     if model in IRT_MODELS:return [d for d in datasets if d.family=='irt' and d.model==model]
     if page=='MTK: Çok Kategorili B14':return [d for d in datasets if d.family=='irt' and d.model in ('GRM','PCM','GPCM','NRM')]
     if page=='Boyutluluk ve Faktör Analizi':return [d for d in datasets if d.family=='factor' or d.family=='irt' and d.model in ('2PL','GRM')]
-    return [d for d in datasets if d.family in ('abc',) or d.family=='irt' and d.model in ('2PL','GRM')]
+    return [d for d in datasets if d.family in ('abc',) or d.family=='irt' and d.model in ('2PL','GRM')] if page in analysis_catalog() else []
 
 
 def _parameters(spec,k,dims=1):
@@ -145,7 +145,8 @@ def _generate(dataset_id):
     import mirt
     spec=registry()[dataset_id];rng=np.random.default_rng(spec.seed)
     metadata={**asdict(spec),'synthetic':True,'status':'GENERATED / schema checked; calibration not certified',
-              'generator_version':'1','numpy':np.__version__,'mirt':'1.2.0',
+              'generator_version':'2','numpy':np.__version__,'mirt':'1.2.0',
+              'response_rng':'Independent SeedSequence([call_seed, 104729]); group/item call_seed offsets in generator',
               'latent_distribution':'N(0,I); independent factors',
               'category_semantics':'NRM nominal; binary 0/1; ordinal 0–3; G/factor metric score'}
     key={}; settings={}; group='grup'; person='ogrenci_id'
@@ -230,6 +231,7 @@ def _generate(dataset_id):
             if spec.k==4:
                 key=dict(zip(items,'ACEB'))
                 df.iloc[:3]=[['A','C','E','B'],['B','C','D','A'],['A','D','E','B']]
+                metadata['fixed_teaching_rows']=3  # Prescribed illustration, not a pure IRT calibration fixture.
         if spec.family=='missing':
             mask=rng.random(df.shape)<(.03,.10,.20)[spec.level]
             df=df.astype(float).mask(mask);metadata.update(mechanism='MCAR by independent Bernoulli mask',missing_rate=(.03,.10,.20)[spec.level])
@@ -243,11 +245,13 @@ def _generate(dataset_id):
 
 def _simulate(model,n,k,theta,params,seed):
     import mirt
+    # Do not restart the latent-theta RNG for the uniform response draws.
+    response_seed=int(np.random.SeedSequence([int(seed),104729]).generate_state(1)[0])
     if model=='RSM':
         from mirt.models import RatingScaleModel
         item=RatingScaleModel(k,4).set_parameters(difficulty=params['difficulty'],thresholds=params['thresholds'][0])
-        return mirt.simdata(item,n_persons=n,theta=theta,seed=seed)
-    return mirt.simdata(model,n_persons=n,n_items=k,n_categories=4,theta=theta,seed=seed,**params)
+        return mirt.simdata(item,n_persons=n,theta=theta,seed=response_seed)
+    return mirt.simdata(model,n_persons=n,n_items=k,n_categories=4,theta=theta,seed=response_seed,**params)
 
 
 def scored(bundle):

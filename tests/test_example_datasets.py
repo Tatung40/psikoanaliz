@@ -32,6 +32,20 @@ def test_registry_covers_actual_routes_and_has_three_distinct_levels():
             assert sorted(d.level for d in group)==[0,1,2]
             assert len({(d.n,d.k,d.seed) for d in group})==3
     assert len([d for d in r if d.family=='g'])==15
+    assert not E.available('unsupported') and not E.available('11. Formüller ve Yöntemler')
+
+
+def test_response_and_latent_rng_streams_are_distinct(monkeypatch):
+    import mirt
+    actual=mirt.simdata;seeds=[]
+    def record(*args,**kwargs):
+        seeds.append(kwargs['seed'])
+        return actual(*args,**kwargs)
+    monkeypatch.setattr(mirt,'simdata',record)
+    d=next(d for d in E.registry().values() if d.model=='2PL' and d.family=='irt')
+    E.materialize(d.id)
+    assert seeds==[int(np.random.SeedSequence([d.seed,104729]).generate_state(1)[0])]
+    assert seeds[0]!=d.seed
 
 
 @pytest.mark.parametrize('dataset_id',list(E.registry()))
