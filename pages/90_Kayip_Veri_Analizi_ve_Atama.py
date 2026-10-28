@@ -6,18 +6,23 @@ from core.reproducible import begin as begin_code_capture, finish as finish_code
 from ui.reproducible_view import render as render_reproducible_code
 from core.missing_imputation import diagnose, apply, METHODS
 from core.missing_decision import assess_necessity
+from core.python_mirt_dif import fingerprint
+from ui.example_datasets_view import render as render_examples, own_file_changed
 
+render_examples('Eksik Veri ve Atama')
 begin_code_capture("Eksik Veri ve Atama", globals())
 
 st.title("🧩 Kayıp Veri Analizi ve Atama")
 st.caption("PsikoAnaliz • scikit-learn destekli • yalnızca seçilen madde sütunlarında işlem yapar")
 st.info("MCAR/MAR/MNAR mekanizması yalnızca kayıp oranlarından kesin olarak belirlenemez. "
         "MTK için eksikleri olabilirlikte modellemek, tek atamadan daha uygun olabilir.")
-source = st.file_uploader("CSV veya Excel yükleyin", type=["csv","xlsx"], key="missing_lab_file")
-if source is not None:
-    if source.name.lower().endswith(".csv"):
+source = st.file_uploader("CSV veya Excel yükleyin", type=["csv","xlsx"], key="missing_lab_file",
+                          on_change=own_file_changed,args=('missing_lab_file',))
+df = st.session_state.get('raw_df')
+if source is not None or df is not None:
+    if source is not None and source.name.lower().endswith(".csv"):
         df = pd.read_csv(source)
-    else:
+    elif source is not None:
         df = pd.read_excel(source)
     defaults = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c]) and
                 c.lower() not in ("id", "participant_id", "score_total")]
@@ -57,6 +62,10 @@ if source is not None:
             rounding = False
             if report["binary"] and method in ("median","knn"):
                 rounding = st.checkbox("0.5 eşiğiyle 0/1 yuvarlamasını kabul ediyorum")
+            signature=fingerprint(df,(tuple(cols),method,int(neighbors),rounding))
+            if st.session_state.get('missing_lab_signature')!=signature:
+                st.session_state.pop('missing_lab_result',None)
+                st.session_state['missing_lab_signature']=signature
             st.caption("Tek atama standart hataları küçümseyebilir. KNN/medyan çoklu atama değildir.")
             if st.button("▶ Seçili yöntemi uygula", type="primary", disabled=(report["missing"] == 0)):
                 result = apply(df,cols,method,neighbors=int(neighbors),binary_round=rounding)

@@ -2,6 +2,8 @@
   {
     "screen": "app.py",
     "core_imports": [
+      "core.answer_keys.read_key",
+      "core.answer_keys.validate_key",
       "core.data_processing.check_duplicate_participants",
       "core.data_processing.handle_missing_data",
       "core.data_processing.inspect_dataset",
@@ -68,6 +70,13 @@
       "core.dimensionality",
       "core.local_fit",
       "core.python_mirt_dif.fingerprint"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
+    "screen": "ui/example_datasets_view.py",
+    "core_imports": [
+      "core.example_datasets"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
@@ -244,7 +253,8 @@
       "core.missing_decision.assess_necessity",
       "core.missing_imputation.METHODS",
       "core.missing_imputation.apply",
-      "core.missing_imputation.diagnose"
+      "core.missing_imputation.diagnose",
+      "core.python_mirt_dif.fingerprint"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   }

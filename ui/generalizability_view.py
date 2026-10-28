@@ -104,7 +104,8 @@ def render(data, item_cols=()):
         if st.session_state.get('gt_key') != key:
             st.session_state.pop('gt_result', None)
             st.session_state['gt_key'] = key
-        if st.button('G ve D çalışmalarını çalıştır', type='primary', key='gt_run'):
+        example_run = st.session_state.pop('_example_g_run', False)
+        if st.button('G ve D çalışmalarını çalıştır', type='primary', key='gt_run') or example_run:
             st.session_state.pop('gt_result', None)
             try:
                 with st.spinner('G/D çalışmaları hesaplanıyor…'):
