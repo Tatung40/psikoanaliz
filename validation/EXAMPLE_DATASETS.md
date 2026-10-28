@@ -56,6 +56,11 @@ Her birinde p=6/12/20; i=3/4/5 ve r=2/3/4 (desende varsa).
 İleri örnekte madde SD'si de değişir. Birey SD=3, hata SD=.6; uzun
 dengeli çapraz/yuvalanmış tablolar üretilir. Yuvalı kimlikler ebeveynler arasında
 benzersizdir. D senaryoları her yüzey için mevcut ve +1 düzeyi içerir; p sabittir.
+Yuvalı alt-yüzey etkileri her ebeveyn için ayrı bağımsız çekilir; yalnız kimlik
+etiketlerini değiştirip aynı etki vektörü yeniden kullanılmaz. Gerçekleşen etki
+tabloları üretim JSON'unda saklanır. MIRT yükleri tam sütun rankı için sınanır;
+bifaktörde genel/özgül yük oranları maddeye göre değişir. Bu gerekli kontroller
+küresel tanımlanabilirlik veya bilimsel sertifika iddiası değildir.
 15 örneğin tamamı **gerçek GeneralizIT 0.1.2 G ve D API'leriyle** hedefli testte
 hesaplanır. Bu **LIBRARY TESTED** durumudur, yeni bağımsız sayısal sertifika
 değildir. Sabit/dengesiz/eksik desenler eklenmez. p×i geniş türevi sunulur;

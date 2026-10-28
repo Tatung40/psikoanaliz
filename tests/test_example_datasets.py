@@ -56,6 +56,8 @@ def test_deterministic_schema_real_loader_and_no_shared_mutation(dataset_id):
     assert len(frame)==d.n and frame.columns.is_unique
     assert all(c in frame for c in items)
     assert first['metadata']['synthetic'] and first['metadata']['seed']==d.seed
+    if d.family=='mirt':
+        assert np.linalg.matrix_rank(np.asarray(first['metadata']['loadings']))==d.dimensions
     actual=E.input_frame(first)
     pd.testing.assert_frame_equal(actual,frame,check_dtype=False,rtol=1e-14,atol=1e-14)
     if d.family!='g':assert frame[first['id']].is_unique and frame[first['group']].nunique()==2
@@ -70,6 +72,14 @@ def test_all_fifteen_real_generalizit_g_and_d(dataset_id,record_property):
     b=E.materialize(dataset_id);m=b['metadata'];d=b['spec']
     _,counts=prepare(b['data'],d.design,m['columns'],'score')
     assert counts==m['counts']
+    if d.design=='p x (r:i)':
+        effects=np.asarray(m['realized_effects']['r'])
+        assert effects.shape==(counts['i'],counts['r'])
+        assert not np.array_equal(effects[0],effects[1])
+    if d.design=='p x (i:r)':
+        effects=np.asarray(m['realized_effects']['i'])
+        assert effects.shape==(counts['r'],counts['i'])
+        assert not np.array_equal(effects[0],effects[1])
     out=analyze(b['data'],d.design,m['columns'],'score',m['scenarios'])
     assert out['g'].shape==(1,2) and len(out['d']) in (2,4)
     assert np.isfinite(out['g'].to_numpy()).all()

@@ -148,7 +148,7 @@ def _generate(dataset_id):
     import mirt
     spec=registry()[dataset_id];rng=np.random.default_rng(spec.seed)
     metadata={**asdict(spec),'synthetic':True,'status':'GENERATED / schema checked; calibration not certified',
-              'generator_version':'2','numpy':np.__version__,'mirt':'1.2.0',
+              'generator_version':'3','numpy':np.__version__,'mirt':'1.2.0',
               'response_rng':'Independent SeedSequence([call_seed, 104729]); group/item call_seed offsets in generator',
               'latent_distribution':'N(0,I); independent factors',
               'category_semantics':'NRM nominal; binary 0/1; ordinal 0–3; G/factor metric score'}
@@ -157,11 +157,16 @@ def _generate(dataset_id):
         p,i,r=((6,3,2),(12,4,3),(20,5,4))[spec.level]
         facets=DESIGNS[spec.design]; n_i=i if 'i' in facets else 1;n_r=r if 'r' in facets else 1
         vp=rng.normal(0,3,p);vi=rng.normal(0,.6+spec.level*.2,n_i);vr=rng.normal(0,.5,n_r)
+        # Distinct nested IDs must also have independent child effects per parent.
+        if spec.design=='p x (r:i)':vr=rng.normal(0,.5,(n_i,n_r))
+        if spec.design=='p x (i:r)':vi=rng.normal(0,.6+spec.level*.2,(n_r,n_i))
         records=[]
         for pp in range(p):
             for ii in range(n_i):
                 for rr in range(n_r):
-                    row={'p':f'P{pp+1:03d}','score':20+vp[pp]+vi[ii]+vr[rr]+rng.normal(0,.6)}
+                    item_effect=vi[rr,ii] if vi.ndim==2 else vi[ii]
+                    rater_effect=vr[ii,rr] if vr.ndim==2 else vr[rr]
+                    row={'p':f'P{pp+1:03d}','score':20+vp[pp]+item_effect+rater_effect+rng.normal(0,.6)}
                     if 'i' in facets:row['i']=f'I{ii+1}' if spec.design!='p x (i:r)' else f'R{rr+1}_I{ii+1}'
                     if 'r' in facets:row['r']=f'R{rr+1}' if spec.design!='p x (r:i)' else f'I{ii+1}_R{rr+1}'
                     records.append(row)
@@ -173,6 +178,7 @@ def _generate(dataset_id):
                   **{f'gt_d_{spec.design}_{f}':','.join(map(str,v)) for f,v in scenarios.items() if f!='p'}}
         metadata.update(generative_sd={'p':3.,'i':.6+spec.level*.2,'r':.5,'residual':.6},
                         counts=counts,scenarios=scenarios,columns={f:f for f in facets},
+                        realized_effects={'p':vp.tolist(),'i':vi.tolist(),'r':vr.tolist()},
                         status='LIBRARY TESTED — all 15 G/D examples exercised by regression; NOT CERTIFIED')
     elif spec.family=='factor':
         z=rng.normal(size=(spec.n,2));loads=np.zeros((spec.k,2));loads[:spec.k//2,0]=.8;loads[spec.k//2:,1]=.8
@@ -205,7 +211,8 @@ def _generate(dataset_id):
             # Public simulation API; simple structure, no new calibration algorithm.
             block=np.minimum(np.arange(k)*dims//k,dims-1)
             if spec.model=='Bifactor':
-                loads=np.zeros((k,dims));loads[:,0]=.8;loads[np.arange(k),1+np.arange(k)*(dims-1)//k]=.7
+                loads=np.zeros((k,dims));loads[:,0]=np.linspace(.7,1.2,k)
+                loads[np.arange(k),1+np.arange(k)*(dims-1)//k]=np.resize([.5,.9,.65,.8],k)
             else:
                 loads=np.zeros((k,dims));loads[np.arange(k),block]=params.get('discrimination',np.ones(k))
             x=np.empty((spec.n,k),int)
