@@ -106,7 +106,7 @@ def guide(page,bundle=None):
         st.write(text)
         st.write('CSV/XLSX doğrudan; TXT/TSV sekmeyle ayrılmış metindir (Veri Yükleme: otomatik ayırıcı veya sekme). '
                  'Ondalık için nokta, benzersiz başlıklar kullanın. .sav/.xls desteği isteğe bağlı paket gerektirir; bu örnekler o biçimlerde üretilmez.')
-        st.code('DOĞRU: ogrenci_id,M01,M02,grup\nO001,1,0,Referans\nYANLIŞ: kimlik ve toplam puanı madde olarak seçmek',language='text')
+        st.text('GENİŞ İKİLİ VERİ ÖRNEĞİ\nDOĞRU: ogrenci_id,M01,M02,grup\nO001,1,0,Referans\nYANLIŞ: kimlik ve toplam puanı madde olarak seçmek')
         if spec.family=='missing':st.caption('Örnek kayıp mekanizması üretimde MCAR olarak tanımlıdır; gerçek veride MCAR/MAR/MNAR yalnız kayıp oranından belirlenemez.')
 
 
