@@ -97,6 +97,7 @@ def available(page):
     if 'DIF' in page:
         choices=[d for d in datasets if d.family=='dif']
         if page=='MTK: GRM Formel DIF':choices=[d for d in choices if d.model=='GRM']
+        if page=='MTK: Python mirt DIF':choices=[d for d in choices if d.model!='RSM']
         if page in ('MTK: 3PL/4PL Bootstrap DIF','MTK: Çok Modelli DIF Taraması'):choices=[d for d in choices if d.model=='2PL']
         if page=='MTK: Çok Kategorili Formel DIF':choices=[d for d in choices if d.model in ('PCM','GPCM','RSM','NRM')]
         if page=='MTK: Gözlenen Puan DIF':choices=[d for d in choices if d.model in ('2PL','GRM')]
@@ -107,6 +108,8 @@ def available(page):
     if model in IRT_MODELS:return [d for d in datasets if d.family=='irt' and d.model==model]
     if page=='MTK: Çok Kategorili B14':return [d for d in datasets if d.family=='irt' and d.model in ('GRM','PCM','GPCM','NRM')]
     if page=='Boyutluluk ve Faktör Analizi':return [d for d in datasets if d.family=='factor' or d.family=='irt' and d.model in ('2PL','GRM')]
+    if page in ('Yerel Bağımsızlık ve Madde Uyumu','MTK: İkili Rapor','MTK: Karşılaştırma'):
+        return [d for d in datasets if d.family=='abc' or d.family=='irt' and d.model=='2PL']
     return [d for d in datasets if d.family in ('abc',) or d.family=='irt' and d.model in ('2PL','GRM')] if page in analysis_catalog() else []
 
 
@@ -235,7 +238,8 @@ def _generate(dataset_id):
         if spec.family=='missing':
             mask=rng.random(df.shape)<(.03,.10,.20)[spec.level]
             df=df.astype(float).mask(mask);metadata.update(mechanism='MCAR by independent Bernoulli mask',missing_rate=(.03,.10,.20)[spec.level])
-        if model=='NRM':settings['python_mirt_nominal_labels']='A,B,C,D'
+        if model=='NRM':
+            settings.update(python_mirt_nominal_labels='A,B,C,D',pmd_labels='A,B,C,D',md_labels='A,B,C,D')
     if spec.family!='g':
         df.insert(0,person,[f'O{i+1:04d}' for i in range(len(df))])
         df[group]=np.where(np.arange(len(df))<len(df)//2,'Referans','Odak')

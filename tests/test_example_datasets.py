@@ -145,5 +145,9 @@ def test_guide_and_registry_are_current_and_nominal_not_ordinal():
     from ui.example_datasets_view import guide
     assert callable(guide)
     assert not any(d.model=='RSM' for d in E.available('MTK: Python mirt NRM'))
+    from core.python_mirt_dif import MODELS
+    assert all(d.model in MODELS for d in E.available('MTK: Python mirt DIF'))
+    for page in ('Yerel Bağımsızlık ve Madde Uyumu','MTK: İkili Rapor','MTK: Karşılaştırma'):
+        assert all(d.model in ('ABCDE','2PL') for d in E.available(page))
     for d in E.registry().values():
         if d.family=='dif' and d.model in ('PCM','RSM'):assert d.effect!='nonuniform'

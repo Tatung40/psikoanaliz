@@ -79,6 +79,9 @@ CSV/XLSX/TXT/TSV indir → **Bu Örnekle Analiz Yap** gerçek `load_dataset`
 otomatik KTK sayfaları mevcut şekilde çalışır. Diğer kestirimler mevcut açık
 çalıştır düğmesine bırakılır; örnek seçimi sonsuz fit/retry başlatmaz.
 Tüm örneklerde parametreler düzenlenebilir ve bilimsel kapılar geçerlidir.
+Python mirt DIF listesinde desteklenmeyen RSM bulunmaz; ikili rapor/karşılaştırma
+ve yerel S-X² ekranlarında sıralı örnekler önerilmez. Nominal kategori kod sırası
+Python mirt, DIF ve MIRT ekranlarında açıkça A/B/C/D olarak eşlenir.
 
 Anahtarlar madde adına göre doğrulanır; eksik/fazla/yinelenen ad, yinelenen
 başlık, A–E dışı seçenek veya sayısal ham veri güvenli biçimde reddedilir.

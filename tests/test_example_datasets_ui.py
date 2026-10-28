@@ -51,16 +51,21 @@ def test_abc_20_loads_scores_manual_key_change_clears_all_results():
     assert at.session_state['group_col'] in at.session_state['scored_df']
 
 
-def test_new_example_clears_previous_models_keys_and_downloads():
-    page='MTK: Python mirt NRM';at=app(page)
+@pytest.mark.parametrize('page,label_key',[
+    ('MTK: Python mirt NRM','python_mirt_nominal_labels'),
+    ('MTK: Python mirt DIF','pmd_labels'),
+    (E.M_PAGE,'md_labels'),
+])
+def test_new_example_clears_previous_models_keys_and_downloads(page,label_key):
+    at=app(page)
     at.session_state['answer_key']={'OLD':'A'}
     at.session_state['python_mirt_cache']={'old':True}
     at.session_state['scored_df']=pd.DataFrame({'OLD':[1,1,1]})
-    d=E.available(page)[0];choose(at,page,d)
+    d=next(d for d in E.available(page) if d.model=='NRM');choose(at,page,d)
     assert not at.error
     assert at.session_state['answer_key']=={}
     assert 'python_mirt_cache' not in at.session_state
-    assert at.text_input(key='python_mirt_nominal_labels').value=='A,B,C,D'
+    assert at.text_input(key=label_key).value=='A,B,C,D'
     assert not any(b.key=='python_mirt_parameters_csv_NRM' for b in at.get('download_button'))
 
 
