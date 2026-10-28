@@ -13,6 +13,8 @@ import streamlit as st
 
 from core.reproducible import begin as begin_code_capture, finish as finish_code_capture, instrument as instrument_code_capture, public_call as record_public_call
 from ui.reproducible_view import render as render_reproducible_code
+from ui.example_datasets_view import render as render_examples, own_file_changed, key_changed, discard_results
+from core.answer_keys import validate_key, read_key
 
 # Core Modülleri
 from core.data_processing import (
@@ -293,6 +295,10 @@ with st.sidebar:
 # =============================================================================
 # SAYFA 1: ANA SAYFA
 # =============================================================================
+# Shared lazy teaching-data library precedes every routed screen.
+render_examples(selected_page)
+if st.session_state.pop("_example_loaded_notice", False):
+    st.success("Sentetik örnek gerçek yükleyiciye aktarıldı; alanlar eşlendi. Analiz ayarlarını kontrol edin.")
 begin_code_capture(selected_page, globals(), st.session_state.get("_repro_history"))
 
 if st.session_state.pop("_session_restored", False) and st.session_state.raw_df is None:
@@ -344,8 +350,9 @@ elif selected_page == "2. Veri Yükleme":
     with tab_upload:
         uploaded_file = st.file_uploader(
             "Veri dosyanızı seçin (CSV, Excel .xlsx/.xls veya SPSS .sav)",
-            type=["csv", "xlsx", "xls", "sav"],
-            key=f"private_file_upload_{st.session_state.get('privacy_upload_nonce', 0)}"
+            type=["csv", "xlsx", "xls", "sav", "txt", "tsv"],
+            key=f"private_file_upload_{st.session_state.get('privacy_upload_nonce', 0)}",
+            on_change=own_file_changed, args=(f"private_file_upload_{st.session_state.get('privacy_upload_nonce', 0)}",)
         )
 
         col_enc, col_sep = st.columns(2)
@@ -360,58 +367,14 @@ elif selected_page == "2. Veri Yükleme":
             file_ext = uploaded_file.name.split(".")[-1].lower()
 
             try:
-                df_loaded, meta = load_dataset(uploaded_file, file_type=file_ext, encoding=enc_param, delimiter=sep_param)
+                df_loaded, meta = load_dataset(uploaded_file, file_type="csv" if file_ext in ("txt","tsv") else file_ext, encoding=enc_param, delimiter=sep_param)
                 st.session_state.raw_df = df_loaded
                 st.success(f"✅ '{uploaded_file.name}' başarıyla yüklendi! ({len(df_loaded)} satır, {len(df_loaded.columns)} sütun)")
             except Exception as e:
                 st.error(f"Dosya okunurken hata oluştu: {str(e)}")
 
     with tab_sample:
-        st.markdown("Uygulamanın yeteneklerini test etmek için hazır sentetik psikometrik veri setlerini yükleyebilirsiniz:")
-        col_s1, col_s2, col_s3 = st.columns(3)
-
-        sample_dir = os.path.join(os.path.dirname(__file__), "sample_data")
-
-        with col_s1:
-            if st.button("📘 1. Çoktan Seçmeli Ham Veri (30 Madde, N=350)"):
-                csv_path = os.path.join(sample_dir, "coktan_secmeli_ham.csv")
-                key_path = os.path.join(sample_dir, "cevap_anahtari.csv")
-                if os.path.exists(csv_path):
-                    df_mc = pd.read_csv(csv_path)
-                    st.session_state.raw_df = df_mc
-                    st.session_state.id_col = "Ogrenci_ID"
-                    st.session_state.group_col = "Cinsiyet"
-                    st.session_state.item_cols = [c for c in df_mc.columns if c.startswith("M_")]
-                    if os.path.exists(key_path):
-                        df_k = pd.read_csv(key_path)
-                        st.session_state.answer_key = dict(zip(df_k["Madde"], df_k["Dogru_Cevap"]))
-                    st.success("Çoktan seçmeli ham veri seti ve cevap anahtarı yüklendi!")
-
-        with col_s2:
-            if st.button("📗 2. Önceden Puanlanmış İkili Veri (25 Madde, N=300)"):
-                csv_path = os.path.join(sample_dir, "ikili_puanlanmis.csv")
-                if os.path.exists(csv_path):
-                    df_bin = pd.read_csv(csv_path)
-                    st.session_state.raw_df = df_bin
-                    st.session_state.scored_df = df_bin.copy()
-                    st.session_state.id_col = "Katilimci_ID"
-                    st.session_state.group_col = "Grup"
-                    st.session_state.item_cols = [c for c in df_bin.columns if c.startswith("Item_")]
-                    st.session_state.is_dichotomous = True
-                    st.success("0/1 puanlanmış ikili veri seti yüklendi!")
-
-        with col_s3:
-            if st.button("📙 3. Likert Tutum Ölçeği (20 Madde, N=250)"):
-                csv_path = os.path.join(sample_dir, "likert_olcek.csv")
-                if os.path.exists(csv_path):
-                    df_lik = pd.read_csv(csv_path)
-                    st.session_state.raw_df = df_lik
-                    st.session_state.scored_df = df_lik.copy()
-                    st.session_state.id_col = "ID"
-                    st.session_state.group_col = "Fakulte"
-                    st.session_state.item_cols = [c for c in df_lik.columns if c.startswith("Likert_")]
-                    st.session_state.is_dichotomous = False
-                    st.success("Likert tipi ölçek veri seti yüklendi!")
+        st.info("Tüm analizlere uygun örnekler ve CSV/XLSX/TSV indirmeleri sayfanın üstündeki ortak Örnek Veri Setleri bölümündedir.")
 
     # Veri Önizleme ve Değişken Seçimi
     if st.session_state.raw_df is not None:
@@ -440,7 +403,7 @@ elif selected_page == "2. Veri Yükleme":
                 ["Çoktan Seçmeli Ham Yanıtlar (Cevap anahtarı ile puanlanacak)", 
                  "Önceden Puanlanmış İkili Veri (0 ve 1)", 
                  "Çok Kategorili Derecelendirme (Likert 1-5, Rubrik vb.)"],
-                index=0 if len(st.session_state.answer_key) > 0 else (0 if not st.session_state.is_dichotomous else 1)
+                index=0 if len(st.session_state.answer_key) > 0 else (1 if st.session_state.is_dichotomous else 2)
             )
 
         # Madde Sütunlarını Seçme
@@ -494,10 +457,26 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
                 if st.button("Toplu Anahtarı Uygula") and batch_key_input:
                     tokens = [t.strip().upper() for t in batch_key_input.split(",") if t.strip()]
                     if len(tokens) == len(item_cols):
-                        st.session_state.answer_key = dict(zip(item_cols, tokens))
-                        st.success("Tüm maddelerin cevap anahtarı başarıyla güncellendi!")
+                        try:
+                            parsed_key = validate_key(dict(zip(item_cols, tokens)),item_cols,df)
+                            discard_results(st.session_state)
+                            st.session_state.answer_key = parsed_key
+                            for item,value in parsed_key.items():st.session_state["key_"+item]=value
+                        except ValueError as exc:
+                            st.error(str(exc))
+                        else:st.success("Tüm maddelerin cevap anahtarı başarıyla güncellendi!")
                     else:
                         st.error(f"Girdiğiniz anahtar sayısı ({len(tokens)}) madde sayısına ({len(item_cols)}) eşit değil.")
+
+            key_file = st.file_uploader("Ayrı cevap anahtarı (CSV/XLSX: madde, dogru_cevap)", type=["csv","xlsx"], key="answer_key_file")
+            if st.button("Anahtar dosyasını uygula", key="answer_key_import") and key_file is not None:
+                try:
+                    parsed_key = read_key(key_file.getvalue(), key_file.name.rsplit(".",1)[-1].lower(), item_cols, df)
+                    discard_results(st.session_state)
+                    st.session_state.answer_key = parsed_key
+                    for item,value in parsed_key.items():st.session_state["key_"+item]=value
+                    st.success("Cevap anahtarı madde adlarıyla eşleştirildi.")
+                except (ValueError,TypeError) as exc:st.error(str(exc))
 
             # Madde bazında anahtarlar
             st.markdown("##### Madde Bazında Doğru Cevaplar:")
@@ -506,8 +485,8 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
 
             for idx, item in enumerate(item_cols):
                 with k_cols_ui[idx % len(k_cols_ui)]:
-                    cur_val = str(updated_key.get(item, "A"))
-                    new_val = st.text_input(f"{item}", value=cur_val, key=f"key_{item}", max_chars=5).strip().upper()
+                    cur_val = str(updated_key.get(item, ""))
+                    new_val = st.text_input(f"{item}", value=cur_val, key=f"key_{item}", max_chars=5, on_change=key_changed).strip().upper()
                     updated_key[item] = new_val
 
             st.session_state.answer_key = updated_key
@@ -517,6 +496,11 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
                 missing_zero = st.checkbox("Boş bırakılan / cevapsız maddeleri 0 olarak puanla (Başarı testleri için standart)", value=True)
             with col_sc2:
                 if st.button("🎯 Veriyi Cevap Anahtarına Göre Puanla", type="primary"):
+                    try:
+                        validate_key(st.session_state.answer_key,item_cols,df)
+                    except ValueError as exc:
+                        st.error(str(exc))
+                        st.stop()
                     scored, diag = score_dichotomous(
                         df,
                         item_columns=item_cols,
@@ -524,6 +508,8 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
                         missing_as_zero=missing_zero,
                         id_column=st.session_state.id_col
                     )
+                    if st.session_state.group_col in df.columns:
+                        scored[st.session_state.group_col] = df[st.session_state.group_col]
                     st.session_state.scored_df = scored
                     st.session_state.is_dichotomous = True
                     st.success(f"Puanlama başarıyla tamamlandı! ({len(item_cols)} madde puanlandı)")
