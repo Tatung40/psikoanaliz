@@ -263,7 +263,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 persons=pd.DataFrame({'Birey':tables['persons'].Birey,'Ham puan':x.to_numpy().sum(1),
                     'Yetenek (θ)':tables['persons']['θ'],'SH (θ)':tables['persons']['Posterior SD']})
             else:persons=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
-            inference,reason=parameter_inference(saved['outcome'].fit,model,cols)
+            inference,reason=parameter_inference(saved['outcome'].fit,model,cols,getattr(saved['outcome'],'estimation',None))
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
             st.warning(f'Ek çıktılar üretilemedi: {exc}');return
         st.markdown('#### Madde parametresi SH ve %95 Wald güven aralığı')

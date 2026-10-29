@@ -1,0 +1,280 @@
+{
+  "design": {
+    "cells": [
+      [
+        "3PL",
+        "MAP",
+        3000,
+        30
+      ],
+      [
+        "4PL",
+        "MAP",
+        3000,
+        30
+      ],
+      [
+        "3PL",
+        "ML",
+        3000,
+        30
+      ],
+      [
+        "4PL",
+        "ML",
+        3000,
+        30
+      ],
+      [
+        "3PL",
+        "ML",
+        10000,
+        30
+      ]
+    ],
+    "replications": {
+      "N3000": 200,
+      "N10000": 100
+    },
+    "seed": 20261030,
+    "truth": "validation/irt_3pl4pl_root_cause.truth",
+    "theta": "N(0, 1)",
+    "fit": "fit_python_mirt screen defaults (EM, 21 GH nodes, tol 1e-4, max_iter 500); MAP = library default priors",
+    "ci": "95% Wald from core.irt_binary_inference.parameter_inference (no evidence gating)"
+  },
+  "criteria": {
+    "convergence_rate_min": 0.99,
+    "withheld_rate_max": 0.05,
+    "coverage_abs_error_max": 0.02,
+    "rationale": "Declared before running; same coverage tolerance as p6_binary_se. With >= 100 x 30 intervals the MC SE of a 95% coverage is <= .004. Withheld intervals are excluded from coverage, so a high withheld rate would make coverage a selected subset."
+  },
+  "results": [
+    {
+      "model": "3PL",
+      "estimation": "MAP",
+      "N": 3000,
+      "items": 30,
+      "replications": 200,
+      "converged": 200,
+      "se_refused": 0,
+      "a": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": -0.022075210484161688,
+        "rmse": 0.13187593287308122,
+        "coverage": 0.9501666666666667,
+        "coverage_mc_se": 0.00280921021588578
+      },
+      "b": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.0035233092389872762,
+        "rmse": 0.13339671739152997,
+        "coverage": 0.9665,
+        "coverage_mc_se": 0.0023229919643999336
+      },
+      "c": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.00015980285817102476,
+        "rmse": 0.04700750680509657,
+        "coverage": 0.9681666666666666,
+        "coverage_mc_se": 0.002266420534022105
+      }
+    },
+    {
+      "model": "4PL",
+      "estimation": "MAP",
+      "N": 3000,
+      "items": 30,
+      "replications": 200,
+      "converged": 200,
+      "se_refused": 0,
+      "a": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.03611575235461893,
+        "rmse": 0.17648951605506077,
+        "coverage": 0.994,
+        "coverage_mc_se": 0.0009969954864491619
+      },
+      "b": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": -0.0194477401321975,
+        "rmse": 0.17223244026906692,
+        "coverage": 0.9705,
+        "coverage_mc_se": 0.0021844049532996385
+      },
+      "c": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.005078269846577936,
+        "rmse": 0.04458604176630111,
+        "coverage": 0.9806666666666667,
+        "coverage_mc_se": 0.0017776180483798881
+      },
+      "d": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": -0.017959759608171366,
+        "rmse": 0.036356100391466424,
+        "coverage": 0.9793333333333333,
+        "coverage_mc_se": 0.001836643476360959
+      }
+    },
+    {
+      "model": "3PL",
+      "estimation": "ML",
+      "N": 3000,
+      "items": 30,
+      "replications": 200,
+      "converged": 200,
+      "se_refused": 0,
+      "a": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.018062868173713182,
+        "rmse": 0.15877082813091173,
+        "coverage": 0.9295,
+        "coverage_mc_se": 0.0033047881929104024
+      },
+      "b": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.008456147916847886,
+        "rmse": 0.22970553174671948,
+        "coverage": 0.8271666666666667,
+        "coverage_mc_se": 0.004881290338667673
+      },
+      "c": {
+        "intervals": 6000,
+        "withheld_rate": 0.12816666666666668,
+        "mean_bias": 0.0006461570668440156,
+        "rmse": 0.08171368283225804,
+        "coverage": 0.9357675396673676,
+        "coverage_mc_se": 0.0033897596575126797
+      }
+    },
+    {
+      "model": "4PL",
+      "estimation": "ML",
+      "N": 3000,
+      "items": 30,
+      "replications": 200,
+      "converged": 200,
+      "se_refused": 0,
+      "a": {
+        "intervals": 6000,
+        "withheld_rate": 0.001,
+        "mean_bias": 0.17862202201770688,
+        "rmse": 0.5037836889890412,
+        "coverage": 0.9364364364364365,
+        "coverage_mc_se": 0.0031512648193604944
+      },
+      "b": {
+        "intervals": 6000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.012820886230725397,
+        "rmse": 0.29251638726406076,
+        "coverage": 0.8151666666666667,
+        "coverage_mc_se": 0.0050111537630606615
+      },
+      "c": {
+        "intervals": 6000,
+        "withheld_rate": 0.17483333333333334,
+        "mean_bias": 0.010149675592860237,
+        "rmse": 0.1024456830136913,
+        "coverage": 0.8840638254898,
+        "coverage_mc_se": 0.0045499312033024175
+      },
+      "d": {
+        "intervals": 6000,
+        "withheld_rate": 0.2813333333333333,
+        "mean_bias": -0.01134151920176319,
+        "rmse": 0.06813155626897752,
+        "coverage": 0.8687384044526901,
+        "coverage_mc_se": 0.005142496133651504
+      }
+    },
+    {
+      "model": "3PL",
+      "estimation": "ML",
+      "N": 10000,
+      "items": 30,
+      "replications": 100,
+      "converged": 100,
+      "se_refused": 0,
+      "a": {
+        "intervals": 3000,
+        "withheld_rate": 0.0,
+        "mean_bias": 0.005754798333805371,
+        "rmse": 0.08635685312006294,
+        "coverage": 0.929,
+        "coverage_mc_se": 0.004688958661934793
+      },
+      "b": {
+        "intervals": 3000,
+        "withheld_rate": 0.0,
+        "mean_bias": -0.0032217159662228053,
+        "rmse": 0.14874042889680228,
+        "coverage": 0.8873333333333333,
+        "coverage_mc_se": 0.0057727200084792185
+      },
+      "c": {
+        "intervals": 3000,
+        "withheld_rate": 0.06533333333333333,
+        "mean_bias": -0.0019601495873794216,
+        "rmse": 0.054708063264211446,
+        "coverage": 0.9461483594864479,
+        "coverage_mc_se": 0.004262752175327168
+      }
+    }
+  ],
+  "checks": {
+    "3PL_MAP_N3000_convergence": true,
+    "3PL_MAP_N3000_a": true,
+    "3PL_MAP_N3000_b": true,
+    "3PL_MAP_N3000_c": true,
+    "4PL_MAP_N3000_convergence": true,
+    "4PL_MAP_N3000_a": false,
+    "4PL_MAP_N3000_b": false,
+    "4PL_MAP_N3000_c": false,
+    "4PL_MAP_N3000_d": false,
+    "3PL_ML_N3000_convergence": true,
+    "3PL_ML_N3000_a": false,
+    "3PL_ML_N3000_b": false,
+    "3PL_ML_N3000_c": false,
+    "4PL_ML_N3000_convergence": true,
+    "4PL_ML_N3000_a": true,
+    "4PL_ML_N3000_b": false,
+    "4PL_ML_N3000_c": false,
+    "4PL_ML_N3000_d": false,
+    "3PL_ML_N10000_convergence": true,
+    "3PL_ML_N10000_a": false,
+    "3PL_ML_N10000_b": false,
+    "3PL_ML_N10000_c": false
+  },
+  "wald_ci_supported": {
+    "3PL_MAP_a": true,
+    "3PL_MAP_b": true,
+    "3PL_MAP_c": true,
+    "4PL_MAP_a": false,
+    "4PL_MAP_b": false,
+    "4PL_MAP_c": false,
+    "4PL_MAP_d": false,
+    "3PL_ML_a": false,
+    "3PL_ML_b": false,
+    "3PL_ML_c": false,
+    "4PL_ML_a": true,
+    "4PL_ML_b": false,
+    "4PL_ML_c": false,
+    "4PL_ML_d": false
+  },
+  "wall_seconds": 802.7,
+  "versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.5.3",
+    "python": "3.13.17"
+  }
+}

@@ -11,17 +11,39 @@ import pandas as pd
 
 Z95 = 1.959963984540054
 NAMES = {"discrimination": "a", "difficulty": "b", "guessing": "c", "upper": "d"}
-STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. 1PL/2PL: önceden kayıtlı Monte Carlo'da (N = 1000, 12 madde, "
-          "300 tekrar) kapsama .945–.953; diğer koşullarda ve 3PL/4PL'de kapsama kanıtı yoktur "
-          "(validation/evidence/p6_binary_se/coverage.json).")
+STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. Önceden kayıtlı Monte Carlo kapsaması: 1PL/2PL (N = 1000, 12 madde) "
+          ".945–.953; 3PL MAP (N = 3000, 30 madde) .950–.968. Ölçütü (.95 ± .02, sınırda tutulan oran ≤ .05) "
+          "sağlamayan 3PL/4PL parametrelerinde SH gösterilir, Wald GA gösterilmez "
+          "(validation/evidence/p6_binary_se, p7_binary34_se).")
+# Pre-registered 3PL/4PL decision (validation/binary34_se_coverage_study.py): (model, estimation, parameter) ->
+# (coverage farthest from .95 over the design cells, largest on-bound withheld rate, Wald CI supported).
+EVIDENCE_34 = {
+    ("3PL", "MAP", "a"): (0.950, 0.000, True),
+    ("3PL", "MAP", "b"): (0.967, 0.000, True),
+    ("3PL", "MAP", "c"): (0.968, 0.000, True),
+    ("4PL", "MAP", "a"): (0.994, 0.000, False),
+    ("4PL", "MAP", "b"): (0.971, 0.000, False),
+    ("4PL", "MAP", "c"): (0.981, 0.000, False),
+    ("4PL", "MAP", "d"): (0.979, 0.000, False),
+    ("3PL", "ML", "a"): (0.929, 0.000, False),
+    ("3PL", "ML", "b"): (0.827, 0.000, False),
+    ("3PL", "ML", "c"): (0.936, 0.128, False),
+    ("4PL", "ML", "a"): (0.936, 0.001, True),
+    ("4PL", "ML", "b"): (0.815, 0.000, False),
+    ("4PL", "ML", "c"): (0.884, 0.175, False),
+    ("4PL", "ML", "d"): (0.869, 0.281, False)
+}
 
 
 def _matrix(value):
     return np.asarray(value() if callable(value) else value, float)
 
 
-def parameter_inference(fit, model, item_names):
-    """Return (table, reason). table is None and reason explains why when SE cannot be reported."""
+def parameter_inference(fit, model, item_names, estimation=None):
+    """Return (table, reason). table is None and reason explains why when SE cannot be reported.
+
+    With estimation ("ML"/"MAP") a 3PL/4PL Wald CI is kept only where EVIDENCE_34 supports it; estimation=None
+    returns the raw intervals (used by the coverage study itself)."""
     from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS as bounds
     if model not in ("Rasch", "1PL", "2PL", "3PL", "4PL"):
         raise ValueError("Yalnız ikili modeller.")
@@ -71,6 +93,13 @@ def parameter_inference(fit, model, item_names):
                      "GA %95 alt": estimate - Z95 * se, "GA %95 üst": estimate + Z95 * se,
                      "Not": "Kutu sınırında; SH/Wald GA geçersiz (kütüphane bu parametreyi sabit tutar)"
                      if on_bound else ""})
+    if estimation is not None and model in ("3PL", "4PL"):
+        for row in rows:
+            coverage, withheld, supported = EVIDENCE_34[(model, estimation, row["Parametre"])]
+            if not supported and not row["Not"]:
+                row["GA %95 alt"] = row["GA %95 üst"] = np.nan
+                row["Not"] = (f"Wald GA gösterilmedi: önceden kayıtlı MC kapsaması {coverage:.3f}, sınırda tutulan "
+                              f"oran {withheld:.3f} (ölçüt .95 ± .02, ≤ .05)")
     order = {"a": 0, "b": 1, "c": 2, "d": 3}
     table = pd.DataFrame(rows)
     table["_o"] = table["Parametre"].map(order)
