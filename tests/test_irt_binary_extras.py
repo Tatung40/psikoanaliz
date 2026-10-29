@@ -67,11 +67,45 @@ def test_parameter_se_matches_independent_observed_information(model):
     assert table.Madde.tolist()[:1] == [x.columns[0]]
 
 
+def _independent_interior_se(x, table, points=21):
+    """-Hessian of an independent GH marginal log-likelihood over the interior (a, b, c, d) only; parameters
+    on a box bound are held at their estimates, as the library does."""
+    nodes, weights = hermegauss(points); logw = np.log(weights / weights.sum())
+    y = x.to_numpy(float); k = y.shape[1]; items = list(x.columns)
+    full = {p: np.array([1.0, 0, 0, 1.0][i] * np.ones(k)) for i, p in enumerate("abcd")}
+    for row in table.itertuples():
+        full[row.Parametre][items.index(row.Madde)] = row.Kestirim
+    free = [(r.Parametre, items.index(r.Madde)) for r in table.itertuples() if np.isfinite(r.SH)]
+
+    def loglik(v):
+        par = {p: full[p].copy() for p in full}
+        for (p, j), value in zip(free, v):
+            par[p][j] = value
+        prob = par["c"] + (par["d"] - par["c"]) * expit(par["a"] * (nodes[:, None] - par["b"]))
+        z = y @ np.log(prob).T + (1 - y) @ np.log1p(-prob).T + logw
+        top = z.max(1, keepdims=True)
+        return float((top[:, 0] + np.log(np.exp(z - top).sum(1))).sum())
+
+    v0 = np.array([full[p][j] for p, j in free]); n, h = len(v0), 1e-4; e = np.eye(n) * h
+    hess = np.empty((n, n))
+    for i in range(n):
+        for j in range(i, n):
+            hess[i, j] = hess[j, i] = (loglik(v0 + e[i] + e[j]) - loglik(v0 + e[i] - e[j])
+                                       - loglik(v0 - e[i] + e[j]) + loglik(v0 - e[i] - e[j])) / (4 * h * h)
+    return np.sqrt(np.diag(np.linalg.inv(-hess)))
+
+
 @pytest.mark.parametrize("model", ["3PL", "4PL"])
-def test_boundary_fits_report_reason_instead_of_fabricated_se(model):
+def test_boundary_fits_give_interior_se_from_independent_information_and_na_on_bound(model):
+    """ML 3PL/4PL: the library holds bound parameters fixed (NaN rows); interior SEs are still valid."""
     x, outcome, _ = _fit(model)
     table, reason = parameter_inference(outcome.fit, model, x.columns)
-    assert table is None and "sonlu değil" in reason
+    assert reason is None
+    bound = table.Not != ""
+    assert bound.any() and table.loc[bound, ["SH", "GA %95 alt", "GA %95 üst"]].isna().all().all()
+    interior = table[~bound]
+    np.testing.assert_allclose(interior.SH.to_numpy(), _independent_interior_se(x, table), rtol=2e-3)
+    np.testing.assert_allclose(interior["GA %95 üst"] - interior.Kestirim, Z95 * interior.SH, rtol=1e-12)
 
 
 def test_nonconverged_fit_has_no_se():

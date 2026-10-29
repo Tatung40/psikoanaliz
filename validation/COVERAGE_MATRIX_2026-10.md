@@ -68,3 +68,17 @@ CI golden-master ve tam regresyon sonucu PR'da raporlanır.
 | Çok boyutlu 2D–5D, bifaktör | R mirt (`mirt_stage1`, 12 profil) | tekrarlı çalışma yok | geri kazanım NOT VERIFIED |
 | Sabit çapalı DIF | yerel ↔ kütüphane LR eşitliği (PR #93) | `dif_validation_study.py` | doğrulandı |
 | G-Kuramı | bağımsız EMS + R ANOVA CI işi | — | doğrulandı |
+
+## 3PL/4PL sorunları ve çözümleri (PR #96)
+
+| Sorun | Sınıf | Çözüm / durum | Kanıt |
+|---|---|---|---|
+| ML 3PL/4PL'de hiç SH yok (kovaryansta sınır satırları NaN → tüm tablo reddediliyordu) | BUG | Kütüphanenin aktif küme kovaryansı kullanılır: iç parametrelerde SH/GA, sınırdakilerde NA + gerekçe | bağımsız gözlenen bilgi ile rtol 2e-3 (`test_irt_binary_extras`) |
+| 3PL/4PL GA kapsaması bilinmiyordu | P2 | Önceden kayıtlı MC (`p7_binary34_se`): 3PL MAP a/b/c .950–.968 → GA gösterilir; 4PL MAP aşırı geniş (.971–.994), ML b .815–.887, c/d sınır oranı ≤ .28 → GA gizlenir, SH korunur, neden yazılır | `test_binary34_se_coverage_evidence` |
+| 4PL ML a: kapsama geçer, sapma +.179 / RMSE .504 | IDENTIFIABILITY | GA ile birlikte açık uyarı; kapsama kestirim başarısı sayılmaz | aynı test |
+| Başlangıç değerine duyarlılık | NUMERICAL | Deterministik 8 başlangıçlı denetim (kütüphane `start_values`, SQUAREM), seçmeli; MAP başlangıçtan bağımsız (fark ≤ .002), ML 4PL ayrı yerel çözümler (≤ .89 logLik) ve varsayılanın .0035 altında kaldığı durum yakalanır | `test_irt_binary_multistart` |
+| Sınır asimptotları / zayıf tanımlanma | IDENTIFIABILITY / DATA LIMITATION | Kök neden çalışması geçerli (`IRT_3PL4PL_ROOT_CAUSE.md`); MAP varsayılanı ve kullanım politikası korunur | mevcut |
+| R ile 3PL/4PL SH karşılaştırması yoktu; 4PL R yakınsamıyordu | P1 | `validation/r_mirt_34`: 3PL iç çözüm (tohum 13) logLik, parametre, IRF, IIF/TIF, SH; 4PL: 1..50 tohumda iç ML çözümü yok → NOT VERIFIED | CI R işi |
+| 3PL/4PL bootstrap DIF | — | Yerel yol korundu; kısıtlar, bağımsız logLik, LR, p ve tohum belirlenimi deterministik testte | `test_dif34_bootstrap` |
+| RSM bağımsız R referansı | P1 | `validation/r_mirt_rsm`: yerel RSM ↔ R mirt `rsm` (σ, logLik, kategori olasılıkları) | CI R işi |
+| Bifaktör geri kazanımı | P2 | Önceden kayıtlı MC (`p8_bifactor`): ölçüt sağlanmadı (özgül RMSE .745 / .423); ekranda açık not | `test_bifactor_recovery_evidence` |

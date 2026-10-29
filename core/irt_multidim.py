@@ -10,6 +10,9 @@ from core.irt_b14 import prepare_polytomous
 from core.irt_python_mirt_adapter import normalize_solver_settings
 
 STATUS='EXPERIMENTAL / NOT CERTIFIED'
+BIFACTOR_RECOVERY=('Bifaktör geri kazanımı (önceden kayıtlı Monte Carlo, 12 madde, 3 özgül grup, 5 GH düğümü, 100 tekrar; '\
+ 'validation/evidence/p8_bifactor): ölçüt sağlanmadı. RMSE genel/özgül/kesişim: N = 500 .494/.745/.183 '\
+ '(yakınsama .91); N = 1000 .271/.423/.113 (ölçüt ≤ .30). Özgül yükler bu koşullarda güvenilir değildir.')
 SURFACE_POINTS=17
 MODELS=('Rasch','1PL (a=1)','2PL','GRM','PCM','GPCM','NRM','Bifactor')
 LIMITATION=('Bağımsız R kabulü yalnız kayıtlı profiller içindir; yeni veride sonuç EXPERIMENTAL / NOT CERTIFIED. '
