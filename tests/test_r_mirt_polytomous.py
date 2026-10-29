@@ -19,7 +19,7 @@ def _to_r(model, p):
     if model in ("PCM", "GPCM"):
         a = p["discrimination"]; d = np.column_stack([np.zeros(len(a)), -np.cumsum(a[:, None] * p["steps"], axis=1)])
         return pd.DataFrame({"a1": a, **{f"ak{k}": float(k) for k in range(4)}, **{f"d{k}": d[:, k] for k in range(4)}})
-    a1 = p["slopes"][:, 3] / 3.0                      # R default ak3 = K-1 = 3, ak0 = 0
+    a1 = np.ones(len(p["slopes"]))                    # reference.R: a1 = 1 fixed, ak0 = 0, ak1..ak3 free
     return pd.DataFrame({"a1": a1, **{f"ak{k}": p["slopes"][:, k] / a1 for k in range(4)},
                          **{f"d{k}": p["intercepts"][:, k] for k in range(4)}})
 
