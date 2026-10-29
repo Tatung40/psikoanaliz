@@ -90,8 +90,10 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         fit=result["result"]
         st.write("Model:",model,"| Motor:",result["engine"],"| N:",result["N"],"| Madde:",result["k"])
         try:
-            summary=fit.coef_with_se()
+            from core.irt_python_mirt_parameters import coef_with_se_table
+            summary=coef_with_se_table(fit)
             st.dataframe(summary,hide_index=False,use_container_width=True)
+            st.caption("Sabit/tanımlama kısıtlı parametrelerin (ör. PCM a = 1, NRM ilk kategori) SH'si kestirilmediği için boş gösterilir.")
             st.download_button("Madde parametrelerini CSV indir",safe_frame(summary.reset_index()).to_csv(index=False).encode("utf-8-sig"),
                                "B14_pilot_parametreler.csv",mime="text/csv",key="b14_csv",on_click="ignore")
         except Exception as exc:
