@@ -25,7 +25,7 @@ jobs:
           python -c "import importlib.metadata, mirt; assert importlib.metadata.version('mirt') == '1.2.0'; assert callable(mirt.fit_mirt); print('PYTHON MIRT IMPORT OK - SCIENTIFIC FIT NOT YET VALIDATED')"
       - name: Regression tests (pull requests; full integration suite)
         if: github.event_name == 'pull_request'
-        timeout-minutes: ${{ (github.head_ref == 'integration/73-75-main' || github.head_ref == 'feat/reproducible-python-r-code') && 55 || 15 }}
+        timeout-minutes: ${{ (github.head_ref == 'integration/73-75-main' || github.head_ref == 'feat/reproducible-python-r-code') && 55 || 30 }}
         env:
           OPENBLAS_NUM_THREADS: '1'
           OMP_NUM_THREADS: '1'

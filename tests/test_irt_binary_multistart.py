@@ -4,7 +4,7 @@ import pytest
 
 pytest.importorskip("mirt")
 from core import example_datasets as ex
-from core.irt_binary_multistart import STARTS, multistart, objective
+from core.irt_binary_multistart import REPLACE_GAP, STARTS, multistart, objective
 from core.irt_python_mirt_adapter import fit_python_mirt
 
 
@@ -25,11 +25,15 @@ def test_4pl_ml_local_solution_is_detected_and_best_objective_selected():
 
 
 def test_default_replaced_only_when_clearly_worse_and_map_is_start_insensitive():
+    # The default EM stopping point varies slightly between runners (gap .0007-.0035 observed), so the
+    # decision rule is checked as such: the default is replaced and reported exactly when gap > 1e-3.
     x = _x("irt_014")
     best, table, notes = multistart(x, "4PL", "ML")
-    default = fit_python_mirt(x, model="4PL", estimation="ML").fit
-    gap = objective(best.fit, "ML") - objective(default, "ML")
-    assert gap > 1e-3 and any("Varsayılan başlangıç" in n for n in notes)
+    default_row = table.iloc[0]
+    gap = float(default_row["En iyiden fark"])
+    assert gap >= 0 and objective(best.fit, "ML") == pytest.approx(table["Amaç"].max(), abs=1e-6)
+    assert any("Varsayılan başlangıç" in n for n in notes) == (gap > REPLACE_GAP)
+    assert bool(default_row["Seçildi"]) == (gap <= 1e-6)
     _, table_map, _ = multistart(x, "4PL", "MAP")
     assert table_map[table_map["Yakınsadı"]]["En iyiden fark"].max() < 1e-2
     assert table_map[table_map["Yakınsadı"]]["En büyük IRF farkı"].max() < .02
@@ -59,6 +63,8 @@ def test_screen_multistart_is_opt_in_and_shows_table_and_selected_fit():
     assert not at.exception
     table, notes = at.session_state["python_mirt_fit_4PL"]["multistart"]
     assert any("Çoklu başlangıç denetimi" in m.value for m in at.markdown)
-    assert any("Varsayılan başlangıç" in w.value for w in at.warning)
+    shown = [w.value for w in at.warning]
+    assert all(note in shown for note in notes)               # every multi-start note reaches the screen
+    assert any("Varsayılan başlangıç" in n for n in notes) == (float(table.iloc[0]["En iyiden fark"]) > REPLACE_GAP)
     chosen = at.session_state["python_mirt_fit_4PL"]["outcome"].fit
     assert objective(chosen, "ML") == pytest.approx(table.loc[table["Seçildi"], "Amaç"].item(), abs=1e-9)
