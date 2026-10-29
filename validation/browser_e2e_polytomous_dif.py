@@ -101,7 +101,7 @@ def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
             with Server(log) as srv:
                 page = browser.new_page(accept_downloads=True)
                 upload(page, srv.port, src)
-                page.get_by_text("Python mirt Kütüphanesi — MTK").first.click()  # collapsed sidebar expander
+                page.get_by_text("🔬 Ayrıntılı MTK Model Raporları").first.click()  # collapsed sidebar expander
                 nav(page, "🧬 B14 Python mirt Çok Kategorili Rapor")
                 page.get_by_text(model, exact=True).first.click(); wait_idle(page)
                 if model == "NRM":
