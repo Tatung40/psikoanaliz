@@ -56,3 +56,15 @@ Kabul kapıları: G1 kapsam PASS (silinen çıktı yok) · G2 bütünleşme PASS
 kişi EAP ve Q3 Python mirt eğrileri/parametreleri; Rasch/DIF eşdeğerlik testleri) · G3 sayısal doğruluk PASS
 (toleranslar değişmedi) · G4 UI PASS (AppTest) · G5 export PASS (Excel/ZIP içerik okumalı testler) · G6 regresyon:
 CI golden-master ve tam regresyon sonucu PR'da raporlanır.
+
+## Bağımsız doğrulama ve parametre geri kazanımı envanteri (PR #95)
+
+| Model | Bağımsız referans | Geri kazanım | Durum |
+|---|---|---|---|
+| Rasch, 1PL, 2PL, 3PL | R mirt (`validation/r_mirt_phase1`, eşleşme ≤ 9e-4 parametre) | 3PL/4PL 20 tekrar (`p1_3pl4pl`); **1PL/2PL 300 tekrar, SH/GA kapsaması .945–.953 (yeni, `p6_binary_se`)** | doğrulandı (belirtilen koşullarda) |
+| 4PL | R mirt yakınsamadı | ML ölçütleri sağlanmadı; MAP N ≥ 3000 | kullanım politikası ile sınırlı |
+| GRM, PCM, GPCM, NRM (tek boyut) | **R mirt karşılaştırması eklendi (`validation/r_mirt_polytomous`)**; sonuç CI R işinde | Monte Carlo (`POLYTOMOUS_MC_VALIDATION.md`) | R sonucu PR CI'da raporlanır |
+| RSM | Python mirt `RatingScaleModel` 20/20 | `rsm_recovery_study.py` | doğrulandı |
+| Çok boyutlu 2D–5D, bifaktör | R mirt (`mirt_stage1`, 12 profil) | tekrarlı çalışma yok | geri kazanım NOT VERIFIED |
+| Sabit çapalı DIF | yerel ↔ kütüphane LR eşitliği (PR #93) | `dif_validation_study.py` | doğrulandı |
+| G-Kuramı | bağımsız EMS + R ANOVA CI işi | — | doğrulandı |
