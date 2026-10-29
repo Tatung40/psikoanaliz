@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from core.reproducible import displayed
 
 from core import dimensionality as dm
 from core import local_fit as lf
@@ -139,6 +140,7 @@ def render_dimensionality(data, item_cols):
     res = st.session_state.get("dim_result")
     if res is None:
         return
+    displayed(res)
     cor = res["correlation"]
     m = st.columns(4)
     m[0].metric("Korelasyon", cor["method"])
@@ -208,6 +210,7 @@ def render_local_fit(data, item_cols):
     res = st.session_state.get("lf_result")
     if res is None:
         return
+    displayed(res)
     if not res["fit"]["converged"]:
         st.warning("MTK kestirimi yakınsamadı; tanılar yorumlanırken dikkat edin.")
     st.caption(f"Kalibrasyon motoru: {res['fit']['engine']} — durum: {res['fit']['engine_status']}")

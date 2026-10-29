@@ -82,3 +82,22 @@ CI golden-master ve tam regresyon sonucu PR'da raporlanır.
 | 3PL/4PL bootstrap DIF | — | Yerel yol korundu; kısıtlar, bağımsız logLik, LR, p ve tohum belirlenimi deterministik testte | `test_dif34_bootstrap` |
 | RSM bağımsız R referansı | P1 | `validation/r_mirt_rsm`: yerel RSM ↔ R mirt `rsm` (σ, logLik, kategori olasılıkları) | CI R işi |
 | Bifaktör geri kazanımı | P2 | Önceden kayıtlı MC (`p8_bifactor`): ölçüt sağlanmadı (özgül RMSE .745 / .423); ekranda açık not | `test_bifactor_recovery_evidence` |
+
+## Platform işlev denetimi — Python kod paneli ve uyarılar (PR #97)
+
+Yöntem: 37 aktif ekran, uygun örnek veriyle AppTest üzerinden gerçek çalıştırma → analiz düğmesi → iki
+ek yeniden çalıştırma (sekme/widget değişimi) → kod paneli manifesti. Önce/sonra aynı betikle karşılaştırıldı.
+
+| Kök neden | Etkilenen ekranlar | Düzeltme |
+|---|---|---|
+| Sonuç kabının alanı (`PythonMirtResult.fit`) izlenmiyordu; yeniden çalıştırmada üretici kayboluyordu | MTK 1PL–4PL | `core.reproducible`: dataclass alanları `{"@attr"}` yoluyla izlenir (kod çözücü dahil) |
+| Önbellekteki sonuç başka bir kayıtlı çağrıya verilmeden gösteriliyordu → yeniden çalıştırmada UNSUPPORTED/boş | Rasch, Python mirt DIF, gözlenen puan DIF, çok modelli DIF, GRM/çok kategorili formel DIF, 3PL/4PL bootstrap DIF, varsayım denetimi, boyutluluk, yerel uyum, MIRT, kayıp veri | Tek ortak `displayed()`: yalnız kaydı olan ve değişmemiş sonuç üreticisine bağlanır |
+| Sayfalar arası yeniden kullanılan kestirimler | MTK: Karşılaştırma | Diğer sayfaların son kaydından üretici aktarımı |
+| `st.stop()` kod kaydını kapatmadan sayfayı kesiyordu | Karşılaştırma ve iki hata yolu | `stop_page()` |
+| Genel "araştırma amaçlıdır" uyarısı | MTK 1PL–4PL, Python mirt ikili, B14 | Model bazlı kanıt notu (`evidence_note`); 4PL ve ortak-a 1PL NOT VERIFIED |
+
+Durum (yeniden çalıştırma sonrası kod paneli): KTK 9 ekran, Rasch, 1PL–4PL, Python mirt 9 model, RSM, B14,
+6 DIF ekranı, varsayım, boyutluluk, yerel uyum, MIRT, G-Kuramı, kayıp veri, karşılaştırma: PASS
+(`tests/test_reproducible_page_reruns.py`, `test_reproducible_result_fields.py`; 2PL ZIP depo dışında
+çalıştırıldı, logLik ve parametreler ekranla eşit). 3PL/4PL bootstrap DIF: tasarım gereği UNSUPPORTED
+(arayüzde kapalı p değerleri ham çağrıyla açılamaz). Grafik/indirme içerikleri: mevcut ekran testleri (PR #94).

@@ -46,3 +46,32 @@ def usage_status(model, estimation, n, k):
                            "kurtarılabilir ancak a/b/c(/d) parametreleri tek tek yorumlanmamalıdır." + tail)
     return "not_supported", (f"{model} {label}: N = {n} < 1000 incelenen tasarımın dışında; parametre "
                              "kurtarma güvencesi yok." + tail)
+
+
+def evidence_note(model, common_discrimination=False):
+    """Return (level, Turkish text): the independent evidence that exists for this binary library model.
+
+    Replaces blanket 'research only' labels with what was actually verified (PR #90-96 evidence files);
+    level is "info" when an independent R comparison and Monte Carlo evidence exist, else "warning".
+    """
+    scope = " Kanıt incelenen veri/koşullar içindir; genel sertifika değildir."
+    if model == "1PL" and common_discrimination:
+        return "warning", ("1PL (ortak serbest a): bağımsız R karşılaştırması ve Monte Carlo kanıtı yok (NOT VERIFIED); "
+                           "a = 1 modelinin kanıtı bu modele aktarılmaz.")
+    if model in ("Rasch", "1PL"):
+        return "info", ("Doğrulama (a = 1): R mirt 1.48 ile sayısal uyum (parametre farkı ≤ 4.4e-4, "
+                        "validation/r_mirt_phase1); Monte Carlo 300/300 yakınsama, b için %95 GA kapsaması .953 "
+                        "(validation/evidence/p6_binary_se)." + scope)
+    if model == "2PL":
+        return "info", ("Doğrulama: R mirt 1.48 ile sayısal uyum (parametre farkı ≤ 9.2e-4, validation/r_mirt_phase1); "
+                        "Monte Carlo 300/300 yakınsama, a/b için %95 GA kapsaması .945–.951 "
+                        "(validation/evidence/p6_binary_se)." + scope)
+    if model == "3PL":
+        return "info", ("Doğrulama: ML 3PL R mirt 1.48 ile sayısal uyum (parametre ≤ 2.4e-4; SH göreli fark ≤ 1.1e-4, "
+                        "validation/r_mirt_phase1, validation/r_mirt_34). Parametre yorumu ve GA gösterimi kullanım "
+                        "sınırına ve önceden kayıtlı kapsama kanıtına bağlıdır (p1_3pl4pl, p7_binary34_se)." + scope)
+    if model == "4PL":
+        return "warning", ("4PL: bağımsız R doğrulaması yok (NOT VERIFIED — R yakınsamadı; sınır dışı ML çözümü "
+                           "bulunamadı). Parametre yorumu kullanım sınırına ve önceden kayıtlı kapsama kanıtına "
+                           "bağlıdır (p1_3pl4pl, p7_binary34_se).")
+    return "warning", "Bu model için bağımsız doğrulama kaydı yok (NOT VERIFIED)."

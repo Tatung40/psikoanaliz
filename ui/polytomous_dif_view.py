@@ -4,6 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 import streamlit as st
+from core.reproducible import displayed
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from core import polytomous_dif as P
@@ -79,6 +80,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     if entry["key"] != key or not agreed or label_error:
         st.info("Veri/model/ayar değişti; eski sonuç gösterilmiyor. Yeniden hesaplayın."); return
     out = entry["out"]
+    displayed(out)
     if "tables" not in entry: entry["tables"] = report_tables(out)
     tables = entry["tables"]
     st.caption(out["status"])

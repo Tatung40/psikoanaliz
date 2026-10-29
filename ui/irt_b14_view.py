@@ -15,9 +15,10 @@ from core.irt_b14_diagnostics import model_diagnostics
 from reports.irt_b14_report import report_tables,export_xlsx,export_zip,category_frequencies,quality_report,safe_frame
 
 def render(data,existing_item_cols=(),id_col=None,group_col=None):
-    st.subheader("B14 — Çok Kategorili MTK (Deneysel Pilot)")
+    st.subheader("B14 — Çok Kategorili MTK")
     st.caption("Sıralı kategoriler: GRM, PCM, GPCM, RSM | Sırasız A–E seçenekleri: NRM. "
-               "Python mirt ayrı bir kestirim motorudur; henüz bağımsız sayısal doğrulaması tamamlanmadı.")
+               "Doğrulama: GRM/PCM/GPCM/NRM R mirt 1.48 ile sayısal uyum (tek veri seti; validation/r_mirt_polytomous) "
+               "ve Monte Carlo geri kazanımı (validation/POLYTOMOUS_MC_VALIDATION.md); genel sertifika değildir.")
     model=st.radio("Model",MODELS,horizontal=True,key="b14_model")
     available=[c for c in data.columns if c not in (id_col,group_col)]
     default=[c for c in existing_item_cols if c in available]
@@ -89,7 +90,7 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
     if result is not None:
         # Optional results (diagnostics, comparison, ZIP) belong to exactly this fit; a refit or data change drops them.
         token=saved["token"] if saved and saved.get("result") is result else None
-        st.warning(result["status"])
+        st.info(result["status"])
         fit=result["result"]
         st.write("Model:",model,"| Motor:",result["engine"],"| N:",result["N"],"| Madde:",result["k"])
         try:

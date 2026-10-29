@@ -5,6 +5,7 @@ The recorder is session-local; wrappers remain inert outside a capture context.
 """
 from contextvars import ContextVar
 from functools import wraps
+import dataclasses
 import hashlib
 import importlib
 import importlib.metadata
@@ -97,7 +98,8 @@ def decode(value, results=()):
     if tag == 'ref':
         result = results[value['path'][0]]
         for key in value['path'][1:]:
-            result = result[key]
+            # {"@attr": name} steps into a field of a result container (e.g. PythonMirtResult.fit).
+            result = getattr(result, key['@attr']) if isinstance(key, dict) else result[key]
         return result
     if tag == 'NA':
         return pd.NA
@@ -156,21 +158,34 @@ def _remember(value, path, refs, keep):
     elif isinstance(value, (tuple, list)):
         for i, item in enumerate(value):
             _remember(item, path + [i], refs, keep)
+    elif dataclasses.is_dataclass(value) and not isinstance(value, type):
+        # Result containers: a later page run may pass one field (outcome.fit) to another public call.
+        for field in dataclasses.fields(value):
+            _remember(getattr(value, field.name), path + [{'@attr': field.name}], refs, keep)
 
 
 class Recorder:
-    def __init__(self, page, previous=None):
+    def __init__(self, page, previous=None, others=()):
         self.page, self.calls, self.errors = page, [], []
         self.previous = previous if previous is not None and previous.page == page else None
+        # Latest recordings of other pages: a page may reuse a result produced there (model comparison).
+        self.others = tuple(o for o in others if o is not None and o.page != page)
         self.imported = {}
         self.references, self.keep = {}, []
 
+    def _source(self, value):
+        for source in ((self.previous,) if self.previous is not None else ()) + self.others:
+            if id(value) in source.references:
+                return source
+        return None
+
     def _import_dependencies(self, value):
-        if self.previous is None or isinstance(value, (pd.DataFrame, pd.Series, np.ndarray)):
+        if isinstance(value, (pd.DataFrame, pd.Series, np.ndarray)):
             return
-        if id(value) in self.previous.references and id(value) not in self.references:
-            old_path = self.previous.references[id(value)]
-            new_index = self._import_call(old_path[0])
+        source = self._source(value)
+        if source is not None and id(value) not in self.references:
+            old_path = source.references[id(value)]
+            new_index = self._import_call(old_path[0], source)
             _remember(value, [new_index] + old_path[1:], self.references, self.keep)
         elif isinstance(value, dict):
             for item in value.values():
@@ -179,22 +194,24 @@ class Recorder:
             for item in value:
                 self._import_dependencies(item)
 
-    def _import_call(self, old_index):
-        if old_index in self.imported:
-            return self.imported[old_index]
+    def _import_call(self, old_index, source=None):
+        source = source or self.previous
+        key = (id(source), old_index)
+        if key in self.imported:
+            return self.imported[key]
         def remap(value):
             if isinstance(value, dict):
                 if value.get('@') == 'ref':
                     path = value['path']
-                    return {'@': 'ref', 'path': [self._import_call(path[0])] + path[1:]}
+                    return {'@': 'ref', 'path': [self._import_call(path[0], source)] + path[1:]}
                 return {k: remap(v) for k, v in value.items()}
             if isinstance(value, list):
                 return [remap(v) for v in value]
             return value
-        call = remap(self.previous.calls[old_index])
+        call = remap(source.calls[old_index])
         index = len(self.calls)
         self.calls.append(call)
-        self.imported[old_index] = index
+        self.imported[key] = index
         return index
 
     def invoke(self, function, args, kwargs, identity=None):
@@ -280,8 +297,8 @@ def capture_view(function):
     return wrapper
 
 
-def begin(page, namespace=None, previous=None):
-    recorder = Recorder(page, previous)
+def begin(page, namespace=None, previous=None, others=()):
+    recorder = Recorder(page, previous, others)
     _ACTIVE.set(recorder)
     instrument(namespace)
     return recorder
@@ -298,11 +315,38 @@ def public_call(module, name, *args, **kwargs):
     return recorder.invoke(function, args, kwargs, identity=(module, name))
 
 
+def displayed(*values):
+    """A page shows a cached result without passing it to another public call: link it to its producer.
+
+    Only results whose producer was recorded on this page or in another page's latest run are imported; a mutable
+    array/frame must still equal its recorded snapshot, so an edited or stale value is never attributed.
+    """
+    recorder = _ACTIVE.get()
+    if recorder is None:
+        return
+    for value in values:
+        source = recorder._source(value)
+        if source is None or id(value) in recorder.references:
+            continue
+        entry = source.references[id(value)]
+        if isinstance(entry, dict):
+            try:
+                if encode(value) != entry['snapshot']:
+                    continue
+            except (Unsupported, TypeError, ValueError, RecursionError, OverflowError):
+                continue
+            path = entry['path']
+        else:
+            path = entry
+        index = recorder._import_call(path[0], source)
+        _remember(value, [index] + path[1:], recorder.references, recorder.keep)
+
+
 def finish():
     recorder = _ACTIVE.get()
     _ACTIVE.set(None)
     if recorder is not None:
-        recorder.previous = None
+        recorder.previous, recorder.others = None, ()
     return recorder
 
 

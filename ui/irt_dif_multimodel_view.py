@@ -1,6 +1,7 @@
 """Universal MTK model-family differential functioning *screening* interface."""
 import pandas as pd
 import streamlit as st
+from core.reproducible import displayed
 from core.irt_dif_multimodel_screen import MODELS,screen_mtk_groups
 
 def render(data,item_cols=(),id_col=None,group_col=None):
@@ -29,6 +30,7 @@ def render(data,item_cols=(),id_col=None,group_col=None):
         except Exception as exc:st.error(str(exc))
     result=st.session_state.get("dif_multi_result")
     if result is not None:
+        displayed(result)
         st.dataframe(result,hide_index=True)
         st.download_button("Tarama tablosunu CSV indir",result.to_csv(index=False).encode("utf-8-sig"),
             "MTK_DIF_OnTarama.csv",mime="text/csv",key="dif_multi_download")

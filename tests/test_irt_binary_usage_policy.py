@@ -70,3 +70,17 @@ def test_3pl_4pl_page_renders_curves_with_policy_columns(model):
     assert len(at.get("plotly_chart")) >= 3
     table = next(d.value for d in at.dataframe if "Sınırdaki parametre" in d.value.columns)
     assert set(table["Kestirim"]) == {"MAP"} and set(table["Kullanım durumu"]) == {"not_supported"}  # N = 600 < 1000
+
+
+def test_evidence_note_is_model_specific_and_matches_stored_coverage():
+    import json
+    from pathlib import Path
+    from core.irt_binary_usage_policy import evidence_note
+    p6 = json.loads((Path(__file__).resolve().parents[1] / "validation/evidence/p6_binary_se/coverage.json").read_text())
+    cov = p6["results"]
+    assert f"{cov['1PL']['b']['coverage']:.3f}".lstrip("0") in evidence_note("1PL")[1]
+    lo, hi = sorted(round(cov["2PL"][q]["coverage"], 3) for q in "ab")
+    assert f"{lo:.3f}".lstrip("0") + "–" + f"{hi:.3f}".lstrip("0") in evidence_note("2PL")[1]
+    assert [evidence_note(m)[0] for m in ("Rasch", "1PL", "2PL", "3PL", "4PL")] == ["info"] * 4 + ["warning"]
+    assert evidence_note("1PL", common_discrimination=True)[0] == "warning"
+    assert "NOT VERIFIED" in evidence_note("4PL")[1] and "araştırma amaçlı" not in evidence_note("2PL")[1]

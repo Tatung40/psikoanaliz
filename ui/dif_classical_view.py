@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from core.reproducible import displayed
 
 from core.dif_classical import ADJUST_METHODS, dif_screen
 from reports.excel_export import sanitize_excel_cell
@@ -87,6 +88,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     if not saved:
         return
     frame, meta = saved["frame"], saved["meta"]
+    displayed(frame, meta)
     st.caption(f"Referans N = {meta['n_reference']}, odak N = {meta['n_focal']} | Düzeltme: {ADJUST_LABELS[meta['adjust']]} "
                f"| Saflaştırma turu: {meta['rounds']}")
     for note in meta["notes"]:

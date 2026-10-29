@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from core.reproducible import begin as begin_code_capture, finish as finish_code_capture, instrument as instrument_code_capture, public_call as record_public_call
+from core.reproducible import begin as begin_code_capture, displayed as record_displayed, finish as finish_code_capture, instrument as instrument_code_capture, public_call as record_public_call
 from ui.reproducible_view import render as render_reproducible_code
 from ui.example_datasets_view import render as render_examples, own_file_changed, key_changed, discard_results
 from core.answer_keys import validate_key, read_key
@@ -296,7 +296,22 @@ with st.sidebar:
 render_examples(selected_page)
 if st.session_state.pop("_example_loaded_notice", False):
     st.success("Sentetik örnek gerçek yükleyiciye aktarıldı; alanlar eşlendi. Analiz ayarlarını kontrol edin.")
-begin_code_capture(selected_page, globals(), st.session_state.get("_repro_history"))
+begin_code_capture(selected_page, globals(), st.session_state.get("_repro_history"),
+                   tuple(st.session_state.get("_repro_pages", {}).values()))
+
+
+def end_page_code_capture():
+    """Finish the run's recording, keep it as page history and render the shared Python code panel."""
+    recorder = finish_code_capture()
+    st.session_state["_repro_history"] = recorder
+    st.session_state.setdefault("_repro_pages", {})[selected_page] = recorder
+    render_reproducible_code(recorder)
+
+
+def stop_page():
+    """st.stop() that still closes code capture, so stopped pages keep a correct code panel."""
+    end_page_code_capture()
+    st.stop()
 
 if st.session_state.pop("_session_restored", False) and st.session_state.raw_df is None:
     st.warning("Sunucu oturumu yenilendi (bağlantı kesintisi, uzun hareketsizlik veya uygulamanın yeniden "
@@ -497,7 +512,7 @@ elif selected_page == "3. Puanlama & Veri Hazırlama":
                         validate_key(st.session_state.answer_key,item_cols,df)
                     except ValueError as exc:
                         st.error(str(exc))
-                        st.stop()
+                        stop_page()
                     scored, diag = score_dichotomous(
                         df,
                         item_columns=item_cols,
@@ -1284,6 +1299,8 @@ elif selected_page == "MTK: Rasch":
             saved = st.session_state.get("rasch_result") or {}
             rr = saved.get("result") if saved.get("fingerprint") == fp else None
             if rr is not None:
+                record_displayed(rr)
+            if rr is not None:
                 stored = {k: rr["ui_settings"][k] for k in ("points", "mnsq_label", "zstd_limit", "include_extreme")}
                 current = {k: settings[k] for k in stored}
                 if stored != current:
@@ -1667,7 +1684,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         if len(irt_columns) < 3:
             st.error("MTK analizi için en az 3 uygun ikili madde gerekli. "
                      "Veri Yükleme bölümünde madde sütunlarını kontrol edin.")
-            st.stop()
+            stop_page()
         if problematic and use_valid_only:
             st.info(f"MTK analizine {len(irt_columns)} madde alınacak; "
                     f"{len(problematic)} sütun dışarıda bırakılacak. "
@@ -1760,7 +1777,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "kestirilen modeller için geçerlidir. "
                            "Standart olabilirlik oranı testi ancak düzenli iç içe modeller için "
                            "uygundur; özellikle 3PL/4PL sınır parametreleri için dikkat gerekir.")
-            st.stop()
+            stop_page()
         # SPSS/Xcalibre-style left settings, right output surface.
         # Selection changes only presentation, never silently recalibrates.
         with st.sidebar.expander("⚙️ MTK model seçimi", expanded=True):
@@ -1777,9 +1794,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         instrument_code_capture(globals())
         with st.sidebar:
             solver_options=solver_controls(f"py_mirt_solver_{model}")
-        st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
-                   "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
-                   "bu çıktılar araştırma amaçlıdır.")
+        from core.irt_binary_usage_policy import evidence_note
+        _level, _note = evidence_note(model)
+        (st.info if _level == "info" else st.warning)("Etkin iki kategorili MTK motoru: Python mirt. " + _note)
         estimation = "ML"
         if model in ("3PL", "4PL"):
             with st.sidebar.expander("🎯 3PL/4PL kestirim yöntemi", expanded=True):
@@ -1873,8 +1890,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 external_fit = previous_external["fit"]
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
                            f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
-                st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
-                        "ürettiği deneysel çıktıdır.")
+                st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan ürettiği çıktıdır.")
                 # Fit diagnostics are read directly from the external library,
                 # never recomputed from the retired native engine.
                 from core.irt_library_diagnostics import library_fit_diagnostics
@@ -2054,7 +2070,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "resmî analiz sonuçlarına eklenmez; AIC/BIC karşılaştırması "
                            "'MTK: Karşılaştırma' sayfasında betimsel olarak sunulur.")
             else:
-                st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
+                st.info("Veri veya madde seçimi değişti; eski sonuç gösterilmiyor.")
 
 
 else:
@@ -2063,6 +2079,4 @@ else:
     st.rerun()
 
 # Common syntax panel records only calls actually executed with current inputs.
-_code_recorder = finish_code_capture()
-st.session_state["_repro_history"] = _code_recorder
-render_reproducible_code(_code_recorder)
+end_page_code_capture()

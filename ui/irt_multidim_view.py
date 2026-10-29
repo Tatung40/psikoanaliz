@@ -3,6 +3,7 @@ import io
 import numpy as np
 import pandas as pd
 import streamlit as st
+from core.reproducible import displayed
 from core.irt_multidim import BIFACTOR_RECOVERY,MODELS,LIMITATION,fit,report,structure,support_matrix
 from core.python_mirt_dif import fingerprint
 from core import irt_multidim_factorized as factorized
@@ -88,7 +89,7 @@ def render(data=None,item_cols=(),id_col=None):
    saved=dict(key=key,result=result);st.session_state[KEY]=saved
   except Exception as exc:st.error(f'Kestirim/raporlama başarısız: {exc}')
  if not saved:return
- result=saved['result'];tables=result['tables']
+ result=saved['result'];tables=result['tables'];displayed(result)
  if not result['metadata']['Converged']:st.error('NOT CONVERGED — yalnız geçici parametreler; puanlar ve eğriler kapalı.')
  if result['metadata'].get('At_box_bound'):st.warning('Kutu sınırında parametre var (Boundaries tablosu): ilgili yük/eşik ve standart hata yorumlanmamalı; örneklemi büyütün veya yapıyı gözden geçirin.')
  tabs=st.tabs(['Özet / yakınsama','Parametreler / yapı','Kişi puanları','Bilgi / SEM','Eğriler','Raporlar'])

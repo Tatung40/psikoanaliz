@@ -1,6 +1,7 @@
 """Shared MTK assumptions page for dichotomous and polytomous data."""
 import pandas as pd
 import streamlit as st
+from core.reproducible import displayed
 from core.irt_assumptions import preflight
 
 def render(data,item_cols=(),id_col=None,group_col=None):
@@ -34,7 +35,7 @@ def render(data,item_cols=(),id_col=None,group_col=None):
     if not saved or saved["mode"]!=mode or saved["columns"]!=tuple(chosen) or saved["data_hash"]!=int(pd.util.hash_pandas_object(raw,index=True).sum()):
         st.info("Yukarıdaki düğmeyle ön denetimi başlatın.")
         return
-    report=saved["report"]
+    report=saved["report"];displayed(report)
     st.markdown("### Sonuç: "+report["decision"])
     if report["blocked"]:st.error(report["explanation"])
     else:st.info(report["explanation"])
