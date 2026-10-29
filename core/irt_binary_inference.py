@@ -33,6 +33,25 @@ EVIDENCE_34 = {
     ("4PL", "ML", "c"): (0.884, 0.175, False),
     ("4PL", "ML", "d"): (0.869, 0.281, False)
 }
+# Same study: (largest |mean bias|, largest RMSE) over the cells. Coverage is not estimation accuracy: where
+# |bias| exceeds the .05 limit used for 1PL/2PL (p6_binary_se), a kept CI carries an explicit warning.
+ACCURACY_34 = {
+    ("3PL", "MAP", "a"): (-0.022, 0.132),
+    ("3PL", "MAP", "b"): (+0.004, 0.133),
+    ("3PL", "MAP", "c"): (+0.000, 0.047),
+    ("4PL", "MAP", "a"): (+0.036, 0.176),
+    ("4PL", "MAP", "b"): (-0.019, 0.172),
+    ("4PL", "MAP", "c"): (+0.005, 0.045),
+    ("4PL", "MAP", "d"): (-0.018, 0.036),
+    ("3PL", "ML", "a"): (+0.018, 0.159),
+    ("3PL", "ML", "b"): (+0.008, 0.230),
+    ("3PL", "ML", "c"): (-0.002, 0.082),
+    ("4PL", "ML", "a"): (+0.179, 0.504),
+    ("4PL", "ML", "b"): (+0.013, 0.293),
+    ("4PL", "ML", "c"): (+0.010, 0.102),
+    ("4PL", "ML", "d"): (-0.011, 0.068)
+}
+BIAS_LIMIT = 0.05
 
 
 def _matrix(value):
@@ -96,10 +115,16 @@ def parameter_inference(fit, model, item_names, estimation=None):
     if estimation is not None and model in ("3PL", "4PL"):
         for row in rows:
             coverage, withheld, supported = EVIDENCE_34[(model, estimation, row["Parametre"])]
-            if not supported and not row["Not"]:
+            bias, rmse = ACCURACY_34[(model, estimation, row["Parametre"])]
+            if row["Not"]:
+                continue
+            if not supported:
                 row["GA %95 alt"] = row["GA %95 üst"] = np.nan
                 row["Not"] = (f"Wald GA gösterilmedi: önceden kayıtlı MC kapsaması {coverage:.3f}, sınırda tutulan "
                               f"oran {withheld:.3f} (ölçüt .95 ± .02, ≤ .05)")
+            elif abs(bias) > BIAS_LIMIT:
+                row["Not"] = (f"Uyarı: GA kapsaması ölçütü sağladı ({coverage:.3f}) ancak MC'de sapma {bias:+.3f}, "
+                              f"RMSE {rmse:.3f}; nokta kestirimi güvenilir değildir")
     order = {"a": 0, "b": 1, "c": 2, "d": 3}
     table = pd.DataFrame(rows)
     table["_o"] = table["Parametre"].map(order)

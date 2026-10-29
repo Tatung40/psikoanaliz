@@ -42,7 +42,7 @@ solver_settings=normalize_solver_settings
 
 
 def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", common_discrimination=False,
-                    max_iter=500, tol=1e-4, n_quadpts=21, solver_settings=None):
+                    max_iter=500, tol=1e-4, n_quadpts=21, solver_settings=None, start_values=None, accelerate="none"):
     """One public fit call; no implicit engine fallback or unsupported inference.
 
     common_discrimination=True explicitly fits a shared free a via the public
@@ -71,6 +71,8 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
         raise ValueError("Common discrimination requires explicit 1PL ML specification.")
     if estimation not in ESTIMATIONS:
         raise ValueError("estimation must be 'ML' or 'MAP'.")
+    if (start_values is not None or accelerate != "none") and (model not in ("3PL", "4PL") or accelerate not in ("none", "squarem")):
+        raise ValueError("start_values/accelerate (library EM options) are enabled only for 3PL/4PL multi-start.")
     if estimation == "MAP" and model not in ("3PL", "4PL"):
         raise ValueError("MAP (library default priors) is enabled only for 3PL/4PL, where it was validated.")
     if model not in SUPPORTED and model != "Rasch":
@@ -133,5 +135,7 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
     if estimation=="MAP":
         from mirt.estimation.priors import default_priors
         kwargs["priors"]=default_priors(model)
+    if start_values is not None:kwargs["start_values"]=start_values
+    if accelerate!="none":kwargs["accelerate"]=accelerate
     result=mirt.fit_mirt(x.astype(int),**kwargs)
     return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings)

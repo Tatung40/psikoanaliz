@@ -31,7 +31,7 @@ from scipy.special import expit, logsumexp
 ROOT = Path(__file__).resolve().parents[2]
 MODELS = ("3PL", "4PL")
 N, K = 5000, 15
-SEEDS = {}          # filled by select_seeds() before the first R run; see README
+SEEDS = {"3PL": 13}  # select_seeds() output before the first R run; 4PL: no interior fit in seeds 1..50
 THETA = np.linspace(-4, 4, 81)
 SE_RELATIVE_MAX = 0.02
 
@@ -91,7 +91,8 @@ def common_loglik(p, x, nodes=121):
 def compare(model, out, criteria):
     seed = SEEDS.get(model)
     if seed is None:
-        return {"model": model, "status": "NOT APPLICABLE", "reason": "no interior Python ML solution in seeds 1..50"}
+        return {"model": model, "status": "NOT VERIFIED",
+                "reason": "pre-set seed limit 1..50 reached: every Python ML fit had a parameter on a box bound"}
     x = simulate(model, seed)
     folder = out / model; folder.mkdir(parents=True, exist_ok=True)
     header = ",".join(f"V{j + 1}" for j in range(K))
@@ -149,7 +150,7 @@ def main(argv=None):
     (out / "report.json").write_text(json.dumps(reports, indent=2, ensure_ascii=False))
     for r in reports:
         print("R_3PL4PL=" + json.dumps(r, ensure_ascii=False))
-    return 0 if all(r["status"].startswith(("NUMERICAL AGREEMENT", "NOT VERIFIED", "NOT APPLICABLE")) for r in reports) else 1
+    return 0 if all(r["status"].startswith(("NUMERICAL AGREEMENT", "NOT VERIFIED")) for r in reports) else 1
 
 
 if __name__ == "__main__":

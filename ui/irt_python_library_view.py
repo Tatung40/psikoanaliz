@@ -53,12 +53,14 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         }
         charts={name:st.checkbox(label,value=True,key=f'python_mirt_chart_{model}_{name}')
                 for name,label in chart_options.items()}
-    estimation='ML';categories=None;labels=()
+    estimation='ML';categories=None;labels=();multi=False
     if model=='Rasch':st.info('Rasch: a=1; θ~N(0,1). Yerel serbest-σ Rasch ekranından ayrıdır.')
     if model=='1PL':st.info('1PL: ortak a serbest; 2PL üzerinde belgelenmiş eşitlik kısıtı. Rasch sekmesinde a=1 sabittir.')
     if model in ('3PL','4PL'):
         estimation=st.radio('Kestirim',['MAP','ML'],key=f'python_mirt_estimation_{model}',horizontal=True)
         st.caption('MAP: kütüphane varsayılan önselleri; mevcut bilimsel kullanım sınırları geçerlidir.')
+        multi=st.checkbox('Çoklu başlangıç denetimi (8 deterministik kestirim; en yüksek amaç değeri seçilir)',value=False,
+                          key=f'python_mirt_multistart_{model}')
     if model=='NRM':
         raw_labels=st.text_input('Nominal kategoriler (kod sırası; başarı sırası değil)',value='A,B,C,D',key='python_mirt_nominal_labels')
         labels=tuple(v.strip().upper() for v in raw_labels.split(','));categories=len(labels)
@@ -82,7 +84,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
         st.error(f'Veri ön kontrolü: {e}');return
     identity_hash=_data_fingerprint(data[[id_col]]) if id_col in data.columns else None
-    key=(identity_hash,tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,tuple(sorted(solver_options.items())),'nine-model-report-v2')
+    key=(identity_hash,tuple(cols),_data_fingerprint(x),categories,tuple(labels),estimation,tuple(sorted(solver_options.items())),'nine-model-report-v2')+(('multistart',) if multi else ())
     saved=st.session_state.get(f'python_mirt_fit_{model}')
     if saved is not None and (not isinstance(saved,dict) or saved.get('key')!=key):
         st.session_state.pop(f"python_mirt_fit_{model}", None)
@@ -97,12 +99,25 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                 fit_kwargs=dict(model=model,n_categories=categories,estimation=estimation,
                                 common_discrimination=model=='1PL')
                 fit_kwargs.update(solver_options)
-                outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
-            saved=dict(key=key,outcome=outcome)
+                multistart_result=None
+                if multi:
+                    from core.irt_binary_multistart import multistart
+                    outcome,ms_table,ms_notes=multistart(x.to_numpy(),model,estimation,**solver_options)
+                    multistart_result=(ms_table,ms_notes)
+                else:outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
+            saved=dict(key=key,outcome=outcome,multistart=multistart_result)
             st.session_state[f'python_mirt_fit_{model}']=saved
         except Exception as e:
             saved=None;st.error(f'Kestirim yapılamadı: {e}')
     if saved is None:return
+    if saved.get('multistart') is not None:
+        ms_table,ms_notes=saved['multistart']
+        st.markdown('#### Çoklu başlangıç denetimi')
+        for note in ms_notes:st.warning(note)
+        if not ms_notes:st.success('Tüm yakınsayan başlangıçlar aynı çözüme ulaştı (amaç farkı ≤ .01, IRF farkı ≤ .02).')
+        st.dataframe(ms_table,hide_index=True,use_container_width=True)
+        st.download_button('Çoklu başlangıç — CSV',_csv(ms_table),f'{model}_multistart.csv','text/csv',
+                           key=f'python_mirt_multistart_csv_{model}',on_click='ignore')
     # A comparison pool is populated only with actual converged ML fits on identical
     # item data and identical category coding. MAP is not compared by ordinary AIC/BIC.
     pool=st.session_state.setdefault('python_mirt_comparison_pool',{})
