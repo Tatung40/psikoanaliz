@@ -153,7 +153,8 @@
       "core.irt_b14_persons_info.information_table",
       "core.irt_b14_persons_info.model_comparison",
       "core.irt_b14_persons_info.person_scores",
-      "core.irt_b14_profiles.empirical_profiles"
+      "core.irt_b14_profiles.empirical_profiles",
+      "core.irt_python_mirt_parameters.coef_with_se_table"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
