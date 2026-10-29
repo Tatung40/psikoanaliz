@@ -34,8 +34,8 @@ gösteriyordu. `coef_with_se_table` bu değerleri boş (NaN) gösterir. Test: `t
 - `core.irt_itemfit` kendi 0/1 doğrulayıcısını taşır; Wright şekli `ui/wright_map.py` içindedir.
 - `core.irt_person_abilities` yalnız kütüphane eğrilerini kullanan yerel ızgara EAP'tir (motor değil);
   çıktıları golden-master ile birebir korunur.
-- Eşdeğerlik: `tools/golden_master.py` kaldırmadan önce alınan tüm Python çıktılarını (9 model, B14, DIF,
-  MIRT, yerel uyum/EFA, 15 G/D, KTK, 117 örnek indirme) kaldırmadan sonra bit düzeyinde yeniden üretir.
+- Eşdeğerlik: CI her çalıştırmada `tools/golden_master.py` ile kaldırma öncesi main (`fa2e25e`) ve güncel ağacın tüm Python çıktılarını (9 model, B14, DIF,
+  MIRT, yerel uyum/EFA, 15 G/D, KTK, 117 örnek indirme) aynı makinede yakalar ve sıfır toleransla karşılaştırır.
 - Kütüphane karşılığı olmadığı için korunan yerel kestiriciler: Rasch MML sayfası (`core.rasch`), RSM
   (`core.irt_rsm`), sabit çapalı ikili/GRM/çok kategorili DIF (`irt_mg`, `grm_dif`, `polytomous_dif`),
   3PL/4PL bootstrap DIF (`irt_mg34`), Q3 (`irt_q3`, yerel uyum ekranı da kullanır), genel MIRT profilleri.

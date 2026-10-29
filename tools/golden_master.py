@@ -1,12 +1,15 @@
 """Golden master of user-visible Python-library analysis outputs.
 
-Captured BEFORE the native ("Eser") binary IRT engine was removed and replayed
-afterwards by tests/test_golden_master_python.py. Only library-backed screens are
-recorded (Python mirt, GeneralizIT, pingouin, statsmodels/numpy screens); the retired
-native engine is not a reference. Volatile fields (timestamps, Python/package
-versions, platform strings, generated hashes of version metadata) are excluded.
+Equivalence gate for the removal of the native ("Eser") binary IRT engine: the
+outputs of a REFERENCE checkout (main before the removal) and of the current tree
+are captured on the same machine in the same CI job and compared exactly. A stored
+master is not used: ill-conditioned EM fits (4PL boundary, multigroup GRM) stop at
+environment-dependent points (~1e-5), so only same-environment comparison is valid.
+Only library-backed screens are recorded; the retired native engine is not a
+reference. Volatile fields (versions, platform, timestamps) are excluded.
 
-Run: python -m tools.golden_master            # rewrite the stored master
+    python tools/golden_master.py capture OUT.json.gz [--root CHECKOUT]
+    python tools/golden_master.py compare REFERENCE.json.gz CURRENT.json.gz
 """
 import gzip
 import io
@@ -20,7 +23,6 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-STORE = ROOT / 'validation' / 'golden_master' / 'python_outputs.json.gz'
 VOLATILE = ('python', 'platform', 'version', 'versions', 'numpy', 'pandas', 'scipy', 'sürüm',
             'engine', 'motor', 'signature', 'timestamp', 'tarih', 'zaman', 'log')
 
@@ -36,6 +38,8 @@ def encode(value):
         frame = value.reset_index() if not isinstance(value.index, pd.RangeIndex) else value
         cols = [str(c) for c in frame.columns]
         keep = [i for i, c in enumerate(cols) if not _volatile(c)]
+        if cols[:1] in (['Setting'], ['Özellik']):  # key/value tables: drop volatile rows
+            frame = frame[[not _volatile(k) for k in frame.iloc[:, 0]]]
         return {'__frame__': [cols[i] for i in keep],
                 'rows': [[encode(row[i]) for i in keep] for row in frame.itertuples(index=False, name=None)]}
     if isinstance(value, pd.Series):
@@ -256,8 +260,13 @@ def capture(names=None):
     return {name: run_section(name) for name in (names or SECTIONS)}
 
 
-def load():
-    with gzip.open(STORE, 'rt', encoding='utf-8') as handle:
+def save(data, path):
+    with gzip.open(path, 'wt', encoding='utf-8', compresslevel=9) as handle:
+        json.dump(data, handle, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+
+
+def load(path):
+    with gzip.open(path, 'rt', encoding='utf-8') as handle:
         return json.load(handle)
 
 
@@ -282,9 +291,31 @@ def compare(expected, actual, path='', rtol=1e-6, atol=1e-8, out=None):
     return out
 
 
+def main(argv=None):
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+    sub = parser.add_subparsers(dest='command', required=True)
+    cap = sub.add_parser('capture'); cap.add_argument('out'); cap.add_argument('--root')
+    cmp_ = sub.add_parser('compare'); cmp_.add_argument('reference'); cmp_.add_argument('current')
+    cmp_.add_argument('--rtol', type=float, default=0.); cmp_.add_argument('--atol', type=float, default=0.)
+    args = parser.parse_args(argv)
+    if args.command == 'capture':
+        import sys
+        if args.root:  # import core/ui/reports from another checkout (the reference commit)
+            sys.path.insert(0, str(Path(args.root).resolve()))
+            for name in [m for m in sys.modules if m.split('.')[0] in ('core', 'ui', 'reports')]:
+                del sys.modules[name]
+        data = capture()
+        save(data, args.out)
+        print(f'captured {list(data)} -> {args.out}')
+        return 0
+    reference, current = load(args.reference), load(args.current)
+    differences = compare(reference, current, rtol=args.rtol, atol=args.atol)
+    for line in differences[:50]:
+        print(line)
+    print(f'{len(differences)} differences in {len(reference)} sections (rtol={args.rtol}, atol={args.atol})')
+    return 1 if differences or set(reference) != set(current) else 0
+
+
 if __name__ == '__main__':
-    STORE.parent.mkdir(parents=True, exist_ok=True)
-    data = capture()
-    with gzip.open(STORE, 'wt', encoding='utf-8', compresslevel=9) as handle:
-        json.dump(data, handle, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
-    print(f'{STORE.relative_to(ROOT)}: {STORE.stat().st_size} bytes, sections={list(data)}')
+    raise SystemExit(main())
