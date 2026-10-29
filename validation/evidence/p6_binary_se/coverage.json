@@ -1,0 +1,76 @@
+{
+  "design": {
+    "models": [
+      "1PL",
+      "2PL"
+    ],
+    "replications": 300,
+    "N": 1000,
+    "items": 12,
+    "seed": 20261029,
+    "a": "linspace(0.8, 2.0, 12) for 2PL; 1 for 1PL",
+    "b": "linspace(-1.5, 1.5, 12)",
+    "theta": "N(0, 1)",
+    "fit": "fit_python_mirt defaults (ML, 21 GH nodes, tol 1e-4, max_iter 500)",
+    "ci": "95% Wald from core.irt_binary_inference.parameter_inference"
+  },
+  "criteria": {
+    "convergence_rate_min": 0.99,
+    "abs_mean_bias_max": 0.05,
+    "coverage_abs_error_max": 0.02,
+    "rationale": "Declared before running. Pooled over items per parameter type; with 300 x 12 intervals the Monte Carlo SE of a 95% coverage is about 0.004, so 0.02 is about five MC SE. Bias limit 0.05 logit is below one tenth of the smallest SE at N = 1000."
+  },
+  "results": {
+    "1PL": {
+      "replications": 300,
+      "converged": 300,
+      "se_withheld": 0,
+      "b": {
+        "intervals": 3600,
+        "mean_bias": -0.003057601317070561,
+        "max_item_abs_bias": 0.009632050076964513,
+        "rmse": 0.08065840466191188,
+        "coverage": 0.9530555555555555,
+        "coverage_mc_se": 0.0035253314887573545
+      }
+    },
+    "2PL": {
+      "replications": 300,
+      "converged": 300,
+      "se_withheld": 0,
+      "a": {
+        "intervals": 3600,
+        "mean_bias": 0.007343525696303056,
+        "max_item_abs_bias": 0.02380244292517894,
+        "rmse": 0.1466287678256511,
+        "coverage": 0.9508333333333333,
+        "coverage_mc_se": 0.0036035979534177437
+      },
+      "b": {
+        "intervals": 3600,
+        "mean_bias": -0.002903429116601916,
+        "max_item_abs_bias": 0.03214218202830254,
+        "rmse": 0.10069416071315057,
+        "coverage": 0.945,
+        "coverage_mc_se": 0.0037996710383926676
+      }
+    }
+  },
+  "checks": {
+    "1PL_convergence": true,
+    "1PL_b_bias": true,
+    "1PL_b_coverage": true,
+    "2PL_convergence": true,
+    "2PL_a_bias": true,
+    "2PL_a_coverage": true,
+    "2PL_b_bias": true,
+    "2PL_b_coverage": true
+  },
+  "status": "MET (pre-registered numerical criteria; not a general certification)",
+  "wall_seconds": 17.0,
+  "versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.5.3",
+    "python": "3.13.17"
+  }
+}
