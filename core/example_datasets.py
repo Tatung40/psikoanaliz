@@ -55,7 +55,8 @@ def registry():
         for level,(n,k,dims) in enumerate(((300,8,2),(500,12,3),(700,16,2))):
             # Free-asymptote general profiles explicitly support 2D only.
             if 'serbest' in model:dims=2
-            if model=='Bifactor':dims=3
+            # Bifactor fit requires 3–4 specific groups with >= 3 items each; 4 per group converges at screen defaults.
+            if model=='Bifactor':dims,k=4,max(k,12)
             add('mirt',model,level,n,k,dimensions=dims)
     for model in ('2PL','GRM','PCM','GPCM','RSM','NRM'):
         for level,effect in enumerate(('null','uniform','nonuniform')):
