@@ -28,3 +28,14 @@ karşılaştırılmıştır.
 | G-Kuramı 5 desen, 15 örnek, D çalışmaları | ✓ | ✓ | yok (golden 0 fark; bağımsız EMS) |
 | 117 örnek veri indirmeleri, Python kod üretimi | ✓ | ✓ | yok (3 bifaktör örneği kasıtlı değişti) |
 | Asimptotik 3PL/4PL DIF, B10/B11 görünümleri | yönlendirilmemiş (erişilemez) | kaldırıldı | kullanıcı kaybı yok |
+
+## Kalan yerel hesaplamalar — kütüphane kararı (2026-10-29)
+
+| Alan | Karar | Gerekçe ve kanıt |
+|---|---|---|
+| Rasch MML (`core.rasch`) | B | Python mirt ortak serbest a'lı 1PL aynı modeldir (σ = a, b = a·b′): σ farkı 3e-6, b ≤ 1,7e-5, logLik 2e-7 (`tests/test_native_library_equivalence.py`). Yerel kestirici korunur: kütüphane adaptörü eksik yanıtı (MAR) kabul etmez; WLE, infit/outfit, güvenirlik, Q3 ve Rasch DIF bu kestirime bağlıdır. |
+| RSM (`core.irt_rsm`) | B | `fit_mirt` RSM sunmaz; alt düzey `EMEstimator(RatingScaleModel)` σ = 1 altında yerel kestirimle 20/20 veri setinde eşleşir (`validation/RSM_VALIDATION.md`, `tests/test_irt_rsm.py`). Rasch tanımlaması (σ serbest) ve RSM–PCM LR yereldir. |
+| Sabit çapalı ikili/GRM/PCM/GPCM DIF | B | Aynı çapa tasarımında genel LR `mirt.fit_multigroup` ile eşit: 2PL/GRM/PCM ≤ 1e-5, GPCM ≤ 5e-4 (tolerans 1e-3). Yerel kestirici korunur: kütüphane yolunda çok gruplu Hessian/SE yok; p/q, Wald GA, tek biçimli/olmayan ayrışımı ve arındırma yalnız yerel yolda doğrulanmıştır. |
+| 3PL/4PL bootstrap DIF (`irt_mg34`) | C | Kütüphanenin çok gruplu 3PL/4PL'i c/d'yi gruplarda eşit tutar; yerel tasarım (sınırlı MML, gruplara göre asimptot, parametrik bootstrap) farklı bir modeldir. Sayısal eşdeğerlik iddia edilmez; mevcut boyut çalışması ve testler korunur. |
+| Q3 / merkezlenmiş Q3 | A | Yerel uyum ekranında madde parametreleri ve bootstrap yeniden kestirimi zaten Python mirt (`local_fit.primary_refit`); Q3 yalnız artık korelasyonudur. Rasch sayfasındaki Q3 yerel Rasch kestirimine tutarlı bağlıdır. |
+| Genel MIRT profilleri / bifaktör | C / A | Serbest asimptotlu çok boyutlu 3PL/4PL `fit_mirt` ile desteklenmez; SciPy prototipi deneysel etiketle korunur. Bifaktör `mirt.bfactor` (A); örnekler varsayılan ayarla yakınsar. N=500/700'de yükler geri bulunur (genel RMSE 0,19/0,12); N=300 öğretim örneğinde bir yük sınıra dayanır, ekran bunu artık açıkça uyarır. |
