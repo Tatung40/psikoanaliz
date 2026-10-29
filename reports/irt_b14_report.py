@@ -63,7 +63,8 @@ def report_tables(result):
         "Kategori Frekansları":category_frequencies(result["coded"],result["labels"]),
         "Kalite Denetimi":quality_report(result["coded"],result["labels"],result["model"])}
     try:
-        p=result["result"].coef_with_se()
+        from core.irt_python_mirt_parameters import coef_with_se_table
+        p=coef_with_se_table(result["result"])
         if not isinstance(p,pd.DataFrame):p=pd.DataFrame(p)
         frames["Motor Parametreleri"]=p.reset_index()
     except Exception as exc:

@@ -28,3 +28,19 @@ def python_mirt_binary_parameters(fit, *, model, item_names=None):
         raw["d"] = coef["upper"]
     # Preserve the external 1PL common discrimination rather than assuming 1.
     return normalize_binary_item_parameters(raw, model=model, item_names=item_names)
+
+
+def coef_with_se_table(fit):
+    """fit.coef_with_se() with SE of fixed/identification-constrained parameters blanked.
+
+    Python mirt 1.2.0 reports SE = 0.0 for parameters that are not estimated (PCM/1PL a = 1,
+    NRM category-1 slope/intercept = 0). An estimated parameter never has an exact zero SE,
+    so 0.0 is shown as missing rather than as a perfectly precise estimate.
+    """
+    frame = fit.coef_with_se()
+    if not isinstance(frame, pd.DataFrame):
+        frame = pd.DataFrame(frame)
+    frame = frame.copy()
+    for column in [c for c in frame.columns if str(c).endswith("_se")]:
+        frame[column] = frame[column].mask(frame[column] == 0)
+    return frame
