@@ -55,6 +55,7 @@ def fit_b14(data,model,*,categories=None):
     x,labels=prepare_polytomous(data,model,categories=categories)
     fitted=fit_python_mirt(x.to_numpy(),model=model,n_categories=len(labels))
     return {"model":model,"engine":"Python mirt 1.2.0",
-            "status":"DENEYSEL — bağımsız psikometrik doğrulama yapılmadı",
+            "status":("R mirt 1.48 ile sayısal uyum (tek veri seti) ve Monte Carlo geri kazanımı mevcut; "
+                      "genel sertifika değildir (validation/r_mirt_polytomous)"),
             "labels":labels,"items":tuple(map(str,x.columns)),"N":len(x),
             "k":x.shape[1],"result":fitted.fit,"coded":x}

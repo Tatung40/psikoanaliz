@@ -5,6 +5,7 @@ The recorder is session-local; wrappers remain inert outside a capture context.
 """
 from contextvars import ContextVar
 from functools import wraps
+import dataclasses
 import hashlib
 import importlib
 import importlib.metadata
@@ -97,7 +98,8 @@ def decode(value, results=()):
     if tag == 'ref':
         result = results[value['path'][0]]
         for key in value['path'][1:]:
-            result = result[key]
+            # {"@attr": name} steps into a field of a result container (e.g. PythonMirtResult.fit).
+            result = getattr(result, key['@attr']) if isinstance(key, dict) else result[key]
         return result
     if tag == 'NA':
         return pd.NA
@@ -156,6 +158,10 @@ def _remember(value, path, refs, keep):
     elif isinstance(value, (tuple, list)):
         for i, item in enumerate(value):
             _remember(item, path + [i], refs, keep)
+    elif dataclasses.is_dataclass(value) and not isinstance(value, type):
+        # Result containers: a later page run may pass one field (outcome.fit) to another public call.
+        for field in dataclasses.fields(value):
+            _remember(getattr(value, field.name), path + [{'@attr': field.name}], refs, keep)
 
 
 class Recorder:

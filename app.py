@@ -1777,9 +1777,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         instrument_code_capture(globals())
         with st.sidebar:
             solver_options=solver_controls(f"py_mirt_solver_{model}")
-        st.warning("Etkin iki kategorili MTK motoru: Python mirt. "
-                   "Parametre kurtarma ve bağımsız karşılaştırma tamamlanmadığından "
-                   "bu çıktılar araştırma amaçlıdır.")
+        from core.irt_binary_usage_policy import evidence_note
+        _level, _note = evidence_note(model)
+        (st.info if _level == "info" else st.warning)("Etkin iki kategorili MTK motoru: Python mirt. " + _note)
         estimation = "ML"
         if model in ("3PL", "4PL"):
             with st.sidebar.expander("🎯 3PL/4PL kestirim yöntemi", expanded=True):
@@ -1873,8 +1873,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 external_fit = previous_external["fit"]
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
                            f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
-                st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
-                        "ürettiği deneysel çıktıdır.")
+                st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan ürettiği çıktıdır.")
                 # Fit diagnostics are read directly from the external library,
                 # never recomputed from the retired native engine.
                 from core.irt_library_diagnostics import library_fit_diagnostics
@@ -2054,7 +2053,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            "resmî analiz sonuçlarına eklenmez; AIC/BIC karşılaştırması "
                            "'MTK: Karşılaştırma' sayfasında betimsel olarak sunulur.")
             else:
-                st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
+                st.info("Veri veya madde seçimi değişti; eski sonuç gösterilmiyor.")
 
 
 else:

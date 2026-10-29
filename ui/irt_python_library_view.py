@@ -56,6 +56,10 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     estimation='ML';categories=None;labels=();multi=False
     if model=='Rasch':st.info('Rasch: a=1; θ~N(0,1). Yerel serbest-σ Rasch ekranından ayrıdır.')
     if model=='1PL':st.info('1PL: ortak a serbest; 2PL üzerinde belgelenmiş eşitlik kısıtı. Rasch sekmesinde a=1 sabittir.')
+    if model in BINARY:
+        from core.irt_binary_usage_policy import evidence_note
+        _level,_note=evidence_note(model,common_discrimination=model=='1PL')
+        (st.info if _level=='info' else st.warning)(_note)
     if model in ('3PL','4PL'):
         estimation=st.radio('Kestirim',['MAP','ML'],key=f'python_mirt_estimation_{model}',horizontal=True)
         st.caption('MAP: kütüphane varsayılan önselleri; mevcut bilimsel kullanım sınırları geçerlidir.')
