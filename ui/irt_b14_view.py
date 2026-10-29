@@ -77,15 +77,18 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
             try:
                 with st.spinner("Çok kategorili model kalibre ediliyor"):
                     result=fit_b14(subset,model,categories=categories)
+                import secrets
                 st.session_state["b14_current"]={"model":model,"columns":tuple(cols),
                     "datahash":int(pd.util.hash_pandas_object(subset,index=True).sum()),
-                    "result":result}
+                    "result":result,"token":secrets.token_hex(8)}
             except Exception as e:
                 st.error(f"Kestirim başarısız: {e}")
         saved=st.session_state.get("b14_current")
         if saved and saved["model"]==model and saved["columns"]==tuple(cols) and saved["datahash"]==int(pd.util.hash_pandas_object(subset,index=True).sum()):
             result=saved["result"]
     if result is not None:
+        # Optional results (diagnostics, comparison, ZIP) belong to exactly this fit; a refit or data change drops them.
+        token=saved["token"] if saved and saved.get("result") is result else None
         st.warning(result["status"])
         fit=result["result"]
         st.write("Model:",model,"| Motor:",result["engine"],"| N:",result["N"],"| Madde:",result["k"])
@@ -101,9 +104,9 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         st.markdown("### Model ve Madde Uyum Tanıları (Deneysel)")
         if st.button("Model sonrası tanıları çalıştır",key="b14_diagnostics_run"):
             status,tables=model_diagnostics(result)
-            st.session_state["b14_diagnostics"]={"model":model,"status":status,"tables":tables}
+            st.session_state["b14_diagnostics"]={"token":token,"status":status,"tables":tables}
         diagnostic=st.session_state.get("b14_diagnostics")
-        if diagnostic and diagnostic["model"]==model:
+        if diagnostic and diagnostic.get("token")==token:
             st.dataframe(diagnostic["status"],hide_index=True,use_container_width=True)
             for diagnostic_name,diagnostic_table in diagnostic["tables"].items():
                 st.markdown("**"+diagnostic_name+"**")
@@ -155,11 +158,14 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
             st.info(f"Bilgi fonksiyonu hesaplanamadı: {exc}")
         if model!="NRM" and st.button("GRM / PCM / GPCM model karşılaştırmasını çalıştır",key="b14_compare_run"):
             with st.spinner("Üç sıralı model kestiriliyor"):
-                st.session_state["b14_compare"]=(tuple(cols),model_comparison(result["coded"]))
+                st.session_state["b14_compare"]=(token,model_comparison(result["coded"]))
         cmp=st.session_state.get("b14_compare")
-        if cmp and cmp[0]==tuple(cols):
+        if cmp and cmp[0]==token:
             table,lr=cmp[1]
             st.dataframe(table,hide_index=True,use_container_width=True)
+            st.download_button("Model karşılaştırmasını CSV indir",
+                safe_frame(table.assign(**({"LR (PCM⊂GPCM)":lr["LR"],"sd":lr["sd"],"p":lr["p"]} if lr else {}))).to_csv(index=False).encode("utf-8-sig"),
+                "B14_model_karsilastirma.csv",mime="text/csv",key="b14_compare_csv",on_click="ignore")
             if lr:
                 st.caption(f"{lr['Karşılaştırma']}: LR = {lr['LR']:.3f}, sd = {lr['sd']}, p = {lr['p']:.4g}. "
                            "GRM ile PCM/GPCM iç içe değildir; yalnızca AIC/BIC karşılaştırılır.")
@@ -175,7 +181,12 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         st.markdown(narrative)
         st.download_button("Açıklamalı raporu Markdown indir",narrative.encode("utf-8"),
                            "B14_Aciklamali_Rapor.md",mime="text/markdown",key="b14_narrative_dl")
-        tables=report_tables(result)
+        extras={}
+        if diagnostic and diagnostic.get("token")==token:
+            extras.update({"Tanı Durumu":diagnostic["status"],**{"Tanı - "+k:v for k,v in diagnostic["tables"].items()}})
+        if cmp and cmp[0]==token:
+            extras["Model Karşılaştırması"]=cmp[1][0]
+        tables=report_tables(result,extras)
         st.markdown("**Model ve kestirim bilgileri**")
         st.dataframe(tables["Meta"],hide_index=True,use_container_width=True)
         left,right=st.columns(2)
@@ -183,9 +194,10 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         left.download_button("B14 tüm tablolar Excel",export_xlsx(tables),
             "B14_rapor.xlsx",mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",key="b14_xlsx",on_click="ignore")
         if right.button("B14 ZIP paketini hazırla",key="b14_zip_make"):
-            st.session_state["b14_zip"]=export_zip(result)
-        if "b14_zip" in st.session_state:
-            right.download_button("B14 ZIP indir",st.session_state["b14_zip"],
+            st.session_state["b14_zip"]=(token,export_zip(result,extras))
+        packed=st.session_state.get("b14_zip")
+        if packed and packed[0]==token:
+            right.download_button("B14 ZIP indir",packed[1],
                 "B14_rapor.zip",mime="application/zip",key="b14_zip_dl")
         st.caption("Parametre SH, model uyumu ve karşılaştırma yorumları bağımsız doğrulama tamamlanmadan "
                    "kesin bilimsel kanıt olarak sunulmaz.")

@@ -1492,6 +1492,20 @@ elif selected_page == "MTK: Rasch":
                             st.dataframe(dr["history"], hide_index=True, use_container_width=True)
                             download_table_pair(dr["table"].round(5), "psikoanaliz_rasch_dif", "DIF tablosu",
                                                 "rasch_dif_dl")
+                # Every table shown above, for the current data and settings only (no recomputation).
+                st.markdown("#### Rasch rapor paketi")
+                current = {name: (st.session_state.get(f"rasch_{name}") or {}) for name in ("gf", "q3", "dif")}
+                current = {name: v.get("result") if v.get("key") == b8_key else None for name, v in current.items()}
+                from ui.rasch_view import report_bundle as rasch_report_bundle
+                bundle_sheets, bundle_xlsx, bundle_zip = rasch_report_bundle(rr, current["gf"], current["q3"], current["dif"])
+                st.caption("İçerik: " + ", ".join(bundle_sheets) + ". Model uyumu, Q3 ve DIF yalnız ilgili sekmede "
+                           "hesaplandıysa eklenir.")
+                pk1, pk2 = st.columns(2)
+                pk1.download_button("⬇️ Tüm Rasch tabloları — Excel", bundle_xlsx, "psikoanaliz_rasch_rapor.xlsx",
+                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    key="rasch_bundle_xlsx", use_container_width=True)
+                pk2.download_button("⬇️ Rasch rapor paketi — ZIP", bundle_zip, "psikoanaliz_rasch_rapor.zip",
+                                    "application/zip", key="rasch_bundle_zip", use_container_width=True)
 
 # =============================================================================
 # SAYFA 13: MADDE TEPKİ KURAMI (MTK / IRT)

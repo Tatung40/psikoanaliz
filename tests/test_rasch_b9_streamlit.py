@@ -87,9 +87,23 @@ def test_apptest_b9_tabs_fit_q3_and_dif():
     assert dif["reference"] == "R" and dif["focal"] == "F"
     assert set(dif["table"].loc[dif["table"]["DIF işareti"], "Madde"]) == {"M3", "M8"}
     assert any("F (odak) − R (referans)" in m.value for m in at.markdown)
+    # Report bundle: every table shown above, read back from the actual Excel bytes.
+    import io
+    names, xlsx, archive = ui.report_bundle(b8, gf, at.session_state["rasch_q3"]["result"], dif)
+    assert names == ["Maddeler", "Kisiler", "Guvenirlik", "Model_ozeti", "Global_uyum", "Siniflama", "Ham_puan",
+                     "Tabakalar", "Artik_ozeti", "Q3_ciftleri", "DIF_ozeti", "DIF_tablosu", "DIF_arindirma"]
+    assert any(c.value == "İçerik: " + ", ".join(names) + ". Model uyumu, Q3 ve DIF yalnız ilgili sekmede "
+               "hesaplandıysa eklenir." for c in at.caption)
+    sheets = pd.read_excel(io.BytesIO(xlsx), sheet_name=None)
+    np.testing.assert_allclose(sheets["DIF_tablosu"]["p"].to_numpy(float), dif["table"]["p"].to_numpy(float), equal_nan=True)
+    np.testing.assert_allclose(sheets["Maddeler"]["b"].to_numpy(float), b8["items"]["b"].to_numpy(float))
+    assert len(sheets["Q3_ciftleri"]) == len(at.session_state["rasch_q3"]["result"]["pairs"])
+    import zipfile
+    assert {f"tablolar/{n}.csv" for n in names} <= set(zipfile.ZipFile(io.BytesIO(archive)).namelist())
     at.checkbox(key="rasch_dif_purify").uncheck().run()
     assert any("farklı grup veya ayarlarla" in i.value for i in at.info)
     # A new B8 run with other settings invalidates the B9 results (session isolation by key).
     at.select_slider(key="rasch_points").set_value(31).run()
     next(b for b in at.button if "Rasch Analizini Başlat" in b.label).click().run()
     assert not any("F (odak) − R (referans)" in m.value for m in at.markdown)
+    assert any(c.value.startswith("İçerik: Maddeler, Kisiler, Guvenirlik, Model_ozeti. ") for c in at.caption)

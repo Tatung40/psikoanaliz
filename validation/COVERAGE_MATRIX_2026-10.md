@@ -39,3 +39,20 @@ karşılaştırılmıştır.
 | 3PL/4PL bootstrap DIF (`irt_mg34`) | C | Kütüphanenin çok gruplu 3PL/4PL'i c/d'yi gruplarda eşit tutar; yerel tasarım (sınırlı MML, gruplara göre asimptot, parametrik bootstrap) farklı bir modeldir. Sayısal eşdeğerlik iddia edilmez; mevcut boyut çalışması ve testler korunur. |
 | Q3 / merkezlenmiş Q3 | A | Yerel uyum ekranında madde parametreleri ve bootstrap yeniden kestirimi zaten Python mirt (`local_fit.primary_refit`); Q3 yalnız artık korelasyonudur. Rasch sayfasındaki Q3 yerel Rasch kestirimine tutarlı bağlıdır. |
 | Genel MIRT profilleri / bifaktör | C / A | Serbest asimptotlu çok boyutlu 3PL/4PL `fit_mirt` ile desteklenmez; SciPy prototipi deneysel etiketle korunur. Bifaktör `mirt.bfactor` (A); örnekler varsayılan ayarla yakınsar. N=500/700'de yükler geri bulunur (genel RMSE 0,19/0,12); N=300 öğretim örneğinde bir yük sınıra dayanır, ekran bunu artık açıkça uyarır. |
+
+## Bütünleşik çıktı denetimi — ekran ↔ indirme (PR #94)
+
+Yöntem: her analiz ekranında gösterilen tablolar ile o ekranın CSV/XLSX/ZIP içerikleri karşılaştırıldı;
+yeni/değişen bağlantılar gerçek dosya içeriği okunarak test edildi.
+
+| Ekran | Durum öncesi | Düzeltme | Test |
+|---|---|---|---|
+| Rasch MML | C: güvenirlik, model özeti, global uyum (M2, sınıflama, artık), DIF özeti ve arındırma geçmişi ekranda, indirmede yok | Koşullu Excel + ZIP rapor paketi (yalnız aynı veri/ayar için hesaplanan bölümler) | `test_rasch_b9_streamlit.py` (Excel içeriği oturum sonuçlarıyla birebir) |
+| B14 (GRM/PCM/GPCM/NRM) | C: GRM/PCM/GPCM karşılaştırması ekranda, hiçbir indirmede yok; tanılar Excel/ZIP'te yok. P1: tanı/karşılaştırma/ZIP bir önceki kestirime ait olabiliyordu | Karşılaştırma CSV'si; tanı ve karşılaştırma Excel/ZIP'e eklenir; hepsi kestirim belirtecine bağlı | `test_b14_optional_exports.py` |
+| Python mirt ikili (SH/GA, 8 grafik, ZIP) | A | — | `test_irt_binary_extras.py` |
+| Yerel uyum/Q3/S-X², boyutluluk, RSM, Python mirt DIF, MIRT, G/D, GRM/çok kategorili DIF | A (paketler sonuçtaki tüm tabloları içerir) | — | mevcut testler |
+
+Kabul kapıları: G1 kapsam PASS (silinen çıktı yok) · G2 bütünleşme PASS (yerel yardımcılar aynı kestirime bağlı:
+kişi EAP ve Q3 Python mirt eğrileri/parametreleri; Rasch/DIF eşdeğerlik testleri) · G3 sayısal doğruluk PASS
+(toleranslar değişmedi) · G4 UI PASS (AppTest) · G5 export PASS (Excel/ZIP içerik okumalı testler) · G6 regresyon:
+CI golden-master ve tam regresyon sonucu PR'da raporlanır.
