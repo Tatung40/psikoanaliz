@@ -11,7 +11,9 @@ import pandas as pd
 
 Z95 = 1.959963984540054
 NAMES = {"discrimination": "a", "difficulty": "b", "guessing": "c", "upper": "d"}
-STATUS = "EXPERIMENTAL: Oakes gözlenen bilgi SH; Wald GA bağımsız kapsama çalışmasıyla sertifikalı değildir."
+STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. 1PL/2PL: önceden kayıtlı Monte Carlo'da (N = 1000, 12 madde, "
+          "300 tekrar) kapsama .945–.953; diğer koşullarda ve 3PL/4PL'de kapsama kanıtı yoktur "
+          "(validation/evidence/p6_binary_se/coverage.json).")
 
 
 def _matrix(value):
