@@ -63,7 +63,7 @@ CI golden-master ve tam regresyon sonucu PR'da raporlanır.
 |---|---|---|---|
 | Rasch, 1PL, 2PL, 3PL | R mirt (`validation/r_mirt_phase1`, eşleşme ≤ 9e-4 parametre) | 3PL/4PL 20 tekrar (`p1_3pl4pl`); **1PL/2PL 300 tekrar, SH/GA kapsaması .945–.953 (yeni, `p6_binary_se`)** | doğrulandı (belirtilen koşullarda) |
 | 4PL | R mirt yakınsamadı | ML ölçütleri sağlanmadı; MAP N ≥ 3000 | kullanım politikası ile sınırlı |
-| GRM, PCM, GPCM, NRM (tek boyut) | **R mirt karşılaştırması eklendi (`validation/r_mirt_polytomous`)**; sonuç CI R işinde | Monte Carlo (`POLYTOMOUS_MC_VALIDATION.md`) | R sonucu PR CI'da raporlanır |
+| GRM, PCM, GPCM, NRM (tek boyut) | **R mirt 1.48 (`validation/r_mirt_polytomous`, CI): 4/4 model ölçütleri sağladı** — parametre ≤ 1,9e-4, olasılık ≤ 3,6e-5, ortak logLik ≤ 2,2e-7, EAP ≤ 3e-5; serbest parametre sayısı eşit. NRM: Python ayna (θ → −θ) yönündeydi (eşdeğer çözüm, hizalandı); R varsayılan tanımlamasıyla yakınsamadı, aynı modelin a1 = 1 tanımlamasıyla yakınsadı | Monte Carlo (`POLYTOMOUS_MC_VALIDATION.md`) | sayısal uyum (N = 300, 8 madde, tek veri seti; genel sertifika değildir) |
 | RSM | Python mirt `RatingScaleModel` 20/20 | `rsm_recovery_study.py` | doğrulandı |
 | Çok boyutlu 2D–5D, bifaktör | R mirt (`mirt_stage1`, 12 profil) | tekrarlı çalışma yok | geri kazanım NOT VERIFIED |
 | Sabit çapalı DIF | yerel ↔ kütüphane LR eşitliği (PR #93) | `dif_validation_study.py` | doğrulandı |
