@@ -57,7 +57,7 @@ def summary_metadata(result):
             continue
     return pd.DataFrame([{"Özellik":k,"Değer":v} for k,v in vals.items()])
 
-def report_tables(result):
+def report_tables(result,extras=None):
     from reports.irt_b14_audit import interpretation_audit
     frames={"Bilimsel Denetim":interpretation_audit(result)["table"],"Meta":summary_metadata(result),
         "Kategori Frekansları":category_frequencies(result["coded"],result["labels"]),
@@ -76,6 +76,9 @@ def report_tables(result):
         frames["Bilgi Fonksiyonları"]=information_table(result)
     except Exception as exc:
         frames["Kişi ve Bilgi Açıklaması"]=pd.DataFrame([{"Açıklama":"Kişi/bilgi tablosu üretilemedi.","Gerekçe":str(exc)}])
+    # Optional sections computed on screen for this same fit (diagnostics, model comparison).
+    for name,frame in (extras or {}).items():
+        frames[name]=pd.DataFrame(frame)
     return frames
 
 def export_xlsx(frames):
@@ -85,9 +88,9 @@ def export_xlsx(frames):
             safe_frame(frame).to_excel(writer,sheet_name=name[:31],index=False)
     return buf.getvalue()
 
-def export_zip(result):
+def export_zip(result,extras=None):
     from reports.irt_b14_narrative import guided_report
-    frames=report_tables(result)
+    frames=report_tables(result,extras)
     buf=io.BytesIO()
     with zipfile.ZipFile(buf,"w",zipfile.ZIP_DEFLATED) as z:
         z.writestr("B14_rapor.xlsx",export_xlsx(frames))
@@ -96,7 +99,9 @@ def export_zip(result):
             slug={"Bilimsel Denetim":"bilimsel_denetim","Meta":"meta","Kategori Frekansları":"kategori_frekans",
                   "Kalite Denetimi":"kalite","Motor Parametreleri":"parametre",
                   "Parametre Açıklaması":"aciklama","Kişi Yetenekleri":"kisi_yetenekleri",
-                  "Bilgi Fonksiyonları":"bilgi_fonksiyonlari","Kişi ve Bilgi Açıklaması":"kisi_bilgi_aciklama"}[name]
+                  "Bilgi Fonksiyonları":"bilgi_fonksiyonlari","Kişi ve Bilgi Açıklaması":"kisi_bilgi_aciklama",
+                  "Model Karşılaştırması":"model_karsilastirma","Tanı Durumu":"tani_durumu"}.get(name)
+            slug=slug or "tani_"+"".join(ch if ch.isalnum() else "_" for ch in name.removeprefix("Tanı - ").lower())
             z.writestr(slug+".csv",safe_frame(frame).to_csv(index=False).encode("utf-8-sig"))
         z.writestr("BILIMSEL_UYARI.txt",
             "B14 deneysel Python mirt kestirimi. SH, GA, model uyumu, yerel bagimsizlik "
