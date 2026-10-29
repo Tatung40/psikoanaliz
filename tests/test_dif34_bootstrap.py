@@ -55,3 +55,38 @@ def test_input_guards():
         boot.bootstrap_dif_test(x, g, 0, 1, "M1", ["M0", "M2"], B=5)
     with pytest.raises(ValueError):
         boot.bootstrap_dif_test(x, g, 0, 1, "M1", ["M0", "M2"], model="2PL", B=19)
+
+
+def _independent_loglik(x, groups, fitted, points=41):
+    """Two-group marginal log-likelihood from the unpacked parameters on an independent GH rule."""
+    from numpy.polynomial.hermite_e import hermegauss
+    from scipy.special import logsumexp
+    z, w = hermegauss(points); logw = np.log(w / w.sum()); d = fitted["design"]; total = 0.
+    for g in (0, 1):
+        mu, sd = d.latent_of(fitted["params"], g)
+        a, b, c, dd = d.unpack(fitted["params"], g)
+        dd = np.ones_like(a) if d.model == "3PL" else dd
+        p = c + (dd - c) * expit(a * (mu + sd * z[:, None] - b))
+        y = x[groups == g]
+        total += logsumexp(y @ np.log(p).T + (1 - y) @ np.log1p(-p).T + logw, axis=1).sum()
+    return float(total)
+
+
+def test_lr_constraints_likelihoods_and_seed_determinism():
+    """Null: studied item equal across groups; alternative: only it free; anchors equal in both; LR and
+    both log-likelihoods agree with an independent evaluation; same seed gives the same bootstrap."""
+    x, g = data(dif=.5, seed=7)
+    y = x.to_numpy(float); groups = g.to_numpy()
+    T, ok, f0, f1 = boot._lr(y, np.ones_like(y, bool), groups, "3PL", 1, [0, 2, 3, 4, 5], boot.default_bounds(), 41)
+    assert ok
+    for fitted, studied_free in ((f0, False), (f1, True)):
+        p0, p1 = (np.array(fitted["design"].unpack(fitted["params"], h)) for h in (0, 1))
+        anchors = [0, 2, 3, 4, 5]
+        np.testing.assert_array_equal(p0[:, anchors], p1[:, anchors])
+        assert (not np.array_equal(p0[:, 1], p1[:, 1])) == studied_free
+        assert _independent_loglik(y, groups, fitted) == pytest.approx(fitted["loglik"], abs=1e-6)
+    assert T == pytest.approx(2 * (f1["loglik"] - f0["loglik"]), abs=1e-12) and T > 0
+    args = (x, g, 0, 1, "M1", ["M0", "M2", "M3", "M4", "M5"])
+    r1, r2 = boot.bootstrap_dif_test(*args, B=19, seed=11), boot.bootstrap_dif_test(*args, B=19, seed=11)
+    assert r1["null_stats"] == r2["null_stats"] and r1["p"] == r2["p"]
+    assert r1["p"] == pytest.approx((1 + sum(t >= r1["T_obs"] - 1e-12 for t in r1["null_stats"])) / (r1["B_ok"] + 1))

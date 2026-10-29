@@ -34,34 +34,43 @@ def parameter_inference(fit, model, item_names):
         return None, "Kütüphane kovaryans matrisi okunamadı; SH üretilmedi."
     if len(labels) > 2 ** min(len(names), 60) - 1:
         return None, "Serbest parametre sayısı gözlenebilir yanıt örüntüsü sayısını aşıyor; SH anlamsız."
-    if not np.isfinite(covariance).all():
-        return None, "Kovaryans matrisi sonlu değil (çoğunlukla sınırdaki parametreler); SH üretilmedi."
-    covariance = (covariance + covariance.T) / 2
-    eigen = np.linalg.eigvalsh(covariance)
-    if eigen[0] <= 0:
-        return None, "Kovaryans matrisi pozitif tanımlı değil; SH üretilemez."
-    if eigen[-1] / eigen[0] > 1e8:
-        return None, f"Kovaryans matrisi kötü koşullanmış (koşul sayısı {eigen[-1] / eigen[0]:.3g}); SH üretilmedi."
     coef = fit.coef()
     library_items = [str(i) for i in coef.index]
     if len(library_items) != len(names):
         return None, "Madde sayısı kütüphane katsayılarıyla uyuşmuyor."
-    rows = []
-    for position, label in enumerate(labels):
+    parsed = []
+    for label in labels:
         parameter, _, item = label.partition("[")
         item = item.rstrip("]")
         if parameter not in NAMES or item not in library_items:
             return None, f"Tanınmayan kovaryans etiketi: {label}"
         j = library_items.index(item)
         estimate = float(coef.iloc[j][parameter])
-        se = float(np.sqrt(covariance[position, position]))
         low, high = bounds[parameter]
-        on_bound = min(abs(estimate - low), abs(estimate - high)) <= 1e-6
-        note = "Kutu sınırında; Wald GA geçersiz" if on_bound else ""
-        rows.append({"Madde": names[j], "Parametre": NAMES[parameter], "Kestirim": estimate,
-                     "SH": np.nan if on_bound else se,
-                     "GA %95 alt": np.nan if on_bound else estimate - Z95 * se,
-                     "GA %95 üst": np.nan if on_bound else estimate + Z95 * se, "Not": note})
+        parsed.append((j, parameter, estimate, min(abs(estimate - low), abs(estimate - high)) <= 1e-6))
+    # The library holds coordinates on an optimizer bound fixed and returns NaN rows/columns for them; the
+    # remaining block is the observed-information covariance of the interior parameters given those values.
+    # A non-finite entry among interior parameters is a failure of the whole matrix.
+    held = np.array([p[3] for p in parsed])
+    active = ~held
+    if not active.any():
+        return None, "Tüm parametreler kutu sınırında; SH üretilemez."
+    block = covariance[np.ix_(active, active)]
+    if not np.isfinite(block).all():
+        return None, "Kovaryans matrisi sınır dışı parametrelerde sonlu değil; SH üretilmedi."
+    block = (block + block.T) / 2
+    eigen = np.linalg.eigvalsh(block)
+    if eigen[0] <= 0:
+        return None, "Kovaryans matrisi pozitif tanımlı değil; SH üretilemez."
+    if eigen[-1] / eigen[0] > 1e8:
+        return None, f"Kovaryans matrisi kötü koşullanmış (koşul sayısı {eigen[-1] / eigen[0]:.3g}); SH üretilmedi."
+    rows = []
+    for position, (j, parameter, estimate, on_bound) in enumerate(parsed):
+        se = np.nan if on_bound else float(np.sqrt(covariance[position, position]))
+        rows.append({"Madde": names[j], "Parametre": NAMES[parameter], "Kestirim": estimate, "SH": se,
+                     "GA %95 alt": estimate - Z95 * se, "GA %95 üst": estimate + Z95 * se,
+                     "Not": "Kutu sınırında; SH/Wald GA geçersiz (kütüphane bu parametreyi sabit tutar)"
+                     if on_bound else ""})
     order = {"a": 0, "b": 1, "c": 2, "d": 3}
     table = pd.DataFrame(rows)
     table["_o"] = table["Parametre"].map(order)
