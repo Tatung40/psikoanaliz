@@ -2,7 +2,7 @@
 import io
 import pandas as pd
 import streamlit as st
-from core.reproducible import begin as begin_code_capture, finish as finish_code_capture
+from core.reproducible import begin as begin_code_capture, displayed, finish as finish_code_capture
 from ui.reproducible_view import render as render_reproducible_code
 from core.missing_imputation import diagnose, apply, METHODS
 from core.missing_decision import assess_necessity
@@ -10,7 +10,7 @@ from core.python_mirt_dif import fingerprint
 from ui.example_datasets_view import render as render_examples, own_file_changed
 
 render_examples('Eksik Veri ve Atama')
-begin_code_capture("Eksik Veri ve Atama", globals())
+begin_code_capture("Eksik Veri ve Atama", globals(), st.session_state.get("_repro_history"))
 
 st.title("🧩 Kayıp Veri Analizi ve Atama")
 st.caption("PsikoAnaliz • scikit-learn destekli • yalnızca seçilen madde sütunlarında işlem yapar")
@@ -73,6 +73,7 @@ if source is not None or df is not None:
                 st.session_state["missing_lab_method"] = method
             if "missing_lab_result" in st.session_state:
                 result = st.session_state["missing_lab_result"]
+                displayed(result)
                 st.success(f"İşlem tamamlandı: {len(result)} satır; yöntem {st.session_state['missing_lab_method']}.")
                 st.dataframe(result.head(20),use_container_width=True)
                 st.download_button("⬇ İşlenmiş CSV indir",
@@ -82,4 +83,6 @@ if source is not None or df is not None:
         except (ValueError, TypeError) as exc:
             st.error(str(exc))
 
-render_reproducible_code(finish_code_capture())
+_code_recorder = finish_code_capture()
+st.session_state["_repro_history"] = _code_recorder
+render_reproducible_code(_code_recorder)

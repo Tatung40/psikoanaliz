@@ -2,6 +2,7 @@
 import io
 import pandas as pd
 import streamlit as st
+from core.reproducible import displayed
 from core.python_mirt_dif import MODELS,FAMILIES,LIMITATION,analyze,fingerprint,prepare,support_matrix
 from reports.python_mirt_dif_report import downloads,figure
 from ui.irt_solver_controls import solver_controls
@@ -85,7 +86,7 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
             saved=dict(key=key,result=result);st.session_state[KEY]=saved
         except Exception as exc:st.error(f'Kestirim başarısız: {exc}')
     if not saved:return
-    result=saved['result'];tables=result['tables']
+    result=saved['result'];tables=result['tables'];displayed(result)
     if not tables['Fit'].Converged.all():st.error('NOT CONVERGED — çıktılar geçici, çıkarım kapalı.')
     st.info('NOT CERTIFIED — p/q ve kararlar kapalı; betimsel LR ve kütüphane eğrileri.')
     for title,name in [('Analiz özeti','Summary'),('Model uyumu / yakınsama','Fit'),('Grup dağılımları','Latent'),('Madde bazında DIF','DIF'),('Parametre farkları','Contrasts'),('Betimsel olasılık etkisi','Effect')]:

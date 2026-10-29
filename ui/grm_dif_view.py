@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
+from core.reproducible import displayed
 from core import grm_dif as G
 from reports.grm_dif_report import report_tables, bundle, safe_frame, CAUTIONS
 
@@ -76,6 +77,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     if entry["key"] != key or not agreed:
         st.info("Veri, madde, grup veya çapa ayarı değişti; eski sonuç gösterilmiyor. Yeniden hesaplayın."); return
     out = entry["out"]
+    displayed(out)
     if "tables" not in entry: entry["tables"] = report_tables(out)
     tables = entry["tables"]
     st.caption(out["status"])

@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from core.reproducible import displayed
 
 from core.irt_dif34_bootstrap import bootstrap_dif_test
 from reports.excel_export import sanitize_excel_cell
@@ -100,6 +101,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     if not saved:
         return
     res, m = saved["result"], saved["model"]
+    displayed(res)
     table = result_table(res, m)
     st.dataframe(table, hide_index=True, use_container_width=True)
     if res.get("null_stats"):

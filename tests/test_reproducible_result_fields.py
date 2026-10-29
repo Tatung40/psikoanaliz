@@ -51,7 +51,7 @@ def test_field_of_cached_dataclass_result_imports_its_producer_without_refit():
 
 
 @pytest.mark.parametrize("model", ["2PL", "3PL"])
-def test_binary_irt_page_code_survives_rerun_and_replays_the_real_fit(model):
+def test_binary_irt_page_code_survives_rerun_and_replays_the_real_fit(model, tmp_path):
     pytest.importorskip("mirt")
     from streamlit.testing.v1 import AppTest
     from core import example_datasets as ex
@@ -78,3 +78,19 @@ def test_binary_irt_page_code_survives_rerun_and_replays_the_real_fit(model):
     expected = python_mirt_binary_parameters(stored, model=model, item_names=list(x.columns))
     pd.testing.assert_frame_equal(replayed[functions.index("python_mirt_binary_parameters")], expected,
                                   check_exact=False, atol=1e-8, rtol=0)
+    if model == "2PL":                               # the downloadable ZIP itself, outside the repository
+        import io, json, os, subprocess, sys, zipfile
+        from core.reproducible import bundle
+        code = python_code(manifest)
+        with zipfile.ZipFile(io.BytesIO(bundle(manifest, code))) as archive:
+            archive.extractall(tmp_path)
+        index = functions.index("python_mirt_binary_parameters")
+        (tmp_path / "analysis.py").write_text(code + (
+            "\nimport json\njson.dump({'loglik': results[0].fit.log_likelihood, 'table': results[%d].to_dict('list')},"
+            " open('out.json', 'w'))\n" % index))
+        run = subprocess.run([sys.executable, "analysis.py"], cwd=tmp_path, env=dict(os.environ, PYTHONPATH=""),
+                             capture_output=True, text=True, timeout=300)
+        assert run.returncode == 0, run.stderr[-2000:]
+        out = json.loads((tmp_path / "out.json").read_text())
+        assert out["loglik"] == pytest.approx(stored.log_likelihood, abs=1e-8)
+        np.testing.assert_allclose(out["table"]["b"], expected["b"].to_numpy(), atol=1e-8)
