@@ -51,9 +51,12 @@ jobs:
           git worktree add --detach /tmp/golden-reference FETCH_HEAD
           python tools/golden_master.py capture /tmp/golden-reference.json.gz --root /tmp/golden-reference
           python tools/golden_master.py capture /tmp/golden-current.json.gz
-          # Intended: bifactor teaching data regenerated with 3 specific groups (screen requires 3–4).
+          # Intended: bifactor teaching data regenerated with 3 specific groups (screen requires 3–4);
+          # B14 "Bilimsel durum" text now states the R mirt / Monte Carlo evidence (PR #97; no numerical change).
           python tools/golden_master.py compare /tmp/golden-reference.json.gz /tmp/golden-current.json.gz \
-            --intended /example_library/mirt_051 --intended /example_library/mirt_052 --intended /example_library/mirt_053
+            --intended /example_library/mirt_051 --intended /example_library/mirt_052 --intended /example_library/mirt_053 \
+            --intended '/b14/GRM/tables/Meta/rows[1][1]:' --intended '/b14/PCM/tables/Meta/rows[1][1]:' \
+            --intended '/b14/GPCM/tables/Meta/rows[1][1]:' --intended '/b14/NRM/tables/Meta/rows[1][1]:'
       - name: Real public LSAT6 KTK benchmark (independent Pingouin)
         if: github.event_name == 'push'
         timeout-minutes: 3
