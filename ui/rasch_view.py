@@ -188,3 +188,36 @@ def dif_summary_rows(dif):
                                    "Evet" if dif["purify"] else "Hayır", "Evet" if dif["stable"] else "Hayır",
                                    round(j["mu_F"], 4), round(j["sd_R"], 4), round(j["sd_F"], 4),
                                    round(j["loglik"], 3), "Evet" if j["converged"] else "Hayır", dif["alpha"]]})
+
+
+def report_bundle(rr, gf=None, q3r=None, dr=None):
+    """(sheet names, xlsx bytes, zip bytes) of every Rasch table shown on screen for the current fit.
+
+    Optional sections (global fit, Q3, DIF) are included only when they were computed for the same
+    data and settings; nothing is recomputed here.
+    """
+    import io
+    import zipfile
+    sheets = {"Maddeler": rr["items"], "Kisiler": rr["persons"], "Guvenirlik": rr["reliability"],
+              "Model_ozeti": summary_rows(rr)}
+    if gf is not None:
+        sheets.update({"Global_uyum": m2_rows(gf), "Siniflama": gf["classification"],
+                       "Ham_puan": gf["raw_scores"], "Tabakalar": gf["strata"],
+                       "Artik_ozeti": pd.DataFrame([gf["residuals"]])})
+    if q3r is not None:
+        sheets["Q3_ciftleri"] = q3r["pairs"]
+    if dr is not None:
+        sheets.update({"DIF_ozeti": dif_summary_rows(dr), "DIF_tablosu": dr["table"],
+                       "DIF_arindirma": dr["history"]})
+    sheets = {name: pd.DataFrame(frame) for name, frame in sheets.items()}
+    xlsx = io.BytesIO()
+    with pd.ExcelWriter(xlsx, engine="openpyxl") as writer:
+        for name, frame in sheets.items():
+            frame.to_excel(writer, sheet_name=name[:31], index=False)
+    archive = io.BytesIO()
+    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("rasch_tum_tablolar.xlsx", xlsx.getvalue())
+        for name, frame in sheets.items():
+            z.writestr(f"tablolar/{name}.csv", frame.to_csv(index=False))
+        z.writestr("yontem.txt", METHOD_NOTE)
+    return list(sheets), xlsx.getvalue(), archive.getvalue()
