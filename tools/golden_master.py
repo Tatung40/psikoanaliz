@@ -298,6 +298,8 @@ def main(argv=None):
     cap = sub.add_parser('capture'); cap.add_argument('out'); cap.add_argument('--root')
     cmp_ = sub.add_parser('compare'); cmp_.add_argument('reference'); cmp_.add_argument('current')
     cmp_.add_argument('--rtol', type=float, default=0.); cmp_.add_argument('--atol', type=float, default=0.)
+    cmp_.add_argument('--intended', action='append', default=[],
+                      help='path prefix of a reviewed, intended output change; it must actually differ')
     args = parser.parse_args(argv)
     if args.command == 'capture':
         import sys
@@ -311,6 +313,12 @@ def main(argv=None):
         return 0
     reference, current = load(args.reference), load(args.current)
     differences = compare(reference, current, rtol=args.rtol, atol=args.atol)
+    for prefix in args.intended:
+        changed = [d for d in differences if d.startswith(prefix)]
+        if not changed:  # a stale allowance must not silently widen the gate
+            differences.append(f'{prefix}: declared as intended change but identical to the reference')
+        print(f'intended change {prefix}: {len(changed)} differences')
+        differences = [d for d in differences if not d.startswith(prefix)]
     for line in differences[:50]:
         print(line)
     print(f'{len(differences)} differences in {len(reference)} sections (rtol={args.rtol}, atol={args.atol})')
