@@ -46,7 +46,7 @@ def render(data=None,item_cols=(),id_col=None):
  if efa:
   pattern[:,:]=1;pattern[:min(dims,len(items)),:]=np.tril(np.ones((dims,dims),int))[:len(items),:]
  if model=='Bifactor':
-  groups=st.text_input('Özgül gruplar (madde sırasıyla 0,1,2…)',','.join(str(i*max(dims-1,1)//max(len(items),1)) for i in range(len(items))),key='md_groups')
+  groups=st.text_input('Özgül gruplar (madde sırasıyla 0,1,2…)',','.join(str(i*max(dims-1,1)//max(len(items),1)) for i in range(len(items))),key=f'md_groups_{dims}')
   chosen=groups
  else:
   matrix=st.data_editor(pd.DataFrame(pattern,index=items,columns=[f'F{j+1}' for j in range(dims)]),key=f'md_pattern_{len(items)}_{dims}_{efa}',num_rows='fixed')
@@ -89,6 +89,7 @@ def render(data=None,item_cols=(),id_col=None):
  if not saved:return
  result=saved['result'];tables=result['tables']
  if not result['metadata']['Converged']:st.error('NOT CONVERGED — yalnız geçici parametreler; puanlar ve eğriler kapalı.')
+ if result['metadata'].get('At_box_bound'):st.warning('Kutu sınırında parametre var (Boundaries tablosu): ilgili yük/eşik ve standart hata yorumlanmamalı; örneklemi büyütün veya yapıyı gözden geçirin.')
  tabs=st.tabs(['Özet / yakınsama','Parametreler / yapı','Kişi puanları','Bilgi / SEM','Eğriler','Raporlar'])
  for tab,names in zip(tabs[:4],[['Summary','Fit'],['Parameters','SharedSteps','Pattern','Covariance','Boundaries'],['EAP','MAP'],['SEM','IIF','TIF']]):
   with tab:
