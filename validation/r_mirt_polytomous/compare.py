@@ -109,6 +109,13 @@ def compare(model, out, criteria):
     x = data.to_numpy()
     fit, py, eap, psd = python_fit(model, x)
     rp = from_r(model, r["coef"])
+    r_eap = np.asarray(r["eap"], float)
+    # NRM orients theta only through its identification (R: ak0 = 0, ak3 = 3; Python: free slopes), so the
+    # mirror solution theta -> -theta has the same likelihood. Align Python to R's orientation when needed.
+    reflected = model == "NRM" and float(np.corrcoef(eap, r_eap)[0, 1]) < 0
+    if reflected:
+        py = {"slopes": -py["slopes"], "intercepts": py["intercepts"]}
+        eap = -eap
     r_trace = np.asarray(r["probtrace"], float)            # items x theta x categories, from R itself
     mapping = float(np.abs(probabilities(model, rp, THETA) - r_trace).max())
     names = [k for k in py if not (model == "PCM" and k == "discrimination")]
@@ -121,7 +128,7 @@ def compare(model, out, criteria):
               "python_parameters": int(fit.n_parameters), "R_parameters": int(r["nest"]),
               "mapping_probability": mapping, "calibration_parameters": parameter,
               "calibration_probability": probability, "common_logLik": loglik,
-              "calibration_EAP": float(np.abs(eap - np.asarray(r["eap"], float)).max()),
+              "calibration_EAP": float(np.abs(eap - r_eap).max()), "python_reflected": reflected,
               "calibration_posterior_SD": float(np.abs(psd - np.asarray(r["eap_se"], float)).max())}
     checks = {k: report[k] <= criteria[k] for k in ("mapping_probability", "calibration_parameters",
               "calibration_probability", "common_logLik", "calibration_EAP", "calibration_posterior_SD")}

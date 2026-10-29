@@ -13,8 +13,11 @@ itemtype <- switch(model, GRM = "graded", PCM = "gpcm", GPCM = "gpcm", NRM = "no
 sv <- mirt(dat, 1, itemtype = itemtype, pars = "values")
 if (model == "PCM") { sv$value[sv$name == "a1"] <- 1; sv$est[sv$name == "a1"] <- FALSE }
 stopifnot(!any(sv$est[sv$name %in% c("MEAN_1", "COV_11")]))
+# NRM: EM with default Ramsay acceleration did not reach TOL in 20000 cycles (first CI run); SQUAREM and
+# more cycles change only the path to R's own ML solution, never the convergence tolerance.
 fit <- mirt(dat, 1, itemtype = itemtype, pars = sv, quadpts = 101, theta_lim = c(-6, 6), TOL = 1e-8,
-            SE = FALSE, verbose = FALSE, technical = list(NCYCLES = 20000))
+            SE = FALSE, verbose = FALSE, accelerate = if (model == "NRM") "squarem" else "Ramsay",
+            technical = list(NCYCLES = if (model == "NRM") 100000 else 20000))
 coefs <- coef(fit, IRTpars = FALSE, simplify = TRUE)$items
 theta <- matrix(read.csv(file.path(out, "theta.csv"))$theta)
 trace <- lapply(seq_len(ncol(dat)), function(j) unname(probtrace(extract.item(fit, j), theta)))

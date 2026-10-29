@@ -34,3 +34,15 @@ def test_formulas_reproduce_python_mirt_and_r_mapping_round_trips(model):
     for key, value in params.items():
         np.testing.assert_allclose(back[key], value, rtol=0, atol=1e-12)
     assert fit.converged and np.isfinite(eap).all() and (psd > 0).all()
+
+
+def test_nrm_mirror_solution_has_identical_likelihood_and_mirrored_curves():
+    """The reflection used to align NRM orientations with R is an exact likelihood equivalence."""
+    from validation.r_mirt_polytomous.compare import common_loglik
+    _, data = example("NRM")
+    x = data.to_numpy()
+    _, params, _, _ = python_fit("NRM", x)
+    mirror = {"slopes": -params["slopes"], "intercepts": params["intercepts"]}
+    assert abs(common_loglik("NRM", params, x) - common_loglik("NRM", mirror, x)) < 1e-9
+    np.testing.assert_allclose(probabilities("NRM", mirror, THETA), probabilities("NRM", params, -THETA),
+                               rtol=0, atol=1e-12)
