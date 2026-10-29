@@ -10,8 +10,8 @@ import pytest
 
 pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest
-from core.irt_simulation import simulate_irt
-from ui.irt_optimization import REFINE_LABEL
+# Label of the removed native refinement option; it must never reappear on library routes.
+REFINE_LABEL = "Gelişmiş kestirim (EM + L-BFGS-B)"
 
 APP = str(Path(__file__).resolve().parents[1] / "app.py")
 
@@ -19,7 +19,11 @@ APP = str(Path(__file__).resolve().parents[1] / "app.py")
 def _data():
     truth = pd.DataFrame({"Madde": [f"Item_{i+1}" for i in range(5)], "a": np.linspace(1.2, 2., 5),
                           "b": np.linspace(-1., 1., 5), "c": np.linspace(.12, .2, 5), "d": 1.})
-    return simulate_irt(600, truth, seed=12)[0]
+    rng = np.random.default_rng(12)
+    theta = rng.standard_normal(600)[:, None]
+    a, b, c, d = (truth[k].to_numpy(float)[None, :] for k in ("a", "b", "c", "d"))
+    p = c + (d - c) / (1 + np.exp(-a * (theta - b)))
+    return pd.DataFrame((rng.random(p.shape) < p).astype(int), columns=truth["Madde"])
 
 
 def _app(page):

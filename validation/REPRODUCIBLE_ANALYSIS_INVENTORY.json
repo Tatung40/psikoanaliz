@@ -103,45 +103,6 @@
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {
-    "screen": "ui/irt_b10_view.py",
-    "core_imports": [
-      "core.irt_dif.dif_analysis",
-      "core.irt_globalfit.global_fit",
-      "core.irt_mg.as_matrix",
-      "core.irt_q3.eap",
-      "core.irt_q3.q3_analysis",
-      "core.irt_q3.wle"
-    ],
-    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
-  },
-  {
-    "screen": "ui/irt_b11_view.py",
-    "core_imports": [
-      "core.irt_dif34.dif_analysis_34",
-      "core.irt_globalfit.global_fit_34",
-      "core.irt_mg.as_matrix",
-      "core.irt_mg34.default_bounds",
-      "core.irt_q3.eap",
-      "core.irt_q3.probabilities",
-      "core.irt_q3.q3_analysis",
-      "core.irt_q3.wle_general",
-      "core.irt_se_diagnostics.hessian_boundary_diagnostics"
-    ],
-    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
-  },
-  {
-    "screen": "ui/irt_b13_view.py",
-    "core_imports": [
-      "core.irt.fit_irt",
-      "core.irt_b13_compare.compare_engines",
-      "core.irt_b13_curves.check_curves",
-      "core.irt_b13_curves.compute_curves",
-      "core.irt_b13_diagnostics.calculate_diagnostics",
-      "core.rasch.rasch_analysis"
-    ],
-    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
-  },
-  {
     "screen": "ui/irt_b14_view.py",
     "core_imports": [
       "core.irt_b14.MODELS",
@@ -179,14 +140,6 @@
       "core.irt_multidim_general_report",
       "core.irt_multidim_rsm_stack",
       "core.python_mirt_dif.fingerprint"
-    ],
-    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
-  },
-  {
-    "screen": "ui/irt_optimization.py",
-    "core_imports": [
-      "core.irt.fit_irt",
-      "core.irt_multistart.fit_irt_multistart"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
@@ -246,6 +199,11 @@
       "core.rasch_globalfit.global_fit",
       "core.rasch_q3.q3_analysis"
     ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
+    "screen": "ui/wright_map.py",
+    "core_imports": [],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {

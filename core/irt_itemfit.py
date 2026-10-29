@@ -69,6 +69,18 @@ def _collapse_cells(obs,expected,mincell=1.0):
     return obs,expected,""
 
 
+def validate_binary(data):
+    """Complete 0/1 matrix with N >= 30, k >= 3 and item means inside (.01, .99)."""
+    x = np.asarray(data, dtype=float)
+    if x.ndim != 2 or x.shape[0] < 30 or x.shape[1] < 3:
+        raise ValueError("MTK için en az 30 katılımcı ve 3 madde gereklidir.")
+    if not np.isfinite(x).all() or not np.isin(x, [0, 1]).all():
+        raise ValueError("MTK, eksiksiz 0/1 puanlı maddeler gerektirir. Eksikleri önce temizleyin.")
+    p = x.mean(axis=0)
+    if np.any((p <= .01) | (p >= .99)):
+        raise ValueError("Ortalaması 0.01–0.99 dışında olan maddeleri ayıklayın (tüm doğru/tüm yanlış dahil).")
+    return x
+
 def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0,return_tables=False):
     """S-X² aligned with mirt's unidimensional dichotomous implementation.
 
@@ -76,7 +88,6 @@ def sx2_mirt_compatible(data,item_table,model,quadpts=61,mincell=1.0,return_tabl
     the Python fit itself is equivalent to an independently fitted mirt model.
     Does not interpret non-converged fit as trustworthy automatically.
     """
-    from core.irt import validate_binary
     x=validate_binary(data).astype(int)
     n,k=x.shape
     if len(item_table)!=k:

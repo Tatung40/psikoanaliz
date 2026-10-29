@@ -27,8 +27,15 @@ Python mirt 1.2.0 `coef_with_se()` sabit/tanımlama kısıtlı parametreler (PCM
 eğim/kesişim) için SE = 0.0 döndürüyordu; B14 ekranı, CSV'si ve raporu bunu kesin kestirim gibi
 gösteriyordu. `coef_with_se_table` bu değerleri boş (NaN) gösterir. Test: `tests/test_python_mirt_fixed_se.py`.
 
-## Eski motor bağımlılıkları (sonraki kaldırma görevi için)
+## Eski motor bağımlılıkları — 2026-10-29 kaldırma sonrası durum
 
-- `ui/irt_python_library_view.py` → `core.irt_person_abilities` (yerel EAP; eski kalibrasyon değil).
-- `ui/rasch_view.py` (`core.rasch`) Wright grafiği Python Rasch yolunda yeniden kullanılıyor (`core/irt_rasch_wright.py`).
-- `core/irt_b13_compare.py`, `core/irt_binary_unified.py`, `core/irt_b13_curves.py` eski `core.irt` ile Python mirt'i karşılaştırır.
+- Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10–B13 altyapısı, motor kaydı) kaldırıldı;
+  `tests/test_legacy_reachability.py` hiçbir dosyanın bunları yeniden içe aktarmamasını denetler.
+- `core.irt_itemfit` kendi 0/1 doğrulayıcısını taşır; Wright şekli `ui/wright_map.py` içindedir.
+- `core.irt_person_abilities` yalnız kütüphane eğrilerini kullanan yerel ızgara EAP'tir (motor değil);
+  çıktıları golden-master ile birebir korunur.
+- Eşdeğerlik: CI her çalıştırmada `tools/golden_master.py` ile kaldırma öncesi main (`fa2e25e`) ve güncel ağacın tüm Python çıktılarını (9 model, B14, DIF,
+  MIRT, yerel uyum/EFA, 15 G/D, KTK, 117 örnek indirme) aynı makinede yakalar ve sıfır toleransla karşılaştırır.
+- Kütüphane karşılığı olmadığı için korunan yerel kestiriciler: Rasch MML sayfası (`core.rasch`), RSM
+  (`core.irt_rsm`), sabit çapalı ikili/GRM/çok kategorili DIF (`irt_mg`, `grm_dif`, `polytomous_dif`),
+  3PL/4PL bootstrap DIF (`irt_mg34`), Q3 (`irt_q3`, yerel uyum ekranı da kullanır), genel MIRT profilleri.

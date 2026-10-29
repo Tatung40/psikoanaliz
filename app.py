@@ -195,7 +195,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("### I. Klasik Test Kuramı (KTK)")
-    with st.expander("🧮 EserPsychometrics Yerel KTK Motoru", expanded=True):
+    with st.expander("🧮 KTK Analizleri", expanded=True):
         for label, page in [
             ("📊 Test İstatistikleri", "4. Test İstatistikleri"),
             ("🔍 Madde Analizi", "5. Madde Analizi"),
@@ -206,11 +206,9 @@ with st.sidebar:
         ]:
             st.button(label, key=f"nav_{page}", use_container_width=True,
                       on_click=navigate_to, args=(page,))
-    with st.expander("Python Kütüphaneleri / Bağımsız KTK Motoru"):
         st.button("📄 Alfa ve Madde Karşılaştırması (Pingouin)",
                   key="nav_ctt_dual",use_container_width=True,
                   on_click=navigate_to,args=("KTK: Çift Motor Rapor",))
-        st.caption("Bu sayfa yerel KTK ile bağımsız Python hesaplamalarını karşılaştırır.")
 
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
@@ -229,7 +227,6 @@ with st.sidebar:
                       use_container_width=True,on_click=navigate_to,args=(f"MTK: {m}",))
         for label,page in [
             ("📊 Model Karşılaştırması","MTK: Karşılaştırma"),
-            ("📋 İkili MTK B13 Raporu","MTK: İkili Rapor"),
             ("🔍 MTK Varsayım Denetimi","MTK: Varsayım Denetimi"),
             ("⚖️ MTK DIF Ön Taraması","MTK: Çok Modelli DIF Taraması"),
         ]:
@@ -248,9 +245,9 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: 3PL/4PL Bootstrap DIF",))
     st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
               on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
-    with st.expander("Python mirt Kütüphanesi — MTK"):
-        st.caption("Python mirt 1.2.0: ayrı kestirim motoru; Rasch ve çok kategorili "
-                   "DIF'in yerel uygulamalarıyla karıştırmayın.")
+    with st.expander("🔬 Ayrıntılı MTK Model Raporları"):
+        st.caption("Python mirt 1.2.0 model raporları: parametreler, eğriler, kişi puanları, "
+                   "madde uyumu ve indirmeler. Motor seçimi yoktur.")
         for m in ("Rasch","1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
             st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
@@ -1577,15 +1574,6 @@ elif selected_page == "MTK: Varsayım Denetimi":
         st.warning("Önce yanıt verilerini yükleyin.")
     else:
         render_irt_assumptions(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
-elif selected_page == "MTK: İkili Rapor":
-    render_academic_header()
-    from ui.irt_b13_view import render as render_b13
-    instrument_code_capture(globals())
-    src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
-    if src is None:
-        st.warning("Önce veri dosyası yükleyin.")
-    else:
-        render_b13(src, list(st.session_state.item_cols), st.session_state.id_col, st.session_state.group_col)
 elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma"):
     render_academic_header()
     st.subheader("🧪 Madde Tepki Kuramı — 1PL, 2PL, 3PL, 4PL")
@@ -1679,14 +1667,23 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 "AIC ve BIC için küçük değer daha iyi uyumu–karmaşıklık dengesini gösterir. "
                 "LogLik için büyük değer daha yüksek olabilirlik anlamına gelir."
             )
-            history = st.session_state.get("irt_model_results", {})
+            # Library fits from the 1PL–4PL pages on identical item data; MAP is not compared by AIC/BIC.
+            from core.irt_library_diagnostics import library_fit_diagnostics
+            import plotly.graph_objects as go
+            history = st.session_state.get("python_mirt_experimental_results", {})
             data = target.loc[:, irt_columns]
-            fingerprint = (tuple(columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
-            usable = {m: entry["result"] for m,entry in history.items()
-                      if entry.get("fingerprint") == fingerprint}
+            fingerprint = (tuple(irt_columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
+            usable = {}
+            for m, entry in history.items():
+                if m in ("1PL", "2PL", "3PL", "4PL") and tuple(entry["fingerprint"][:3]) == fingerprint \
+                        and entry["fingerprint"][3] == "ML":
+                    diag = library_fit_diagnostics(entry["fit"].fit)
+                    usable[m] = {"aic": diag["aic"], "bic": diag["bic"], "loglik": diag["log_likelihood"],
+                                 "param_count": diag["n_parameters"], "converged": diag["converged"],
+                                 "points": entry["fit"].solver_settings.get("n_quadpts")}
             if not usable:
                 st.info("Bu veri setiyle henüz bir MTK modeli çalıştırılmadı. "
-                        "Önce ilgili 1PL–4PL sayfalarında kalibrasyon yapın.")
+                        "Önce ilgili 1PL–4PL sayfalarında ML kalibrasyonu yapın.")
             else:
                 model_order = ["1PL", "2PL", "3PL", "4PL"]
                 comparison = pd.DataFrame([
@@ -1695,8 +1692,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                      "logLik":float(usable[m]["loglik"]),
                      "Parametre sayısı":int(usable[m]["param_count"]),
                      "Yakınsama":bool(usable[m]["converged"]),
-                     "Yöntem":estimation_method(usable[m]),
-                     "GH düğümü":(usable[m].get("settings") or {}).get("points")}
+                     "Yöntem":"Python mirt ML (EM)",
+                     "GH düğümü":usable[m]["points"]}
                     for m in model_order if m in usable
                 ])
                 valid = comparison[comparison["Yakınsama"]]
@@ -1741,10 +1738,6 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                "logLik/AIC/BIC değerleri tam olarak aynı olabilirlik "
                                "yaklaşımına dayanmaz. Karşılaştırma için aynı düğüm sayısıyla "
                                "yeniden kestirin.")
-                if (comparison["Yöntem"]=="EM + L-BFGS-B").any():
-                    st.caption("Yöntem sütunu her modelin hangi optimizasyonla kestirildiğini gösterir. "
-                               "İyileştirme yalnızca aynı olabilirlik içinde daha yüksek bir noktaya "
-                               "ulaşır; model seçiminin gerekçesi değildir.")
                 if (~comparison["Yakınsama"]).any():
                     st.warning("Yakınsamamış model(ler) bulunuyor. Bu modeller 'EN İYİ' "
                                "seçiminde değerlendirilmedi.")
@@ -1817,10 +1810,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             st.caption("Bu kutucuklar yalnızca sağdaki rapor görünümünü değiştirir; "
                        "model yeniden kestirilmez.")
         with st.sidebar.expander("▶ MTK analizini çalıştır", expanded=True):
-            st.caption("Python mirt hazır bir MTK kütüphanesidir. EserPsychometrics "
-                       "arayüzündeki parametre eşleştirmeleri ve çıkarımsal "
-                       "raporlama henüz bağımsız karşılaştırmadan geçmediği için "
-                       "bu motorun çıktıları ayrı tutulur.")
+            st.caption("İkili MTK kestirimi Python mirt 1.2.0 ile yapılır; çıkarımsal "
+                       "raporlama bilimsel kullanım sınırlarıyla birlikte sunulur.")
             if st.button("▶️ Python mirt ile analiz", key=f"py_mirt_run_{model}"):
                 try:
                     from core.irt_python_mirt_adapter import fit_python_mirt
@@ -1869,8 +1860,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
                            f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
                 st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan "
-                        "ürettiği deneysel çıktıdır. Yerel EserPsychometrics "
-                        "raporlarıyla eşdeğerliği henüz doğrulanmadı.")
+                        "ürettiği deneysel çıktıdır.")
                 # Fit diagnostics are read directly from the external library,
                 # never recomputed from the retired native engine.
                 from core.irt_library_diagnostics import library_fit_diagnostics
@@ -2046,19 +2036,11 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         )
                     except Exception as summary_error:
                         st.warning(f"Bu motor için okunabilir özet alınamadı: {summary_error}")
-                st.caption("Parametre dönüşümü, SH ve AIC/BIC karşılaştırması "
-                           "henüz bağımsız eşleştirmeden geçmediği için "
-                           "resmî analiz sonuçlarına eklenmez.")
+                st.caption("Parametre dönüşümü ve SH henüz bağımsız eşleştirmeden geçmediği için "
+                           "resmî analiz sonuçlarına eklenmez; AIC/BIC karşılaştırması "
+                           "'MTK: Karşılaştırma' sayfasında betimsel olarak sunulur.")
             else:
                 st.info("Veri veya madde seçimi değişti; eski deneysel sonuç gösterilmiyor.")
-        # Retired native IRT results and diagnostics are never rendered.
-        # All current binary IRT reports above originate from Python mirt.
-        if "irt_model_results" in st.session_state:
-            st.session_state.pop("irt_model_results", None)
-        if "irt_b10" in st.session_state:
-            st.session_state.pop("irt_b10", None)
-        if "irt_b11" in st.session_state:
-            st.session_state.pop("irt_b11", None)
 
 
 else:

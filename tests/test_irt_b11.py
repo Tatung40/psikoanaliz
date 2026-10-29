@@ -11,8 +11,6 @@ import pytest
 from scipy.special import expit
 import core.irt_mg34 as M
 import core.irt_q3 as Q
-import core.irt_globalfit as GF
-import core.irt_dif34 as D
 from core.irt_mg import as_matrix, Quadrature, _parts
 
 F = Path(__file__).parent / "fixtures" / "irt_b11"
@@ -125,73 +123,9 @@ def test_q3_uses_the_full_3pl_irf_and_detects_planted_pair():
 
 
 # ----------------------------------------------------------------------------------- M2
-@pytest.mark.parametrize("model", ["3PL", "4PL"])
-@pytest.mark.parametrize("grid", ["gauss-hermite", "mirt"])
-def test_m2_jacobian_df_and_fixed_columns(model, grid):
-    case = "irt3pl_ok" if model == "3PL" else "irt4pl_ok"
-    x = _data(case).to_numpy(float); n, k = x.shape
-    rng = np.random.default_rng(3)
-    a, b = rng.uniform(.8, 2, k), np.linspace(-.4, 2, k); c = rng.uniform(.1, .25, k)
-    d = rng.uniform(.88, .98, k) if model == "4PL" else np.ones(k)
-    pairs = [(i, j) for i in range(k) for j in range(i + 1, k)]
-    theta, w = GF.quadrature(grid, 41)
-    names = GF.FREE[model]
-
-    def margins(par):
-        v = dict(zip(names, np.split(par, len(names))))
-        P = v.get("c", c) + (v.get("d", d) - v.get("c", c)) * expit(v["a"] * (theta[:, None] - v["b"]))
-        return np.r_[w @ P, [w @ (P[:, i] * P[:, j]) for i, j in pairs]]
-
-    par = np.concatenate([{"a": a, "b": b, "c": c, "d": d}[nm] for nm in names])
-    jac = np.column_stack([(margins(par + e) - margins(par - e)) / 2e-6 for e in np.eye(len(par)) * 1e-6])
-    ours = GF.m2_statistic(x, a, b, model, grid=grid, c=c, d=d, max_condition=np.inf)
-    np.testing.assert_allclose(ours["jacobian"], jac, atol=1e-8)
-    s = k + k * (k - 1) // 2
-    assert ours["df"] == s - len(names) * k and not ours["conditional"]
-    fixed = {"c": np.r_[True, True, np.zeros(k - 2, bool)]}
-    cond = GF.m2_statistic(x, a, b, model, grid=grid, c=c, d=d, fixed=fixed, max_condition=np.inf)
-    assert cond["conditional"] and cond["df"] == ours["df"] + 2 and cond["free_parameters"] == ours["free_parameters"] - 2
-    np.testing.assert_allclose(cond["jacobian"], np.delete(jac, [2 * k, 2 * k + 1], axis=1), atol=1e-8)
-
-
-def test_m2_unavailable_df_and_boundary_policy():
-    x = _data("irt3pl_ok").iloc[:, :5]                                                    # s = 15 < q = 15 + 1
-    assert "Serbestlik" in GF.m2_statistic(x, np.ones(5), np.zeros(5), "3PL", c=np.full(5, .2))["reason"]
-    d = _data("irt3pl_easy"); k = d.shape[1]
-    f = M.fit_single(d, "3PL", points=31, information=False)
-    a, b, c, _ = M.Design34("3PL", ["anchor"] * k, 1).unpack(f["params"], 0)
-    fixed = {p_: np.zeros(k, bool) for p_ in "abc"}
-    for p_, _, i in f["bound_labels"]:
-        fixed[p_][i] = True
-    g = GF.global_fit_34(d, a, b, c, None, "3PL", np.zeros(len(d)), "EAP", True, fixed, points=31)
-    assert g["m2"]["available"] and g["m2"]["conditional"] and np.isnan(g["m2"]["p_reported"])
-    assert g["classification"].iloc[0]["Sınıf"] == GF.CLASS_EXPERIMENTAL
-    miss = GF.global_fit_34(_data("irt3pl_missing"), a, b, c, None, "3PL", np.zeros(2000), "EAP", True, None, 31)
-    assert not miss["m2"]["available"] and "eksiksiz" in miss["m2"]["reason"]
 
 
 # ------------------------------------------------------------------------- DIF utilities
-def test_response_function_comparison_shapes():
-    s = D.response_function_comparison([1.5, 0., .2, 1.], [1.5, .5, .2, 1.], 0., 1.)
-    assert s["shape"] == "against" and s["signed"] < 0 and s["unsigned"] == pytest.approx(-s["signed"], rel=1e-9)
-    x = D.response_function_comparison([1.8, 0., .2, 1.], [.7, 0., .2, 1.], 0., 1.)
-    assert x["shape"] == "crossing" and any(abs(v) < .05 for v in x["crossings"])
-    lower = D.response_function_comparison([1.5, 0., .1, 1.], [1.5, 0., .3, 1.], 0., 1.)
-    assert lower["shape"] == "favour" and lower["max_abs"] > .15                             # c-DIF: low-θ region
-    assert D.response_function_comparison([1., 0., .2, 1.], [1., 0., .2, 1.], 0., 1.)["shape"] == "none"
-
-
-def test_dif34_guards():
-    d = _data("dif3pl_none")
-    with pytest.raises(ValueError, match="en az 100"):
-        small = pd.concat([d[d.Grup == "R"].iloc[:300], d[d.Grup == "F"].iloc[:60]])
-        D.dif_analysis_34(small.drop(columns="Grup"), small["Grup"], "R", "F")
-    with pytest.raises(ValueError, match="yalnızca 3PL ve 4PL"):
-        D.dif_analysis_34(d.drop(columns="Grup"), d["Grup"], "R", "F", model="2PL")
-    dis = d.copy(); items = list(dis.columns[1:])
-    dis.loc[dis.Grup == "R", items[:6]] = np.nan; dis.loc[dis.Grup == "F", items[6:]] = np.nan
-    with pytest.raises(ValueError, match="Bağlantısız"):
-        D.dif_analysis_34(dis.drop(columns="Grup"), dis["Grup"], "R", "F")
 
 
 # ---------------------------------------------------------------- R references: single group
@@ -271,91 +205,36 @@ def test_mirt_wle_is_the_jeffreys_mode_not_warm_for_3pl():
     assert np.nanmax(np.abs(Q.wle_general(x, obs, a, b, c, dd)[0] - mirt)) > 1e-2
 
 
-def _mirt_style_m2(x, a, b, c, d):
-    """M2 with mirt 1.48's dichotomous dP (theta*P*Q, P*Q, 1-P): the 2PL derivatives."""
-    n, k = x.shape; theta, w = GF.quadrature("mirt", 41)
-    P = c + (d - c) * expit(a * (theta[:, None] - b))
-    pairs = [(i, j) for i in range(k) for j in range(i + 1, k)]; sets = [(i,) for i in range(k)] + pairs; s = len(sets)
-    ind = np.zeros((s, k))
-    for r, S in enumerate(sets):
-        ind[r, list(S)] = 1
-    m = np.exp(ind @ np.log(P).T); pi = m @ w
-    union = np.maximum(ind[:, None, :], ind[None, :, :]).reshape(s * s, k)
-    xi = (np.exp(union @ np.log(P).T) @ w).reshape(s, s) - np.outer(pi, pi)
-    e = np.r_[x.mean(0), [np.mean(x[:, i] * x[:, j]) for i, j in pairs]] - pi
-    cols = []
-    for j in range(k):
-        mP = m * ind[:, [j]] / P[:, j][None, :]
-        parts = [theta * P[:, j] * (1 - P[:, j]), P[:, j] * (1 - P[:, j]), 1 - P[:, j]] + ([P[:, j]] if np.any(d < 1) else [])
-        cols.append(np.column_stack([(mP * v[None, :]) @ w for v in parts]))
-    delta = np.hstack(cols); Wi = np.linalg.solve(xi, e); Wd = np.linalg.solve(xi, delta)
-    return n * (e @ Wi - (delta.T @ Wi) @ np.linalg.solve(delta.T @ Wd, delta.T @ Wi))
-
-
-@pytest.mark.parametrize("case", ["irt3pl_ok", "irt3pl_ld", "irt3pl_easy"])
-def test_m2_differs_from_mirt_only_through_mirts_2pl_jacobian(case):
-    model = "3PL"; d = _data(case); cols = list(d.columns); a, b, c, dd = _mirt_items(model, case, cols)
-    ref = _r(model, case, "m2").set_index("col").value
-    x = d.to_numpy(float)
-    assert _mirt_style_m2(x, a, b, c, dd) == pytest.approx(ref["M2"], rel=1e-9)               # rest identical
-    ours = GF.m2_statistic(d, a, b, model, grid="mirt", c=c, d=dd, max_condition=np.inf)
-    assert ours["df"] == int(ref["df"]) and ours["SRMSR"] == pytest.approx(ref["SRMSR"], rel=1e-9)
-    assert abs(ours["M2"] - ref["M2"]) > .1                                                   # correct Jacobian differs
-
-
-def test_information_matches_b2_hessian_validated_against_mirt():
-    """mg34 observed information == core.irt_hessian (B2/B3, checked against mirt) at interior parameters."""
-    from core.irt_hessian import _observed_information
+def test_information_matches_independent_numerical_hessian():
+    """mg34 observed information == -Hessian of an independent GH marginal log-likelihood (interior truth)."""
+    from numpy.polynomial.hermite_e import hermegauss
     d = _data("irt3pl_ok"); x, obs = as_matrix(d); k = d.shape[1]
     t = pd.read_csv(F / "truth_irt3pl_ok.csv")
     design = M.Design34("3PL", ["anchor"] * k, 1)
     par = np.array([t[p].to_numpy()[i] for p, _, i in design.labels])
     info = M.information(par, design, _parts(x, obs, np.zeros(len(x), int), 1), Quadrature("gauss-hermite", 31), len(x))
-    ref, why = _observed_information(x, t, ("a", "b", "c"), 31, 4., .65)
-    assert ref is not None, why
-    np.testing.assert_allclose(info, (ref + ref.T) / 2, rtol=1e-4, atol=1e-5 * np.abs(ref).max())
+    nodes, weights = hermegauss(31); logw = np.log(weights / weights.sum())
+    y = np.nan_to_num(np.asarray(x, float)); seen = np.asarray(obs, bool)
+
+    def loglik(v):
+        p = {name: np.zeros(k) for name in ("a", "b", "c")}
+        for value, (name, _, item) in zip(v, design.labels):
+            p[name][item] = value
+        prob = p["c"] + (1 - p["c"]) * expit(p["a"] * (nodes[:, None] - p["b"]))
+        terms = seen[:, None, :] * (y[:, None, :] * np.log(prob) + (1 - y[:, None, :]) * np.log1p(-prob))
+        z = terms.sum(2) + logw
+        top = z.max(1, keepdims=True)
+        return float((top[:, 0] + np.log(np.exp(z - top).sum(1))).sum())
+
+    h = 1e-4; n = len(par); ref = np.empty((n, n)); eye = np.eye(n) * h
+    for i in range(n):
+        for j in range(i, n):
+            ref[i, j] = ref[j, i] = -(loglik(par + eye[i] + eye[j]) - loglik(par + eye[i] - eye[j])
+                                      - loglik(par - eye[i] + eye[j]) + loglik(par - eye[i] - eye[j])) / (4 * h * h)
+    np.testing.assert_allclose(info, ref, rtol=1e-4, atol=1e-5 * np.abs(ref).max())
 
 
 # ------------------------------------------------------------------- R references: DIF (3PL)
-@pytest.mark.parametrize("case", ["dif3pl", "dif3pl_none"])
-def test_3pl_round0_lr_and_final_model_match_boxed_mirt(case):
-    x, obs, g, cols = _xg(case); k = len(cols)
-    fitter = D._Fitter34(x, obs, g, "3PL", "mirt", 41, M.default_bounds())
-    base = fitter(["anchor"] * k)
-    assert base["loglik"] >= float(_b("3PL", case, "box_base_loglik").value.iloc[0]) - 1e-6
-    ref = _b("3PL", case, "box_lr_omnibus").set_index("row").value
-    for i, c in enumerate(cols):
-        t = ["anchor"] * k; t[i] = "all"
-        stat, _, _ = D._lr(fitter(t), base, i)
-        assert stat == pytest.approx(ref[c], abs=5e-3)                  # mirt EM tolerance at the box
-    anchors = pd.read_csv(F / f"py_dif_anchors_{case}.csv").anchor.tolist()
-    fin = fitter(["anchor" if c in anchors else "all" for c in cols])
-    assert fin["converged"] and fin["loglik"] >= float(_b("3PL", case, "box_final_loglik").value.iloc[0]) - 1e-6
-    # unbounded mirt: same likelihood function at mirt's parameters (fixed-parameter evaluation)
-    pR, pF = _r("3PL", case, "final_par_R"), _r("3PL", case, "final_par_F")
-    design = fin["design"]
-    get = lambda p, nm: p[p.col == nm].set_index("row").value.loc[cols].to_numpy()
-    vals = {0: {"a": get(pR, "a1"), "b": -get(pR, "d") / get(pR, "a1"), "c": get(pR, "g")},
-            1: {"a": get(pF, "a1"), "b": -get(pF, "d") / get(pF, "a1"), "c": get(pF, "g")}}
-    par = np.array([vals[max(gg, 0)][p][i] for p, gg, i in design.labels]
-                   + [float(pF[pF.col == "MEAN_1"].value.iloc[0]), .5 * np.log(float(pF[pF.col == "COV_11"].value.iloc[0]))])
-    assert M.loglik_at(x, obs, g, design, par) == pytest.approx(float(_r("3PL", case, "final_loglik_fixed_sum").value.iloc[0]),
-                                                                 rel=1e-12)
-
-
-def test_3pl_dif_procedure_on_planted_and_null_data():
-    known = D.dif_analysis_34(_data("dif3pl").drop(columns="Grup"), _data("dif3pl")["Grup"], "R", "F", points=31)
-    t = known["table"].set_index("Madde")
-    removed = set(t.index[~t["Çapa"]])
-    assert {"M3", "M8", "M10"} <= removed                          # all planted DIF items leave the anchor set
-    assert (t.loc[["M3", "M8", "M10"], "LR χ² genel (sd=3)"] > 25).all()
-    for item in removed:                                            # boundary items: no p-value, only screening
-        if not np.isfinite(t.loc[item, "p"]):
-            assert t.loc[item, "Çapa taraması"] == "Çapa dışı (sezgisel)" and not t.loc[item, "DIF işareti"]
-    assert t.loc["M3", "İşaretli fark E_F[P_F − P_R]"] < 0          # b +0.6: harder for focal
-    assert t.loc["M8", "İşaretli fark E_F[P_F − P_R]"] > 0          # c +0.15: easier at low theta
-    assert t.loc[np.isfinite(t["p"].astype(float)), "Çıkarım"].eq("Asimptotik χ² (düzenli çözüm)").all()
-    assert not t.loc[~np.isfinite(t["p"].astype(float)), "DIF işareti"].any()      # no p-value -> never flagged
 
 
 def _fake(converged=True, regular=True, linked=True, bound=(), ll=-100.):
@@ -363,83 +242,8 @@ def _fake(converged=True, regular=True, linked=True, bound=(), ll=-100.):
             "cov": np.eye(1), "cov_conditional": False, "quadrature_ok": True}
 
 
-def test_lr_rule_interior_nuisance_boundary_and_nonconvergence():
-    null, alt = _fake(ll=-105.), _fake(ll=-100.)
-    assert D._lr(alt, null, 0)[:2] == (10., True)                                         # all interior
-    nuis = _fake(regular=False, bound=[("c", -1, 3)], ll=-100.)                          # other item on a bound
-    stat, ok, note = D._lr(nuis, null, 0)
-    assert stat == 10. and not ok and "Başka" in note
-    stat, ok, _ = D._lr(_fake(regular=False, bound=[("c", 1, 0)]), null, 0)               # studied item on a bound
-    assert stat == 10. and not ok
-    stat, ok, note = D._lr(_fake(converged=False), null, 0)
-    assert np.isnan(stat) and not ok and "yakınsamadı" in note
-    assert not D._lr(_fake(linked=False, regular=False), null, 0)[1]
-
-
 # ------------------------------------------------------------------- Phase B: 4PL references
 @pytest.mark.parametrize("case", ["irt4pl_ok", "irt4pl_ld"])
 def test_4pl_single_group_against_mirt_and_catR(case):
     _single_checks("4PL", case)
 
-
-@pytest.mark.parametrize("case", ["irt4pl_ok", "irt4pl_ld"])
-def test_4pl_m2_jacobian_vs_mirt_and_policy(case):
-    d = _data(case); cols = list(d.columns); a, b, c, dd = _mirt_items("4PL", case, cols)
-    ref = _r("4PL", case, "m2").set_index("col").value
-    assert _mirt_style_m2(d.to_numpy(float), a, b, c, dd) == pytest.approx(ref["M2"], rel=1e-8)
-    ours = GF.m2_statistic(d, a, b, "4PL", grid="mirt", c=c, d=dd, max_condition=np.inf)
-    assert ours["df"] == int(ref["df"]) == 78 - 48
-    f = M.fit_single(d, "4PL", points=31, information=False)                       # production-like bounded fit
-    A, B, C, DD = M.Design34("4PL", ["anchor"] * 12, 1).unpack(f["params"], 0)
-    fixed = {p: np.zeros(12, bool) for p in "abcd"}
-    for p, _, i in f["bound_labels"]:
-        fixed[p][i] = True
-    g = GF.global_fit_34(d, A, B, C, DD, "4PL", np.zeros(len(d)), "EAP", f["converged"], fixed, points=31)
-    assert f["bound_labels"] and g["classification"].iloc[0]["Sınıf"] in (GF.CLASS_EXPERIMENTAL, "Hesaplanmadı")
-    assert not np.isfinite(g["m2"].get("p_reported", np.nan))                       # never inferential at a bound
-
-
-@pytest.mark.parametrize("case", ["dif4pl", "dif4pl_none"])
-def test_4pl_descriptive_lr_matches_boxed_mirt(case):
-    x, obs, g, cols = _xg(case); k = len(cols)
-    fitter = D._Fitter34(x, obs, g, "4PL", "mirt", 41, M.default_bounds())
-    base = fitter(["anchor"] * k)
-    assert base["loglik"] >= float(_b("4PL", case, "box_base_loglik").value.iloc[0]) - 1e-6
-    ref = _b("4PL", case, "box_lr_omnibus").set_index("row").value
-    diffs = []
-    for i, c in enumerate(cols):
-        t = ["anchor"] * k; t[i] = "all"
-        diffs.append(D._lr(fitter(t), base, i)[0] - ref[c])
-    assert np.max(np.abs(diffs)) < 1e-2                    # flat 4PL surfaces; mirt TOL 1e-6 at the box
-    assert np.min(diffs) > -5e-3                           # ours never materially below mirt
-    anchors = pd.read_csv(F / f"py_dif_anchors_{case}.csv").anchor.tolist()
-    design = M.Design34("4PL", ["anchor" if c in anchors else "all" for c in cols], 2)
-    pR, pF = _r("4PL", case, "final_par_R"), _r("4PL", case, "final_par_F")
-    get = lambda p, nm: p[p.col == nm].set_index("row").value.loc[cols].to_numpy()
-    vals = {g_: {"a": get(p_, "a1"), "b": -get(p_, "d") / get(p_, "a1"), "c": get(p_, "g"), "d": get(p_, "u")}
-            for g_, p_ in ((0, pR), (1, pF))}
-    par = np.array([vals[max(gg, 0)][p][i] for p, gg, i in design.labels]
-                   + [float(pF[pF.col == "MEAN_1"].value.iloc[0]), .5 * np.log(float(pF[pF.col == "COV_11"].value.iloc[0]))])
-    assert M.loglik_at(x, obs, g, design, par) == pytest.approx(float(_r("4PL", case, "final_loglik_fixed_sum").value.iloc[0]),
-                                                                 rel=1e-12)
-
-
-def test_4pl_dif_descriptive_recovers_location_dif():
-    d = _data("dif4pl")
-    out = D.dif_analysis_34(d.drop(columns="Grup"), d["Grup"], "R", "F", model="4PL", points=31, inferential=False)
-    t = out["table"].set_index("Madde")
-    assert t["p"].isna().all() and not out["purify"] and set(t["Çıkarım"]) == {"Betimsel"}
-    assert t.loc["M3", "LR χ² genel (sd=4)"] == t["LR χ² genel (sd=4)"].max()
-    assert t.loc["M3", "İşaretli fark E_F[P_F − P_R]"] < -.05
-
-
-def test_weakly_identified_c_small_sample_is_non_regular():
-    f = M.fit_single(_data("irt3pl_weak"), "3PL", points=21)
-    assert f["converged"] and not f["regular"] and len(f["bound_labels"]) >= 3
-    x = _data("irt3pl_weak")
-    a, b, c, _ = M.Design34("3PL", ["anchor"] * 8, 1).unpack(f["params"], 0)
-    fixed = {p_: np.zeros(8, bool) for p_ in "abc"}
-    for p_, _, i in f["bound_labels"]:
-        fixed[p_][i] = True
-    g = GF.global_fit_34(x, a, b, c, None, "3PL", np.zeros(len(x)), "EAP", True, fixed, points=21)
-    assert g["classification"].iloc[0]["Sınıf"] != GF.CLASS_INFERENTIAL
