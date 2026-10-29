@@ -34,7 +34,7 @@ def rasch_wright_tables(outcome,responses,*,item_names,identifiers=None,bins=30)
 
 def wright_figure(tables):
     # Reuse the established Rasch plot; change its WLE legend to actual EAP.
-    from ui.rasch_view import wright_map
+    from ui.wright_map import wright_map
     people,items,h=tables['persons'],tables['items'],tables['histogram']
     if people.empty or items.empty or not np.isfinite(np.r_[people['θ'],items.b]).all() or int(h['Kişi sayısı'].sum())!=len(people):
         raise ValueError('Geçersiz Wright tabloları.')
