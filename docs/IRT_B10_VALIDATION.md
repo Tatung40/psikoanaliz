@@ -1,5 +1,7 @@
 # 1PL and 2PL diagnostics — validation record (B10)
 
+> **Arşiv notu (2026-10-29):** Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10/B11/B12/B13 karşılaştırma altyapısı) kaldırıldı; ikili MTK kestirimi yalnız Python mirt ile yapılır. Bu belgedeki kaldırılan modüllere ait bölümler tarihsel kayıttır. Korunan modüller (`core.irt_mg`, `core.irt_mg34`, `core.irt_dif`, `core.irt_q3`) etkin DIF/yerel uyum ekranlarında kullanılmaya devam eder.
+
 **Scope:** 1PL and 2PL only. New modules `core/irt_mg.py` (single/two-group MML),
 `core/irt_q3.py`, `core/irt_dif.py`, `core/irt_globalfit.py`, `ui/irt_b10_view.py`, and three new
 tabs on the MTK 1PL and 2PL pages. 3PL/4PL estimation, pages and diagnostics are unchanged

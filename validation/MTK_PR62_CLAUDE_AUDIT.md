@@ -1,5 +1,7 @@
 # PR #62 — independent audit, fixes and evidence (Claude, 24 Ekim 2026)
 
+> **Arşiv notu (2026-10-29):** Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10/B11/B12/B13 karşılaştırma altyapısı) kaldırıldı; ikili MTK kestirimi yalnız Python mirt ile yapılır. Bu belgedeki kaldırılan modüllere ait bölümler tarihsel kayıttır. Korunan modüller (`core.irt_mg`, `core.irt_mg34`, `core.irt_dif`, `core.irt_q3`) etkin DIF/yerel uyum ekranlarında kullanılmaya devam eder.
+
 Base: `68bcfda` (Codex delivery). No merge to `main`. Every number below is read from a committed
 evidence file produced by a script whose design and acceptance criteria were fixed before running.
 

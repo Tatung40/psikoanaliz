@@ -5,7 +5,6 @@ import pandas as pd
 import pytest
 import mirt
 from core.irt_python_mirt_adapter import fit_python_mirt,solver_settings
-from core.irt_binary_unified import fit_binary
 
 
 def binary_data():
@@ -23,7 +22,7 @@ def test_real_em_settings_and_unchanged_defaults(monkeypatch,record_property):
     monkeypatch.setattr(EMEstimator,'fit',observe)
     x=binary_data()
     one=fit_python_mirt(x,model='1PL',max_iter=1,tol=1e-12,n_quadpts=11)
-    three=fit_binary(x,'1PL',engine='python_mirt',max_iter=3,tol=1e-12,n_quadpts=31).result
+    three=fit_python_mirt(x,model='1PL',max_iter=3,tol=1e-12,n_quadpts=31)
     loose=fit_python_mirt(x,model='1PL',max_iter=20,tol=1e6,n_quadpts=31)
     strict=fit_python_mirt(x,model='1PL',max_iter=20,tol=1e-8,n_quadpts=31)
     assert one.fit.n_iterations==1 and not one.fit.converged
@@ -60,8 +59,8 @@ def test_invalid_settings_fail_before_engine(kwargs,monkeypatch):
 
 
 def test_unknown_service_option_is_not_ignored():
-    with pytest.raises(ValueError,match='Unsupported'):
-        fit_binary(binary_data(),'2PL',engine='python_mirt',points=31)
+    with pytest.raises(TypeError):
+        fit_python_mirt(binary_data(),model='2PL',points=31)
 
 
 def test_legacy_ui_applies_real_cap_and_invalidates_settings():

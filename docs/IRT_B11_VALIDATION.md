@@ -1,5 +1,7 @@
 # 3PL and 4PL diagnostics — validation record (B11)
 
+> **Arşiv notu (2026-10-29):** Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10/B11/B12/B13 karşılaştırma altyapısı) kaldırıldı; ikili MTK kestirimi yalnız Python mirt ile yapılır. Bu belgedeki kaldırılan modüllere ait bölümler tarihsel kayıttır. Korunan modüller (`core.irt_mg`, `core.irt_mg34`, `core.irt_dif`, `core.irt_q3`) etkin DIF/yerel uyum ekranlarında kullanılmaya devam eder.
+
 **Scope:** 3PL (Phase A, validated first) and 4PL (Phase B). New modules `core/irt_mg34.py`
 (bounded single/two-group MML), `core/irt_dif34.py`, `ui/irt_b11_view.py`; backward-compatible
 extensions of `core/irt_q3.py` (c/d in the IRF, Warm WLE for 3PL/4PL) and `core/irt_globalfit.py`

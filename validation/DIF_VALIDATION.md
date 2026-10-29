@@ -1,5 +1,7 @@
 # DIF validation — observed-score methods, IRT-LR and 3PL/4PL bootstrap
 
+> **Arşiv notu (2026-10-29):** Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10/B11/B12/B13 karşılaştırma altyapısı) kaldırıldı; ikili MTK kestirimi yalnız Python mirt ile yapılır. Bu belgedeki kaldırılan modüllere ait bölümler tarihsel kayıttır. Korunan modüller (`core.irt_mg`, `core.irt_mg34`, `core.irt_dif`, `core.irt_q3`) etkin DIF/yerel uyum ekranlarında kullanılmaya devam eder.
+
 Builds on `docs/DIF_COMPLETION_MATRIX.md` (fixed-anchor IRT DIF for 1PL/2PL/GRM/PCM/GPCM/RSM/NRM,
 200-repetition studies) without repeating it. All designs and acceptance criteria below were written
 into the scripts before any result was produced.

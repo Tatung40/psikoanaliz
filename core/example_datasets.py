@@ -79,7 +79,7 @@ def analysis_catalog():
         '5. Madde Analizi','6. Çeldirici Analizi','7. Güvenirlik & Ölçme Hatası',
         '8. Grup Bazlı Analizler','9. Bilimsel Grafikler','10. Raporlama','KTK: Çift Motor Rapor',
         'MTK: Rasch','MTK: 1PL','MTK: 2PL','MTK: 3PL','MTK: 4PL','MTK: Karşılaştırma',
-        'MTK: İkili Rapor','MTK: Varsayım Denetimi','MTK: Çok Modelli DIF Taraması',
+        'MTK: Varsayım Denetimi','MTK: Çok Modelli DIF Taraması',
         'MTK: Çok Kategorili B14','MTK: RSM','MTK: Python mirt DIF',
         'MTK: GRM Formel DIF','MTK: Çok Kategorili Formel DIF','MTK: Gözlenen Puan DIF',
         'MTK: 3PL/4PL Bootstrap DIF','Boyutluluk ve Faktör Analizi',
@@ -108,7 +108,7 @@ def available(page):
     if model in IRT_MODELS:return [d for d in datasets if d.family=='irt' and d.model==model]
     if page=='MTK: Çok Kategorili B14':return [d for d in datasets if d.family=='irt' and d.model in ('GRM','PCM','GPCM','NRM')]
     if page=='Boyutluluk ve Faktör Analizi':return [d for d in datasets if d.family=='factor' or d.family=='irt' and d.model in ('2PL','GRM')]
-    if page in ('Yerel Bağımsızlık ve Madde Uyumu','MTK: İkili Rapor','MTK: Karşılaştırma'):
+    if page in ('Yerel Bağımsızlık ve Madde Uyumu','MTK: Karşılaştırma'):
         return [d for d in datasets if d.family=='abc' or d.family=='irt' and d.model=='2PL']
     return [d for d in datasets if d.family in ('abc',) or d.family=='irt' and d.model in ('2PL','GRM')] if page in analysis_catalog() else []
 

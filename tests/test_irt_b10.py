@@ -12,8 +12,6 @@ from scipy.special import expit
 import core.irt_mg as M
 import core.irt_q3 as Q
 import core.irt_dif as D
-import core.irt_globalfit as GF
-from core.irt import fit_irt
 
 F = Path(__file__).parent / "fixtures" / "irt_b10"
 
@@ -36,6 +34,13 @@ def _r(case, quantity):
 def _xg(case):
     d = _data(case); x, obs = M.as_matrix(d.drop(columns="Grup"))
     return x, obs, (d["Grup"] == "F").to_numpy().astype(int), list(d.columns[1:])
+
+
+def _single(frame, model, points):
+    """Single-group MML (core.irt_mg, the retained native DIF estimator) for Q3 inputs."""
+    fit = M.fit_single(frame, model, points=points)
+    a, b = M.Design(model, ["anchor"] * frame.shape[1], 1).unpack(fit["params"], 0)
+    return np.asarray(a, float), np.asarray(b, float), fit["converged"]
 
 
 @lru_cache(maxsize=None)
@@ -69,17 +74,6 @@ def test_multigroup_score_matches_finite_differences(model, types, quadrature):
     fd = np.array([(M.negloglik(p + e, design, parts, quad, len(x))[0]
                     - M.negloglik(p - e, design, parts, quad, len(x))[0]) / 2e-6 for e in np.eye(design.size) * 1e-6])
     assert np.abs(grad - fd).max() <= 1e-6 * np.abs(grad).max()
-
-
-@pytest.mark.parametrize("model", ["1PL", "2PL"])
-def test_single_group_mml_agrees_with_production_em(model):
-    d = _data("irt1pl_ok" if model == "1PL" else "irt2pl_ok")
-    ours = M.fit_single(d, model, points=31)
-    em = fit_irt(d, model=model, points=31, max_iter=2000, tolerance=1e-9)
-    a, b = M.Design(model, ["anchor"] * 10, 1).unpack(ours["params"], 0)
-    assert ours["converged"] and np.abs(b - em["items"]["b"]).max() < 1e-4
-    assert np.abs(a - em["items"]["a"]).max() < 1e-4
-    assert ours["loglik"] == pytest.approx(em["loglik"], abs=1e-6)
 
 
 def test_unidentified_linking_gives_no_standard_errors():
@@ -167,8 +161,8 @@ def test_dif_guards_small_unbalanced_untestable_and_disconnected():
 
 # ----------------------------------------------------------------------------------- Q3
 def test_q3_identity_adjustment_and_planted_pair():
-    d = _data("irt2pl_ld"); r = fit_irt(d, model="2PL", points=41, max_iter=500)
-    out = Q.q3_analysis(d, r["items"]["a"], r["items"]["b"], "2PL")
+    d = _data("irt2pl_ld"); a, b, _ = _single(d, "2PL", 41)
+    out = Q.q3_analysis(d, a, b, "2PL")
     assert {out["pairs"].iloc[0]["Madde 1"], out["pairs"].iloc[0]["Madde 2"]} == {"M4", "M5"}
     off = out["q3"].to_numpy()[np.triu_indices(10, 1)]
     np.testing.assert_allclose(out["adjusted"].to_numpy()[np.triu_indices(10, 1)], off - off.mean())
@@ -189,52 +183,23 @@ def test_q3_missing_pairwise_zero_variance_and_guards():
 
 
 def test_q3_bootstrap_reports_failures_and_is_reproducible():
-    d = _data("irt1pl_ok"); r = fit_irt(d, model="1PL", points=31, max_iter=500)
+    d = _data("irt1pl_ok"); a0, b0, _ = _single(d, "1PL", 31)
     calls = {"n": 0}
 
     def refit(frame):
         calls["n"] += 1
         if calls["n"] == 2:
             raise ValueError("simulated failure")
-        f = fit_irt(frame, model="1PL", points=31, max_iter=500)
-        return f["items"]["a"].to_numpy(), f["items"]["b"].to_numpy(), f["converged"]
+        return _single(frame, "1PL", 31)
 
-    out = Q.q3_analysis(d, r["items"]["a"], r["items"]["b"], "1PL", bootstrap=6, seed=4, refit=refit, points=31)
+    out = Q.q3_analysis(d, a0, b0, "1PL", bootstrap=6, seed=4, refit=refit, points=31)
     bs = out["bootstrap"]
     assert bs["failed"] == 1 and bs["used"] == 5 and bs["p_max"] * 6 == pytest.approx(round(bs["p_max"] * 6))   # (1+#)/(B+1)
-    again = Q.q3_analysis(d, r["items"]["a"], r["items"]["b"], "1PL", bootstrap=3, seed=4, points=31)["bootstrap"]
-    assert again == Q.q3_analysis(d, r["items"]["a"], r["items"]["b"], "1PL", bootstrap=3, seed=4, points=31)["bootstrap"]
+    again = Q.q3_analysis(d, a0, b0, "1PL", bootstrap=3, seed=4, points=31)["bootstrap"]
+    assert again == Q.q3_analysis(d, a0, b0, "1PL", bootstrap=3, seed=4, points=31)["bootstrap"]
 
 
 # ------------------------------------------------------------------------------- M2
-@pytest.mark.parametrize("model,case", [("1PL", "irt1pl_ok"), ("2PL", "irt2pl_ok")])
-@pytest.mark.parametrize("grid", ["gauss-hermite", "mirt"])
-def test_m2_jacobian_and_df_match_finite_differences(model, case, grid):
-    d = _data(case).to_numpy(float); n, k = d.shape
-    r = fit_irt(pd.DataFrame(d), model=model, points=41, max_iter=500)
-    a, b = r["items"]["a"].to_numpy(), r["items"]["b"].to_numpy()
-    pairs = [(i, j) for i in range(k) for j in range(i + 1, k)]
-    theta, w = GF.quadrature(grid, 41)
-
-    def margins(par):
-        aa = np.ones(k) if model == "1PL" else par[k:]
-        P = expit(aa * (theta[:, None] - par[:k]))
-        return np.r_[w @ P, [w @ (P[:, i] * P[:, j]) for i, j in pairs]]
-
-    par = b if model == "1PL" else np.r_[b, a]
-    jac = np.column_stack([(margins(par + e) - margins(par - e)) / 2e-6 for e in np.eye(len(par)) * 1e-6])
-    ours = GF.m2_statistic(d, a, b, model, grid=grid)
-    np.testing.assert_allclose(ours["jacobian"], jac, atol=1e-8)
-    assert ours["df"] == k + k * (k - 1) // 2 - (k if model == "1PL" else 2 * k) and ours["free_parameters"] == len(par)
-
-
-def test_m2_unavailable_cases():
-    d = _data("irt2pl_missing")
-    assert "eksiksiz" in GF.m2_statistic(d, np.ones(10), np.zeros(10), "2PL")["reason"]
-    small = _data("irt2pl_ok").iloc[:, :3]
-    assert "Serbestlik" in GF.m2_statistic(small, np.ones(3), np.zeros(3), "2PL")["reason"]   # df = 6 - 6
-    g = GF.global_fit(_data("irt2pl_ok"), np.ones(10), np.zeros(10), "2PL", np.zeros(1200), "EAP", converged=False)
-    assert not g["m2"]["available"] and g["classification"].iloc[0]["Sınıf"] == "Hesaplanmadı"
 
 
 # ------------------------------------------------------------------- R mirt references
@@ -283,16 +248,6 @@ def test_wle_eap_and_q3_match_mirt_with_fixed_parameters(case):
     q3, _ = Q.q3_matrix(x, obs, th, a, b, min_pairs=1)
     for _, r in _r(case, "q3").iterrows():
         assert q3[cols.index(r.row), cols.index(r.col)] == pytest.approx(r.value, abs=1e-12)
-
-
-@pytest.mark.parametrize("case", ["irt1pl_ok", "irt2pl_ok", "irt2pl_ld"])
-def test_m2_matches_mirt(case):
-    model = SINGLE[case]; d = _data(case); a, b, _ = _mirt_ab(case, list(d.columns))
-    ours = GF.m2_statistic(d, a, b, model, grid="mirt"); ref = _r(case, "m2").set_index("col").value
-    assert ours["M2"] == pytest.approx(ref["M2"], rel=1e-9) and ours["df"] == int(ref["df"])
-    assert ours["p"] == pytest.approx(ref["p"], rel=1e-8) and ours["SRMSR"] == pytest.approx(ref["SRMSR"], rel=1e-9)
-    n = len(d)                                                   # RMSEA2: ours N, mirt N - 1
-    assert np.sqrt(max(ref["M2"] - ref["df"], 0) / ((n - 1) * ref["df"])) == pytest.approx(ref["RMSEA"], rel=1e-8, abs=1e-12)
 
 
 @pytest.mark.parametrize("case,model", [("dif1pl_uniform", "1PL"), ("dif2pl_mixed", "2PL"), ("dif2pl_none", "2PL")])

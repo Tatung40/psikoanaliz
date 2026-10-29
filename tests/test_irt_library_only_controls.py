@@ -29,7 +29,9 @@ def test_retired_native_calibration_button_and_call_are_removed():
     source = (Path(__file__).resolve().parents[1] / "app.py").read_text(encoding="utf-8")
     assert "MTK Analizini Başlat — eski yerel motor devre dışı" not in source
     assert "result=run_irt_calibration(data,current_settings)" not in source
-    assert 'st.session_state.pop("irt_model_results", None)' in source
+    # Retired native session keys are neither written, read nor cleaned up any more.
+    for key in ('"irt_model_results"', '"irt_b10"', '"irt_b11"'):
+        assert key not in source
 
 
 def test_native_results_ui_is_not_present():

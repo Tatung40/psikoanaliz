@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 from scipy.stats import chi2
 from core import irt_dif as binary
-from core import irt_dif34 as asymptote
 
 
 def fit(ll, **updates):
@@ -18,8 +17,6 @@ def fit(ll, **updates):
 ])
 def test_valid_nested_lr_and_roundoff(alt, null, expected):
     assert binary._lr(fit(alt), fit(null)) == pytest.approx(expected)
-    stat, usable, note = asymptote._lr(fit(alt), fit(null), 0)
-    assert stat == pytest.approx(expected) and usable and not note
 
 
 @pytest.mark.parametrize("alt,null", [
@@ -30,15 +27,12 @@ def test_valid_nested_lr_and_roundoff(alt, null, expected):
 def test_invalid_nested_lr_has_no_p_value(alt, null):
     stat = binary._lr(fit(alt), fit(null))
     assert np.isnan(stat) and np.isnan(chi2.sf(stat, 1))
-    stat, usable, note = asymptote._lr(fit(alt), fit(null), 0)
-    assert np.isnan(stat) and not usable and "p değeri verilmedi" in note
 
 
 def test_nonconverged_fits_still_block_inference():
     alt = fit(-100.)
     alt["converged"] = False
     assert np.isnan(binary._lr(alt, fit(-105.)))
-    assert not asymptote._lr(alt, fit(-105.), 0)[1]
 
 
 @pytest.mark.parametrize("model", ["1PL", "2PL"])

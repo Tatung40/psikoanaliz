@@ -1,5 +1,7 @@
 # 3PL / 4PL scientific validation record
 
+> **Arşiv notu (2026-10-29):** Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10/B11/B12/B13 karşılaştırma altyapısı) kaldırıldı; ikili MTK kestirimi yalnız Python mirt ile yapılır. Bu belgedeki kaldırılan modüllere ait bölümler tarihsel kayıttır. Korunan modüller (`core.irt_mg`, `core.irt_mg34`, `core.irt_dif`, `core.irt_q3`) etkin DIF/yerel uyum ekranlarında kullanılmaya devam eder.
+
 **Status:** Internal verification and simulations are available. **NOT independently
 validated against an external calibration implementation under matched fixed
 parameters and real data.** The software must not claim otherwise.

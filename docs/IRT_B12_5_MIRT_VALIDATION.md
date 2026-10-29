@@ -1,5 +1,7 @@
 # B12.5 — Independent R mirt cross-validation (uploaded evidence)
 
+> **Arşiv notu (2026-10-29):** Yerel ikili MTK motoru (`core.irt`, `core.irt_mixed`, B10/B11/B12/B13 karşılaştırma altyapısı) kaldırıldı; ikili MTK kestirimi yalnız Python mirt ile yapılır. Bu belgedeki kaldırılan modüllere ait bölümler tarihsel kayıttır. Korunan modüller (`core.irt_mg`, `core.irt_mg34`, `core.irt_dif`, `core.irt_q3`) etkin DIF/yerel uyum ekranlarında kullanılmaya devam eder.
+
 **Status: PARTIALLY VALIDATED — experimental backend only.** Evidence archive: `EserPsychometrics_B12_5_R_Validation.zip` (2026-10-22). This document records supplied outputs; it does not claim that GitHub CI executed R.
 
 ## Design
