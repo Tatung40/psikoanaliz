@@ -212,6 +212,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                     st.warning(f'Python mirt Wright Map üretilemedi: {exc}')
     elif model!='Rasch':
         st.caption('Wright Map: bu model için bağımsız bilimsel doğrulama kapısı henüz açılmadı.')
+    if model in BINARY and report.metadata.get('Yakınsama') is True and not report.errors:
+        _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables)
     if report.curves.empty:return
     if not outputs['curves'] and not outputs['information']:return
     # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
@@ -246,3 +248,55 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         finally:plt.close(fig)
     st.caption('SEM(θ)=1/√I_test(θ), parametre standart hatası veya kişi posterior SS değildir.')
     st.download_button('Madde/test bilgisi ve SEM — CSV',_csv(info),f'{model}_information.csv','text/csv',key=f'python_mirt_information_csv_{model}',on_click='ignore')
+
+
+def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
+    """B13 output types on the library route: parameter SE/CI, eight charts as 300 dpi PNG, report bundle."""
+    from core.irt_binary_inference import parameter_inference,STATUS
+    from reports.irt_binary_report import kinds,png_bytes,bundle
+    with st.expander('Ek bilimsel çıktılar — parametre SH/GA, grafikler (300 dpi PNG) ve rapor paketi',expanded=False):
+        if not st.checkbox('Ek çıktıları göster',value=False,key=f'python_mirt_extras_{model}'):return
+        try:
+            ids=data[id_col].to_numpy(copy=True) if id_col in data.columns else None
+            if model=='Rasch':
+                tables=rasch_tables or rasch_wright_tables(saved['outcome'],x,item_names=cols,identifiers=ids)
+                persons=pd.DataFrame({'Birey':tables['persons'].Birey,'Ham puan':x.to_numpy().sum(1),
+                    'Yetenek (θ)':tables['persons']['θ'],'SH (θ)':tables['persons']['Posterior SD']})
+            else:persons=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
+            inference,reason=parameter_inference(saved['outcome'].fit,model,cols)
+        except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
+            st.warning(f'Ek çıktılar üretilemedi: {exc}');return
+        st.markdown('#### Madde parametresi SH ve %95 Wald güven aralığı')
+        if inference is None:st.info(reason)
+        else:
+            st.dataframe(safe_frame(inference).round(4),hide_index=True,use_container_width=True)
+            st.download_button('Parametre SH/GA — CSV',_csv(inference),f'{model}_parameter_se_ci.csv','text/csv',
+                               key=f'python_mirt_se_csv_{model}',on_click='ignore')
+        st.caption(STATUS)
+        kind=st.selectbox('Grafik',kinds(model),key=f'python_mirt_extra_kind_{model}')
+        chosen=None
+        if kind in ('ICC','IIC'):
+            chosen=st.multiselect('Maddeler',cols,default=cols[:8],key=f'python_mirt_extra_items_{model}') or cols[:1]
+        image=png_bytes(report,persons,kind,chosen)
+        st.image(image,use_container_width=True)
+        st.download_button('PNG indir (300 dpi)',image,f'{model}_{kind}.png','image/png',
+                           key=f'python_mirt_extra_png_{model}',on_click='ignore')
+        if kind=='Wright haritası' and model not in ('Rasch','1PL','2PL'):
+            st.caption('3PL/4PL: b ortak θ ölçeğindedir ancak P = .5 noktası değildir; harita betimseldir.')
+        store=st.session_state.setdefault('python_mirt_bundle',{})
+        if st.button('Rapor paketini hazırla (Excel + ZIP)',key=f'python_mirt_bundle_run_{model}'):
+            itemfit=None
+            try:
+                import mirt
+                itemfit=safe_frame(mirt.itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),statistics=['infit','outfit','S_X2']))
+            except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
+                itemfit=None
+            store[model]={'key':saved['key'],'files':bundle(report,persons,inference,reason,itemfit)}
+        entry=store.get(model)
+        if entry and entry['key']==saved['key']:
+            xlsx,archive=entry['files']
+            st.download_button('Excel — tüm tablolar',xlsx,f'{model}_rapor.xlsx',
+                               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                               key=f'python_mirt_bundle_xlsx_{model}',on_click='ignore')
+            st.download_button('ZIP — rapor paketi',archive,f'{model}_rapor.zip','application/zip',
+                               key=f'python_mirt_bundle_zip_{model}',on_click='ignore')
