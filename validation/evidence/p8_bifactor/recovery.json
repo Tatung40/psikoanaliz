@@ -1,0 +1,100 @@
+{
+  "design": {
+    "N": [
+      500,
+      1000
+    ],
+    "replications": 100,
+    "items": 12,
+    "groups": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "seed": 20261031,
+    "general": "linspace(1.0, 1.8, 12)",
+    "specific": "(.6, .8, 1.0, 1.2) per group",
+    "intercept": "linspace(-1, 1, 12)",
+    "fit": "core.irt_multidim.fit(..., 'Bifactor', groups, n_quadpts=5)"
+  },
+  "criteria": {
+    "convergence_rate_min": 0.95,
+    "rmse_max": 0.3,
+    "abs_mean_bias_max": 0.1,
+    "rationale": "Declared before running; RMSE limit as for 3PL/4PL a/b usability (irt_3pl4pl_root_cause)."
+  },
+  "results": {
+    "N500": {
+      "replications": 100,
+      "converged": 91,
+      "failed": 0,
+      "general": {
+        "mean_bias": 0.06801370171074399,
+        "max_item_abs_bias": 0.22179957065259778,
+        "rmse": 0.4944778343980487,
+        "rmse_mc_se": 0.03156090513703189
+      },
+      "specific": {
+        "mean_bias": 0.07453082330882936,
+        "max_item_abs_bias": 0.2505767439560881,
+        "rmse": 0.745462983740402,
+        "rmse_mc_se": 0.04225592902217514
+      },
+      "intercept": {
+        "mean_bias": -0.007280484604459101,
+        "max_item_abs_bias": 0.06839206822519127,
+        "rmse": 0.18335863340509068,
+        "rmse_mc_se": 0.007304941345220828
+      }
+    },
+    "N1000": {
+      "replications": 100,
+      "converged": 99,
+      "failed": 0,
+      "general": {
+        "mean_bias": 0.010757448807458068,
+        "max_item_abs_bias": 0.06031931340672818,
+        "rmse": 0.2712386346004345,
+        "rmse_mc_se": 0.017620234033520855
+      },
+      "specific": {
+        "mean_bias": 0.05761767888408621,
+        "max_item_abs_bias": 0.09790513169314048,
+        "rmse": 0.4225105871403687,
+        "rmse_mc_se": 0.027791053418554444
+      },
+      "intercept": {
+        "mean_bias": 0.006390083214184722,
+        "max_item_abs_bias": 0.043866593634919446,
+        "rmse": 0.11273539561681982,
+        "rmse_mc_se": 0.0035973017585689423
+      }
+    }
+  },
+  "checks": {
+    "N500_convergence": false,
+    "N500_general": false,
+    "N500_specific": false,
+    "N500_intercept": true,
+    "N1000_convergence": true,
+    "N1000_general": true,
+    "N1000_specific": false,
+    "N1000_intercept": true
+  },
+  "status": "NOT MET",
+  "wall_seconds": 132.8,
+  "versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.5.3",
+    "python": "3.13.17"
+  }
+}

@@ -3,7 +3,7 @@ import io
 import numpy as np
 import pandas as pd
 import streamlit as st
-from core.irt_multidim import MODELS,LIMITATION,fit,report,structure,support_matrix
+from core.irt_multidim import BIFACTOR_RECOVERY,MODELS,LIMITATION,fit,report,structure,support_matrix
 from core.python_mirt_dif import fingerprint
 from core import irt_multidim_factorized as factorized
 from core import irt_multidim_rsm_stack as rsm
@@ -48,6 +48,7 @@ def render(data=None,item_cols=(),id_col=None):
  if model=='Bifactor':
   groups=st.text_input('Özgül gruplar (madde sırasıyla 0,1,2…)',','.join(str(i*max(dims-1,1)//max(len(items),1)) for i in range(len(items))),key=f'md_groups_{dims}')
   chosen=groups
+  st.caption(BIFACTOR_RECOVERY)
  else:
   matrix=st.data_editor(pd.DataFrame(pattern,index=items,columns=[f'F{j+1}' for j in range(dims)]),key=f'md_pattern_{len(items)}_{dims}_{efa}',num_rows='fixed')
   chosen=matrix.to_numpy().tolist()
