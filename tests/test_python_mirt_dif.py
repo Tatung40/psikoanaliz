@@ -107,9 +107,10 @@ def test_ui_real_flow_stale_and_downloads(binary,monkeypatch):
     at.run();assert not at.exception
     at.selectbox(key='pmd_model').set_value('2PL').run()
     at.button(key='pmd_run').click().run();assert not at.exception and len(calls)==1
-    assert len(scientific_downloads(at))==5
+    assert len(scientific_downloads(at))==6
+    assert 'pmd_download_academic_docx' in {b.key for b in scientific_downloads(at)}
     assert {b.key for b in at.get('download_button')} - {b.key for b in scientific_downloads(at)} == {'repro_py','repro_zip'}
-    at.run();assert not at.exception and len(calls)==1 and len(scientific_downloads(at))==5
+    at.run();assert not at.exception and len(calls)==1 and len(scientific_downloads(at))==6
     old=at.session_state[view.KEY]
     mutations=[('pmd_alpha',.04),('pmd_correction','holm'),('pmd_anchors',items[:3]),
                ('pmd_model','Rasch'),('pmd_test','Omnibus'),('pmd_group',items[0]),('pmd_reference','F'),('pmd_items',items[:3]),
