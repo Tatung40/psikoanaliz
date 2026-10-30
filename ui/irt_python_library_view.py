@@ -29,7 +29,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     choices=[c for c in data.columns if c not in (id_col,group_col)]
     cols=st.multiselect('Madde sütunları',choices,default=[c for c in items if c in choices] or choices[:10],key=f'python_mirt_cols_{model}')
     # Display-only controls: never alter calibration or claim unsupported solver settings.
-    with st.expander('Çıktılar ve raporlama — SPSS tarzı seçimler',expanded=False):
+    with st.expander('Çıktılar ve Raporlama Seçenekleri',expanded=False):
         st.caption('Varsayılan: tüm mevcut çıktılar. Seçimler yalnızca görünümü ve dışa aktarımı etkiler; model kalibrasyonunu değiştirmez.')
         output_names={
             'summary':'Model özeti, LogLik, AIC/BIC ve yakınsama',
