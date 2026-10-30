@@ -35,8 +35,9 @@ def activate(dataset_id,page):
     state=st.session_state
     nonce=int(state.get('privacy_upload_nonce',0))+1
     # Callback runs before widgets: reset old models, uploaded files and all caches.
+    picker_key='examples_pick_'+page
     for key in list(state):
-        if key not in ('nav_page',):del state[key]
+        if key not in ('nav_page',picker_key):del state[key]
     state.update(raw_df=E.input_frame(bundle),scored_df=None,item_cols=bundle['items'],
                  id_col=bundle['id'],group_col=bundle['group'],answer_key=bundle['key'],
                  privacy_upload_nonce=nonce,_example_active=dataset_id,_example_metadata=bundle['metadata'])
@@ -110,6 +111,12 @@ def guide(page,bundle=None):
         if spec.family=='missing':st.caption('Örnek kayıp mekanizması üretimde MCAR olarak tanımlıdır; gerçek veride MCAR/MAR/MNAR yalnız kayıp oranından belirlenemez.')
 
 
+def _select_example(page):
+    selected=st.session_state.get('examples_pick_'+page)
+    if selected:
+        activate(selected,page)
+
+
 def render(page):
     choices=E.available(page)
     if not choices:return
@@ -117,7 +124,7 @@ def render(page):
     with st.expander('Örnek Veri Setleri ve Veri Hazırlama Rehberi'):
         selected=st.selectbox('Örnek veri seti',[None]+[d.id for d in choices],
             format_func=lambda v:'Örnek seçin (veri henüz üretilmez)' if v is None else E.registry()[v].title,
-            key='examples_pick_'+page)
+            key='examples_pick_'+page,on_change=_select_example,args=(page,))
         if selected:
             bundle=E.materialize(selected)
             st.caption('SENTETİK öğretim verisi — gerçek araştırma verisi veya bilimsel sertifika değildir.')
@@ -138,7 +145,6 @@ def render(page):
                                key='examples_book_'+page,on_click='ignore')
             if 'genis.csv' in files:st.download_button('Geniş p × i — CSV',files['genis.csv'],selected+'_genis.csv',key='examples_wide_'+page,on_click='ignore')
             st.download_button('Üretim bilgileri — JSON',files['uretim_bilgileri.json'],selected+'.json',key='examples_meta_'+page,on_click='ignore')
-            st.button('Bu Örnekle Analiz Yap',key='examples_activate_'+page,on_click=activate,args=(selected,page),type='primary')
-            st.caption('Veri gerçek yükleyiciyle aktarılır; alanlar eşlenir. G/D ve otomatik KTK ekranları hesaplar; '
-                       'diğer modellerde ayarları kontrol edip mevcut çalıştır düğmesine basın. Yakınsama garanti edilmez.')
+            st.caption('Örnek seçildiğinde veri otomatik yüklenir ve alanlar eşlenir. G/D ve otomatik KTK ekranları hesaplar; '
+                       'diğer modellerde ayarları kontrol edip ilgili analizi başlatın. Yakınsama garanti edilmez.')
     guide(page,bundle)
