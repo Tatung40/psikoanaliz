@@ -16,7 +16,7 @@ def app(page='2. Veri Yükleme'):
 def choose(at,page,d):
     at.selectbox(key='examples_pick_'+page).set_value(d.id).run()
     assert not at.exception
-    at.button(key='examples_activate_'+page).click().run()
+    assert not any(b.key=='examples_activate_'+page for b in at.button)
     assert not at.exception
     return at
 
