@@ -29,8 +29,7 @@ def run(output,app_python=None,browser_path=None):
                         wait_idle(page)
                     errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
                     upload(page,server.port,ROOT/'tests/fixtures/rasch/data_rasch_main.csv')
-                    page.get_by_text('🔬 Ayrıntılı MTK Model Raporları',exact=True).first.click()
-                    nav(page,'Python mirt — Rasch')
+                    nav(page,'📐 Rasch Modeli')
                     click_text('Çıktılar ve raporlama — SPSS tarzı seçimler')
                     names=['Model özeti, LogLik, AIC/BIC ve yakınsama','Madde parametreleri',
                         'Birey EAP yetenekleri ve posterior SH','Madde/kategori tepki eğrileri',
