@@ -215,7 +215,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
     with st.expander("📐 MTK Modelleri ve Analizler", expanded=True):
-        st.caption("Python mirt: SPSS tarzı ayarlar, parametreler, grafikler ve indirmeler.")
+        st.caption("Python mirt: gelişmiş analiz ayarları, parametreler, grafikler ve indirmeler.")
         binary_quick_model = st.selectbox(
             "Hızlı ikili MTK model seçimi",
             ("Rasch", "1PL", "2PL", "3PL", "4PL"),
