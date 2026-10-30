@@ -344,6 +344,12 @@ if selected_page == "1. Ana Sayfa":
     doğrulama düzeyi farklıdır. Bazı DIF yöntemleri deneysel olup 4PL formel
     DIF çıkarımı güvenilir koşullar sağlanana kadar kapalıdır.
 
+    **Genellenebilirlik Kuramı (GK)** kapsamında G çalışmalarıyla ölçme sonuçlarındaki
+    varyans bileşenleri ve farklı hata kaynakları incelenebilmekte; D çalışmalarıyla
+    alternatif ölçme desenleri için genellenebilirlik (Eρ²) ve mutlak karar (Φ)
+    katsayıları değerlendirilebilmektedir. Bu bölüm, desteklenen dengeli ve rastgele
+    yüzeyli desenlerle sınırlıdır; doğrulanmamış desenler analiz kapsamı dışındadır.
+
     PsikoAnaliz, psikometrik analiz süreçlerinin anlaşılır, bütünleşik ve
     yeniden üretilebilir bir ortamda yürütülmesini amaçlamaktadır.
 
