@@ -30,7 +30,7 @@ def run(output,app_python=None,browser_path=None):
                     errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
                     upload(page,server.port,ROOT/'tests/fixtures/rasch/data_rasch_main.csv')
                     nav(page,'📐 Rasch Modeli')
-                    click_text('Çıktılar ve raporlama — SPSS tarzı seçimler')
+                    click_text('Çıktılar ve Raporlama Seçenekleri')
                     names=['Model özeti, LogLik, AIC/BIC ve yakınsama','Madde parametreleri',
                         'Birey EAP yetenekleri ve posterior SH','Madde/kategori tepki eğrileri',
                         'Madde ve test bilgisi, koşullu SEM','Aynı veri üzerinde model karşılaştırması (ML AIC/BIC)',
@@ -52,7 +52,7 @@ def run(output,app_python=None,browser_path=None):
                     np.testing.assert_allclose(people['Yetenek (θ)'],ep['θ'],rtol=1e-12,atol=1e-12)
                     np.testing.assert_allclose(people['SH (θ)'],ep['Posterior SD'],rtol=1e-12,atol=1e-12)
                     np.testing.assert_allclose(params.set_index('Madde').loc[ei.Madde,'b'],ei.b,rtol=1e-12,atol=1e-12)
-                    page.get_by_text('Çıktılar ve raporlama — SPSS tarzı seçimler',exact=True).evaluate("el => el.scrollIntoView({block:'center'})")
+                    page.get_by_text('Çıktılar ve Raporlama Seçenekleri',exact=True).evaluate("el => el.scrollIntoView({block:'center'})")
                     page.screenshot(path=str(out/'default_rasch_spss.png'),full_page=True)
                     # Output controls must change actual visibility, preserving the fitted values.
                     set_checkbox('Madde/kategori tepki eğrileri',False)
