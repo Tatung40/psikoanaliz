@@ -13,7 +13,8 @@ def test_engine_nav_routes_and_expanders():
         assert retired not in text
     assert 'args=("KTK: Çift Motor Rapor",)' in text
     assert 'selected_page.startswith("MTK: Python mirt ")' in text
-    assert 'for m in ("GRM","PCM","GPCM","NRM")' in text\n    assert 'args=(f"MTK: Python mirt {binary_quick_model}",)' in text
+    assert 'for m in ("GRM","PCM","GPCM","NRM")' in text
+    assert 'args=(f"MTK: Python mirt {binary_quick_model}",)' in text
 
 def test_library_render_imports():
     from ui.irt_python_library_view import MODELS,render
