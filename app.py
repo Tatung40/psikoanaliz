@@ -1922,6 +1922,18 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                         "Python mirt yakınsamadı. Parametreler ve model "
                         "karşılaştırmaları kesin sonuç olarak yorumlanmamalıdır."
                     )
+                if model == "2PL":
+                    try:
+                        from reports.irt_2pl_academic_docx import export_2pl_docx
+                        academic_word = export_2pl_docx(external_fit, irt_columns)
+                        st.download_button(
+                            "Akademik 2PL raporu — Word",
+                            data=academic_word,
+                            file_name="python_mirt_2pl_akademik_rapor.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            key="py_mirt_2pl_academic_word")
+                    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+                        st.warning(f"Akademik 2PL Word raporu hazırlanamadı: {exc}")
                 if model in ("1PL", "2PL", "3PL", "4PL"):
                     try:
                         from core.irt_python_mirt_parameters import python_mirt_binary_parameters
