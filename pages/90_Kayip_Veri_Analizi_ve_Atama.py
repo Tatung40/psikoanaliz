@@ -2,6 +2,8 @@
 import io
 import pandas as pd
 import streamlit as st
+from project_modules import purge_stale, record_loaded
+purge_stale()  # before any project import (in-place redeploy)
 from core.reproducible import begin as begin_code_capture, displayed, finish as finish_code_capture
 from ui.reproducible_view import render as render_reproducible_code
 from core.missing_imputation import diagnose, apply, METHODS
@@ -84,5 +86,6 @@ if source is not None or df is not None:
             st.error(str(exc))
 
 _code_recorder = finish_code_capture()
+record_loaded()
 st.session_state["_repro_history"] = _code_recorder
 render_reproducible_code(_code_recorder)

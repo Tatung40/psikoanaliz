@@ -7,6 +7,10 @@ Lisans: MIT (Açık Kaynak, 0 TL Bütçe)
 
 import io
 import os
+
+from project_modules import purge_stale, record_loaded
+purge_stale()  # before any project import: no stale modules after an in-place redeploy
+
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -302,6 +306,7 @@ begin_code_capture(selected_page, globals(), st.session_state.get("_repro_histor
 
 def end_page_code_capture():
     """Finish the run's recording, keep it as page history and render the shared Python code panel."""
+    record_loaded()
     recorder = finish_code_capture()
     st.session_state["_repro_history"] = recorder
     st.session_state.setdefault("_repro_pages", {})[selected_page] = recorder
