@@ -7,6 +7,11 @@ Lisans: MIT (Açık Kaynak, 0 TL Bütçe)
 
 import io
 import os
+
+# A Streamlit Cloud in-place rollback can retain modules from a newer commit.
+# Reconcile project modules before importing any core/ui/reports code.
+from project_modules import purge_stale
+purge_stale()
 import numpy as np
 import pandas as pd
 import streamlit as st
