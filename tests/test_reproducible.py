@@ -329,3 +329,20 @@ def test_inplace_value_change_invalidates_mutable_producer_reference():
     arguments = rec.calls[1]['arguments']
     assert dict(arguments['values'])['self']['@'] == 'frame'
     pd.testing.assert_frame_equal(decode(arguments)['self'], copied)
+
+
+def test_python_panel_is_blank_before_completed_analysis():
+    from streamlit.testing.v1 import AppTest
+    app = AppTest.from_string("""
+import pandas as pd
+from core import dimensionality
+from core.reproducible import begin, finish
+from ui.reproducible_view import render
+begin('preflight')
+dimensionality.data_type(pd.DataFrame({'M1': [0, 1], 'M2': [1, 0]}))
+render(finish())
+""").run(timeout=30)
+    assert not app.exception
+    assert any(tab.label == '</> Python Kodları' for tab in app.tabs)
+    assert not app.info and not app.warning and not app.code
+    assert not app.get('download_button')
