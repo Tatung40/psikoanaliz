@@ -190,8 +190,6 @@ with st.sidebar:
               on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
     st.button("❓ Kayıp Veri Atama", use_container_width=True,
               on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
-    st.button("📐 Genellenebilirlik Kuramı", key="nav_generalizability", use_container_width=True,
-              on_click=navigate_to, args=("Genellenebilirlik Kuramı (G ve D Çalışmaları)",))
     st.button("🧭 Boyutluluk ve Faktör Analizi", key="nav_dimensionality", use_container_width=True,
               on_click=navigate_to, args=("Boyutluluk ve Faktör Analizi",))
     st.button("🔗 Yerel Bağımsızlık ve Madde Uyumu", key="nav_local_fit", use_container_width=True,
@@ -260,6 +258,11 @@ with st.sidebar:
         st.caption("RSM ayrı model sayfasındadır; Python mirt fit_mirt API'sinde yoktur.")
     st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
               on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
+    st.markdown("---")
+    st.markdown("### III. Genellenebilirlik Kuramı")
+    with st.expander("📐 Genellenebilirlik Kuramı Analizleri", expanded=True):
+        st.button("📊 G ve D Çalışmaları", key="nav_generalizability", use_container_width=True,
+                  on_click=navigate_to, args=("Genellenebilirlik Kuramı (G ve D Çalışmaları)",))
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
     for label, page in [
