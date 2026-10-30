@@ -36,7 +36,8 @@ def app_with_real_fits(actual_fits,monkeypatch):
     at=AppTest.from_file(str(Path('app.py').resolve()),default_timeout=120)
     for k,v in dict(raw_df=data,scored_df=None,item_cols=list(x.columns),id_col='ID',group_col=None,is_dichotomous=True,nav_page='MTK: Python mirt Rasch').items():at.session_state[k]=v
     at.run();assert not at.exception
-    assert all(f'python_irt_{m}' in {b.key for b in at.button} for m in ('Rasch','1PL','2PL','3PL','4PL','GRM','PCM','GPCM','NRM'))
+    assert all(f'irt_nav_{m}' in {b.key for b in at.button} for m in ('Rasch','1PL','2PL','3PL','4PL'))
+    assert all(f'python_irt_{m}' in {b.key for b in at.button} for m in ('GRM','PCM','GPCM','NRM'))
     return at,calls,downloads,data
 
 
@@ -74,7 +75,7 @@ def test_spss_outputs_and_rasch_map_preserve_actual_values(actual_fits,monkeypat
 def test_comparison_requires_matched_solver_and_bad_settings_fail_closed(actual_fits,monkeypatch):
     at,calls,downloads,_=app_with_real_fits(actual_fits,monkeypatch)
     at.button(key='python_mirt_start_Rasch').click().run()
-    at.button(key='python_irt_2PL').click().run()
+    at.button(key='irt_nav_2PL').click().run()
     at.button(key='python_mirt_start_2PL').click().run()
     assert not at.exception and len(calls)==2
     comparison=pd.read_csv(io.BytesIO(downloads['python_mirt_compare_csv_2PL']))

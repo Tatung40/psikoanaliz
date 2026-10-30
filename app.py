@@ -190,8 +190,6 @@ with st.sidebar:
               on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
     st.button("❓ Kayıp Veri Atama", use_container_width=True,
               on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
-    st.button("📐 Genellenebilirlik Kuramı", key="nav_generalizability", use_container_width=True,
-              on_click=navigate_to, args=("Genellenebilirlik Kuramı (G ve D Çalışmaları)",))
     st.button("🧭 Boyutluluk ve Faktör Analizi", key="nav_dimensionality", use_container_width=True,
               on_click=navigate_to, args=("Boyutluluk ve Faktör Analizi",))
     st.button("🔗 Yerel Bağımsızlık ve Madde Uyumu", key="nav_local_fit", use_container_width=True,
@@ -217,7 +215,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### II. Madde Tepki Kuramı (MTK)")
     with st.expander("📐 MTK Modelleri ve Analizler", expanded=True):
-        st.caption("İkili modeller: Python mirt; Rasch ve diğer araştırma sayfalarının doğrulama durumu ayrıdır.")
+        st.caption("Python mirt: gelişmiş analiz ayarları, parametreler, grafikler ve indirmeler.")
         binary_quick_model = st.selectbox(
             "Hızlı ikili MTK model seçimi",
             ("Rasch", "1PL", "2PL", "3PL", "4PL"),
@@ -225,10 +223,10 @@ with st.sidebar:
         )
         st.button("Seçili MTK analizine git",key="binary_irt_quick_go",
                   use_container_width=True,on_click=navigate_to,
-                  args=(f"MTK: {binary_quick_model}",))
+                  args=(f"MTK: Python mirt {binary_quick_model}",))
         for m in ("Rasch","1PL","2PL","3PL","4PL"):
             st.button(f"📐 {m} Modeli",key=f"irt_nav_{m}",
-                      use_container_width=True,on_click=navigate_to,args=(f"MTK: {m}",))
+                      use_container_width=True,on_click=navigate_to,args=(f"MTK: Python mirt {m}",))
         for label,page in [
             ("📊 Model Karşılaştırması","MTK: Karşılaştırma"),
             ("🔍 MTK Varsayım Denetimi","MTK: Varsayım Denetimi"),
@@ -247,22 +245,24 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
         st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
                   use_container_width=True,on_click=navigate_to,args=("MTK: 3PL/4PL Bootstrap DIF",))
-    st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
-              on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
-    with st.expander("🔬 Ayrıntılı MTK Model Raporları"):
-        st.caption("Python mirt 1.2.0 model raporları: parametreler, eğriler, kişi puanları, "
-                   "madde uyumu ve indirmeler. Motor seçimi yoktur.")
-        for m in ("Rasch","1PL","2PL","3PL","4PL","GRM","PCM","GPCM","NRM"):
-            st.button(f"Python mirt — {m}",key=f"python_irt_{m}",
+        st.caption("Çok kategorili MTK modelleri")
+        for m in ("GRM","PCM","GPCM","NRM"):
+            st.button(f"📐 {m} Modeli",key=f"python_irt_{m}",
                       use_container_width=True,on_click=navigate_to,
                       args=(f"MTK: Python mirt {m}",))
         st.button("⚖️ Python mirt — DIF Analizleri",key="nav_python_mirt_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Python mirt DIF",))
-        st.caption("RSM: Python mirt fit_mirt API'sinde yok; tam RSM analizi için 'RSM — Derecelendirme Ölçeği Modeli' sayfasını kullanın.")
         st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
                   key="nav_irt_b14",use_container_width=True,
                   on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
-
+        st.caption("RSM ayrı model sayfasındadır; Python mirt fit_mirt API'sinde yoktur.")
+    st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
+              on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
+    st.markdown("---")
+    st.markdown("### III. Genellenebilirlik Kuramı")
+    with st.expander("📐 Genellenebilirlik Kuramı Analizleri", expanded=True):
+        st.button("📊 G ve D Çalışmaları", key="nav_generalizability", use_container_width=True,
+                  on_click=navigate_to, args=("Genellenebilirlik Kuramı (G ve D Çalışmaları)",))
     st.markdown("---")
     st.markdown("### Ortak Araçlar")
     for label, page in [

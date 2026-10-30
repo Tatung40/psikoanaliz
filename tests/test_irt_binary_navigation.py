@@ -1,4 +1,4 @@
-"""Navigation regression: Rasch/1PL-4PL quick picker preserves existing pages."""
+"""Navigation regression: Rasch/1PL-4PL quick picker opens detailed Python mirt pages."""
 from pathlib import Path
 import pytest
 
@@ -15,4 +15,4 @@ def test_binary_dropdown_navigation(model):
     assert not at.exception
     at.button(key="binary_irt_quick_go").click().run()
     assert not at.exception
-    assert at.session_state["nav_page"]==f"MTK: {model}"
+    assert at.session_state["nav_page"]==f"MTK: Python mirt {model}"
