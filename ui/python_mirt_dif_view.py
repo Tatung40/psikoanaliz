@@ -5,6 +5,7 @@ import streamlit as st
 from core.reproducible import displayed
 from core.python_mirt_dif import MODELS,FAMILIES,LIMITATION,analyze,fingerprint,prepare,support_matrix
 from reports.python_mirt_dif_report import downloads,figure
+from reports.dif_academic_docx import dif_academic_docx
 from ui.irt_solver_controls import solver_controls
 
 KEY='python_mirt_dif_result'
@@ -103,5 +104,13 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
     if saved.get('bundle_key')!=bundle_key:
         saved['downloads']=downloads(result,item);saved['bundle_key']=bundle_key
     bundle=saved['downloads']
+    try:
+        docx_bytes=dif_academic_docx(result,item)
+        st.download_button('Akademik DIF raporu — Word',docx_bytes,
+            'python_mirt_dif_academic.docx',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            key='pmd_download_academic_docx')
+    except (ValueError,KeyError,TypeError) as exc:
+        st.warning(f'Word raporu üretilemedi: {exc}')
     for label,ext,mime in [('DIF — CSV','csv','text/csv'),('Tam rapor — XLSX','xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),('Grafikler — PNG','png','image/png'),('Tüm sonuçlar — ZIP','zip','application/zip'),('Yöntem ve sınırlılıklar — Markdown','report','text/markdown')]:
         st.download_button(label,bundle[ext],'python_mirt_dif.'+('md' if ext=='report' else ext),mime,key='pmd_download_'+ext)
