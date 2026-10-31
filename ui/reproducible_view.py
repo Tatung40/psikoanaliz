@@ -5,13 +5,15 @@ from core.reproducible import bundle, python_code
 
 def render(recorder):
     with st.tabs(['</> Python Kodları'])[0]:
-        # Before a completed analysis (or when a faithful replay cannot be
-        # generated), leave the panel empty rather than showing a false alarm.
         if recorder is None or not recorder.calls:
+            st.info('Bu sayfada kaydedilmiş bir hesaplama çağrısı bulunamadı. Analizi bu oturumda yeniden çalıştırın; kod üretilmeden boş bir alan gösterilmez.')
             return
         manifest = recorder.manifest()
         python = python_code(manifest)
         if not python:
+            st.warning('Bu analiz için doğrulanabilir Python yeniden üretim kodu oluşturulamadı. Eksik veya desteklenmeyen adımlar:')
+            for reason in manifest.get('unsupported', []):
+                st.caption(str(reason))
             return
         st.caption('Gerçek hesaplama girdileri kullanılır. Kod üretimi bağımsız bilimsel doğrulama değildir. '
                    'Ön işleme uygulanmış veri tekrar kodlanmaz; seed yalnız açıkça verilmişse taşınır. '
