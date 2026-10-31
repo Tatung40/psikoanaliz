@@ -19,6 +19,11 @@ DESIGN (fixed before results; copied into the output JSON):
    FWER <= .05, each judged with its exact 95% Clopper-Pearson / normal MC interval reported; CI
    coverage in [.925, .975]. Power is descriptive (no threshold). Failed analyses are recorded.
 Run: PYTHONPATH=. python validation/dif_validation_study.py OUTDIR [--quick]
+
+Precision amendment (2026-11-01): thresholds and historical evidence unchanged.
+Pooled item-binomial intervals are replaced by dataset-cluster MCSE and marginal
+Hoeffding-ratio intervals; only dataset-level FWER retains Clopper-Pearson.
+Replay without fitting: python -m validation.dif_validation_study OUTDIR --reuse SOURCE_JSON
 """
 import json
 import os
@@ -31,6 +36,7 @@ import numpy as np
 import pandas as pd
 from scipy.special import expit
 from scipy.stats import beta as beta_dist
+from validation.coverage_precision import coverage_precision
 
 K_BIN = 20
 A_REF = 0.7 + 1.1 * ((7 * np.arange(K_BIN)) % 20) / 19
@@ -141,6 +147,25 @@ def cp(x, n):
     return [float(lo), float(hi)]
 
 
+def clustered_rate(parts, capacity):
+    """Independent datasets, not dependent item intervals, are sampling units.
+
+    95% distribution-free ratio interval: Hoeffding bounds for E(C/k),
+    E(M/k), each in [0,1], with a union bound. Targets coverage/rejection
+    conditional on eligible successful analyses; not a certification rule.
+    """
+    precision = coverage_precision(parts, len(parts))
+    counts = precision['coverage_cluster_counts']
+    c, m = np.asarray(counts['covered']), np.asarray(counts['eligible'])
+    if capacity <= 0 or np.any(m > capacity):
+        raise ValueError('Invalid per-replication capacity')
+    eps = np.sqrt(np.log(4 / .05) / (2 * len(parts)))
+    cm, mm = c.mean() / capacity, m.mean() / capacity
+    ci = [max(0., (cm-eps)/(mm+eps)),
+          min(1., (cm+eps)/(mm-eps)) if mm > eps else 1.]
+    return precision, ci
+
+
 def summarize(records):
     groups = {}
     for r in records:
@@ -160,17 +185,27 @@ def summarize(records):
                 rej = np.array([[np.isfinite(v) and v < .05 for v in r[key]] for r in ok])
                 nn = rej[:, null_items]
                 x = int(nn.sum()); n = nn.size
-                row[f"type1_{lab}"] = x / n; row[f"type1_{lab}_ci"] = cp(x, n)
+                precision, ci = clustered_rate([v[:, None] for v in nn], len(null_items))
+                row[f"type1_{lab}"] = x / n; row[f"type1_{lab}_ci"] = ci
+                row[f"type1_{lab}_precision"] = precision
                 V = nn.sum(1); Rn = rej.sum(1)
                 fdr = V / np.maximum(Rn, 1)
                 row[f"fdr_{lab}"] = float(fdr.mean())
                 row[f"fdr_{lab}_mcse"] = float(fdr.std(ddof=1) / np.sqrt(len(fdr))) if len(fdr) > 1 else np.nan
+                eps = np.sqrt(np.log(2 / .05) / (2 * len(fdr)))
+                row[f"fdr_{lab}_ci"] = [max(0., float(fdr.mean())-eps), min(1., float(fdr.mean())+eps)]
+                # Failed analyses have unknown FDP, not FDP=0. This is a
+                # sensitivity range, not a sampling confidence interval.
+                row[f"fdr_{lab}_failure_range"] = [float(fdr.sum()/len(rs)),
+                    float((fdr.sum()+len(rs)-len(ok))/len(rs))]
                 fw = int((V > 0).sum()); row[f"fwer_{lab}"] = fw / len(ok); row[f"fwer_{lab}_ci"] = cp(fw, len(ok))
                 if dif:
                     for name, items in ((("uniform", UNIFORM), ("nonuniform", NONUNIFORM)) if kind == "binary"
                                         else (("threshold_shift", ORD_DIF),)):
                         pw = rej[:, list(items)]
-                        row[f"power_{name}_{lab}"] = float(pw.mean()); row[f"power_{name}_{lab}_ci"] = cp(int(pw.sum()), pw.size)
+                        precision, ci = clustered_rate([v[:, None] for v in pw], len(items))
+                        row[f"power_{name}_{lab}"] = float(pw.mean()); row[f"power_{name}_{lab}_ci"] = ci
+                        row[f"power_{name}_{lab}_precision"] = precision
             row["untestable_mean"] = float(np.mean([r.get("n_untestable", 0) for r in ok]))
             if method == "IRTLR":
                 row["unstable_purification"] = int(sum(not r["stable"] for r in ok))
@@ -178,17 +213,49 @@ def summarize(records):
                     c = [v for r in ok for v in r["coverage"][par]["covered"]]
                     row[f"coverage_{par}"] = float(np.mean(c)) if c else np.nan
                     row[f"coverage_{par}_n"] = len(c)
-                    row[f"coverage_{par}_ci"] = cp(int(np.sum(c)), len(c)) if c else [np.nan, np.nan]
+                    if c:
+                        precision, ci = clustered_rate([np.array(r['coverage'][par]['covered'])[:, None] for r in ok], k)
+                        row[f"coverage_{par}_ci"] = ci
+                        row[f"coverage_{par}_precision"] = precision
+                    else:
+                        row[f"coverage_{par}_ci"] = [None, None]
             row["seconds_mean"] = float(np.mean([r["seconds"] for r in ok]))
             row["meets_type1_raw"] = bool(CRITERIA["type1"][0] <= row["type1_raw"] <= CRITERIA["type1"][1])
             row["meets_fdr_bh"] = bool(row["fdr_bh"] <= CRITERIA["fdr"])
             row["meets_fwer_holm"] = bool(row["fwer_holm"] <= CRITERIA["fwer"])
+            row['precision_note'] = ('Dataset-cluster MCSE; 95% Hoeffding-ratio intervals for item rates, '
+                'Hoeffding for mean FDP; Clopper-Pearson only for replication-level FWER. '
+                'meets_* are historical point-estimate checks, not precision-adjusted certification. '
+                'All metrics conditional on successful analyses; untestable items are not rejections.')
         out.append(row)
     return out
 
 
-def main(outdir, quick=False):
+def main(outdir, quick=False, reuse=None):
     os.makedirs(outdir, exist_ok=True)
+    if reuse is not None:
+        import hashlib
+        import platform
+        from importlib.metadata import version
+        from pathlib import Path
+        raw = Path(reuse).read_bytes(); original = json.loads(raw)
+        if Path(reuse).resolve() == (Path(outdir)/'dif_validation_study.json').resolve():
+            raise ValueError('Never overwrite source evidence')
+        records = original['runs']
+        keys = [(r['kind'],r['method'],r['n_ref'],r['n_foc'],r['mu'],r['dif'],r['seed']) for r in records]
+        if len(keys) != len(set(keys)):
+            raise ValueError('Duplicate independent replication in a design cell')
+        if original['criteria'] != json.loads(json.dumps(CRITERIA)):
+            raise ValueError('Source preregistered criteria differ')
+        payload = dict(source=str(reuse), source_sha256=hashlib.sha256(raw).hexdigest(),
+            execution='SAVED RECORD REANALYSIS — NO FITS OR SIMULATION',
+            scientific_status='NOT CERTIFIED', criteria=original['criteria'], n_jobs=len(records),
+            source_versions=original.get('versions','UNKNOWN'),
+            analysis_versions=dict(python=platform.python_version(),numpy=np.__version__,scipy=version('scipy')),
+            code_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in
+                (Path(__file__),Path(__file__).with_name('coverage_precision.py'))}, summary=summarize(records))
+        (Path(outdir)/'dif_validation_study.json').write_text(json.dumps(payload,ensure_ascii=False,separators=(',',':')))
+        return payload
     js = jobs(quick); t0 = time.time()
     with Pool(int(os.environ.get("P2_PROCS", "2"))) as pool:
         recs = pool.map(run_job, js, chunksize=1)
@@ -202,4 +269,5 @@ def main(outdir, quick=False):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], quick="--quick" in sys.argv)
+    reuse = sys.argv[sys.argv.index('--reuse')+1] if '--reuse' in sys.argv else None
+    main(sys.argv[1], quick="--quick" in sys.argv, reuse=reuse)

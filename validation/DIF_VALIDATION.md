@@ -75,3 +75,21 @@ Selection-adjusted inference after data-driven anchor purification; FDR/coverage
 designs (more items, unequal slopes in ordinal data, non-normal latent distributions); NRM weighted
 category-effect intervals in `core.polytomous_dif` (previous minimum coverage 88 %, still withheld);
 3PL bootstrap size slightly liberal for an interior studied item.
+
+## Saved-record precision correction (2026-11-01)
+
+The archived p2 JSON/CSV and preregistered numerical cutoffs are unchanged. Their
+Clopper–Pearson intervals pooled dependent item outcomes for Type-I rates, power
+and parameter coverage: those intervals do not have a justified binomial sampling
+unit. `dif_validation_study.summarize` now clusters MCSE by independently generated
+dataset and reports conservative 95% Hoeffding ratio intervals for these rates.
+FWER is one Bernoulli event per dataset, so its exact Clopper–Pearson interval is
+preserved. Mean FDP already used replication-level MCSE; its new Hoeffding interval
+remains nonzero-width even with zero observed false discoveries. These are Monte
+Carlo uncertainty intervals, not item-parameter intervals or adjusted p-values.
+
+The original `meets_*` checks remain point-estimate comparisons, not scientific
+certification. Metrics are conditional on successful analyses. The new FDR failure
+range treats failed analyses as unknown FDP in [0,1], never as zero. One failed IRT-LR
+purification is preserved. No inference gate is opened. Reanalysis of the 2,560 saved
+records and 28 cells requires no fitting: see `FOUR_PL_DIF_PRECISION_2026-11-01.md`.
