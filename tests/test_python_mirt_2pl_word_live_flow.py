@@ -26,6 +26,17 @@ def _app(model, case):
     return at, list(x.columns)
 
 
+def _assert_python_code_panel(at):
+    """The shared 'Python Kodları' tab shows the real replay recipe of this fit and offers the .py file."""
+    manifest = at.session_state["_repro_history"].manifest()
+    assert manifest["status"] == "GENERATED / UNVERIFIED", manifest["unsupported"]
+    calls = [c["function"] for c in manifest["calls"]]
+    assert calls[0] == "fit_python_mirt" and dict(manifest["calls"][0]["arguments"]["values"])["model"] == "2PL"
+    code = [c.value for c in at.code if c.value.startswith("# PsikoAnaliz reproducible analysis")]
+    assert len(code) == 1 and '"fit_python_mirt"' in code[0]
+    assert any(d.proto.id and "repro_py" in d.proto.id for d in at.get("download_button"))
+
+
 def _downloads(at):
     """Downloads of the analysis page itself (the shared Python Kodları panel renders after every page)."""
     return [d for d in at.get("download_button") if d.proto.id and not any(k in d.proto.id for k in ("repro_py", "repro_zip"))]
@@ -45,11 +56,12 @@ def test_2pl_word_download_is_last_output_and_docx_holds_real_results():
     assert "Madde karakteristik eğrileri (ICC)" in text and "Madde ve test bilgi fonksiyonları" in text
     cells = " ".join(c.text for t in doc.tables for r in t.rows for c in r.cells)
     assert all(item in cells or item in text for item in items)
-    assert any('Python' in m.value and 'Kod' in m.value for m in at.markdown), 'Python code panel absent'
+    _assert_python_code_panel(at)
     first = store["docx"]
     at.run()                                                    # ordinary rerun: button stays, no rebuild
     assert [d.proto.label for d in _downloads(at)][-1] == "📄 Akademik 2PL Raporu — Word İndir"
     assert at.session_state["python_mirt_2pl_word"]["docx"] is first
+    _assert_python_code_panel(at)                               # code panel also survives the rerun
 
 
 @pytest.mark.parametrize("model,case", [("1PL", "irt_003"), ("3PL", "irt_009")])
