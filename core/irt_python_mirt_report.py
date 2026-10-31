@@ -23,6 +23,18 @@ class LibraryReport:
     errors: list=field(default_factory=list)
 
 
+def binary_evidence_label(outcome, *, common_discrimination=False, converged=None):
+    """Presentation only: never rewrite adapter status codes or infer normality."""
+    if outcome.model=='1PL' and common_discrimination:
+        return 'NOT VERIFIED — ortak serbest a; sabit-a kanıtı aktarılamaz'
+    if converged is not True:
+        return 'Yakınsama doğrulanmadı — geçici sonuç; koşullu doğrulama uygulanmaz'
+    if (outcome.estimation=='ML' and outcome.n_persons==1000 and outcome.n_items==12
+            and outcome.solver_settings==dict(max_iter=500,tol=1e-4,n_quadpts=21)):
+        return 'KOŞULLU DOĞRULANDI — referans çalışma: ML, N=1000, k=12, θ~N(0,1) varsayımı; bu veriye sertifika değil'
+    return 'Koşullu doğrulama kanıtı mevcut; referans kapsamı ML, N=1000, k=12, θ~N(0,1); bu tasarıma genellenmez'
+
+
 def _array(parameters,key,shape):
     if key not in parameters:raise ValueError(f"Python mirt model.parameters: {key} eksik")
     a=np.asarray(parameters[key],float)
@@ -74,10 +86,18 @@ def build_report(outcome, *, model, items, labels=(), theta=None):
     except (ValueError,TypeError,AttributeError) as e:report.errors.append(f"Kestirim tanı API'si: {e}")
     report.warnings.append("Bağımsız bilimsel doğrulama tamamlandı iddiası yok; bu rapor formel DIF veya parametre GA üretmez.")
     if model=='Rasch':report.warnings.append("Python Rasch: kütüphanenin 1PL/Rasch ailesi, a=1 ve θ~N(0,1). Yerel serbest-σ Rasch ile aynı ölçek değildir.")
-    if model=='1PL':report.warnings.append("Bu sekmede 1PL: ortak a serbest (2PL + eşitlik kısıtı), θ~N(0,1). Kütüphanenin varsayılan 1PL'si a=1'dir; önceki sabit-a doğrulaması buraya aktarılamaz.")
+    if model=='1PL':
+        from mirt.models.dichotomous import OneParameterLogistic
+        fixed_a = isinstance(getattr(fit, 'model', None), OneParameterLogistic)
+        report.warnings.append("1PL: a=1 sabit, θ~N(0,1); kanıt yalnız incelenen koşullar içindir." if fixed_a else
+            "Bu sekmede 1PL: ortak a serbest (2PL + eşitlik kısıtı), θ~N(0,1). Kütüphanenin varsayılan 1PL'si a=1'dir; önceki sabit-a doğrulaması buraya aktarılamaz.")
     if model=='NRM':report.warnings.append("Kategori0 referanstır; seçenekler ve θ yönü başarı sırası değildir.")
     policy,message=usage_status(model,outcome.estimation,outcome.n_persons,outcome.n_items)
     report.metadata['Kullanım durumu']=policy if policy!='not_applicable' else 'EXPERIMENTAL'
+    if model in ('1PL','2PL'):
+        report.metadata['Kullanım durumu']=binary_evidence_label(
+            outcome, common_discrimination=model=='1PL' and not fixed_a,
+            converged=report.metadata['Yakınsama'])
     if message:report.warnings.append(message)
     if outcome.estimation=='MAP':report.warnings.append('Motorun logLik/AIC/BIC değerleri MAP noktasındadır; standart ML maksimumuna dayalı model seçimi olarak yorumlanmamalıdır.')
     try:

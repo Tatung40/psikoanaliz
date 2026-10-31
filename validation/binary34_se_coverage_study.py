@@ -19,6 +19,11 @@ from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 
+from validation.coverage_precision import coverage_precision
+
+# Preserve historical DESIGN/CRITERIA and raw evidence; their iid-interval MCSE
+# rationale is unverified. New runs use independent datasets as clusters.
+
 CELLS = [("3PL", "MAP", 3000, 30), ("4PL", "MAP", 3000, 30), ("3PL", "ML", 3000, 30), ("4PL", "ML", 3000, 30),
          ("3PL", "ML", 10000, 30)]
 DESIGN = {"cells": CELLS, "replications": {"N3000": 200, "N10000": 100}, "seed": 20261030,
@@ -68,7 +73,8 @@ def _cell(args):
         cov = float(shown[:, 2].mean()) if len(shown) else float("nan")
         out[q] = {"intervals": int(len(arr)), "withheld_rate": float(arr[:, 1].mean()),
                   "mean_bias": float(arr[:, 0].mean()), "rmse": float(np.sqrt((arr[:, 0] ** 2).mean())),
-                  "coverage": cov, "coverage_mc_se": float(np.sqrt(cov * (1 - cov) / max(len(shown), 1)))}
+                  "coverage": cov,
+                  **coverage_precision(rows, reps, eligible_column=1)}
     return out
 
 

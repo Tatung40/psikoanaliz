@@ -13,7 +13,8 @@ Z95 = 1.959963984540054
 NAMES = {"discrimination": "a", "difficulty": "b", "guessing": "c", "upper": "d"}
 STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. Önceden kayıtlı Monte Carlo kapsaması: 1PL/2PL (N = 1000, 12 madde) "
           ".945–.953; 3PL MAP (N = 3000, 30 madde) .950–.968. Ölçütü (.95 ± .02, sınırda tutulan oran ≤ .05) "
-          "sağlamayan 3PL/4PL parametrelerinde SH gösterilir, Wald GA gösterilmez "
+          "sağlamayan 3PL/4PL parametrelerinde SH gösterilir, Wald GA gösterilmez; 4PL ML'de kullanım "
+          "politikası gereği kapsama oranından bağımsız tüm Wald GA kapalıdır "
           "(validation/evidence/p6_binary_se, p7_binary34_se).")
 # Pre-registered 3PL/4PL decision (validation/binary34_se_coverage_study.py): (model, estimation, parameter) ->
 # (coverage farthest from .95 over the design cells, largest on-bound withheld rate, Wald CI supported).
@@ -61,7 +62,8 @@ def _matrix(value):
 def parameter_inference(fit, model, item_names, estimation=None):
     """Return (table, reason). table is None and reason explains why when SE cannot be reported.
 
-    With estimation ("ML"/"MAP") a 3PL/4PL Wald CI is kept only where EVIDENCE_34 supports it; estimation=None
+    With estimation ("ML"/"MAP") coverage evidence is necessary but not sufficient:
+    4PL ML is excluded by the usage policy. estimation=None
     returns the raw intervals (used by the coverage study itself)."""
     from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS as bounds
     if model not in ("Rasch", "1PL", "2PL", "3PL", "4PL"):
@@ -118,7 +120,11 @@ def parameter_inference(fit, model, item_names, estimation=None):
             bias, rmse = ACCURACY_34[(model, estimation, row["Parametre"])]
             if row["Not"]:
                 continue
-            if not supported:
+            if model == "4PL" and estimation == "ML":
+                row["GA %95 alt"] = row["GA %95 üst"] = np.nan
+                row["Not"] = ("Wald GA gösterilmedi: 4PL ML kullanım politikası parametre yorumunu desteklemiyor; "
+                              "tek başına kapsama oranı bilimsel yeterlilik değildir (sapma/RMSE ve sınır çözümleri).")
+            elif not supported:
                 row["GA %95 alt"] = row["GA %95 üst"] = np.nan
                 row["Not"] = (f"Wald GA gösterilmedi: önceden kayıtlı MC kapsaması {coverage:.3f}, sınırda tutulan "
                               f"oran {withheld:.3f} (ölçüt .95 ± .02, ≤ .05)")

@@ -123,6 +123,9 @@ def python_mirt_models():
         record = {'metadata': report.metadata, 'parameters': report.parameters, 'curves': report.curves,
                   'information': report.information, 'warnings': report.warnings, 'errors': report.errors,
                   'diagnostics': library_fit_diagnostics(outcome.fit)}
+        # Compare user-facing labels separately; numeric columns stay exact.
+        record['usage_labels'] = report.parameters['Kullanım durumu']
+        record['parameters'] = report.parameters.drop(columns=['Kullanım durumu'])
         ids = bundle['data'][bundle['id']].to_numpy()
         if model == 'Rasch':
             from core.irt_rasch_wright import wright_figure
