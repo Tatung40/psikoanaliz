@@ -1905,7 +1905,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             file_name="python_mirt_2pl_akademik_rapor.docx",
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                             key="py_mirt_2pl_academic_word")
-                    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+                    except Exception as exc:
                         st.error(f"Akademik 2PL Word raporu hazırlanamadı: {type(exc).__name__}: {exc}")
                 # Fit diagnostics are read directly from the external library,
                 # never recomputed from the retired native engine.
