@@ -44,8 +44,11 @@ IRT-LR Wald 95 % intervals of Δa and Δb covered the true values in .942–.965
 all binary cells and missed by ordinal LR with impact (.080). FWER inflation is supported in
 specific ordinal impact cells: for example, Mantel with DIF and impact −.5 has Holm FWER .12
 (cell-specific exact 95% interval [.064, .200]). BH-FDR point estimates also exceed .05 in some
-cells, but the available Monte Carlo uncertainty does not establish BH-FDR inflation; neither
-general control nor definite inflation is certified. The page warns and recommends IRT-LR,
+cells, but the reported conservative mean-FDP Hoeffding intervals do not establish general
+BH-FDR inflation; no general control or inflation certificate follows. Under the complete null,
+FDR equals FWER: the ordinal LR/impact −.5 cell has BH-FDR .11 and a cell-specific exact binomial
+95% interval [.056, .188], which supports inflation in that cell. This does not establish a
+general result across designs. The page warns and recommends IRT-LR,
 whose evidence is itself restricted to the studied designs.
 MH is insensitive to nonuniform DIF (power .18–.41), as expected.
 
@@ -93,7 +96,7 @@ remains nonzero-width even with zero observed false discoveries. These are Monte
 Carlo uncertainty intervals, not item-parameter intervals or adjusted p-values.
 Hoeffding intervals are deliberately conservative and can be wide. Scientific decisions must
 consider the point estimate, replication-cluster MCSE and an appropriate confidence interval
-together, including failure/eligibility conditions. A wide interval is not evidence of either
+together, including failure/eligibility conditions. Interval width alone is not evidence of either
 control or inflation; a point estimate alone is insufficient for either claim.
 
 The original `meets_*` checks remain point-estimate comparisons, not scientific
