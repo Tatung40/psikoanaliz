@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from core.irt_python_mirt_adapter import fit_python_mirt
+from core.reproducible import displayed as record_displayed
 from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
@@ -114,6 +115,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         except Exception as e:
             saved=None;st.error(f'Kestirim yapılamadı: {e}')
     if saved is None:return
+    record_displayed(saved['outcome'])
     if saved.get('multistart') is not None:
         ms_table,ms_notes=saved['multistart']
         st.markdown('#### Çoklu başlangıç denetimi')

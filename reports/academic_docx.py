@@ -75,6 +75,7 @@ def build_academic_docx(result, *, max_rows_per_table=100):
             continue
         columns = list(dict.fromkeys(k for row in rows for k in row))
         table = doc.add_table(rows=1, cols=len(columns))
+        table.style = 'Table Grid'  # Visible horizontal and vertical borders in Word.
         for cell, name in zip(table.rows[0].cells, columns):
             cell.text = str(name)
         for row in rows[:max_rows_per_table]:
