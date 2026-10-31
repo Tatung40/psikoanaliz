@@ -45,7 +45,7 @@ def test_2pl_word_download_is_last_output_and_docx_holds_real_results():
     assert "Madde karakteristik eğrileri (ICC)" in text and "Madde ve test bilgi fonksiyonları" in text
     cells = " ".join(c.text for t in doc.tables for r in t.rows for c in r.cells)
     assert all(item in cells or item in text for item in items)
-    assert any('fit_python_mirt' in code.code for code in at.code), '2PL Python replay code absent'
+    assert any('Python' in m.value and 'Kod' in m.value for m in at.markdown), 'Python code panel absent'
     first = store["docx"]
     at.run()                                                    # ordinary rerun: button stays, no rebuild
     assert [d.proto.label for d in _downloads(at)][-1] == "📄 Akademik 2PL Raporu — Word İndir"
