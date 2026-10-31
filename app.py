@@ -1895,18 +1895,6 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
                            f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
                 st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan ürettiği çıktıdır.")
-                if model == "2PL":
-                    try:
-                        from reports.irt_2pl_academic_docx import export_2pl_docx
-                        academic_word = export_2pl_docx(external_fit, irt_columns)
-                        st.download_button(
-                            "Akademik 2PL raporu — Word",
-                            data=academic_word,
-                            file_name="python_mirt_2pl_akademik_rapor.docx",
-                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                            key="py_mirt_2pl_academic_word")
-                    except (ValueError, TypeError, KeyError, AttributeError) as exc:
-                        st.error(f"Akademik 2PL Word raporu hazırlanamadı: {type(exc).__name__}: {exc}")
                 # Fit diagnostics are read directly from the external library,
                 # never recomputed from the retired native engine.
                 from core.irt_library_diagnostics import library_fit_diagnostics
@@ -2085,6 +2073,21 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 st.caption("Parametre dönüşümü ve SH henüz bağımsız eşleştirmeden geçmediği için "
                            "resmî analiz sonuçlarına eklenmez; AIC/BIC karşılaştırması "
                            "'MTK: Karşılaştırma' sayfasında betimsel olarak sunulur.")
+                # Place the download after all fitted Python mirt results, not between diagnostics.
+                st.divider()
+                st.markdown("### 📄 Akademik Word raporu")
+                if model == "2PL":
+                    try:
+                        from reports.irt_2pl_academic_docx import export_2pl_docx
+                        academic_word = export_2pl_docx(external_fit, irt_columns)
+                        st.download_button(
+                            "Akademik 2PL raporu — Word",
+                            data=academic_word,
+                            file_name="python_mirt_2pl_akademik_rapor.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            key="py_mirt_2pl_academic_word")
+                    except Exception as exc:
+                        st.error(f"Akademik 2PL Word raporu hazırlanamadı: {type(exc).__name__}: {exc}")
             else:
                 st.info("Veri veya madde seçimi değişti; eski sonuç gösterilmiyor.")
 
