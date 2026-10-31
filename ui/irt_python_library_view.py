@@ -3,7 +3,8 @@ import hashlib
 import numpy as np
 import pandas as pd
 import streamlit as st
-from core.reproducible import public_call as record_public_call, displayed as record_displayed
+from core.irt_python_mirt_adapter import fit_python_mirt
+from core.reproducible import displayed as record_displayed
 from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
@@ -108,7 +109,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                     from core.irt_binary_multistart import multistart
                     outcome,ms_table,ms_notes=multistart(x.to_numpy(),model,estimation,**solver_options)
                     multistart_result=(ms_table,ms_notes)
-                else:outcome=record_public_call('core.irt_python_mirt_adapter','fit_python_mirt',x.to_numpy(),**fit_kwargs)
+                else:outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
             saved=dict(key=key,outcome=outcome,multistart=multistart_result)
             st.session_state[f'python_mirt_fit_{model}']=saved
         except Exception as e:
