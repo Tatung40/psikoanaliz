@@ -41,8 +41,12 @@ items. 100 replications (IRT-LR 40). 2,560 analyses; one IRT-LR analysis stopped
 
 IRT-LR Wald 95 % intervals of Δa and Δb covered the true values in .942–.965 of cases (criterion
 [.925, .975] met in all four conditions). Pre-registered per-item Type I criterion [.025, .075] met by
-all binary cells and missed by ordinal LR with impact (.080). Family-wise / FDR control is not
-achieved by the observed-score ordinal methods under impact: the page warns and recommends IRT-LR.
+all binary cells and missed by ordinal LR with impact (.080). FWER inflation is supported in
+specific ordinal impact cells: for example, Mantel with DIF and impact −.5 has Holm FWER .12
+(cell-specific exact 95% interval [.064, .200]). BH-FDR point estimates also exceed .05 in some
+cells, but the available Monte Carlo uncertainty does not establish BH-FDR inflation; neither
+general control nor definite inflation is certified. The page warns and recommends IRT-LR,
+whose evidence is itself restricted to the studied designs.
 MH is insensitive to nonuniform DIF (power .18–.41), as expected.
 
 ## 3PL/4PL boundary inference: parametric bootstrap (`core/irt_dif34_bootstrap.py`)
@@ -87,6 +91,10 @@ FWER is one Bernoulli event per dataset, so its exact Clopper–Pearson interval
 preserved. Mean FDP already used replication-level MCSE; its new Hoeffding interval
 remains nonzero-width even with zero observed false discoveries. These are Monte
 Carlo uncertainty intervals, not item-parameter intervals or adjusted p-values.
+Hoeffding intervals are deliberately conservative and can be wide. Scientific decisions must
+consider the point estimate, replication-cluster MCSE and an appropriate confidence interval
+together, including failure/eligibility conditions. A wide interval is not evidence of either
+control or inflation; a point estimate alone is insufficient for either claim.
 
 The original `meets_*` checks remain point-estimate comparisons, not scientific
 certification. Metrics are conditional on successful analyses. The new FDR failure
