@@ -11,6 +11,34 @@ from core.irt_python_mirt_report import MODELS, BINARY, build_report
 from ui.irt_python_library_view import _csv
 
 
+@pytest.mark.parametrize('model',['1PL','2PL'])
+def test_conditional_evidence_label_never_rewrites_unknown_or_extends_scope(model):
+    from core.irt_python_mirt_report import binary_evidence_label
+    outcome=SimpleNamespace(model=model,n_persons=1000,n_items=12,estimation='ML',
+                            solver_settings=dict(max_iter=500,tol=1e-4,n_quadpts=21),scientific_status='Unknown')
+    assert binary_evidence_label(outcome,converged=True).startswith('KOŞULLU DOĞRULANDI')
+    assert 'Yakınsama doğrulanmadı' in binary_evidence_label(outcome,converged=False)
+    outcome.n_persons=500
+    assert 'bu tasarıma genellenmez' in binary_evidence_label(outcome,converged=True)
+    outcome.n_persons=1000;outcome.solver_settings['n_quadpts']=61
+    assert 'bu tasarıma genellenmez' in binary_evidence_label(outcome,converged=True)
+    if model=='1PL':
+        assert 'NOT VERIFIED' in binary_evidence_label(outcome,common_discrimination=True,converged=True)
+    assert outcome.scientific_status=='Unknown'
+
+
+def test_fixed_one_pl_report_uses_actual_specification_and_preserves_adapter_status():
+    frame=pd.read_csv('tests/fixtures/irt_b10/data_irt1pl_ok.csv').iloc[:100,:6].astype(int)
+    outcome=fit_python_mirt(frame.to_numpy(),model='1PL')
+    report=build_report(outcome,model='1PL',items=frame.columns)
+    assert not report.errors and report.metadata['Yakınsama']
+    assert 'Koşullu doğrulama kanıtı' in report.metadata['Kullanım durumu']
+    assert 'bu tasarıma genellenmez' in report.metadata['Kullanım durumu']
+    assert any('a=1 sabit' in w for w in report.warnings)
+    assert not any('ortak a serbest' in w for w in report.warnings)
+    assert outcome.scientific_status=='EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED'
+
+
 @pytest.fixture(scope='module', params=MODELS)
 def calibrated(request):
     model=request.param
@@ -96,6 +124,12 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     parameter_index=1 if model=='NRM' else 2
     pd.testing.assert_frame_equal(at.dataframe[parameter_index].value,report.parameters)
+    if model in ('1PL','2PL'):
+        label=report.metadata['Kullanım durumu']
+        assert 'EXPERIMENTAL' not in label and 'Deneysel' not in label
+        assert ('NOT VERIFIED' in label) == (model=='1PL')  # shared-free-a UI
+        assert report.parameters['Kullanım durumu'].eq(label).all()
+        assert outcome.scientific_status=='EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED'
     assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[parameter_index+1].value.columns)
     assert len(at.dataframe[parameter_index+1].value)==len(frame)
     at.run();assert len(calls)==1 and len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==8

@@ -2,7 +2,7 @@
 
 Başlangıç: `24c12e2`; #115 entegrasyonu `93bac01` ayrıca korunur.
 Envanter: `app.py` yönlendirmeleri ve `core.example_datasets.analysis_catalog()`:
-**39 analiz girdisi** (aynı motorun birden fazla ekranı var). Aşağıdaki **23 değerlendirme
+**39 analiz girdisi** (aynı motorun birden fazla ekranı var). Aşağıdaki **25 değerlendirme
 birimi**, ekran veya bağımsız model sayısı değildir. Henüz olmayan DFA/regresyon
 modülleri eklenmiş sayılmaz. Açık #65/#69/#72/#74/#83/#100/#20/#23 dalları değiştirilmedi.
 
@@ -14,11 +14,13 @@ Hiçbiri bütün veri kümelerine/genel üretim sertifikasına karşılık gelme
 
 | Analiz | Simülasyon / veri | Referans uyumu | Sayısal kararlılık / açık sınır | Karar | Etiket kararı |
 |---|---|---|---|---|---|
-| Rasch / sabit-a=1 1PL | p6: 300 tekrar, N1000/J12, normal θ | Phase1: ≤4.42e-4 parametre | b kapsama .953; tekrar-kümeli MCSE tarihsel kayıtta yok; yerel serbest-σ Rasch ayrı model | K | Koşullar kalır |
+| Yerel Rasch (`core.rasch`), a=1, σ serbest | Kaydedilmiş Rasch/B9 fikstürleri; p6 bu motora ait değil | Phase1 R Rasch: Δparam 1.276e-6, ΔLL 1.352e-8; ikisi yakınsamış | GH/optimizasyon bütünüyle eşlenmedi; geniş kurtarma/GA sertifikası yok | K | Yalnız kaydedilmiş sayısal eşleşme kapsamı |
+| Python mirt sabit-a=1 1PL, σ=1 | p6: 300 tekrar, N1000/J12, normal θ | Phase1 R 1PL: Δparam .0004417 | b kapsama .953; tarihsel kümeli MCSE yok; ortak-serbest-a yolundan ayrı | K | ML referans koşulları açıkça gösterilir |
 | Ortak-serbest-a 1PL | Sabit-a kanıtı aktarılamaz | Eşdeğer serbest-σ Rasch matematiği genel kurtarma çalışması değildir | Özel kapsam/GA kanıtı eksik | D | NOT VERIFIED kalır |
 | 2PL | p6: 300 tekrar, N1000/J12 | Phase1: ≤.000923 parametre | a/b kapsama .945–.951; kümeli MCSE bilinmiyor | K | Koşullar kalır |
 | 3PL | p1: 20/hücre; p7: 100–200/hücre | Eşlenmiş Phase1: ΔLL 1.537e-7, Δparam .0002353 | ML sınırlı; MAP önselleri ayrı; GA desteği parametre/koşula bağlı | K | Kullanım/GA kapıları kalır |
-| 4PL | p1: ML kurtarma başarısız; MAP sınırlı | R sıcak başlangıç tanısı: ΔLL .000228813, ΔICC .008999804 | R 3000 döngüde yakınsamadı; ML sınırları, zayıf tanımlanma | D | NOT VERIFIED / NOT CERTIFIED kalır |
+| 4PL ML | p1: kurtarma ölçütleri hiçbir hücrede sağlanmadı | R sıcak başlangıç: ΔLL .000228813, ΔICC .008999804; bağımsız doğrulama değil | R 3000 döngüde yakınsamadı; a sapma +.179/RMSE .504; tüm Wald GA kapalı, SH betimsel | D | NOT VERIFIED / NOT CERTIFIED kalır |
+| 4PL MAP | p1: normal θ, N∈{3000,10000}, k∈{12,30}, 20/hücre, varsayılan önseller | Bağımsız R MAP karşılaştırması yok; ML kanıtı aktarılamaz | N≥3000, k≥12 için politika destekli nokta kestirimi; yalnız çalışılmış hücreler doğrudan kanıtlıdır. p7 GA kapsama .971–.994; tüm Wald GA kapalı | K | Koşullu nokta kestirimi; GA sertifikası yok |
 | GRM | p4: N500/2000, J10, C4, 50/hücre | `r_mirt_polytomous`: bağımsız R karşılaştırma kaydı | Normal θ; N2000 a/b kapsama .958/.952; seyrek kategori genellemesi yok | K | Veri/koşul notu kalır |
 | PCM | Aynı p4 tasarımı | R `gpcm`, a=1 dönüşümü | N2000 adım kapsaması .940; ortak-serbest-a ile karıştırılmaz | K | Koşullar kalır |
 | GPCM | Aynı p4 tasarımı | R `gpcm`, kümülatif adım dönüşümü | N2000 a/adım kapsama .952/.966; J/C sınırlı | K | Koşullar kalır |
@@ -38,9 +40,9 @@ Hiçbiri bütün veri kümelerine/genel üretim sertifikasına karşılık gelme
 | MIRT / bifaktör | 2D–5D profil kıyasları; p8 kurtarma başarısız | Modele/profil/kısıta özgü R kayıtları | Bifaktör özgül RMSE .745/.423; genellenebilir kurtarma/GA yok | D | EXPERIMENTAL / NOT CERTIFIED kalır |
 | Kayıp veri/atama ve varsayım kararları | Mevcut listwise/atama testleri | İşlev kontrolleri bilimsel MAR/MNAR sertifikası değildir | Her atama için sonuç yanlılığı/kapsama kanıtı burada eşleşmedi | D | Yöntem/varsayım uyarıları kalır |
 
-**Sayım (23 birim): DOĞRULANDI 0; KOŞULLU DOĞRULANDI 15; DOĞRULANMADI 8.**
+**Sayım (25 birim): DOĞRULANDI 0; KOŞULLU DOĞRULANDI 17; DOĞRULANMADI 8.**
 Bu, var olan bütün işlemlerin hatalı olduğu anlamına gelmez. Genel sertifika verilmedi.
-Hiçbir etiket kaldırılmadı; yeni kullanım yetkisi veya çıkarım kapısı açılmadı.
+1PL/2PL raporlarındaki genel EXPERIMENTAL etiketi, gerçek model/ayar/yakınsamaya göre koşullu kanıt veya kapsam dışı metniyle değiştirildi. Ortak-serbest-a 1PL NOT VERIFIED kalır. Teknik durum kodları/Unknown ve diğer model etiketleri korunur; yeni çıkarım kapısı açılmadı.
 
 ## Doğrulanmış kusur ve minimal düzeltme
 
@@ -97,3 +99,16 @@ MTK quick/browser kontrolleri başarılıydı (koşular 41206968771, 41206968871
 bu kayıt yeni dalın kabulü değildir. Sonuç/CI ve tam regresyon kayıtları bu değişikliğin
 PR'ında SHA ile tutulur; başarısızlık varsa saklanır. Bilimsel açık kapsamlar nedeniyle
 platform-geneli üretim sertifikası ve otomatik main birleştirmesi **yok**.
+
+## Hedefli bağımsız denetim düzeltmesi
+
+4PL ML a için tarihsel kapsama kararı `(0.936, 0.001, True)` değiştirilmedi;
+üretim kullanım politikası ayrıca tüm 4PL ML Wald GA'yı bastırır (UI/CSV/XLSX/ZIP
+aynı tablodan). SH ve çalışmanın ham-GA araştırma yolu korunur; diğer modellerin GA'sı değişmez.
+1PL/2PL adaptörünün teknik `scientific_status` kodu korunur. Yakınsamama koşullu başarı
+sayılmaz; koşullu rapor etiketi yalnız referans ML/ayar/N/k kapsamını belirtir, θ normalitesini
+veriden doğrulanmış göstermez.
+`binary_se_coverage_study.run` artık `constant_item_skipped` sayısını raporlar;
+planlanan tekrar paydası, kapsama hesaplaması, `judge` ve geçmiş JSON'lar aynıdır.
+Tam regresyon tekrarı yerine etkilenen GA/rapor/UI/MCSE testleri ve mevcut CI kapıları
+kullanılır; üretim kestirimi veya sayısal sonuç değiştirilmedi.

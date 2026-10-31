@@ -48,10 +48,11 @@ def run(design=DESIGN):
         a_true = np.ones(k) if model == "1PL" else np.linspace(0.8, 2.0, k)
         rng = np.random.default_rng([design["seed"], design["models"].index(model)])
         rows = {"a": [], "b": []}
-        converged = withheld = 0
+        converged = withheld = constant_item_skipped = 0
         for _ in range(design["replications"]):
             x = simulate(rng, a_true, b_true, design["N"])
             if (x.mean(0) == 0).any() or (x.mean(0) == 1).any():
+                constant_item_skipped += 1
                 continue
             fit = fit_python_mirt(x, model=model).fit
             converged += bool(fit.converged)
@@ -65,7 +66,8 @@ def run(design=DESIGN):
                     continue
                 est = part["Kestirim"].to_numpy(); low = part["GA %95 alt"].to_numpy(); high = part["GA %95 üst"].to_numpy()
                 rows[name].append(np.column_stack([est - truth, (low <= truth) & (truth <= high)]))
-        summary = {"replications": design["replications"], "converged": converged, "se_withheld": withheld}
+        summary = {"replications": design["replications"], "converged": converged, "se_withheld": withheld,
+                   "constant_item_skipped": constant_item_skipped}
         for name, parts in rows.items():
             if not parts:
                 continue

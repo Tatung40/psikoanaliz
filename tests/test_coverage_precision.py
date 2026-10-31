@@ -67,3 +67,24 @@ def test_study_paths_report_cluster_precision_without_calibration(monkeypatch, s
     assert result["b"]["coverage"] == .5
     assert result["b"]["coverage_mc_se"] == pytest.approx(np.sqrt(1 / 12))
     assert result["converged"] == result["replications"] == 4
+
+
+def test_constant_item_skips_are_counted_without_changing_coverage(monkeypatch):
+    from types import SimpleNamespace
+    import pandas as pd
+    from core import irt_binary_inference, irt_python_mirt_adapter
+    from validation import binary_se_coverage_study as binary
+    samples = iter((np.zeros((2, 2)), np.array([[0, 0], [1, 1]]), np.ones((2, 2))))
+    monkeypatch.setattr(binary, "simulate", lambda *a: next(samples))
+    monkeypatch.setattr(irt_python_mirt_adapter, "fit_python_mirt",
+                        lambda *a, **kw: SimpleNamespace(fit=SimpleNamespace(converged=True)))
+    truth = np.linspace(-1.5, 1.5, 2)
+    table = pd.DataFrame({"Parametre": ["b", "b"], "Kestirim": truth,
+                          "GA %95 alt": truth-1, "GA %95 üst": truth+1})
+    monkeypatch.setattr(irt_binary_inference, "parameter_inference", lambda *a: (table, None))
+    result = binary.run({**binary.DESIGN, "models": ["1PL"], "items": 2, "replications": 3})["1PL"]
+    assert result["constant_item_skipped"] == 2
+    assert result["replications"] == 3 and result["converged"] == 1 and result["se_withheld"] == 0
+    assert result["b"]["coverage"] == 1 and result["b"]["intervals"] == 2
+    assert result["b"]["coverage_cluster_counts"] == {"covered": [2, 0, 0], "eligible": [2, 0, 0]}
+    assert not binary.judge({"1PL": result})["1PL_convergence"]
