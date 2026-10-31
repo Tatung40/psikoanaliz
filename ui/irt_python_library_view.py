@@ -233,40 +233,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.caption('Wright Map: bu model için bağımsız bilimsel doğrulama kapısı henüz açılmadı.')
     if model in BINARY and report.metadata.get('Yakınsama') is True and not report.errors:
         _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables)
-    if report.curves.empty:return
-    if not outputs['curves'] and not outputs['information']:return
-    # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
-    import matplotlib
-    matplotlib.use('Agg')
-    from matplotlib import pyplot as plt
-    selected=st.selectbox('Grafik maddesi',cols,key=f'python_mirt_plot_item_{model}')
-    shown=report.curves[report.curves.Madde==str(selected)]
-    if model in BINARY:shown=shown[shown.Kategori=='1']
-    if outputs['curves']:
-        fig,ax=plt.subplots(figsize=(7,4))
-        for category,group in shown.groupby('Kategori',sort=False):
-            ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
-        ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
-               xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
-        ax.grid(alpha=.2)
-        if len(shown['Kategori'].unique())>1:ax.legend()
-        fig.tight_layout()
-        try:st.pyplot(fig,use_container_width=True)
-        finally:plt.close(fig)
-        st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
-    if not outputs['information'] or report.information.empty:return
-    info=report.information
-    for chart_key,title,col in [('item_info','Madde bilgi fonksiyonu',f'I_{selected}'),('test_info','Test bilgi fonksiyonu','Test bilgisi'),('sem','Koşullu standart hata','SEM(θ)')]:
-        if not charts[chart_key]:continue
-        fig,ax=plt.subplots(figsize=(7,4))
-        ax.plot(info['θ'],info[col])
-        ax.set(title=title,xlabel='Theta',ylabel=col)
-        ax.grid(alpha=.2)
-        fig.tight_layout()
-        try:st.pyplot(fig,use_container_width=True)
-        finally:plt.close(fig)
-    st.caption('SEM(θ)=1/√I_test(θ), parametre standart hatası veya kişi posterior SS değildir.')
-    st.download_button('Madde/test bilgisi ve SEM — CSV',_csv(info),f'{model}_information.csv','text/csv',key=f'python_mirt_information_csv_{model}',on_click='ignore')
+    _charts(report,outputs,charts,cols,model)
+    _academic_word(saved,model,cols)
 
 
 def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
@@ -319,3 +287,59 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                                key=f'python_mirt_bundle_xlsx_{model}',on_click='ignore')
             st.download_button('ZIP — rapor paketi',archive,f'{model}_rapor.zip','application/zip',
                                key=f'python_mirt_bundle_zip_{model}',on_click='ignore')
+
+
+def _charts(report,outputs,charts,cols,model):
+    if report.curves.empty:return
+    if not outputs['curves'] and not outputs['information']:return
+    # Render server-side PNG charts: avoids mobile Safari dynamic Plotly module imports.
+    import matplotlib
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
+    selected=st.selectbox('Grafik maddesi',cols,key=f'python_mirt_plot_item_{model}')
+    shown=report.curves[report.curves.Madde==str(selected)]
+    if model in BINARY:shown=shown[shown.Kategori=='1']
+    if outputs['curves']:
+        fig,ax=plt.subplots(figsize=(7,4))
+        for category,group in shown.groupby('Kategori',sort=False):
+            ax.plot(group['Theta'],group['Olasılık'],label=f'Kategori {category}')
+        ax.set(title='ICC — Madde tepki olasılığı' if model in BINARY else 'Kategori tepki eğrileri',
+               xlabel='Theta',ylabel='Olasılık',ylim=(0,1))
+        ax.grid(alpha=.2)
+        if len(shown['Kategori'].unique())>1:ax.legend()
+        fig.tight_layout()
+        try:st.pyplot(fig,use_container_width=True)
+        finally:plt.close(fig)
+        st.download_button('Tüm tepki eğrileri — CSV',_csv(report.curves),f'{model}_curves.csv','text/csv',key=f'python_mirt_curves_csv_{model}',on_click='ignore')
+    if not outputs['information'] or report.information.empty:return
+    info=report.information
+    for chart_key,title,col in [('item_info','Madde bilgi fonksiyonu',f'I_{selected}'),('test_info','Test bilgi fonksiyonu','Test bilgisi'),('sem','Koşullu standart hata','SEM(θ)')]:
+        if not charts[chart_key]:continue
+        fig,ax=plt.subplots(figsize=(7,4))
+        ax.plot(info['θ'],info[col])
+        ax.set(title=title,xlabel='Theta',ylabel=col)
+        ax.grid(alpha=.2)
+        fig.tight_layout()
+        try:st.pyplot(fig,use_container_width=True)
+        finally:plt.close(fig)
+    st.caption('SEM(θ)=1/√I_test(θ), parametre standart hatası veya kişi posterior SS değildir.')
+    st.download_button('Madde/test bilgisi ve SEM — CSV',_csv(info),f'{model}_information.csv','text/csv',key=f'python_mirt_information_csv_{model}',on_click='ignore')
+
+
+def _academic_word(saved,model,cols):
+    """2PL academic Word report after all results; built once per fit (reports.irt_2pl_academic_docx)."""
+    if model!='2PL':return
+    st.divider()
+    st.markdown('### 📄 Akademik 2PL Raporu')
+    store=st.session_state.setdefault('python_mirt_2pl_word',{})
+    if store.get('key')!=saved['key']:
+        try:
+            from reports.irt_2pl_academic_docx import export_2pl_docx
+            store.clear();store.update(key=saved['key'],docx=export_2pl_docx(saved['outcome'],list(cols)),error=None)
+        except Exception as exc:
+            store.clear();store.update(key=saved['key'],docx=None,error=f'{type(exc).__name__}: {exc}')
+    if store['docx'] is None:
+        st.error(f"Akademik 2PL Word raporu hazırlanamadı: {store['error']}");return
+    st.download_button('📄 Akademik 2PL Raporu — Word İndir',store['docx'],'python_mirt_2pl_akademik_rapor.docx',
+                       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                       key='python_mirt_2pl_academic_word',on_click='ignore')
