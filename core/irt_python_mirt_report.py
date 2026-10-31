@@ -88,7 +88,7 @@ def build_report(outcome, *, model, items, labels=(), theta=None):
     if model=='Rasch':report.warnings.append("Python Rasch: kütüphanenin 1PL/Rasch ailesi, a=1 ve θ~N(0,1). Yerel serbest-σ Rasch ile aynı ölçek değildir.")
     if model=='1PL':
         from mirt.models.dichotomous import OneParameterLogistic
-        fixed_a = isinstance(fit.model, OneParameterLogistic)
+        fixed_a = isinstance(getattr(fit, 'model', None), OneParameterLogistic)
         report.warnings.append("1PL: a=1 sabit, θ~N(0,1); kanıt yalnız incelenen koşullar içindir." if fixed_a else
             "Bu sekmede 1PL: ortak a serbest (2PL + eşitlik kısıtı), θ~N(0,1). Kütüphanenin varsayılan 1PL'si a=1'dir; önceki sabit-a doğrulaması buraya aktarılamaz.")
     if model=='NRM':report.warnings.append("Kategori0 referanstır; seçenekler ve θ yönü başarı sırası değildir.")
