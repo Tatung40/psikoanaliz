@@ -1869,7 +1869,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                                 "dönüştürme veya örtük atama yapılmadı. Eksik veri "
                                 "analizi sekmesinde uygun yöntemi değerlendirin."
                             )
-                        external_fit = fit_python_mirt(
+                        external_fit = record_public_call("core.irt_python_mirt_adapter", "fit_python_mirt",
                             external_data.to_numpy(), model=model, estimation=estimation,
                             **solver_options, n_categories=(int(external_data.to_numpy().max()) + 1)
                             if model in ("GRM", "PCM", "GPCM", "NRM") else None)
@@ -1891,6 +1891,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                 int(pd.util.hash_pandas_object(current_external_data, index=True).sum()), estimation, tuple(sorted(solver_options.items())))
             if previous_external["fingerprint"] == current_external_fingerprint:
                 external_fit = previous_external["fit"]
+                record_displayed(external_fit)
                 st.caption(f"Motor: {external_fit.engine} | Model: {external_fit.model} "
                            f"| N: {external_fit.n_persons} | Madde: {external_fit.n_items}")
                 st.info("Aşağıdaki özet, Python mirt kütüphanesinin doğrudan ürettiği çıktıdır.")
@@ -1933,7 +1934,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                             key="py_mirt_2pl_academic_word")
                     except (ValueError, TypeError, KeyError, AttributeError) as exc:
-                        st.warning(f"Akademik 2PL Word raporu hazırlanamadı: {exc}")
+                        st.error(f"Akademik 2PL Word raporu hazırlanamadı: {type(exc).__name__}: {exc}")
                 if model in ("1PL", "2PL", "3PL", "4PL"):
                     try:
                         from core.irt_python_mirt_parameters import python_mirt_binary_parameters
