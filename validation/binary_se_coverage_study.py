@@ -14,6 +14,12 @@ import time
 
 import numpy as np
 
+from validation.coverage_precision import coverage_precision
+
+# CRITERIA below is the immutable historical preregistration. Its iid-interval
+# MCSE rationale is not justified: items share respondents and calibration.
+# New runs report replication-cluster MCSE without altering thresholds/results.
+
 DESIGN = {"models": ["1PL", "2PL"], "replications": 300, "N": 1000, "items": 12, "seed": 20261029,
           "a": "linspace(0.8, 2.0, 12) for 2PL; 1 for 1PL", "b": "linspace(-1.5, 1.5, 12)",
           "theta": "N(0, 1)", "fit": "fit_python_mirt defaults (ML, 21 GH nodes, tol 1e-4, max_iter 500)",
@@ -68,7 +74,7 @@ def run(design=DESIGN):
             summary[name] = {"intervals": n, "mean_bias": float(arr[:, 0].mean()),
                              "max_item_abs_bias": float(np.abs(np.mean(np.stack(parts)[:, :, 0], axis=0)).max()),
                              "rmse": float(np.sqrt((arr[:, 0] ** 2).mean())), "coverage": coverage,
-                             "coverage_mc_se": float(np.sqrt(coverage * (1 - coverage) / n))}
+                             **coverage_precision(parts, design["replications"])}
         results[model] = summary
     return results
 
