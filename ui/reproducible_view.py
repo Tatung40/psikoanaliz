@@ -11,9 +11,13 @@ def render(recorder):
         manifest = recorder.manifest()
         python = python_code(manifest)
         if not python:
-            st.warning('Bu analiz için doğrulanabilir Python yeniden üretim kodu oluşturulamadı. Eksik veya desteklenmeyen adımlar:')
-            for reason in manifest.get('unsupported', []):
-                st.caption(str(reason))
+            # Preflight-only pages intentionally remain silent; show failures only
+            # when a substantive analysis call was recorded but cannot replay.
+            from core.reproducible import PREFLIGHT_ONLY
+            if any(call.get('function') not in PREFLIGHT_ONLY for call in recorder.calls):
+                st.warning('Bu analiz için doğrulanabilir Python yeniden üretim kodu oluşturulamadı.')
+                for reason in manifest.get('unsupported', []):
+                    st.caption(str(reason))
             return
         st.caption('Gerçek hesaplama girdileri kullanılır. Kod üretimi bağımsız bilimsel doğrulama değildir. '
                    'Ön işleme uygulanmış veri tekrar kodlanmaz; seed yalnız açıkça verilmişse taşınır. '
