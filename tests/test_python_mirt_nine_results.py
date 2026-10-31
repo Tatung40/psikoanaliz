@@ -92,7 +92,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
     assert len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==4
-    assert len(at.get('download_button'))==(6 if model=='NRM' else 7)
+    assert len(at.get('download_button'))==(6 if model=='NRM' else 8 if model=='2PL' else 7)  # 2PL: + academic Word report
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     parameter_index=1 if model=='NRM' else 2
     pd.testing.assert_frame_equal(at.dataframe[parameter_index].value,report.parameters)
