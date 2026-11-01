@@ -51,3 +51,36 @@ def test_original_evidence_roundtrip_and_shared_h2():
             assert error<1e-12
             if h=='H2':solutions.append(p)
     np.testing.assert_array_equal(*solutions)
+
+
+def test_cached_diagnostic_integrity_and_derivative_checks_no_refit():
+    import json
+    r=json.loads((D.HERE/'results/diagnostic.json').read_text())
+    assert r['fits_executed']==0 and r['prior_files_verified']==D.protect()==146
+    assert len(r['slots'])==8 and len(r['unique_solutions'])==7
+    for name,digest in r['sources'].items():assert D.sha((D.ROOT/name).read_bytes())==digest
+    assert D.sha((D.PRIOR/r['source_archive']).read_bytes())==r['source_archive_sha256']
+    assert D.sha((D.PRIOR/r['source_failed_matrix']).read_bytes())==json.loads((D.HERE/'prior_manifest.json').read_text())[str((D.PRIOR/r['source_failed_matrix']).relative_to(D.ROOT))]
+    for u in r['unique_solutions'].values():
+        assert set(u['evaluations'])=={'61','81','101','121','161'}
+        # Arithmetic reproduction tolerances only; NOT scientific gate changes.
+        assert abs(u['saved_loglik_reconstruction_error'])<1e-8
+        assert abs(u['saved_score_reconstruction_error'])<1e-10
+        assert abs(u['saved_audit_score_reconstruction_error'])<1e-10
+        for q,e in u['evaluations'].items():
+            gradient=np.array(e['normalized_gradient']);j=int(np.argmax(np.abs(gradient)))
+            assert e['max_parameter']==u['labels'][j]
+            assert e['max_abs_gradient']==abs(gradient[j])
+            assert e['native_gate_exceeded']==bool(np.max(np.abs(gradient))>1e-5)
+            assert e['total_loglik_score_at_max']==-r['n']*gradient[j]
+            assert abs(e['native_minus_independent_loglik'])<1e-8
+        for q,checks in u['finite_differences'].items():
+            analytic=np.array(u['evaluations'][q]['normalized_gradient'])
+            for step,fd in checks.items():
+                error=np.abs(analytic-fd['gradient'])
+                assert fd['max_abs_error']==error.max()
+                np.testing.assert_allclose(fd['gradient'],analytic,atol=1e-8,rtol=1e-5)
+    # Diagnose only: never rewrite the prior p suppression or classify it as valid.
+    record,_,_,_=D.load_saved()
+    assert not record['result']['valid']
+    assert all(v['p'] is None for v in record['result']['table'])
