@@ -1,0 +1,14 @@
+{
+  "status": "PROPOSED ONLY / NOT EXECUTED",
+  "version": "PROPOSED-GRM-GH101-V2",
+  "scope": "New estimation-procedure validation, not repair/pooling of the stopped fixed-GH61 PR123 experiment.",
+  "model": "Unchanged GRM/anchors/latent scale/hypotheses/bounds/native optimizer",
+  "quadrature": "Fit GH101 for EVERY hypothesis/dataset; independently constructed GH161 audit. Same1e-5 score/.001 logLik and native convergence/bounds/information gates; denser information check remains. No selective per-replicate density upgrade.",
+  "initialization": "Use native deterministic default initialization uniformly for ALL datasets in the proposed main study. The successful current warm-start case is feasibility evidence only, not a homogeneous main-study observation. Prior GH61 estimates may be compared diagnostically, not counted as final GH101 results.",
+  "data": "Same immutable DGP,2500 seeds/both impacts and archived response hashes; reuse data/ordinal outcomes only; preserve PR120-124 records unchanged.",
+  "stages": "First10 seed pairs measure cold-start cost and native/dense gates; preregister approved cumulative budget before100/500/2500 expansion. No budget extrapolation from one warm-start case. No next-stage execution in this PR.",
+  "independent_validation": "Finite-difference full-score checks on prespecified pilot/sentinel cases; native score and information/denser-grid checks on every fit. Never remove the1e-5 gate. All audit sampling and stopping fixed before outcomes.",
+  "statistics": "Retain9-component CP/Hoeffding family and5 binary McNemar-Holm comparisons, paired interactions, failed-analysis sensitivity and fixed-R rules. No significance-based stopping or automatic CERTIFIED label.",
+  "failure": "Stop on prespecified technical/scientific/resource failure; record all failures, no replacements. A need for uniformGH161 would require another version/protocol, not post-hoc rescuing selected outcomes.",
+  "production": "No production/p-value gate change implied by this proposal; evidence for one dataset is not nominal FWER control."
+}

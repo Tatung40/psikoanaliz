@@ -1,0 +1,20 @@
+{
+  "source_archive": "chunk_017.jsonl.gz",
+  "data_sha256": "0f59eff9c670a91424e74db344d72943ce7dd5141760197939272673fed1d6b6",
+  "source_archive_sha256": "f4d6e89cef517f268dabe71cb310d755257e58617e8875103692273d372f451e",
+  "fits_attempted": 7,
+  "fits_executed": 7,
+  "p_values_generated": false,
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0"
+  },
+  "git_commit": "c599c35cb0f0161d74089b6d1ec0fb6ddde69b9f",
+  "peak_rss_mib": 141.33203125,
+  "status": "GH101 TECHNICAL FEASIBILITY PASSED",
+  "seconds": 11.773297389998334,
+  "prior_files_verified": 152,
+  "scientific_classification": "SINGLE DATASET / NOT CERTIFIED",
+  "previous_mc_unchanged": true
+}

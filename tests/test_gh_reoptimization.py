@@ -44,3 +44,49 @@ def test_native_lr_table_and_derived_error_bound_without_fit():
     assert all(r['valid'] and r['audit_minus_fit_lr']==pytest.approx(0.) for r in table)
     assert [r['df'] for r in table[:3]]==[4,3,1]
     assert all(r['implied_grid_error_bound']==.004 for r in table)
+
+
+def test_cached_reoptimization_and_dense_gates_without_calibration():
+    r=json.loads((E.HERE/'results/report.json').read_text())
+    assert E.protect()==r['prior_files_verified']==152
+    assert r['p_values_generated'] is False and r['previous_mc_unchanged']
+    assert r['scientific_classification']=='SINGLE DATASET / NOT CERTIFIED'
+    for path,digest in r['sources'].items():assert E.D.sha((E.ROOT/path).read_bytes())==digest
+    prior,x,g,path=E.D.load_saved();models,slots=E.saved_models(prior)
+    assert r['data_sha256']==prior['data_sha256'] and r['slots']==slots
+    assert E.D.sha(path.read_bytes())==r['source_archive_sha256']
+    assert all(v['p'] is None for v in prior['result']['table'])
+    assert [s['fit_points'] for s in r['stages']] in ([101],[101,161])
+    if len(r['stages'])==2:assert not r['stages'][0]['passed']
+    for stage in r['stages']:
+        assert stage['audit_points']>stage['fit_points']
+        if stage['passed']:assert len(stage['solutions'])==stage['native_optimizer_calls']==7
+        for key,s in stage['solutions'].items():
+            if stage['fit_points']==101:
+                np.testing.assert_array_equal(s['initial_params'],models[key]['params'])
+            a,b=np.array(s['a']),np.array(s['b'])
+            np.testing.assert_array_equal(a[0,:8],a[1,:8]);np.testing.assert_array_equal(b[0,:8],b[1,:8])
+            assert (np.diff(b,axis=2)>0).all()
+            audit=s['evaluations'][str(stage['audit_points'])]
+            if s['passed']:
+                assert s['converged'] and not s['at_bound'] and s['covariance_available']
+                assert s['native_score']<2e-6 and audit['max_abs_normalized_gradient']<=1e-5
+                assert s['quadrature_error']<=1e-3 and s['quadrature_ok']
+                eigen=np.array(s['dense_information']['eigenvalues'])
+                assert eigen[0]>1e-7*max(eigen[-1],1.)
+            for q,e in s['evaluations'].items():
+                assert e['independent_loglik']==pytest.approx(e['loglik'],abs=1e-8)
+                assert np.max(np.abs(e['gradient']))==e['max_abs_normalized_gradient']
+                assert e['second_moment']==pytest.approx(1.,abs=1e-13)
+            for h,fd in s['derivative_checks'].items():
+                if h=='reason':continue
+                error=np.max(np.abs(np.array(fd['finite_difference_gradient'])-audit['gradient']))
+                assert fd['max_abs_error']==error
+        for row in stage['lr']:
+            a=stage['solutions'][slots[row['item']+'.H2']]
+            null={'omnibus':'H0','thresholds':'Ha','slope':'Hb'}[row['test']]
+            b=stage['solutions'][slots[row['item']+'.'+null]]
+            for q,stat in row['lr'].items():
+                expected,_=G._nested_lr(a['evaluations'][q]['loglik'],b['evaluations'][q]['loglik'])
+                assert stat==expected
+    assert r['fits_attempted']>=r['fits_executed']
