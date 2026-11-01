@@ -1,0 +1,53 @@
+import numpy as np
+import pytest
+from core import grm_dif as G
+from validation.gh81_diagnostic import diagnostic as D
+
+
+def fixture():
+    d=G.Design(['anchor','anchor','ab'],4)
+    a=np.array([[1.,1.2,1.4],[1.,1.2,1.3]])
+    b=np.broadcast_to([-1.,0.,1.],(2,3,3)).copy();b[1,2]+=.1
+    p=d.encode(a,b,-.5,.9)
+    x=np.array([[0,1,3],[1,2,0],[3,1,2],[2,0,1]])
+    return d,p,x,np.array([0,0,1,1])
+
+
+def test_independent_likelihood_and_finite_difference_no_fit(monkeypatch):
+    def forbidden(*a,**kw):raise AssertionError('No fitting allowed')
+    monkeypatch.setattr(G,'minimize',forbidden);monkeypatch.setattr(G.Fitter,'fit',forbidden)
+    d,p,x,g=fixture();value,score=G.objective(p,d,G.pattern_parts(x,g,4),G._grid(61))
+    assert D.reference_nll(p,d,x,g,61)==pytest.approx(value,abs=1e-12)
+    numeric,_=D.finite_difference(p,d,x,g,61,1e-5)
+    np.testing.assert_allclose(numeric,score,rtol=1e-6,atol=1e-8)
+
+
+def test_physical_score_chain_rule_and_normal_quadrature():
+    d,p,x,g=fixture();score=np.arange(d.size)/100;physical=D.physical_score(score,p,d)
+    jac=np.eye(d.size);blocks={}
+    for j,(kind,group,item,c) in enumerate(d.labels):
+        if kind=='b':blocks.setdefault((group,item),[]).append(j)
+    for indices in blocks.values():
+        jac[np.ix_(indices,indices)]=0
+        for i,j in enumerate(indices):
+            jac[j,indices[0]]=1
+            for k in indices[1:i+1]:jac[j,k]=np.exp(p[k])
+    jac[-1,-1]=np.exp(p[-1])
+    np.testing.assert_allclose(jac.T@physical,score,atol=1e-12)
+    for q in D.POINTS:
+        z,lw=D.reference_grid(q)
+        assert np.exp(lw).sum()==pytest.approx(1.,abs=1e-13)
+        assert np.exp(lw)@(z*z)==pytest.approx(1.,abs=1e-13)
+
+
+def test_original_evidence_roundtrip_and_shared_h2():
+    assert D.protect()==146
+    r,x,g,path=D.load_saved()
+    assert x.shape==(1000,10) and np.bincount(g).tolist()==[500,500]
+    solutions=[]
+    for item,fits in r['result']['fits'].items():
+        for h,f in fits.items():
+            d,p,error=D.recover(item,h,f)
+            assert error<1e-12
+            if h=='H2':solutions.append(p)
+    np.testing.assert_array_equal(*solutions)
