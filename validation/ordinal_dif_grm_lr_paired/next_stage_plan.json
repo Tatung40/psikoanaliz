@@ -1,0 +1,40 @@
+{
+  "status": "PROPOSED FUTURE RESOURCE PLAN \u2014 NOT EXECUTED OR AUTHORIZED BY CURRENT600s RUN",
+  "completed_seed_pairs": 10,
+  "main_required_seed_pairs": 2500,
+  "mean_observed_seconds_per_seed_pair": 5.5184863064998355,
+  "projected_full_seconds": 13796.215766249588,
+  "proposed_cumulative_main_wall_budget_seconds": 18000,
+  "budget_note": "18000s is resource headroom over measured13796s extrapolation, not a confidence bound, precision claim or statistical threshold; current authorization remains600s feasibility only.",
+  "stages": [
+    {
+      "cumulative_pairs": 100,
+      "additional_pairs": 90,
+      "additional_grm_analyses": 180,
+      "projected_increment_seconds": 496.6637675849852,
+      "proposed_stage_wall_cap_seconds": 900
+    },
+    {
+      "cumulative_pairs": 500,
+      "additional_pairs": 400,
+      "additional_grm_analyses": 800,
+      "projected_increment_seconds": 2207.394522599934,
+      "proposed_stage_wall_cap_seconds": 3600
+    },
+    {
+      "cumulative_pairs": 2500,
+      "additional_pairs": 2000,
+      "additional_grm_analyses": 4000,
+      "projected_increment_seconds": 11036.97261299967,
+      "proposed_stage_wall_cap_seconds": 15000
+    }
+  ],
+  "rules": [
+    "Reuse all20 completed fits unchanged if same source/settings; no repeated ordinal LR fits.",
+    "Cumulative18000s cap overrides the sum of proposed stage caps; per-analysis90s and1024MiB memory safety rule unchanged.",
+    "At stage boundaries inspect validity/resource use, not favorable event counts. Any API/hash/design mismatch stops.",
+    "Retain all failed analyses without retry/replacement; no confirmatory decision without fixed2500 valid condition-pairs.",
+    "Stop when estimated remaining cost exceeds the remaining approved budget; report incomplete evidence and intervals without certification.",
+    "No scientific thresholds, hypotheses, model settings, alpha or seed replacement based on outcomes; changed design requires new preregistration."
+  ]
+}

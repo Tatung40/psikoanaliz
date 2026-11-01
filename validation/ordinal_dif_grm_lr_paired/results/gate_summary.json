@@ -1,0 +1,11 @@
+{
+  "fit_slots": 160,
+  "optimizer_calls": 140,
+  "max_score": 5.603753641306997e-07,
+  "max_audit_score": 2.5062686501735596e-06,
+  "max_quadrature_loglik_error": 0.00011158329549232349,
+  "min_information_eigenvalue": 6.847135490244629,
+  "max_information_condition": 155.49422433793876,
+  "bound_flags": 0,
+  "anchor_checks": 160
+}
