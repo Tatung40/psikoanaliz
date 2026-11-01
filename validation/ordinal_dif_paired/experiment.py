@@ -159,6 +159,15 @@ def summarize(records, plan, precision, main_completed=False):
                  bh_fdr=bh/n if n else None,bh_fwer=bh/n if n else None,
                  bh_ci95=binomial_ci(bh,n),bh_mcse=math.sqrt((bh/n)*(1-bh/n)/n) if n else None,
                  decision=decision,interpretation='Conditional on complete valid families; complete null FDR=FWER')
+        if method=='GRM_LR':
+            fits=[[f for hypotheses in r.get('fits',{}).values() for f in hypotheses.values()] for r in rows]
+            row['convergence_confirmed']=sum(bool(fs) and all(f['converged'] for f in fs) for fs in fits)
+            row['convergence_not_assessed']=sum(not fs for fs in fits)
+        elif method=='ordinal_LR':
+            row['convergence_confirmed']=n  # production returns p only after all three regressions converge
+            row['convergence_not_confirmed']=failed
+        else:
+            row['convergence']='not_applicable: stratified statistic'
         if n:
             parts=[np.array(r['raw_rejections'])[:,None] for r in valid]
             row['raw_type1']=float(np.mean([r['raw_rejections'] for r in valid]))
@@ -169,9 +178,61 @@ def summarize(records, plan, precision, main_completed=False):
         d=np.array([int(x['holm_event'])-int(y['holm_event']) for x,y in pairs]);n=len(d);missing=len(records)-n
         eps=math.sqrt(2*math.log(2/.05)/n) if n else 2
         result['paired'][a+' minus '+b]=dict(complete_pairs=n,missing_pairs=missing,
+            a_only=int(np.sum(d==1)),b_only=int(np.sum(d==-1)),
             mean=float(d.mean()) if n else None,mcse=float(d.std(ddof=1)/math.sqrt(n)) if n>1 else None,
             marginal_ci95=[max(-1,float(d.mean())-eps),min(1,float(d.mean())+eps)] if n else [-1,1],
             missing_pair_range=[float((d.sum()-missing)/len(records)),float((d.sum()+missing)/len(records))] if records else [-1,1])
+    return result
+
+
+def audit_saved(output):
+    """No fits: verify saved data/anchors/df/gates and recompute descriptive summary."""
+    plan=json.loads(PLAN_PATH.read_text()); records=[]
+    for path in sorted(output.glob('rep_*.json')):
+        r=json.loads(path.read_text());csv=output/f"data_{r['seed']}.csv"
+        if digest(csv.read_bytes())!=r['data_sha256'] or r['plan_sha256']!=digest(PLAN_PATH.read_bytes()):
+            raise ValueError('Saved data/plan hash mismatch')
+        data=pd.read_csv(csv);g=data.pop('group');x=data.to_numpy()
+        if list(data.columns)!=r['items'] or not np.isin(x,range(plan['categories'])).all():
+            raise ValueError('Category/item alignment mismatch')
+        if (int((g==0).sum()),int((g==1).sum()))!=(plan['n_reference'],plan['n_focal']):
+            raise ValueError('Group counts differ')
+        grm=r['methods']['GRM_LR']
+        if grm['valid']:
+            for item, hypotheses in grm['fits'].items():
+                for f in hypotheses.values():
+                    if not (f['converged'] and f['quadrature_ok'] and f['information_available'] and not f['at_bound']):
+                        raise ValueError('Invalid GRM inference was released')
+                    for anchor in plan['anchors']:
+                        j=r['items'].index(anchor)
+                        if f['a'][0][j]!=f['a'][1][j] or f['b'][0][j]!=f['b'][1][j]:
+                            raise ValueError('Fixed-anchor equality violated')
+            if any(row['sd (genel)']!=plan['categories'] for row in grm['table']):
+                raise ValueError('GRM omnibus df mismatch')
+        if 'reused_observed' in r:
+            old=Path(r['reused_observed']['source']); raw=old.read_bytes()
+            if digest(raw)!=r['reused_observed']['record_sha256']:
+                raise ValueError('Original observed fit provenance changed')
+            prior=json.loads(raw)
+            if any(r['methods'][m]!=prior['methods'][m] for m in ('Mantel','ordinal_LR')):
+                raise ValueError('Observed-score fits were not reused unchanged')
+        records.append(r)
+    if len({r['seed'] for r in records})!=len(records) or len({r['data_sha256'] for r in records})!=len(records):
+        raise ValueError('Duplicated dataset/seed')
+    prior=json.loads((output/'summary.json').read_text()); result=summarize(records,plan,precision_plan(plan),len(records)==precision_plan(plan)['required_repetitions'])
+    result.update({k:v for k,v in prior.items() if k not in ('methods','paired','scientific_status')})
+    result.update(saved_audit='PASSED: hashes, counts, categories, anchor equalities, df, inference gates, observed fit reuse',
+                  reporting_code_sha256=digest(Path(__file__).read_bytes()),record_code_sha256=sorted({r['code_sha256'] for r in records}))
+    assessment=dict(pilot_complete=len(records)>=plan['pilot_repetitions'],
+        pilot_all_valid=all(v['valid'] for r in records for v in r['methods'].values()),
+        projected_total_seconds=prior.get('estimated_required_seconds'),budget_seconds=plan['total_fit_budget_seconds'])
+    reasons=[]
+    if not assessment['pilot_complete']:reasons.append('INCOMPLETE PILOT')
+    if not assessment['pilot_all_valid']:reasons.append('INVALID PILOT ANALYSES')
+    if assessment['projected_total_seconds'] is None or assessment['projected_total_seconds']>assessment['budget_seconds']:
+        reasons.append('PROJECTED COST EXCEEDS FIXED BUDGET')
+    assessment['expansion_blockers']=reasons;result['expansion_assessment']=assessment
+    save(output/'summary.json',result)
     return result
 
 
@@ -237,7 +298,9 @@ def run(output, reuse_observed=None):
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--run',type=Path);parser.add_argument('--grm-worker',nargs=2,type=Path)
     parser.add_argument('--reuse-observed',type=Path)
+    parser.add_argument('--summarize',type=Path)
     args=parser.parse_args()
     if args.grm_worker:grm_worker(*args.grm_worker)
+    elif args.summarize:audit_saved(args.summarize)
     elif args.run:run(args.run,args.reuse_observed)
     else:print(json.dumps(precision_plan(json.loads(PLAN_PATH.read_text())),indent=2))

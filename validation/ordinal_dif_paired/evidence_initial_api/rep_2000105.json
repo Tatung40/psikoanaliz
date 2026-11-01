@@ -1,0 +1,128 @@
+{
+  "seed": 2000105,
+  "plan_sha256": "65c68ab9b9510bac949a584076fb5dd5997cf8eb467a40ffaa95ed420266fe41",
+  "code_sha256": "3d0f54916e5857fcfbe3bb1edc99a1a73c3de7ab0a2ffefbb0d8c81de40118eb",
+  "data_sha256": "375023ba1ac730aa7887b217a29a37f5c5e274bf81f94c2dbc8b9f1b77e3b558",
+  "items": [
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P07",
+    "P08",
+    "P09",
+    "P10"
+  ],
+  "tested_family": [
+    "P09",
+    "P10"
+  ],
+  "anchors": [
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P07",
+    "P08"
+  ],
+  "methods": {
+    "Mantel": {
+      "valid": true,
+      "p": [
+        0.9547498971150181,
+        0.9781908652367303
+      ],
+      "bh": [
+        0.9781908652367303,
+        0.9781908652367303
+      ],
+      "holm": [
+        1.0,
+        1.0
+      ],
+      "raw_rejections": [
+        0,
+        0
+      ],
+      "holm_event": false,
+      "bh_event": false,
+      "raw": [
+        {
+          "chi2": 0.003219771327573797,
+          "p": 0.9547498971150181,
+          "smd": -0.006839417479291612,
+          "strata_used": 26,
+          "reason": ""
+        },
+        {
+          "chi2": 0.000747317115892374,
+          "p": 0.9781908652367303,
+          "smd": 0.0008029331868233491,
+          "strata_used": 28,
+          "reason": ""
+        }
+      ],
+      "convergence": "not_applicable",
+      "seconds": 0.0017383510021318216
+    },
+    "ordinal_LR": {
+      "valid": true,
+      "p": [
+        0.7659196882493075,
+        0.2082541493131102
+      ],
+      "bh": [
+        0.7659196882493075,
+        0.4165082986262204
+      ],
+      "holm": [
+        0.7659196882493075,
+        0.4165082986262204
+      ],
+      "raw_rejections": [
+        0,
+        0
+      ],
+      "holm_event": false,
+      "bh_event": false,
+      "raw": [
+        {
+          "lr_uniform": 0.0024084710928491404,
+          "p_uniform": 0.960858588980854,
+          "lr_nonuniform": 0.5309474496386883,
+          "p_nonuniform": 0.4662088041765703,
+          "lr_omnibus": 0.5333559207315375,
+          "p_omnibus": 0.7659196882493075,
+          "delta_r2": 0.00031004152531899365,
+          "delta_r2_uniform": 1.4004237619547055e-06,
+          "beta_group": null,
+          "reason": ""
+        },
+        {
+          "lr_uniform": 0.05733843012149009,
+          "p_uniform": 0.8107532184325597,
+          "lr_nonuniform": 3.0806537168002706,
+          "p_nonuniform": 0.07922867552493672,
+          "lr_omnibus": 3.1379921469217607,
+          "p_omnibus": 0.2082541493131102,
+          "delta_r2": 0.0018615951996358016,
+          "delta_r2_uniform": 3.406810471606736e-05,
+          "beta_group": null,
+          "reason": ""
+        }
+      ],
+      "convergence": "production convergence gate",
+      "seconds": 0.21987376200195285
+    },
+    "GRM_LR": {
+      "valid": false,
+      "reason": "ValueError: Bu GRM uygulaması ortak 3–10 kategori destekler.",
+      "seconds": 0.0006516639987239614
+    }
+  },
+  "seconds": 0.9912566279999737
+}

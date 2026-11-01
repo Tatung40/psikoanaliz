@@ -69,3 +69,21 @@ def test_grm_worker_passes_category_count_not_labels(tmp_path,monkeypatch):
     monkeypatch.setattr(grm_dif,'test_dif',reference_contract)
     grm_worker(source,output)
     assert json.loads(output.read_text())['valid']
+
+
+def test_saved_pilot_provenance_and_gate_audit_without_refitting(tmp_path):
+    import shutil
+    from validation.ordinal_dif_paired.experiment import audit_saved
+    source=PLAN_PATH.parent/'evidence'
+    for path in source.glob('rep_*.json'):shutil.copyfile(path,tmp_path/path.name)
+    for path in source.glob('data_*.csv'):shutil.copyfile(path,tmp_path/path.name)
+    shutil.copyfile(source/'summary.json',tmp_path/'summary.json')
+    result=audit_saved(tmp_path)
+    assert result['executed']==10
+    assert all(r['valid']==10 and r['failed']==0 for r in result['methods'].values())
+    assert result['methods']['GRM_LR']['convergence_confirmed']==10
+    assert all(r['complete_pairs']==10 for r in result['paired'].values())
+    assert result['scientific_status']=='PILOT ONLY / NOT CERTIFIED'
+    # Engineering failure records remain visible and are not relabeled successes.
+    old=json.loads((PLAN_PATH.parent/'evidence_initial_api'/'summary.json').read_text())
+    assert old['methods']['GRM_LR']['valid']==0 and old['methods']['GRM_LR']['failed']==10

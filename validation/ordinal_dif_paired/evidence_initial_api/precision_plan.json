@@ -1,0 +1,7 @@
+{
+  "required_repetitions": 3632,
+  "method_alpha": 0.016666666666666666,
+  "worst_ci_deviation": 0.019998448135808533,
+  "previous_n_deviation": 0.02000122039835045,
+  "worst_bernoulli_mcse": 0.00829654139499965
+}
