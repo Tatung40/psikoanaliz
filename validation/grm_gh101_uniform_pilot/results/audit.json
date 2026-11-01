@@ -1,0 +1,13 @@
+{
+  "cold_optimizer_calls_verified": 140,
+  "native_completed_fits": 140,
+  "valid_datasets_verified": 20,
+  "LR_grid_records_verified": 240,
+  "independent_likelihood_rechecks": 280,
+  "maximum_loglik_discrepancy": 5.4569682106375694e-12,
+  "prior_files_verified": 159,
+  "scientific_certification": false,
+  "data_generated": 0,
+  "technical_decision_reproduced": "PASS",
+  "seconds": 1.5972211710031843
+}
