@@ -1,0 +1,7 @@
+{
+  "used_seconds": 4839.206901242003,
+  "attempted": 1763,
+  "valid": 1762,
+  "stage": 500,
+  "stop": "scientific/native/worker gate failed"
+}

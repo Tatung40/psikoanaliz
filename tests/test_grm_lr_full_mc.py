@@ -48,3 +48,38 @@ def test_raw_item_holm_bh_reconstruction():
     np.testing.assert_allclose(b,[.04,.04])
     assert not np.any(h<.05) and np.any(b<.05)
     with pytest.raises(AssertionError):A.holm_bh([.1,float('nan')])
+
+
+def test_saved_staged_evidence_and_independent_audit_without_fits():
+    output=E.HERE/'results'
+    saved=json.loads((output/'summary.json').read_text());metadata=json.loads((output/'metadata.json').read_text())
+    records=list(E.stream_new(output));pilot=E.pilot_records()
+    assert len(records)==saved['new_attempted']
+    keys=[(r['seed'],r['impact']) for r in pilot+records]
+    assert len(keys)==len(set(keys))==saved['attempted']
+    assert saved['pilot_reused_analyses']==20
+    assert all(2026110100<=r['seed']<=2026112599 for r in records)
+    assert all(r['seed']>=2026110110 for r in records)
+    assert E.protect()==111
+    assert E.Z.digest((E.PILOT/'records.json.gz').read_bytes())==metadata['pilot_records_sha256']
+    for path,digest in metadata['sources'].items():assert E.Z.digest((E.ROOT/path).read_bytes())==digest
+    archived=json.loads((output/'audit.json').read_text());recomputed=A.audit(output)
+    def compare(a,b):
+        if isinstance(a,dict):
+            assert a.keys()==b.keys()
+            for k in a:compare(a[k],b[k])
+        elif isinstance(a,list):
+            assert len(a)==len(b)
+            for x,y in zip(a,b):compare(x,y)
+        elif isinstance(a,float):assert a==pytest.approx(b,rel=1e-10,abs=1e-12)
+        else:assert a==b
+    compare(archived,recomputed)
+    assert archived['scientific_certification'] is False
+    for stage in (100,500,2500):
+        path=output/f'stage_{stage:04d}.json'
+        if path.exists():
+            boundary=json.loads(path.read_text());assert boundary['analyses']==boundary['valid']==2*stage
+    for r in records:
+        if 'failed_matrix' in r:
+            path=output/r['failed_matrix'];assert E.Z.digest(path.read_bytes())==r['matrix_sha256']
+            with np.load(path) as data:assert E.Z.digest(data['X'].tobytes()+data['group'].tobytes())==r['data_sha256']
