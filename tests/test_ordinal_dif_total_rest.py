@@ -58,3 +58,39 @@ def test_precision_and_design_preregistered():
     assert p['n_required']==2500 and p['feasibility_pilot']==30 and p['budget_seconds']==1800
     assert p['primary_ci_halfwidth']==pytest.approx(math.sqrt(2*math.log(40)/2500))
     assert 'not nominal FWER control' in p['mcnemar']
+
+
+def test_stored_evidence_integrity_summary_and_paired_raw_families():
+    import gzip
+    import hashlib
+    import json
+    from validation.ordinal_dif_total_rest.experiment import HERE
+    root=HERE/'results'
+    payload=gzip.decompress((root/'records.jsonl.gz').read_bytes())
+    rows=[json.loads(line) for line in payload.splitlines()]
+    summary=json.loads((root/'summary.json').read_text())
+    assert hashlib.sha256(payload).hexdigest()==summary['records_sha256']
+    assert hashlib.sha256((root/'records.jsonl.gz').read_bytes()).hexdigest()==summary['records_gzip_sha256']
+    rebuilt=summarize(rows)
+    for key,value in rebuilt.items(): assert summary[key]==value
+    assert len({r['seed'] for r in rows})==len(rows)
+    for i,r in enumerate(rows):
+        assert r['seed']==2026110100+i and r['index']==i
+        assert r['columns']==[f'P{j:02d}' for j in range(1,11)]
+        for name,method in r['methods'].items():
+            if method['valid']:
+                decision=classify([z['p_omnibus'] for z in method['raw']],.05)
+                for key,value in decision.items(): assert method[key]==value
+        if 'matrix_file' in r:
+            path=root/r['matrix_file']
+            assert hashlib.sha256(path.read_bytes()).hexdigest()==r['matrix_sha256']
+            with np.load(path) as arrays:
+                assert list(arrays['X'].shape)==r['shape']
+                data_bytes=arrays['X'].tobytes()+arrays['group'].tobytes()
+                assert hashlib.sha256(data_bytes).hexdigest()==r['data_sha256']
+    meta=json.loads((root/'metadata.json').read_text())
+    for name,digest in meta['sources'].items():
+        assert hashlib.sha256((HERE.parents[1]/name).read_bytes()).hexdigest()==digest
+    pilot=json.loads((root/'feasibility.json').read_text())
+    assert pilot['n']==30
+    assert pilot['continue']==(pilot['valid_pairs']==30 and pilot['projected_total_seconds']<=1800)

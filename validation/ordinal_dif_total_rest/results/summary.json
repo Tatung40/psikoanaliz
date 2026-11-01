@@ -1,0 +1,106 @@
+{
+  "attempted": 2500,
+  "valid_pairs": 2500,
+  "failures": 0,
+  "fixed_design_complete": true,
+  "methods": {
+    "total": {
+      "valid": 2500,
+      "failed": 0,
+      "holm_events": 171,
+      "fwer": 0.0684,
+      "fwer_ci": [
+        0.05753116675690408,
+        0.08056956197940553
+      ],
+      "fwer_mcse": 0.0050496312251692285,
+      "bh_global_null_fdr": 0.0692,
+      "bh_ci": [
+        0.05826891735738684,
+        0.08142924222567
+      ],
+      "raw_type1": 0.0704,
+      "raw_type1_cluster_mcse": 0.003558454866991594,
+      "unknown_failure_empirical_bounds": [
+        0.0684,
+        0.0684
+      ],
+      "failure_robust_ci": [
+        0.05753116675690408,
+        0.08056956197940553
+      ],
+      "decision": "SCOPED INFLATION"
+    },
+    "rest": {
+      "valid": 2500,
+      "failed": 0,
+      "holm_events": 533,
+      "fwer": 0.2132,
+      "fwer_ci": [
+        0.19507679467655703,
+        0.23217996386624823
+      ],
+      "fwer_mcse": 0.008192994206126637,
+      "bh_global_null_fdr": 0.2164,
+      "bh_ci": [
+        0.1981724992349618,
+        0.23547463444911795
+      ],
+      "raw_type1": 0.1784,
+      "raw_type1_cluster_mcse": 0.005374097912333617,
+      "unknown_failure_empirical_bounds": [
+        0.2132,
+        0.2132
+      ],
+      "failure_robust_ci": [
+        0.19507679467655703,
+        0.23217996386624823
+      ],
+      "decision": "SCOPED INFLATION"
+    }
+  },
+  "paired": {
+    "n": 2500,
+    "a": 154,
+    "b": 17,
+    "c": 379,
+    "d": 1950,
+    "delta": -0.1448,
+    "mcse": 0.007415873655398204,
+    "mcnemar_p": 3.7278025041989e-90,
+    "no_discordances": false,
+    "pi_ci": [
+      0.14234937737476164,
+      0.17547286227267211
+    ],
+    "q_ci": [
+      0.023238023867634718,
+      0.07168165439059779
+    ],
+    "exact_ci": [
+      -0.16731757714944304,
+      -0.12194169963137275
+    ],
+    "hoeffding_ci": [
+      -0.1991240606296248,
+      -0.09047593937037524
+    ],
+    "unknown_failure_empirical_bounds": [
+      -0.1448,
+      -0.1448
+    ]
+  },
+  "primary_decision": "PAIRED DIRECTION DETECTED",
+  "warning": "McNemar tests equal marginal events; it does not certify nominal FWER. BH event=FDR only under this global null. No general certification.",
+  "seconds": 1083.4756147869994,
+  "stop": "fixed design completed",
+  "feasibility": {
+    "n": 30,
+    "valid_pairs": 30,
+    "seconds": 13.506617364000704,
+    "projected_total_seconds": 1125.5514470000587,
+    "continue": true
+  },
+  "records_sha256": "38d2aaa0040ccb9048cdd9e2e82cb6ef4555f85c233bbf7bbae777d6348b0f98",
+  "records_gzip_sha256": "89a12c7a44bb284cbc69a9b896f61c2044e6582cb0483916b9ea63495a25d023"
+}

@@ -1,0 +1,73 @@
+{
+  "python": "3.11.17",
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0",
+    "statsmodels": "0.15.0"
+  },
+  "git_commit": "08869ff531362159d141d0ff06fbcf6e2dbbd475",
+  "sources": {
+    "validation/ordinal_dif_total_rest/experiment.py": "d110c118ab75cf01228baff4849d217d95e9a7aa66d765105838c8fb10a2e3f7",
+    "validation/ordinal_dif_total_rest/plan.json": "7200812deb26415d9d8c27e065444794bf3e812c2ea82fef9a716c591e7c25ed",
+    "validation/dif_validation_study.py": "76f11c747cc8ddf4db7bd404546b2a4c97a83ef18bd88d82f153986f64cbf684",
+    "core/dif_classical.py": "428a2265cb823cb292953cdd0dd14b6f3b29680f8a2ba66a127b642423c26d5b",
+    "validation/ordinal_dif_paired/experiment.py": "62400f72c78a39289dd67b200e5219ad60204b8206a9b75d06237e14878e9e20"
+  },
+  "plan": {
+    "status": "AUGMENTED PREREGISTRATION BEFORE NEW DATA OR RESULTS",
+    "question": "Does replacing total by rest score change operational latent-null Holm-FWER for the same ordinal-LR procedure? No assumption that rest score fixes the latent/observed conditioning mismatch.",
+    "methods": [
+      "production ordinal LR omnibus, total score",
+      "same production ordinal LR omnibus, rest score excluding studied item"
+    ],
+    "dgp": "Existing gen_ordinal, N500/500 J10 C4 a=linspace(.9,1.8), b=linspace(-1,1)+[-1,0,1], normal theta mean0/-0.5 SD1, no true latent DIF, local independence",
+    "tested_family": [
+      "P09",
+      "P10"
+    ],
+    "matching": "Total uses all ten items including target; rest uses the other nine. No purification or selected anchors; exact same raw matrix and row order for both methods.",
+    "alpha": 0.05,
+    "multiplicity": "Holm across the same two items primary; BH descriptive secondary",
+    "primary": "Mean paired dataset-level Holm event difference D=I_total-I_rest",
+    "estimand_note": "False-DIF operating risk relative to latent invariance, not the same formal conditional null for the two matching variables",
+    "paired_mcse_target": 0.02,
+    "n_required": 2500,
+    "n_derivation": "D in [-1,1] implies Var(D)<=1, so true MCSE(mean D)<=1/sqrt(R). R=ceil(1/.02^2)=2500. This is not a .02 confidence-halfwidth target.",
+    "max_paired_mcse": 0.02,
+    "primary_ci": "Fixed-R marginal two-sided distribution-free Hoeffding: mean D +/- sqrt(2 log(2/.05)/R), clipped to [-1,1]",
+    "primary_ci_halfwidth": 0.05432406062962478,
+    "secondary_fwer_intervals": "Per-method exact CP at 97.5% (Bonferroni joint >=95% for two methods). These do not guarantee the older PR118 .02 interval-deviation target.",
+    "acceptance": "For paired direction, primary interval must exclude0, after full fixed R and prespecified validity checks. Method-specific scoped control requires upper bound<=.05, inflation lower>.05; otherwise INCONCLUSIVE. No general method certification or production-label change.",
+    "failures": "Retain all data/results. Any incomplete item family invalid. Report valid-case paired statistics and missing-pair sensitivity; no failed test imputed as no rejection. Confirmatory precision claim only with complete valid fixed R; otherwise diagnostic/inconclusive.",
+    "seed_rule": "2026110100 + replication_index, same raw data for both methods; no outcome-dependent seed replacement",
+    "feasibility_pilot": 30,
+    "timing_rule": "Pilot included in fixed2500 only if all tests valid and no method/settings change. Stop if projected total exceeds1800s. No threshold/precision adjustment after outcomes.",
+    "budget_seconds": 1800,
+    "cached_timing_seconds_per_total_LR_dataset": {
+      "evidence": 0.23166920480034606,
+      "evidence_control": 0.23140132499975152
+    },
+    "estimated_two_method_seconds": 1158.3460240017303,
+    "timing_limitation": "Rest timing not yet measured; estimate is not guaranteed; 30-pair feasibility stage required. No optional stopping for significant/favorable results. Budget/validity stop => no confirmatory acceptance.",
+    "scope_limits": "Only this DGP/impact/test length/family/no-selection setting; no power, anchor-selection or general FDR claims",
+    "source_counterexample_sha256": "3f08597890300fea3db98c1773961512a8ce1bf61094cc75abd80920d4eec75d",
+    "base_main": "b030cd7",
+    "source_plan_sha256": "c39e055af01f2532f9b7a225750d7f1f625ca3abbfa06816578d692c1f67048d",
+    "discordance_definition": "b=total Holm event only; c=rest Holm event only; a=both; d=neither. Delta=(b-c)/valid complete pairs.",
+    "mcnemar": "Exact two-sided conditional binomial test b | (b+c) ~ Binomial(b+c,0.5); b+c=0 => p=1 with no-discordance warning; zero valid pairs => undefined. This tests equal marginal event probabilities, not nominal FWER control.",
+    "paired_exact_ci": "Conservative exact-coverage 95% paired risk-difference interval: pi=P(discordance), q=P(total-only | discordance), Delta=pi*(2q-1). Separate 97.5% CP intervals for pi from m/N and q from b/m give joint coverage >=95% by union bound. Min/max product over corners. m=0 => q interval [0,1], never zero-width certainty.",
+    "primary_rule": "Original primary Hoeffding interval and fixed-R validity/precision rules retained. Exact paired CI and McNemar are supplementary sensitivity/inference, never selected post hoc to override a primary inconclusive result or certify FWER.",
+    "method_ci": "Individual method FWER with 97.5% exact CP, joint >=95% for two methods; separate unknown-failure bounds. No equality/nominal control inferred from McNemar.",
+    "feasibility_decision": "Run exactly first30 pairs, inspect validity and runtime only; do not use event counts or effect direction to select expansion. Continue only if 30/30 pairs valid and elapsed/30*2500 <=1800s. No retries or seed replacement. Main may retain later failed pairs; no confirmatory acceptance unless fixed2500 complete valid pairs.",
+    "budget_deadline": "1800s fitting wall deadline; interrupted attempted pair recorded invalid with partial diagnostics. Reset timer after execution. Budget/feasibility stops remain diagnostic, not confirmatory.",
+    "data_storage": "Compressed first30 response matrices and any failed-pair matrices; every repeat stores seed, data-content hash, raw statistics/p, Holm/BH and event decisions in append-only JSONL then verified deterministic gzip. All full responses reproducible from fixed source/versions/seed; no 2500 duplicate CSV files.",
+    "missing_pairs": "Never impute failed analysis as no event. Conditional complete-pair estimates, b/c, missing-pair empirical sensitivity, per-method failures and conservative failure envelopes; incomplete experiment => INCONCLUSIVE.",
+    "paired_mcse_formula": "sqrt((sum(D^2)-sum(D)^2/n)/(n-1)/n), D in {-1,0,1}; n<2 undefined. Report zero empirical MCSE with nonzero interval uncertainty.",
+    "failure_retries": false,
+    "stopping_after_main_failure": "Retain failures without retry; continue while within budget to estimate failure rate. Confirmatory acceptance remains disabled if any invalid pair.",
+    "no_other_engines": "Only production ordinal LR for total/rest. No GRM-LR, 4PL, R or new estimator."
+  },
+  "clock": "monotonic wall seconds",
+  "engine": "production ordinal LR only"
+}
