@@ -1,0 +1,28 @@
+{
+  "stage": "CONTROL FOLLOW-UP REGISTERED BEFORE CONTROL OUTCOMES",
+  "base_commit": "5da63fa9a8885c6b1b572727dfd3487e152ceb98",
+  "base_plan_sha256": "65c68ab9b9510bac949a584076fb5dd5997cf8eb467a40ffaa95ed420266fe41",
+  "impact": 0.0,
+  "seeds": [
+    2000100,
+    2000101,
+    2000102,
+    2000103,
+    2000104,
+    2000105,
+    2000106,
+    2000107,
+    2000108,
+    2000109
+  ],
+  "changes": "Only focal latent mean changes from -0.5 to 0. No new minus-impact analysis; all other generator/model/family/anchor settings from plan.json unchanged.",
+  "repetitions": 10,
+  "expansion": false,
+  "budget_seconds": 600,
+  "grm_timeout_seconds": 90,
+  "crn_check": "Trace every actual control generator normal/uniform draw. Reconstruct stored negative-impact responses from those draws without refitting. Verify source/NumPy compatibility, exact old matrices, identical reference rows, monotone focal responses and identical draw-call shapes; do not infer statistical correlation from seed alone.",
+  "comparisons": "Original per-condition primary intervals retained (1-0.05/3 per method); secondary BH-FDR under complete null equals BH-FWER. Within-control and across-impact paired event contrasts use complete seed pairs, empirical SD/sqrt(n), marginal conservative 95% bounded Hoeffding intervals and missing-pair sensitivity. No simultaneous claim across both conditions or contrasts.",
+  "decision": "Diagnostic / INCONCLUSIVE / NOT CERTIFIED regardless of point estimates. No superiority/control/general validity claim from ten repetitions.",
+  "failure_policy": "Unchanged production gates. Any incomplete two-item family invalid; retain failures/timeouts, no retries.",
+  "cleanup": "Audit all 112 original changed files. Remove only byte-reconstructable empty/redundant evidence through SHA256 reconstruction manifest; retain canonical records, raw matrices, original summaries and hashes."
+}

@@ -1,0 +1,252 @@
+{
+  "executed": 10,
+  "planned_pilot": 10,
+  "methods": {
+    "Mantel": {
+      "attempted": 10,
+      "valid": 10,
+      "failed": 0,
+      "valid_rate": 1.0,
+      "holm_fwer": 0.1,
+      "holm_events": 1,
+      "holm_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_robust_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_range": [
+        0.1,
+        0.1
+      ],
+      "holm_mcse": 0.09486832980505139,
+      "bh_fdr": 0.1,
+      "bh_fwer": 0.1,
+      "bh_ci95": [
+        0.0025285785444617848,
+        0.4450161170281954
+      ],
+      "bh_mcse": 0.09486832980505139,
+      "decision": "INCONCLUSIVE",
+      "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+      "raw_type1": 0.1,
+      "raw_precision": {
+        "coverage_mc_se": 0.06666666666666668,
+        "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+        "independent_replications": 10,
+        "eligible_replications": 10,
+        "coverage_cluster_counts": {
+          "covered": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "eligible": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    },
+    "ordinal_LR": {
+      "attempted": 10,
+      "valid": 10,
+      "failed": 0,
+      "valid_rate": 1.0,
+      "holm_fwer": 0.1,
+      "holm_events": 1,
+      "holm_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_robust_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_range": [
+        0.1,
+        0.1
+      ],
+      "holm_mcse": 0.09486832980505139,
+      "bh_fdr": 0.1,
+      "bh_fwer": 0.1,
+      "bh_ci95": [
+        0.0025285785444617848,
+        0.4450161170281954
+      ],
+      "bh_mcse": 0.09486832980505139,
+      "decision": "INCONCLUSIVE",
+      "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+      "raw_type1": 0.1,
+      "raw_precision": {
+        "coverage_mc_se": 0.06666666666666668,
+        "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+        "independent_replications": 10,
+        "eligible_replications": 10,
+        "coverage_cluster_counts": {
+          "covered": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "eligible": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    },
+    "GRM_LR": {
+      "attempted": 10,
+      "valid": 10,
+      "failed": 0,
+      "valid_rate": 1.0,
+      "holm_fwer": 0.0,
+      "holm_events": 0,
+      "holm_ci": [
+        0.0,
+        0.38044213374586455
+      ],
+      "failure_robust_ci": [
+        0.0,
+        0.38044213374586455
+      ],
+      "failure_range": [
+        0.0,
+        0.0
+      ],
+      "holm_mcse": 0.0,
+      "bh_fdr": 0.0,
+      "bh_fwer": 0.0,
+      "bh_ci95": [
+        0.0,
+        0.3084971078187607
+      ],
+      "bh_mcse": 0.0,
+      "decision": "INCONCLUSIVE",
+      "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+      "raw_type1": 0.05,
+      "raw_precision": {
+        "coverage_mc_se": 0.05,
+        "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+        "independent_replications": 10,
+        "eligible_replications": 10,
+        "coverage_cluster_counts": {
+          "covered": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "eligible": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    }
+  },
+  "paired": {
+    "Mantel minus ordinal_LR": {
+      "complete_pairs": 10,
+      "missing_pairs": 0,
+      "mean": 0.0,
+      "mcse": 0.0,
+      "marginal_ci95": [
+        -0.8589388166934752,
+        0.8589388166934752
+      ],
+      "missing_pair_range": [
+        0.0,
+        0.0
+      ]
+    },
+    "Mantel minus GRM_LR": {
+      "complete_pairs": 10,
+      "missing_pairs": 0,
+      "mean": 0.1,
+      "mcse": 0.09999999999999999,
+      "marginal_ci95": [
+        -0.7589388166934752,
+        0.9589388166934751
+      ],
+      "missing_pair_range": [
+        0.1,
+        0.1
+      ]
+    },
+    "ordinal_LR minus GRM_LR": {
+      "complete_pairs": 10,
+      "missing_pairs": 0,
+      "mean": 0.1,
+      "mcse": 0.09999999999999999,
+      "marginal_ci95": [
+        -0.7589388166934752,
+        0.9589388166934751
+      ],
+      "missing_pair_range": [
+        0.1,
+        0.1
+      ]
+    }
+  },
+  "scientific_status": "PILOT ONLY / NOT CERTIFIED",
+  "required_repetitions": 3632,
+  "stop_reason": "NO EXPANSION: invalid pilot or projected precision-planned cost exceeds fixed budget",
+  "seconds": 37.91863902899058,
+  "plan_sha256": "65c68ab9b9510bac949a584076fb5dd5997cf8eb467a40ffaa95ed420266fe41",
+  "code_sha256": "ec4909b0ae346c492f567f0fdc535eeffc269d859b13f72d685f79e8a8a2c6a8",
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0",
+    "statsmodels": "0.15.0"
+  },
+  "estimated_required_seconds": 13772.04969532938
+}
