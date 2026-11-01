@@ -1,0 +1,20 @@
+{
+  "base_commit": "2839aae208a1b2649fac5b2b310e23003ce0be99",
+  "seed": 2026110981,
+  "impact": -0.5,
+  "quadrature": [
+    61,
+    81,
+    101,
+    121,
+    161
+  ],
+  "models": "All8 saved item/hypothesis slots; deduplicate identical roles+encoded parameter vectors, no refit",
+  "reconstruction": "Recover encoded free coordinates from saved physical a,b,mu,sd using exact native Design roles; report roundtrip/logLik/score discrepancies, do not claim original encoded bits were stored.",
+  "normalization": "Native objective=-marginal logLik/N, N=1000. Gradient in constrained free coordinates (shared anchors sum both groups). Gate1e-5 remains unchanged; total logLik score=-N*native gradient.",
+  "independent_reference": "Direct rowwise stable GRM category log probabilities; SciPy probabilists roots_hermitenorm weights normalized by sqrt(2pi), compared with native NumPy physicists hermgauss sqrt2 convention.",
+  "finite_differences": "Independent likelihood central differences for ALL free coordinates at GH61 and GH161, h=(1e-4 or1e-5)*max(1,abs(p_j)); exact same baseline parameters, no optimization. Record FD/analytic discrepancy and perturbation logLik changes; no new statistical acceptance limit.",
+  "physical_sensitivity": "Chain rule from b0/log gaps to shared/group physical thresholds and logSD to SD; report both bases, gate remains on native encoded coordinates.",
+  "decision": "Compare saved solutions across fixed grids; report whether same1e-5 native score gate exceeded at each. Distinguish integration-grid sensitivity, sign/scale, derivative correctness and numerical stability. No model fit, MC, Hessian optimization, p unlocking or threshold change.",
+  "prior_canonical_files": 146
+}
