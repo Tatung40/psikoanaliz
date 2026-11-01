@@ -1,0 +1,174 @@
+{
+  "primary_zero_total_minus_rest": {
+    "n": 2500,
+    "a": 91,
+    "b": 20,
+    "c": 33,
+    "d": 2356,
+    "delta": -0.0052,
+    "mcse": 0.002910768460254385,
+    "mcnemar_p": 0.09837064844049181,
+    "no_discordances": false,
+    "pi_ci": [
+      0.015258061193770172,
+      0.028609138295551943
+    ],
+    "q_ci": [
+      0.23223486593386694,
+      0.5402808487516659
+    ],
+    "exact_ci": [
+      -0.015321059502450015,
+      0.002304800745197243
+    ],
+    "hoeffding_ci": [
+      -0.059524060629624787,
+      0.04912406062962478
+    ],
+    "unknown_failure_empirical_bounds": [
+      -0.0052,
+      -0.0052
+    ],
+    "simultaneous_four_contrasts_ci": [
+      -0.0689192204298441,
+      0.0585192204298441
+    ],
+    "mcnemar_holm_three_tests_p": 0.09837064844049181
+  },
+  "impact_changes": {
+    "total": {
+      "n": 2500,
+      "a": 56,
+      "b": 55,
+      "c": 115,
+      "d": 2274,
+      "delta": -0.024,
+      "mcse": 0.005194265314446572,
+      "mcnemar_p": 4.870265681432836e-06,
+      "no_discordances": false,
+      "pi_ci": [
+        0.05716245820845479,
+        0.08013955639276842
+      ],
+      "q_ci": [
+        0.24484954824062316,
+        0.41013875516995074
+      ],
+      "exact_ci": [
+        -0.040895288034821835,
+        -0.01027337930431483
+      ],
+      "hoeffding_ci": [
+        -0.07832406062962478,
+        0.030324060629624783
+      ],
+      "unknown_failure_empirical_bounds": [
+        -0.024,
+        -0.024
+      ],
+      "simultaneous_four_contrasts_ci": [
+        -0.08771922042984409,
+        0.0397192204298441
+      ],
+      "mcnemar_holm_three_tests_p": 9.740531362865671e-06
+    },
+    "rest": {
+      "n": 2500,
+      "a": 78,
+      "b": 46,
+      "c": 455,
+      "d": 1921,
+      "delta": -0.1636,
+      "mcse": 0.00833557488860183,
+      "mcnemar_p": 1.1411917959501148e-85,
+      "no_discordances": false,
+      "pi_ci": [
+        0.18271095471177465,
+        0.21898433802539435
+      ],
+      "q_ci": [
+        0.0650316922145265,
+        0.1248518529590164
+      ],
+      "exact_ci": [
+        -0.1905024938848558,
+        -0.13708735220842266
+      ],
+      "hoeffding_ci": [
+        -0.21792406062962477,
+        -0.10927593937037522
+      ],
+      "unknown_failure_empirical_bounds": [
+        -0.1636,
+        -0.1636
+      ],
+      "simultaneous_four_contrasts_ci": [
+        -0.2273192204298441,
+        -0.0998807795701559
+      ],
+      "mcnemar_holm_three_tests_p": 3.4235753878503447e-85
+    }
+  },
+  "interaction": {
+    "n": 2500,
+    "mean": 0.1396,
+    "mcse": 0.007883501496057151,
+    "hoeffding_ci": [
+      0.030951878740750435,
+      0.24824812125924955
+    ],
+    "definition": "(total-rest)_impact0 - (total-rest)_impact_minus0.5",
+    "simultaneous_four_contrasts_ci": [
+      0.012161559140311806,
+      0.2670384408596882
+    ],
+    "conservative_exact_paired_ci": [
+      0.10280474774276953,
+      0.1732130099188066
+    ],
+    "signed_event_table": {
+      "-1,-1": 10,
+      "-1,0": 22,
+      "-1,1": 1,
+      "0,-1": 365,
+      "0,0": 2067,
+      "0,1": 15,
+      "1,-1": 4,
+      "1,0": 15,
+      "1,1": 1
+    },
+    "quadruple_order": [
+      "T0",
+      "R0",
+      "Tm",
+      "Rm"
+    ],
+    "quadruple_table": {
+      "0000": 1900,
+      "0001": 348,
+      "0010": 10,
+      "0011": 98,
+      "0100": 16,
+      "0101": 10,
+      "0110": 1,
+      "0111": 6,
+      "1000": 10,
+      "1001": 4,
+      "1010": 1,
+      "1011": 5,
+      "1100": 24,
+      "1101": 17,
+      "1110": 5,
+      "1111": 45
+    },
+    "unknown_failure_empirical_bounds": [
+      0.1396,
+      0.1396
+    ],
+    "mcnemar": "NOT APPLICABLE: difference of paired differences is not a binary paired event contrast"
+  },
+  "all_four_cells_valid": 2500,
+  "confirmatory_fixed_design_complete": true,
+  "multiplicity": "Four simultaneous Hoeffding intervals jointly>=95%; individual exact95% intervals not joint. Holm McNemar3 binary contrasts; no McNemar for interaction. Separate FWER CP family within each condition only.",
+  "no_negative_refits": true
+}
