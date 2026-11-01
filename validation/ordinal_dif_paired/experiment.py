@@ -96,7 +96,7 @@ def grm_worker(data_path, output_path):
     plan=json.loads(PLAN_PATH.read_text()); frame=pd.read_csv(data_path); group=frame.pop('group')
     t=time.monotonic()
     try:
-        out=G.test_dif(frame,group,0,1,plan['anchors'],categories=[0,1,2,3],points=61,alpha=plan['alpha'])
+        out=G.test_dif(frame,group,0,1,plan['anchors'],categories=plan['categories'],points=61,alpha=plan['alpha'])
         table=out['table'].set_index('Madde').loc[plan['tested_family']]
         result=classify(table['p'],plan['alpha'])
         result.update(table=table.reset_index().to_dict('records'),fits={},n_fits=out['n_fits'])
@@ -175,7 +175,7 @@ def summarize(records, plan, precision, main_completed=False):
     return result
 
 
-def run(output):
+def run(output, reuse_observed=None):
     from validation.dif_validation_study import gen_ordinal
     from importlib.metadata import version
     plan=json.loads(PLAN_PATH.read_text()); output.mkdir(parents=True,exist_ok=True)
@@ -199,11 +199,23 @@ def run(output):
             records.append(r);total_seconds+=r['seconds'];continue
         if total_seconds+plan['grm_timeout_seconds']>plan['total_fit_budget_seconds']:
             stop='BUDGET STOP before next dataset';break
-        t=time.monotonic();x,g=gen_ordinal(500,500,-.5,False,seed)
-        frame=x.copy();frame['group']=np.asarray(g);frame.to_csv(csv,index=False)
+        t=time.monotonic();prior=None
+        if reuse_observed is not None:
+            old_record=reuse_observed/f'rep_{seed}.json';old_data=reuse_observed/f'data_{seed}.csv'
+            prior=json.loads(old_record.read_text())
+            if prior['plan_sha256']!=plan_hash or digest(old_data.read_bytes())!=prior['data_sha256']:
+                raise ValueError('Observed reuse provenance mismatch')
+            csv.write_bytes(old_data.read_bytes());x=pd.read_csv(csv);g=x.pop('group')
+        else:
+            x,g=gen_ordinal(plan['n_reference'],plan['n_focal'],plan['theta_focal'][0],plan['true_dif'],seed)
+            frame=x.copy();frame['group']=np.asarray(g);frame.to_csv(csv,index=False)
         r=dict(seed=seed,plan_sha256=plan_hash,code_sha256=code_hash,data_sha256=digest(csv.read_bytes()),
                items=list(x.columns),tested_family=plan['tested_family'],anchors=plan['anchors'],methods={})
-        for method in ('Mantel','ordinal_LR'):r['methods'][method]=observed(x,g,plan,method)
+        for method in ('Mantel','ordinal_LR'):
+            r['methods'][method]=prior['methods'][method] if prior else observed(x,g,plan,method)
+        if prior:
+            r['reused_observed']=dict(source=str(old_record),record_sha256=digest(old_record.read_bytes()),
+                                      code_sha256=prior['code_sha256'])
         worker=output/f'grm_{seed}.json'
         with (output/f'grm_{seed}.stdout').open('w') as stdout,(output/f'grm_{seed}.stderr').open('w') as stderr:
             try:
@@ -211,7 +223,8 @@ def run(output):
                     cwd=ROOT,stdout=stdout,stderr=stderr,timeout=plan['grm_timeout_seconds'],check=True)
                 r['methods']['GRM_LR']=json.loads(worker.read_text())
             except Exception as exc:r['methods']['GRM_LR']=dict(valid=False,reason=f'{type(exc).__name__}: {exc}')
-        r['seconds']=time.monotonic()-t;total_seconds+=r['seconds'];save(path,r);records.append(clean(r))
+        r['seconds']=time.monotonic()-t+(prior['seconds'] if prior else 0)
+        total_seconds+=r['seconds'];save(path,r);records.append(clean(r))
         print(json.dumps(dict(seed=seed,valid={k:v['valid'] for k,v in r['methods'].items()},seconds=r['seconds'])),flush=True)
     result=summarize(records,plan,precision,len(records)==precision['required_repetitions'])
     result.update(stop_reason=stop,seconds=total_seconds,plan_sha256=plan_hash,code_sha256=code_hash,
@@ -223,7 +236,8 @@ def run(output):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--run',type=Path);parser.add_argument('--grm-worker',nargs=2,type=Path)
+    parser.add_argument('--reuse-observed',type=Path)
     args=parser.parse_args()
     if args.grm_worker:grm_worker(*args.grm_worker)
-    elif args.run:run(args.run)
+    elif args.run:run(args.run,args.reuse_observed)
     else:print(json.dumps(precision_plan(json.loads(PLAN_PATH.read_text())),indent=2))

@@ -54,3 +54,18 @@ def test_known_model_score_convolution_zero_impact_and_normalization():
 def test_zero_events_are_not_a_zero_width_interval():
     assert binomial_ci(0,10,.05/3)[1]>.05
     assert binomial_ci(0,0)==[0.,1.]
+
+
+def test_grm_worker_passes_category_count_not_labels(tmp_path,monkeypatch):
+    import pandas as pd
+    from core import grm_dif
+    from validation.ordinal_dif_paired.experiment import grm_worker
+    frame=pd.DataFrame({f'P{i:02d}':[0,1,2,3] for i in range(1,11)});frame['group']=[0,0,1,1]
+    source=tmp_path/'data.csv';output=tmp_path/'result.json';frame.to_csv(source,index=False)
+    def reference_contract(*args,**kwargs):
+        assert type(kwargs['categories']) is int and kwargs['categories']==4
+        assert kwargs['points']==61
+        return dict(table=pd.DataFrame({'Madde':['P09','P10'],'p':[.9,.9]}),fits={},n_fits=0)
+    monkeypatch.setattr(grm_dif,'test_dif',reference_contract)
+    grm_worker(source,output)
+    assert json.loads(output.read_text())['valid']
