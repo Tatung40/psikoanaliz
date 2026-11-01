@@ -42,7 +42,7 @@
   "seed_rule": "first10 existing seeds2026110100..2026110109, each at both impacts; same raw data/content hashes and cached ordinal outcomes from PR120/121, no ordinal refits",
   "pairing": "verify generator/version/source plus both archived data hashes; reuse traced PR121 common normal/uniform reconstruction for impact0; compare reference rows and groups; retain matrix hashes and CRN trace, never equate seed identity alone with pairing",
   "feasibility_seed_pairs": 10,
-  "planned_grm_analyses": 20,
+  "planned_grm_analyses": 5000,
   "budget_seconds": 18000,
   "per_analysis_timeout_seconds": 90,
   "memory_limit_mib": 1024,
@@ -55,9 +55,9 @@
   "main_required_seed_pairs": 2500,
   "precision": "2500 gives worst-case binary difference MCSE<=.02, interaction<=.04, Bernoulli FWER<=.01; no .02 CI-halfwidth claim",
   "decision": "Authorized continuation only within18000s INCLUDING pilot cost; per-stage caps and90s/analysis remain. At stage100 and500 check validity, checksums and observed mean projected remaining cost<=remaining budget, never events/significance. No early statistical success. Final scientific classification MEASURED / NOT CERTIFIED regardless CI; scoped conclusions only fixed2500 all-valid condition pairs with predeclared9-family intervals.",
-  "next_plan": "No new fit without a separately preregistered adequate main wall budget. Proposed immutable stages: existing10 pairs ->100 ->500 ->2500, same seeds/design. Each stage reports runtime/validity only for resource continuation; no hypothesis/alpha/precision changes or event-based stop. Invalid main analyses retained, no replacement, no confirmatory certification without fixed2500 valid pairs. Any source/settings changes require new version and prohibit pooling unchanged-design claims.",
+  "next_plan": "Authorized100/500/2500 continuation with immutable source/settings and existing10-pair pilot; no alternative design or automatic scientific certification.",
   "acceptance": "No new statistical cutoffs. At completed fixed2500 only: primary joint-family CP lower>.05 supports scoped inflation; upper<=.05 supports scoped control; otherwise INCONCLUSIVE. Cross-contrast direction requires corresponding joint-family Hoeffding interval excludes0. Pilot always FEASIBILITY ONLY / NOT CERTIFIED.",
-  "preserved_files": 81,
+  "preserved_files": 111,
   "production_changes": false,
   "ordinal_refits": false,
   "R_fits": false,
@@ -79,5 +79,7 @@
   ],
   "stopping": "Stop before any fit if cumulative budget or current stage limit exhausted. At boundaries stop if projected remaining5000 total analyses exceeds remaining total budget. Preserve native thresholds unchanged. Pilot cost and prior elapsed continuation cost persist across restarts.",
   "storage": "Immutable pilot reference plus deterministic gzip chunks of up to100 new analysis records, checksums, raw native diagnostics and decisions; append-only fsynced active ledger; marker before each attempted fit prevents speculative retry after interruption. Source/settings/version hashes, per-input archived hashes and common-RNG trace comparison preserved. Only failed new matrices need storing; all matrices deterministic from protected generator/seeds.",
-  "independent_audit": "After stop/completion independently reconstruct per-item Holm/BH from raw p, FWER/FDR, repeat-clustered MCSE, CP intervals, binary contrast tables and exact binomial-CDF McNemar; interactions via four-event covariance. Check joint9 Hoeffding formulas independently and protect prior files. No new fits during audit. Complete-case/missing bounds and not-attempted totals explicit."
+  "independent_audit": "After stop/completion independently reconstruct per-item Holm/BH from raw p, FWER/FDR, repeat-clustered MCSE, CP intervals, binary contrast tables and exact binomial-CDF McNemar; interactions via four-event covariance. Check joint9 Hoeffding formulas independently and protect prior files. No new fits during audit. Complete-case/missing bounds and not-attempted totals explicit.",
+  "pilot_reused_grm_analyses": 20,
+  "new_maximum_grm_analyses": 4980
 }
