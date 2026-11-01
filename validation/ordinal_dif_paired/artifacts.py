@@ -34,7 +34,7 @@ def audit_and_prune():
         elif '/grm_' in name and name.endswith('.json'):
             seed=p.stem[4:];record=p.with_name('rep_'+seed+'.json')
             recipe=dict(type='json_subtree',path=str(record.relative_to(ROOT)),keys=['methods','GRM_LR'])
-        elif '/evidence_initial_api/' in name and p.name in ('mechanism.json','precision_plan.json'):
+        elif '/evidence_initial_api/' in name and (p.name in ('mechanism.json','precision_plan.json') or p.suffix=='.csv'):
             recipe=dict(type='copy',path=str(p.parent.with_name('evidence')/p.name))
             recipe['path']=str(Path(recipe['path']).relative_to(ROOT))
         if recipe is not None:
@@ -47,12 +47,13 @@ def audit_and_prune():
     for i in range(2000100,2000110):
         a=ROOT/f'validation/ordinal_dif_paired/evidence/data_{i}.csv'
         b=ROOT/f'validation/ordinal_dif_paired/evidence_initial_api/data_{i}.csv'
-        if a.read_bytes()!=b.read_bytes():raise ValueError('Original paired CSV mismatch')
-        duplicate_raw.append(dict(canonical=str(a.relative_to(ROOT)),retained_alias=str(b.relative_to(ROOT)),sha256=sha(a.read_bytes())))
+        entry=next(e for e in entries if e['path']==str(b.relative_to(ROOT)))
+        if sha(a.read_bytes())!=entry['sha256']:raise ValueError('Original paired CSV mismatch')
+        duplicate_raw.append(dict(canonical=str(a.relative_to(ROOT)),reconstructable_alias=str(b.relative_to(ROOT)),sha256=sha(a.read_bytes())))
     result=dict(audited_commit=BASE,files=len(entries),bytes=sum(e['bytes'] for e in entries),
                 removed=sum(e['action']=='removed_losslessly' for e in entries),entries=entries,
-                retained_duplicate_csv=duplicate_raw,
-                rationale='Keep raw aliases required by historical execution code; Git deduplicates identical blobs. No oversized temporary data. Remove empty logs and byte-reconstructable duplicate diagnostics only.')
+                deduplicated_csv=duplicate_raw,
+                rationale='One canonical copy per raw matrix; restore byte-identical historical aliases on demand. No oversized temporary data. All removed evidence is byte-reconstructable.')
     MANIFEST.write_text(json.dumps(result,indent=2));return result
 
 

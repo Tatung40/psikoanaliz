@@ -35,8 +35,34 @@ def test_paired_uncertainty_uses_actual_discordances_and_missing_pairs():
 
 def test_all_removed_artifacts_reconstruct_original_bytes():
     manifest=json.loads(artifacts.MANIFEST.read_text())
-    assert manifest['files']==112 and manifest['removed']==62
-    assert artifacts.verify()==62
+    assert manifest['files']==112 and manifest['removed']==72
+    assert artifacts.verify()==72
     for entry in manifest['entries']:
         if entry['action']=='removed_losslessly':
             assert hashlib.sha256(artifacts.reconstruct(entry)).hexdigest()==entry['sha256']
+
+
+def test_saved_control_pairs_and_native_gates_without_refitting(tmp_path):
+    import shutil
+    from pathlib import Path
+    from validation.ordinal_dif_paired import control
+    source=control.HERE/'evidence_control'
+    old_summary=(control.OLD/'summary.json').read_bytes()
+    for path in source.glob('rep_*.json'):shutil.copyfile(path,tmp_path/path.name)
+    for path in source.glob('data_*.csv'):shutil.copyfile(path,tmp_path/path.name)
+    result=control.analyze(tmp_path)
+    assert result['crn_verified_datasets']==10
+    assert (control.OLD/'summary.json').read_bytes()==old_summary
+    assert all(r['valid']==10 and r['failed']==0 for r in result['control_summary']['methods'].values())
+    for row in result['impact0_minus_impact_minus0_5'].values():
+        assert row['holm_event']['complete_pairs']==10
+        assert row['holm_event']['mean']==0 and row['holm_event']['marginal_ci95'][1]>0
+    for path in source.glob('rep_*.json'):
+        r=json.loads(path.read_text())
+        assert r['crn']['identical_reference_rows'] and r['crn']['focal_monotone']
+        for hypotheses in r['methods']['GRM_LR']['fits'].values():
+            for f in hypotheses.values():
+                assert f['converged'] and f['quadrature_ok'] and f['information_available'] and not f['at_bound']
+                for anchor in r['anchors']:
+                    j=r['items'].index(anchor)
+                    assert f['a'][0][j]==f['a'][1][j] and f['b'][0][j]==f['b'][1][j]

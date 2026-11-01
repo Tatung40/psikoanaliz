@@ -75,7 +75,7 @@ def metric(row,name):
 def analyze(output):
     base=json.loads(E.PLAN_PATH.read_text());control=json.loads(CONTROL_PLAN.read_text())
     records=[json.loads(p.read_text()) for p in sorted(output.glob('rep_*.json'))]
-    old={r['seed']:r for r in (json.loads(p.read_text()) for p in OLD.glob('rep_*.json'))}
+    old={r['seed']:r for r in (json.loads(p.read_text()) for p in sorted(OLD.glob('rep_*.json')))}
     if [r['seed'] for r in records]!=control['seeds']:raise ValueError('Incomplete/changed ten-seed family')
     for r in records:
         if E.digest((output/f"data_{r['seed']}.csv").read_bytes())!=r['data_sha256']:raise ValueError('Control data hash changed')
@@ -91,12 +91,14 @@ def analyze(output):
         valid=[r for r in records if r['methods'][method]['valid'] and old[r['seed']]['methods'][method]['valid']]
         comparisons[method]={name:pair_contrast([metric(r['methods'][method],name) for r in valid],
             [metric(old[r['seed']]['methods'][method],name) for r in valid],len(records)) for name in ('holm_event','bh_event','raw_type1')}
+        for row in comparisons[method].values():row['paired_seeds']=[r['seed'] for r in valid]
     for condition,rs in (('impact0',records),('impact_minus0.5',list(old.values()))):
         within[condition]={}
         for a,b in itertools.combinations(base['methods'],2):
             valid=[r for r in rs if r['methods'][a]['valid'] and r['methods'][b]['valid']]
             within[condition][a+' minus '+b]={name:pair_contrast([metric(r['methods'][a],name) for r in valid],
                 [metric(r['methods'][b],name) for r in valid],len(rs)) for name in ('holm_event','bh_event','raw_type1')}
+            for row in within[condition][a+' minus '+b].values():row['paired_seeds']=[r['seed'] for r in valid]
     result=dict(control_summary=summary,minus_summary_sha256=E.digest((OLD/'summary.json').read_bytes()),
         minus_methods_reused=json.loads((OLD/'summary.json').read_text())['methods'],
         impact0_minus_impact_minus0_5=comparisons,within_condition=within,

@@ -2,7 +2,7 @@
   "audited_commit": "5da63fa9a8885c6b1b572727dfd3487e152ceb98",
   "files": 112,
   "bytes": 1379181,
-  "removed": 62,
+  "removed": 72,
   "entries": [
     {
       "path": ".github/workflows/pytest.yml",
@@ -490,61 +490,101 @@
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000100.csv",
       "bytes": 22046,
       "sha256": "a32ca23f938f965eb3da195090529fe649f60039cf9154bff8b318fe16e16826",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000100.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000101.csv",
       "bytes": 22046,
       "sha256": "2c475e2c4c555dec931f3e6255ad87a7b63caafe0e379283ea8c401c80f9c07e",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000101.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000102.csv",
       "bytes": 22046,
       "sha256": "0c5cb446913e76e683020a4c9dc80790a7310bf2a242b62b7481b8ca1e907c7e",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000102.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000103.csv",
       "bytes": 22046,
       "sha256": "38c566da403559d0725bcc62deda5f8692d995906ec3ccc4d981ad64018be949",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000103.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000104.csv",
       "bytes": 22046,
       "sha256": "b7163193a2a62b4e957892ea55ad76b1d91ce72c0f4ae0810c388d0c7ff1d832",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000104.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000105.csv",
       "bytes": 22046,
       "sha256": "375023ba1ac730aa7887b217a29a37f5c5e274bf81f94c2dbc8b9f1b77e3b558",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000105.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000106.csv",
       "bytes": 22046,
       "sha256": "fcde3303c56c7f484da90282a2d85e276bc4c14f4c4773615590466d0bac8bac",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000106.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000107.csv",
       "bytes": 22046,
       "sha256": "2106c3dda9d4cf57772512e81caa527152f15cddc1bba4c98701f527dcdbf4b4",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000107.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000108.csv",
       "bytes": 22046,
       "sha256": "413054a67995b62f3646a575f5b47ea62dd4134f769a511e65650bc8e8175bca",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000108.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/data_2000109.csv",
       "bytes": 22046,
       "sha256": "c4b7e3110a801715119cef1bab058e7a99061664e71fba5fd307f783a416600b",
-      "action": "retained"
+      "action": "removed_losslessly",
+      "reconstruct": {
+        "type": "copy",
+        "path": "validation/ordinal_dif_paired/evidence/data_2000109.csv"
+      }
     },
     {
       "path": "validation/ordinal_dif_paired/evidence_initial_api/grm_2000100.json",
@@ -965,57 +1005,57 @@
       "action": "retained"
     }
   ],
-  "retained_duplicate_csv": [
+  "rationale": "One canonical copy per raw matrix; restore byte-identical historical aliases on demand. No oversized temporary data. All removed evidence is byte-reconstructable.",
+  "deduplicated_csv": [
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000100.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000100.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000100.csv",
       "sha256": "a32ca23f938f965eb3da195090529fe649f60039cf9154bff8b318fe16e16826"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000101.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000101.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000101.csv",
       "sha256": "2c475e2c4c555dec931f3e6255ad87a7b63caafe0e379283ea8c401c80f9c07e"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000102.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000102.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000102.csv",
       "sha256": "0c5cb446913e76e683020a4c9dc80790a7310bf2a242b62b7481b8ca1e907c7e"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000103.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000103.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000103.csv",
       "sha256": "38c566da403559d0725bcc62deda5f8692d995906ec3ccc4d981ad64018be949"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000104.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000104.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000104.csv",
       "sha256": "b7163193a2a62b4e957892ea55ad76b1d91ce72c0f4ae0810c388d0c7ff1d832"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000105.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000105.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000105.csv",
       "sha256": "375023ba1ac730aa7887b217a29a37f5c5e274bf81f94c2dbc8b9f1b77e3b558"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000106.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000106.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000106.csv",
       "sha256": "fcde3303c56c7f484da90282a2d85e276bc4c14f4c4773615590466d0bac8bac"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000107.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000107.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000107.csv",
       "sha256": "2106c3dda9d4cf57772512e81caa527152f15cddc1bba4c98701f527dcdbf4b4"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000108.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000108.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000108.csv",
       "sha256": "413054a67995b62f3646a575f5b47ea62dd4134f769a511e65650bc8e8175bca"
     },
     {
       "canonical": "validation/ordinal_dif_paired/evidence/data_2000109.csv",
-      "retained_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000109.csv",
+      "reconstructable_alias": "validation/ordinal_dif_paired/evidence_initial_api/data_2000109.csv",
       "sha256": "c4b7e3110a801715119cef1bab058e7a99061664e71fba5fd307f783a416600b"
     }
-  ],
-  "rationale": "Keep raw aliases required by historical execution code; Git deduplicates identical blobs. No oversized temporary data. Remove empty logs and byte-reconstructable duplicate diagnostics only."
+  ]
 }

@@ -37,6 +37,7 @@ Corrected only this harness contract and added a no-fit regression. Same CSV byt
 Mantel and ordinal-LR results were reused unchanged. Exactly one actual GRM analysis
 per seed then ran; no alternate starts, criterion changes or scientific fit retries.
 These are ten unique paired datasets, not twenty independent repetitions.
+Historical file-layout aliases can be restored exactly with `artifacts --restore`.
 
 Final pilot: **10/10 complete valid triples**. Mantel convergence is not applicable;
 ordinal LR's production gate requires all regressions to converge; all ten GRM
@@ -113,8 +114,9 @@ a different precision/scope before new outcomes; do not reinterpret this pilot.
 ## Reproduction and verification
 
 - `plan.json`, precision_plan.json: locked scientific design and exact required R.
-- `evidence/data_*.csv`, rep_*.json, grm_*.json/stdout/stderr: raw paired matrices,
-  method p/statistics, full GRM estimates and diagnostics, hashes and timing.
+- `evidence/data_*.csv`, rep_*.json: raw paired matrices, method p/statistics, full
+  GRM estimates/diagnostics in methods.GRM_LR, hashes and timing. Redundant worker
+  JSON and empty logs are byte-reconstructable through artifact_audit.json; see below.
 - `summary_fit_run.json`: untouched execution summary; `summary.json`: cached-data
   audit/analysis, with raw-execution and reporting-code hashes distinguished.
 - New targeted tests: precision sizing, same-family decisions, failures/paired
@@ -133,3 +135,82 @@ run `--run NEW_OUTPUT --reuse-observed validation/ordinal_dif_paired/evidence_in
 This executes GRM fits; it is deliberately opt-in, not a CI command. Never overwrite
 archived evidence or silently refit cached datasets. Final targeted/CI status and
 commit are recorded in the PR. Main is not merged by this task.
+
+
+## Impact=0 control follow-up (same ten seeds; no negative-condition refits)
+
+Control plan committed at **1cc8a85**, before control outcomes. Only focal mean
+changes to 0; N500/500, J10/C4, true DIF absent, P01–P08 anchors, P09/P10 family,
+matching, alpha, native fitting settings and all validity gates remain identical.
+Exactly ten new control datasets were analyzed, ~**32.3 seconds** total. All three
+methods have 10/10 complete valid results; no failed new analyses. Original
+negative-condition CSVs, repetition records and summaries remain byte-identical.
+
+| Impact | Procedure | Holm-FWER | Primary interval (98.333%) | FWER MCSE | BH-FDR | Raw Type-I (cluster MCSE) |
+|---|---|---:|---:|---:|---:|---:|
+| −.5, cached | Mantel | .10 | [.00084,.51524] | .0949 | .10 | .10 (.0667) |
+| 0 | Mantel | .10 | [.00084,.51524] | .0949 | .10 | .10 (.1000) |
+| −.5, cached | Ordinal LR | .10 | [.00084,.51524] | .0949 | .10 | .10 (.0667) |
+| 0 | Ordinal LR | .10 | [.00084,.51524] | .0949 | .10 | .05 (.0500) |
+| −.5, cached | GRM-LR | .00 | [0,.38044] | .0000 | .00 | .05 (.0500) |
+| 0 | GRM-LR | .00 | [0,.38044] | .0000 | .00 | .00 (.0000) |
+
+BH-FDR equals BH-FWER under these complete nulls. Its marginal 95% binomial
+intervals are [.00253,.44502] for the observed-score methods and [0,.30850] for
+GRM, in both conditions. Primary confidence coverage is >=95% across three
+methods **within each condition**, not across all six condition/method cells.
+
+### Verified common randomness, not an assumed statistical gain
+
+Seed equality alone was not used as proof. The actual impact0 generator was
+instrumented: two standard-normal vectors (reference/focal) and ten item-uniform
+vectors were traced with call names, shapes, SHA256, BitGenerator and NumPy version.
+The generator source was checked against 5da63fa. With those actual control draws,
+applying focal shift −.5 reconstructs every stored negative response **exactly**;
+reference responses are identical and focal responses are monotonically coupled.
+No negative-condition model or p-value was recalculated. This verifies the intended
+common-random-number structure under the recorded source/runtime. It cannot verify
+unarchived older P2 bitstreams and is not a guarantee of strong outcome correlation.
+
+Across-impact Holm and BH paired differences (impact0 minus −.5) are **0** for all
+three methods, empirical MCSE0, ten complete pairs, marginal conservative 95%
+interval **[−.85894,.85894]**. Thus no zero impact effect or equality is established.
+Observed-score event vectors are identical (empirical correlation ~1 on ten
+observations); GRM event correlation is undefined because both vectors are zero.
+Neither fact estimates population pairing strength reliably. Raw Type-I differences
+are 0 (Mantel, MCSE .07454), −.05 (LR and GRM, MCSE .05); their broad marginal
+intervals also include zero. Within either condition, observed-score minus GRM
+Holm difference is +.10 (MCSE .10, interval [−.75894,.95894]); no superiority follows.
+Full event/difference vectors, empirical correlations, failures and missing-pair
+sensitivity ranges are in evidence_control/comparison.json and raw rep_*.json.
+
+### Audit of the original 112-file change
+
+At 5da63fa: **112 files, 1,379,181 bytes**, largest 42,463 bytes; no oversized
+transient model data. Removed **72** losslessly reconstructable files: 40 empty
+logs, 20 redundant worker JSON files already embedded in canonical repetition
+records, two duplicate initial precision/mechanism files, and ten byte-identical raw CSV aliases. Every removed byte
+stream has its original path, size, SHA256 and reconstruction recipe in
+artifact_audit.json. The full 112-file inventory is retained. One canonical copy of each negative-impact matrix remains; `--restore` reconstructs
+byte-identical CSV aliases for historical harness compatibility. Canonical raw responses, fits,
+initial API errors and original summaries were not removed or recomputed.
+
+```
+python -m validation.ordinal_dif_paired.artifacts          # verify 72 recipes, no writes
+python -m validation.ordinal_dif_paired.artifacts --restore  # optional exact old layout
+python -m validation.ordinal_dif_paired.control --summarize validation/ordinal_dif_paired/evidence_control
+```
+
+The opt-in `control --run NEW_OUTPUT` executes only the ten impact0 controls, no
+expansion. It is not a CI command. Control records distinguish control-driver,
+unchanged worker, generator and plan hashes. Four small follow-up tests cover RNG
+coupling, actual paired uncertainty, all reconstruction hashes and saved-control
+inference/anchor audits; no fits occur in these tests.
+
+**Decision unchanged: INCONCLUSIVE / NOT CERTIFIED for all three methods.** This
+control does not demonstrate FWER control, general impact invariance, or superiority.
+The analytical matching-null mismatch remains a candidate mechanism; its effect
+on operating error rates is not established by ten paired trials. No model status,
+production inference gate or scientific threshold changed. No broad MC study,
+full regression or R calibration was launched for this follow-up. Normal mandatory
+CI status is recorded in PR #118; no merge.

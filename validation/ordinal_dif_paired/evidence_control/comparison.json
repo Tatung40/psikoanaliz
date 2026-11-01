@@ -1,0 +1,1618 @@
+{
+  "control_summary": {
+    "executed": 10,
+    "planned_pilot": 10,
+    "methods": {
+      "Mantel": {
+        "attempted": 10,
+        "valid": 10,
+        "failed": 0,
+        "valid_rate": 1.0,
+        "holm_fwer": 0.1,
+        "holm_events": 1,
+        "holm_ci": [
+          0.000836474926686568,
+          0.5152376388191577
+        ],
+        "failure_robust_ci": [
+          0.000836474926686568,
+          0.5152376388191577
+        ],
+        "failure_range": [
+          0.1,
+          0.1
+        ],
+        "holm_mcse": 0.09486832980505139,
+        "bh_fdr": 0.1,
+        "bh_fwer": 0.1,
+        "bh_ci95": [
+          0.0025285785444617848,
+          0.4450161170281954
+        ],
+        "bh_mcse": 0.09486832980505139,
+        "decision": "INCONCLUSIVE",
+        "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+        "convergence": "not_applicable: stratified statistic",
+        "raw_type1": 0.1,
+        "raw_precision": {
+          "coverage_mc_se": 0.1,
+          "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+          "independent_replications": 10,
+          "eligible_replications": 10,
+          "coverage_cluster_counts": {
+            "covered": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0
+            ],
+            "eligible": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          }
+        }
+      },
+      "ordinal_LR": {
+        "attempted": 10,
+        "valid": 10,
+        "failed": 0,
+        "valid_rate": 1.0,
+        "holm_fwer": 0.1,
+        "holm_events": 1,
+        "holm_ci": [
+          0.000836474926686568,
+          0.5152376388191577
+        ],
+        "failure_robust_ci": [
+          0.000836474926686568,
+          0.5152376388191577
+        ],
+        "failure_range": [
+          0.1,
+          0.1
+        ],
+        "holm_mcse": 0.09486832980505139,
+        "bh_fdr": 0.1,
+        "bh_fwer": 0.1,
+        "bh_ci95": [
+          0.0025285785444617848,
+          0.4450161170281954
+        ],
+        "bh_mcse": 0.09486832980505139,
+        "decision": "INCONCLUSIVE",
+        "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+        "convergence_confirmed": 10,
+        "convergence_not_confirmed": 0,
+        "raw_type1": 0.05,
+        "raw_precision": {
+          "coverage_mc_se": 0.05,
+          "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+          "independent_replications": 10,
+          "eligible_replications": 10,
+          "coverage_cluster_counts": {
+            "covered": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "eligible": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          }
+        }
+      },
+      "GRM_LR": {
+        "attempted": 10,
+        "valid": 10,
+        "failed": 0,
+        "valid_rate": 1.0,
+        "holm_fwer": 0.0,
+        "holm_events": 0,
+        "holm_ci": [
+          0.0,
+          0.38044213374586455
+        ],
+        "failure_robust_ci": [
+          0.0,
+          0.38044213374586455
+        ],
+        "failure_range": [
+          0.0,
+          0.0
+        ],
+        "holm_mcse": 0.0,
+        "bh_fdr": 0.0,
+        "bh_fwer": 0.0,
+        "bh_ci95": [
+          0.0,
+          0.3084971078187607
+        ],
+        "bh_mcse": 0.0,
+        "decision": "INCONCLUSIVE",
+        "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+        "convergence_confirmed": 10,
+        "convergence_not_assessed": 0,
+        "raw_type1": 0.0,
+        "raw_precision": {
+          "coverage_mc_se": 0.0,
+          "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+          "independent_replications": 10,
+          "eligible_replications": 10,
+          "coverage_cluster_counts": {
+            "covered": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "eligible": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          }
+        }
+      }
+    },
+    "paired": {
+      "Mantel minus ordinal_LR": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "a_only": 0,
+        "b_only": 0,
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ]
+      },
+      "Mantel minus GRM_LR": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "a_only": 1,
+        "b_only": 0,
+        "mean": 0.1,
+        "mcse": 0.09999999999999999,
+        "marginal_ci95": [
+          -0.7589388166934752,
+          0.9589388166934751
+        ],
+        "missing_pair_range": [
+          0.1,
+          0.1
+        ]
+      },
+      "ordinal_LR minus GRM_LR": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "a_only": 1,
+        "b_only": 0,
+        "mean": 0.1,
+        "mcse": 0.09999999999999999,
+        "marginal_ci95": [
+          -0.7589388166934752,
+          0.9589388166934751
+        ],
+        "missing_pair_range": [
+          0.1,
+          0.1
+        ]
+      }
+    },
+    "scientific_status": "CONTROL PILOT / INCONCLUSIVE / NOT CERTIFIED",
+    "required_repetitions": 3632,
+    "impact": 0.0,
+    "control_plan_sha256": "7d6e0ea7231fd145c18a333143f518470c3eeba06e00fc71d9bae970238498aa",
+    "seconds": 32.312565937005274
+  },
+  "minus_summary_sha256": "631d9c2ea991b10b8ac542943b59dccd3bdb0c5491d6bc3efc0425763c86d048",
+  "minus_methods_reused": {
+    "Mantel": {
+      "attempted": 10,
+      "valid": 10,
+      "failed": 0,
+      "valid_rate": 1.0,
+      "holm_fwer": 0.1,
+      "holm_events": 1,
+      "holm_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_robust_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_range": [
+        0.1,
+        0.1
+      ],
+      "holm_mcse": 0.09486832980505139,
+      "bh_fdr": 0.1,
+      "bh_fwer": 0.1,
+      "bh_ci95": [
+        0.0025285785444617848,
+        0.4450161170281954
+      ],
+      "bh_mcse": 0.09486832980505139,
+      "decision": "INCONCLUSIVE",
+      "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+      "convergence": "not_applicable: stratified statistic",
+      "raw_type1": 0.1,
+      "raw_precision": {
+        "coverage_mc_se": 0.06666666666666668,
+        "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+        "independent_replications": 10,
+        "eligible_replications": 10,
+        "coverage_cluster_counts": {
+          "covered": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "eligible": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    },
+    "ordinal_LR": {
+      "attempted": 10,
+      "valid": 10,
+      "failed": 0,
+      "valid_rate": 1.0,
+      "holm_fwer": 0.1,
+      "holm_events": 1,
+      "holm_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_robust_ci": [
+        0.000836474926686568,
+        0.5152376388191577
+      ],
+      "failure_range": [
+        0.1,
+        0.1
+      ],
+      "holm_mcse": 0.09486832980505139,
+      "bh_fdr": 0.1,
+      "bh_fwer": 0.1,
+      "bh_ci95": [
+        0.0025285785444617848,
+        0.4450161170281954
+      ],
+      "bh_mcse": 0.09486832980505139,
+      "decision": "INCONCLUSIVE",
+      "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+      "convergence_confirmed": 10,
+      "convergence_not_confirmed": 0,
+      "raw_type1": 0.1,
+      "raw_precision": {
+        "coverage_mc_se": 0.06666666666666668,
+        "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+        "independent_replications": 10,
+        "eligible_replications": 10,
+        "coverage_cluster_counts": {
+          "covered": [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "eligible": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    },
+    "GRM_LR": {
+      "attempted": 10,
+      "valid": 10,
+      "failed": 0,
+      "valid_rate": 1.0,
+      "holm_fwer": 0.0,
+      "holm_events": 0,
+      "holm_ci": [
+        0.0,
+        0.38044213374586455
+      ],
+      "failure_robust_ci": [
+        0.0,
+        0.38044213374586455
+      ],
+      "failure_range": [
+        0.0,
+        0.0
+      ],
+      "holm_mcse": 0.0,
+      "bh_fdr": 0.0,
+      "bh_fwer": 0.0,
+      "bh_ci95": [
+        0.0,
+        0.3084971078187607
+      ],
+      "bh_mcse": 0.0,
+      "decision": "INCONCLUSIVE",
+      "interpretation": "Conditional on complete valid families; complete null FDR=FWER",
+      "convergence_confirmed": 10,
+      "convergence_not_assessed": 0,
+      "raw_type1": 0.05,
+      "raw_precision": {
+        "coverage_mc_se": 0.05,
+        "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+        "independent_replications": 10,
+        "eligible_replications": 10,
+        "coverage_cluster_counts": {
+          "covered": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "eligible": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        }
+      }
+    }
+  },
+  "impact0_minus_impact_minus0_5": {
+    "Mantel": {
+      "holm_event": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 0,
+        "b_greater": 0,
+        "empirical_outcome_correlation": 0.9999999999999998,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      },
+      "bh_event": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 0,
+        "b_greater": 0,
+        "empirical_outcome_correlation": 0.9999999999999998,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      },
+      "raw_type1": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          -0.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.5,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.07453559924999298,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 1,
+        "b_greater": 1,
+        "empirical_outcome_correlation": 0.6666666666666667,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      }
+    },
+    "ordinal_LR": {
+      "holm_event": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 0,
+        "b_greater": 0,
+        "empirical_outcome_correlation": 0.9999999999999998,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      },
+      "bh_event": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 0,
+        "b_greater": 0,
+        "empirical_outcome_correlation": 0.9999999999999998,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      },
+      "raw_type1": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          -0.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": -0.05,
+        "mcse": 0.049999999999999996,
+        "marginal_ci95": [
+          -0.9089388166934752,
+          0.8089388166934751
+        ],
+        "missing_pair_range": [
+          -0.05,
+          -0.05
+        ],
+        "a_greater": 0,
+        "b_greater": 1,
+        "empirical_outcome_correlation": 0.6666666666666667,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      }
+    },
+    "GRM_LR": {
+      "holm_event": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 0,
+        "b_greater": 0,
+        "empirical_outcome_correlation": null,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      },
+      "bh_event": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "mcse": 0.0,
+        "marginal_ci95": [
+          -0.8589388166934752,
+          0.8589388166934752
+        ],
+        "missing_pair_range": [
+          0.0,
+          0.0
+        ],
+        "a_greater": 0,
+        "b_greater": 0,
+        "empirical_outcome_correlation": null,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      },
+      "raw_type1": {
+        "complete_pairs": 10,
+        "missing_pairs": 0,
+        "differences": [
+          -0.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": -0.05,
+        "mcse": 0.049999999999999996,
+        "marginal_ci95": [
+          -0.9089388166934752,
+          0.8089388166934751
+        ],
+        "missing_pair_range": [
+          -0.05,
+          -0.05
+        ],
+        "a_greater": 0,
+        "b_greater": 1,
+        "empirical_outcome_correlation": null,
+        "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+        "paired_seeds": [
+          2000100,
+          2000101,
+          2000102,
+          2000103,
+          2000104,
+          2000105,
+          2000106,
+          2000107,
+          2000108,
+          2000109
+        ]
+      }
+    }
+  },
+  "within_condition": {
+    "impact0": {
+      "Mantel minus ordinal_LR": {
+        "holm_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "mcse": 0.0,
+          "marginal_ci95": [
+            -0.8589388166934752,
+            0.8589388166934752
+          ],
+          "missing_pair_range": [
+            0.0,
+            0.0
+          ],
+          "a_greater": 0,
+          "b_greater": 0,
+          "empirical_outcome_correlation": 0.9999999999999998,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "bh_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "mcse": 0.0,
+          "marginal_ci95": [
+            -0.8589388166934752,
+            0.8589388166934752
+          ],
+          "missing_pair_range": [
+            0.0,
+            0.0
+          ],
+          "a_greater": 0,
+          "b_greater": 0,
+          "empirical_outcome_correlation": 0.9999999999999998,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "raw_type1": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.0,
+            0.0
+          ],
+          "mean": 0.05,
+          "mcse": 0.049999999999999996,
+          "marginal_ci95": [
+            -0.8089388166934751,
+            0.9089388166934752
+          ],
+          "missing_pair_range": [
+            0.05,
+            0.05
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": 0.9999999999999998,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        }
+      },
+      "Mantel minus GRM_LR": {
+        "holm_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "bh_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "raw_type1": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        }
+      },
+      "ordinal_LR minus GRM_LR": {
+        "holm_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "bh_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "raw_type1": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.0,
+            0.0
+          ],
+          "mean": 0.05,
+          "mcse": 0.049999999999999996,
+          "marginal_ci95": [
+            -0.8089388166934751,
+            0.9089388166934752
+          ],
+          "missing_pair_range": [
+            0.05,
+            0.05
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        }
+      }
+    },
+    "impact_minus0.5": {
+      "Mantel minus ordinal_LR": {
+        "holm_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "mcse": 0.0,
+          "marginal_ci95": [
+            -0.8589388166934752,
+            0.8589388166934752
+          ],
+          "missing_pair_range": [
+            0.0,
+            0.0
+          ],
+          "a_greater": 0,
+          "b_greater": 0,
+          "empirical_outcome_correlation": 0.9999999999999998,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "bh_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "mcse": 0.0,
+          "marginal_ci95": [
+            -0.8589388166934752,
+            0.8589388166934752
+          ],
+          "missing_pair_range": [
+            0.0,
+            0.0
+          ],
+          "a_greater": 0,
+          "b_greater": 0,
+          "empirical_outcome_correlation": 0.9999999999999998,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "raw_type1": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "mcse": 0.0,
+          "marginal_ci95": [
+            -0.8589388166934752,
+            0.8589388166934752
+          ],
+          "missing_pair_range": [
+            0.0,
+            0.0
+          ],
+          "a_greater": 0,
+          "b_greater": 0,
+          "empirical_outcome_correlation": 1.0,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        }
+      },
+      "Mantel minus GRM_LR": {
+        "holm_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "bh_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "raw_type1": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            -0.5,
+            0.5,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.0,
+            0.0
+          ],
+          "mean": 0.05,
+          "mcse": 0.08975274678557507,
+          "marginal_ci95": [
+            -0.8089388166934751,
+            0.9089388166934752
+          ],
+          "missing_pair_range": [
+            0.05,
+            0.05
+          ],
+          "a_greater": 2,
+          "b_greater": 1,
+          "empirical_outcome_correlation": -0.1666666666666667,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        }
+      },
+      "ordinal_LR minus GRM_LR": {
+        "holm_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "bh_event": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "mean": 0.1,
+          "mcse": 0.09999999999999999,
+          "marginal_ci95": [
+            -0.7589388166934752,
+            0.9589388166934751
+          ],
+          "missing_pair_range": [
+            0.1,
+            0.1
+          ],
+          "a_greater": 1,
+          "b_greater": 0,
+          "empirical_outcome_correlation": null,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        },
+        "raw_type1": {
+          "complete_pairs": 10,
+          "missing_pairs": 0,
+          "differences": [
+            -0.5,
+            0.5,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.5,
+            0.0,
+            0.0
+          ],
+          "mean": 0.05,
+          "mcse": 0.08975274678557507,
+          "marginal_ci95": [
+            -0.8089388166934751,
+            0.9089388166934752
+          ],
+          "missing_pair_range": [
+            0.05,
+            0.05
+          ],
+          "a_greater": 2,
+          "b_greater": 1,
+          "empirical_outcome_correlation": -0.1666666666666667,
+          "interpretation": "Diagnostic paired contrast; marginal conservative interval, not joint certification",
+          "paired_seeds": [
+            2000100,
+            2000101,
+            2000102,
+            2000103,
+            2000104,
+            2000105,
+            2000106,
+            2000107,
+            2000108,
+            2000109
+          ]
+        }
+      }
+    }
+  },
+  "crn_verified_datasets": 10,
+  "no_negative_condition_refits": true,
+  "reporting_code_sha256": "43412c26a815f10734bee4eb59c7e6714ce781c636e71a643e753e6efe9bc31b",
+  "confidence_note": "Primary method intervals: joint >=95% across three methods WITHIN each condition only. Contrasts and BH intervals are marginal 95%; no joint claim across six cells or contrasts."
+}
