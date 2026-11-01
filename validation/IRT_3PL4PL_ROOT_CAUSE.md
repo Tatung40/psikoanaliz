@@ -14,8 +14,8 @@ Truth as in PR #62 (`known_truth_irt_recovery.py`), extended to k = 30; theta ~ 
 |---|---|---|
 | Parameter mapping / slope transformation | IRF from reported a,b,c,d vs `model.probability` | max diff 3.3e-16 |
 | Quadrature / tolerance | ML 21 nodes tol 1e-4 vs 61 nodes tol 1e-6 | same estimates (a RMSE 1.82 vs 1.86, 4PL N1000 k12) |
-| Local maxima / start values | ML started at the TRUE parameters | converges to the same maximum (a RMSE 1.87) |
-| Optimizer failure | logL(estimate) − logL(truth), common 61-node grid | positive in every one of 880 fits (min +5.9) |
+| Start sensitivity in this fixture | ML started at the TRUE parameters | similar estimates (a RMSE 1.87); not proof of a global maximum |
+| Likelihood improvement over truth | logL(estimate) − logL(truth), common uniform 61-node grid | positive in every one of 880 fits (min +5.9); does not establish stationarity or convergence |
 
 ## Cause
 

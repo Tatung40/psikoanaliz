@@ -41,8 +41,15 @@ items. 100 replications (IRT-LR 40). 2,560 analyses; one IRT-LR analysis stopped
 
 IRT-LR Wald 95 % intervals of Δa and Δb covered the true values in .942–.965 of cases (criterion
 [.925, .975] met in all four conditions). Pre-registered per-item Type I criterion [.025, .075] met by
-all binary cells and missed by ordinal LR with impact (.080). Family-wise / FDR control is not
-achieved by the observed-score ordinal methods under impact: the page warns and recommends IRT-LR.
+all binary cells and missed by ordinal LR with impact (.080). FWER inflation is supported in
+specific ordinal impact cells: for example, Mantel with DIF and impact −.5 has Holm FWER .12
+(cell-specific exact 95% interval [.064, .200]). BH-FDR point estimates also exceed .05 in some
+cells, but the reported conservative mean-FDP Hoeffding intervals do not establish general
+BH-FDR inflation; no general control or inflation certificate follows. Under the complete null,
+FDR equals FWER: the ordinal LR/impact −.5 cell has BH-FDR .11 and a cell-specific exact binomial
+95% interval [.056, .188], which supports inflation in that cell. This does not establish a
+general result across designs. The page warns and recommends IRT-LR,
+whose evidence is itself restricted to the studied designs.
 MH is insensitive to nonuniform DIF (power .18–.41), as expected.
 
 ## 3PL/4PL boundary inference: parametric bootstrap (`core/irt_dif34_bootstrap.py`)
@@ -75,3 +82,25 @@ Selection-adjusted inference after data-driven anchor purification; FDR/coverage
 designs (more items, unequal slopes in ordinal data, non-normal latent distributions); NRM weighted
 category-effect intervals in `core.polytomous_dif` (previous minimum coverage 88 %, still withheld);
 3PL bootstrap size slightly liberal for an interior studied item.
+
+## Saved-record precision correction (2026-11-01)
+
+The archived p2 JSON/CSV and preregistered numerical cutoffs are unchanged. Their
+Clopper–Pearson intervals pooled dependent item outcomes for Type-I rates, power
+and parameter coverage: those intervals do not have a justified binomial sampling
+unit. `dif_validation_study.summarize` now clusters MCSE by independently generated
+dataset and reports conservative 95% Hoeffding ratio intervals for these rates.
+FWER is one Bernoulli event per dataset, so its exact Clopper–Pearson interval is
+preserved. Mean FDP already used replication-level MCSE; its new Hoeffding interval
+remains nonzero-width even with zero observed false discoveries. These are Monte
+Carlo uncertainty intervals, not item-parameter intervals or adjusted p-values.
+Hoeffding intervals are deliberately conservative and can be wide. Scientific decisions must
+consider the point estimate, replication-cluster MCSE and an appropriate confidence interval
+together, including failure/eligibility conditions. Interval width alone is not evidence of either
+control or inflation; a point estimate alone is insufficient for either claim.
+
+The original `meets_*` checks remain point-estimate comparisons, not scientific
+certification. Metrics are conditional on successful analyses. The new FDR failure
+range treats failed analyses as unknown FDP in [0,1], never as zero. One failed IRT-LR
+purification is preserved. No inference gate is opened. Reanalysis of the 2,560 saved
+records and 28 cells requires no fitting: see `FOUR_PL_DIF_PRECISION_2026-11-01.md`.
