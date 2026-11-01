@@ -1,0 +1,89 @@
+{
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0",
+    "statsmodels": "0.15.0"
+  },
+  "python": "3.11.17 (main, Oct  3 2026, 01:05:36) [Clang 22.1.3 ]",
+  "git_commit": "2f7034a65b727d155e5a5171d2ef0591f052ce14",
+  "sources": {
+    "validation/ordinal_dif_grm_lr_paired/experiment.py": "1f666edde07b97c4d2ccacda60ee0c3a356b31cdacf1e63ad6c0bc03c28f6dce",
+    "validation/ordinal_dif_grm_lr_paired/plan.json": "9e6042b26e60bd38dcf85047fc368c60e85241971e7308047c8b0c8e761a6749",
+    "validation/ordinal_dif_grm_lr_paired/prior_manifest.json": "a52cc7fdeae03bfdc3d3744133448c4e0eb7977d9ea7f54958fc33fa491487f2",
+    "core/grm_dif.py": "1e6cf07657f26f78a961a18457aee8b106eb46e88300c5edfba303cc6c97a2ba",
+    "core/rasch.py": "405dd1720bdea1e811ad3c34eeec49af7f8f608fde143d7c71adebb8d0a38a17",
+    "core/irt_dif.py": "f6fcf8bbae297a83e8b3459fc8117f19ec45e5364634a721d5cb4f1551091449",
+    "validation/ordinal_dif_paired/experiment.py": "62400f72c78a39289dd67b200e5219ad60204b8206a9b75d06237e14878e9e20",
+    "validation/ordinal_dif_paired/plan.json": "65c68ab9b9510bac949a584076fb5dd5997cf8eb467a40ffaa95ed420266fe41",
+    "validation/ordinal_dif_impact_zero/experiment.py": "f15ca4b34ff398365c3562d70502d90552fc4320950a1d7b63dc0b81d466fe1f",
+    "validation/ordinal_dif_paired/control.py": "43412c26a815f10734bee4eb59c7e6714ce781c636e71a643e753e6efe9bc31b",
+    "validation/dif_validation_study.py": "76f11c747cc8ddf4db7bd404546b2a4c97a83ef18bd88d82f153986f64cbf684"
+  },
+  "plan": {
+    "status": "PREREGISTERED BEFORE NEW GRM FITS OR OUTCOMES",
+    "base_main": "2b1f619",
+    "primary": "GRM-LR operational Holm-FWER under latent-null impact=-0.5",
+    "secondary": [
+      "GRM-LR FWER impact0",
+      "GRM-minus-total and GRM-minus-rest in each impact",
+      "GRM impact0-minus-impact_minus0.5",
+      "(GRM-ordinal)_0-minus-(GRM-ordinal)_minus0.5 for total and rest",
+      "validity, convergence, boundaries, quadrature, information and memory"
+    ],
+    "n_reference": 500,
+    "n_focal": 500,
+    "items": 10,
+    "categories": 4,
+    "true_latent_dif": false,
+    "impacts": [
+      -0.5,
+      0.0
+    ],
+    "generator": "unchanged validation.dif_validation_study.gen_ordinal; a=linspace(.9,1.8,10); thresholds=linspace(-1,1,10)+[-1,0,1]; normal theta SD1; only focal mean changes",
+    "anchors": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "tested_family": [
+      "P09",
+      "P10"
+    ],
+    "alpha": 0.05,
+    "test": "production core.grm_dif.test_dif; joint slope and all3 thresholds,4df; other tested item free; no purification",
+    "identification": "eight oracle-invariant anchors share slopes/thresholds; reference N(0,1); focal mu/SD estimated; positive slopes, ordered thresholds; scalar ability orientation and scale fixed by reference and anchors, not by observed total/rest scores",
+    "settings": "categories=4 INTEGER, points=61, native GH81 likelihood/score audit; min_cell=5; unchanged native optimizer maxiter2000 ftol1e-14 gtol1e-10; no priors",
+    "gates": "ALL H0/Hb/Ha/H2 fits converged finite native per-observation max score<2e-6, no transformed bound distance<1e-4; GH61/GH81 logLik error<=1e-3 and audit max score<=1e-5; finite information eigenvalues with min>1e-7*max(max,1); cov available; complete2-item p family; nested LR nonnegative within native tolerance; exact anchor equality/ordered thresholds/physical bounds/df4 must agree",
+    "bounds": "a[.1,4]; b0[-6,4]; log gaps[log(.05),log(6)]; focal mu[-3,3],logSD[log(.3),log(3)]",
+    "seed_rule": "first10 existing seeds2026110100..2026110109, each at both impacts; same raw data/content hashes and cached ordinal outcomes from PR120/121, no ordinal refits",
+    "pairing": "verify generator/version/source plus both archived data hashes; reuse traced PR121 common normal/uniform reconstruction for impact0; compare reference rows and groups; retain matrix hashes and CRN trace, never equate seed identity alone with pairing",
+    "feasibility_seed_pairs": 10,
+    "planned_grm_analyses": 20,
+    "budget_seconds": 600,
+    "per_analysis_timeout_seconds": 90,
+    "memory_limit_mib": 1024,
+    "memory_rule": "record child ru_maxrss in MiB (Linux); stop launching new analyses if observed worker peak exceeds1024MiB. Timeout/OS termination retains stderr/stdout and failure record; no invented completed fit diagnostics.",
+    "failure_rule": "Any invalid item family/native gate makes dataset-method invalid. Preserve all attempts, partial/failed outputs and matrices; no retry/replacement, no tuning. Continue planned seed pairs within budget to measure failure rate; stop on source/data/API mismatch, elapsed600s, or memory safety threshold. No favorable-outcome stopping.",
+    "estimands": "Operational false-DIF decisions against latent-null DGP. GRM latent invariance and observed-score conditional ordinal-LR nulls differ; paired event differences do not prove interchangeable hypotheses or universal method superiority.",
+    "multiplicity": "Primary/secondary GRM FWER2 plus7 contrasts form9-component family: CP FWER intervals alpha=.05/9 each and Hoeffding contrast intervals alpha=.05/9 each => joint>=95%. Supplementary97.5% CP for2 GRM conditions jointly>=95% only within that pair. Marginal exact paired95% CIs not joint across contrasts. McNemar only5 binary paired contrasts, raw+Holm5 adjusted; not applicable to2 difference-of-differences interactions and never a nominal-control certificate.",
+    "intervals": "reuse paired_stats/exact_paired_ci and mean_stats; D in[-1,1], W in[-2,2]; MCSE sample SD/sqrt(n) on complete dataset pairs/quadruples; interaction covariance retained in16-cell event table. Exact paired interaction CI subtracts two97.5% paired component intervals by union bound. Unknown failures bounded per missing D[-1,1] or W[-2,2]; never impute no event.",
+    "bh": "secondary BH event probability equals FDR only under global latent null; raw itemwise false-positive mean with repetition-clustered MCSE; no mixed-null FDR claim",
+    "main_required_seed_pairs": 2500,
+    "precision": "2500 gives worst-case binary difference MCSE<=.02, interaction<=.04, Bernoulli FWER<=.01; no .02 CI-halfwidth claim",
+    "decision": "This PR runs feasibility ONLY; no main experiment automatically. Never scientifically certify from10 seeds. Estimate2500-pair cost from observed per-condition runtime, startup, failures and peakRSS; 5000 GRM dataset fits required for both impacts. Feasibility supports a staged next study only if20/20 valid, gates pass and no safety stop. If projected main cost exceeds600 seconds, no main run under present budget.",
+    "next_plan": "No new fit without a separately preregistered adequate main wall budget. Proposed immutable stages: existing10 pairs ->100 ->500 ->2500, same seeds/design. Each stage reports runtime/validity only for resource continuation; no hypothesis/alpha/precision changes or event-based stop. Invalid main analyses retained, no replacement, no confirmatory certification without fixed2500 valid pairs. Any source/settings changes require new version and prohibit pooling unchanged-design claims.",
+    "acceptance": "No new statistical cutoffs. At completed fixed2500 only: primary joint-family CP lower>.05 supports scoped inflation; upper<=.05 supports scoped control; otherwise INCONCLUSIVE. Cross-contrast direction requires corresponding joint-family Hoeffding interval excludes0. Pilot always FEASIBILITY ONLY / NOT CERTIFIED.",
+    "preserved_files": 81,
+    "production_changes": false,
+    "ordinal_refits": false,
+    "R_fits": false
+  },
+  "protected_files": 81,
+  "canonical_logs": "stdout/stderr.txt stored in archive; no ignored *.log dependency"
+}

@@ -49,3 +49,33 @@ def test_plan_and_canonical_prior_protection():
     assert p['anchors']==X.ANCHORS and p['categories']==4
     assert '9-component' in p['multiplicity'] and 'feasibility ONLY' in p['decision']
     assert X.protect()==p['preserved_files']==81
+
+
+def test_saved_feasibility_records_gates_and_pairing_without_refits():
+    import gzip
+    out=X.HERE/'results'
+    packed=(out/'records.json.gz').read_bytes();raw=gzip.decompress(packed)
+    saved=json.loads(raw);records=saved['records']
+    summary=json.loads((out/'summary.json').read_text());meta=json.loads((out/'metadata.json').read_text())
+    assert X.Z.digest(raw)==summary['records_sha256']
+    assert X.Z.digest(packed)==summary['records_gzip_sha256']
+    assert X.protect()==81 and not summary['main_executed']
+    for name,value in meta['sources'].items():assert X.Z.digest((X.ROOT/name).read_bytes())==value
+    cached={k:{r['seed']:r for r in X.Z.load_records(path/'results/records.jsonl.gz')} for k,path in (('minus',X.Z.OLD),('zero',X.Z.HERE))}
+    rebuilt=X.summarize(records,cached,summary['seconds'],summary['stop'])
+    for key,value in rebuilt.items():assert summary[key]==value
+    for r in records:
+        assert 2026110100<=r['seed']<=2026110109
+        assert r['data_sha256']==cached[r['impact']][r['seed']]['data_sha256']
+        path=out/r['matrix_file']
+        assert X.Z.digest(path.read_bytes())==r['matrix_sha256']
+        with np.load(path) as matrix:
+            assert matrix['X'].shape==(1000,10)
+            assert X.Z.digest(matrix['X'].tobytes()+matrix['group'].tobytes())==r['data_sha256']
+        if r['result'].get('valid',False):
+            assert r['result']['gate_audit']==X.gates(r['result'])
+            decision=X.P.classify([v['p'] for v in r['result']['table']],.05)
+            for key,value in decision.items():assert r['result'][key]==value
+        assert r['crn']['reconstructed_negative_exactly']
+        assert r['crn']['negative_hash']==cached['minus'][r['seed']]['data_sha256']
+    assert summary['seconds']<=600
