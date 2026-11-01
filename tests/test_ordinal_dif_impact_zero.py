@@ -74,3 +74,61 @@ def test_preregistered_scope_and_pr120_protection():
     assert p['budget_seconds']==1800 and 'FOUR contrasts' in p['multiplicity_scope']
     assert X.protect()==39
     assert 'not' in p['causal_scope']
+
+
+def test_independent_count_and_covariance_audit():
+    zero=[row(i,t,r) for i,(t,r) in enumerate([(1,0),(0,1),(0,0),(1,1)])]
+    minus=[row(i,t,r) for i,(t,r) in enumerate([(0,1),(0,0),(0,0),(1,1)])]
+    for r in zero:
+        for method in r['methods'].values():
+            method['raw']=[{'p_omnibus':.001 if method['holm_event'] else .5},{'p_omnibus':.8}]
+            method['bh_event']=method['holm_event']
+    audit=X.audit_results(zero,minus,X.compare(zero,minus))
+    assert audit['raw_zero_method_decisions_checked']==8
+    assert audit['interaction_from_four_cell_covariance']['mean']==.25
+    assert audit['contrasts']['total_impact_change']['b']==1
+    assert audit['scientific_certification'] is False
+
+
+def test_saved_control_evidence_pairing_and_immutable_negative_results():
+    import gzip
+    output=X.HERE/'results'
+    zero=X.load_records(output/'records.jsonl.gz')
+    old=X.load_records(X.OLD/'results/records.jsonl.gz')
+    old_by_seed={r['seed']:r for r in old}
+    summary=json.loads((output/'summary.json').read_text())
+    comparison=json.loads((output/'comparison.json').read_text())
+    for key,value in X.E.summarize(zero).items():assert summary[key]==value
+    assert comparison==X.compare(zero,old)
+    meta=json.loads((output/'metadata.json').read_text())
+    assert meta['actual_impact']==0 and X.protect()==39
+    assert X.digest((X.OLD/'results/records.jsonl.gz').read_bytes())==meta['negative_records_sha256']
+    for name,expected in meta['sources'].items():assert X.digest((X.ROOT/name).read_bytes())==expected
+    raw=gzip.decompress((output/'crn.jsonl.gz').read_bytes())
+    assert X.digest(raw)==meta['crn_sha256']
+    assert X.digest((output/'crn.jsonl.gz').read_bytes())==meta['crn_gzip_sha256']
+    traces=[json.loads(line) for line in raw.splitlines()]
+    assert len(traces)==len(zero)
+    for i,(r,trace) in enumerate(zip(zero,traces)):
+        assert r['seed']==trace['seed']==2026110100+i
+        assert trace['control_hash']==r['data_sha256']
+        assert trace['negative_hash']==old_by_seed[r['seed']]['data_sha256']
+        assert trace['reference_rows_identical'] and trace['focal_responses_monotone']
+        assert trace['reconstructed_negative_exactly']
+        assert [(d['method'],d['shape']) for d in trace['draws']]==[('standard_normal',[500])]*2+[('random',[1000])]*10
+        if 'matrix_file' in r:
+            path=output/r['matrix_file']
+            assert X.digest(path.read_bytes())==r['matrix_sha256']
+            with np.load(path) as data:
+                assert X.digest(data['X'].tobytes()+data['group'].tobytes())==r['data_sha256']
+                if i<30:
+                    with np.load(X.OLD/'results'/f'data_{i:04d}.npz') as negative:
+                        np.testing.assert_array_equal(data['X'][:500],negative['X'][:500])
+                        np.testing.assert_array_equal(data['group'],negative['group'])
+    payload=gzip.decompress((output/'records.jsonl.gz').read_bytes())
+    assert X.digest(payload)==summary['records_sha256']
+    assert X.digest((output/'records.jsonl.gz').read_bytes())==summary['records_gzip_sha256']
+    audit=json.loads((output/'audit.json').read_text())
+    assert audit['complete_quadruples']==comparison['all_four_cells_valid']
+    assert audit['scientific_certification'] is False
+    assert audit['interaction_from_four_cell_covariance']['mean']==pytest.approx(comparison['interaction']['mean'])

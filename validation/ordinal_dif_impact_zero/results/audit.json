@@ -1,0 +1,33 @@
+{
+  "raw_zero_method_decisions_checked": 5000,
+  "complete_quadruples": 2500,
+  "protected_pr120_files": 39,
+  "scientific_certification": false,
+  "contrasts": {
+    "zero_total_minus_rest": {
+      "b": 20,
+      "c": 33,
+      "delta": -0.0052,
+      "mcse": 0.002910768460254385,
+      "mcnemar_from_binomial_cdf": 0.09837064844049181
+    },
+    "total_impact_change": {
+      "b": 55,
+      "c": 115,
+      "delta": -0.024,
+      "mcse": 0.005194265314446572,
+      "mcnemar_from_binomial_cdf": 4.870265681432836e-06
+    },
+    "rest_impact_change": {
+      "b": 46,
+      "c": 455,
+      "delta": -0.1636,
+      "mcse": 0.00833557488860183,
+      "mcnemar_from_binomial_cdf": 1.1411917959501148e-85
+    }
+  },
+  "interaction_from_four_cell_covariance": {
+    "mean": 0.1396,
+    "mcse": 0.007883501496057108
+  }
+}
