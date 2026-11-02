@@ -1,0 +1,968 @@
+{
+  "version": "GRM-GH101-GH161-STAGE-A-1",
+  "status": "PREREGISTERED BEFORE NEW STAGE-A OUTCOMES",
+  "base_commit": "cfbb1992e53f992c321bd39fe617fb6b772bccd9",
+  "scientific_status": "STAGE A / NOT CERTIFIED",
+  "seeds": [
+    2026110100,
+    2026110101,
+    2026110102,
+    2026110103,
+    2026110104,
+    2026110105,
+    2026110106,
+    2026110107,
+    2026110108,
+    2026110109,
+    2026110110,
+    2026110111,
+    2026110112,
+    2026110113,
+    2026110114,
+    2026110115,
+    2026110116,
+    2026110117,
+    2026110118,
+    2026110119,
+    2026110120,
+    2026110121,
+    2026110122,
+    2026110123,
+    2026110124,
+    2026110125,
+    2026110126,
+    2026110127,
+    2026110128,
+    2026110129,
+    2026110130,
+    2026110131,
+    2026110132,
+    2026110133,
+    2026110134,
+    2026110135,
+    2026110136,
+    2026110137,
+    2026110138,
+    2026110139,
+    2026110140,
+    2026110141,
+    2026110142,
+    2026110143,
+    2026110144,
+    2026110145,
+    2026110146,
+    2026110147,
+    2026110148,
+    2026110149,
+    2026110150,
+    2026110151,
+    2026110152,
+    2026110153,
+    2026110154,
+    2026110155,
+    2026110156,
+    2026110157,
+    2026110158,
+    2026110159,
+    2026110160,
+    2026110161,
+    2026110162,
+    2026110163,
+    2026110164,
+    2026110165,
+    2026110166,
+    2026110167,
+    2026110168,
+    2026110169,
+    2026110170,
+    2026110171,
+    2026110172,
+    2026110173,
+    2026110174,
+    2026110175,
+    2026110176,
+    2026110177,
+    2026110178,
+    2026110179,
+    2026110180,
+    2026110181,
+    2026110182,
+    2026110183,
+    2026110184,
+    2026110185,
+    2026110186,
+    2026110187,
+    2026110188,
+    2026110189,
+    2026110190,
+    2026110191,
+    2026110192,
+    2026110193,
+    2026110194,
+    2026110195,
+    2026110196,
+    2026110197,
+    2026110198,
+    2026110199
+  ],
+  "analysis_order": [
+    {
+      "seed": 2026110100,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110100,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110101,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110101,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110102,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110102,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110103,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110103,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110104,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110104,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110105,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110105,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110106,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110106,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110107,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110107,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110108,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110108,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110109,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110109,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110110,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110110,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110111,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110111,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110112,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110112,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110113,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110113,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110114,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110114,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110115,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110115,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110116,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110116,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110117,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110117,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110118,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110118,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110119,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110119,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110120,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110120,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110121,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110121,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110122,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110122,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110123,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110123,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110124,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110124,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110125,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110125,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110126,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110126,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110127,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110127,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110128,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110128,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110129,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110129,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110130,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110130,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110131,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110131,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110132,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110132,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110133,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110133,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110134,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110134,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110135,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110135,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110136,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110136,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110137,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110137,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110138,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110138,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110139,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110139,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110140,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110140,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110141,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110141,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110142,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110142,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110143,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110143,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110144,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110144,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110145,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110145,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110146,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110146,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110147,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110147,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110148,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110148,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110149,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110149,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110150,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110150,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110151,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110151,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110152,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110152,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110153,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110153,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110154,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110154,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110155,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110155,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110156,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110156,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110157,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110157,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110158,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110158,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110159,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110159,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110160,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110160,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110161,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110161,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110162,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110162,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110163,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110163,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110164,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110164,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110165,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110165,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110166,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110166,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110167,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110167,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110168,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110168,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110169,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110169,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110170,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110170,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110171,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110171,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110172,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110172,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110173,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110173,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110174,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110174,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110175,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110175,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110176,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110176,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110177,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110177,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110178,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110178,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110179,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110179,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110180,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110180,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110181,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110181,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110182,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110182,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110183,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110183,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110184,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110184,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110185,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110185,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110186,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110186,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110187,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110187,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110188,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110188,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110189,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110189,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110190,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110190,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110191,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110191,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110192,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110192,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110193,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110193,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110194,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110194,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110195,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110195,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110196,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110196,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110197,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110197,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110198,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110198,
+      "impact": "zero"
+    },
+    {
+      "seed": 2026110199,
+      "impact": "minus"
+    },
+    {
+      "seed": 2026110199,
+      "impact": "zero"
+    }
+  ],
+  "planned_pairs": 100,
+  "planned_analyses": 200,
+  "allowed_stages": [
+    100
+  ],
+  "environment": {
+    "python": "existing Python 3.12 environment",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "pandas": "3.0.5",
+    "blas_threads": 1
+  },
+  "pilot_reuse": {
+    "allowed": false,
+    "reason": "Pilot numpy2.4.6/scipy1.17.1/pandas3.1.0/Python3.11 differs from current runtime; current runner omits old-GH61 diagnostic calculations. Strict identity condition fails. Refit all200; no pilot estimates pooled. Preserve and hash archived matrices/ordinal outcomes; verify reconstructed data hashes."
+  },
+  "data": "Unchanged gen_ordinal N500/500 J10 C4 latent no-DIF a=linspace(.9,1.8,10), thresholds=linspace(-1,1,10)+[-1,0,1]. Seeds fixed first100 original family. Reconstruct common two normal+ten uniform draws for impacts -.5/0, validate both archived per-seed data hashes before fitting; persist matrices and draw hashes. Seed equality alone insufficient. No old GH61 MC calibration/refits. Reuse ordinal total/rest decisions ONLY with matching seed/impact/data hash; missing/invalid ordinal decisions remain missing, never recomputed.",
+  "model": "Unchanged core.grm_dif; P01-P08 oracle invariant anchors; P09/P10 tested; reference N(0,1); focal mean/logSD free. Slopes positive [.1,4], thresholds ordered b0[-6,4], log gaps[log(.05),log6], focal mu[-3,3],logSD[log(.3),log3]. Seven unique hypotheses/eight slots; H2 shared once. df omnibus4/thresholds3/slope1.",
+  "optimization": "Every unique hypothesis G.Fitter.fit(start_fit=None,information=True,max_iter=2000), fresh per-dataset fitter; uniform native NumPy GH101. L-BFGS-B maxiter2000 ftol1e-14 gtol1e-10 unchanged. Capture actual x0 and independently reconstruct pooled-category a1/mu0/SD1 start. No warm starts, retries, substitution, rescue/density escalation, or alternate seeds.",
+  "audit": "Unchanged pilot arithmetic: SciPy roots_hermitenorm GH161; direct-row logLik at101/161, normalized gradient at161, all-coordinate independent direct-row central differences h1e-4 and1e-5*max(1,abs(p)), dense GH161 observed information (analytic-gradient differences), anchor/physical bounds and LR checks. Independent post-run reader verifies raw hashes, actual starts, source hashes, likelihoods, gradients/information/LR and statistical calculations without optimization.",
+  "gates": {
+    "native_score_strict_lt": 0.000002,
+    "audit_score_lte": 0.00001,
+    "absolute_loglik_grid_error_lte": 0.001,
+    "bound_distance_gte": 0.0001,
+    "information": "finite covariance; native and GH161 dense minEigen>1e-7*max(maxEigen,1)",
+    "fd_atol": 1e-8,
+    "fd_rtol": 0.00001,
+    "lr": "Unchanged native _nested_lr; exact df4/3/1 and anchors, positive ordered thresholds. LR fit/audit .004 is implied per-fit bound, not loosened gate."
+  },
+  "decisions": "Validation-only p=chi2.sf(LR_GH161_at_GH101_solution,df); GH101 LR/p retained as sensitivity diagnostics. Per dataset primary omnibus P09/P10 family m=2: Holm(alpha=.05) FWER and BH(q=.05). Threshold and slope families m=2 each separately descriptive; not a common six-test FWER guarantee. If any scientific gate fails, dataset GRM family p/decisions suppressed (null), not zero. No production suppression change.",
+  "statistics": "Primary operational false-DIF rates conditional on valid complete dataset family, against global latent-null DGP. BH P(any rejection)=FDR only under this global null. Raw rejection count/2 reported with seed-clustered sample SD/sqrt(n) MCSE. Bernoulli MCSE sample SD/sqrt(n), null for n<2. CP95 marginal and CP97.5 for two rate intervals; paired differences sample SD/sqrt(n). Never interpret 1400 fitted hypotheses as 1400 independent replications.",
+  "contrasts": {
+    "binary": [
+      "GRM-minus-total_minus",
+      "GRM-minus-rest_minus",
+      "GRM-minus-total_zero",
+      "GRM-minus-rest_zero",
+      "GRM_zero-minus-minus",
+      "total-minus-rest_minus",
+      "total-minus-rest_zero"
+    ],
+    "interactions": [
+      "(GRM-total)_zero-minus-minus",
+      "(GRM-rest)_zero-minus-minus"
+    ],
+    "pairing": "Each contrast uses only identical seeds with all constituent valid data/decisions; impact pairs and interactions require common random draw/data evidence. Record n, missing and discordant/16-cell tables.",
+    "intervals": "Conservative exact paired95 via CP bounds on discordance and direction, each alpha=.025. Hoeffding marginal95 for D width2 and W width4. Joint11-component family: two GRM FWER CP intervals and nine contrast Hoeffding intervals, each alpha=.05/11. Exact interaction95 uses subtraction of two97.5% paired intervals (union bound). Seven binary McNemar exact two-sided raw and Holm7/BH7 adjusted p; not for interactions. All are scoped/descriptive StageA, no nominal-control certification."
+  },
+  "failure": "Retain all attempted/partial/invalid rows and matrices. Scientific/convergence/FD/LR failure invalidates entire dataset; stop that case without retry, continue next predefined case to measure failures. Source/data/hash/RNG/actual-cold-start mismatch, unexpected layout/API, total budget or memory breach stops entire StageA. Per-case timeout retained invalid; no rerun/resume of attempted cases. Exhausted total budget leaves remaining fixed cases not-run.",
+  "missing_inference": "Report planned200, attempted/completed/valid/invalid/not-run and complete paired seeds. Conditional estimates/CI after failure or technical stop are descriptions only, not unconditional control. Unknown-outcome empirical bounds use full planned100 denominator: rate [events/100,(events+missing)/100], D [-1,1], interaction [-2,2] per missing seed. No missing-as-no-event imputation. Confirmatory/scoped-control claims disabled at StageA even if all200 valid; no early statistical stopping or altered validity threshold.",
+  "resources": {
+    "total_stage_wall_seconds": 7200,
+    "per_dataset_wall_seconds": 120,
+    "process_rss_limit_mib": 1024,
+    "budget_scope": "Execution plus independent audits; no 500/2500 stages. Record wall/native fitting/audit timing, max process RSS cumulative Linux ru_maxrss; observed metrics not reproducibility targets."
+  },
+  "protection": "Only new validation/grm_gh101_stage_a files, targeted tests and dedicated CI workflow. No core/production/p-value gate/old artifact changes. SHA256 per source/input/output plus raw/gzip roundtrip; original Git blob identities retained. Commit this protocol before any new fits/statistical outcomes."
+}
