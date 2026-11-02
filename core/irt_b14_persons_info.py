@@ -40,7 +40,9 @@ def information_table(result, theta=None):
         raise ValueError("Geçersiz bilgi fonksiyonu değerleri.")
     frame = pd.DataFrame(info, columns=[f"I_{i}" for i in items]); frame.insert(0, "θ", theta)
     frame["Test bilgisi"] = info.sum(1)
-    frame["SEM(θ)"] = 1 / np.sqrt(np.maximum(frame["Test bilgisi"], 1e-300))
+    tif = frame["Test bilgisi"].to_numpy()
+    frame["SEM(θ)"] = np.divide(1, np.sqrt(np.maximum(tif, 0)),
+                                out=np.full_like(tif, np.nan), where=tif > 0)
     return frame
 
 

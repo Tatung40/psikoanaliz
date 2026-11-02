@@ -38,6 +38,9 @@ def usage_status(model, estimation, n, k):
         return "not_supported", (f"{model} {label}: hiçbir incelenen örneklem büyüklüğünde (N ≤ 10000) parametre "
                                  "kurtarma ölçütleri sağlanmadı; ML kestirimleri sistematik olarak kutu sınırlarına "
                                  "(a = 5, c = 0, d = 1) dayandı. MAP seçeneğini kullanın." + tail)
+    if n >= needed and (n not in (1000, 3000, 10000) or k not in (12, 30)):
+        return "caution", (f"{model} {label}: N = {n}, k = {k} doğrudan incelenmiş bir tasarım hücresi değil; "
+                           "komşu örneklem/madde sayılarındaki kanıt bu tasarımı doğrulamaz." + tail)
     if n >= needed:
         return "supported", (f"{model} {label}: N = {n} ≥ {needed} için önceden tanımlanmış kurtarma ölçütleri "
                              "karşılandı." + tail)

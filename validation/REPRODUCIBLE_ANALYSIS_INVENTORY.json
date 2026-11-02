@@ -154,6 +154,7 @@
       "core.irt_binary_multistart.multistart",
       "core.irt_binary_usage_policy.evidence_note",
       "core.irt_library_diagnostics.library_fit_diagnostics",
+      "core.irt_library_diagnostics.library_itemfit",
       "core.irt_person_abilities.person_abilities",
       "core.irt_python_mirt_adapter.fit_python_mirt",
       "core.irt_python_mirt_report.BINARY",

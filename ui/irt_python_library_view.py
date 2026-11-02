@@ -11,6 +11,7 @@ from reports.irt_b14_report import safe_frame
 from core.irt_person_abilities import person_abilities
 from ui.irt_solver_controls import solver_controls
 from core.irt_rasch_wright import rasch_wright_tables,wright_figure,wright_exports
+from core.irt_library_diagnostics import library_itemfit
 
 
 def _data_fingerprint(frame):
@@ -161,14 +162,12 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     for error in report.errors:st.error(error)
     if outputs['itemfit'] and model!='NRM':
         st.markdown('### Madde uyumu — Python mirt itemfit')
-        st.caption('Infit ve Outfit MNSQ, S-X²: Python mirt 1.2.0 kamuya açık itemfit API. Yalnızca yakınsamış modelde gösterilir. Model ailesine göre istatistik desteği değişebilir; desteklenmeyen sonuçlar uydurulmaz.')
+        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için p/karar kapalı. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
         if report.metadata.get('Yakınsama') is not True or report.errors:
             st.warning('Yakınsama veya rapor hatası nedeniyle madde uyumu hesaplanmadı.')
         else:
             try:
-                import mirt
-                fit_table=mirt.itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),
-                                       statistics=['infit','outfit','S_X2'])
+                fit_table=library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model)
                 fit_frame=safe_frame(fit_table)
                 if fit_frame.empty:
                     st.info('Kütüphane bu model için madde uyum tablosu döndürmedi.')
@@ -276,8 +275,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         if st.button('Rapor paketini hazırla (Excel + ZIP)',key=f'python_mirt_bundle_run_{model}'):
             itemfit=None
             try:
-                import mirt
-                itemfit=safe_frame(mirt.itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),statistics=['infit','outfit','S_X2']))
+                itemfit=safe_frame(library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model))
             except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
                 itemfit=None
             store[model]={'key':saved['key'],'files':bundle(report,persons,inference,reason,itemfit)}
