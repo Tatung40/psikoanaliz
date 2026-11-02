@@ -81,7 +81,7 @@ def analysis_catalog():
         '8. Grup Bazlı Analizler','9. Bilimsel Grafikler','10. Raporlama','KTK: Çift Motor Rapor',
         'MTK: Rasch','MTK: 1PL','MTK: 2PL','MTK: 3PL','MTK: 4PL','MTK: Karşılaştırma',
         'MTK: Varsayım Denetimi','MTK: Çok Modelli DIF Taraması',
-        'MTK: Çok Kategorili B14','MTK: RSM','MTK: Python mirt DIF',
+        'MTK: Çok Kategorili B14','MTK: RSM','MTK: Python mirt DIF','MTK: DIF Analiz Merkezi',
         'MTK: GRM Formel DIF','MTK: Çok Kategorili Formel DIF','MTK: Gözlenen Puan DIF',
         'MTK: 3PL/4PL Bootstrap DIF','Boyutluluk ve Faktör Analizi',
         'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE]

@@ -1,0 +1,104 @@
+{
+  "status": "NUMERICAL CHECKS ONLY / NOT CERTIFIED",
+  "R_execution": "NOT EXECUTED",
+  "Python": "3.11.17",
+  "mirt": "1.2.0",
+  "numpy": "2.4.6",
+  "scipy": "1.17.1",
+  "sibtest_signature": "(data: 'NDArray[np.int_]', groups: 'NDArray', suspect_items: 'list[int] | NDArray[np.int_]', matching_items: 'list[int] | NDArray[np.int_] | None' = None, method: 'SIBTESTMethod' = 'original', correction: 'bool' = True, *, min_cell_size: 'int' = 2, focal_group: 'Any | None' = None) -> 'SIBTESTResult'",
+  "wald_signature": "(model: 'BaseItemModel | FitResult', param_indices: list[int] | numpy.ndarray[tuple[typing.Any, ...], numpy.dtype[numpy.int64]] | None = None, constraint_values: numpy.ndarray[tuple[typing.Any, ...], numpy.dtype[numpy.float64]] | list[float] | None = None, vcov: numpy.ndarray[tuple[typing.Any, ...], numpy.dtype[numpy.float64]] | None = None, *, contrast_matrix: numpy.ndarray[tuple[typing.Any, ...], numpy.dtype[numpy.float64]] | None = None) -> mirt.utils.statistical_tests.WaldTestResult",
+  "multigroup_fields": [
+    "model",
+    "invariance",
+    "log_likelihood",
+    "n_iterations",
+    "converged",
+    "group_log_likelihoods",
+    "group_n_observations",
+    "latent_distributions",
+    "aic",
+    "bic",
+    "n_parameters",
+    "n_observations",
+    "standard_errors"
+  ],
+  "simulations": 0,
+  "calibrations": 0,
+  "SIBTEST_original_uncorrected": {
+    "beta": 0.3333333333333333,
+    "se": 0.0875376219064817,
+    "chi2": 14.499999999999998,
+    "df": 1,
+    "p": 0.00014015954262956465,
+    "max_abs_error": 1.7763568394002505e-15
+  },
+  "SIBTEST_crossing_uncorrected": {
+    "beta_cross": 0.3333333333333333,
+    "chi2": 14.499999999999998,
+    "df": 2,
+    "p": 0.0007101743888425495,
+    "expected_chi2": 14.5,
+    "expected_p": 0.0007101743888425494
+  },
+  "SIBTEST_exact_balanced_null": {
+    "beta": 0.0,
+    "p": 1.0,
+    "note": "One deterministic identity, NOT a Type-I/FWER experiment"
+  },
+  "Raju_adaptive_quadrature": [
+    {
+      "reference": [
+        1,
+        -0.4,
+        0,
+        1
+      ],
+      "focal": [
+        1,
+        0.5,
+        0,
+        1
+      ],
+      "signed": -0.9,
+      "unsigned": 0.9,
+      "signed_error": 0.0,
+      "unsigned_error": 1.1102230246251565e-16
+    },
+    {
+      "reference": [
+        0.8,
+        -0.5,
+        0,
+        1
+      ],
+      "focal": [
+        1.6,
+        0.7,
+        0,
+        1
+      ],
+      "signed": -1.2,
+      "unsigned": 1.3710088918150476,
+      "signed_error": 0.0,
+      "unsigned_error": 3.774758283725532e-15
+    },
+    {
+      "reference": [
+        1.2,
+        0.3,
+        0.15,
+        0.9
+      ],
+      "focal": [
+        0.7,
+        -0.4,
+        0.15,
+        0.9
+      ],
+      "signed": 0.5249999999999999,
+      "unsigned": 0.7650797554285091,
+      "signed_error": 1.5543122344752192e-15,
+      "unsigned_error": 2.1760371282653068e-14
+    }
+  ]
+}

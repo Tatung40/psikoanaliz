@@ -1,0 +1,287 @@
+{
+  "status": "MEASURED / NOT CERTIFIED",
+  "R_execution": "EXECUTED",
+  "cases": {
+    "dif1pl_uniform": {
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "data_sha256": "f3bcae3735e3dfd6e0178de8d382c12ea141fa1e4b9e68247cc803a5e4b34587",
+        "seed": 20261102,
+        "original_n": 1600,
+        "used_n": 741,
+        "converged": [
+          true,
+          true,
+          true
+        ],
+        "bounds_interior": [
+          true,
+          true,
+          true
+        ],
+        "limitation": "Bounds compared at interior solutions; separate and simultaneous latent assumptions differ; NOT CERTIFIED"
+      },
+      "comparisons": {
+        "wald": {
+          "chi2": {
+            "max_absolute": 0.005787918980878715,
+            "max_relative": 0.0006148146724721938,
+            "undefined_relative_count": 0
+          },
+          "delta": {
+            "max_absolute": 0.00015333572896747416,
+            "max_relative": 0.00025777513028484635,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 3.735749632312324e-06,
+            "max_relative": 9.939196755944668e-05,
+            "undefined_relative_count": 0
+          },
+          "status": "PASS"
+        },
+        "lord": {
+          "chi2": {
+            "max_absolute": 2.855027962933576e-06,
+            "max_relative": 9.697949450042392e-07,
+            "undefined_relative_count": 0
+          },
+          "delta": {
+            "max_absolute": 6.774105765217087e-08,
+            "max_relative": 2.0467151980780042e-07,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 2.0854345465781687e-08,
+            "max_relative": 5.604513202724475e-07,
+            "undefined_relative_count": 0
+          },
+          "status": "PASS"
+        },
+        "single_R": {
+          "parameters": {
+            "max_absolute": 5.318182639324487e-06,
+            "max_relative": 0.00015320420321519496,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 1.4467299889325824e-08,
+            "max_relative": 7.764356819192996e-07,
+            "undefined_relative_count": 0
+          }
+        },
+        "single_F": {
+          "parameters": {
+            "max_absolute": 7.844273178680972e-06,
+            "max_relative": 7.716362254949497e-05,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 8.051510735213041e-08,
+            "max_relative": 1.529054674574487e-06,
+            "undefined_relative_count": 0
+          }
+        }
+      }
+    },
+    "dif2pl_mixed": {
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "data_sha256": "ce1e577b79fc77a17f34eb467af71c64d11fc1d37579d096f1c3a1bc4d79f4dd",
+        "seed": 20261102,
+        "original_n": 2000,
+        "used_n": 2000,
+        "converged": [
+          true,
+          true,
+          true
+        ],
+        "bounds_interior": [
+          true,
+          true,
+          true
+        ],
+        "limitation": "Bounds compared at interior solutions; separate and simultaneous latent assumptions differ; NOT CERTIFIED"
+      },
+      "comparisons": {
+        "wald": {
+          "chi2": {
+            "max_absolute": 0.0004691726862517953,
+            "max_relative": 1.0684656715246009e-05,
+            "undefined_relative_count": 0
+          },
+          "delta": {
+            "max_absolute": 3.472282731600829e-05,
+            "max_relative": 0.00025594156599548294,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 2.0867737136054387e-06,
+            "max_relative": 2.6707040985030128e-05,
+            "undefined_relative_count": 0
+          },
+          "status": "PASS"
+        },
+        "lord": {
+          "chi2": {
+            "max_absolute": 0.00016600666452859514,
+            "max_relative": 5.760068504922023e-06,
+            "undefined_relative_count": 0
+          },
+          "delta": {
+            "max_absolute": 1.2108195664661814e-05,
+            "max_relative": 2.6672204731278793e-05,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 4.4708794549874753e-07,
+            "max_relative": 0.0005379226589800134,
+            "undefined_relative_count": 0
+          },
+          "status": "PASS"
+        },
+        "single_R": {
+          "parameters": {
+            "max_absolute": 8.888510838911401e-06,
+            "max_relative": 0.00012734734121255754,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 6.548603626692351e-07,
+            "max_relative": 0.001081778739118787,
+            "undefined_relative_count": 0
+          }
+        },
+        "single_F": {
+          "parameters": {
+            "max_absolute": 2.270667971281809e-05,
+            "max_relative": 0.0006879720473197415,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 1.1613672943402986e-06,
+            "max_relative": 0.006796494514586573,
+            "undefined_relative_count": 0
+          }
+        }
+      }
+    },
+    "dif2pl_none": {
+      "R": {
+        "R": "R version 4.6.1 (2026-06-24)",
+        "mirt": "1.48",
+        "data_sha256": "f322a62ff3f16c5752f8206177f28e508382231d5774faafc134087f32595640",
+        "seed": 20261102,
+        "original_n": 2000,
+        "used_n": 2000,
+        "converged": [
+          true,
+          true,
+          true
+        ],
+        "bounds_interior": [
+          true,
+          true,
+          true
+        ],
+        "limitation": "Bounds compared at interior solutions; separate and simultaneous latent assumptions differ; NOT CERTIFIED"
+      },
+      "comparisons": {
+        "wald": {
+          "chi2": {
+            "max_absolute": 0.0011257200734515749,
+            "max_relative": 0.000740570186694367,
+            "undefined_relative_count": 0
+          },
+          "delta": {
+            "max_absolute": 6.96873545511234e-05,
+            "max_relative": 0.001480205101914319,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 7.226567089888003e-06,
+            "max_relative": 7.321543654341362e-05,
+            "undefined_relative_count": 0
+          },
+          "status": "PASS"
+        },
+        "lord": {
+          "chi2": {
+            "max_absolute": 5.001504155677239e-05,
+            "max_relative": 0.00022434794705726593,
+            "undefined_relative_count": 0
+          },
+          "delta": {
+            "max_absolute": 7.179351358271857e-06,
+            "max_relative": 0.00011852744133413868,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 2.2699066807019275e-06,
+            "max_relative": 2.0396007821478754e-05,
+            "undefined_relative_count": 0
+          },
+          "status": "PASS"
+        },
+        "single_R": {
+          "parameters": {
+            "max_absolute": 2.0089395927236353e-05,
+            "max_relative": 1.5374999470400725e-05,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 6.49683287307079e-07,
+            "max_relative": 0.0009027141200311806,
+            "undefined_relative_count": 0
+          }
+        },
+        "single_F": {
+          "parameters": {
+            "max_absolute": 1.9056063572442383e-05,
+            "max_relative": 0.00013151416577082155,
+            "undefined_relative_count": 0
+          },
+          "covariance": {
+            "max_absolute": 1.465845812592681e-06,
+            "max_relative": 0.0039009172418171074,
+            "undefined_relative_count": 0
+          }
+        }
+      }
+    }
+  },
+  "numerical_status": "PASS",
+  "execution_commit": "3a2de19094cf3650d3430036a8cabf134bf6ce90",
+  "workflow_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/41445711328",
+  "scope": "Three archived B10 fixtures only; NOT CERTIFIED; exact complete-case cohorts",
+  "chi_relative_limit": 0.001,
+  "source_sha256": {
+    "core/irt_dif.py": "2be799fb79dbc288bd0eca8884b045becbf926165357e1295cbcb21299d9e052",
+    "core/dif_lord.py": "baf7ad5c5615c6dc20e6d4cfc8e75ec00fd3681f851231d43e477afa3d1b11e6",
+    "validation/dif_wald_lord/compare.py": "ababed9094ce99b84f76a2475cd75166686d2c9fb1ebc81d9f64f4eefb6353d4",
+    "validation/dif_wald_lord/reference.R": "ba76f11b35e0999ae239b9f9ef98b6882f889208776c920b381ed7e4268f2342",
+    "scripts/mirt_irt_b10_reference.R": "8b15268629cefcdf9b2c297dc38a9f3c91dedff6f112a2ffce5da9f0a14bfb6e"
+  },
+  "python_evidence_sha256": {
+    "validation/dif_wald_lord/results/dif1pl_uniform/python_fits.npz": "4e8972fd71c9a2f01d473e87306c063aa703ee652a3bf6cca9b5aa87add9f256",
+    "validation/dif_wald_lord/results/dif1pl_uniform/python_lord.csv": "0135e9f500641868e7d50ccc5e0b7e655ccce0bc7596ec690f97e71402d96a4e",
+    "validation/dif_wald_lord/results/dif1pl_uniform/python_lord_cov.csv": "a7e7ea8380fed9152f3cc364fbde79bcbed203dd98580915c065b95ff80bd27a",
+    "validation/dif_wald_lord/results/dif1pl_uniform/python_wald.csv": "5855ecdd36b32a18fbe680e18674b4250570987c929968de222421dfc5d7533f",
+    "validation/dif_wald_lord/results/dif1pl_uniform/python_wald_cov.csv": "db36722cd7bff2c669049e64ff9ed4d5fc1f8d5f2d83360f81161edb400fed22",
+    "validation/dif_wald_lord/results/dif1pl_uniform/settings.json": "f70f29f4f2739c24819034f3a0686dafe82c7c81d6f1a73c246498761140f363",
+    "validation/dif_wald_lord/results/dif2pl_mixed/python_fits.npz": "1e073ae0e1e8275105d2ee67a0efa19d7eee16aefd0da5242610576166768764",
+    "validation/dif_wald_lord/results/dif2pl_mixed/python_lord.csv": "29997817748f8b931e0d545941e3aa1c66ca8a865b53cc2bee38f3a9bd4abf51",
+    "validation/dif_wald_lord/results/dif2pl_mixed/python_lord_cov.csv": "f60e926ab4667ec46106e5bb3045ac13ef1c8629e9fc4e37aaf54200707638d4",
+    "validation/dif_wald_lord/results/dif2pl_mixed/python_wald.csv": "3885f15106dd5806b79446e23cdade82a36f3a375c96478c9769ad083d236ef7",
+    "validation/dif_wald_lord/results/dif2pl_mixed/python_wald_cov.csv": "e98352e635422efff0304b9fdbefefac8b7eac07502ea07c8bb8a341704f138a",
+    "validation/dif_wald_lord/results/dif2pl_mixed/settings.json": "e3d044bc93a69786fdb41e991e2ebd04e32a17446e704eb8e429e1cb91bef16b",
+    "validation/dif_wald_lord/results/dif2pl_none/python_fits.npz": "798fc810ff31c5528e7dae06bae9e162a500c6238f5ba902af40d9a8e3ba6d8b",
+    "validation/dif_wald_lord/results/dif2pl_none/python_lord.csv": "c70498717760fdf09cab74bd92593c770a0da8e7c42f78f1fc41d273b2b813e5",
+    "validation/dif_wald_lord/results/dif2pl_none/python_lord_cov.csv": "692e5679175d07f7a2bdb354bbea10056f2ec20395335b3dedf5861e132b61b9",
+    "validation/dif_wald_lord/results/dif2pl_none/python_wald.csv": "1af315e076c1e6e10b6ed48a543f45a9a59b6ec025359cfc5334b67558109b71",
+    "validation/dif_wald_lord/results/dif2pl_none/python_wald_cov.csv": "bbd7cf7d95c07f9cd5f29927387ff54520f4f476e71692ba2656e0fbdd917c3a",
+    "validation/dif_wald_lord/results/dif2pl_none/settings.json": "57240bded4df6615937814e0fdba4a82a245dfdd9b11223806215d1e96970702"
+  }
+}

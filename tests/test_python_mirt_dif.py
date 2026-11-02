@@ -45,6 +45,9 @@ def test_known_dif_actual_library_and_report(known):
     assert t['DIF'][['p','q']].isna().all().all()
     assert (t['DIF'].Decision=='ÇIKARIM KAPALI').all()
     assert known['metadata']['Status']=='NOT CERTIFIED'
+    area=t['Raju_area']
+    assert len(area)==len(known['metadata']['Items']) and area.p.isna().all()
+    assert area.Converged.all() and np.isfinite(area[['Signed_area','Unsigned_area']]).all().all()
     bundle=downloads(known,'M3')
     assert bundle['png'].startswith(b'\x89PNG')
     for frame in (pd.read_csv(io.BytesIO(bundle['csv'])),pd.read_excel(io.BytesIO(bundle['xlsx']),sheet_name='DIF')):

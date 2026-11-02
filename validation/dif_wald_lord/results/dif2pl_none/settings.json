@@ -1,0 +1,304 @@
+{
+  "case": "dif2pl_none",
+  "model": "2PL",
+  "items": [
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M9",
+    "M10",
+    "M11",
+    "M12"
+  ],
+  "anchors": [
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8"
+  ],
+  "studied": [
+    "M9",
+    "M10",
+    "M11",
+    "M12"
+  ],
+  "original_n": 2000,
+  "used_n": 2000,
+  "excluded_incomplete": 0,
+  "missing_policy": "Explicit identical complete-case cohort for both methods; no production imputation",
+  "data_sha256": "f322a62ff3f16c5752f8206177f28e508382231d5774faafc134087f32595640",
+  "mirt": "1.2.0",
+  "Python": "3.11.17",
+  "Lord": {
+    "n_quadpts": 61,
+    "tol": 1e-08,
+    "max_iter": 3000,
+    "estimation": "ML",
+    "prior": "none",
+    "latent": "N(0,1)"
+  },
+  "Wald": {
+    "quadrature": "mirt",
+    "points": 61,
+    "latent": "reference N(0,1), focal mean/SD free",
+    "priors": "none"
+  },
+  "covariance_condition_limit": 100000000.0,
+  "chi_relative_limit": 0.001,
+  "native_diagnostics": {
+    "converged": true,
+    "loglik": -12378.327366869733,
+    "iterations": 71,
+    "max_score_per_person": 2.3492960087967417e-08,
+    "mu_F": -0.3152616731977658,
+    "sd_F": 1.2257462042225364
+  },
+  "Lord_diagnostics": [
+    {
+      "converged": true,
+      "iterations": 30,
+      "loglik": -7508.791275052568,
+      "original_vcov_labels": [
+        "discrimination[Item_1]",
+        "discrimination[Item_2]",
+        "discrimination[Item_3]",
+        "discrimination[Item_4]",
+        "discrimination[Item_5]",
+        "discrimination[Item_6]",
+        "discrimination[Item_7]",
+        "discrimination[Item_8]",
+        "discrimination[Item_9]",
+        "discrimination[Item_10]",
+        "discrimination[Item_11]",
+        "discrimination[Item_12]",
+        "difficulty[Item_1]",
+        "difficulty[Item_2]",
+        "difficulty[Item_3]",
+        "difficulty[Item_4]",
+        "difficulty[Item_5]",
+        "difficulty[Item_6]",
+        "difficulty[Item_7]",
+        "difficulty[Item_8]",
+        "difficulty[Item_9]",
+        "difficulty[Item_10]",
+        "difficulty[Item_11]",
+        "difficulty[Item_12]"
+      ]
+    },
+    {
+      "converged": true,
+      "iterations": 47,
+      "loglik": -4860.888294505163,
+      "original_vcov_labels": [
+        "discrimination[Item_1]",
+        "discrimination[Item_2]",
+        "discrimination[Item_3]",
+        "discrimination[Item_4]",
+        "discrimination[Item_5]",
+        "discrimination[Item_6]",
+        "discrimination[Item_7]",
+        "discrimination[Item_8]",
+        "discrimination[Item_9]",
+        "discrimination[Item_10]",
+        "discrimination[Item_11]",
+        "discrimination[Item_12]",
+        "difficulty[Item_1]",
+        "difficulty[Item_2]",
+        "difficulty[Item_3]",
+        "difficulty[Item_4]",
+        "difficulty[Item_5]",
+        "difficulty[Item_6]",
+        "difficulty[Item_7]",
+        "difficulty[Item_8]",
+        "difficulty[Item_9]",
+        "difficulty[Item_10]",
+        "difficulty[Item_11]",
+        "difficulty[Item_12]"
+      ]
+    }
+  ],
+  "native_labels": [
+    [
+      "a",
+      -1,
+      0
+    ],
+    [
+      "b",
+      -1,
+      0
+    ],
+    [
+      "a",
+      -1,
+      1
+    ],
+    [
+      "b",
+      -1,
+      1
+    ],
+    [
+      "a",
+      -1,
+      2
+    ],
+    [
+      "b",
+      -1,
+      2
+    ],
+    [
+      "a",
+      -1,
+      3
+    ],
+    [
+      "b",
+      -1,
+      3
+    ],
+    [
+      "a",
+      -1,
+      4
+    ],
+    [
+      "b",
+      -1,
+      4
+    ],
+    [
+      "a",
+      -1,
+      5
+    ],
+    [
+      "b",
+      -1,
+      5
+    ],
+    [
+      "a",
+      -1,
+      6
+    ],
+    [
+      "b",
+      -1,
+      6
+    ],
+    [
+      "a",
+      -1,
+      7
+    ],
+    [
+      "b",
+      -1,
+      7
+    ],
+    [
+      "a",
+      0,
+      8
+    ],
+    [
+      "a",
+      1,
+      8
+    ],
+    [
+      "b",
+      0,
+      8
+    ],
+    [
+      "b",
+      1,
+      8
+    ],
+    [
+      "a",
+      0,
+      9
+    ],
+    [
+      "a",
+      1,
+      9
+    ],
+    [
+      "b",
+      0,
+      9
+    ],
+    [
+      "b",
+      1,
+      9
+    ],
+    [
+      "a",
+      0,
+      10
+    ],
+    [
+      "a",
+      1,
+      10
+    ],
+    [
+      "b",
+      0,
+      10
+    ],
+    [
+      "b",
+      1,
+      10
+    ],
+    [
+      "a",
+      0,
+      11
+    ],
+    [
+      "a",
+      1,
+      11
+    ],
+    [
+      "b",
+      0,
+      11
+    ],
+    [
+      "b",
+      1,
+      11
+    ]
+  ],
+  "git_commit": "0202f2f84bc197d5aaa08c0235b56f18283abc4f",
+  "calibration_source_sha256": {
+    "core/irt_mg.py": "232a57dbd1560cebc89a86131e5ee8c741154c79f4a2906fdb164a65b13393f6",
+    "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60"
+  },
+  "working_tree_modified_at_execution": true,
+  "software_versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0",
+    "statsmodels": "0.15.0"
+  }
+}

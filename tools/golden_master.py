@@ -277,8 +277,12 @@ def compare(expected, actual, path='', rtol=1e-6, atol=1e-8, out=None):
     """List every difference; floats use a fixed predeclared tolerance."""
     out = [] if out is None else out
     if isinstance(expected, dict) and isinstance(actual, dict):
-        if set(expected) != set(actual):
-            out.append(f'{path}: keys {sorted(set(expected) ^ set(actual))[:6]}')
+        # Name each exact added/deleted key so a reviewed additive output can be
+        # allowed without excluding its parent and all legacy numerical tables.
+        for k in sorted(set(actual)-set(expected)):
+            out.append(f'{path}/{k}: unexpected key')
+        for k in sorted(set(expected)-set(actual)):
+            out.append(f'{path}/{k}: missing key')
         for k in sorted(set(expected) & set(actual)):
             compare(expected[k], actual[k], f'{path}/{k}', rtol, atol, out)
     elif isinstance(expected, list) and isinstance(actual, list):
@@ -318,10 +322,10 @@ def main(argv=None):
     differences = compare(reference, current, rtol=args.rtol, atol=args.atol)
     for prefix in args.intended:
         changed = [d for d in differences if d.startswith(prefix)]
+        differences = [d for d in differences if not d.startswith(prefix)]
         if not changed:  # a stale allowance must not silently widen the gate
             differences.append(f'{prefix}: declared as intended change but identical to the reference')
         print(f'intended change {prefix}: {len(changed)} differences')
-        differences = [d for d in differences if not d.startswith(prefix)]
     for line in differences[:50]:
         print(line)
     print(f'{len(differences)} differences in {len(reference)} sections (rtol={args.rtol}, atol={args.atol})')

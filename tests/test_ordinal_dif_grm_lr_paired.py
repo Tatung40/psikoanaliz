@@ -60,7 +60,8 @@ def test_saved_feasibility_records_gates_and_pairing_without_refits():
     assert X.Z.digest(raw)==summary['records_sha256']
     assert X.Z.digest(packed)==summary['records_gzip_sha256']
     assert X.protect()==81 and not summary['main_executed']
-    for name,value in meta['sources'].items():assert X.Z.digest((X.ROOT/name).read_bytes())==value
+    from validation.archived_source_identity import source_matches
+    for name,value in meta['sources'].items():assert source_matches(X.ROOT/name,value),name
     cached={k:{r['seed']:r for r in X.Z.load_records(path/'results/records.jsonl.gz')} for k,path in (('minus',X.Z.OLD),('zero',X.Z.HERE))}
     rebuilt=X.summarize(records,cached,summary['seconds'],summary['stop'])
     for key,value in rebuilt.items():assert summary[key]==value

@@ -1,3 +1,11 @@
+# Opt-in targeted Lord/Wald reference; leave historical B10 outputs untouched.
+if ("--wald-lord" %in% commandArgs(trailingOnly=TRUE)) {
+  args <- commandArgs(trailingOnly=TRUE)
+  stopifnot(length(args)==2L, args[1]=="--wald-lord")
+  source("validation/dif_wald_lord/reference.R")
+  run_wald_lord_reference(args[2])
+  quit(status=0L)
+}
 # R references for B10 (1PL/2PL Q3, WLE/EAP, M2, two-group DIF). Run after
 # scripts/irt_b10_inputs_for_r.py from the repository root:
 #   Rscript scripts/mirt_irt_b10_reference.R

@@ -36,3 +36,18 @@ def test_every_section_is_callable_and_capture_round_trips(tmp_path):
     data = {"ctt": gm.run_section("ctt")}
     gm.save(data, tmp_path / "m.json.gz")
     assert gm.compare(data, gm.load(tmp_path / "m.json.gz"), rtol=0, atol=0) == []
+
+
+def test_additive_raju_allowance_preserves_exact_legacy_tables_and_requires_addition(tmp_path):
+    reference={'python_dif':{'2PL':{'tables':{'DIF':{'LR':1.}}}}}
+    actual={'python_dif':{'2PL':{'tables':{'DIF':{'LR':1.},'Raju_area':{'Signed_area':.2}}}}}
+    left,right=tmp_path/'reference.json.gz',tmp_path/'current.json.gz'
+    gm.save(reference,left);gm.save(actual,right)
+    args=['compare',str(left),str(right),'--rtol','0','--atol','0',
+          '--intended','/python_dif/2PL/tables/Raju_area:']
+    assert gm.main(args)==0
+    actual['python_dif']['2PL']['tables']['DIF']['LR']=np.nextafter(1.,2.)
+    gm.save(actual,right)
+    assert gm.main(args)==1  # A single ULP in any legacy result still fails.
+    gm.save(reference,right)
+    assert gm.main(args)==1  # The allowance fails if the new feature disappears.
