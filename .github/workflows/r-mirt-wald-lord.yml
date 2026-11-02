@@ -1,0 +1,57 @@
+name: Independent R mirt — Lord and Wald DIF
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'core/dif_lord.py'
+      - 'core/irt_dif.py'
+      - 'validation/dif_wald_lord/**'
+      - 'scripts/mirt_irt_b10_reference.R'
+      - 'tests/test_dif_wald_lord.py'
+      - '.github/workflows/r-mirt-wald-lord.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.6.1'
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::jsonlite
+            any::digest
+            any::numDeriv
+          cache-version: 1
+      - name: Existing Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Cached actual Python fits and targeted covariance tests
+        run: |
+          python -m validation.dif_wald_lord.compare --prepare
+          python -m pytest -q tests/test_dif_wald_lord.py
+      - name: Actual independent R calibrations (three fixtures, no MC)
+        run: Rscript scripts/mirt_irt_b10_reference.R --wald-lord validation/dif_wald_lord/results > validation/dif_wald_lord/results/R_stdout.log 2> validation/dif_wald_lord/results/R_stderr.log
+      - name: Predeclared relative chi-square gate
+        run: python -m validation.dif_wald_lord.compare --compare
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r-mirt-wald-lord-${{ github.sha }}
+          path: validation/dif_wald_lord/results/
+          if-no-files-found: error

@@ -11,6 +11,7 @@ from core.dif_center import support_matrix
 def tables(result):
     frames={'DIF':result['table'], 'Support':support_matrix(),
             'Settings':pd.DataFrame([{'Setting':k,'Value':str(v)} for k,v in result['metadata'].items()])}
+    frames.update(result.get('extra_tables',{}))
     if result.get('theta') is not None:frames['Theta_sensitivity']=result['theta']
     return frames
 
@@ -31,7 +32,7 @@ def downloads(result):
         'Ham bileşen p değerleri tamamlayıcıdır; karar yalnız seçilen hipotezin yöntem içi düzeltilmiş p değerine dayanır. '
         'Hesaplanamayan hipotezler kayıtta NaN kalır; çoklu düzeltmede önceden seçilmiş aile büyüklüğü korunur. '
         'ETS ve ΔR² sınıfları kendi yöntem tanımlarındadır; yöntemler arasında eşdeğer etki ölçeği değildir. '
-        'SIBTEST etki sınıfı bağımsız doğrulanmadığından atanmaz.\n\n'
+        'SIBTEST etki sınıfı bağımsız doğrulanmadığından atanmaz. Lord: bağımsız grup kalibrasyonları ve çapa A/B belirsizliğini taşıyan tam delta kovaryansı; Wald: eşzamanlı M1/M2 ortak kovaryansı. Yöntemlerin null/ölçek varsayımları aynı değildir. Genel DIF-FWER sertifikası yok.\n\n'
         'Theta duyarlılığı varsa: tek havuzlanmış sabit-a/2PL kalibrasyonu, GH61 EAP; '
         'çıkarılan yanıtlar yalnız puanlama sırasında eksik sayılır; yeniden kalibrasyon yok. '
         'Delta theta gerçek yetenek hatası, RMSD veya yanlılık düzeltmesi değildir.\n\n'+

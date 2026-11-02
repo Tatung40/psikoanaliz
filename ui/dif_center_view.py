@@ -2,7 +2,7 @@
 import io
 import pandas as pd
 import streamlit as st
-from core.dif_center import METHODS,LIMITATIONS,observed,support_matrix,theta_sensitivity,fingerprint
+from core.dif_center import BASE_METHODS,METHODS,LIMITATIONS,observed,support_matrix,theta_sensitivity,fingerprint
 from core.reproducible import displayed
 from reports.dif_center_report import downloads,figure
 from reports.irt_b14_report import safe_frame
@@ -48,13 +48,15 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
     st.caption('Varsayılan çapa seçimi değişmezlik kanıtı değildir; bilimsel gerekçeyle seçin. Çapalar test ailesinden ayrıdır.')
     studied=st.multiselect('Ortak test ailesi',[c for c in items if c not in anchors],
         default=[c for c in items if c not in anchors],key='dc_studied')
-    methods=st.multiselect('Yöntemler',METHODS,default=list(METHODS),key='dc_methods')
+    methods=st.multiselect('Yöntemler',METHODS,default=list(BASE_METHODS),key='dc_methods')
+    model=st.selectbox('Lord/Wald modeli',('1PL','2PL'),index=1,key='dc_parametric_model')
+    st.caption('Wald: mevcut eşzamanlı MML. Lord: ayrı Python mirt ML + Oakes, çapa belirsizliği dahil eşitleme. Yalnız seçilirse kalibre edilir; genel FWER sertifikası yok.')
     correction=st.selectbox('Yöntem içi düzeltme',('Holm','Bonferroni','BH','none'),key='dc_correction')
     alpha=st.number_input('α',min_value=.001,max_value=.2,value=.05,key='dc_alpha')
     lr_test=st.selectbox('Birincil lojistik hipotezi',('omnibus','uniform','nonuniform'),key='dc_lr_test')
     sib_method=st.selectbox('SIBTEST hipotezi',('original','crossing'),key='dc_sib_method')
     sib_correction=st.checkbox('SIBTEST gerçek-puan regresyon düzeltmesi',value=True,key='dc_sib_correction')
-    settings=(items,group,reference,focal,anchors,studied,methods,correction,alpha,lr_test,sib_method,sib_correction,id_col)
+    settings=(items,group,reference,focal,anchors,studied,methods,correction,alpha,lr_test,sib_method,sib_correction,id_col,model)
     key=fingerprint(data,settings)
     saved=st.session_state.get(KEY)
     if saved and saved['key']!=key:st.session_state.pop(KEY,None);saved=None
@@ -63,7 +65,7 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
         try:
             result=observed(data,items=items,group=group,reference=reference,focal=focal,anchors=anchors,
                 studied=studied,methods=methods,correction=correction,alpha=alpha,lr_test=lr_test,
-                sib_method=sib_method,sib_correction=sib_correction)
+                sib_method=sib_method,sib_correction=sib_correction,model=model)
             saved={'key':key,'result':result};st.session_state[KEY]=saved
         except Exception as exc:st.error(f'Analiz başarısız: {exc}')
     if saved is None:return
@@ -71,6 +73,8 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
     st.dataframe(safe_frame(result['table']),hide_index=True)
     st.caption(result['metadata']['Matching'])
     st.json(result['metadata'])
+    for name,frame in result.get('extra_tables',{}).items():
+        with st.expander(name):st.dataframe(safe_frame(frame),hide_index=True)
     fig=figure(result);st.pyplot(fig)
     import matplotlib.pyplot as plt
     plt.close(fig)

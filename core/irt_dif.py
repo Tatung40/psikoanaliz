@@ -380,3 +380,74 @@ def dif_analysis(data, group, reference, focal, model="2PL", alpha=.05, purify=T
                          "daha zor." if model == "1PL" else
                          "Δa = a_odak − a_referans, Δb = b_odak − b_referans; DIF türü grup tepki fonksiyonlarının "
                          "kesişimine göre belirlenir. İşaretli fark < 0: madde odak grup için daha zor.")}
+
+
+def _checked_covariance(covariance):
+    """Full free-coordinate covariance; never substitute a diagonal or pinv."""
+    c = np.asarray(covariance, float)
+    if c.ndim != 2 or c.shape[0] != c.shape[1] or not c.size or not np.isfinite(c).all():
+        raise ValueError('Sonlu kare kovaryans gerekli')
+    if not np.allclose(c, c.T, rtol=1e-10, atol=1e-12):
+        raise ValueError('Kovaryans simetrik değil')
+    c = (c+c.T)/2
+    ev = np.linalg.eigvalsh(c)
+    if ev[0] <= 0 or ev[-1]/ev[0] > 1e8:
+        raise ValueError('Kovaryans pozitif tanımlı değil veya koşul sayısı >1e8')
+    return c
+
+
+def _contrast_cov(f, i, kinds=None):
+    """Focal-reference vector and FULL covariance, including shared/link terms."""
+    design=f['design']
+    kinds = ('b',) if design.model=='1PL' else ('a','b') if kinds is None else kinds
+    if design.model not in ('1PL','2PL'):raise ValueError('Yalnız 1PL/2PL')
+    if not f['converged'] or np.any(f.get('at_bound', True)):
+        raise ValueError('Yakınsamama veya sınır parametresi')
+    covariance=_checked_covariance(f['cov'])
+    if covariance.shape!=(design.size,design.size):raise ValueError('Kovaryans boyutu uyuşmuyor')
+    C=np.zeros((len(kinds),design.size))
+    for row,kind in enumerate(kinds):
+        indices=design.a if kind=='a' else design.b
+        r,s=indices[0,i],indices[1,i]
+        if min(r,s)<0 or r==s:raise ValueError('Kontrast sabit/eşit parametre içeriyor')
+        C[row,s]=1;C[row,r]=-1
+    if not np.isfinite(f['params']).all():raise ValueError('Sonlu olmayan ortak parametre')
+    delta=C@f['params'];V=_checked_covariance(C@covariance@C.T)
+    return delta,V
+
+
+def wald_dif(data, group, reference, focal, *, model='2PL', anchors, studied,
+             quadrature='gauss-hermite', points=61):
+    """Existing simultaneous M1/M2 fit, once; no null/LR refits or new Hessian."""
+    if model not in ('1PL','2PL'):raise ValueError('Wald DIF yalnız 1PL/2PL')
+    if reference==focal:raise ValueError('Referans/odak farklı olmalı')
+    names=list(data.columns);anchors=list(anchors);studied=list(studied)
+    if (len(set(names))!=len(names) or len(set(anchors))<2 or len(set(anchors))!=len(anchors)
+            or not set(anchors)<=set(names) or not studied or len(set(studied))!=len(studied)
+            or not set(studied)<=set(names)-set(anchors)):
+        raise ValueError('En az iki benzersiz çapa ve ayrı incelenen maddeler gerekli')
+    x,obs,g,keep=_prepare(data,group,reference,focal)
+    if min(np.bincount(g,minlength=2))<50:raise ValueError('Her grupta en az 50 kişi gerekli')
+    for j in range(len(names)):
+        for gg in (0,1):
+            v=x[g==gg,j][obs[g==gg,j]]
+            if len(v)==0 or np.ptp(v)==0:raise ValueError('Her grupta değişken, geçerli maddeler gerekli')
+    free='b' if model=='1PL' else 'ab'
+    fit=_Fitter(x,obs,g,model,quadrature,points)(['anchor' if n in anchors else free for n in names],information=True)
+    rows=[];covariances=[]
+    for item in studied:
+        row=dict(Item=item,Method='Wald DIF',Statistic=np.nan,df=1 if model=='1PL' else 2,p=np.nan,
+                 Status='IMPLEMENTED / NOT CERTIFIED',Reason='')
+        try:
+            delta,V=_contrast_cov(fit,names.index(item))
+            stat=float(delta@np.linalg.solve(V,delta))
+            row.update(Statistic=stat,p=float(chi2.sf(stat,len(delta))))
+            for j,kind in enumerate(('b',) if model=='1PL' else ('a','b')):
+                row['Delta_'+kind]=float(delta[j]);row['SE_'+kind]=float(np.sqrt(V[j,j]))
+            covariances.extend(dict(Item=item,Row=j,Column=k,Covariance=float(V[j,k]))
+                               for j in range(len(delta)) for k in range(len(delta)))
+        except (ValueError,TypeError,KeyError,np.linalg.LinAlgError) as exc:
+            row.update(Status='UNESTIMABLE / NOT CERTIFIED',Reason=str(exc))
+        rows.append(row)
+    return dict(table=pd.DataFrame(rows),covariance=pd.DataFrame(covariances),fit=fit,
+                model=model,anchors=anchors,quadrature=quadrature,points=points)

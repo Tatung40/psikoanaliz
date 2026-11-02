@@ -60,6 +60,7 @@
   {
     "screen": "ui/dif_center_view.py",
     "core_imports": [
+      "core.dif_center.BASE_METHODS",
       "core.dif_center.LIMITATIONS",
       "core.dif_center.METHODS",
       "core.dif_center.fingerprint",

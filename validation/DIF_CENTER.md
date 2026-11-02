@@ -91,3 +91,46 @@ Yeni koruma testi mevcut allowlist uygulamasında ek bir hata yakaladı: bulunma
 beklenen fark için üretilen hata, aynı önek filtresiyle tekrar siliniyordu.
 Filtreleme hata eklenmeden önceye taşındı; artık eski/bulunmayan izin gerçekten
 FAIL üretir. Sayısal tolerans değişmedi. Dört golden testi düzeltmeden sonra geçti.
+
+## Lord χ² ve Wald DIF — 1PL/2PL tamamlaması
+
+Önceki BLOCKED satırları public çok-grup API kapsamına aitti. Kullanıcının açık
+istemine göre iki farklı mevcut kovaryans yolu artık ayrı ve seçime bağlıdır:
+
+- **Wald:** `core.irt_dif.wald_dif`, mevcut eşzamanlı M1 (1PL, Δb) / M2 (2PL,
+  Δa/Δb). Referans N(0,1), odak μ/σ serbest, sabit çapalar; `_contrast_cov` tam
+  CΣCᵀ, çapraz grup ve a–b kovaryansları dahil. Mevcut gözlenen bilgi kullanılır;
+  yeni Hessian/kalibrasyon motoru yazılmadı. Bu açık Wald seçeneği, eski motoru
+  diğer ekranlarda sessizce birincil yapmaz; public IRT-LR kapısı değişmez.
+- **Lord:** ayrı public `fit_python_mirt` ML kalibrasyonları/Oakes; 1PL sabit a=1
+  ve A=1, B=ortalama farkı. 2PL A=sd(b_R,çapa)/sd(b_F,çapa),
+  B=mean(b_R,çapa)−A mean(b_F,çapa). θ_R=Aθ_F+B, a_F*=a_F/A, b_F*=A b_F+B.
+  Tam analitik J_R/J_F bütün çapa türevlerini ve çapa–test kovaryanslarını içerir;
+  ΣΔ=J_RΣ_RJ_Rᵀ+J_FΣ_FJ_Fᵀ. Grup bağımsızlığı yalnız ayrı Lord örneklemleri
+  içindir; eşzamanlı Wald’da çapraz grup terimleri korunur.
+
+Her iki yöntemde yakınsama, sınır dışı serbest parametreler, pozitif tanımlı
+serbest/kontrast kovaryansı ve κ≤1e8 zorunlu. 3PL/4PL reddedilir; geçersiz uyumda
+χ²/p=NA ve gerekçe. En az iki benzersiz/değişken çapa ve ayrı test ailesi gerekir.
+Yeni yöntemler varsayılan otomatik seçime eklenmez. Model seçimi fingerprint’e
+katılır. p düzeltmesi önceden seçilen tam yöntem-içi aileye uygulanır; kontrast
+kovaryans tabloları UI, Excel ve ZIP’te aynı kaynaklardan üretilir.
+
+Kanıt: `validation/dif_wald_lord/PROTOCOL.md` ve `results/`. 3 sabit fikstürde
+**3 mevcut eşzamanlı + 6 ayrı public Python kalibrasyonu** gerçekten çalıştı;
+hepsi yakınsadı ve kovaryans kapılarını geçti. Tekrar kullanılabilir NPZ’ler
+parametre/kovaryansları kayıpsız saklar; güncellemelerde kalibrasyon tekrar edilmez.
+`dif1pl_uniform` eksik veri nedeniyle açık, eşit complete-case kohorta (741/1600)
+indirgenmiştir; 859 çıkarım kaydedilir. Diğer iki fikstür 2000’er satırdır.
+Üretimde sessiz listwise/imputation eklenmedi. Lord’un iki sabit-N(0,1) modeli ve
+Wald’ın serbest-odak-dağılım modeli aynı test değildir; sonuçları eşitlemek amaçlanmaz.
+
+Bağımsız R karşılaştırması yeni hedefli CI işinde, R mirt1.48 ve aynı üç kohortta
+çalışır: `Rscript scripts/mirt_irt_b10_reference.R --wald-lord validation/dif_wald_lord/results`.
+Eski B10 varsayılan betiği/ham referansları değişmez. Lord’da aynı GH61 ve kütleler;
+Wald referansında mevcut mirt-grid61; R kovaryansı a,d→a,b dönüştürülür. Lord R
+Jacobiani bağımsız `numDeriv` ile hesaplanır. Kullanıcının **χ² göreli fark ≤1e−3**
+eşiği değişmez. Parametre/kovaryans farkları ayrıca raporlanır; farklı parametrizasyonda
+ham a,d Wald’ı fiziksel a,b Wald’ıyla aynıymış gibi karşılaştırılmaz. Son gerçek
+R yürütme/karşılaştırma durumu CI artifact `comparison.json` ve PR raporundadır;
+R çıktısı yoksa VALIDATED veya CERTIFIED yazılmaz. Genel DIF-FWER sertifikası yok.
