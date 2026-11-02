@@ -28,8 +28,14 @@ def library_itemfit(fit, responses, *, model):
         for column in ("p_value", "p_value_adjusted"):
             if column in frame:
                 frame[column] = np.nan
-    frame["Bilimsel durum"] = ("EXPLORATORY / NOT CERTIFIED — kütüphane S-X² bağımsız referansla eşlenmedi" if eligible
-                               else "DESCRIPTIVE / NOT CERTIFIED — S-X² çıkarımı kapalı")
+    if not eligible:
+        label = "DESCRIPTIVE / NOT CERTIFIED — S-X² çıkarımı kapalı"
+    elif model == "2PL":
+        # tests/test_psychometrics_reference.py: LSAT7 only, |ΔS-X²| <= .0022 vs R mirt 1.x.
+        label = "EXPLORATORY / NOT CERTIFIED — 2PL S-X² yalnız LSAT7 örneğinde R mirt ile eşlendi"
+    else:
+        label = "EXPLORATORY / NOT CERTIFIED — kütüphane S-X² bağımsız referansla eşlenmedi"
+    frame["Bilimsel durum"] = label
     return frame
 
 

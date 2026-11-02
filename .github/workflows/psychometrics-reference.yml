@@ -1,0 +1,23 @@
+name: psychometrics-reference
+# Targeted published-example checks for linking, equating, reliability, rotation and LSAT7 S-X².
+# Kept separate from pytest.yml so it does not conflict with open PRs editing that file.
+on:
+  pull_request:
+    paths: ['core/irt_linking.py','core/irt_equating.py','core/reliability_extended.py','core/factor_rotation.py',
+            'core/irt_library_diagnostics.py','tests/test_psychometrics_reference.py','tests/fixtures/psychometrics_reference/**',
+            '.github/workflows/psychometrics-reference.yml']
+  push:
+    branches: [main]
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install -r requirements.txt
+          python -m pip install --only-binary=:all: 'mirt==1.2.0'
+      - run: python -m pytest -q tests/test_psychometrics_reference.py tests/test_irt_completion_safety.py
