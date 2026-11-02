@@ -93,14 +93,16 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     res = None
     if req is not None:
         try:
-            frame = data.loc[:, req["cols"]]
+            if (list(cols), ident, points, with_lr) != (req["cols"], req["ident"], req["points"], req["lr"]):
+                raise KeyError
+            frame = data.loc[:, cols]
             if _fingerprint(frame) != req["fp"]:
                 raise KeyError
             res = _analyse(frame, req["ident"], req["points"], req["lr"])
         except Exception:
             st.session_state.pop("rsm_request", None)
             with tabs[0]:
-                st.info("Veri veya madde seçimi değişti; analizi yeniden başlatın.")
+                st.info("Veri veya analiz ayarları değişti; analizi yeniden başlatın.")
             res = None
     if res is None:
         for t in tabs[1:]:

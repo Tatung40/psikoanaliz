@@ -5,9 +5,10 @@ from core.irt_b14_diagnostics import model_diagnostics
 
 class Fit:
     model=object()
+    converged=True
 
 def sample():
-    return {"result":Fit(),"coded":pd.DataFrame(np.ones((20,4),dtype=int))}
+    return {"result":Fit(),"model":"GRM","coded":pd.DataFrame(np.ones((20,4),dtype=int))}
 
 def test_valid_item_diagnostics():
     with patch("mirt.itemfit",return_value=pd.DataFrame({"S_X2":[3.,4.]})),patch("mirt.compute_fit_indices",return_value={"M2":3.1}):

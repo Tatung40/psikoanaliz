@@ -4,6 +4,7 @@ No made-up S-X2: failures produce an explicit unavailable record.
 """
 import numpy as np
 import pandas as pd
+from core.irt_library_diagnostics import library_itemfit
 
 def _frame(value):
     if isinstance(value,pd.DataFrame):
@@ -22,7 +23,7 @@ def model_diagnostics(result):
     records=[]
     tables={}
     operations=(
-        ("Madde uyumu",lambda:mirt.itemfit(fit,responses,statistics=["infit","outfit","S_X2"])),
+        ("Madde uyumu",lambda:library_itemfit(fit,responses,model=result.get("model"))),
         ("Model uyumu",lambda:mirt.compute_fit_indices(fit.model,responses)),
     )
     for name,call in operations:
