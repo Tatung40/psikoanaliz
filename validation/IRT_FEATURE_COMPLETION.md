@@ -97,3 +97,14 @@ ID ve bilimsel notlar ilgili raporlarda korunur. Nominal kategori sırası başa
   ordinal S-X² çıkarımı, NRM uyum/Wright, genel MAR/MNAR ve DIF-FWER sertifikası.
   Bunlar yeni/bağımsız bilimsel kanıt gerektirir; 0-TL hızlı düzeltmeyle üretilmiş
   sayılmaz. P2: kesik kişi ızgarası hassasiyeti ve ek formatlar. Otomatik merge yok.
+
+## Tam regresyon sonucu ve envanter düzeltmesi
+
+CI `41398075970`, `c187ee8`: **1234 passed, 15 skipped, 1 failed**, 1461.33 s.
+Tek hata `test_inventory_is_current_and_includes_missing_data_page`: yeni ortak
+`library_itemfit` importu üretilmiş kod envanterinde yoktu. Mevcut
+`tools/inventory_reproducible.py` ile yeniden üretim tam **bir satır** ekledi;
+başarısız test **1 passed**. Üretim kodu değişmedi. Toplam hedefli başarı 36.
+Tam süit ikinci kez çalıştırılmaz; PR gövdesindeki opt-in işareti kaldırılarak
+son commit için mevcut zorunlu CI seçili regresyonları izlenir. İlk başarısız
+CI kaydı korunur; tam süit hatasızmış gibi gösterilmez.
