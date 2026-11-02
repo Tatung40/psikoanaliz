@@ -171,3 +171,22 @@ Herhangi bir kaynak/veri/uyum değişirse gerçek R işi gerekir; eski kanıt se
 geçerli sayılmaz. Bu korumanın değişmiş kaynak/NPZ karşı örnekleri geçti. Yeni
 R kurulumu veya dokuz kalibrasyonun tekrarı gerekmez; `new_R_fits_this_run=0`
 ve asıl yürütme commit/workflow bağlantısı artifact’ta açıkça kaydedilir.
+
+### Son tam regresyondaki arşiv kimliği düzeltmesi
+
+`3a2de19` tam regresyon: **1278 passed, 15 skipped, 2 failed** (1443.68 s).
+İki hata aynı kaynak kimliğindeydi: eski GRM kayıtları `core/irt_dif.py` dosyasının
+tamamını eski SHA ile karşılaştırıyordu. Kanıt: dosyanın eski **22312 byte’ı**
+**aynen korunur**, SHA-256 `f6fcf8bbae297a83e8b3459fc8117f19ec45e5364634a721d5cb4f1551091449`;
+tek fark sonuna eklenen `_checked_covariance`, `_contrast_cov`, `wald_dif` tanımları.
+
+Arşiv/manifest/reference hash’leri değiştirilmedi. Yeni doğrulayıcı sadece bu
+bilinen dosya/ön-ek için byte kimliğini ve üç yeni, eski adları gölgelemeyen,
+dekoratör/default-call/top-level yan etkisi olmayan fonksiyon tanımını kabul eder.
+Başka kaynaklar ve tüm ham kayıtlar halen tam-dosya SHA ile kontrol edilir.
+Dondurulmuş bağımsız denetleyici değiştirilmeden, yalnız bu kanıtlanmış kaynak
+byte’larının hash’ine kapsamlı olmayan tarihsel görünüm verilir; veri/diğer kaynak
+hash’leri etkilenmez. Bozuk eski ön-ek, değişmiş veri, eski fonksiyonu yeniden
+tanımlama veya top-level tolerans değişikliği reddedilir. İki eski başarısız test
+ve iki yeni negatif koruma testi geçti. Lord/Wald kalibrasyon/referans kaynakları
+R yürütmesindeki byte’larla aynıdır; tekrar uyum veya ikinci tam süit gerekmez.

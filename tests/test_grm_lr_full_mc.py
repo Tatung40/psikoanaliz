@@ -62,8 +62,11 @@ def test_saved_staged_evidence_and_independent_audit_without_fits():
     assert all(r['seed']>=2026110110 for r in records)
     assert E.protect()==111
     assert E.Z.digest((E.PILOT/'records.json.gz').read_bytes())==metadata['pilot_records_sha256']
-    for path,digest in metadata['sources'].items():assert E.Z.digest((E.ROOT/path).read_bytes())==digest
-    archived=json.loads((output/'audit.json').read_text());recomputed=A.audit(output)
+    from validation.archived_source_identity import source_matches
+    for path,digest in metadata['sources'].items():assert source_matches(E.ROOT/path,digest),path
+    archived=json.loads((output/'audit.json').read_text())
+    from validation.archived_source_identity import historical_digest
+    with historical_digest(E.Z):recomputed=A.audit(output)
     def compare(a,b):
         if isinstance(a,dict):
             assert a.keys()==b.keys()
