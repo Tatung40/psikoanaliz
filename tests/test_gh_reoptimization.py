@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 from core import grm_dif as G
 from validation.gh_reoptimization import experiment as E
+from validation.grm_archive_identity import bind_archived_models, assert_reconstructed_parameters
 
 
 def test_versioned_protocol_and_saved_unique_constraints():
@@ -53,7 +54,8 @@ def test_cached_reoptimization_and_dense_gates_without_calibration():
     assert r['scientific_classification']=='SINGLE DATASET / NOT CERTIFIED'
     for path,digest in r['sources'].items():assert E.D.sha((E.ROOT/path).read_bytes())==digest
     prior,x,g,path=E.D.load_saved();models,slots=E.saved_models(prior)
-    assert r['data_sha256']==prior['data_sha256'] and r['slots']==slots
+    assert r['data_sha256']==prior['data_sha256']
+    models,slots=bind_archived_models(r,models,slots)
     assert E.D.sha(path.read_bytes())==r['source_archive_sha256']
     assert all(v['p'] is None for v in prior['result']['table'])
     assert [s['fit_points'] for s in r['stages']] in ([101],[101,161])
@@ -63,7 +65,7 @@ def test_cached_reoptimization_and_dense_gates_without_calibration():
         if stage['passed']:assert len(stage['solutions'])==stage['native_optimizer_calls']==7
         for key,s in stage['solutions'].items():
             if stage['fit_points']==101:
-                np.testing.assert_array_equal(s['initial_params'],models[key]['params'])
+                assert_reconstructed_parameters(s['initial_params'],models[key]['params'],models[key]['design'])
             a,b=np.array(s['a']),np.array(s['b'])
             np.testing.assert_array_equal(a[0,:8],a[1,:8]);np.testing.assert_array_equal(b[0,:8],b[1,:8])
             assert (np.diff(b,axis=2)>0).all()
@@ -89,4 +91,10 @@ def test_cached_reoptimization_and_dense_gates_without_calibration():
             for q,stat in row['lr'].items():
                 expected,_=G._nested_lr(a['evaluations'][q]['loglik'],b['evaluations'][q]['loglik'])
                 assert stat==expected
+    model=next(iter(models.values()));d=model['design'];p=model['params'].copy()
+    j=next(j for j,label in enumerate(d.labels) if label[0]=='b' and label[3]>0)
+    changed=p.copy();changed[j]=np.nextafter(np.nextafter(changed[j],np.inf),np.inf)
+    with pytest.raises(AssertionError):assert_reconstructed_parameters(p,changed,d)
+    changed=p.copy();changed[0]=np.nextafter(changed[0],np.inf)
+    with pytest.raises(AssertionError):assert_reconstructed_parameters(p,changed,d)
     assert r['fits_attempted']>=r['fits_executed']

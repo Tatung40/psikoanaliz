@@ -1,0 +1,7 @@
+{
+  "attempted": 60,
+  "valid": 60,
+  "status": "USER-STOPPED / INCOMPLETE",
+  "original_planned": 200,
+  "resource_limited_target": 60
+}

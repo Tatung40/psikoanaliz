@@ -1,0 +1,25 @@
+name: GRM GH101 Stage A cached evidence
+on:
+  pull_request:
+    paths:
+      - 'validation/grm_gh101_stage_a/**'
+      - 'tests/test_grm_gh101_stage_a.py'
+      - 'tests/test_grm_stage_a_user_stop.py'
+      - '.github/workflows/grm-gh101-stage-a.yml'
+permissions:
+  contents: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.5.3 scipy==1.18.1 pandas==3.0.5 pytest
+      - run: python -m pytest -q tests/test_grm_gh101_stage_a.py tests/test_grm_stage_a_user_stop.py

@@ -1,0 +1,15 @@
+{
+  "status": "STAGE A / NOT CERTIFIED",
+  "rows": 60,
+  "cold_starts": 420,
+  "likelihoods": 840,
+  "gradient_vectors": 420,
+  "information_matrices": 420,
+  "lr_records": 360,
+  "sha256_verified": true,
+  "optimizations": 0,
+  "valid": 60,
+  "invalid": 0,
+  "statistical_audit": true,
+  "seconds": 270.2097298110002
+}
