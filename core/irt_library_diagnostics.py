@@ -9,7 +9,7 @@ def library_itemfit(fit, responses, *, model):
     """Public itemfit API with the same scientific restrictions in UI and exports.
 
     Ordinal mean squares are descriptive; nominal item fit is unsupported here.
-    S-X² inference remains restricted to the reference-checked binary families.
+    S-X² p-values for eligible binary families are exploratory, not independently reference-validated.
     """
     import mirt
     import numpy as np
@@ -28,7 +28,7 @@ def library_itemfit(fit, responses, *, model):
         for column in ("p_value", "p_value_adjusted"):
             if column in frame:
                 frame[column] = np.nan
-    frame["Bilimsel durum"] = ("NUMERICAL REFERENCE CHECKED / NOT CERTIFIED" if eligible
+    frame["Bilimsel durum"] = ("EXPLORATORY / NOT CERTIFIED — kütüphane S-X² bağımsız referansla eşlenmedi" if eligible
                                else "DESCRIPTIVE / NOT CERTIFIED — S-X² çıkarımı kapalı")
     return frame
 
