@@ -72,3 +72,17 @@ Bağımlılık sırası: mevcut MH/LR → public SIBTEST → mevcut bağlı IRF�
 sabit veriyle R/difR düzeltilmiş SIBTEST karşılaştırması ve public çok-grup
 ortak kovaryans/ölçek sözleşmesinin doğrulanmasıdır; sonra Lord/Wald kapısı
 ayrıca değerlendirilebilir. Bu PR bunlar için yeni R kurulumu/Monte Carlo yapmaz.
+
+## Son regresyon ve additive-output kontrolü
+
+İlk CI (`41433659362`, `ba8d71b`) tam regresyonu: **1258 passed, 15 skipped**,
+979.89 s. Tek iş hatası, eski golden-master tablosunda yeni `Raju_area` anahtarının
+bulunmamasıydı. Karşılaştırıcı artık eklenen/silinen anahtarı tam çocuk yoluyla
+bildirir; mevcut `--intended` mekanizması yalnız
+`/python_dif/2PL/tables/Raju_area:` eklemesini tanır. Üst tablo, eski katsayılar,
+LR, olasılık veya toleranslar dışlanmaz/değişmez; referans commit aynı kaldı.
+Yeni test, eski LR’de tek ULP değişikliğinin ve yeni alanın kaldırılmasının hâlâ
+başarısız olduğunu doğrular. Golden karşılaştırıcının **4 hedefli testi geçti**
+(toplam 35 ayrı hedefli vaka). Yeni tablo mevcut bağımsız integral testleriyle
+ayrıca doğrulanır. Üretim kodu tam regresyondan sonra değişmedi. İkinci tam süit
+çalıştırılmaz; son başlıkta mevcut zorunlu CI kontrolleri izlenir.

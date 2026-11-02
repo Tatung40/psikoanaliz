@@ -277,8 +277,12 @@ def compare(expected, actual, path='', rtol=1e-6, atol=1e-8, out=None):
     """List every difference; floats use a fixed predeclared tolerance."""
     out = [] if out is None else out
     if isinstance(expected, dict) and isinstance(actual, dict):
-        if set(expected) != set(actual):
-            out.append(f'{path}: keys {sorted(set(expected) ^ set(actual))[:6]}')
+        # Name each exact added/deleted key so a reviewed additive output can be
+        # allowed without excluding its parent and all legacy numerical tables.
+        for k in sorted(set(actual)-set(expected)):
+            out.append(f'{path}/{k}: unexpected key')
+        for k in sorted(set(expected)-set(actual)):
+            out.append(f'{path}/{k}: missing key')
         for k in sorted(set(expected) & set(actual)):
             compare(expected[k], actual[k], f'{path}/{k}', rtol, atol, out)
     elif isinstance(expected, list) and isinstance(actual, list):

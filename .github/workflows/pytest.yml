@@ -62,7 +62,8 @@ jobs:
             --intended '/python_mirt_models/1PL/metadata/Kullanım durumu:' \
             --intended '/python_mirt_models/2PL/metadata/Kullanım durumu:' \
             --intended '/python_mirt_models/1PL/usage_labels' --intended '/python_mirt_models/2PL/usage_labels' \
-            --intended '/python_mirt_models/1PL/warnings[1]:'
+            --intended '/python_mirt_models/1PL/warnings[1]:' \
+            --intended '/python_dif/2PL/tables/Raju_area:'
       - name: Real public LSAT6 KTK benchmark (independent Pingouin)
         if: github.event_name == 'push'
         timeout-minutes: 3
