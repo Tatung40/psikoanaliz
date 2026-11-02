@@ -1,0 +1,26 @@
+{
+  "protocol_commit": "9d01c0fdd8681e85e43437906459752353dc003d",
+  "sources": {
+    "core/grm_dif.py": "1e6cf07657f26f78a961a18457aee8b106eb46e88300c5edfba303cc6c97a2ba",
+    "validation/gh81_diagnostic/diagnostic.py": "182ad3dbb9cf0fc8752bb7f586bf8b7cffbe3cd905731ac32c18e0733e2b5569",
+    "validation/gh_reoptimization/experiment.py": "c2cc45695723d8c22994b371a4340828d139e873ebabb4ec63a76912e50255ac",
+    "validation/grm_gh101_stage_a/runner.py": "a51ccaf148b5b42fc56048ecc6c98f8c22b6e737fe199fcf94b1347c1e33dd79",
+    "validation/grm_gh101_uniform_pilot/pilot.py": "f174de414346de23704b4f104a63d5c43719785c8645668d39208bff48fee285",
+    "validation/dif_validation_study.py": "76f11c747cc8ddf4db7bd404546b2a4c97a83ef18bd88d82f153986f64cbf684",
+    "validation/ordinal_dif_paired/control.py": "43412c26a815f10734bee4eb59c7e6714ce781c636e71a643e753e6efe9bc31b",
+    "validation/grm_fwer_sequential/runner.py": "95d05d31021903081e52aed4db8688e08413dce4715357562ea43a26b0f6c18b",
+    "validation/grm_fwer_sequential/statistics.py": "6eddeadb6057d7e7bef2774fcf07d4cd2e15bad8abdf8e49de70ee3d477ca3af",
+    "validation/grm_fwer_sequential/protocol.json": "28c2947ed4b8b5ece12e49b85e1c9405e002ce1af2a24f66fafd67c6df20a007"
+  },
+  "archives": {
+    "validation/ordinal_dif_total_rest/results/records.jsonl.gz": "89a12c7a44bb284cbc69a9b896f61c2044e6582cb0483916b9ea63495a25d023",
+    "validation/ordinal_dif_impact_zero/results/records.jsonl.gz": "635e4ec1fe7299d8c54c253ee18704f96f5d7ae664a50540f6a24115e959ab0f"
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0"
+  },
+  "execution_commit": "5868fdd1e259f7a8fdff3ee851a54c4faf36c332",
+  "historical_fits_reused": 0
+}

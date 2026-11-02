@@ -1,5 +1,5 @@
 {
-  "status": "NUMERICAL REFERENCE FAIL",
+  "status": "NUMERICAL REFERENCE PASS / NOT FWER CERTIFIED",
   "R_execution": "EXECUTED",
   "R_mirt": "1.48",
   "R": {
@@ -60,62 +60,62 @@
   "comparisons": {
     "61": {
       "Statistic": {
-        "max_absolute": 0.0036941705165656202,
-        "max_relative": 0.0006855140641135235,
+        "max_absolute": 0.00013346020437499106,
+        "max_relative": 1.670945533880038e-05,
         "undefined_relative_count": 0
       },
       "p": {
-        "max_absolute": 0.0001453564840710464,
-        "max_relative": 0.0020424966027500773,
+        "max_absolute": 1.2412955820439997e-06,
+        "max_relative": 7.37185835144094e-05,
         "undefined_relative_count": 0
       },
       "Delta_b": {
-        "max_absolute": 0.00010007416006252434,
-        "max_relative": 0.0002963180826193341,
+        "max_absolute": 4.360999980579372e-06,
+        "max_relative": 7.87027755771507e-06,
         "undefined_relative_count": 0
       },
       "SE_b": {
-        "max_absolute": 9.924640887837288e-06,
-        "max_relative": 5.062153203924654e-05,
+        "max_absolute": 1.0712659889722254e-07,
+        "max_relative": 5.37200681970828e-07,
         "undefined_relative_count": 0
       },
       "contrast_covariance": {
-        "max_absolute": 3.891663719196581e-06,
-        "max_relative": 0.00010124562661666807,
+        "max_absolute": 4.272560179957585e-08,
+        "max_relative": 1.0744016467591983e-06,
         "undefined_relative_count": 0
       },
       "R": {
         "b": {
-          "max_absolute": 3.938188845475921e-06,
-          "max_relative": 1.4819817691084493e-05,
+          "max_absolute": 3.95503948547038e-06,
+          "max_relative": 1.4789596142403264e-05,
           "undefined_relative_count": 0
         },
         "sd_Python": 0.9965295477767826,
-        "sd_R": 0.9965342623412233,
+        "sd_R": 0.9965343124191635,
         "b_covariance": {
-          "max_absolute": 5.5184052608764356e-08,
-          "max_relative": 1.030572112602597e-05,
+          "max_absolute": 5.560813480867677e-08,
+          "max_relative": 1.0410188923182495e-05,
           "undefined_relative_count": 0
         },
         "full_b_logSD_covariance": {
-          "max_absolute": 5.5184052608764356e-08,
-          "max_relative": 0.00026594865952682325,
+          "max_absolute": 5.560813480867677e-08,
+          "max_relative": 0.00025774466972800495,
           "undefined_relative_count": 0
         },
         "common_GH101_loglik_Python": -3227.762911289432,
-        "common_GH101_loglik_R": -3227.762911293601,
-        "common_loglik_difference": -4.169123712927103e-09,
-        "R_solution_common_GH101_score": 2.9020766329494054e-06,
+        "common_GH101_loglik_R": -3227.7629112936806,
+        "common_loglik_difference": -4.248704499332234e-09,
+        "R_solution_common_GH101_score": 2.9361832848112516e-06,
         "Python_converged": true,
         "R_diagnostics": {
           "converged": true,
-          "sd": 0.9965,
-          "variance": 0.9931,
+          "sd": 0.9965343124191636,
+          "variance": 0.9930806358287352,
           "iterations": 19,
-          "loglik": -3227.7629,
+          "loglik": -3227.762911293681,
           "interior": true,
           "covariance_valid": true,
-          "full_covariance_condition": 4.146,
+          "full_covariance_condition": 4.146046904726179,
           "identification": "a=1; mean=0; SD free",
           "points": 61,
           "vcov_labels": [
@@ -138,36 +138,36 @@
       },
       "F": {
         "b": {
-          "max_absolute": 0.00045136018449776216,
-          "max_relative": 0.00026931433053660236,
+          "max_absolute": 2.3673998507778293e-05,
+          "max_relative": 8.995290872144859e-05,
           "undefined_relative_count": 0
         },
         "sd_Python": 1.4851325018161396,
-        "sd_R": 1.4842852358255674,
+        "sd_R": 1.4851203763060252,
         "b_covariance": {
-          "max_absolute": 2.302766870609929e-05,
-          "max_relative": 0.0017040043440950238,
+          "max_absolute": 6.602566802044185e-07,
+          "max_relative": 2.4774579916155634e-05,
           "undefined_relative_count": 0
         },
         "full_b_logSD_covariance": {
-          "max_absolute": 2.302766870609929e-05,
-          "max_relative": 0.22141217108571631,
+          "max_absolute": 6.602566802044185e-07,
+          "max_relative": 0.015590474123915581,
           "undefined_relative_count": 0
         },
         "common_GH101_loglik_Python": -1653.1012050576403,
-        "common_GH101_loglik_R": -1653.1012433716915,
-        "common_loglik_difference": -3.831405115306552e-05,
-        "R_solution_common_GH101_score": 0.0005008142853102648,
+        "common_GH101_loglik_R": -1653.1012050721497,
+        "common_loglik_difference": -1.4509396351058967e-08,
+        "R_solution_common_GH101_score": 6.890127062665163e-06,
         "Python_converged": true,
         "R_diagnostics": {
           "converged": true,
-          "sd": 1.4843,
-          "variance": 2.2031,
+          "sd": 1.4851203763060266,
+          "variance": 2.2055825321193536,
           "iterations": 25,
-          "loglik": -1653.0996,
+          "loglik": -1653.1012050721438,
           "interior": true,
           "covariance_valid": true,
-          "full_covariance_condition": 6.2212,
+          "full_covariance_condition": 6.224968597837764,
           "identification": "a=1; mean=0; SD free",
           "points": 61,
           "vcov_labels": [
@@ -191,62 +191,62 @@
     },
     "101": {
       "Statistic": {
-        "max_absolute": 0.004108285775478393,
-        "max_relative": 0.0007637892918474211,
+        "max_absolute": 0.00013336740947877956,
+        "max_relative": 1.669783725092686e-05,
         "undefined_relative_count": 0
       },
       "p": {
-        "max_absolute": 0.000161957411091318,
-        "max_relative": 0.002271714830608837,
+        "max_absolute": 1.227702788320073e-06,
+        "max_relative": 7.366732505051996e-05,
         "undefined_relative_count": 0
       },
       "Delta_b": {
-        "max_absolute": 0.0001111863972060867,
-        "max_relative": 0.00033009049379397674,
+        "max_absolute": 4.356895762058777e-06,
+        "max_relative": 7.862870692591663e-06,
         "undefined_relative_count": 0
       },
       "SE_b": {
-        "max_absolute": 1.1073762832658485e-05,
-        "max_relative": 5.648306383433779e-05,
+        "max_absolute": 1.0696318594738408e-07,
+        "max_relative": 5.363812258232515e-07,
         "undefined_relative_count": 0
       },
       "contrast_covariance": {
-        "max_absolute": 4.3422462650197224e-06,
-        "max_relative": 0.00011296931800785846,
+        "max_absolute": 4.26604277875553e-08,
+        "max_relative": 1.0727627448833993e-06,
         "undefined_relative_count": 0
       },
       "R": {
         "b": {
-          "max_absolute": 3.932900783487625e-06,
-          "max_relative": 1.4829921243823409e-05,
+          "max_absolute": 3.955037953362606e-06,
+          "max_relative": 1.4789569124451412e-05,
           "undefined_relative_count": 0
         },
         "sd_Python": 0.996529547776797,
-        "sd_R": 0.9965342465831092,
+        "sd_R": 0.9965343124190807,
         "b_covariance": {
-          "max_absolute": 5.5064853662911695e-08,
-          "max_relative": 1.0275088447146106e-05,
+          "max_absolute": 5.560799496220903e-08,
+          "max_relative": 1.0407740353139885e-05,
           "undefined_relative_count": 0
         },
         "full_b_logSD_covariance": {
-          "max_absolute": 5.5064853662911695e-08,
-          "max_relative": 0.0002686894840928376,
+          "max_absolute": 5.560799496220903e-08,
+          "max_relative": 0.0002571979686177408,
           "undefined_relative_count": 0
         },
         "common_GH101_loglik_Python": -3227.762911289432,
-        "common_GH101_loglik_R": -3227.7629112935765,
-        "common_loglik_difference": -4.144567355979234e-09,
-        "R_solution_common_GH101_score": 2.8913459011602956e-06,
+        "common_GH101_loglik_R": -3227.7629112936806,
+        "common_loglik_difference": -4.248704499332234e-09,
+        "R_solution_common_GH101_score": 2.9361833350962426e-06,
         "Python_converged": true,
         "R_diagnostics": {
           "converged": true,
-          "sd": 0.9965,
-          "variance": 0.9931,
+          "sd": 0.9965343124190807,
+          "variance": 0.99308063582857,
           "iterations": 19,
-          "loglik": -3227.7629,
+          "loglik": -3227.7629112936806,
           "interior": true,
           "covariance_valid": true,
-          "full_covariance_condition": 4.146,
+          "full_covariance_condition": 4.146046907177729,
           "identification": "a=1; mean=0; SD free",
           "points": 101,
           "vcov_labels": [
@@ -269,36 +269,36 @@
       },
       "F": {
         "b": {
-          "max_absolute": 0.000501037053058262,
-          "max_relative": 0.00028701059502815064,
+          "max_absolute": 2.3691931468228233e-05,
+          "max_relative": 8.998826808191847e-05,
           "undefined_relative_count": 0
         },
         "sd_Python": 1.485132569959313,
-        "sd_R": 1.4841902550821542,
+        "sd_R": 1.4851203762965715,
         "b_covariance": {
-          "max_absolute": 2.574253890678946e-05,
-          "max_relative": 0.0018964517143726545,
+          "max_absolute": 6.600041205923057e-07,
+          "max_relative": 2.4669874067011068e-05,
           "undefined_relative_count": 0
         },
         "full_b_logSD_covariance": {
-          "max_absolute": 2.574253890678946e-05,
-          "max_relative": 0.24175528919433503,
+          "max_absolute": 6.600041205923057e-07,
+          "max_relative": 0.015751603246467977,
           "undefined_relative_count": 0
         },
         "common_GH101_loglik_Python": -1653.1012050576398,
-        "common_GH101_loglik_R": -1653.1012524517346,
-        "common_loglik_difference": -4.73940947358642e-05,
-        "R_solution_common_GH101_score": 0.0005568442445154884,
+        "common_GH101_loglik_R": -1653.1012050721497,
+        "common_loglik_difference": -1.4509851098409854e-08,
+        "R_solution_common_GH101_score": 6.890135536439856e-06,
         "Python_converged": true,
         "R_diagnostics": {
           "converged": true,
-          "sd": 1.4842,
-          "variance": 2.2028,
+          "sd": 1.4851203762965715,
+          "variance": 2.20558253209127,
           "iterations": 25,
-          "loglik": -1653.0994,
+          "loglik": -1653.1012050721438,
           "interior": true,
           "covariance_valid": true,
-          "full_covariance_condition": 6.2207,
+          "full_covariance_condition": 6.224968601634001,
           "identification": "a=1; mean=0; SD free",
           "points": 101,
           "vcov_labels": [
@@ -346,23 +346,23 @@
     },
     "r": {
       "Statistic": {
-        "max_absolute": 0.0004142087997696109,
-        "max_relative": 7.839295578556185e-05,
+        "max_absolute": 7.459606266024821e-10,
+        "max_relative": 9.33955993243579e-11,
         "undefined_relative_count": 0
       },
       "p": {
-        "max_absolute": 1.6614503008993697e-05,
-        "max_relative": 0.0002288026832412583,
+        "max_absolute": 1.6805001834541144e-11,
+        "max_relative": 4.1202556429753e-10,
         "undefined_relative_count": 0
       },
       "Delta_b": {
-        "max_absolute": 1.11163372370493e-05,
-        "max_relative": 3.3813653499798075e-05,
+        "max_absolute": 4.125033647994769e-12,
+        "max_relative": 7.444430151215307e-12,
         "undefined_relative_count": 0
       },
       "SE_b": {
-        "max_absolute": 1.1488192900033223e-06,
-        "max_relative": 5.859691441106867e-06,
+        "max_absolute": 1.0615008871894815e-11,
+        "max_relative": 5.414010220928612e-11,
         "undefined_relative_count": 0
       }
     }
@@ -379,5 +379,5 @@
   },
   "comparison_scope": "PASS applies to the preregistered chi-square criterion and convergence/PD/interior gates only; parameter/covariance/common-grid score discrepancies are reported, not independently certified.",
   "metadata_note": "Effective settings follow actual native fit records and R raw parameter tables; inherited legacy Lord/Wald labels in original settings.json were not used by either fitter. Original workflow report/settings preserved; R SD reconstructed from full-precision raw CSV, not rounded diagnostic JSON.",
-  "R_window": "default[-6,6]"
+  "R_window": "[-12,12]"
 }

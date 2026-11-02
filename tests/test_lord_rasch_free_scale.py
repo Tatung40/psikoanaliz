@@ -52,3 +52,74 @@ def test_free_scale_inference_requires_actual_independent_reference(monkeypatch)
 def test_no_reference_cannot_be_assumed_from_model_name(monkeypatch,tmp_path):
     monkeypatch.setattr(L,'REFERENCE',tmp_path/'missing.json')
     assert L.reference_valid() is False
+
+
+def test_unestimable_rows_keep_failure_status():
+    raw=dict(table=pd.DataFrame([dict(Method='Lord χ²',Statistic=np.nan,p=np.nan,
+        Status='UNESTIMABLE / NOT CERTIFIED',Reason='Rasch yakınsama kapısı')]),metadata={'Parametric_model':'1PL'})
+    result=protect_result(raw)
+    assert result['table'].Status.eq('UNESTIMABLE / NOT CERTIFIED').all()
+    assert result['table'].p.isna().all()
+
+
+def test_actual_independent_free_sd_evidence_and_marginal_covariance():
+    import json
+    root=L.REFERENCE.parent
+    assert L.reference_valid()
+    report=json.loads(L.REFERENCE.read_text())
+    for q in ('61','101'):
+        result=report['comparisons'][q]
+        assert result['Statistic']['max_relative']<=1e-3
+        for g in ('R','F'):
+            assert result[g]['R_solution_common_GH101_score']<=1e-5
+            folder=root/f'GH{q}'
+            full=pd.read_csv(folder/f'python_{g}_full_cov.csv').to_numpy()
+            bb=pd.read_csv(folder/f'python_{g}_b_cov.csv').to_numpy()
+            np.testing.assert_array_equal(full[:-1,:-1],bb)
+            conditional=np.linalg.inv(np.linalg.inv(full)[:-1,:-1])
+            assert np.max(np.abs(bb-conditional))>0
+            values=pd.read_csv(root/'wide'/f'GH{q}'/f'r_{g}_raw_parameters.csv')
+            assert values.loc[values.name.eq('COV_11'),'est'].item()
+            assert not values.loc[values.name.eq('MEAN_1'),'est'].item()
+            assert values.loc[values.name.eq('a1'),'value'].eq(1).all()
+
+
+@pytest.mark.parametrize('failure',['window','score','chi','convergence'])
+def test_pass_label_cannot_override_failed_reference_criteria(monkeypatch,tmp_path,failure):
+    import json
+    from core.dif_lord_policy import free_scale_reference_eligible
+    report=json.loads(L.REFERENCE.read_text())
+    if failure=='window':report['R_window']='default[-6,6]'
+    if failure=='score':report['comparisons']['61']['F']['R_solution_common_GH101_score']=1.01e-5
+    if failure=='chi':report['comparisons']['101']['Statistic']['max_relative']=1.01e-3
+    if failure=='convergence':report['comparisons']['61']['R']['R_diagnostics']['converged']=False
+    fake=tmp_path/'report.json';fake.write_text(json.dumps(report));monkeypatch.setattr(L,'REFERENCE',fake)
+    monkeypatch.setattr(L,'reference_valid',lambda:True)
+    assert not free_scale_reference_eligible()
+
+
+def test_real_free_sd_center_and_exports_allow_only_the_new_valid_path(monkeypatch):
+    import io,json,zipfile
+    from core.dif_center import observed
+    from reports.dif_center_report import downloads
+    folder=L.REFERENCE.parent/'GH61'
+    raw=pd.read_csv(folder/'python_lord.csv').fillna({'Reason':''})
+    outcome=dict(table=raw,covariance=pd.read_csv(folder/'python_lord_cov.csv'),
+        diagnostics=json.loads((folder/'python_diagnostics.json').read_text()))
+    monkeypatch.setattr(L,'lord_1pl_rasch',lambda *a,**kw:outcome)
+    settings=json.loads((L.REFERENCE.parent/'settings.json').read_text())
+    data=pd.read_csv('tests/fixtures/irt_b10/data_dif1pl_uniform.csv').dropna()
+    result=observed(data,items=settings['items'],group='Grup',reference='R',focal='F',
+        anchors=settings['anchors'],studied=settings['studied'],methods=['Lord χ²'],model='1PL',correction='BH')
+    assert result['table'].p.notna().all() and result['table'].p_adj.notna().all()
+    assert result['table'].Status.eq(L.STATUS).all()
+    assert result['table'].Lord_sigma_reference.eq(outcome['diagnostics'][0]['sd']).all()
+    assert result['table'].Lord_sigma_focal.eq(outcome['diagnostics'][1]['sd']).all()
+    assert len(result['extra_tables']['Lord_group_diagnostics'])==2
+    payload=downloads(result)
+    tables=[pd.read_csv(io.BytesIO(payload['csv'])),pd.read_excel(io.BytesIO(payload['xlsx']),sheet_name='DIF')]
+    with zipfile.ZipFile(io.BytesIO(payload['zip'])) as z:tables.append(pd.read_csv(io.BytesIO(z.read('DIF.csv'))))
+    for table in tables:
+        np.testing.assert_allclose(table.p,result['table'].p,rtol=1e-13)
+        assert table.Status.eq(L.STATUS).all()
+    # Existing legacy-table tests separately prove that reference PASS cannot unlock fixed-SD outputs.

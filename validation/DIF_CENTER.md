@@ -232,8 +232,8 @@ audit apply. The old numerical kernel and original R artifacts are immutable.
 
 [Preregistered protocol](lord_rasch_free_scale/PROTOCOL.md): actual R mirt1.48
 Rasch/GH61 and101, same741 complete-case cohort, independent numerical delta
-Jacobian, pre-existing relative chi-square limit1e-3. No reference PASS is
-claimed until actual execution. Source/data-identity checking fails closed;
+Jacobian, pre-existing relative chi-square limit1e-3. Actual independent execution and the window diagnostic are recorded in
+[lord_rasch_free_scale/REPORT.md](lord_rasch_free_scale/REPORT.md). Source/data-identity checking fails closed;
 legacy cached fixed-SD results never acquire inference. New results retain
 conditional inference and NOT FWER CERTIFIED wording even after numeric PASS.
 
@@ -244,3 +244,10 @@ share alpha.05. Liberal control<=.075 differs from nominal .05; both control
 and inflation flags can coexist. Failed fits count as operational events but
 cannot manufacture evidence of inferential Type-I inflation. Old30 pairs are
 not reused because environment identities differ. No interim certification.
+
+The final free-SD reference uses actual R mirt1.48 GH61/GH101 with a supported
+[-12,12] integration window. The default[-6,6] diagnostic is retained as a
+common-grid stationarity failure despite its narrow chi-square agreement.
+Matched chi-square max relative error1.671e-5; maximum R common-GH101 score
+6.891e-6 satisfies the unchanged1e-5 guard. Only this source-identified
+reference enables conditional new-path p/q. No FWER claim follows from it.

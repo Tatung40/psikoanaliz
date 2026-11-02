@@ -31,7 +31,7 @@ def support_matrix():
     frame['Certified'] = False
     frame['Validation_scope'] = ['Uncorrected original/crossing identities; corrected API exercised',
         'Existing model-specific evidence; no general DIF-FWER certificate',
-        'R mirt1.48: three B10 complete-case fixtures only; see DIF_WALD_LORD_REFERENCE.json', 'Adaptive quadrature identity; no area SE/p',
+        '2PL: original two B10 fixtures; 1PL: free-SD Rasch only with independent reference gate; legacy fixed-SD descriptive', 'Adaptive quadrature identity; no area SE/p',
         'statsmodels matched-stratum/RBG reference', 'Nested likelihood identities; no general FWER control',
         'R mirt1.48: three B10 fixtures, full shared-anchor covariance; no general FWER certificate']
     return frame
@@ -67,6 +67,12 @@ def observed(data, *, items, group, reference, focal, anchors, studied, methods=
                 else:
                     from core.dif_lord import lord_dif
                     outcome=lord_dif(data[items],data[group],reference,focal,model=model,anchors=anchors,studied=studied)
+            if method=='Lord χ²' and model=='1PL' and len(outcome.get('diagnostics',[]))==2:
+                diagnostics=pd.DataFrame(outcome['diagnostics'])
+                diagnostics.insert(0,'Group',[repr(reference),repr(focal)])
+                extra_tables['Lord_group_diagnostics']=diagnostics
+                outcome['table']=outcome['table'].assign(Lord_sigma_reference=diagnostics.sd.iloc[0],
+                    Lord_sigma_focal=diagnostics.sd.iloc[1])
             parametric[method]=outcome['table'].set_index('Item')
             extra_tables[('Wald' if method=='Wald DIF' else 'Lord')+'_covariance']=outcome['covariance']
         except (ValueError,TypeError,np.linalg.LinAlgError) as exc:

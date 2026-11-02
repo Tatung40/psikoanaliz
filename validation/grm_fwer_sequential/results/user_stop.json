@@ -1,0 +1,17 @@
+{
+  "reason": "Explicit user request to finalize PR131",
+  "signal": "SIGINT parent only at sleeping executor; shutdown waits for workers",
+  "state": "S (sleeping)",
+  "protocol_sha256": "28c2947ed4b8b5ece12e49b85e1c9405e002ce1af2a24f66fafd67c6df20a007",
+  "in_flight": "Drained futures may not be collected; no invented results or retries.",
+  "completed_pairs": 852,
+  "completed_analyses": 1704,
+  "uncollected_inflight_pairs": 1,
+  "interrupted_seed": 2026110952,
+  "interrupted_conditions": [
+    "minus",
+    "zero"
+  ],
+  "inference": "No invented results: uncollected in-flight pair is unknown; not counted as converged or failed fits; no retries. Formal uncertainty only at registered completed look500.",
+  "stop_request_utc": "2026-11-02T18:14:23.975488+00:00"
+}

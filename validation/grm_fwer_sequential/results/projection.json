@@ -1,0 +1,9 @@
+{
+  "records": 1704,
+  "original_full_archive_sha256": "0b50c076b97bcccda343618fb46e389819377a8e389b7fe371101db11c7314e4",
+  "original_bytes": 94237546,
+  "canonical_bytes": 16097258,
+  "canonical_sha256": "adfe95e03800631058e01cef7b92be0502dbf4ce44c7ad7015a86b133c5c8a7e",
+  "omitted": "Only deterministic dense observed-information matrices; shapes/eigenvalues/conditions/matrix SHA256 retained. All fits/parameters/LR/p/decisions/failures/gradient vectors/RNG and data hashes preserved.",
+  "original_location": "Full original archive retained in execution workspace; not modified. Matrices reproducible from saved parameters, pinned source/runtime and verified data; no optimization required."
+}
