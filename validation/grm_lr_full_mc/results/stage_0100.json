@@ -1,0 +1,10 @@
+{
+  "completed_pairs": 100,
+  "analyses": 200,
+  "valid": 200,
+  "used_seconds": 551.1750831980025,
+  "peak_worker_rss_mib": 204.203125,
+  "projected_total_seconds": 13779.38093115008,
+  "prior_files_verified": 111,
+  "decision_basis": "technical gates/runtime only; no statistical success decision"
+}

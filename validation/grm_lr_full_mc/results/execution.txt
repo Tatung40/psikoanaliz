@@ -1,0 +1,170 @@
+40/5000 analyses completed; 110.9s including pilot; stage target 100
+60/5000 analyses completed; 163.5s including pilot; stage target 100
+80/5000 analyses completed; 219.0s including pilot; stage target 100
+100/5000 analyses completed; 273.3s including pilot; stage target 100
+120/5000 analyses completed; 327.6s including pilot; stage target 100
+140/5000 analyses completed; 381.2s including pilot; stage target 100
+160/5000 analyses completed; 439.2s including pilot; stage target 100
+180/5000 analyses completed; 492.8s including pilot; stage target 100
+200/5000 analyses completed; 551.0s including pilot; stage target 100
+Stage 100 technical audit complete; 551.2s
+220/5000 analyses completed; 604.9s including pilot; stage target 500
+240/5000 analyses completed; 657.6s including pilot; stage target 500
+260/5000 analyses completed; 710.9s including pilot; stage target 500
+280/5000 analyses completed; 762.9s including pilot; stage target 500
+300/5000 analyses completed; 815.3s including pilot; stage target 500
+320/5000 analyses completed; 870.8s including pilot; stage target 500
+340/5000 analyses completed; 925.2s including pilot; stage target 500
+360/5000 analyses completed; 984.1s including pilot; stage target 500
+380/5000 analyses completed; 1037.4s including pilot; stage target 500
+400/5000 analyses completed; 1091.3s including pilot; stage target 500
+420/5000 analyses completed; 1143.9s including pilot; stage target 500
+440/5000 analyses completed; 1198.4s including pilot; stage target 500
+460/5000 analyses completed; 1252.5s including pilot; stage target 500
+480/5000 analyses completed; 1306.7s including pilot; stage target 500
+500/5000 analyses completed; 1361.4s including pilot; stage target 500
+520/5000 analyses completed; 1416.7s including pilot; stage target 500
+540/5000 analyses completed; 1471.0s including pilot; stage target 500
+560/5000 analyses completed; 1524.7s including pilot; stage target 500
+580/5000 analyses completed; 1579.0s including pilot; stage target 500
+600/5000 analyses completed; 1631.7s including pilot; stage target 500
+620/5000 analyses completed; 1685.5s including pilot; stage target 500
+640/5000 analyses completed; 1738.1s including pilot; stage target 500
+660/5000 analyses completed; 1794.0s including pilot; stage target 500
+680/5000 analyses completed; 1849.2s including pilot; stage target 500
+700/5000 analyses completed; 1903.0s including pilot; stage target 500
+720/5000 analyses completed; 1961.9s including pilot; stage target 500
+740/5000 analyses completed; 2015.4s including pilot; stage target 500
+760/5000 analyses completed; 2076.0s including pilot; stage target 500
+780/5000 analyses completed; 2130.8s including pilot; stage target 500
+800/5000 analyses completed; 2185.4s including pilot; stage target 500
+820/5000 analyses completed; 2243.3s including pilot; stage target 500
+840/5000 analyses completed; 2298.7s including pilot; stage target 500
+860/5000 analyses completed; 2354.4s including pilot; stage target 500
+880/5000 analyses completed; 2411.2s including pilot; stage target 500
+900/5000 analyses completed; 2468.1s including pilot; stage target 500
+920/5000 analyses completed; 2523.9s including pilot; stage target 500
+940/5000 analyses completed; 2578.3s including pilot; stage target 500
+960/5000 analyses completed; 2632.6s including pilot; stage target 500
+980/5000 analyses completed; 2686.6s including pilot; stage target 500
+1000/5000 analyses completed; 2740.2s including pilot; stage target 500
+Stage 500 technical audit complete; 2740.5s
+1020/5000 analyses completed; 2797.3s including pilot; stage target 2500
+1040/5000 analyses completed; 2853.8s including pilot; stage target 2500
+1060/5000 analyses completed; 2907.8s including pilot; stage target 2500
+1080/5000 analyses completed; 2965.6s including pilot; stage target 2500
+1100/5000 analyses completed; 3022.4s including pilot; stage target 2500
+1120/5000 analyses completed; 3077.7s including pilot; stage target 2500
+1140/5000 analyses completed; 3135.0s including pilot; stage target 2500
+1160/5000 analyses completed; 3189.5s including pilot; stage target 2500
+1180/5000 analyses completed; 3245.6s including pilot; stage target 2500
+1200/5000 analyses completed; 3303.2s including pilot; stage target 2500
+1220/5000 analyses completed; 3359.4s including pilot; stage target 2500
+1240/5000 analyses completed; 3414.5s including pilot; stage target 2500
+1260/5000 analyses completed; 3467.5s including pilot; stage target 2500
+1280/5000 analyses completed; 3521.5s including pilot; stage target 2500
+1300/5000 analyses completed; 3575.0s including pilot; stage target 2500
+1320/5000 analyses completed; 3630.7s including pilot; stage target 2500
+1340/5000 analyses completed; 3683.8s including pilot; stage target 2500
+1360/5000 analyses completed; 3736.8s including pilot; stage target 2500
+1380/5000 analyses completed; 3793.4s including pilot; stage target 2500
+1400/5000 analyses completed; 3851.1s including pilot; stage target 2500
+1420/5000 analyses completed; 3907.7s including pilot; stage target 2500
+1440/5000 analyses completed; 3960.9s including pilot; stage target 2500
+1460/5000 analyses completed; 4013.7s including pilot; stage target 2500
+1480/5000 analyses completed; 4066.6s including pilot; stage target 2500
+1500/5000 analyses completed; 4121.0s including pilot; stage target 2500
+1520/5000 analyses completed; 4175.5s including pilot; stage target 2500
+1540/5000 analyses completed; 4232.6s including pilot; stage target 2500
+1560/5000 analyses completed; 4287.3s including pilot; stage target 2500
+1580/5000 analyses completed; 4341.6s including pilot; stage target 2500
+1600/5000 analyses completed; 4398.8s including pilot; stage target 2500
+1620/5000 analyses completed; 4452.1s including pilot; stage target 2500
+1640/5000 analyses completed; 4506.4s including pilot; stage target 2500
+1660/5000 analyses completed; 4561.0s including pilot; stage target 2500
+1680/5000 analyses completed; 4613.2s including pilot; stage target 2500
+1700/5000 analyses completed; 4667.5s including pilot; stage target 2500
+1720/5000 analyses completed; 4722.5s including pilot; stage target 2500
+1740/5000 analyses completed; 4776.3s including pilot; stage target 2500
+1760/5000 analyses completed; 4831.3s including pilot; stage target 2500
+{
+  "attempted": 1763,
+  "valid": 1762,
+  "seconds": 4839.208180424008,
+  "stop": "scientific/native/worker gate failed",
+  "scientific_status": "INCOMPLETE / NOT CERTIFIED",
+  "conditions": {
+    "minus": {
+      "attempted": 882,
+      "valid": 881,
+      "failed": 1,
+      "native_converged": 882,
+      "holm_events": 57,
+      "fwer": 0.06469920544835414,
+      "fwer_cp975": [
+        0.04742740163628925,
+        0.08574938371950507
+      ],
+      "joint_nine_cp": [
+        0.04390094173039861,
+        0.09105384303314461
+      ],
+      "fwer_mcse": 0.008292467711910296,
+      "bh_global_null_fdr": 0.06696935300794551,
+      "raw_type1": 0.06583427922814983,
+      "seconds": 2303.2546713869306,
+      "mean_seconds": 2.6113998541801933,
+      "projected_2500_seconds": 6528.499635450483,
+      "failed_outcome_empirical_bounds": [
+        0.06462585034013606,
+        0.06575963718820861
+      ],
+      "raw_type1_cluster_mcse": 0.006029115779431204,
+      "scoped_joint_decision": "INCONCLUSIVE / INCOMPLETE"
+    },
+    "zero": {
+      "attempted": 881,
+      "valid": 881,
+      "failed": 0,
+      "native_converged": 881,
+      "holm_events": 55,
+      "fwer": 0.06242905788876277,
+      "fwer_cp975": [
+        0.0454730438139363,
+        0.08318552863177592
+      ],
+      "joint_nine_cp": [
+        0.04202273470590743,
+        0.0884235062664636
+      ],
+      "fwer_mcse": 0.008155566324177023,
+      "bh_global_null_fdr": 0.06469920544835414,
+      "raw_type1": 0.055051078320090804,
+      "seconds": 2517.407713123066,
+      "mean_seconds": 2.8574434882214144,
+      "projected_2500_seconds": 7143.608720553536,
+      "failed_outcome_empirical_bounds": [
+        0.06242905788876277,
+        0.06242905788876277
+      ],
+      "raw_type1_cluster_mcse": 0.005744089161024513,
+      "scoped_joint_decision": "INCONCLUSIVE / INCOMPLETE"
+    }
+  },
+  "mean_seconds_per_analysis": 2.7448713445399933,
+  "projected_2500_pairs_both_impacts_seconds": 13724.356722699966,
+  "peak_worker_rss_mib": 210.828125,
+  "stage": 500,
+  "completed_attempt_pairs": 881,
+  "required_pairs": 2500,
+  "not_attempted": {
+    "minus": 1618,
+    "zero": 1619
+  },
+  "fixed_design_complete": false,
+  "inference_note": "Confirmatory conclusions disabled unless fixed2500 all-valid pairs. Valid-case rates/intervals after technical stop are conditional descriptions, not nominal FWER certification.",
+  "pilot_reused_analyses": 20,
+  "new_attempted": 1743,
+  "budget_seconds": 18000,
+  "prior_files_verified": 111
+}

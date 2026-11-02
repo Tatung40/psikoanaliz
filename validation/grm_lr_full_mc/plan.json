@@ -1,0 +1,85 @@
+{
+  "status": "PREREGISTERED CONTINUATION BEFORE NEW FITS; stages100/500/2500",
+  "base_main": "0bd4eb6",
+  "primary": "GRM-LR operational Holm-FWER under latent-null impact=-0.5",
+  "secondary": [
+    "GRM-LR FWER impact0",
+    "GRM-minus-total and GRM-minus-rest in each impact",
+    "GRM impact0-minus-impact_minus0.5",
+    "(GRM-ordinal)_0-minus-(GRM-ordinal)_minus0.5 for total and rest",
+    "validity, convergence, boundaries, quadrature, information and memory"
+  ],
+  "n_reference": 500,
+  "n_focal": 500,
+  "items": 10,
+  "categories": 4,
+  "true_latent_dif": false,
+  "impacts": [
+    -0.5,
+    0.0
+  ],
+  "generator": "unchanged validation.dif_validation_study.gen_ordinal; a=linspace(.9,1.8,10); thresholds=linspace(-1,1,10)+[-1,0,1]; normal theta SD1; only focal mean changes",
+  "anchors": [
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P07",
+    "P08"
+  ],
+  "tested_family": [
+    "P09",
+    "P10"
+  ],
+  "alpha": 0.05,
+  "test": "production core.grm_dif.test_dif; joint slope and all3 thresholds,4df; other tested item free; no purification",
+  "identification": "eight oracle-invariant anchors share slopes/thresholds; reference N(0,1); focal mu/SD estimated; positive slopes, ordered thresholds; scalar ability orientation and scale fixed by reference and anchors, not by observed total/rest scores",
+  "settings": "categories=4 INTEGER, points=61, native GH81 likelihood/score audit; min_cell=5; unchanged native optimizer maxiter2000 ftol1e-14 gtol1e-10; no priors",
+  "gates": "ALL H0/Hb/Ha/H2 fits converged finite native per-observation max score<2e-6, no transformed bound distance<1e-4; GH61/GH81 logLik error<=1e-3 and audit max score<=1e-5; finite information eigenvalues with min>1e-7*max(max,1); cov available; complete2-item p family; nested LR nonnegative within native tolerance; exact anchor equality/ordered thresholds/physical bounds/df4 must agree",
+  "bounds": "a[.1,4]; b0[-6,4]; log gaps[log(.05),log(6)]; focal mu[-3,3],logSD[log(.3),log(3)]",
+  "seed_rule": "first10 existing seeds2026110100..2026110109, each at both impacts; same raw data/content hashes and cached ordinal outcomes from PR120/121, no ordinal refits",
+  "pairing": "verify generator/version/source plus both archived data hashes; reuse traced PR121 common normal/uniform reconstruction for impact0; compare reference rows and groups; retain matrix hashes and CRN trace, never equate seed identity alone with pairing",
+  "feasibility_seed_pairs": 10,
+  "planned_grm_analyses": 5000,
+  "budget_seconds": 18000,
+  "per_analysis_timeout_seconds": 90,
+  "memory_limit_mib": 1024,
+  "memory_rule": "record child ru_maxrss in MiB (Linux); stop launching new analyses if observed worker peak exceeds1024MiB. Timeout/OS termination retains stderr/stdout and failure record; no invented completed fit diagnostics.",
+  "failure_rule": "STOP at first new invalid native/scientific gate, timeout, memory>1024MiB, API/data/source/hash mismatch or interrupted attempt. Preserve all successful/failed/partial records; no retry, replacement or new seed. Unattempted conditions explicitly not run. No confirmatory inference from incomplete/valid-case selected data.",
+  "estimands": "Operational false-DIF decisions against latent-null DGP. GRM latent invariance and observed-score conditional ordinal-LR nulls differ; paired event differences do not prove interchangeable hypotheses or universal method superiority.",
+  "multiplicity": "Primary/secondary GRM FWER2 plus7 contrasts form9-component family: CP FWER intervals alpha=.05/9 each and Hoeffding contrast intervals alpha=.05/9 each => joint>=95%. Supplementary97.5% CP for2 GRM conditions jointly>=95% only within that pair. Marginal exact paired95% CIs not joint across contrasts. McNemar only5 binary paired contrasts, raw+Holm5 adjusted; not applicable to2 difference-of-differences interactions and never a nominal-control certificate.",
+  "intervals": "reuse paired_stats/exact_paired_ci and mean_stats; D in[-1,1], W in[-2,2]; MCSE sample SD/sqrt(n) on complete dataset pairs/quadruples; interaction covariance retained in16-cell event table. Exact paired interaction CI subtracts two97.5% paired component intervals by union bound. Unknown failures bounded per missing D[-1,1] or W[-2,2]; never impute no event.",
+  "bh": "secondary BH event probability equals FDR only under global latent null; raw itemwise false-positive mean with repetition-clustered MCSE; no mixed-null FDR claim",
+  "main_required_seed_pairs": 2500,
+  "precision": "2500 gives worst-case binary difference MCSE<=.02, interaction<=.04, Bernoulli FWER<=.01; no .02 CI-halfwidth claim",
+  "decision": "Authorized continuation only within18000s INCLUDING pilot cost; per-stage caps and90s/analysis remain. At stage100 and500 check validity, checksums and observed mean projected remaining cost<=remaining budget, never events/significance. No early statistical success. Final scientific classification MEASURED / NOT CERTIFIED regardless CI; scoped conclusions only fixed2500 all-valid condition pairs with predeclared9-family intervals.",
+  "next_plan": "Authorized100/500/2500 continuation with immutable source/settings and existing10-pair pilot; no alternative design or automatic scientific certification.",
+  "acceptance": "No new statistical cutoffs. At completed fixed2500 only: primary joint-family CP lower>.05 supports scoped inflation; upper<=.05 supports scoped control; otherwise INCONCLUSIVE. Cross-contrast direction requires corresponding joint-family Hoeffding interval excludes0. Pilot always FEASIBILITY ONLY / NOT CERTIFIED.",
+  "preserved_files": 111,
+  "production_changes": false,
+  "ordinal_refits": false,
+  "R_fits": false,
+  "pilot_seconds_counted_against_budget": 55.18486306499835,
+  "reuse": "Load all20 immutable PR122 fits; never repeat any seed/condition already attempted. Load ordinal outcomes from PR120/121 unchanged.",
+  "stages": [
+    {
+      "pairs": 100,
+      "increment_wall_cap_seconds": 900
+    },
+    {
+      "pairs": 500,
+      "increment_wall_cap_seconds": 3600
+    },
+    {
+      "pairs": 2500,
+      "increment_wall_cap_seconds": 15000
+    }
+  ],
+  "stopping": "Stop before any fit if cumulative budget or current stage limit exhausted. At boundaries stop if projected remaining5000 total analyses exceeds remaining total budget. Preserve native thresholds unchanged. Pilot cost and prior elapsed continuation cost persist across restarts.",
+  "storage": "Immutable pilot reference plus deterministic gzip chunks of up to100 new analysis records, checksums, raw native diagnostics and decisions; append-only fsynced active ledger; marker before each attempted fit prevents speculative retry after interruption. Source/settings/version hashes, per-input archived hashes and common-RNG trace comparison preserved. Only failed new matrices need storing; all matrices deterministic from protected generator/seeds.",
+  "independent_audit": "After stop/completion independently reconstruct per-item Holm/BH from raw p, FWER/FDR, repeat-clustered MCSE, CP intervals, binary contrast tables and exact binomial-CDF McNemar; interactions via four-event covariance. Check joint9 Hoeffding formulas independently and protect prior files. No new fits during audit. Complete-case/missing bounds and not-attempted totals explicit.",
+  "pilot_reused_grm_analyses": 20,
+  "new_maximum_grm_analyses": 4980
+}

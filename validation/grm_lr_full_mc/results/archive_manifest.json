@@ -1,0 +1,74 @@
+{
+  "chunk_000.jsonl.gz": {
+    "sha256": "c2fcf87985562e59b24ca279e9a3f267ce591d167146a5116f56cdedb7d75ee8",
+    "bytes": 449470
+  },
+  "chunk_001.jsonl.gz": {
+    "sha256": "5c550990e0d619b72ce4cfc25cb6bd3bbdd395e2d25ae016d49ffa5cfeeda227",
+    "bytes": 360082
+  },
+  "chunk_002.jsonl.gz": {
+    "sha256": "0009c133cf0a9b352a1300069804e1e7b129c7dd4c832a0e71b4ccc6bca1516b",
+    "bytes": 448894
+  },
+  "chunk_003.jsonl.gz": {
+    "sha256": "bad6dc9adeffb7f7f9d2dee8afbcf3bae8db0bfe5997d35adf563adb0c3668d2",
+    "bytes": 449103
+  },
+  "chunk_004.jsonl.gz": {
+    "sha256": "c1ba1f04924a2df8a36e01fb94b3f79e799df148a6895945e3811f15dea2b371",
+    "bytes": 449337
+  },
+  "chunk_005.jsonl.gz": {
+    "sha256": "af21c7b7bb54121bee88f4a95bba3d54d4fb795743fbf2640d4d14632e57cc9a",
+    "bytes": 448941
+  },
+  "chunk_006.jsonl.gz": {
+    "sha256": "54821e12f20790b3c332d327c6aa5f84bece1b3fe604c6b58eadbb50be02a4e4",
+    "bytes": 449252
+  },
+  "chunk_007.jsonl.gz": {
+    "sha256": "4d92be00b8e180486e4894f920cd8e3f73354d42d91a4d5159223f4cc299f6dc",
+    "bytes": 449515
+  },
+  "chunk_008.jsonl.gz": {
+    "sha256": "a3846fa4de52ef1f52242f88b92caa9d191a200153a48ede098aba03ec2742a9",
+    "bytes": 449675
+  },
+  "chunk_009.jsonl.gz": {
+    "sha256": "d260554710fa6bd2b0cf4b4bd83087e8a76dbc2589c39ab9b354f5a1795e27b5",
+    "bytes": 448543
+  },
+  "chunk_010.jsonl.gz": {
+    "sha256": "256214c2553ea874cd3e5443ed97ac4ed0094a5bd3acaee5176f0ccf538fc8d4",
+    "bytes": 449599
+  },
+  "chunk_011.jsonl.gz": {
+    "sha256": "4642e5ca841064f82be3d17ebc5c6015f9963035d88e86d495f2c708451a6147",
+    "bytes": 449406
+  },
+  "chunk_012.jsonl.gz": {
+    "sha256": "26f939beca5ddea1bf8e2901b05ae7809d5c4b399fa75e82a6e2952040830439",
+    "bytes": 449790
+  },
+  "chunk_013.jsonl.gz": {
+    "sha256": "aafdc0fed68188c33825f616d6a6b801057fbdcc3bbfd802f3d673f0a768b9ba",
+    "bytes": 449914
+  },
+  "chunk_014.jsonl.gz": {
+    "sha256": "923e5b00e844319cdb0640dcbadaec25cac7b0b03468354889148c477a94c1af",
+    "bytes": 449368
+  },
+  "chunk_015.jsonl.gz": {
+    "sha256": "8ecf82fa161774ae322ab783a8093b967722b5d58c7b9d865b6e3c9a600cb66d",
+    "bytes": 449089
+  },
+  "chunk_016.jsonl.gz": {
+    "sha256": "3dfc22b314951d5c140ba22734c0c03c22e784d12d7d5e39fe2ebd4061dac4f8",
+    "bytes": 449292
+  },
+  "chunk_017.jsonl.gz": {
+    "sha256": "f4d6e89cef517f268dabe71cb310d755257e58617e8875103692273d372f451e",
+    "bytes": 283641
+  }
+}
