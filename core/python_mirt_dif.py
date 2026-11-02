@@ -197,6 +197,25 @@ def curve_tables(fit,items,labels,model):
     difference['Focal_minus_reference']=difference.focal-difference.reference
     effect=difference.groupby('Item').Focal_minus_reference.agg(lambda v:float(np.abs(v).max())).rename('Max_abs_probability_difference_on_grid').reset_index()
     tables={'Curves':curves,'Difference':difference,'IIF':information,'TIF':information.groupby(['Group','Theta'],as_index=False).Information.sum(),'Effect':effect}
+    if model in ('Rasch','1PL','2PL','3PL','4PL'):
+        from core.dif_center import raju_area
+        areas=[]
+        for j,item in enumerate(items):
+            row={'Item':item,'p':np.nan,'Status':'DESCRIPTIVE / NOT CERTIFIED','Converged':bool(fit.converged)}
+            try:
+                parameters=[]
+                for name in ('reference','focal'):
+                    pars=fit.model.get_group_model(list(fit.group_labels).index(name)).get_item_parameters(j)
+                    required=['discrimination','difficulty']+(['guessing'] if model in ('3PL','4PL') else [])+(['upper'] if model=='4PL' else [])
+                    if not set(required)<=set(pars):raise ValueError('Raju için gerekli katsayı API’si eksik')
+                    parameters.append([float(np.asarray(pars.get(k,default)).item()) for k,default in
+                        (('discrimination',1),('difficulty',0),('guessing',0),('upper',1))])
+                row.update(raju_area(*parameters))
+            except (ValueError,AttributeError,TypeError,KeyError) as exc:
+                row.update(Signed_area=np.nan,Unsigned_area=np.nan,Reason=str(exc))
+            if not fit.converged:row['Status']='NOT CONVERGED / DESCRIPTIVE / NOT CERTIFIED'
+            areas.append(row)
+        tables['Raju_area']=pd.DataFrame(areas)
     if model!='NRM':
         scores={str(label):c for c,label in enumerate(labels)}
         scored=curves.assign(Expected=curves.Probability*curves.Category.astype(str).map(scores))

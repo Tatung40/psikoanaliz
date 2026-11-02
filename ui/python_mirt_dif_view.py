@@ -94,8 +94,9 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
         st.markdown('#### '+title);st.dataframe(tables[name],hide_index=True,use_container_width=True)
     with st.expander('Tam tablolar ve çapa duyarlılığı'):
         for name,frame in tables.items():
-            if name.startswith('Alt_') or name in ('Parameters','Categories','DTF','Sensitivity'):
+            if name.startswith('Alt_') or name in ('Parameters','Categories','DTF','Sensitivity','Raju_area'):
                 st.write(name);st.dataframe(frame,hide_index=True)
+                if name=='Raju_area':st.caption('Tüm θ doğrusu üzerinde odak−referans lojistik alanı; ortak asimptot ve bağlı ölçek gerekir. SH/test/p üretilmez; kategori alanı veya yanlılık sertifikası değildir.')
     item=st.selectbox('Grafik maddesi',items,key='pmd_plot_item')
     fig=figure(tables,item);st.pyplot(fig)
     import matplotlib.pyplot as plt

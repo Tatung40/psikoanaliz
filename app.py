@@ -227,6 +227,8 @@ with st.sidebar:
             st.button(label,key=f"irt_nav_{page}",use_container_width=True,
                       on_click=navigate_to,args=(page,))
         st.caption("Formel DIF sayfalarında doğrulama durumu ayrıca belirtilir.")
+        st.button("⚖️ DIF Analiz Merkezi",key="nav_dif_center",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: DIF Analiz Merkezi",))
         st.button("⚖️ GRM Formel DIF (Deneysel)",key="nav_grm_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: GRM Formel DIF",))
         st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)",key="nav_poly_dif",
@@ -1227,6 +1229,12 @@ elif selected_page == "Çok Boyutlu MTK (MIRT)":
     from ui.irt_multidim_view import render as render_multidim
     instrument_code_capture(globals())
     render_multidim(st.session_state.raw_df, st.session_state.item_cols, st.session_state.id_col)
+
+elif selected_page == "MTK: DIF Analiz Merkezi":
+    from ui.dif_center_view import render as render_dif_center
+    instrument_code_capture(globals())
+    render_dif_center(st.session_state.raw_df,st.session_state.item_cols,
+                      st.session_state.id_col,st.session_state.group_col)
 
 elif selected_page == "MTK: Python mirt DIF":
     from ui.python_mirt_dif_view import render as render_python_mirt_dif
