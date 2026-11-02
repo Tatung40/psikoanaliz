@@ -1,0 +1,48 @@
+{
+  "version": "GRM-GH101-COLD-PILOT-1",
+  "status": "COMMITTED BEFORE NEW PILOT FITS/OUTCOMES",
+  "base_commit": "5dda9687d2ff1ed2ad3fd3b48f372808980a4e19",
+  "seeds": [
+    2026110100,
+    2026110101,
+    2026110102,
+    2026110103,
+    2026110104,
+    2026110105,
+    2026110106,
+    2026110107,
+    2026110108,
+    2026110109
+  ],
+  "seed_selection": "The first10 fixed seeds in PR125 proposal/original2500 family, selected before GH101 pilot outcomes; distinct from single-case2026110981. Existing GH61 results known but not used for seed selection.",
+  "impacts": [
+    "minus",
+    "zero"
+  ],
+  "impact_means": {
+    "minus": -0.5,
+    "zero": 0.0
+  },
+  "planned_datasets": 20,
+  "unique_hypotheses_per_dataset": 7,
+  "hypothesis_slots_per_dataset": 8,
+  "data": "Load the20 immutable PR122 NPZ matrices directly; no response/data generation. Verify raw values/group SHA256, archived NumPy version, all original RNG draw hashes, identical reference rows and shared groups, focal monotonicity.",
+  "model": "Same N500/500,J10,C4, latent no-DIF GRM; anchorsP01-P08; targetsP09/P10; referenceN(0,1), focal mean/SD free; same positive slopes, threshold ordering, native bounds, identification and4/3/1df hypotheses.",
+  "initialization": "For EVERY unique hypothesis in EVERY dataset: native G.Fitter.fit(start_fit=None), not old GH61/GH101 or another hypothesis. Fresh dataset fitter, one call per unique roles. Record actual optimizer x0 via transparent wrapper and verify exactly equals native pooled-tail/a1/mu0/SD1 initialization after native bound clipping. No alternative starts/retries.",
+  "fitting": "Uniform GH101 ONLY. Unchanged L-BFGS-B maxiter2000 ftol1e-14 gtol1e-10. No adaptive GH161 optimization or rescuing failed outcomes.",
+  "audit": "Independently constructed SciPy GH161 nodes/weights vs native NumPy GH101 fit nodes; direct rowwise logLik, ALL-coordinate two-step central FD (1e-4/1e-5*max(1,abs(p))), GH161 observed-information audit; same inherited methods as PR125, all7 hypotheses for EVERY attempted dataset.",
+  "gates": "Same native max normalized fit score<2e-6, encoded-bound margin>=1e-4, GH161 score<=1e-5, absolute logLik grid discrepancy<=1e-3, native covariance and relative PD info min>1e-7*max(max,1); same dense PD check; exact anchors/ordered thresholds. FD arithmetic check atol1e-8 rtol1e-5 inherited from PR124/125, not a scientific threshold change. Native nested-LR checks; LR grid bound .004 follows from per-fit .001, not a new criterion.",
+  "comparison": "GH61 cached fits are diagnostic reference ONLY: use the same exact20 data/hypothesis constraints; compare common-GH161 logLik/LR/parameters and native-grid changes. Legacy GH61 used its native within-dataset warm-start hierarchy, whereas this pilot is strict per-hypothesis cold. Differences cannot be attributed to quadrature alone or interpreted as superiority/FWER evidence. No old fits rerun, pooled or replaced.",
+  "resources": {
+    "total_wall_seconds": 600,
+    "per_dataset_wall_seconds": 45,
+    "peak_process_rss_mib": 1024
+  },
+  "failure": "Stop at first invalid scientific/native/derivative/LR/cold-start gate, timeout, memory or source/data/hash error. Save every attempted dataset and completed/partial hypothesis. No retry, substitution, seed replacement or density escalation. Report attempted/20, valid/attempted, incomplete and not-run explicitly.",
+  "decision": "TECHNICAL PILOT PASS only if all20 predefined datasets/140 unique optimizations complete, converge and pass ALL gates/cold verification within resources; otherwise FAIL/INCOMPLETE with exact reason. Counts of140 fits or160 slots are not independent replications. No FWER, power, scientific certification or production-label promotion.",
+  "next": "Do not launch100/500/2500. Any continuation requires a separate preregistered budgeted uniform-policy protocol; reuse data/ordinal evidence but do not merge these estimates into GH61 Monte Carlo.",
+  "protected_files": 159,
+  "p_values_generated": false,
+  "data_generated": false,
+  "production_changes": false
+}

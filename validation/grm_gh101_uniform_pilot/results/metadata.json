@@ -1,0 +1,185 @@
+{
+  "protocol": {
+    "version": "GRM-GH101-COLD-PILOT-1",
+    "status": "COMMITTED BEFORE NEW PILOT FITS/OUTCOMES",
+    "base_commit": "5dda9687d2ff1ed2ad3fd3b48f372808980a4e19",
+    "seeds": [
+      2026110100,
+      2026110101,
+      2026110102,
+      2026110103,
+      2026110104,
+      2026110105,
+      2026110106,
+      2026110107,
+      2026110108,
+      2026110109
+    ],
+    "seed_selection": "The first10 fixed seeds in PR125 proposal/original2500 family, selected before GH101 pilot outcomes; distinct from single-case2026110981. Existing GH61 results known but not used for seed selection.",
+    "impacts": [
+      "minus",
+      "zero"
+    ],
+    "impact_means": {
+      "minus": -0.5,
+      "zero": 0.0
+    },
+    "planned_datasets": 20,
+    "unique_hypotheses_per_dataset": 7,
+    "hypothesis_slots_per_dataset": 8,
+    "data": "Load the20 immutable PR122 NPZ matrices directly; no response/data generation. Verify raw values/group SHA256, archived NumPy version, all original RNG draw hashes, identical reference rows and shared groups, focal monotonicity.",
+    "model": "Same N500/500,J10,C4, latent no-DIF GRM; anchorsP01-P08; targetsP09/P10; referenceN(0,1), focal mean/SD free; same positive slopes, threshold ordering, native bounds, identification and4/3/1df hypotheses.",
+    "initialization": "For EVERY unique hypothesis in EVERY dataset: native G.Fitter.fit(start_fit=None), not old GH61/GH101 or another hypothesis. Fresh dataset fitter, one call per unique roles. Record actual optimizer x0 via transparent wrapper and verify exactly equals native pooled-tail/a1/mu0/SD1 initialization after native bound clipping. No alternative starts/retries.",
+    "fitting": "Uniform GH101 ONLY. Unchanged L-BFGS-B maxiter2000 ftol1e-14 gtol1e-10. No adaptive GH161 optimization or rescuing failed outcomes.",
+    "audit": "Independently constructed SciPy GH161 nodes/weights vs native NumPy GH101 fit nodes; direct rowwise logLik, ALL-coordinate two-step central FD (1e-4/1e-5*max(1,abs(p))), GH161 observed-information audit; same inherited methods as PR125, all7 hypotheses for EVERY attempted dataset.",
+    "gates": "Same native max normalized fit score<2e-6, encoded-bound margin>=1e-4, GH161 score<=1e-5, absolute logLik grid discrepancy<=1e-3, native covariance and relative PD info min>1e-7*max(max,1); same dense PD check; exact anchors/ordered thresholds. FD arithmetic check atol1e-8 rtol1e-5 inherited from PR124/125, not a scientific threshold change. Native nested-LR checks; LR grid bound .004 follows from per-fit .001, not a new criterion.",
+    "comparison": "GH61 cached fits are diagnostic reference ONLY: use the same exact20 data/hypothesis constraints; compare common-GH161 logLik/LR/parameters and native-grid changes. Legacy GH61 used its native within-dataset warm-start hierarchy, whereas this pilot is strict per-hypothesis cold. Differences cannot be attributed to quadrature alone or interpreted as superiority/FWER evidence. No old fits rerun, pooled or replaced.",
+    "resources": {
+      "total_wall_seconds": 600,
+      "per_dataset_wall_seconds": 45,
+      "peak_process_rss_mib": 1024
+    },
+    "failure": "Stop at first invalid scientific/native/derivative/LR/cold-start gate, timeout, memory or source/data/hash error. Save every attempted dataset and completed/partial hypothesis. No retry, substitution, seed replacement or density escalation. Report attempted/20, valid/attempted, incomplete and not-run explicitly.",
+    "decision": "TECHNICAL PILOT PASS only if all20 predefined datasets/140 unique optimizations complete, converge and pass ALL gates/cold verification within resources; otherwise FAIL/INCOMPLETE with exact reason. Counts of140 fits or160 slots are not independent replications. No FWER, power, scientific certification or production-label promotion.",
+    "next": "Do not launch100/500/2500. Any continuation requires a separate preregistered budgeted uniform-policy protocol; reuse data/ordinal evidence but do not merge these estimates into GH61 Monte Carlo.",
+    "protected_files": 159,
+    "p_values_generated": false,
+    "data_generated": false,
+    "production_changes": false
+  },
+  "sources": {
+    "validation/grm_gh101_uniform_pilot/pilot.py": "f174de414346de23704b4f104a63d5c43719785c8645668d39208bff48fee285",
+    "validation/grm_gh101_uniform_pilot/protocol.json": "d6215f98bab9207921ffc86db210b288c8d89b00a3b0a2bc2f2039ad8b58e159",
+    "validation/grm_gh101_uniform_pilot/prior_manifest.json": "b956f30c2100145564bb1108e5832cdfb9804424ee98390d4a70deb1bb934394",
+    "validation/grm_gh101_uniform_pilot/audit.py": "7279dae8b33985c8f28c251fad7d883c980de3f056ac18ab00802bf766ef755e"
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.0"
+  },
+  "git_commit": "43913ed8596b539337fb2c827a958039aecc8d30",
+  "pairing_audit": [
+    {
+      "seed": 2026110100,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "358743c1b0f7f75c31c99dee0c95280d54ed2848f35f5ee0f897b8fe0cc55155",
+      "matrix_hashes": {
+        "minus": "272b188ef491d539236707815e35966c16a72640514c035e8416206e698b2e95",
+        "zero": "c9530e4bdfa4ddaf3a38070f97e54e1bcabeb2d549356045810ef9a8a128e0c8"
+      }
+    },
+    {
+      "seed": 2026110101,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "f9339c50b648ddf93c91728a8d16e674193a00aa87c504bff524a3782ae72c07",
+      "matrix_hashes": {
+        "minus": "63cb5d14a5098e586a4ba7b55cd54be5446c4c7a29b731f2394ad5ca9b4bb9e1",
+        "zero": "b7256527f21792fd9cb30fedb459b76abde9d00b4832da01929c164a1270be77"
+      }
+    },
+    {
+      "seed": 2026110102,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "68bb90c1f6853400133bf8a72ecb259e67876f1e61ec6085a5bd1981fcab9f80",
+      "matrix_hashes": {
+        "minus": "d8a0e6fa966230b54e4e667c990a7796f92b8820c03d237e0dfe9f8f18c7b8a5",
+        "zero": "c60e530c8205db81640db6a79a5e95f0f89ad3b99f613b223198208fa911b87f"
+      }
+    },
+    {
+      "seed": 2026110103,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "338752e4561e88cdb1ca2894c428abe6c2205fcaf4510b2896ea8862b5a767fe",
+      "matrix_hashes": {
+        "minus": "7401057123faff514f64782f1b4381e83e164d4bb655f442888be813b76f5759",
+        "zero": "221af5f9b11237e391d8663e93cf64f702ed887efe078a1212fab7f03b676ae2"
+      }
+    },
+    {
+      "seed": 2026110104,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "5915da4a159fc6c14670e651b91ada91f215986de35c8b168e13c1009efedbb9",
+      "matrix_hashes": {
+        "minus": "10492b10140a6af7b144f87b9a7ebd2791faeac4d1d3980be7e30637857d3c75",
+        "zero": "ce79174f2487404213c1de490acc30f05b71fbdc3cf3b855089c6c8202cc122b"
+      }
+    },
+    {
+      "seed": 2026110105,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "39742139edc9f6492c2f03a64a6849c7525c05b98d9be45a1869b4da9f92640f",
+      "matrix_hashes": {
+        "minus": "dbed437e3e8cd9668a2321f98a963dc57a6ce8bf58d53f893ec851da0e007c25",
+        "zero": "e240441a1209f8375f6e64e127ee088648801f99255fa978c42a70c073598b14"
+      }
+    },
+    {
+      "seed": 2026110106,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "7cc246443fbba43ed0cf4166e71d494a6b4543e7387fea9e7673d16cc511bf5b",
+      "matrix_hashes": {
+        "minus": "428d982618c8fe55afc6d723bcdfd7f4340ecb711356d693b52d3c072282d192",
+        "zero": "6dc65eb561e92bba46cd1f0457683444c6f08225be7cd197e7d17ceb9f520116"
+      }
+    },
+    {
+      "seed": 2026110107,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "ca1a7ad8f5f99ac6d44a2cba01c41f796e32d6cf8b4b9748a14c91bd11ef0b2c",
+      "matrix_hashes": {
+        "minus": "f26b8e73c10f8e9c24747826c50799cefcd2054d61adc6cd3da20e3d9ee5dd89",
+        "zero": "0249734c910a044daf2e5f0421173862cc6c3bb39e82c19f3078a1577a689403"
+      }
+    },
+    {
+      "seed": 2026110108,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "2212e2fc53748419e52216a5deb9da6eac1bbda1f79b564a3d2b68c067bbb22f",
+      "matrix_hashes": {
+        "minus": "c4e9fadf74a79e283058dec2895fb2a1f35859cb099a31b9adf9d7fc803ed509",
+        "zero": "60a0742376200667fcadf73f84e3d75bcac550684836e9cdddf1026ef37beaf6"
+      }
+    },
+    {
+      "seed": 2026110109,
+      "rng_hashes_verified": 12,
+      "reference_rows_identical": true,
+      "groups_identical": true,
+      "focal_monotone": true,
+      "source_crn_sha256": "57b669b985def04bad5aa6518a252b465572dad2efebec9642f06b3f6ce85a86",
+      "matrix_hashes": {
+        "minus": "121565689505424f22f64974c6677f871504a80e81962cb3cfcf84366d0e4dbb",
+        "zero": "86f5634226b047851b621594ecf3619ed44d726b4a01b534461185634017b7d2"
+      }
+    }
+  ],
+  "prior_files_verified": 159
+}

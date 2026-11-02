@@ -1,0 +1,29 @@
+{
+  "per_condition": {
+    "minus": {
+      "n": 10,
+      "seconds": 128.20718481298536,
+      "valid": 10
+    },
+    "zero": {
+      "n": 10,
+      "seconds": 130.04762570100138,
+      "valid": 10
+    }
+  },
+  "native_fit_seconds": 56.64627063382068,
+  "scipy_success_calls": 140,
+  "cold_clipping_calls": 0,
+  "min_native_information_eigenvalue": 6.847139367103938,
+  "min_dense_information_eigenvalue": 6.84713937217099,
+  "max_dense_information_condition": 155.4932345294133,
+  "max_fd_error_h1e4": 3.7155514291953307e-09,
+  "max_fd_error_h1e5": 2.5816197402050946e-10,
+  "max_same_grid_legacy_LR_delta": 4.129105946049094e-09,
+  "max_physical_parameter_change_vs_legacy": 1.0035263859453636e-05,
+  "min_legacy_common_loglik_improvement": -3.728928277269006e-10,
+  "max_legacy_common_loglik_improvement": 6.857590051367879e-09,
+  "max_dataset_seconds": 14.842067887992016,
+  "min_dataset_seconds": 11.910620561990072,
+  "legacy_LR_notes": 0
+}
