@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import pytest
-from test_grm_gh101_stage_a import fixture
+from tests.test_grm_gh101_stage_a import fixture
 from validation.grm_gh101_stage_a import runner as R
 from validation.grm_gh101_stage_a import statistics as S
 from validation.grm_gh101_stage_a import user_stop_finalize as F
