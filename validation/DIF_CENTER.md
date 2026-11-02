@@ -8,11 +8,11 @@ korunur. Menü: **MTK: DIF Analiz Merkezi**. Mevcut kullanıcı ekranları kald�
 |---|---|---|---|
 | SIBTEST | Gerçek mirt1.2.0 original/crossing; β, SH, z, χ²/sd/p, yön; sabit çapalar | Düzeltmesiz iki-katman hesabı; düzeltilmiş yol gerçek API ile çalıştırıldı | Düzeltilmiş/crossing genel Tip-I/FWER ve etki sınıfı sertifikası yok |
 | IRT-LR | Mevcut sabit-çapalı model ekranları; public mirt LR/sd/parametre farkları/eğriler | Önceki modele özgü arşivler; yerel↔Python aynı proje karşılaştırması R değildir | Public p/q/Wald kapısı kapalı; mevcut yerel model kapıları değişmedi |
-| Lord χ² | Üretim public mirt çok-grup yolunda **BLOCKED** | Yeni test/benchmark yok | Ortak bağlı-ölçek parametre kovaryansı sunulmuyor; grup SH’lerini bağımsız sayıp kovaryans uydurulmaz |
+| Lord χ² | **IMPLEMENTED / fixture-specific VALIDATED**, 1PL/2PL ayrı public kalibrasyonlar | Gerçek R mirt1.48, üç B10 fikstürü, tam anchor-Jacobian | 3PL/4PL yok; genel FWER sertifikası yok; public çok-grup kovaryansı yerine ayrı örneklem Oakes kullanılır |
 | Raju | İkili, ortak c/u, aynı bağlı θ ölçeğinde tam-doğru işaretli/işaretsiz alan | Bağımsız scipy adaptif sonsuz-aralık integrali | Betimsel; SH/test/p ve sınıf yok; farklı asimptotlar ıraksar |
 | MH | Mevcut MH/RBG ve ETS ΔMH/OR/A-B-C | statsmodels StratifiedTable/RBG | Koşullu gözlenen puan null’u; genel FWER sertifikası yok |
 | Lojistik LR | Mevcut M0/M1/M2; uniform/nonuniform/omnibus, seçilen birincil hipotez, omnibus ΔR² | Mevcut likelihood/df kimlikleri ve gerçek statsmodels | Impact/çapa koşulları; bileşen için omnibus etki sınıfı atanmaz |
-| Wald DIF | Üretim public mirt çok-grup yolunda **BLOCKED** | Genel `mirt.wald` imzası kaynak koddan doğrulandı | Tek-grup Wald, DIF değildir; ortak kovaryans, link belirsizliği ve tanı kapıları gerekir |
+| Wald DIF | **IMPLEMENTED / fixture-specific VALIDATED**, 1PL M1 / 2PL M2 | Gerçek R mirt1.48, üç B10 fikstürü, mevcut ortak MML kovaryansı | 3PL/4PL yok; tek-grup `mirt.wald` ile karıştırılmaz; genel FWER sertifikası yok |
 
 **Hiçbir yeni yöntem CERTIFIED değildir.** `checks.json` gerçek no-fit çalışmanın
 makine-okunur sayısal sonuçları, sürümleri, API imzaları ve public çok-grup sonuç
@@ -60,7 +60,7 @@ akışları, yedi stale-input vakası, tüm formel yönlendirmeler ve güvenli r
 çalıştırıldı. Sayısal toleranslar eşitlik/entegrasyon testidir, bilimsel kabul
 sınırı veya sonradan ayarlanmış FWER ölçütü değildir.
 
-**Rscript yok: yeni bağımsız R/difR/lordif çalışması NOT EXECUTED.** Uysal ve ark.
+**İlk SIBTEST/Raju aşamasında yerel Rscript yoktu; o yöntemlerin R/difR/lordif karşılaştırması NOT EXECUTED.** Lord/Wald için aşağıdaki gerçek CI-R kanıtı ayrıdır. Uysal ve ark.
 (2019), DOI 10.21031/epod.534312 PDF’i sağlanmadı; makale replikasyonu iddia edilmez.
 GH101/GH161, 1e−5 kapısı, 4PL politikaları ve geçmiş ham kanıtlar değişmedi:
 **NUMERICALLY VALIDATED — 30 PAIRED SEEDS** / **FWER NOT CERTIFIED**.
@@ -134,3 +134,30 @@ eşiği değişmez. Parametre/kovaryans farkları ayrıca raporlanır; farklı p
 ham a,d Wald’ı fiziksel a,b Wald’ıyla aynıymış gibi karşılaştırılmaz. Son gerçek
 R yürütme/karşılaştırma durumu CI artifact `comparison.json` ve PR raporundadır;
 R çıktısı yoksa VALIDATED veya CERTIFIED yazılmaz. Genel DIF-FWER sertifikası yok.
+
+### Gerçek bağımsız R sonucu (kalibrasyonlar tekrarlanmadı)
+
+R `mirt` **1.48**, workflow `41445711328`, kod `3a2de19`: **9/9 uyum yakınsamış,
+sınır/pozitif tanımlılık/κ≤1e8 kontrolleri başarılı**. Kaynak hash’leri, kullanılan
+kohortlar, parametre/kovaryans farkları ve tam karşılaştırma özeti
+`validation/DIF_WALD_LORD_REFERENCE.json`; ham R/Python CSV, RDS ve stdout/stderr
+aynı workflow artifact’ındadır. Aşağıdaki göreli χ² farkları önceden verilen
+1e−3 sınırının altındadır:
+
+| Fikstür | Wald max göreli χ² | Lord max göreli χ² |
+|---|---|---|
+| dif1pl_uniform (741 tam satır) | 6.14815e−4 | 9.69795e−7 |
+| dif2pl_mixed (2000) | 1.06847e−5 | 5.76007e−6 |
+| dif2pl_none (2000) | 7.40570e−4 | 2.24348e−4 |
+
+En büyük mutlak kontrast parametre farkı Wald **1.53336e−4**, Lord **1.21082e−5**;
+kontrast kovaryansı farkı Wald **7.22657e−6**, Lord **2.26991e−6**. Diğer parametre
+ve kovaryans farkları ayrıca kaydedilir; bunlar için sonradan kabul eşiği
+uydurulmadı. Küçük değere bölünen göreli ikincil farklar χ² eşiğiyle karıştırılmaz
+(ör. null Wald kontrastında göreli parametre farkı 1.48021e−3; ayrı Lord
+kalibrasyonu kovaryansında bazı küçük elemanlarda göreli fark ≈0.00680).
+
+**Lord/Wald bu üç kayıtlı tasarım için bağımsız referansla VALIDATED; genel
+CERTIFIED değil.** UI’daki BLOCKED kaldırıldı, referans kapsamı açık kaldı.
+Bu salt kanıt/durum güncellemesi yeniden R kalibrasyonu gerektirmez; CI kaynak
+hash’leri ve aynı önceden tanımlı 1e−3 sınırıyla kayıtlı gerçek kanıtı doğrular.

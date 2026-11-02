@@ -18,21 +18,21 @@ def support_matrix():
     frame = pd.DataFrame([
         ('SIBTEST', 'IMPLEMENTED', 'İkili; gerçek mirt.sibtest, sabit çapalar', 'β, SH, z/χ², sd, p; genel FWER/etki sınıfı sertifikası yok'),
         ('IRT-LR', 'IMPLEMENTED / LIMITED', 'Mevcut formel model sayfaları; public çok-grup ayrı', 'G²/sd/parametre farkı/eğriler; public mirt p/q kapalı'),
-        ('Lord χ²', 'IMPLEMENTED / NOT CERTIFIED', '1PL/2PL; ayrı public mirt kalibrasyonları', 'Oakes + tam çapa Jacobianı; 1PL A=1, 2PL mean/sigma'),
+        ('Lord χ²', 'INDEPENDENTLY REFERENCED / NOT CERTIFIED', '1PL/2PL; ayrı public mirt kalibrasyonları', 'Oakes + tam çapa Jacobianı; 1PL A=1, 2PL mean/sigma'),
         ('Raju', 'IMPLEMENTED / DESCRIPTIVE', 'İkili lojistik; ortak alt/üst asimptot', 'Tam θ doğrusu işaretli/işaretsiz alan; test/p/etki sınıfı kapalı'),
         ('MH', 'INDEPENDENTLY REFERENCED', 'İkili; mevcut MH/RBG motoru', 'χ², sd=1, OR, ΔMH, ETS A/B/C; genelleme koşullu'),
         ('Lojistik LR', 'IMPLEMENTED', 'İkili; ordinal için mevcut ayrı ekran', 'Uniform/nonuniform/omnibus LR, sd, p, omnibus ΔR²'),
-        ('Wald DIF', 'IMPLEMENTED / NOT CERTIFIED', '1PL M1 / 2PL M2; mevcut eşzamanlı MML', 'Tam ortak kontrast kovaryansı; Lord ile aynı yöntem değildir'),
+        ('Wald DIF', 'INDEPENDENTLY REFERENCED / NOT CERTIFIED', '1PL M1 / 2PL M2; mevcut eşzamanlı MML', 'Tam ortak kontrast kovaryansı; Lord ile aynı yöntem değildir'),
     ], columns=['Method', 'Evidence', 'Design', 'Outputs / restriction'])
     frame['Implemented'] = True
     frame['Numerically_validated'] = frame.Method.isin(['SIBTEST','Raju','MH','Lojistik LR','IRT-LR','Lord χ²','Wald DIF'])
-    frame['Independent_reference'] = frame.Method.eq('MH')
+    frame['Independent_reference'] = frame.Method.isin(['MH','Lord χ²','Wald DIF'])
     frame['Certified'] = False
     frame['Validation_scope'] = ['Uncorrected original/crossing identities; corrected API exercised',
         'Existing model-specific evidence; no general DIF-FWER certificate',
-        'Anchor Jacobian and covariance identities; independent R fixture check recorded separately', 'Adaptive quadrature identity; no area SE/p',
+        'R mirt1.48: three B10 complete-case fixtures only; see DIF_WALD_LORD_REFERENCE.json', 'Adaptive quadrature identity; no area SE/p',
         'statsmodels matched-stratum/RBG reference', 'Nested likelihood identities; no general FWER control',
-        'Full shared-anchor covariance from existing MML; independent R fixture check recorded separately']
+        'R mirt1.48: three B10 fixtures, full shared-anchor covariance; no general FWER certificate']
     return frame
 
 
