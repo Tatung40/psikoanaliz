@@ -1,0 +1,37 @@
+{
+  "version": "GH-REOPT-1",
+  "status": "COMMITTED BEFORE NEW REOPTIMIZATION OUTCOMES",
+  "base_commit": "aee9926818521becde184918044cd7cfb0cf7517",
+  "seed": 2026110981,
+  "impact": -0.5,
+  "data": "Only saved failed_0881_minus.npz; no generation/MC/ordinal LR/replacement",
+  "model": "Same two-group GRM, categories4, anchorsP01-P08, targetsP09/P10, referenceN(0,1), focal mu/SD free; eight slots/seven unique roles, identical constraints/bounds.",
+  "stages": [
+    {
+      "fit_points": 101,
+      "audit_points": 161
+    },
+    {
+      "fit_points": 161,
+      "audit_points": 201
+    }
+  ],
+  "algorithm": "Unchanged native G.Fitter.fit, information=True, max_iter2000, L-BFGS-B ftol1e-14 gtol1e-10; configure only validation instance grid and independently constructed SciPy audit_grid; no production source/default change.",
+  "initialization": "GH101 each unique hypothesis starts from its own saved GH61 physical solution recovered by native Design. No start clipping accepted. GH161 fallback only if ANY complete GH101 stage fails a gate: reoptimize ALL7 unique hypotheses once, starting their GH101 finite/interior solution, otherwise own GH61. No extra initializations/retries.",
+  "stopping": "Skip GH161 optimization if ALL GH101 solutions and nested LR checks pass. Stop after failed GH161 stage or resource/error; no speculative repeat.",
+  "gates": "Same native optimizer score<2e-6, no encoded-bound distance<1e-4, audit max normalized gradient<=1e-5 and absolute logLik grid difference<=1e-3, information finite PD with min>1e-7*max(max,1), covariance available; exact anchor equality/physical constraints; independent audit-grid Hessian must satisfy same PD rule.",
+  "independent_checks": "Audit grid uses scipy roots_hermitenorm, separate from native fit-grid NumPy hermgauss. Direct rowwise likelihood and two-step central FD (1e-4,1e-5 times max(1,abs(p))) of ALL free coordinates at audit grid; arithmetic derivative check inherited PR124 np.allclose atol1e-8 rtol1e-5, not changed scientific1e-5 gate. Normalization -logLik/N, N1000.",
+  "information": "Native fit-grid information retained; additionally compute observed information at denser audit grid using native analytic-score central differences h1e-5*max(1,abs(p)) and same normalization/spectral criterion. No p, SE/CI or model certification generated.",
+  "lr": "Same omnibus4df, threshold3df, slope1df; check native nested-LR criterion at fit and audit grids. Per-fit logLik quadrature tolerance1e-3 implies LR grid discrepancy bound4e-3 by triangle inequality; this is not a new acceptance threshold. Compare old GH61 and old fixed-solution GH161 against new common GH161 values without refitting old solutions. Never add diagnostic p values to MC; no p values need be computed.",
+  "resources": {
+    "total_wall_seconds": 120,
+    "per_fit_wall_seconds": 30,
+    "worker_rss_safety_mib": 1024
+  },
+  "failure": "Keep every attempted stage/fit/partial result, no hidden deletion/retry. Nonconvergence, active bound, failed information/quadrature/derivative/LR check=>stage not passed; do not relax limits.",
+  "decision": "One saved dataset technical feasibility ONLY / NOT CERTIFIED. If stage passes, propose a NEW predeclared uniform-density staged validation; do not replace/extend PR123 records or revive its original fixed-GH61 experiment.",
+  "protected_prior_files": 152,
+  "production_changes": false,
+  "previous_evidence_changes": false,
+  "p_value_generation": false
+}
