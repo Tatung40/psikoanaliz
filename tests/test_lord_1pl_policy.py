@@ -69,7 +69,7 @@ def test_2pl_lord_and_all_wald_rows_are_unchanged():
 
 def install_saved_engines(monkeypatch):
     root=ROOT/'dif1pl_uniform';cfg=json.loads((root/'settings.json').read_text())
-    for name,target in [('lord','core.dif_lord.lord_dif'),('wald','core.irt_dif.wald_dif')]:
+    for name,target in [('lord','core.dif_lord_rasch.lord_1pl_rasch'),('wald','core.irt_dif.wald_dif')]:
         result=dict(table=pd.read_csv(root/f'python_{name}.csv',dtype={'Reason':'string'}).fillna({'Reason':''}),
                     covariance=pd.read_csv(root/f'python_{name}_cov.csv'))
         monkeypatch.setattr(target,lambda *a,_result=result,**kw:_result)
