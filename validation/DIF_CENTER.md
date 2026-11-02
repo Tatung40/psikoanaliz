@@ -86,3 +86,8 @@ başarısız olduğunu doğrular. Golden karşılaştırıcının **4 hedefli te
 (toplam 35 ayrı hedefli vaka). Yeni tablo mevcut bağımsız integral testleriyle
 ayrıca doğrulanır. Üretim kodu tam regresyondan sonra değişmedi. İkinci tam süit
 çalıştırılmaz; son başlıkta mevcut zorunlu CI kontrolleri izlenir.
+
+Yeni koruma testi mevcut allowlist uygulamasında ek bir hata yakaladı: bulunmayan
+beklenen fark için üretilen hata, aynı önek filtresiyle tekrar siliniyordu.
+Filtreleme hata eklenmeden önceye taşındı; artık eski/bulunmayan izin gerçekten
+FAIL üretir. Sayısal tolerans değişmedi. Dört golden testi düzeltmeden sonra geçti.

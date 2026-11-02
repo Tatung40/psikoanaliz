@@ -322,10 +322,10 @@ def main(argv=None):
     differences = compare(reference, current, rtol=args.rtol, atol=args.atol)
     for prefix in args.intended:
         changed = [d for d in differences if d.startswith(prefix)]
+        differences = [d for d in differences if not d.startswith(prefix)]
         if not changed:  # a stale allowance must not silently widen the gate
             differences.append(f'{prefix}: declared as intended change but identical to the reference')
         print(f'intended change {prefix}: {len(changed)} differences')
-        differences = [d for d in differences if not d.startswith(prefix)]
     for line in differences[:50]:
         print(line)
     print(f'{len(differences)} differences in {len(reference)} sections (rtol={args.rtol}, atol={args.atol})')
