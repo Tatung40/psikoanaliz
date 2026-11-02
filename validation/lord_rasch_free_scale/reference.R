@@ -4,6 +4,18 @@ stopifnot(as.character(packageVersion('mirt'))=='1.48')
 set.seed(20261102)
 root <- 'validation/lord_rasch_free_scale/results'
 cfg <- jsonlite::read_json(file.path(root,'settings.json'),simplifyVector=TRUE)
+wide <- '--wide' %in% commandArgs(trailingOnly=TRUE)
+if(wide) {
+  # Verify the actual installed implementation before ANY new calibration.
+  defaults <- mirt:::makeopts(method='EM',GenRandomPars=FALSE)
+  expanded <- mirt:::makeopts(method='EM',GenRandomPars=FALSE,technical=list(theta_lim=c(-12,12)))
+  stopifnot(identical(as.numeric(defaults$theta_lim),c(-6,6)),
+    identical(as.numeric(expanded$theta_lim),c(-12,12)))
+  root<-file.path(root,'wide');dir.create(root,showWarnings=FALSE)
+  jsonlite::write_json(list(mirt=as.character(packageVersion('mirt')),default_theta_lim=defaults$theta_lim,
+    expanded_theta_lim=expanded$theta_lim,verified_against_actual_runtime=TRUE),
+    file.path(root,'runtime_preflight.json'),pretty=TRUE,auto_unbox=TRUE,digits=16)
+}
 path <- 'tests/fixtures/irt_b10/data_dif1pl_uniform.csv'
 stopifnot(digest::digest(file=path,algo='sha256')==cfg$data_sha256)
 frame <- read.csv(path,check.names=FALSE)
@@ -17,7 +29,7 @@ pd <- function(V) {
 emit <- function(x,path)write.csv(x,path,row.names=FALSE)
 all_ok <- TRUE
 for(q in c(61,101)) {
-  out <- file.path(root,paste0('GH',q));vectors<-list();covs<-list()
+  out <- file.path(root,paste0('GH',q));dir.create(out,showWarnings=FALSE);vectors<-list();covs<-list()
   for(g in c('R','F')) {
     sub <- frame[frame$Grup==g,cfg$items,drop=FALSE]
     cache <- file.path(out,paste0('r_',g,'.rds'))
@@ -29,8 +41,10 @@ for(q in c(61,101)) {
     # Physical bounds: d=-b, variance=SD^2; no slope/intercept coupling needed.
     sv$lbound[sv$name=='d']<- -10;sv$ubound[sv$name=='d']<-10
     sv$lbound[sv$name=='COV_11']<-1e-6;sv$ubound[sv$name=='COV_11']<-400
+    tech<-list(NCYCLES=20000)
+    if(wide)tech$theta_lim<-c(-12,12)
     fit <- mirt(sub,1,itemtype='Rasch',pars=sv,quadpts=q,TOL=1e-10,
-      SE=TRUE,SE.type='Oakes',technical=list(NCYCLES=20000),verbose=FALSE)
+      SE=TRUE,SE.type='Oakes',technical=tech,verbose=FALSE)
     saveRDS(fit,cache)
     values <- mod2values(fit);V <- pd(vcov(fit));labels<-colnames(V)
     emit(values,file.path(out,paste0('r_',g,'_raw_parameters.csv')))
@@ -47,7 +61,7 @@ for(q in c(61,101)) {
       covariance_valid=TRUE,full_covariance_condition=kappa(V,exact=TRUE),
       identification='a=1; mean=0; SD free',points=q,vcov_labels=labels,
       numerical_limit='Native R regular quadrature differs from native Python GH; both densities checked')
-    jsonlite::write_json(diag,file.path(out,paste0('r_',g,'_diagnostics.json')),pretty=TRUE,auto_unbox=TRUE)
+    jsonlite::write_json(diag,file.path(out,paste0('r_',g,'_diagnostics.json')),pretty=TRUE,auto_unbox=TRUE,digits=16)
     emit(data.frame(item=cfg$items,b=b),file.path(out,paste0('r_',g,'_parameters.csv')))
     emit(as.data.frame(C),file.path(out,paste0('r_',g,'_b_cov.csv')))
     vectors[[g]]<-b;covs[[g]]<-C;all_ok<-all_ok && diag$converged && diag$interior

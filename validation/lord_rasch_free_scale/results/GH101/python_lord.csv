@@ -1,0 +1,3 @@
+Item,Method,Statistic,df,p,Status,Reason,A,B,Delta_b,SE_b,Lord_identification
+M3,Lord χ²,7.9869734341840415,1,0.004711511064161906,CONDITIONAL INFERENCE / DIF-FWER NOT CERTIFIED,"a=1, μ_R=μ_F=0, σ_R/σ_F serbest; tam (b,log σ) kovaryansı ve çapa delta yöntemi. Genel DIF-FWER sertifikası yok.",1.0,-0.3747541802310611,0.5541057044796349,0.19606564447693767,RASCH_FREE_SD_V1
+M9,Lord χ²,1.913267491714326,1,0.16660075168931132,CONDITIONAL INFERENCE / DIF-FWER NOT CERTIFIED,"a=1, μ_R=μ_F=0, σ_R/σ_F serbest; tam (b,log σ) kovaryansı ve çapa delta yöntemi. Genel DIF-FWER sertifikası yok.",1.0,-0.3747541802310611,-0.27583466272814494,0.19941645637626296,RASCH_FREE_SD_V1

@@ -1,0 +1,383 @@
+{
+  "status": "NUMERICAL REFERENCE FAIL",
+  "R_execution": "EXECUTED",
+  "R_mirt": "1.48",
+  "R": {
+    "R": "R version 4.6.1 (2026-06-24)",
+    "mirt": "1.48",
+    "data_sha256": "f3bcae3735e3dfd6e0178de8d382c12ea141fa1e4b9e68247cc803a5e4b34587",
+    "used_n": 741,
+    "seed": 20261102,
+    "session": [
+      "R version 4.6.1 (2026-06-24)",
+      "Platform: x86_64-pc-linux-gnu",
+      "Running under: Ubuntu 26.04.1 LTS",
+      "",
+      "Matrix products: default",
+      "BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 ",
+      "LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0",
+      "",
+      "locale:",
+      " [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       ",
+      " [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   ",
+      " [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          ",
+      "[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   ",
+      "",
+      "time zone: UTC",
+      "tzcode source: system (glibc)",
+      "",
+      "attached base packages:",
+      "[1] stats4    stats     graphics  grDevices utils     datasets  methods  ",
+      "[8] base     ",
+      "",
+      "other attached packages:",
+      "[1] mirt_1.48      lattice_0.22-9",
+      "",
+      "loaded via a namespace (and not attached):",
+      " [1] GPArotation_2026.8-2 future_1.80.0        generics_0.1.4      ",
+      " [4] class_7.3-23         listenv_1.1.0        digest_0.6.39       ",
+      " [7] magrittr_2.0.5       grid_4.6.1           splines2_0.5.4      ",
+      "[10] beepr_2.0            jsonlite_2.0.0       R.oo_1.27.1         ",
+      "[13] qs2_0.3.1            Matrix_1.7-5         R.utils_2.13.0      ",
+      "[16] sessioninfo_1.2.4    brio_1.1.5           e1071_1.7-17        ",
+      "[19] gridExtra_2.3.1      audio_0.1-12         mgcv_1.9-4          ",
+      "[22] dcurver_0.9.3        permute_0.9-10       pbapply_1.7-5       ",
+      "[25] numDeriv_2016.8-1.1  codetools_0.2-20     cli_3.6.6           ",
+      "[28] rlang_1.3.0          R.methodsS3_1.8.2    parallelly_1.50.0   ",
+      "[31] future.apply_1.21.0  splines_4.6.1        otel_0.2.0          ",
+      "[34] vegan_2.7-6          tools_4.6.1          parallel_4.6.1      ",
+      "[37] dplyr_1.2.1          globals_0.20.0       Deriv_4.3.6         ",
+      "[40] vctrs_0.7.3          R6_2.6.1             proxy_0.4-29        ",
+      "[43] lifecycle_1.0.5      SimDesign_2.28       stringfish_0.19.2   ",
+      "[46] MASS_7.3-65          cluster_2.1.8.2      pkgconfig_2.0.3     ",
+      "[49] clipr_0.8.1          gtable_0.3.6         progressr_1.1.0     ",
+      "[52] RcppParallel_6.2.1   pillar_1.11.1        glue_1.8.1          ",
+      "[55] Rcpp_1.1.2           tibble_3.3.1         tidyselect_1.2.1    ",
+      "[58] nlme_3.1-169         testthat_3.3.2       compiler_4.6.1      "
+    ]
+  },
+  "covariance": "b block after full inverse; latent SD nuisance included",
+  "comparisons": {
+    "61": {
+      "Statistic": {
+        "max_absolute": 0.0036941705165656202,
+        "max_relative": 0.0006855140641135235,
+        "undefined_relative_count": 0
+      },
+      "p": {
+        "max_absolute": 0.0001453564840710464,
+        "max_relative": 0.0020424966027500773,
+        "undefined_relative_count": 0
+      },
+      "Delta_b": {
+        "max_absolute": 0.00010007416006252434,
+        "max_relative": 0.0002963180826193341,
+        "undefined_relative_count": 0
+      },
+      "SE_b": {
+        "max_absolute": 9.924640887837288e-06,
+        "max_relative": 5.062153203924654e-05,
+        "undefined_relative_count": 0
+      },
+      "contrast_covariance": {
+        "max_absolute": 3.891663719196581e-06,
+        "max_relative": 0.00010124562661666807,
+        "undefined_relative_count": 0
+      },
+      "R": {
+        "b": {
+          "max_absolute": 3.938188845475921e-06,
+          "max_relative": 1.4819817691084493e-05,
+          "undefined_relative_count": 0
+        },
+        "sd_Python": 0.9965295477767826,
+        "sd_R": 0.9965342623412233,
+        "b_covariance": {
+          "max_absolute": 5.5184052608764356e-08,
+          "max_relative": 1.030572112602597e-05,
+          "undefined_relative_count": 0
+        },
+        "full_b_logSD_covariance": {
+          "max_absolute": 5.5184052608764356e-08,
+          "max_relative": 0.00026594865952682325,
+          "undefined_relative_count": 0
+        },
+        "common_GH101_loglik_Python": -3227.762911289432,
+        "common_GH101_loglik_R": -3227.762911293601,
+        "common_loglik_difference": -4.169123712927103e-09,
+        "R_solution_common_GH101_score": 2.9020766329494054e-06,
+        "Python_converged": true,
+        "R_diagnostics": {
+          "converged": true,
+          "sd": 0.9965,
+          "variance": 0.9931,
+          "iterations": 19,
+          "loglik": -3227.7629,
+          "interior": true,
+          "covariance_valid": true,
+          "full_covariance_condition": 4.146,
+          "identification": "a=1; mean=0; SD free",
+          "points": 61,
+          "vcov_labels": [
+            "d.2",
+            "d.6",
+            "d.10",
+            "d.14",
+            "d.18",
+            "d.22",
+            "d.26",
+            "d.30",
+            "d.34",
+            "d.38",
+            "d.42",
+            "d.46",
+            "COV_11.50"
+          ],
+          "numerical_limit": "Native R regular quadrature differs from native Python GH; both densities checked"
+        }
+      },
+      "F": {
+        "b": {
+          "max_absolute": 0.00045136018449776216,
+          "max_relative": 0.00026931433053660236,
+          "undefined_relative_count": 0
+        },
+        "sd_Python": 1.4851325018161396,
+        "sd_R": 1.4842852358255674,
+        "b_covariance": {
+          "max_absolute": 2.302766870609929e-05,
+          "max_relative": 0.0017040043440950238,
+          "undefined_relative_count": 0
+        },
+        "full_b_logSD_covariance": {
+          "max_absolute": 2.302766870609929e-05,
+          "max_relative": 0.22141217108571631,
+          "undefined_relative_count": 0
+        },
+        "common_GH101_loglik_Python": -1653.1012050576403,
+        "common_GH101_loglik_R": -1653.1012433716915,
+        "common_loglik_difference": -3.831405115306552e-05,
+        "R_solution_common_GH101_score": 0.0005008142853102648,
+        "Python_converged": true,
+        "R_diagnostics": {
+          "converged": true,
+          "sd": 1.4843,
+          "variance": 2.2031,
+          "iterations": 25,
+          "loglik": -1653.0996,
+          "interior": true,
+          "covariance_valid": true,
+          "full_covariance_condition": 6.2212,
+          "identification": "a=1; mean=0; SD free",
+          "points": 61,
+          "vcov_labels": [
+            "d.2",
+            "d.6",
+            "d.10",
+            "d.14",
+            "d.18",
+            "d.22",
+            "d.26",
+            "d.30",
+            "d.34",
+            "d.38",
+            "d.42",
+            "d.46",
+            "COV_11.50"
+          ],
+          "numerical_limit": "Native R regular quadrature differs from native Python GH; both densities checked"
+        }
+      }
+    },
+    "101": {
+      "Statistic": {
+        "max_absolute": 0.004108285775478393,
+        "max_relative": 0.0007637892918474211,
+        "undefined_relative_count": 0
+      },
+      "p": {
+        "max_absolute": 0.000161957411091318,
+        "max_relative": 0.002271714830608837,
+        "undefined_relative_count": 0
+      },
+      "Delta_b": {
+        "max_absolute": 0.0001111863972060867,
+        "max_relative": 0.00033009049379397674,
+        "undefined_relative_count": 0
+      },
+      "SE_b": {
+        "max_absolute": 1.1073762832658485e-05,
+        "max_relative": 5.648306383433779e-05,
+        "undefined_relative_count": 0
+      },
+      "contrast_covariance": {
+        "max_absolute": 4.3422462650197224e-06,
+        "max_relative": 0.00011296931800785846,
+        "undefined_relative_count": 0
+      },
+      "R": {
+        "b": {
+          "max_absolute": 3.932900783487625e-06,
+          "max_relative": 1.4829921243823409e-05,
+          "undefined_relative_count": 0
+        },
+        "sd_Python": 0.996529547776797,
+        "sd_R": 0.9965342465831092,
+        "b_covariance": {
+          "max_absolute": 5.5064853662911695e-08,
+          "max_relative": 1.0275088447146106e-05,
+          "undefined_relative_count": 0
+        },
+        "full_b_logSD_covariance": {
+          "max_absolute": 5.5064853662911695e-08,
+          "max_relative": 0.0002686894840928376,
+          "undefined_relative_count": 0
+        },
+        "common_GH101_loglik_Python": -3227.762911289432,
+        "common_GH101_loglik_R": -3227.7629112935765,
+        "common_loglik_difference": -4.144567355979234e-09,
+        "R_solution_common_GH101_score": 2.8913459011602956e-06,
+        "Python_converged": true,
+        "R_diagnostics": {
+          "converged": true,
+          "sd": 0.9965,
+          "variance": 0.9931,
+          "iterations": 19,
+          "loglik": -3227.7629,
+          "interior": true,
+          "covariance_valid": true,
+          "full_covariance_condition": 4.146,
+          "identification": "a=1; mean=0; SD free",
+          "points": 101,
+          "vcov_labels": [
+            "d.2",
+            "d.6",
+            "d.10",
+            "d.14",
+            "d.18",
+            "d.22",
+            "d.26",
+            "d.30",
+            "d.34",
+            "d.38",
+            "d.42",
+            "d.46",
+            "COV_11.50"
+          ],
+          "numerical_limit": "Native R regular quadrature differs from native Python GH; both densities checked"
+        }
+      },
+      "F": {
+        "b": {
+          "max_absolute": 0.000501037053058262,
+          "max_relative": 0.00028701059502815064,
+          "undefined_relative_count": 0
+        },
+        "sd_Python": 1.485132569959313,
+        "sd_R": 1.4841902550821542,
+        "b_covariance": {
+          "max_absolute": 2.574253890678946e-05,
+          "max_relative": 0.0018964517143726545,
+          "undefined_relative_count": 0
+        },
+        "full_b_logSD_covariance": {
+          "max_absolute": 2.574253890678946e-05,
+          "max_relative": 0.24175528919433503,
+          "undefined_relative_count": 0
+        },
+        "common_GH101_loglik_Python": -1653.1012050576398,
+        "common_GH101_loglik_R": -1653.1012524517346,
+        "common_loglik_difference": -4.73940947358642e-05,
+        "R_solution_common_GH101_score": 0.0005568442445154884,
+        "Python_converged": true,
+        "R_diagnostics": {
+          "converged": true,
+          "sd": 1.4842,
+          "variance": 2.2028,
+          "iterations": 25,
+          "loglik": -1653.0994,
+          "interior": true,
+          "covariance_valid": true,
+          "full_covariance_condition": 6.2207,
+          "identification": "a=1; mean=0; SD free",
+          "points": 101,
+          "vcov_labels": [
+            "d.2",
+            "d.6",
+            "d.10",
+            "d.14",
+            "d.18",
+            "d.22",
+            "d.26",
+            "d.30",
+            "d.34",
+            "d.38",
+            "d.42",
+            "d.46",
+            "COV_11.50"
+          ],
+          "numerical_limit": "Native R regular quadrature differs from native Python GH; both densities checked"
+        }
+      }
+    }
+  },
+  "density_stability": {
+    "python": {
+      "Statistic": {
+        "max_absolute": 1.225208461352878e-07,
+        "max_relative": 6.403748909437994e-08,
+        "undefined_relative_count": 0
+      },
+      "p": {
+        "max_absolute": 1.3575988722092092e-08,
+        "max_relative": 8.148816007390855e-08,
+        "undefined_relative_count": 0
+      },
+      "Delta_b": {
+        "max_absolute": 8.615154478697207e-09,
+        "max_relative": 3.123303791296189e-08,
+        "undefined_relative_count": 0
+      },
+      "SE_b": {
+        "max_absolute": 3.026548178741706e-10,
+        "max_relative": 1.5436402368277759e-09,
+        "undefined_relative_count": 0
+      }
+    },
+    "r": {
+      "Statistic": {
+        "max_absolute": 0.0004142087997696109,
+        "max_relative": 7.839295578556185e-05,
+        "undefined_relative_count": 0
+      },
+      "p": {
+        "max_absolute": 1.6614503008993697e-05,
+        "max_relative": 0.0002288026832412583,
+        "undefined_relative_count": 0
+      },
+      "Delta_b": {
+        "max_absolute": 1.11163372370493e-05,
+        "max_relative": 3.3813653499798075e-05,
+        "undefined_relative_count": 0
+      },
+      "SE_b": {
+        "max_absolute": 1.1488192900033223e-06,
+        "max_relative": 5.859691441106867e-06,
+        "undefined_relative_count": 0
+      }
+    }
+  },
+  "limits": {
+    "relative_chi_square": 0.001
+  },
+  "certification": "NO GENERAL DIF-FWER CERTIFICATION",
+  "production_source_sha256": {
+    "core/rasch.py": "405dd1720bdea1e811ad3c34eeec49af7f8f608fde143d7c71adebb8d0a38a17",
+    "core/dif_lord.py": "baf7ad5c5615c6dc20e6d4cfc8e75ec00fd3681f851231d43e477afa3d1b11e6",
+    "core/dif_lord_rasch.py": "df241e605ee1a0b27030a2cafa7fff58c952756af207afb1a2c7b92fade9edb7",
+    "tests/fixtures/irt_b10/data_dif1pl_uniform.csv": "f3bcae3735e3dfd6e0178de8d382c12ea141fa1e4b9e68247cc803a5e4b34587"
+  },
+  "comparison_scope": "PASS applies to the preregistered chi-square criterion and convergence/PD/interior gates only; parameter/covariance/common-grid score discrepancies are reported, not independently certified.",
+  "metadata_note": "Effective settings follow actual native fit records and R raw parameter tables; inherited legacy Lord/Wald labels in original settings.json were not used by either fitter. Original workflow report/settings preserved; R SD reconstructed from full-precision raw CSV, not rounded diagnostic JSON.",
+  "R_window": "default[-6,6]"
+}

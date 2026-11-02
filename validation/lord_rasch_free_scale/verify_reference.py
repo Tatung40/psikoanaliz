@@ -9,7 +9,7 @@ OUT=ROOT/'validation/lord_rasch_free_scale/results'
 
 
 def verify():
-    report=OUT/'report.json'
+    report=OUT/'wide/report.json'
     if not report.exists():
         needs=True
     else:
@@ -22,7 +22,8 @@ def verify():
             if hashlib.sha256((OUT/p).read_bytes()).hexdigest()!=h:raise ValueError('Raw reference evidence changed')
         needs=False
     if os.environ.get('GITHUB_OUTPUT'):
-        with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write(f'needs_r={str(needs).lower()}\n')
+        with open(os.environ['GITHUB_OUTPUT'],'a') as stream:
+            stream.write(f'needs_r={str(needs).lower()}\nneeds_python={str(not (OUT/"python_done.json").exists()).lower()}\n')
     print('PENDING ACTUAL R EXECUTION' if needs else 'Actual independent R evidence verified; no new fits')
 
 if __name__=='__main__':verify()
