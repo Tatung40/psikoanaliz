@@ -161,3 +161,13 @@ kalibrasyonu kovaryansında bazı küçük elemanlarda göreli fark ≈0.00680).
 CERTIFIED değil.** UI’daki BLOCKED kaldırıldı, referans kapsamı açık kaldı.
 Bu salt kanıt/durum güncellemesi yeniden R kalibrasyonu gerektirmez; CI kaynak
 hash’leri ve aynı önceden tanımlı 1e−3 sınırıyla kayıtlı gerçek kanıtı doğrular.
+
+PR path filtreleri toplam PR farkını da kapsadığından, yalnız kanıt commit’i bile
+R işini yeniden tetikleyebilir. `use_reference.py` bu durumda gerçek tamamlanmış
+R yürütmesini **yalnız** beş kalibrasyon/referans kaynağı, üç ham veri dosyası ve
+18 Python uyum/kovaryans/ayar dosyasının SHA-256 kimliği bire bir eşleşirse kullanır.
+Önceden tanımlı 1e−3 sınırı ve bütün yakınsama/sınır sonuçları yeniden doğrulanır.
+Herhangi bir kaynak/veri/uyum değişirse gerçek R işi gerekir; eski kanıt sessizce
+geçerli sayılmaz. Bu korumanın değişmiş kaynak/NPZ karşı örnekleri geçti. Yeni
+R kurulumu veya dokuz kalibrasyonun tekrarı gerekmez; `new_R_fits_this_run=0`
+ve asıl yürütme commit/workflow bağlantısı artifact’ta açıkça kaydedilir.

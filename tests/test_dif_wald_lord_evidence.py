@@ -24,3 +24,14 @@ def test_real_r_reference_is_scoped_matches_sources_and_meets_predeclared_chi_ga
             assert result['chi2']['max_relative']<=1e-3
             assert result['chi2']['undefined_relative_count']==0
             assert result['covariance']['max_absolute']>=0
+
+
+def test_actual_r_cache_rejects_changed_source_or_fit_data(monkeypatch):
+    from validation.dif_wald_lord.use_reference import verified_reference
+    import pytest
+    verified_reference()
+    read=Path.read_bytes
+    for changed in ['core/dif_lord.py','validation/dif_wald_lord/results/dif2pl_mixed/python_fits.npz']:
+        with monkeypatch.context() as patch:
+            patch.setattr(Path,'read_bytes',lambda p,_changed=changed: b'changed' if str(p)==_changed else read(p))
+            with pytest.raises(ValueError,match='identity changed'):verified_reference()
