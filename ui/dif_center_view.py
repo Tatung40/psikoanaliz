@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 from core.dif_center import BASE_METHODS,METHODS,LIMITATIONS,observed,support_matrix,theta_sensitivity,fingerprint
 from core.reproducible import displayed
+from core.dif_lord_policy import protect_result,WARNING,DESCRIPTIVE_NOTE
 from reports.dif_center_report import downloads,figure
 from reports.irt_b14_report import safe_frame
 
@@ -69,7 +70,9 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
             saved={'key':key,'result':result};st.session_state[KEY]=saved
         except Exception as exc:st.error(f'Analiz başarısız: {exc}')
     if saved is None:return
-    result=saved['result'];displayed(result)
+    result=protect_result(saved['result']);saved['result']=result;displayed(result)
+    if result['metadata'].get('Lord_inference_status'):
+        st.warning(WARNING);st.caption(DESCRIPTIVE_NOTE)
     st.dataframe(safe_frame(result['table']),hide_index=True)
     st.caption(result['metadata']['Matching'])
     st.json(result['metadata'])

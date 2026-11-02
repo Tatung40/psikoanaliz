@@ -8,7 +8,7 @@ korunur. Menü: **MTK: DIF Analiz Merkezi**. Mevcut kullanıcı ekranları kald�
 |---|---|---|---|
 | SIBTEST | Gerçek mirt1.2.0 original/crossing; β, SH, z, χ²/sd/p, yön; sabit çapalar | Düzeltmesiz iki-katman hesabı; düzeltilmiş yol gerçek API ile çalıştırıldı | Düzeltilmiş/crossing genel Tip-I/FWER ve etki sınıfı sertifikası yok |
 | IRT-LR | Mevcut sabit-çapalı model ekranları; public mirt LR/sd/parametre farkları/eğriler | Önceki modele özgü arşivler; yerel↔Python aynı proje karşılaştırması R değildir | Public p/q/Wald kapısı kapalı; mevcut yerel model kapıları değişmedi |
-| Lord χ² | **IMPLEMENTED / fixture-specific VALIDATED**, 1PL/2PL ayrı public kalibrasyonlar | Gerçek R mirt1.48, üç B10 fikstürü, tam anchor-Jacobian | 3PL/4PL yok; genel FWER sertifikası yok; public çok-grup kovaryansı yerine ayrı örneklem Oakes kullanılır |
+| Lord χ² | **2PL: fixture-specific numerical validation; 1PL: DESCRIPTIVE** | Gerçek R mirt1.48 sayısal uyumu; tam anchor-Jacobian | 1PL eşit örtük ölçek varsayımı doğrulanmadı: p/q kapalı. 2PL ve kovaryans hesapları korunur; genel FWER sertifikası yok |
 | Raju | İkili, ortak c/u, aynı bağlı θ ölçeğinde tam-doğru işaretli/işaretsiz alan | Bağımsız scipy adaptif sonsuz-aralık integrali | Betimsel; SH/test/p ve sınıf yok; farklı asimptotlar ıraksar |
 | MH | Mevcut MH/RBG ve ETS ΔMH/OR/A-B-C | statsmodels StratifiedTable/RBG | Koşullu gözlenen puan null’u; genel FWER sertifikası yok |
 | Lojistik LR | Mevcut M0/M1/M2; uniform/nonuniform/omnibus, seçilen birincil hipotez, omnibus ΔR² | Mevcut likelihood/df kimlikleri ve gerçek statsmodels | Impact/çapa koşulları; bileşen için omnibus etki sınıfı atanmaz |
@@ -157,8 +157,7 @@ uydurulmadı. Küçük değere bölünen göreli ikincil farklar χ² eşiğiyle
 (ör. null Wald kontrastında göreli parametre farkı 1.48021e−3; ayrı Lord
 kalibrasyonu kovaryansında bazı küçük elemanlarda göreli fark ≈0.00680).
 
-**Lord/Wald bu üç kayıtlı tasarım için bağımsız referansla VALIDATED; genel
-CERTIFIED değil.** UI’daki BLOCKED kaldırıldı, referans kapsamı açık kaldı.
+**R karşılaştırması bu üç kayıtlı tasarımın sayısal χ²/parametre/kovaryans uyumudur; genel CERTIFIED değildir. 1PL Lord için eşit örtük varyans varsayımını doğrulamaz ve çıkarımsal p/q kullanımına izin vermez.** 2PL Lord ve Wald kapsamları korunur.
 Bu salt kanıt/durum güncellemesi yeniden R kalibrasyonu gerektirmez; CI kaynak
 hash’leri ve aynı önceden tanımlı 1e−3 sınırıyla kayıtlı gerçek kanıtı doğrular.
 
@@ -190,3 +189,33 @@ hash’leri etkilenmez. Bozuk eski ön-ek, değişmiş veri, eski fonksiyonu yen
 tanımlama veya top-level tolerans değişikliği reddedilir. İki eski başarısız test
 ve iki yeni negatif koruma testi geçti. Lord/Wald kalibrasyon/referans kaynakları
 R yürütmesindeki byte’larla aynıdır; tekrar uyum veya ikinci tam süit gerekmez.
+
+## Final scientific fix — 1PL Lord is descriptive only
+
+The separate fixed-a 1PL fits force sigma=1 in each group; A=1/B location linking
+cannot establish equal true latent SDs. Agreement with R under the SAME imposed
+scale does not independently validate this assumption. No cutoff on a fitted
+Wald sigma_F (including sigma_F close to 1) is used as evidence.
+
+The shared production/report policy therefore always withholds 1PL Lord p/q,
+raw/adjusted aliases and inferential decisions. It preserves chi-square, delta-b,
+SE and link/covariance numerics, while marking chi-square explicitly descriptive:
+`DESCRIPTIVE / EQUAL LATENT SCALE ASSUMPTION NOT VERIFIED`.
+
+> 1PL Lord testi, grupların örtük yetenek ölçeklerinin eşitliği varsayımına duyarlıdır. Bu varsayım doğrulanmadığından p değeri raporlanmamaktadır. Çıkarımsal DIF değerlendirmesi için Wald DIF veya uygun 2PL Lord analizini kullanınız.
+
+The same policy applies at the center boundary, to existing cached UI results,
+and defensively inside CSV/Excel/ZIP/Markdown/plot exporters. It offers no manual
+verification toggle. The numerical calibration/reference kernel and frozen R
+outputs remain unchanged for reproducibility; their historical numerical tails
+are not user-facing inferential results. 2PL Lord and both Wald paths retain
+all previous values and gates. No new calibration, Monte Carlo or full local
+regression was run. Targeted tests use saved real fits and cover sigma values,
+all p/q aliases, legacy exports, exact descriptive numerics, UI and unaffected
+2PL/Wald results. Existing R/source/archive integrity tests remain strict.
+
+Original raw R coefficient/covariance CSVs are retained in workflow `41445711328`,
+artifact `13142108086` (SHA-256 `7f779513508bb37b9e6d78ec83434d58414b63640ad0a64ec267a50a7805c1d6`):
+`dif1pl_uniform/r_single_{R,F}_raw_parameters.csv` and
+`dif1pl_uniform/r_single_{R,F}_raw_vcov.csv`. They are not rewritten or regenerated
+by this fix; no assumption-verification claim is inferred from them.

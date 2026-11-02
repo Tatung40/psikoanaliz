@@ -66,7 +66,10 @@
       "core.dif_center.fingerprint",
       "core.dif_center.observed",
       "core.dif_center.support_matrix",
-      "core.dif_center.theta_sensitivity"
+      "core.dif_center.theta_sensitivity",
+      "core.dif_lord_policy.DESCRIPTIVE_NOTE",
+      "core.dif_lord_policy.WARNING",
+      "core.dif_lord_policy.protect_result"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },

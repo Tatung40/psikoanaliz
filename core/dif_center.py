@@ -5,6 +5,7 @@ import pandas as pd
 from core.dif_classical import (_prepare, mantel_haenszel, logistic_dif, adjust_pvalues,
                                 ets_mh_class, jodoin_gierl)
 from core.python_mirt_dif import fingerprint
+from core.dif_lord_policy import protect_result
 
 BASE_METHODS = ('MH', 'LR', 'SIBTEST')
 METHODS = BASE_METHODS+('Wald DIF','Lord χ²')
@@ -18,7 +19,7 @@ def support_matrix():
     frame = pd.DataFrame([
         ('SIBTEST', 'IMPLEMENTED', 'İkili; gerçek mirt.sibtest, sabit çapalar', 'β, SH, z/χ², sd, p; genel FWER/etki sınıfı sertifikası yok'),
         ('IRT-LR', 'IMPLEMENTED / LIMITED', 'Mevcut formel model sayfaları; public çok-grup ayrı', 'G²/sd/parametre farkı/eğriler; public mirt p/q kapalı'),
-        ('Lord χ²', 'INDEPENDENTLY REFERENCED / NOT CERTIFIED', '1PL/2PL; ayrı public mirt kalibrasyonları', 'Oakes + tam çapa Jacobianı; 1PL A=1, 2PL mean/sigma'),
+        ('Lord χ²', 'INDEPENDENTLY REFERENCED / NOT CERTIFIED', '1PL/2PL; ayrı public mirt kalibrasyonları', 'Oakes + tam çapa Jacobianı; 1PL A=1: betimsel, eşit örtük ölçek doğrulanmadığından p/q kapalı; 2PL mean/sigma'),
         ('Raju', 'IMPLEMENTED / DESCRIPTIVE', 'İkili lojistik; ortak alt/üst asimptot', 'Tam θ doğrusu işaretli/işaretsiz alan; test/p/etki sınıfı kapalı'),
         ('MH', 'INDEPENDENTLY REFERENCED', 'İkili; mevcut MH/RBG motoru', 'χ², sd=1, OR, ΔMH, ETS A/B/C; genelleme koşullu'),
         ('Lojistik LR', 'IMPLEMENTED', 'İkili; ordinal için mevcut ayrı ekran', 'Uniform/nonuniform/omnibus LR, sd, p, omnibus ΔR²'),
@@ -128,7 +129,7 @@ def observed(data, *, items, group, reference, focal, anchors, studied, methods=
         mirt=importlib.metadata.version('mirt'), Data_SHA256=fingerprint(data,()),
         Matching='MH/LR: anchor total + studied item; SIBTEST: anchor total only',
         Limitations=LIMITATIONS, Scientific_status='NOT CERTIFIED')
-    return {'table':pd.DataFrame(rows), 'metadata':meta, 'extra_tables':extra_tables}
+    return protect_result({'table':pd.DataFrame(rows), 'metadata':meta, 'extra_tables':extra_tables})
 
 
 def raju_area(reference, focal):

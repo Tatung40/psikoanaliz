@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from reports.irt_b14_report import safe_frame, export_xlsx
 from core.dif_center import support_matrix
+from core.dif_lord_policy import protect_result
 
 
 def tables(result):
+    result=protect_result(result)
     frames={'DIF':result['table'], 'Support':support_matrix(),
             'Settings':pd.DataFrame([{'Setting':k,'Value':str(v)} for k,v in result['metadata'].items()])}
     frames.update(result.get('extra_tables',{}))
@@ -17,6 +19,7 @@ def tables(result):
 
 
 def figure(result):
+    result=protect_result(result)
     fig,ax=plt.subplots(figsize=(9,4),layout='constrained')
     for method,part in result['table'].groupby('Method',sort=False):
         ax.plot(part.Item,part.p_adj,marker='o',label=method)
@@ -26,6 +29,7 @@ def figure(result):
 
 
 def downloads(result):
+    result=protect_result(result)
     frames=tables(result)
     narrative=('# DIF Analiz Merkezi\n\n'+result['metadata']['Limitations']+
         '\n\nMH/LR: çapa toplamı + incelenen madde. SIBTEST: yalnız çapa toplamı. '
