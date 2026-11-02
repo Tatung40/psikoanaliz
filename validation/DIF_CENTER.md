@@ -8,7 +8,7 @@ korunur. Menü: **MTK: DIF Analiz Merkezi**. Mevcut kullanıcı ekranları kald�
 |---|---|---|---|
 | SIBTEST | Gerçek mirt1.2.0 original/crossing; β, SH, z, χ²/sd/p, yön; sabit çapalar | Düzeltmesiz iki-katman hesabı; düzeltilmiş yol gerçek API ile çalıştırıldı | Düzeltilmiş/crossing genel Tip-I/FWER ve etki sınıfı sertifikası yok |
 | IRT-LR | Mevcut sabit-çapalı model ekranları; public mirt LR/sd/parametre farkları/eğriler | Önceki modele özgü arşivler; yerel↔Python aynı proje karşılaştırması R değildir | Public p/q/Wald kapısı kapalı; mevcut yerel model kapıları değişmedi |
-| Lord χ² | **2PL: fixture-specific numerical validation; 1PL: DESCRIPTIVE** | Gerçek R mirt1.48 sayısal uyumu; tam anchor-Jacobian | 1PL eşit örtük ölçek varsayımı doğrulanmadı: p/q kapalı. 2PL ve kovaryans hesapları korunur; genel FWER sertifikası yok |
+| Lord χ² | **2PL: fixture-specific numerical validation; 1PL: free-SD Rasch reference gate** | Gerçek R mirt1.48 sayısal uyumu; tam anchor-Jacobian | Eski sabit-σ 1PL: p/q kapalı. Yeni serbest-σ Rasch: yalnız gerçek R kanıtı + sayısal kapılarla koşullu çıkarım; genel FWER sertifikası yok |
 | Raju | İkili, ortak c/u, aynı bağlı θ ölçeğinde tam-doğru işaretli/işaretsiz alan | Bağımsız scipy adaptif sonsuz-aralık integrali | Betimsel; SH/test/p ve sınıf yok; farklı asimptotlar ıraksar |
 | MH | Mevcut MH/RBG ve ETS ΔMH/OR/A-B-C | statsmodels StratifiedTable/RBG | Koşullu gözlenen puan null’u; genel FWER sertifikası yok |
 | Lojistik LR | Mevcut M0/M1/M2; uniform/nonuniform/omnibus, seçilen birincil hipotez, omnibus ΔR² | Mevcut likelihood/df kimlikleri ve gerçek statsmodels | Impact/çapa koşulları; bileşen için omnibus etki sınıfı atanmaz |
@@ -190,14 +190,14 @@ tanımlama veya top-level tolerans değişikliği reddedilir. İki eski başarı
 ve iki yeni negatif koruma testi geçti. Lord/Wald kalibrasyon/referans kaynakları
 R yürütmesindeki byte’larla aynıdır; tekrar uyum veya ikinci tam süit gerekmez.
 
-## Final scientific fix — 1PL Lord is descriptive only
+## Historical PR130 fix — fixed-SD 1PL Lord is descriptive only
 
 The separate fixed-a 1PL fits force sigma=1 in each group; A=1/B location linking
 cannot establish equal true latent SDs. Agreement with R under the SAME imposed
 scale does not independently validate this assumption. No cutoff on a fitted
 Wald sigma_F (including sigma_F close to 1) is used as evidence.
 
-The shared production/report policy therefore always withholds 1PL Lord p/q,
+The shared production/report policy therefore always withholds legacy fixed-SD 1PL Lord p/q,
 raw/adjusted aliases and inferential decisions. It preserves chi-square, delta-b,
 SE and link/covariance numerics, while marking chi-square explicitly descriptive:
 `DESCRIPTIVE / EQUAL LATENT SCALE ASSUMPTION NOT VERIFIED`.
@@ -219,3 +219,35 @@ artifact `13142108086` (SHA-256 `7f779513508bb37b9e6d78ec83434d58414b63640ad0a64
 `dif1pl_uniform/r_single_{R,F}_raw_parameters.csv` and
 `dif1pl_uniform/r_single_{R,F}_raw_vcov.csv`. They are not rewritten or regenerated
 by this fix; no assumption-verification claim is inferred from them.
+
+
+## Free-SD Rasch extension — independently gated
+
+The new `core.dif_lord_rasch` path reuses `core.rasch.fit_rasch`, with a=1,
+mean=0 and independent free SDs. Common units follow from a=1, and anchor
+centering supplies location; no equality of latent SDs is assumed. Covariance
+is the b block of the FULL inverse information in (b,log SD), with complete
+anchor Jacobians. Existing PD/condition/bound gates and independent GH101
+audit apply. The old numerical kernel and original R artifacts are immutable.
+
+[Preregistered protocol](lord_rasch_free_scale/PROTOCOL.md): actual R mirt1.48
+Rasch/GH61 and101, same741 complete-case cohort, independent numerical delta
+Jacobian, pre-existing relative chi-square limit1e-3. Actual independent execution and the window diagnostic are recorded in
+[lord_rasch_free_scale/REPORT.md](lord_rasch_free_scale/REPORT.md). Source/data-identity checking fails closed;
+legacy cached fixed-SD results never acquire inference. New results retain
+conditional inference and NOT FWER CERTIFIED wording even after numeric PASS.
+
+[Sequential GRM-FWER protocol](grm_fwer_sequential/protocol.json) is a separate
+scoped experiment, not evidence for Rasch Lord/Wald/SIBTEST/Raju or selected
+anchors. Fixed500/1000/1500 looks, two impacts, twelve directional CP endpoints
+share alpha.05. Liberal control<=.075 differs from nominal .05; both control
+and inflation flags can coexist. Failed fits count as operational events but
+cannot manufacture evidence of inferential Type-I inflation. Old30 pairs are
+not reused because environment identities differ. No interim certification.
+
+The final free-SD reference uses actual R mirt1.48 GH61/GH101 with a supported
+[-12,12] integration window. The default[-6,6] diagnostic is retained as a
+common-grid stationarity failure despite its narrow chi-square agreement.
+Matched chi-square max relative error1.671e-5; maximum R common-GH101 score
+6.891e-6 satisfies the unchanged1e-5 guard. Only this source-identified
+reference enables conditional new-path p/q. No FWER claim follows from it.

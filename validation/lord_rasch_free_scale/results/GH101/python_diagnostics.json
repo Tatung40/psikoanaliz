@@ -1,0 +1,24 @@
+[
+  {
+    "sd": 0.996529547776797,
+    "converged": true,
+    "at_bound": false,
+    "points": 101,
+    "normalized_score": 2.2050885421958062e-08,
+    "GH101_score": 2.2050885421958062e-08,
+    "GH101_loglik_difference": 0.0,
+    "full_information_condition": 14.071407164520544,
+    "covariance_coordinates": "b then log_SD; b block of full inverse information"
+  },
+  {
+    "sd": 1.485132569959313,
+    "converged": true,
+    "at_bound": false,
+    "points": 101,
+    "normalized_score": 2.298524670836711e-09,
+    "GH101_score": 2.298524670836711e-09,
+    "GH101_loglik_difference": 0.0,
+    "full_information_condition": 35.13653497170402,
+    "covariance_coordinates": "b then log_SD; b block of full inverse information"
+  }
+]

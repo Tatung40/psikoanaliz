@@ -19,7 +19,7 @@ def support_matrix():
     frame = pd.DataFrame([
         ('SIBTEST', 'IMPLEMENTED', 'İkili; gerçek mirt.sibtest, sabit çapalar', 'β, SH, z/χ², sd, p; genel FWER/etki sınıfı sertifikası yok'),
         ('IRT-LR', 'IMPLEMENTED / LIMITED', 'Mevcut formel model sayfaları; public çok-grup ayrı', 'G²/sd/parametre farkı/eğriler; public mirt p/q kapalı'),
-        ('Lord χ²', 'INDEPENDENTLY REFERENCED / NOT CERTIFIED', '1PL/2PL; ayrı public mirt kalibrasyonları', 'Oakes + tam çapa Jacobianı; 1PL A=1: betimsel, eşit örtük ölçek doğrulanmadığından p/q kapalı; 2PL mean/sigma'),
+        ('Lord χ²', 'INDEPENDENTLY REFERENCED / NOT CERTIFIED', '1PL: native Rasch, σ serbest; 2PL: ayrı public mirt', 'Tam çapa Jacobianı; 1PL tam (b,log σ) kovaryansı + R kanıt kapısı; eski sabit-σ p/q kapalı; 2PL Oakes mean/sigma'),
         ('Raju', 'IMPLEMENTED / DESCRIPTIVE', 'İkili lojistik; ortak alt/üst asimptot', 'Tam θ doğrusu işaretli/işaretsiz alan; test/p/etki sınıfı kapalı'),
         ('MH', 'INDEPENDENTLY REFERENCED', 'İkili; mevcut MH/RBG motoru', 'χ², sd=1, OR, ΔMH, ETS A/B/C; genelleme koşullu'),
         ('Lojistik LR', 'IMPLEMENTED', 'İkili; ordinal için mevcut ayrı ekran', 'Uniform/nonuniform/omnibus LR, sd, p, omnibus ΔR²'),
@@ -31,7 +31,7 @@ def support_matrix():
     frame['Certified'] = False
     frame['Validation_scope'] = ['Uncorrected original/crossing identities; corrected API exercised',
         'Existing model-specific evidence; no general DIF-FWER certificate',
-        'R mirt1.48: three B10 complete-case fixtures only; see DIF_WALD_LORD_REFERENCE.json', 'Adaptive quadrature identity; no area SE/p',
+        '2PL: original two B10 fixtures; 1PL: free-SD Rasch only with independent reference gate; legacy fixed-SD descriptive', 'Adaptive quadrature identity; no area SE/p',
         'statsmodels matched-stratum/RBG reference', 'Nested likelihood identities; no general FWER control',
         'R mirt1.48: three B10 fixtures, full shared-anchor covariance; no general FWER certificate']
     return frame
@@ -61,8 +61,18 @@ def observed(data, *, items, group, reference, focal, anchors, studied, methods=
                 from core.irt_dif import wald_dif
                 outcome=wald_dif(data[items],data[group],reference,focal,model=model,anchors=anchors,studied=studied)
             else:
-                from core.dif_lord import lord_dif
-                outcome=lord_dif(data[items],data[group],reference,focal,model=model,anchors=anchors,studied=studied)
+                if model=='1PL':
+                    from core.dif_lord_rasch import lord_1pl_rasch
+                    outcome=lord_1pl_rasch(data[items],data[group],reference,focal,anchors=anchors,studied=studied)
+                else:
+                    from core.dif_lord import lord_dif
+                    outcome=lord_dif(data[items],data[group],reference,focal,model=model,anchors=anchors,studied=studied)
+            if method=='Lord χ²' and model=='1PL' and len(outcome.get('diagnostics',[]))==2:
+                diagnostics=pd.DataFrame(outcome['diagnostics'])
+                diagnostics.insert(0,'Group',[repr(reference),repr(focal)])
+                extra_tables['Lord_group_diagnostics']=diagnostics
+                outcome['table']=outcome['table'].assign(Lord_sigma_reference=diagnostics.sd.iloc[0],
+                    Lord_sigma_focal=diagnostics.sd.iloc[1])
             parametric[method]=outcome['table'].set_index('Item')
             extra_tables[('Wald' if method=='Wald DIF' else 'Lord')+'_covariance']=outcome['covariance']
         except (ValueError,TypeError,np.linalg.LinAlgError) as exc:
@@ -125,7 +135,8 @@ def observed(data, *, items, group, reference, focal, anchors, studied, methods=
         SIBTEST_correction=sib_correction, N_reference=int((gf==0).sum()), N_focal=int(gf.sum()),
         Excluded_other_or_missing_group=int(len(data)-len(gf)),
         Parametric_model=model, Wald_design='Existing simultaneous M1/M2; reference N(0,1), focal mean/SD free; GH61',
-        Lord_design='Separate ML N(0,1), Oakes, GH61/tol1e-8/max_iter3000; complete anchor-link delta covariance',
+        Lord_design=('1PL: separate native Rasch ML, a=1/mean=0/SD free per group; full (b,log SD) inverse, GH61/GH101 audit'
+            if model=='1PL' else 'Separate ML N(0,1), Oakes, GH61/tol1e-8/max_iter3000; complete anchor-link delta covariance'),
         mirt=importlib.metadata.version('mirt'), Data_SHA256=fingerprint(data,()),
         Matching='MH/LR: anchor total + studied item; SIBTEST: anchor total only',
         Limitations=LIMITATIONS, Scientific_status='NOT CERTIFIED')

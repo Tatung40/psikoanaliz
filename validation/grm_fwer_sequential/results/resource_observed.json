@@ -1,0 +1,7 @@
+{
+  "sampling_seconds": 1,
+  "units": "MiB",
+  "scope": "Observed kernel lifetime VmHWM; supervisor starts mid-run, reads producer and workers without changing them",
+  "parent_peak_hwm_mib": 781.16015625,
+  "worker_peak_hwm_mib": 114.30859375
+}

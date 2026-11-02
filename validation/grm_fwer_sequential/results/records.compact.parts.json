@@ -1,0 +1,18 @@
+{
+  "encoding": "Concatenate binary parts in listed order to reproduce original gzip byte-for-byte",
+  "canonical_sha256": "adfe95e03800631058e01cef7b92be0502dbf4ce44c7ad7015a86b133c5c8a7e",
+  "parts": [
+    {
+      "path": "records.compact.part000",
+      "bytes": 8400000,
+      "sha256": "3d5082517dd1ff762f26b341f61d36fb27a7eca9ff58d07ab400b6896347ed83",
+      "git_sha": "4daf54141b430a512a69841cdfc0db1f384b24d1"
+    },
+    {
+      "path": "records.compact.part001",
+      "bytes": 7697258,
+      "sha256": "f59dc0e6669773dbc2c7e0ac89d956b3cd39b640d0db2b3a26f8f196ededbd61",
+      "git_sha": "a53a701bfdf221d3d4741e8195e57f8765799d1a"
+    }
+  ]
+}

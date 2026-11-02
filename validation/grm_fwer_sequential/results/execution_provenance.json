@@ -1,0 +1,5 @@
+{
+  "local_execution_commit": "5868fdd1e259f7a8fdff3ee851a54c4faf36c332",
+  "published_equivalent_runtime_source_commit": "48bc76067bdbad6cb0fa3046c0d98f8ce1ecd641",
+  "identity": "All runtime source files listed in metadata.sources remain byte-identical and are verified by the audit. Local execution commit is retained truthfully; it is not misrepresented as a GitHub commit."
+}

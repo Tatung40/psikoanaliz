@@ -1,0 +1,6 @@
+{
+  "mirt": "1.48",
+  "default_theta_lim": [-6, 6],
+  "expanded_theta_lim": [-12, 12],
+  "verified_against_actual_runtime": true
+}

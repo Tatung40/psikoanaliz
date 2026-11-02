@@ -4,8 +4,11 @@ on:
     branches: [main]
     paths:
       - 'core/dif_lord.py'
+      - 'core/dif_lord_rasch.py'
+      - 'core/dif_lord_policy.py'
       - 'core/irt_dif.py'
       - 'validation/dif_wald_lord/**'
+      - 'validation/lord_rasch_free_scale/**'
       - 'scripts/mirt_irt_b10_reference.R'
       - 'tests/test_dif_wald_lord.py'
       - '.github/workflows/r-mirt-wald-lord.yml'
@@ -13,6 +16,57 @@ on:
 permissions:
   contents: read
 jobs:
+  rasch-free-scale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Verify immutable free-SD Rasch evidence or request actual R
+        id: rasch
+        run: python validation/lord_rasch_free_scale/verify_reference.py
+      - uses: r-lib/actions/setup-r@v2
+        if: steps.rasch.outputs.needs_r == 'true'
+        with:
+          r-version: '4.6.1'
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: steps.rasch.outputs.needs_r == 'true'
+        with:
+          packages: |
+            any::mirt@1.48
+            any::jsonlite
+            any::digest
+            any::numDeriv
+          cache-version: 1
+      - name: Existing Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Targeted free-SD covariance and policy checks
+        run: python -m pytest -q tests/test_lord_rasch_free_scale.py tests/test_lord_1pl_policy.py
+      - name: Exactly one Python calibration per group and density
+        if: steps.rasch.outputs.needs_python == 'true'
+        run: python -m validation.lord_rasch_free_scale.compare --prepare
+      - name: Actual independent free-SD R Rasch calibrations
+        if: steps.rasch.outputs.needs_r == 'true'
+        run: Rscript validation/lord_rasch_free_scale/reference.R --wide > validation/lord_rasch_free_scale/results/R_wide_stdout.log 2> validation/lord_rasch_free_scale/results/R_wide_stderr.log
+      - name: Predeclared numerical comparison (no fits)
+        run: python -m validation.lord_rasch_free_scale.compare --compare --wide
+      - name: Preserve compact original evidence in logs
+        if: always()
+        run: python -m validation.lord_rasch_free_scale.compare --emit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rasch-free-scale-${{ github.sha }}
+          path: validation/lord_rasch_free_scale/results/
+          if-no-files-found: error
   compare:
     runs-on: ubuntu-latest
     timeout-minutes: 35

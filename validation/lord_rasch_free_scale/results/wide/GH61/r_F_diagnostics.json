@@ -1,0 +1,14 @@
+{
+  "converged": true,
+  "sd": 1.4851203763060266,
+  "variance": 2.2055825321193536,
+  "iterations": 25,
+  "loglik": -1653.1012050721438,
+  "interior": true,
+  "covariance_valid": true,
+  "full_covariance_condition": 6.2249685978377638,
+  "identification": "a=1; mean=0; SD free",
+  "points": 61,
+  "vcov_labels": ["d.2", "d.6", "d.10", "d.14", "d.18", "d.22", "d.26", "d.30", "d.34", "d.38", "d.42", "d.46", "COV_11.50"],
+  "numerical_limit": "Native R regular quadrature differs from native Python GH; both densities checked"
+}

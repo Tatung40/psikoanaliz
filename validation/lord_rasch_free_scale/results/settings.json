@@ -1,0 +1,68 @@
+{
+  "case": "dif1pl_uniform",
+  "model": "1PL",
+  "items": [
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M9",
+    "M10",
+    "M11",
+    "M12"
+  ],
+  "anchors": [
+    "M1",
+    "M2",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M10",
+    "M11",
+    "M12"
+  ],
+  "studied": [
+    "M3",
+    "M9"
+  ],
+  "original_n": 1600,
+  "used_n": 741,
+  "excluded_incomplete": 859,
+  "missing_policy": "Explicit identical complete-case cohort for both methods; no production imputation",
+  "data_sha256": "f3bcae3735e3dfd6e0178de8d382c12ea141fa1e4b9e68247cc803a5e4b34587",
+  "mirt": "1.2.0",
+  "Python": "3.11.17",
+  "Lord": {
+    "n_quadpts": 61,
+    "tol": 1e-08,
+    "max_iter": 3000,
+    "estimation": "ML",
+    "prior": "none",
+    "latent": "N(0,1)"
+  },
+  "Wald": {
+    "quadrature": "mirt",
+    "points": 61,
+    "latent": "reference N(0,1), focal mean/SD free",
+    "priors": "none"
+  },
+  "covariance_condition_limit": 100000000.0,
+  "chi_relative_limit": 0.001,
+  "protocol_commit": "9d01c0fdd8681e85e43437906459752353dc003d",
+  "execution_commit": "ca767df95e2f92ab75d934cb1957d256e2043781",
+  "identification": "a=1; mean=0; latent SD free in EACH independent group",
+  "engine": "core.rasch.fit_rasch",
+  "priors": "none",
+  "densities": [
+    61,
+    101
+  ],
+  "native_max_iter": 2000,
+  "normalized_score_tolerance": 1e-06
+}

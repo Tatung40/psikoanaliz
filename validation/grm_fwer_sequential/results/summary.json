@@ -1,0 +1,102 @@
+{
+  "conditions": {
+    "minus": {
+      "n": 852,
+      "valid": 852,
+      "failures": 0,
+      "observed_rejections": 56,
+      "operational_events": 56,
+      "operational_fwer": 0.06572769953051644,
+      "operational_mcse": 0.00848967676387605,
+      "operational_cp": [
+        0.045334800919450004,
+        0.09135336708651207
+      ],
+      "missing_outcome_robust_cp": [
+        0.045334800919450004,
+        0.09135336708651207
+      ],
+      "latent_null_fwer_empirical_sensitivity": [
+        0.06572769953051644,
+        0.06572769953051644
+      ],
+      "valid_only_fwer": 0.06572769953051644,
+      "bh_failure_as_event": 0.06807511737089202,
+      "decision": "INCONCLUSIVE",
+      "classified": false,
+      "certification": "NO GENERAL CERTIFICATION"
+    },
+    "zero": {
+      "n": 852,
+      "valid": 852,
+      "failures": 0,
+      "observed_rejections": 54,
+      "operational_events": 54,
+      "operational_fwer": 0.06338028169014084,
+      "operational_mcse": 0.008347163752022253,
+      "operational_cp": [
+        0.04337580577328721,
+        0.08864865188123343
+      ],
+      "missing_outcome_robust_cp": [
+        0.04337580577328721,
+        0.08864865188123343
+      ],
+      "latent_null_fwer_empirical_sensitivity": [
+        0.06338028169014084,
+        0.06338028169014084
+      ],
+      "valid_only_fwer": 0.06338028169014084,
+      "bh_failure_as_event": 0.06572769953051644,
+      "decision": "INCONCLUSIVE",
+      "classified": false,
+      "certification": "NO GENERAL CERTIFICATION"
+    }
+  },
+  "attempted": 1704,
+  "stop_at_look": false,
+  "paired_operational_difference": {
+    "n": 852,
+    "mean": -0.002347417840375587,
+    "mcse": 0.010102235894232795,
+    "interpretation": "Descriptive zero-minus; no sequential superiority claim"
+  },
+  "stop": "EXPLICIT USER STOP \u2014 no further fitting",
+  "seconds": 4535.654650228011,
+  "certified": false,
+  "scientific_status": "INCONCLUSIVE / NOT CERTIFIED",
+  "last_registered_look": 500,
+  "unreached_looks": [
+    1000,
+    1500
+  ],
+  "prefix_interval_scope": "Unplanned-prefix fixed-n CP intervals are descriptive only; no sequential coverage/certification claim. Use look_0500.json for the registered simultaneous uncertainty.",
+  "uncollected_inflight_analyses": 2,
+  "total_dispatched_including_uncollected": 1706,
+  "uncollected_seed_sensitivity": {
+    "minus": {
+      "completed": 852,
+      "uncollected": 1,
+      "dispatched": 853,
+      "completed_rejections": 56,
+      "worst_case_events": 57,
+      "empirical_unknown_outcome_bounds": [
+        0.06565064478311841,
+        0.0668229777256741
+      ],
+      "classification": "INCONCLUSIVE / NOT CERTIFIED; no unregistered-look inference"
+    },
+    "zero": {
+      "completed": 852,
+      "uncollected": 1,
+      "dispatched": 853,
+      "completed_rejections": 54,
+      "worst_case_events": 55,
+      "empirical_unknown_outcome_bounds": [
+        0.06330597889800703,
+        0.06447831184056271
+      ],
+      "classification": "INCONCLUSIVE / NOT CERTIFIED; no unregistered-look inference"
+    }
+  }
+}

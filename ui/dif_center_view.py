@@ -51,7 +51,7 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
         default=[c for c in items if c not in anchors],key='dc_studied')
     methods=st.multiselect('Yöntemler',METHODS,default=list(BASE_METHODS),key='dc_methods')
     model=st.selectbox('Lord/Wald modeli',('1PL','2PL'),index=1,key='dc_parametric_model')
-    st.caption('Wald: mevcut eşzamanlı MML. Lord: ayrı Python mirt ML + Oakes, çapa belirsizliği dahil eşitleme. Yalnız seçilirse kalibre edilir; genel FWER sertifikası yok.')
+    st.caption('Wald: mevcut eşzamanlı MML. 1PL Lord: ayrı Rasch, a=1/μ=0/σ serbest; tam gözlenen bilgi ve çapa belirsizliği. 2PL Lord: Python mirt ML + Oakes. Genel FWER sertifikası yok.')
     correction=st.selectbox('Yöntem içi düzeltme',('Holm','Bonferroni','BH','none'),key='dc_correction')
     alpha=st.number_input('α',min_value=.001,max_value=.2,value=.05,key='dc_alpha')
     lr_test=st.selectbox('Birincil lojistik hipotezi',('omnibus','uniform','nonuniform'),key='dc_lr_test')
@@ -72,7 +72,7 @@ def render(data=None,item_cols=(),id_col=None,group_col=None):
     if saved is None:return
     result=protect_result(saved['result']);saved['result']=result;displayed(result)
     if result['metadata'].get('Lord_inference_status'):
-        st.warning(WARNING);st.caption(DESCRIPTIVE_NOTE)
+        st.warning(result['metadata']['Lord_warning']);st.caption(DESCRIPTIVE_NOTE)
     st.dataframe(safe_frame(result['table']),hide_index=True)
     st.caption(result['metadata']['Matching'])
     st.json(result['metadata'])
