@@ -103,13 +103,16 @@ def test_itemfit_ui_and_export_policy(model):
     assert pd.read_excel(io.BytesIO(output.getvalue())).p_value.isna().all()
 
 
-def test_itemfit_preserves_reference_checked_2pl_and_rejects_invalid_fits():
+def test_itemfit_labels_2pl_exploratory_and_rejects_invalid_fits():
     from types import SimpleNamespace
     from unittest.mock import patch
     from core.irt_library_diagnostics import library_itemfit
     with patch('mirt.itemfit', return_value=pd.DataFrame({'p_value': [.2]})) as api:
         fit = SimpleNamespace(converged=True)
-        assert library_itemfit(fit, [[0, 1]], model='2PL').p_value.iloc[0] == .2
+        table = library_itemfit(fit, [[0, 1]], model='2PL')
+        assert table.p_value.iloc[0] == .2
+        assert 'EXPLORATORY / NOT CERTIFIED' in table['Bilimsel durum'].iloc[0]
+        assert 'NUMERICAL REFERENCE CHECKED' not in table['Bilimsel durum'].iloc[0]
         api.reset_mock()
         for model, converged in [('NRM', True), ('RSM', True), ('2PL', False)]:
             with pytest.raises(ValueError):
