@@ -181,7 +181,7 @@ def render_academic_header():
         <h1>PsikoAnaliz</h1>
         <h3>Psikometrik Analiz Platformu</h3>
         <p style="margin: 0; font-size: 0.95rem; opacity: 0.92;">
-            Klasik Test Kuramı (KTK) ve Madde Tepki Kuramı (MTK) Temelli Ölçme ve Değerlendirme Uygulamaları
+            Klasik Test Kuramı (KTK), Madde Tepki Kuramı (MTK) ve Genellenebilirlik Kuramı (GK) Temelli Ölçme ve Değerlendirme Uygulamaları
         </p>
         <div class="badge-container">
             <span class="academic-badge">👨‍🏫 Doç. Dr. Mehmet Taha Eser</span>
