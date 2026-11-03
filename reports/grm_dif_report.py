@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from core import grm_dif as G
 from reports.irt_b14_report import safe_frame, export_xlsx
+from reports.academic_docx import standardize_document, _value
 
 REFERENCES = [
     "Samejima, F. (1968). Estimation of latent ability using a response pattern of graded scores "
@@ -142,13 +143,15 @@ def word_bytes(out, tables, figures):
         for cell, name in zip(table.rows[0].cells, frame.columns): cell.text = str(name)
         for values in frame.itertuples(index=False, name=None):
             for cell, value in zip(table.add_row().cells, values):
-                cell.text = f"{value:.5g}" if isinstance(value, (float, np.floating)) else str(value)
+                cell.text = _value(value.item() if isinstance(value,np.generic) else value)
     doc.add_paragraph("Tüm ayrıntılı tablolar, noktasal eğri aralıkları ve betimsel kategori tanıları XLSX/CSV eklerindedir. "
                       "Pozitif işaretli etki aynı theta'da odak grup lehine daha yüksek beklenen puandır; "
                       "ortalama etki eğrilerdeki yön değişimini gizleyebilir.")
     for figure in figures: doc.add_picture(io.BytesIO(figure), width=Inches(6))
     doc.add_heading("Kaynaklar", 1)
     for reference in REFERENCES: doc.add_paragraph(reference)
+    standardize_document(doc,method=out.get('method'),warnings=[out['status']]+CAUTIONS+out['warnings'],
+        provenance={'Üretici':'reports.grm_dif_report','Yöntem bilgisi':'Yontem tablosunda; ek kestirim yapılmadı.'})
     buffer = io.BytesIO(); doc.save(buffer); return buffer.getvalue()
 
 

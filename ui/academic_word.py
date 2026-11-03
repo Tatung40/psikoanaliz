@@ -207,7 +207,8 @@ def finish(recorder):
         visual=hashlib.sha256(json.dumps(ctx['view_widgets'],sort_keys=True,default=str).encode())
         for caption,png in ctx['figures']:visual.update(caption.encode());visual.update(png)
         for caption,fig in ctx['plotly']:visual.update(caption.encode());visual.update(fig.to_json().encode())
-        result['provenance'].update(input_fingerprint=ctx['data_key'],view_fingerprint=visual.hexdigest())
+        from reports.academic_docx import REPORT_STANDARD_VERSION
+        result['provenance'].update(input_fingerprint=ctx['data_key'],view_fingerprint=visual.hexdigest(),report_standard=REPORT_STANDARD_VERSION)
         if not fresh and old and old.get('result')==result:
             payload=old['docx']
         else:

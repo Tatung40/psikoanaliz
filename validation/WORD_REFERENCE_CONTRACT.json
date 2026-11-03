@@ -1,0 +1,54 @@
+{
+  "reference_document": "python_mirt_2pl_akademik_rapor.docx",
+  "reference_sha256": "d320d744671298e5bac68c7db07e8987f63918c121d4d4c8d4ddcb9cf80b0e8f",
+  "reference_tables": 3,
+  "reference_figures": 17,
+  "page_inches": [
+    8.5,
+    11
+  ],
+  "margins_inches": {
+    "top": 1,
+    "bottom": 1,
+    "left": 1.25,
+    "right": 1.25
+  },
+  "fonts_pt": {
+    "Normal": 11,
+    "Title": 26,
+    "Heading 1": 14,
+    "Heading 2": 13,
+    "Caption": 9
+  },
+  "reference_headings": [
+    "Model uyumu",
+    "Tablolar",
+    "Şekiller",
+    "Bilimsel sınırlılıklar ve uyarılar",
+    "Tekrarlanabilirlik bilgisi",
+    "Madde karakteristik eğrileri (ICC)",
+    "Madde ve test bilgi fonksiyonları"
+  ],
+  "standard_version": "2pl-academic-v2",
+  "target_sections": [
+    "Yöntem ve kestirim ayarları",
+    "Bulgular",
+    "Model uyumu",
+    "Tablolar",
+    "Şekiller",
+    "Bilimsel sınırlılıklar ve uyarılar",
+    "Kaynaklar",
+    "Tekrarlanabilirlik bilgisi"
+  ],
+  "changes": "Preserve actual content/images; consolidate appended ICC/IIF under Figures before limitations/reproducibility; sequential Word SEQ captions; APA horizontal table rules.",
+  "executed_reference_checks": {
+    "actual_table_cells_unchanged": true,
+    "embedded_image_sha256_set_unchanged": true,
+    "tables": 3,
+    "figures": 17,
+    "sequential_captions": true,
+    "six_inch_table_bounds": true,
+    "idempotent_normalization": true,
+    "office_visual_rendering": "NOT EXECUTED: LibreOffice/Word not available; OOXML geometry, content and image checks executed"
+  }
+}

@@ -59,7 +59,7 @@ certification or VERIFIED code execution is made by the UI.
 - **11. Formüller ve Yöntemler**: Başvuru/yöntem metni; veri üzerinde analiz üretmez.
 - **12. Kullanım Kılavuzu**: Kullanım yardımı; veri üzerinde analiz üretmez.
 
-The aggregate report retains its original Word exporter. Existing .py/ZIP controls
+The aggregate report retains its original content/API and now uses the same final formatting standard (reports.word_export). Existing .py/ZIP controls
 remain where their actual computations can be recorded. Exclusions do not remove
 existing application functionality.
 
@@ -131,3 +131,45 @@ No R calibration, Monte Carlo study or scientific archive is changed by this PR.
 Targeted results and the single final regression are recorded in the PR description.
 The coverage table describes supported runtime paths, not scientific certification
 of every model/design or execution of every possible option.
+
+
+## Shared reference-2PL Word standard (v2)
+
+All 38 analysis routes above and the aggregate reporting route use the same
+`reports.academic_docx.standardize_document` finalizer. Five preparation/help routes
+remain auxiliary. No new estimator or separate model-specific DOCX engine is added.
+Existing content producers keep their actual tables, figures, notes and APIs.
+
+The reference contract is versioned in `WORD_REFERENCE_CONTRACT.json` (original
+file SHA-256, layout and headings). The original DOCX contains 3 tables/17 figures;
+its data are not committed or used as fabricated calibration evidence.
+
+Hierarchy: Methods/settings → observed findings → model fit (only supplied fit
+metrics) → tables → figures → limitations → references (if supplied) → reproducibility.
+The 2PL ICC and IIF/TIF sections retain every plot and become figure subsections;
+limitations and reproducibility finish the document. Inapplicable sections are
+omitted with an explicit reason. No missing fit statistic, p/CI or reference result
+is created. The 2PL reference's Letter size, margins, heading sizes and blue palette
+are shared; body Calibri 11pt, captions 9pt. APA tables use horizontal top/header/
+bottom rules, repeating headers, sequential cached Word SEQ fields, and fit figures
+to the 6-inch text area. Numeric values are not inferred from nominal labels.
+
+| Existing content producer | Entry points / scope | Shared formatting |
+|---|---|---|
+| reports.academic_docx | 34 generic analysis routes: KTK, IRT, MIRT/bifactor, DIF, G theory, factors, missingness | v2; actual displayed outputs |
+| reports.irt_2pl_academic_docx | Both 2PL routes | v2; grouped item ICC + IIF/TIF preserved |
+| reports.ctt_guided_docx | Dual CTT button and its release ZIP | v2; native/reference checks retained |
+| reports.dif_academic_docx | Python mirt DIF button | v2; original four-panel figure retained |
+| reports.word_export | Aggregate KTK reporting route | v2; existing API and source content retained |
+| reports.grm_dif_report | GRM DIF DOCX inside ZIP | v2; source cautions, tables, PNG unchanged |
+| reports.polytomous_dif_report | PCM/GPCM/RSM/NRM DIF DOCX inside ZIP | v2; nominal restrictions retained |
+
+The same data/settings/producer fingerprints still gate downloads. Renderer-version
+keys additionally invalidate old 2PL DOCX/generic Word and prepared GRM/poly ZIP
+bytes after a format upgrade, without recalibrating models. CSV/XLSX/PNG remain
+unchanged. The existing 38-route real-result tests now assert the common hierarchy,
+caption sequences, page dimensions, image width, table rules, Turkish text and
+reproducibility. `tests/test_word_standard.py` covers mixed figure sources and legacy
+normalization; existing 2PL, DIF, CTT and bundle safeguards remain active.
+
+Reference execution: all 3 table cell grids and all 17 image SHA-256 values were preserved; normalization was checked for idempotence. Native Word/LibreOffice pagination was not rendered in this environment; OOXML dimensions, table widths, caption order and image placement bounds are tested.

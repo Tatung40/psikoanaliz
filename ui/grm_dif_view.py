@@ -99,7 +99,9 @@ def render(data, item_cols=(), id_col=None, group_col=None):
         st.error("Geçerli çıkarım üretilmedi. Başarısızlık notlarını inceleyin; bu sonuç DIF yokluğu kanıtı değildir.")
     st.download_button("Madde tablosu CSV (UTF-8 BOM)", safe_frame(out["table"]).to_csv(index=False).encode("utf-8-sig"),
                        "GRM_DIF_maddeler.csv", "text/csv", key="grm_csv")
+    from reports.academic_docx import REPORT_STANDARD_VERSION
+    if entry.get('bundle_standard')!=REPORT_STANDARD_VERSION:entry.pop('bundle',None)
     if st.button("DOCX / XLSX / CSV / 300 dpi PNG paketini hazırla", key="grm_prepare"):
-        entry["bundle"] = bundle(out, tables)
+        entry["bundle"] = bundle(out, tables);entry['bundle_standard']=REPORT_STANDARD_VERSION
     if "bundle" in entry:
         st.download_button("GRM araştırma paketini ZIP indir", entry["bundle"], "GRM_DIF.zip", "application/zip", key="grm_zip")

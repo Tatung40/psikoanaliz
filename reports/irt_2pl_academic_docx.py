@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 from core.academic_result_adapters import irt_report_to_result
 from core.irt_python_mirt_report import build_report
-from reports.academic_docx import build_academic_docx
+from reports.academic_docx import build_academic_docx, standardize_document
 
 
 def _png(fig):
@@ -34,7 +34,7 @@ def export_2pl_docx(outcome, items):
     # plotting and use explicitly grouped ICC and item-information plots below.
     document_source = deepcopy(result)
     document_source["metadata"]["analysis_type"] = "2pl_word_grouped"
-    doc = Document(BytesIO(build_academic_docx(document_source)))
+    doc = Document(BytesIO(build_academic_docx(document_source,standardize=False)))
     curves = report.curves
     information = report.information
     required = {"Madde", "Theta", "Kategori", "Olasılık"}
@@ -71,5 +71,6 @@ def export_2pl_docx(outcome, items):
     doc.add_picture(_png(fig), width=Inches(5.7))
     doc.add_paragraph("Not. Grafikler doğrudan Python mirt kalibrasyonundan hesaplanan eğri ve bilgi tablolarını kullanır. Standart hata ve çıkarımsal karar üretilmez.")
     output = BytesIO()
+    standardize_document(doc,method=str(report.metadata))
     doc.save(output)
     return output.getvalue()
