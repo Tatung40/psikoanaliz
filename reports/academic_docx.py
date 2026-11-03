@@ -47,17 +47,32 @@ def _figure(rows, spec):
     return stream
 
 
-def build_academic_docx(result, *, max_rows_per_table=100):
+def build_academic_docx(result, *, max_rows_per_table=100, validator=None, title=None,
+                        figures=(), apa7=False):
     """Return DOCX bytes; report all omitted rows explicitly, no external requests."""
-    source = validate_result(result)
+    source = (validator or validate_result)(result)
     if type(max_rows_per_table) is not int or max_rows_per_table < 1:
         raise ValueError("max_rows_per_table must be positive")
-    manifest = build_visual_catalog(source)
+    catalog_source={**source,'family':source['family'] if source['family'] in ('CTT','IRT','GT') else 'CTT'}
+    manifest = build_visual_catalog(catalog_source)
     doc = Document()
-    doc.add_heading("Bulgular ve Yorumlar — Sayısal Rapor", 0)
+    if apa7:
+        from docx.shared import Pt
+        doc.styles['Normal'].font.name='Times New Roman'
+        doc.styles['Normal'].font.size=Pt(12)
+        for section in doc.sections:
+            section.top_margin=section.bottom_margin=section.left_margin=section.right_margin=Inches(1)
+    doc.add_heading(title or "Bulgular ve Yorumlar — Sayısal Rapor", 0)
     doc.add_paragraph(f"Alan: {source['family']} | Model: {source['model']}")
     doc.add_paragraph(f"N = {source['sample']['n']} | Madde sayısı: {_value(source['sample']['k'])}")
     doc.add_paragraph("Bu belge hesaplanan sonuçları sunar; kaynak temelli yorum ve istatistiksel çıkarım üretmez.")
+    if source.get('metadata',{}).get('sample_basis'):
+        doc.add_paragraph('Örneklem kapsamı: '+source['metadata']['sample_basis'])
+        doc.add_heading('Yöntem ve kestirim ayarları',level=1)
+        for setting in source['metadata'].get('settings',[]):doc.add_paragraph(str(setting))
+    if source.get('metadata',{}).get('findings'):
+        doc.add_heading('Bulgular',level=1)
+        for finding in source['metadata']['findings']:doc.add_paragraph(str(finding))
     if source["fit_statistics"]:
         doc.add_heading("Model uyumu", level=1)
         for key, value in source["fit_statistics"].items():
@@ -76,6 +91,14 @@ def build_academic_docx(result, *, max_rows_per_table=100):
         columns = list(dict.fromkeys(k for row in rows for k in row))
         table = doc.add_table(rows=1, cols=len(columns))
         table.style = 'Table Grid'  # Visible horizontal and vertical borders in Word.
+        if apa7:
+            from docx.oxml import OxmlElement
+            from docx.oxml.ns import qn
+            borders=OxmlElement('w:tblBorders')
+            for side in ('top','bottom','left','right','insideH','insideV'):
+                border=OxmlElement('w:'+side);border.set(qn('w:val'),'single' if side in ('top','bottom') else 'nil')
+                border.set(qn('w:sz'),'6');borders.append(border)
+            table._tbl.tblPr.append(borders)
         for cell, name in zip(table.rows[0].cells, columns):
             cell.text = str(name)
         for row in rows[:max_rows_per_table]:
@@ -83,8 +106,13 @@ def build_academic_docx(result, *, max_rows_per_table=100):
             for cell, name in zip(cells, columns):
                 cell.text = _value(row.get(name))
         if len(rows) > max_rows_per_table:
-            doc.add_paragraph(f"Not. {len(rows)-max_rows_per_table} satır belge boyutu nedeniyle gösterilmedi; özgün JSON'da korunur.")
+            suffix='ekrandaki tam tablo ve özgün analiz dışa aktarımlarına bakınız.' if apa7 else "özgün JSON'da korunur."
+            doc.add_paragraph(f"Not. {len(rows)-max_rows_per_table} satır belge boyutu nedeniyle gösterilmedi; {suffix}")
     doc.add_heading("Şekiller", level=1)
+    for number,(caption,png) in enumerate(figures,1):
+        doc.add_paragraph(f'Şekil {number}');doc.add_paragraph(caption)
+        doc.add_picture(BytesIO(png),width=Inches(5.8))
+        doc.add_paragraph('Not. Ekranda gösterilen aynı gözlemlerden; ek istatistik kestirilmedi.')
     for spec in manifest["figures"]:
         plot = _figure(source["tables"][spec["source_table"]], spec)
         if plot is None:

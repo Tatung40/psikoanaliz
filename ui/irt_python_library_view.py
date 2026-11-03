@@ -107,8 +107,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                 fit_kwargs.update(solver_options)
                 multistart_result=None
                 if multi:
-                    from core.irt_binary_multistart import multistart
-                    outcome,ms_table,ms_notes=multistart(x.to_numpy(),model,estimation,**solver_options)
+                    from core.reproducible import public_call
+                    outcome,ms_table,ms_notes=public_call('core.irt_binary_multistart','multistart',x.to_numpy(),model,estimation,**solver_options)
                     multistart_result=(ms_table,ms_notes)
                 else:outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
             saved=dict(key=key,outcome=outcome,multistart=multistart_result)

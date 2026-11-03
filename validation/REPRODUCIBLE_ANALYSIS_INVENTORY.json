@@ -33,6 +33,19 @@
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {
+    "screen": "ui/academic_word.py",
+    "core_imports": [
+      "core.academic_screen_results.adapt_screen",
+      "core.academic_screen_results.comparison_inputs_match",
+      "core.academic_screen_results.convergence",
+      "core.academic_screen_results.domain",
+      "core.academic_screen_results.primary",
+      "core.academic_screen_results.validate_screen_result",
+      "core.reproducible"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
     "screen": "ui/charts.py",
     "core_imports": [],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
@@ -167,7 +180,6 @@
       "core.irt_b14.prepare_polytomous",
       "core.irt_binary_inference.STATUS",
       "core.irt_binary_inference.parameter_inference",
-      "core.irt_binary_multistart.multistart",
       "core.irt_binary_usage_policy.evidence_note",
       "core.irt_library_diagnostics.library_fit_diagnostics",
       "core.irt_library_diagnostics.library_itemfit",
@@ -221,6 +233,13 @@
       "core.rasch_dif.dif_analysis",
       "core.rasch_globalfit.global_fit",
       "core.rasch_q3.q3_analysis"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
+    "screen": "ui/reproducible_capture.py",
+    "core_imports": [
+      "core.reproducible"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
