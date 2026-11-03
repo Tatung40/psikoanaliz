@@ -4,7 +4,9 @@ import pandas as pd
 import streamlit as st
 from project_modules import purge_stale, record_loaded
 purge_stale()  # before any project import (in-place redeploy)
-from core.reproducible import begin as begin_code_capture, displayed, finish as finish_code_capture
+from core.reproducible import displayed, finish as finish_code_capture
+from ui.reproducible_capture import begin as begin_code_capture
+from ui.academic_word import begin as begin_academic_screen, finish as finish_academic_screen
 from ui.reproducible_view import render as render_reproducible_code
 from core.missing_imputation import diagnose, apply, METHODS
 from core.missing_decision import assess_necessity
@@ -12,7 +14,8 @@ from core.python_mirt_dif import fingerprint
 from ui.example_datasets_view import render as render_examples, own_file_changed
 
 render_examples('Eksik Veri ve Atama')
-begin_code_capture("Eksik Veri ve Atama", globals(), st.session_state.get("_repro_history"))
+begin_code_capture("Eksik Veri ve Atama", globals(), st.session_state.get('_repro_pages',{}).get('Eksik Veri ve Atama', st.session_state.get("_repro_history")))
+begin_academic_screen('Eksik Veri ve Atama',st.session_state.get('raw_df'),st.session_state.get('scored_df'),st.session_state.get('item_cols',()))
 
 st.title("🧩 Kayıp Veri Analizi ve Atama")
 st.caption("PsikoAnaliz • scikit-learn destekli • yalnızca seçilen madde sütunlarında işlem yapar")
@@ -88,4 +91,6 @@ if source is not None or df is not None:
 _code_recorder = finish_code_capture()
 record_loaded()
 st.session_state["_repro_history"] = _code_recorder
+st.session_state.setdefault('_repro_pages',{})['Eksik Veri ve Atama']=_code_recorder
+finish_academic_screen(_code_recorder)
 render_reproducible_code(_code_recorder)

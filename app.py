@@ -15,7 +15,9 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from core.reproducible import begin as begin_code_capture, displayed as record_displayed, finish as finish_code_capture, instrument as instrument_code_capture, public_call as record_public_call
+from core.reproducible import displayed as record_displayed, finish as finish_code_capture, public_call as record_public_call
+from ui.reproducible_capture import begin as begin_code_capture, instrument as instrument_code_capture
+from ui.academic_word import begin as begin_academic_screen, finish as finish_academic_screen
 from ui.reproducible_view import render as render_reproducible_code
 from ui.example_datasets_view import render as render_examples, own_file_changed, key_changed, discard_results
 from core.answer_keys import validate_key, read_key
@@ -294,8 +296,9 @@ with st.sidebar:
 render_examples(selected_page)
 if st.session_state.pop("_example_loaded_notice", False):
     st.success("Sentetik örnek gerçek yükleyiciye aktarıldı; alanlar eşlendi. Analiz ayarlarını kontrol edin.")
-begin_code_capture(selected_page, globals(), st.session_state.get("_repro_history"),
+begin_code_capture(selected_page, globals(), st.session_state.get("_repro_pages", {}).get(selected_page, st.session_state.get("_repro_history")),
                    tuple(st.session_state.get("_repro_pages", {}).values()))
+begin_academic_screen(selected_page, st.session_state.get('raw_df'), st.session_state.get('scored_df'), st.session_state.get('item_cols', ()))
 
 
 def end_page_code_capture():
@@ -304,6 +307,7 @@ def end_page_code_capture():
     recorder = finish_code_capture()
     st.session_state["_repro_history"] = recorder
     st.session_state.setdefault("_repro_pages", {})[selected_page] = recorder
+    finish_academic_screen(recorder)
     render_reproducible_code(recorder)
 
 
@@ -1555,12 +1559,14 @@ elif selected_page == "MTK: 3PL/4PL Bootstrap DIF":
 elif selected_page == "Genellenebilirlik Kuramı (G ve D Çalışmaları)":
     render_academic_header()
     from ui.generalizability_view import render as render_generalizability
+    instrument_code_capture(globals())
     src = st.session_state.raw_df
     if src is None: st.warning("Önce CSV/XLSX verisini Veri Yükleme ekranından yükleyin.")
     else: render_generalizability(src, list(st.session_state.item_cols))
 elif selected_page in ("Boyutluluk ve Faktör Analizi", "Yerel Bağımsızlık ve Madde Uyumu"):
     render_academic_header()
     from ui import dimensionality_localfit_view as dlv
+    instrument_code_capture(globals())
     src = st.session_state.scored_df if st.session_state.scored_df is not None else st.session_state.raw_df
     if src is None: st.warning("Önce puanlanmış yanıt verisi yükleyin.")
     elif selected_page == dlv.PAGE_DIM: dlv.render_dimensionality(src, list(st.session_state.item_cols))

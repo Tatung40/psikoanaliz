@@ -1,6 +1,6 @@
 """Shared Python syntax panel: no fit, code execution, network call or installs."""
 import streamlit as st
-from core.reproducible import bundle, python_code
+from ui.reproducible_capture import bundle, python_code, replay_manifest
 
 
 def render(recorder):
@@ -8,18 +8,18 @@ def render(recorder):
         if recorder is None or not recorder.calls:
             st.info('Bu sayfada kaydedilmiş bir hesaplama çağrısı bulunamadı. Analizi bu oturumda yeniden çalıştırın; kod üretilmeden boş bir alan gösterilmez.')
             return
-        manifest = recorder.manifest()
+        manifest = replay_manifest(recorder)
         python = python_code(manifest)
         if not python:
             # Preflight-only pages intentionally remain silent; show failures only
             # when a substantive analysis call was recorded but cannot replay.
             from core.reproducible import PREFLIGHT_ONLY
             if any(call.get('function') not in PREFLIGHT_ONLY for call in recorder.calls):
-                st.warning('Bu analiz için doğrulanabilir Python yeniden üretim kodu oluşturulamadı.')
+                st.warning('UNSUPPORTED — Bu analiz için doğrulanabilir Python yeniden üretim kodu oluşturulamadı.')
                 for reason in manifest.get('unsupported', []):
                     st.caption(str(reason))
             return
-        st.caption('Gerçek hesaplama girdileri kullanılır. Kod üretimi bağımsız bilimsel doğrulama değildir. '
+        st.caption('GENERATED / UNVERIFIED — Gerçek hesaplama girdileri kullanılır. Kod üretimi bağımsız bilimsel doğrulama değildir. '
                    'Ön işleme uygulanmış veri tekrar kodlanmaz; seed yalnız açıkça verilmişse taşınır. '
                    'Kod bloğunun kopyala düğmesini kullanabilirsiniz. İndirmeler verinizi içerir.')
         st.caption('Bağımsız çalıştırma: ZIP paketini açın; requirements-repro.txt kurulumundan sonra analysis.py çalıştırın. Python yalnız aynı mevcut motoru tekrar çağırır.')

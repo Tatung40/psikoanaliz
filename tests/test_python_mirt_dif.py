@@ -100,6 +100,8 @@ def test_ui_real_flow_stale_and_downloads(binary,monkeypatch):
     import ui.python_mirt_dif_view as view
     calls=[]
     original=view.analyze
+    from functools import wraps
+    @wraps(original)
     def actual(*args,**kwargs):
         calls.append(kwargs);return original(*args,**kwargs)
     monkeypatch.setattr(view,'analyze',actual)
@@ -123,7 +125,13 @@ def test_ui_real_flow_stale_and_downloads(binary,monkeypatch):
         # Each route reuses the already measured fit; no additional calibrations.
         fresh=AppTest.from_file(str(Path('app.py').resolve()),default_timeout=120)
         for k,v in dict(raw_df=d,scored_df=None,item_cols=items,id_col=None,group_col='Grup',nav_page='MTK: Python mirt DIF').items():fresh.session_state[k]=v
-        fresh.run();fresh.selectbox(key='pmd_model').set_value('2PL').run();fresh.session_state[view.KEY]=dict(old);fresh.run()
+        fresh.run();fresh.selectbox(key='pmd_model').set_value('2PL').run();fresh.session_state[view.KEY]=dict(old)
+        # Reuse the measured result with its real producer and current-input
+        # provenance; a bare old-session opaque result is intentionally blocked.
+        for key in ('_repro_pages','_academic_history','_academic_data_key'):
+            provenance=at.session_state[key]
+            fresh.session_state[key]=dict(provenance) if isinstance(provenance,dict) else provenance
+        fresh.run()
         assert len(scientific_downloads(fresh))==6
         widget=next(w for kind in ('number_input','selectbox','multiselect','checkbox') for w in fresh.get(kind) if w.key==control)
         widget.set_value(value).run()

@@ -105,11 +105,17 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
         rendered_figures.append(fig)
         return original_pyplot(fig,*args,**kwargs)
     monkeypatch.setattr(view.st,'pyplot',capture_pyplot)
+    from functools import wraps
+    from core.reproducible import recorded
+    # Earlier tests may already have instrumented this API. Copy its public
+    # signature, not the recorder's __dict__ marker onto an unrecorded spy.
+    @wraps(recorded(view.fit_python_mirt),updated=())
     def fitted(x,**kwargs):
         np.testing.assert_array_equal(x,frame.to_numpy())
         assert kwargs['common_discrimination']==(model=='1PL')
         calls.append(kwargs)
         return outcome
+    assert not getattr(fitted,'__repro_recorded__',False)
     monkeypatch.setattr(view,'fit_python_mirt',fitted)
     data=frame.replace(dict(enumerate(labels))) if model=='NRM' else frame
     at=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=120)
@@ -120,7 +126,9 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
     assert len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==4
-    assert len(at.get('download_button'))==(6 if model=='NRM' else 8 if model=='2PL' else 7)  # 2PL: + academic Word report
+    from tests.reproducible_ui import scientific_downloads
+    assert len(scientific_downloads(at))==(6 if model=='NRM' else 8 if model=='2PL' else 7)  # existing model exports, including specialized 2PL Word
+    assert {'repro_py','repro_zip'} <= {d.key for d in at.get('download_button')}
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     parameter_index=1 if model=='NRM' else 2
     pd.testing.assert_frame_equal(at.dataframe[parameter_index].value,report.parameters)
