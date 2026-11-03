@@ -96,5 +96,8 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     else: st.error("Geçerli çıkarım yok; başarısız kalibrasyon DIF yokluğu değildir.")
     st.download_button("Madde CSV (UTF-8 BOM)", safe_frame(out["table"]).to_csv(index=False).encode("utf-8-sig"),
                        f"{model}_DIF_maddeler.csv", "text/csv", key="poly_csv")
-    if st.button("DOCX / XLSX / CSV / 300 dpi PNG paketini hazırla", key="poly_prepare"): entry["bundle"] = bundle(out, tables)
+    from reports.academic_docx import REPORT_STANDARD_VERSION
+    if entry.get('bundle_standard')!=REPORT_STANDARD_VERSION:entry.pop('bundle',None)
+    if st.button("DOCX / XLSX / CSV / 300 dpi PNG paketini hazırla", key="poly_prepare"):
+        entry["bundle"] = bundle(out, tables);entry['bundle_standard']=REPORT_STANDARD_VERSION
     if "bundle" in entry: st.download_button("Araştırma ZIP paketini indir", entry["bundle"], f"{model}_DIF.zip", "application/zip", key="poly_zip")

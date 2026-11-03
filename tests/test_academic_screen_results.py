@@ -21,7 +21,7 @@ def test_new_family_keeps_domain_actual_cells_and_suppressed_statistics():
     cells=' '.join(c.text for t in doc.tables for row in t.rows for c in row.cells)
     assert '1.23457' in cells and 'Raporlanmadı' in cells
     assert any('NOT CERTIFIED' in p.text for p in doc.paragraphs)
-    assert doc.styles['Normal'].font.name=='Times New Roman'
+    assert doc.styles['Normal'].font.name=='Calibri'
     assert 'insideV' in doc.tables[0]._tbl.xml and 'nil' in doc.tables[0]._tbl.xml
     assert 'Bulgular' in '\n'.join(p.text for p in doc.paragraphs)
 

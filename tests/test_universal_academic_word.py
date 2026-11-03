@@ -28,6 +28,8 @@ def _assert_word(at,page):
         assert any(d.key=='academic_word' for d in at.get('download_button'))
         raw=history[page]['docx']
     doc=Document(raw if hasattr(raw,'read') else io.BytesIO(raw));text='\n'.join(p.text for p in doc.paragraphs)
+    from tests.test_word_standard import assert_word_standard
+    assert_word_standard(doc)
     assert doc.tables or doc.inline_shapes
     assert 'NOT IMPLIED' in text or 'legacy_docx' in history[page]
     if 'result' in history[page]:

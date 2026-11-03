@@ -332,12 +332,13 @@ def _academic_word(saved,model,cols):
     st.divider()
     st.markdown('### 📄 Akademik 2PL Raporu')
     store=st.session_state.setdefault('python_mirt_2pl_word',{})
-    if store.get('key')!=saved['key']:
+    from reports.academic_docx import REPORT_STANDARD_VERSION
+    if store.get('key')!=saved['key'] or store.get('standard')!=REPORT_STANDARD_VERSION:
         try:
             from reports.irt_2pl_academic_docx import export_2pl_docx
-            store.clear();store.update(key=saved['key'],docx=export_2pl_docx(saved['outcome'],list(cols)),error=None)
+            store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,docx=export_2pl_docx(saved['outcome'],list(cols)),error=None)
         except Exception as exc:
-            store.clear();store.update(key=saved['key'],docx=None,error=f'{type(exc).__name__}: {exc}')
+            store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,docx=None,error=f'{type(exc).__name__}: {exc}')
     if store['docx'] is None:
         st.error(f"Akademik 2PL Word raporu hazırlanamadı: {store['error']}");return
     st.download_button('📄 Akademik 2PL Raporu — Word İndir',store['docx'],'python_mirt_2pl_akademik_rapor.docx',

@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from core import polytomous_dif as P
 from reports.irt_b14_report import safe_frame, export_xlsx
+from reports.academic_docx import standardize_document, _value
 
 REFERENCES = {
     "PCM": "Masters, G. N. (1982). A Rasch model for partial credit scoring. Psychometrika, 47(2), 149–174. https://doi.org/10.1007/BF02296272",
@@ -133,11 +134,13 @@ def bundle(out, tables=None):
         table = doc.add_table(rows=1, cols=len(frame.columns)); table.style = "Light Shading Accent 1"
         for cell, label in zip(table.rows[0].cells, frame.columns): cell.text = str(label)
         for row in frame.itertuples(index=False, name=None):
-            for cell, value in zip(table.add_row().cells, row): cell.text = f"{value:.5g}" if isinstance(value, (float, np.floating)) else str(value)
+            for cell, value in zip(table.add_row().cells, row): cell.text = _value(value.item() if isinstance(value,np.generic) else value)
     doc.add_paragraph("Tüm tanılar ve noktasal eğri aralıkları XLSX/CSV eklerindedir. Pozitif olasılık farkı yalnızca belirtilen kategorinin aynı theta'da odak grupta daha olası olduğunu gösterir. Sıralı modellerde pozitif puan etkisi daha yüksek beklenen puandır; NRM için puan/başarı/avantaj yorumu yapılmaz.")
     figures = [png_bytes(out, tables, item) for item in out["table"].loc[~out["table"]["Sabit çapa"], "Madde"]]
     for figure in figures: doc.add_picture(io.BytesIO(figure), width=Inches(6))
     doc.add_heading("Kaynak", 1); doc.add_paragraph(reference)
+    standardize_document(doc,method=out.get('method'),warnings=cautions,
+        provenance={'Üretici':'reports.polytomous_dif_report','Model':model,'Yöntem bilgisi':'Yontem tablosunda; ek kestirim yapılmadı.'})
     word = io.BytesIO(); doc.save(word); output = io.BytesIO()
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(f"{model}_DIF.docx", word.getvalue())

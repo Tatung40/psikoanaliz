@@ -8,6 +8,7 @@ import io
 from typing import Dict, List, Optional, Any
 import numpy as np
 import pandas as pd
+from reports.academic_docx import standardize_document, _value
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -84,8 +85,8 @@ def create_word_report(
     p_intro.paragraph_format.first_line_indent = Inches(0.5)
     run_intro = p_intro.add_run(
         f"Bu raporda sunulan analizler, Klasik Test Kuramı (KTK) prensiplerine uygun olarak gerçekleştirilmiştir. "
-        f"Veri setinde toplam {test_summary.get('n_examinees', 0)} katılımcı ve {test_summary.get('k_items', 0)} madde "
-        f"bulunmaktadır. Test puan ortalaması {test_summary.get('mean', 0.0):.2f} (SS = {test_summary.get('std_dev', 0.0):.2f}) "
+        f"Veri setinde toplam {_value(test_summary.get('n_examinees'))} katılımcı ve {_value(test_summary.get('k_items'))} madde "
+        f"bulunmaktadır. Test puan ortalaması {_value(test_summary.get('mean'))} (SS = {_value(test_summary.get('std_dev'))}) "
         f"olarak hesaplanmıştır. Analiz kapsamında test düzeyi normlar, madde güçlük ve ayırt edicilik indeksleri, "
         f"güvenirlik katsayıları ve pedagojik tanısal bayraklar incelenmiştir."
     )
@@ -123,13 +124,13 @@ def create_word_report(
         p.runs[0].font.bold = True
 
     t1_data = [
-        ("Katılımcı Sayısı (N)", str(test_summary.get("n_examinees", "-")), "Minimum Puan", str(test_summary.get("min", "-"))),
-        ("Madde Sayısı (k)", str(test_summary.get("k_items", "-")), "Maksimum Puan", str(test_summary.get("max", "-"))),
-        ("Ortalama (Mean)", str(test_summary.get("mean", "-")), "Ranj (Aralık)", str(test_summary.get("range", "-"))),
-        ("Medyan (Ortanca)", str(test_summary.get("median", "-")), "Çarpıklık (Skewness)", str(test_summary.get("skewness", "-"))),
-        ("Standart Sapma (s)", str(test_summary.get("std_dev", "-")), "Basıklık (Kurtosis)", str(test_summary.get("kurtosis", "-"))),
-        ("Örneklem Varyansı (s²)", str(test_summary.get("variance", "-")), "Çeyrekler Arası Ranj (IQR)", str(test_summary.get("iqr", "-"))),
-        ("Ort. Standart Hatası (SEM_m)", str(test_summary.get("sem_mean", "-")), "Taban / Tavan %", f"%{test_summary.get('floor_pct', 0.0):.1f} / %{test_summary.get('ceiling_pct', 0.0):.1f}")
+        ("Katılımcı Sayısı (N)", _value(test_summary.get("n_examinees")), "Minimum Puan", _value(test_summary.get("min"))),
+        ("Madde Sayısı (k)", _value(test_summary.get("k_items")), "Maksimum Puan", _value(test_summary.get("max"))),
+        ("Ortalama (Mean)", _value(test_summary.get("mean")), "Ranj (Aralık)", _value(test_summary.get("range"))),
+        ("Medyan (Ortanca)", _value(test_summary.get("median")), "Çarpıklık (Skewness)", _value(test_summary.get("skewness"))),
+        ("Standart Sapma (s)", _value(test_summary.get("std_dev")), "Basıklık (Kurtosis)", _value(test_summary.get("kurtosis"))),
+        ("Örneklem Varyansı (s²)", _value(test_summary.get("variance")), "Çeyrekler Arası Ranj (IQR)", _value(test_summary.get("iqr"))),
+        ("Ort. Standart Hatası (SEM_m)", _value(test_summary.get("sem_mean")), "Taban / Tavan %", f"{_value(test_summary.get('floor_pct'))} / {_value(test_summary.get('ceiling_pct'))}")
     ]
 
     for row_idx, (s1, v1, s2, v2) in enumerate(t1_data):
@@ -179,16 +180,21 @@ def create_word_report(
         p.runs[0].font.bold = True
 
     t2_data = [
-        ("Cronbach Alfa (α)", str(reliability_data.get("cronbach_alpha", "-")), "İç tutarlık katsayısı"),
-        ("Standartlaştırılmış Alfa", str(reliability_data.get("standardized_alpha", "-")), "Maddeler arası ortalama korelasyona dayalı"),
-        ("KR-20 (Kuder-Richardson)", str(reliability_data.get("kr20", "-")) if reliability_data.get("kr20") is not None else "Çok Kategorili Ölçek", "İkili veride Alfa ile tam eşdeğer"),
-        ("KR-21 Katsayısı", str(reliability_data.get("kr21", "-")) if reliability_data.get("kr21") is not None else "-", "Eşit güçlük varsayımı altında alt sınır"),
-        ("İki-Yarı (Tek-Çift) Spearman-Brown", str(reliability_data.get("spearman_brown_odd_even", "-")), "Test yarısı eşdeğerlik kestirimi"),
-        ("Guttman Split-Half (λ4)", str(reliability_data.get("guttman_lambda4", "-")), "Yarı-test varyans temelli güvenirlik"),
-        ("McDonald Omega (ω_t)", str(reliability_data.get("mcdonald_omega", "-")), "Tek faktörlü model faktör yüklerine dayalı"),
-        ("Ölçmenin Standart Hatası (SEM)", str(reliability_data.get("sem", "-")), f"Bireysel puan hata marjı: ±{reliability_data.get('ci_95_margin', '-')} (%95 GA)"),
+        ("Cronbach Alfa (α)", _value(reliability_data.get("cronbach_alpha")), "İç tutarlık katsayısı"),
+        ("Standartlaştırılmış Alfa", _value(reliability_data.get("standardized_alpha")), "Maddeler arası ortalama korelasyona dayalı"),
+        ("KR-20 (Kuder-Richardson)", _value(reliability_data.get("kr20")) if reliability_data.get("kr20") is not None else "Çok Kategorili Ölçek", "İkili veride Alfa ile tam eşdeğer"),
+        ("KR-21 Katsayısı", _value(reliability_data.get("kr21")) if reliability_data.get("kr21") is not None else "-", "Eşit güçlük varsayımı altında alt sınır"),
+        ("İki-Yarı (Tek-Çift) Spearman-Brown", _value(reliability_data.get("spearman_brown_odd_even")), "Test yarısı eşdeğerlik kestirimi"),
+        ("Guttman Split-Half (λ4)", _value(reliability_data.get("guttman_lambda4")), "Yarı-test varyans temelli güvenirlik"),
+        ("McDonald Omega (ω_t)", _value(reliability_data.get("mcdonald_omega")), "Tek faktörlü model faktör yüklerine dayalı"),
+        ("Ölçmenin Standart Hatası (SEM)", _value(reliability_data.get("sem")), f"Bireysel puan hata marjı: ±{reliability_data.get('ci_95_margin', '-')} (%95 GA)"),
         ("Feldt (1969) %95 Alfa GA", f"[{reliability_data.get('alpha_ci_lower', '-')}, {reliability_data.get('alpha_ci_upper', '-')}]", "Kuramsal güven aralığı")
     ]
+
+    if not all(isinstance(reliability_data.get(key),(int,float,np.number)) and np.isfinite(reliability_data[key])
+               for key in ('alpha_ci_lower','alpha_ci_upper')):
+        t2_data=[row for row in t2_data if not row[0].startswith("Feldt")]
+        doc.add_paragraph('Feldt alfa güven aralığı: geçerli sınırlar kaynak sonuçlarda sağlanmadığından raporlanmadı.')
 
     for row_idx, (m, val, desc) in enumerate(t2_data):
         row_cells = table2.add_row().cells
@@ -241,11 +247,11 @@ def create_word_report(
         vals = [
             str(row["Madde"]),
             str(row["N"]),
-            f"{row['Güçlük (p)']:.2f}" if not pd.isna(row["Güçlük (p)"]) else "-",
-            f"{row['r_it']:.2f}" if not pd.isna(row["r_it"]) else "-",
-            f"{row['r_ir (Düzeltilmiş)']:.2f}" if not pd.isna(row["r_ir (Düzeltilmiş)"]) else "-",
-            f"{row['D (%27)']:.2f}" if not pd.isna(row["D (%27)"]) else "-",
-            f"{row['Silindiğinde Alfa']:.2f}" if not pd.isna(row["Silindiğinde Alfa"]) else "-",
+            _value(row["Güçlük (p)"]),
+            _value(row["r_it"]),
+            _value(row["r_ir (Düzeltilmiş)"]),
+            _value(row["D (%27)"]),
+            _value(row["Silindiğinde Alfa"]),
             str(row["Tanısal Bayrak"])
         ]
         for col_idx, val_str in enumerate(vals):
@@ -282,6 +288,8 @@ def create_word_report(
         r_ref.font.size = Pt(10)
 
     output = io.BytesIO()
+    standardize_document(doc,method=test_title,provenance={'Üretici':'reports.word_export.create_word_report'},
+        warnings=['Cronbach alfa tek boyutluluğu veya geçerliği kanıtlamaz. Yalnızca kaynak hesaplamalar raporlanmıştır.'])
     doc.save(output)
     output.seek(0)
     return output
