@@ -106,12 +106,16 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
         return original_pyplot(fig,*args,**kwargs)
     monkeypatch.setattr(view.st,'pyplot',capture_pyplot)
     from functools import wraps
-    @wraps(view.fit_python_mirt)
+    from core.reproducible import recorded
+    # Earlier tests may already have instrumented this API. Copy its public
+    # signature, not the recorder's __dict__ marker onto an unrecorded spy.
+    @wraps(recorded(view.fit_python_mirt),updated=())
     def fitted(x,**kwargs):
         np.testing.assert_array_equal(x,frame.to_numpy())
         assert kwargs['common_discrimination']==(model=='1PL')
         calls.append(kwargs)
         return outcome
+    assert not getattr(fitted,'__repro_recorded__',False)
     monkeypatch.setattr(view,'fit_python_mirt',fitted)
     data=frame.replace(dict(enumerate(labels))) if model=='NRM' else frame
     at=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py'),default_timeout=120)
