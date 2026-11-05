@@ -12,6 +12,7 @@ import pandas as pd
 import streamlit as st
 from core.academic_screen_results import adapt_screen,comparison_inputs_match,convergence,domain,primary
 from core import reproducible as R
+from ui.result_panels import OUTPUTS,docx_download,in_expander,target_for,call_in,render_output
 
 # Stable dispatcher survives the existing in-place-deploy module guard. User data
 # is kept only in the current ContextVar/session, never in a shared global cache.
@@ -20,7 +21,7 @@ BUSY=sys.__dict__.setdefault('_academic_screen_busy',ContextVar('academic_screen
 WIDGETS={'selectbox','multiselect','radio','checkbox','toggle','slider','select_slider',
          'number_input','text_input','text_area','date_input','file_uploader','data_editor'}
 DISPLAY={'dataframe','table','metric','pyplot','plotly_chart','json','markdown','caption',
-         'header','subheader','title','warning','error','info','success','download_button'}
+         'header','subheader','title','warning','error','info','success','download_button'} | OUTPUTS
 PRESENTATION=re.compile(r'(?:output_|chart_|show_|plot_|report_|theta_range|theta_min|theta_max|theta_points)')
 
 
@@ -61,8 +62,12 @@ def _observe(name,args,kwargs,original):
     if name=='download_button':
         filename=values.get('file_name','') or ''
         if str(filename).lower().endswith('.docx'):
-            target=values.pop('self',None) or getattr(original,'__self__',None) or st
+            target=values.pop('self',None) or getattr(original,'__self__',None) or st._main
+            values['label'],values['file_name']=docx_download(ctx['page'],st.session_state)
+            if in_expander(target):target=ctx['downloads']
             slot=target.empty();ctx['existing'].append((slot,values));return False
+        target=target_for(original,values)
+        if in_expander(target):return call_in(original,args,kwargs,ctx['downloads'])
         return original(*args,**kwargs)
     prepared=None
     if name=='pyplot':
@@ -73,7 +78,11 @@ def _observe(name,args,kwargs,original):
         out=io.BytesIO();fig.savefig(out,format='png',dpi=130)
         prepared=(ctx['heading'] or 'Ekrandaki grafik',out.getvalue())
     token=BUSY.set(True)
-    try:result=original(*args,**kwargs)
+    try:
+        if name in OUTPUTS:result=render_output(ctx,name,values,original,args,kwargs)
+        elif name in ('warning','error') and in_expander(target_for(original,values)):
+            result=call_in(original,args,kwargs,ctx['alerts'])
+        else:result=original(*args,**kwargs)
     finally:BUSY.reset(token)
     if name in WIDGETS:
         label=str(values.get('label',''));key=str(values.get('key') or name+':'+label)
@@ -127,7 +136,9 @@ def begin(page,raw=None,scored=None,items=()):
     if st.session_state.get('_academic_data_key')!=data_key:
         st.session_state.pop('_academic_history',None)
         st.session_state['_academic_data_key']=data_key
+    alerts=st.container();downloads=st.container()
     CTX.set(dict(page=page,source=source,data_key=data_key,widgets={},view_widgets={},tables=[],metrics={},
+                 alerts=alerts,downloads=downloads,panels={},
                  notes=[],figures=[],plotly=[],heading='',existing=[]))
 
 
@@ -222,7 +233,8 @@ def finish(recorder):
             payload=build_academic_docx(result,validator=validate_screen_result,title='Akademik '+page+' Raporu',figures=figures,apa7=True)
         history[page].update(result=result,docx=payload)
         st.markdown('### Akademik '+page+' Raporu')
-        st.download_button('Word indir (.docx)',payload,'psikoanaliz_akademik_rapor.docx',
+        label,filename=docx_download(page,st.session_state)
+        st.download_button(label,payload,filename,
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',key='academic_word',on_click='ignore')
     except (ValueError,TypeError,KeyError,AttributeError) as exc:
         history.pop(page,None);st.warning('Akademik Word hazırlanamadı: '+str(exc))
