@@ -207,6 +207,11 @@
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {
+    "screen": "ui/p_display.py",
+    "core_imports": [],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
     "screen": "ui/polytomous_dif_view.py",
     "core_imports": [
       "core.polytomous_dif"
