@@ -1,0 +1,15 @@
+{
+ "purpose": "Next deterministic step named in validation/FOUR_PL_ML_DECISION.md: higher-grid 4PL ML solution with an independent higher-density audit. Diagnostic only; not certification.",
+ "data": {"path": "tests/fixtures/irt_b11/data_irt4pl_ok.csv", "sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c"},
+ "model": "4PL marginal ML, D=1, theta~N(0,1), no priors, physical a/b/c/u with original BOUNDS (validation/r_mirt_phase1/equivalence_audit.py)",
+ "start": "validation/q1_q3/profile_polished.json point u=0.6198282615 (highest GH61 logLik among the five), all 48 coordinates then free",
+ "objective_grid": "Gauss-Hermite 101 (scipy roots_hermite, x*sqrt(2), w/sqrt(pi))",
+ "algorithm": "bounded Newton score polishing identical to validation/q1_q3/polish.py (observed information on the free active face, PD and condition<=1e8 gate, step halving <=10, accept only nondecreasing logLik and decreasing projected score), at most 6 steps; u of M12 NOT fixed",
+ "gates": {"stationary_objective": "projected raw score max <= 1e-5 on GH101",
+           "audit": "projected raw score max <= 1e-5 on GH161 at the GH101 solution and |logLik_GH161 - logLik_GH101| <= 1e-3",
+           "information": "active-face min eigenvalue > 0 and condition <= 1e8"},
+ "also_reported": "logLik at GH41/GH61/GH101/GH161 for the final parameters; max |parameter change| vs the GH61 start; boundary coordinates",
+ "decision": "Both gates PASS -> fixture-scoped numerical stationarity at GH101 (quadrature blocker resolved for this fixture only). Any FAIL -> quadrature/stationarity blocker persists; no further repair in this batch. Never certification; recovery and CI coverage evidence unchanged (p1, p7).",
+ "monte_carlo": 0,
+ "thresholds_source": "unchanged from FOUR_PL_ML_DECISION.md / q1_q3 polish protocol"
+}
