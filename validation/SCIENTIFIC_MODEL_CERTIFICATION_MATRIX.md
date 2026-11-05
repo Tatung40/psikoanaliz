@@ -5,30 +5,31 @@ Sertifikasyon için bağımsız referans, önceden kayıtlı kabul kriteri, sın
 iddialar için simülasyon ve tekrarlanabilir CI sonucunun hepsi gerekir. Hiçbir modelde bunların tamamı yok.
 Tek fikstürle yapılan karşılaştırma yalnız noktasal eşleşmeyi gösterir.
 
-Base: `main` `45d61f7`. Açık PR'lar: #136 (çıktı biçimi), #137 (Faz 2 raporu), #138 (eğri, 1PL ortak-a ve G Kuramı kanıtı).
+Base: `main` `d9a6266`; #136–#139 birleştirildi. Bu eski özet tablosunun V/P işaretleri
+sertifikasyon değildir. Çıktı/kestirici düzeyindeki güncel kayıt: `certification/matrix.jsonl`.
 PR'a özgü kanıtlar ilgili hücrede belirtildi.
 
 Kısaltmalar: **V** = VERIFIED, **P** = PARTIAL, **NV** = NOT VERIFIED, **NS** = NOT SUPPORTED (bilinçli olarak kapalı), **NA** = NOT APPLICABLE.
 
 | Model | Parametre | Uyum (LL/AIC/BIC) | SE/CI/p | Kişi (EAP) | Eğriler / Wright | Kararlılık | Genel durum |
 |---|---|---|---|---|---|---|---|
-| Rasch / 1PL (a = 1) | V — R mirt 1.48 ≤4.4e-4 (`r_mirt_phase1`); yerel ↔ R 1.3e-6 | V — AIC/BIC özdeşliği; R logLik | P — Monte Carlo 300/300, b GA kapsaması .953 (yalnız çalışılan koşullar) | V — bağımsız kareleme ≤1e-10 (bu PR) | V eğriler (#138); P Wright (statik) | P — yakınsama kapıları | NOT CERTIFIED |
-| 1PL ortak serbest a | P — yerel σ-serbest Rasch ile özdeşlik, tek fikstür (#138) | V — ΔLL 1.4e-8 (#138) | NV | V (ortak EAP fonksiyonu) | V eğriler; NS Wright | P | NOT CERTIFIED |
+| Rasch / 1PL (a = 1) | V — R mirt 1.48 ≤4.4e-4 (`r_mirt_phase1`); yerel ↔ R 1.3e-6 | V — AIC/BIC özdeşliği; R logLik | P — Monte Carlo 300/300, b GA kapsaması .953 (yalnız çalışılan koşullar) | P — bağımsız EAP testi yalnız 2PL fikstüründe; buraya genellenemez | V eğriler (#138); P Wright (statik) | P — yakınsama kapıları | NOT CERTIFIED |
+| 1PL ortak serbest a | P — yerel σ-serbest Rasch ile özdeşlik, tek fikstür (#138) | V — ΔLL 1.4e-8 (#138) | NV | NV — ortak fonksiyon tek başına model bazlı bağımsız kanıt değildir | V eğriler; NS Wright | P | NOT CERTIFIED |
 | 2PL | V — R mirt (`r_mirt_phase1`) | V | P — SE kapsama çalışması (`binary_se_coverage_study`); S-X² yalnız LSAT7 (#132) | V | V | P | NOT CERTIFIED |
-| 3PL | P — MAP N ≥ 3000, ML N ≥ 10000; R eşlenmiş fit (`r_mirt_phase1/matched_fit.py`) | P | NV — SE/GA kapsaması doğrulanmadı; bootstrap DIF p kapalı | V | V eğriler (#138) | P — sınır çözümleri raporlanıyor | NOT CERTIFIED |
-| 4PL | NV — ML: R yakınsamadı, zayıf tanımlanabilirlik; MAP: P (çalışılan koşullarda nokta geri kazanımı) | NV | NS — GA kapalı | V | V eğriler | NV — ML | NOT CERTIFIED |
-| GRM | V — R mirt politomöz (`r_mirt_polytomous`) | V | P — politomöz Monte Carlo (`p4_polytomous`) | V | V (#138) | P | NOT CERTIFIED |
-| PCM / GPCM | P — Monte Carlo geri kazanımı (`p4_polytomous`) | V | P | V | V (#138) | P | NOT CERTIFIED |
-| RSM | P — 1020 fit (`p3_rsm`), R RSM (`r_mirt_rsm`) | V | P | V | P — statik | P | NOT CERTIFIED |
-| NRM | P — Monte Carlo; SE kusuru `oakes` ile düzeltildi | V | P — ağırlıklı kategori etkisi GA'sı kapalı | V | V eğriler; NS madde uyumu ve Wright | P | NOT CERTIFIED |
+| 3PL | P — MAP N ≥ 3000, ML N ≥ 10000; R eşlenmiş fit (`r_mirt_phase1/matched_ml.R`; `final_summary.json`) | P | NV — SE/GA kapsaması doğrulanmadı; bootstrap DIF p kapalı | NV — tek 2PL EAP fikstürü bu modele genellenmez | V eğriler (#138) | P — sınır çözümleri raporlanıyor | NOT CERTIFIED |
+| 4PL | NV — ML: R yakınsamadı, zayıf tanımlanabilirlik; MAP: P (çalışılan koşullarda nokta geri kazanımı) | NV | NS — GA kapalı | NV — tek 2PL EAP fikstürü bu modele genellenmez | V eğriler | NV — ML | NOT CERTIFIED |
+| GRM | V — R mirt politomöz (`r_mirt_polytomous`) | V | P — politomöz Monte Carlo (`p4_polytomous`) | NV — tek 2PL EAP fikstürü bu modele genellenmez | V (#138) | P | NOT CERTIFIED |
+| PCM / GPCM | P — Monte Carlo geri kazanımı (`p4_polytomous`) | V | P | NV — tek 2PL EAP fikstürü bu modele genellenmez | V (#138) | P | NOT CERTIFIED |
+| RSM | P — 1020 fit (`p3_rsm`), R RSM (`r_mirt_rsm`) | V | P | NV — tek 2PL EAP fikstürü bu modele genellenmez | P — statik | P | NOT CERTIFIED |
+| NRM | P — Monte Carlo; SE kusuru `oakes` ile düzeltildi | V | P — ağırlıklı kategori etkisi GA'sı kapalı | NV — tek 2PL EAP fikstürü bu modele genellenmez | V eğriler; NS madde uyumu ve Wright | P | NOT CERTIFIED |
 | MIRT (1–4PL/GRM, bifaktör) | P — R Stage 1 sayısal eşdeğerlik (run 40383677441) | V — formüller | NS — interaktif SE/GA/LR kapalı; MAP NV | P | P — kodda yüzey değişmezleri | P | NOT CERTIFIED |
 | DIF: MH, lojistik, düzeltmeler | V — statsmodels / sklearn ≤1e-10 / ≤1e-5 (bu PR) | NA | P — impact altında sıralı DIF FWER şişmesi belgelenmiş (#118–#121) | NA | NA | V | NOT CERTIFIED |
-| DIF: Lord/Wald (2PL), GRM-LR | V — R mirt ≤7.4e-4 (#130); GRM GH101/GH161 kapıları | NA | NV — FWER yalnız 30 çift (NOT CERTIFIED); 1PL Lord yalnız betimsel | NA | NA | V — sayısal kapılar | NOT CERTIFIED |
+| DIF: Lord/Wald (2PL), GRM-LR | V — R mirt ≤7.4e-4 (#130); GRM GH101/GH161 kapıları | NA | NV — FWER: 852 tamamlanan çift; önkayıtlı bakış500 INCONCLUSIVE / NOT CERTIFIED; eski sabit-SD 1PL Lord betimsel; yeni serbest-SD yolunda R sayısal karşılaştırması geçti (#131), FWER doğrulanmadı | NA | NA | V — sayısal kapılar | NOT CERTIFIED |
 | KTK (α, KR-20/21, λ1–λ6) | V — pingouin α ≤1e-6 (bu PR); psych λ (#132) | NA | P — Feldt GA | NA | NA | V — tanımsız katsayı artık NaN (bu PR) | NOT CERTIFIED |
 | G Kuramı | V — p×i bağımsız ANOVA (#138); diğer dengeli desenler P (R CI) | NA | NS — F/p ve GA üretilmiyor | NA | NA | P | NOT CERTIFIED |
 | Eksik veri | V — gözlenen değer ve maske bütünlüğü (Faz 2 betiği) | NA | NS — tekli atama belirsizliği yansıtmaz | NA | NA | V | NOT CERTIFIED |
 
-Ekran–Word–CSV/XLSX eşdeğerliği tüm modeller için **P**: p biçimi ve Word bölüm düzeltmeleri PR #136'da (merge edilmedi).
+Ekran–Word–CSV/XLSX eşdeğerliği tüm modeller için **P**: p biçimi ve Word bölüm düzeltmeleri PR #136'da birleştirildi; biçim testi bilimsel geçerlilik kanıtı değildir.
 
 ## Bu PR'da yeni doğrulanan iddialar (önceden belirlenen toleranslar)
 
@@ -54,9 +55,13 @@ Hiçbir tolerans gevşetilmedi. Test yalnız Δ'nın işaretini iddia ediyor; ö
 
 ## Açık bilimsel riskler ve kalan NV/NS alanları
 
-4PL ML; 3PL SE/GA; 1PL ortak-a SE/GA; MIRT MAP ve çıkarımsal istatistikler; Lord serbest-SD Rasch;
-GRM-LR ve diğer IRT DIF yöntemlerinde FWER (yalnız 30 çift); G Kuramı sabit yüzeyler ve dengesiz desenler;
-NRM madde uyumu ve Wright haritası; Wright haritasının 1PL'e genişletilmesi. Toplam: **NV 9, NS 8 hücre**.
+Yerel serbest-SD Rasch, kütüphane sabit-a=1 1PL ve ortak-a 1PL ayrı ölçek/kestirim yollarıdır.
+4PL ML ve MAP kanıtları birleştirilmez. Eski tabloda tek hücredeki EAP V işareti,
+yalnız 2PL fikstürünün ortak ızgara testini diğer modellere aktaramaz; güncel JSONL bunu sınırlar.
+
+4PL ML; 3PL SE/GA; 1PL ortak-a SE/GA; MIRT MAP ve çıkarımsal istatistikler; Lord serbest-SD Rasch için genel Tip-I/FWER ve kapsama;
+GRM-LR ve diğer IRT DIF yöntemlerinde FWER (852 tamamlanan çift; yalnız önkayıtlı 500 bakışı: INCONCLUSIVE); G Kuramı sabit yüzeyler ve dengesiz desenler;
+NRM madde uyumu ve Wright haritası; Wright haritasının 1PL'e genişletilmesi. Eski NV/NS toplamı güncel çıktı envanteri sayımı olarak kullanılmaz; güncel sayım `certification/manifest.json` içindedir.
 Yerelde R yok; R kanıtları CI çalıştırmalarından alındı.
 
 ## CI
