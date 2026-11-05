@@ -1,4 +1,4 @@
-"""'MTK: Karşılaştırma' compares Python mirt ML fits run on the 1PL–4PL pages (no native engine)."""
+"""'MTK: Karşılaştırma' fits 1PL–4PL by ML in one click on identical data (no native engine)."""
 from pathlib import Path
 
 import numpy as np
@@ -19,31 +19,27 @@ def _data():
     return pd.DataFrame((rng.random(p.shape) < p).astype(int), columns=[f"M{i}" for i in range(1, 7)])
 
 
-def test_comparison_page_uses_library_fits_of_identical_data():
+def test_comparison_page_fits_all_four_models_on_identical_data():
     df = _data()
-    at = AppTest.from_file(APP, default_timeout=180)
+    at = AppTest.from_file(APP, default_timeout=600)
     for key, value in dict(raw_df=df, scored_df=df.copy(), item_cols=list(df.columns), id_col=None,
                            group_col=None, is_dichotomous=True, nav_page="MTK: Karşılaştırma").items():
         at.session_state[key] = value
     at.run()
     assert not at.exception
-    assert any("henüz bir MTK modeli çalıştırılmadı" in i.value for i in at.info)
-    for model in ("1PL", "2PL"):
-        at.session_state["nav_page"] = f"MTK: {model}"
-        at.run()
-        at.button(key=f"py_mirt_run_{model}").click().run()
-        assert not at.exception
-    at.session_state["nav_page"] = "MTK: Karşılaştırma"
-    at.run()
+    assert any("düğmeye basın" in i.value for i in at.info)
+    at.button(key="irt_compare_run").click().run()
     assert not at.exception
-    fits = {m: at.session_state["python_mirt_experimental_results"][m]["fit"].fit for m in ("1PL", "2PL")}
+    rows = {r["Model"]: r for r in at.session_state["irt_model_comparison"]["rows"]}
     shown = at.dataframe[0].value.set_index("Model")
-    for model, fit in fits.items():
-        assert float(shown.loc[model, "AIC"]) == pytest.approx(round(fit.aic, 3), abs=1e-3)
-        assert float(shown.loc[model, "BIC"]) == pytest.approx(round(fit.bic, 3), abs=1e-3)
-    best = min(fits, key=lambda m: fits[m].aic)
-    assert shown.loc["EN İYİ", "AIC"] == best
+    assert list(shown.index) == ["1PL", "2PL", "3PL", "4PL"]
+    for model, row in rows.items():
+        if row["AIC"] is not None:
+            assert float(shown.loc[model, "AIC"]) == pytest.approx(row["AIC"], abs=1e-3)
+            assert float(shown.loc[model, "BIC"]) == pytest.approx(row["BIC"], abs=1e-3)
+    best = min((r for r in rows.values() if r["eligible"]), key=lambda r: r["BIC"])["Model"]
+    assert shown.loc[best, "ΔBIC"] == "0.000"
     changed = df.copy(); changed.iloc[0, 0] = 1 - changed.iloc[0, 0]
     at.session_state["scored_df"] = changed
     at.run()
-    assert any("henüz bir MTK modeli çalıştırılmadı" in i.value for i in at.info)
+    assert any("geçersizleştirildi" in i.value for i in at.info) and not at.dataframe

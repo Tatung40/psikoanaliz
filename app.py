@@ -1708,92 +1708,48 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     "Asıl veri dosyanız değiştirilmez.")
         model = selected_page.replace("MTK: ", "")
         if model == "Karşılaştırma":
-            st.subheader("📊 MTK Model Karşılaştırması")
-            st.markdown(
-                "Aynı veri üzerinde kestirilen **1PL, 2PL, 3PL ve 4PL** modelleri "
-                "**AIC**, **BIC** ve **logLik** ölçütleriyle karşılaştırılır. "
-                "AIC ve BIC için küçük değer daha iyi uyumu–karmaşıklık dengesini gösterir. "
-                "LogLik için büyük değer daha yüksek olabilirlik anlamına gelir."
-            )
-            # Library fits from the 1PL–4PL pages on identical item data; MAP is not compared by AIC/BIC.
-            from core.irt_library_diagnostics import library_fit_diagnostics
-            import plotly.graph_objects as go
-            history = st.session_state.get("python_mirt_experimental_results", {})
-            data = target.loc[:, irt_columns]
-            fingerprint = (tuple(irt_columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()))
-            usable = {}
-            for m, entry in history.items():
-                if m in ("1PL", "2PL", "3PL", "4PL") and tuple(entry["fingerprint"][:3]) == fingerprint \
-                        and entry["fingerprint"][3] == "ML":
-                    diag = library_fit_diagnostics(entry["fit"].fit)
-                    usable[m] = {"aic": diag["aic"], "bic": diag["bic"], "loglik": diag["log_likelihood"],
-                                 "param_count": diag["n_parameters"], "converged": diag["converged"],
-                                 "points": entry["fit"].solver_settings.get("n_quadpts")}
-            if not usable:
-                st.info("Bu veri setiyle henüz bir MTK modeli çalıştırılmadı. "
-                        "Önce ilgili 1PL–4PL sayfalarında ML kalibrasyonu yapın.")
+            st.subheader("📊 Model Karşılaştırması")
+            from core.irt_model_comparison import MODELS, SOLVER, comparison_table, interpretation, summarize_fit
+            data = target.loc[:, irt_columns].apply(pd.to_numeric, errors="coerce")
+            st.caption("1PL (a = 1), 2PL, 3PL ve 4PL aynı 0/1 matris üzerinde Python mirt marjinal ML (EM) ile "
+                       f"kestirilir; N(0,1) örtük dağılım, {SOLVER['n_quadpts']} Gauss–Hermite düğümü, "
+                       f"tol = {SOLVER['tol']:g}. MAP amaç fonksiyonu AIC/BIC karşılaştırmasına katılmaz.")
+            if data.isna().any().any():
+                st.error("Eksik yanıt bulunduğu için karşılaştırma yapılamaz; eksik veriler sıfıra çevrilmez.")
+                stop_page()
+            key = (tuple(irt_columns), data.shape, int(pd.util.hash_pandas_object(data, index=True).sum()),
+                   tuple(sorted(SOLVER.items())))
+            saved = st.session_state.get("irt_model_comparison")
+            if saved is not None and saved.get("key") != key:
+                st.session_state.pop("irt_model_comparison", None); saved = None
+                st.info("Veri veya madde seçimi değişti; önceki karşılaştırma geçersizleştirildi.")
+            if st.button("▶️ Model Karşılaştırması", type="primary", key="irt_compare_run"):
+                history = st.session_state.get("python_mirt_experimental_results", {})
+                same = (tuple(irt_columns), data.shape, key[2], "ML", tuple(sorted(SOLVER.items())))
+                rows, progress = [], st.progress(0., text="Modeller kestiriliyor…")
+                for i, m in enumerate(MODELS):
+                    progress.progress(i / len(MODELS), text=f"{m} kestiriliyor…")
+                    entry = history.get(m)
+                    fit = entry["fit"].fit if entry is not None and tuple(entry["fingerprint"]) == same else None
+                    if fit is None:
+                        try:
+                            fit = record_public_call("core.irt_python_mirt_adapter", "fit_python_mirt", data.to_numpy(), model=m, estimation="ML", **SOLVER).fit
+                        except Exception as exc:
+                            row = summarize_fit(m, None, len(data)); row["reason"] = f"kestirim başarısız: {exc}"[:160]
+                            rows.append(row); continue
+                    rows.append(summarize_fit(m, fit, len(data)))
+                progress.progress(1., text="Tamamlandı.")
+                st.session_state.irt_model_comparison = dict(key=key, rows=rows)
+                saved = st.session_state.irt_model_comparison
+            if saved is None:
+                st.info("Dört modeli aynı veriyle kestirmek ve karşılaştırmak için düğmeye basın.")
             else:
-                model_order = ["1PL", "2PL", "3PL", "4PL"]
-                comparison = pd.DataFrame([
-                    {"Model":m, "AIC":float(usable[m]["aic"]),
-                     "BIC":float(usable[m]["bic"]),
-                     "logLik":float(usable[m]["loglik"]),
-                     "Parametre sayısı":int(usable[m]["param_count"]),
-                     "Yakınsama":bool(usable[m]["converged"]),
-                     "Yöntem":"Python mirt ML (EM)",
-                     "GH düğümü":usable[m]["points"]}
-                    for m in model_order if m in usable
-                ])
-                valid = comparison[comparison["Yakınsama"]]
-                if valid.empty:
-                    st.error("Hiçbir model yakınsama sağlamadı. Güvenilir bir 'EN İYİ' seçimi yapılamaz.")
-                else:
-                    best_aic = valid.loc[valid["AIC"].idxmin(), "Model"]
-                    best_bic = valid.loc[valid["BIC"].idxmin(), "Model"]
-                    st.markdown("#### Model karşılaştırma istatistikleri")
-                    table_rows = []
-                    for m in model_order:
-                        if m in usable:
-                            rr = comparison.loc[comparison["Model"] == m].iloc[0]
-                            table_rows.append({"Model":m, "AIC":f'{rr["AIC"]:.3f}',
-                                               "BIC":f'{rr["BIC"]:.3f}',
-                                               "logLik":f'{rr["logLik"]:.3f}',
-                                               "Yakınsama":"Evet" if rr["Yakınsama"] else "Hayır",
-                                               "Yöntem":rr["Yöntem"]})
-                        else:
-                            table_rows.append({"Model":m, "AIC":"—", "BIC":"—",
-                                               "logLik":"—", "Yakınsama":"Çalıştırılmadı",
-                                               "Yöntem":"—"})
-                    table_rows.append({"Model":"EN İYİ", "AIC":best_aic, "BIC":best_bic,
-                                       "logLik":"—", "Yakınsama":"Yalnızca yakınsayanlar",
-                                       "Yöntem":"—"})
-                    st.dataframe(pd.DataFrame(table_rows), hide_index=True, use_container_width=True)
-                    ca, cb = st.columns(2)
-                    ca.metric("AIC'ye göre en iyi model", best_aic)
-                    cb.metric("BIC'ye göre en iyi model", best_bic)
-                    fig = go.Figure()
-                    for metric in ("AIC", "BIC"):
-                        fig.add_bar(name=metric, x=comparison["Model"], y=comparison[metric])
-                    fig.update_layout(barmode="group", template="plotly_white",
-                        title="Model Karşılaştırması (AIC / BIC)",
-                        xaxis_title="MTK modeli", yaxis_title="Bilgi ölçütü")
-                    st.plotly_chart(fig, use_container_width=True)
-                    download_table_pair(pd.DataFrame(table_rows),
-                                        "psikoanaliz_mtk_model_karsilastirma",
-                                        "Model Karşılaştırması", "irt_comparison")
-                if comparison["GH düğümü"].nunique(dropna=False)>1:
-                    st.warning("Modeller farklı Gauss–Hermite düğüm sayılarıyla kestirildi; "
-                               "logLik/AIC/BIC değerleri tam olarak aynı olabilirlik "
-                               "yaklaşımına dayanmaz. Karşılaştırma için aynı düğüm sayısıyla "
-                               "yeniden kestirin.")
-                if (~comparison["Yakınsama"]).any():
-                    st.warning("Yakınsamamış model(ler) bulunuyor. Bu modeller 'EN İYİ' "
-                               "seçiminde değerlendirilmedi.")
-                st.caption("AIC ve BIC farklı modelleri seçebilir; bu normaldir. "
-                           "Karşılaştırma yalnızca aynı veri ve aynı olabilirlik tanımıyla "
-                           "kestirilen modeller için geçerlidir. "
-                           "Standart olabilirlik oranı testi ancak düzenli iç içe modeller için "
-                           "uygundur; özellikle 3PL/4PL sınır parametreleri için dikkat gerekir.")
+                table = comparison_table(saved["rows"])
+                st.dataframe(table, hide_index=True, use_container_width=True)
+                st.markdown("#### Model Seçiminin Değerlendirilmesi")
+                st.markdown(interpretation(saved["rows"]))
+                download_table_pair(table, "psikoanaliz_mtk_model_karsilastirma",
+                                    "Model Karşılaştırması", "irt_comparison")
             stop_page()
         # SPSS/Xcalibre-style left settings, right output surface.
         # Selection changes only presentation, never silently recalibrates.

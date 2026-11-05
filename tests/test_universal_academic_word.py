@@ -79,10 +79,7 @@ def test_center_word_and_comparison_word():
     at=app();at.button(key='dc_run').click().run();_assert_word(at,'MTK: DIF Analiz Merkezi')
     page='MTK: Karşılaştırma';at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=180)
     for k,v in _state('irt_006',page).items():at.session_state[k]=v
-    for model in ('1PL','2PL'):
-        at.session_state['nav_page']='MTK: '+model
-        at.run();at.button(key='py_mirt_run_'+model).click().run()
-    at.session_state['nav_page']=page;at.run();_assert_word(at,page)
+    at.run();at.button(key='irt_compare_run').click().run();_assert_word(at,page)
     assert at.session_state['_repro_history'].manifest()['status']=='GENERATED / UNVERIFIED'
 
 
