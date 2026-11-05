@@ -1,0 +1,36 @@
+name: jMetrik psychometrics 4PL benchmark
+on:
+  pull_request:
+    branches: [main]
+    paths: ['validation/four_pl_java/**', '.github/workflows/java-4pl-benchmark.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  java4pl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+      - run: python -m pip install -r requirements.txt
+      - name: Build psychometrics at the pinned commit
+        run: |
+          git clone https://github.com/meyerjp3/psychometrics.git /tmp/psy
+          cd /tmp/psy && git checkout 1fac2d7053ae17acb0b9bedc13c52c41874e8a77
+          mvn -q -B -DskipTests install
+          cd psychometrics-irt && mvn -q -B dependency:build-classpath -Dmdep.outputFile=/tmp/cp.txt
+          echo "CP=$(cat /tmp/cp.txt):/tmp/psy/psychometrics-irt/target/classes:/tmp/java" >> "$GITHUB_ENV"
+      - name: Compile driver
+        run: mkdir -p /tmp/java && javac -cp "$CP" -d /tmp/java validation/four_pl_java/Fit4PL.java
+      - name: One bounded Java fit + common-evaluator gates
+        run: python validation/four_pl_java/compare.py --output validation-output/java4pl --classpath "$CP"
