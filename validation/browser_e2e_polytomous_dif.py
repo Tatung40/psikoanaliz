@@ -87,21 +87,31 @@ def ordinal_data(seed=1, n=500, k=8, C=4):
     return pd.DataFrame(x, columns=[f"I{j + 1}" for j in range(k)])
 
 
-def verify_result_panels(page):
+def verify_result_panels(page,diagnostic_path=None):
+    try:return _verify_result_panels(page)
+    except Exception:
+        if diagnostic_path is not None:diagnostic_path.write_text(page.content(),encoding='utf-8')
+        raise
+
+
+def _verify_result_panels(page):
     """Real frontend toggles; use the already-fitted flow, never add calibration."""
     import re
-    output='[data-testid=stDataFrame], [data-testid=stPlotlyChart], [data-testid=stImage], [data-testid=stVegaLiteChart], [data-testid=stArrowVegaLiteChart]'
-    panels=page.locator('[data-testid=stExpander] details').filter(has=page.locator(output))
-    visible=[panels.nth(i) for i in range(panels.count()) if panels.nth(i).locator('summary').is_visible()]
+    from playwright.sync_api import expect
+    # Closed content can lazy-mount; identify the public keyed output block,
+    # rather than requiring a chart/dataframe descendant before opening it.
+    panels=page.locator('[class*="st-key-result_panel_"] [data-testid=stExpander] > details:visible')
+    panels.first.wait_for(state='visible',timeout=60_000)
+    visible=[panels.nth(i) for i in range(panels.count())]
     assert visible,'No collapsible result panel'
     assert all(panel.get_attribute('open') is None for panel in visible),'Results must start collapsed'
     assert all(panel.locator('[data-testid=stExpander]').count()==0 for panel in visible),'Nested result expander'
     first=visible[0];summary=first.locator('summary')
-    summary.click();assert first.get_attribute('open') is not None
-    first.locator(output).first.wait_for(state='visible',timeout=60_000)
+    summary.click();expect(first).to_have_js_property('open',True)
+    first.locator('[data-testid=stExpanderDetails]').first.wait_for(state='visible',timeout=60_000)
     if len(visible)>1:assert visible[1].get_attribute('open') is None
-    summary.click();assert first.get_attribute('open') is None
-    assert first.locator(output).first.is_hidden()
+    summary.click();expect(first).to_have_js_property('open',False)
+    expect(first.locator('[data-testid=stExpanderDetails]').first).to_be_hidden()
     page.get_by_role('button',name=re.compile(r'Akademik Rapor$')).first.wait_for(state='visible',timeout=60_000)
     # Existing scientific checks below still inspect fully rendered charts/tables.
     for panel in visible:
@@ -131,7 +141,7 @@ def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
                 page.get_by_role("button", name="Python mirt ile B14 pilot analizi").click()
                 page.get_by_role("button", name="Madde parametrelerini CSV indir").wait_for(timeout=180_000)
                 wait_idle(page)
-                rec['panels']=verify_result_panels(page)
+                rec['panels']=verify_result_panels(page,outdir/f'{model}_panel_dom.html')
                 charts = page.locator("[data-testid=stVegaLiteChart], [data-testid=stArrowVegaLiteChart], .vega-embed").count()
                 path = download(page, "Madde parametrelerini CSV indir", outdir / model)
                 got = pd.read_csv(path)
@@ -171,7 +181,7 @@ def flow_rsm(browser, outdir, log):
             nav(page, "📏 RSM — Derecelendirme Ölçeği Modeli")
             page.get_by_role("button", name="▶️ RSM analizini başlat").click(); wait_idle(page)
             page.get_by_role("tab", name="📈 Grafikler").click()
-            rec['panels']=verify_result_panels(page)
+            rec['panels']=verify_result_panels(page,outdir/'RSM_panel_dom.html')
             page.locator("[data-testid=stPlotlyChart]").first.wait_for(timeout=60_000)
             charts = page.locator("[data-testid=stPlotlyChart]").count()
             page.get_by_role("tab", name="📦 İndirme").click()
@@ -210,7 +220,7 @@ def flow_dif(browser, outdir, log):
                 nav(page, "⚖️ Gözlenen Puan DIF (MH / Lojistik)")
                 page.get_by_text(label, exact=True).click(); wait_idle(page)
                 page.get_by_role("button", name="▶️ DIF analizini çalıştır").click(); wait_idle(page)
-                rec['panels']=verify_result_panels(page)
+                rec['panels']=verify_result_panels(page,outdir/f'{method}_panel_dom.html')
                 page.locator("[data-testid=stPlotlyChart]").first.wait_for(timeout=60_000)
                 path = download(page, "DIF tablosu — CSV", outdir / f"dif_{method}")
                 xpath = download(page, "DIF tablosu — XLSX", outdir / f"dif_{method}")

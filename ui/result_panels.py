@@ -1,5 +1,6 @@
 """Presentation helpers only: no estimation, state mutation or report generation."""
 import inspect
+import hashlib
 import re
 import unicodedata
 import streamlit as st
@@ -76,5 +77,10 @@ def render_output(ctx,kind,values,original,args,kwargs):
     title=panel_title(kind,values,ctx['heading'])
     count=ctx['panels'].get(title,0)+1;ctx['panels'][title]=count
     if count>1:title+=f' ({count})'
-    panel=target.expander(title,expanded=False)
+    options={}
+    if 'key' in inspect.signature(target.expander).parameters:
+        # Public Streamlit identity/CSS key; default on_change='ignore' keeps
+        # frontend expansion independent of analysis inputs and calibration.
+        options['key']='result_panel_'+hashlib.sha256(f"{ctx['page']}:{title}:{count}".encode()).hexdigest()
+    panel=target.expander(title,expanded=False,**options)
     return call_in(original,args,kwargs,panel)

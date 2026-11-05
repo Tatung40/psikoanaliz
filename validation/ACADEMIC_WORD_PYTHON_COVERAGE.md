@@ -241,3 +241,5 @@ panel stays closed, check the DOCX button remains accessible, then open panels f
 the original numerical/export checks. No model/test/assertion or numeric tolerance
 was removed, and no extra calibration is added. Actual frontend toggle evidence is
 produced by CI (local Playwright/browser is not installed).
+
+Frontend synchronization: Streamlit 1.66.1 documents animated `details.open` updates. Stable public result-panel keys identify collapsed outputs without requiring their child charts to mount first; Playwright awaits open/closed state and saves HTML on failure. Key support is feature-detected for older Streamlit. Expansion remains frontend-only (`on_change=ignore`); no analysis input or cache fingerprint is added.
