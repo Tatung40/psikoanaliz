@@ -1,5 +1,6 @@
 """Observed-score DIF page: Mantel–Haenszel / Mantel and (ordinal) logistic regression."""
 import io
+from ui.p_display import apa_p_frame
 import hashlib
 
 import numpy as np
@@ -94,7 +95,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     for note in meta["notes"]:
         st.warning(note)
     show = frame.drop(columns=[c for c in ("reason",) if c in frame.columns and frame[c].eq("").all()])
-    st.dataframe(show.round(4), hide_index=True, use_container_width=True)
+    st.dataframe(apa_p_frame(show).round(4), hide_index=True, use_container_width=True)
     st.metric("DIF işaretlenen madde", int(frame["DIF (düzeltilmiş p < alpha)"].sum()))
     if method == "MH" and not meta["ordinal"]:
         fig = go.Figure()

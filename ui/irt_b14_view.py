@@ -4,6 +4,7 @@ No scoring key is inferred from raw nominal responses. Results from
 Python mirt are reported as experimental, never mixed with native B13.
 """
 import io
+from ui.p_display import truncation_note
 import pandas as pd
 import streamlit as st
 from core.irt_b14 import MODELS,ORDINAL,prepare_polytomous,fit_b14
@@ -138,6 +139,7 @@ def render(data,existing_item_cols=(),id_col=None,group_col=None):
         try:
             persons=person_scores(result)
             st.dataframe(persons.head(200).round(4),hide_index=True,use_container_width=True)
+            if truncation_note(min(len(persons),200),len(persons)):st.caption(truncation_note(min(len(persons),200),len(persons),export="CSV"))
             st.caption(f"EAP θ ve posterior SS (Python mirt fscores); {len(persons)} kişi. Kişi kimlikleri eklenmez."
                        + (" NRM'de θ ekseninin işareti kütüphaneye aittir; başarı yönü değildir." if model=="NRM" else ""))
             st.download_button("Kişi yeteneklerini CSV indir",safe_frame(persons).to_csv(index=False).encode("utf-8-sig"),
