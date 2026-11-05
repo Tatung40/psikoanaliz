@@ -1,0 +1,21 @@
+{
+ "purpose": "4PL engine selection on one fixture (numerical validation only; no Monte Carlo, no certification).",
+ "data": {"path": "tests/fixtures/irt_b11/data_irt4pl_ok.csv", "sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c"},
+ "model": "P = c + (d - c) / (1 + exp(-a(theta - b))), D = 1, theta ~ N(0,1) fixed, marginal ML, no priors; bounds a [.1,5], b [-6,6], c [0,.5], d [.5,1] (R: a1/g/u boxed, intercept free; b = -d_R/a)",
+ "candidates": {
+   "python_mirt": "reuse validation/four_pl_gh_refinement/result.json (PR #145; GH101 Newton-polished MLE); no refit",
+   "R_mirt_1.48": "NEW execution in CI: itemtype '4PL', method EM, TOL 1e-8, NCYCLES 20000, SE FALSE, default deterministic starts, customTheta/customPriorFun = the same GH grid; bounded sequence: GH61 then GH101 (two fits)",
+   "R_TAM / R_ltm": "eligible only if the installed API exposes an estimated upper asymptote (checked by formals in CI); otherwise UNSUPPORTED"
+ },
+ "common_evaluator": "validation/r_mirt_phase1/equivalence_audit.evaluate (logLik), m12_diagnostic.scores + feasible_scores (projected raw score), information_audit.information (active-face information)",
+ "gates_per_engine": {
+   "executed": "exit 0, finite parameters inside bounds",
+   "stationary_objective": "projected raw score <= 1e-5 on the engine's own objective grid",
+   "audit_GH161": "projected raw score <= 1e-5 on GH161 at the same parameters and |logLik_GH161 - logLik_objective| <= 1e-3",
+   "information": "active-face min eigenvalue > 0 and condition <= 1e8",
+   "converged_flag_alone": "never sufficient"
+ },
+ "agreement_reported": "common logLik difference, max |param| difference after mapping, max |ICC| and |IIF| difference on theta in [-4,4] (161 points)",
+ "decision": "A: R mirt passes all gates -> numerically validated on this fixture, candidate primary. B: an alternative R engine passes and R mirt fails. C: Python passes and outperforms. D: no candidate passes -> NO VALIDATED 4PL ENGINE; production default unchanged. Fixture validation is never population-level recovery/SE/CI validation or certification.",
+ "monte_carlo": 0
+}
