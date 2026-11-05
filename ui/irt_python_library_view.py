@@ -1,5 +1,6 @@
 """Nine explicit Python mirt model routes sharing verified result reporting."""
 import hashlib
+from ui.p_display import apa_p_frame
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -257,7 +258,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         st.markdown('#### Madde parametresi SH ve %95 Wald güven aralığı')
         if inference is None:st.info(reason)
         else:
-            st.dataframe(safe_frame(inference).round(4),hide_index=True,use_container_width=True)
+            st.dataframe(apa_p_frame(safe_frame(inference)).round(4),hide_index=True,use_container_width=True)
             st.download_button('Parametre SH/GA — CSV',_csv(inference),f'{model}_parameter_se_ci.csv','text/csv',
                                key=f'python_mirt_se_csv_{model}',on_click='ignore')
         st.caption(STATUS)

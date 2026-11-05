@@ -3,6 +3,7 @@
 Separate from the fixed-anchor RSM DIF page (core.polytomous_dif) and never labeled PCM.
 """
 import hashlib
+from ui.p_display import apa_p_frame, truncation_note
 import io
 from datetime import datetime, timezone
 
@@ -143,6 +144,8 @@ def render(data, item_cols=(), id_col=None, group_col=None):
         st.caption(f["se_reason"] or "SH: gözlenen bilgi matrisinin tersi; %95 Wald aralıkları.")
     with tabs[3]:
         st.dataframe(pers.head(500).round(4), hide_index=True, use_container_width=True)
+        if truncation_note(min(len(pers), 500), len(pers)):
+            st.caption(truncation_note(min(len(pers), 500), len(pers)))
         st.caption(f"İlk 500 satır ({len(pers)} kişi). Kişi kimlikleri gizlilik nedeniyle tabloya eklenmez. "
                    "WLE uç puanlarda da sonludur; EAP önsel N(0, σ²) kullanır.")
     with tabs[4]:
@@ -176,7 +179,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
                            xaxis_title="Kişi sayısı", template="plotly_white")
         st.plotly_chart(fig4, use_container_width=True)
     with tabs[5]:
-        st.dataframe(ifit.round(3), hide_index=True, use_container_width=True)
+        st.dataframe(apa_p_frame(ifit).round(3), hide_index=True, use_container_width=True)
         st.caption("Infit/Outfit MNSQ ve ZSTD: WLE θ ile, uç puanlı kişiler hariç. θ aynı veriden kestirildiği "
                    "için kısa testlerde MNSQ beklenen değeri 1'in biraz altındadır; ZSTD'yi bu nedenle temkinle "
                    "yorumlayın. Bilgi fonksiyonu Rasch ailesinde koşullu varyansa eşittir.")

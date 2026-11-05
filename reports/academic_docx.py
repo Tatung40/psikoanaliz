@@ -67,6 +67,17 @@ def standardize_document(doc, *, method=None, warnings=(), provenance=None):
     body=doc.element.body
     groups={name:[] for name in SECTION_ORDER};current=SECTION_ORDER[0]
     explicit=set(map(str,warnings));existing={p.text for p in doc.paragraphs}
+    # A legacy Heading 1 keeps its explanation and its tables/figures together: the whole
+    # block moves as one unit, so a table never lands under another section's heading.
+    fixed=set(SECTION_ORDER[5:])|{'Kaynaklar'}
+    block=None
+    def flush():
+        if block is None:return
+        target=block['section']
+        if not block['exact'] and target not in fixed:
+            if block['table']:target='Tablolar'
+            elif block['figure']:target='Şekiller'
+        groups[target].extend(block['items'])
     for element in list(body):
         if element.tag==qn('w:sectPr'):continue
         if element.tag==qn('w:p'):
@@ -76,14 +87,21 @@ def standardize_document(doc, *, method=None, warnings=(), provenance=None):
                     p.style='Subtitle';groups[SECTION_ORDER[0]].append(element)
                 continue
             if p.style.name=='Heading 1':
-                current=_section(text)
+                flush();current=_section(text)
+                block=dict(section=current,exact=text in SECTION_ORDER,table=False,figure=False,items=[])
                 if text in SECTION_ORDER:continue
                 p.style='Heading 2'
             if text in explicit:groups[SECTION_ORDER[5]].append(element);continue
-            if text.startswith('Şekil') or element.xpath('.//w:drawing'):current='Şekiller'
-            elif re.match(r'^Tablo\s+\d+',text):current='Tablolar'
-        elif element.tag==qn('w:tbl'):current='Tablolar'
-        groups[current].append(element)
+            if block is None:
+                if text.startswith('Şekil') or element.xpath('.//w:drawing'):current='Şekiller'
+                elif re.match(r'^Tablo\s+\d+',text):current='Tablolar'
+            elif element.xpath('.//w:drawing'):block['figure']=True
+        elif element.tag==qn('w:tbl'):
+            if block is None:current='Tablolar'
+            else:block['table']=True
+        if block is None:groups[current].append(element)
+        else:block['items'].append(element)
+    flush()
     def paragraph(text,style=None):return doc.add_paragraph(str(text),style)._p
     if method is not None and str(method) not in existing:groups[SECTION_ORDER[0]].append(paragraph(method))
     if not groups[SECTION_ORDER[0]]:

@@ -3,6 +3,7 @@
 İndirilebilir çıktılar: CSV, XLSX, PNG (matplotlib) ve hepsini içeren ZIP.
 """
 import io
+from ui.p_display import apa_p_frame
 import zipfile
 
 import numpy as np
@@ -164,7 +165,7 @@ def render_dimensionality(data, item_cols):
     fig.update_layout(title="Yamaç birikinti grafiği ve paralel analiz", xaxis_title="Bileşen", yaxis_title="Özdeğer")
     st.plotly_chart(fig, use_container_width=True)
     t1, t2, t3, t4 = st.tabs(["Faktör yükleri", "Tek boyutluluk", "KMO (madde)", "Korelasyon matrisi"])
-    t1.dataframe(res["loadings"].style.format("{:.3f}"))
+    t1.dataframe(res["loadings"].round(3))
     if res["n_factors"] > 1:
         t1.caption(f"Döndürme: {res['rotation']}. Faktörler arası korelasyon:"); t1.dataframe(res["factor_correlations"].round(3))
     t2.dataframe(pd.Series(res["unidimensionality"], name="Değer").astype(str))
@@ -221,7 +222,7 @@ def render_local_fit(data, item_cols):
     bs = q3.get("bootstrap")
     m[2].metric("Bootstrap %95 (maks. Q3*)", f"{bs['max_quantile_95']:.3f}" if bs else "—")
     tab1, tab2, tab3, tab4 = st.tabs(["Madde çiftleri", "Q3 ısı haritası", "S-X² madde uyumu", "Gözlenen/beklenen"])
-    tab1.dataframe(li["pairs"].round(4), use_container_width=True)
+    tab1.dataframe(apa_p_frame(li["pairs"]).round(4), use_container_width=True)
     tab1.caption("Evrensel kesme puanı kullanılmaz; çiftler merkezlenmiş Q3'e göre sıralıdır.")
     tab2.plotly_chart(_heat(q3["adjusted"], "Merkezlenmiş Q3"), use_container_width=True)
     tab2.plotly_chart(_heat(li["residuals"], "Tek faktör artık korelasyonları"), use_container_width=True)
@@ -234,7 +235,7 @@ def render_local_fit(data, item_cols):
         it = res["itemfit"]
         if not res["certified"]:
             tab3.warning("NOT CERTIFIED: 1PL/2PL p/BH-FDR keşifseldir; 3PL/4PL ve yakınsamayan kestirimlerde p/karar kapalıdır.")
-        tab3.dataframe(it.round(4), use_container_width=True)
+        tab3.dataframe(apa_p_frame(it).round(4), use_container_width=True)
         tables["sx2_madde_uyumu"] = it
         sel = tab4.selectbox("Madde", list(res["obs_exp"]), key="lf_item")
         g = res["obs_exp"][sel]
@@ -244,7 +245,7 @@ def render_local_fit(data, item_cols):
         fig.update_layout(title=f"{sel}: puan grubu bazında gözlenen/beklenen", xaxis_title="Toplam puan grubu (birleştirilmiş)",
                           yaxis_title="P(1)")
         tab4.plotly_chart(fig, use_container_width=True)
-        tab4.dataframe(g.round(4))
+        tab4.dataframe(apa_p_frame(g).round(4))
         allg = pd.concat({k: v for k, v in res["obs_exp"].items()}, names=["Madde", "satır"])
         tables["gozlenen_beklenen"] = allg
         pngs["gozlenen_beklenen"] = _png_lines(g["Grup"], {"Gözlenen": g["Gözlenen oran"], "Beklenen": g["Beklenen oran"]},
