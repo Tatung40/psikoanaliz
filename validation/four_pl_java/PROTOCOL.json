@@ -1,0 +1,16 @@
+{
+ "purpose": "Benchmark the Java psychometrics-irt (jMetrik library) 4PL MML estimator against PR #145/#146 evidence on one fixture. Numerical only; no Monte Carlo unless every gate passes.",
+ "source": {"repo": "meyerjp3/psychometrics", "commit": "1fac2d7053ae17acb0b9bedc13c52c41874e8a77", "license": "Apache-2.0 (Java file headers and pom <licenses>; a stale GPL notice in pom.xml header is recorded)", "used_as": "external binary in CI only; no source copied into PsikoAnaliz"},
+ "inspection": {
+   "estimator": "MarginalMaximumLikelihoodEstimation: EM; per-item M-step with DefaultUncminOptimizer (unconstrained quasi-Newton, Dennis-Schnabel), stopping on max parameter change",
+   "bounds": "none in the optimizer; Irm4PL.probability clips to [0,1] and ItemLogLikelihood clips to [EPS,1-EPS]",
+   "priors": "optional; the only 4PL estimation test in the repo (pl4Test) is disabled and uses Beta4 priors (MAP)",
+   "quadrature": "user supplied (UserSuppliedQuadratureRule) allowed"
+ },
+ "data": {"path": "tests/fixtures/irt_b11/data_irt4pl_ok.csv", "sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c"},
+ "run": "one bounded execution: Irm4PL(a=1,b=0,c=.05,d=.95,D=1), NO priors (ML), StartingValues, latent N(0,1) on the same GH61 nodes/weights, estimateParameters(converge=1e-6, maxIter=2000)",
+ "unavoidable_differences": "no box constraints (our ML uses a[.1,5], b[-6,6], c[0,.5], d[.5,1]); probability clipping; parameter-change stopping rule",
+ "gates": "identical to validation/four_pl_engine/PROTOCOL.json gates_per_engine (common evaluator; projected raw score <= 1e-5 on GH61 and GH161 audit, |dlogLik GH161| <= 1e-3, PD information, condition <= 1e8) plus all estimates inside the common bounds",
+ "decision": "PASS -> run the smallest separately preregistered recovery experiment (not SE/CI). FAIL -> record the blocker; no threshold relaxation, no seed or optimizer search, no adapter, no production switch.",
+ "monte_carlo": 0
+}
