@@ -13,7 +13,7 @@ Sertifikasyon engellendi (BLOCK). Monte Carlo yapılmadı.
 **R ile Python farkları (ortak değerlendirici, θ ∈ [−4, 4]):** en büyük \|Δparam\| .051; \|ΔICC\| .0064–.0080; \|ΔIIF\| .013.
 R çözümünün logLik değeri Python'un durağan noktasından .004 daha düşük. Yani R EM, TOL = 1e-8 ve NCYCLES = 20000
 altında optimuma ulaşmadan durdu; bu, arşivdeki R yakınsama sorunuyla tutarlı.
-Sınır kestirimleri: Python 11, R ise CI özetine göre az sayıda. Eksiksiz liste `ci_summary_run42065126768.txt` dosyasında.
+Sınır kestirimleri: Python 11, R GH61 ve GH101 birer (M9:a). Eksiksiz liste `ci_summary_run42065126768.txt` dosyasında.
 
 **Kanıtın kökeni:** Artifact blob deposuna bu ortamdan erişilemedi (403). Bu nedenle sonuçlar, aynı çalıştırmanın
 CI günlüğündeki `compare.py` özetinden alındı (`ci_summary_run42065126768.txt`). Tam `engine_report.json`,
