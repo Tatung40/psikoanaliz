@@ -59,7 +59,8 @@ def evidence_note(model, common_discrimination=False):
     """
     scope = " Kanıt incelenen veri/koşullar içindir; genel sertifika değildir."
     if model == "1PL" and common_discrimination:
-        return "warning", ("1PL (ortak serbest a): bağımsız R karşılaştırması ve Monte Carlo kanıtı yok (NOT VERIFIED); "
+        return "warning", ("1PL (ortak serbest a): nokta kestirimleri ve logLik yerel σ-serbest Rasch ile sayısal olarak eşdeğer "
+                           "(tek fikstür); bağımsız R karşılaştırması ve Monte Carlo kanıtı yok (NOT VERIFIED); "
                            "a = 1 modelinin kanıtı bu modele aktarılmaz.")
     if model in ("Rasch", "1PL"):
         return "info", ("Doğrulama (a = 1): R mirt 1.48 ile sayısal uyum (parametre farkı ≤ 4.4e-4, "

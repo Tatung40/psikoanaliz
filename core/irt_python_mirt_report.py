@@ -26,7 +26,9 @@ class LibraryReport:
 def binary_evidence_label(outcome, *, common_discrimination=False, converged=None):
     """Presentation only: never rewrite adapter status codes or infer normality."""
     if outcome.model=='1PL' and common_discrimination:
-        return 'NOT VERIFIED — ortak serbest a; sabit-a kanıtı aktarılamaz'
+        # tests/test_scientific_gap_closure.py: identical to native sigma-free Rasch (one fixture).
+        return ('POINT ESTIMATES NUMERICALLY VERIFIED (yerel σ-serbest Rasch eşdeğerliği, tek fikstür); '
+                'SE/GA, R ve Monte Carlo: NOT VERIFIED — ortak serbest a; sabit-a kanıtı aktarılamaz')
     if converged is not True:
         return 'Yakınsama doğrulanmadı — geçici sonuç; koşullu doğrulama uygulanmaz'
     if (outcome.estimation=='ML' and outcome.n_persons==1000 and outcome.n_items==12
