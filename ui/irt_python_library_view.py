@@ -62,6 +62,9 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     if model in BINARY:
         from core.irt_binary_usage_policy import evidence_note
         _level,_note=evidence_note(model,common_discrimination=model=='1PL')
+        if model=='1PL':
+            from core.irt_python_mirt_report import common_a_evidence_note
+            _level,_note=common_a_evidence_note()
         (st.info if _level=='info' else st.warning)(_note)
     if model in ('3PL','4PL'):
         estimation=st.radio('Kestirim',['MAP','ML'],key=f'python_mirt_estimation_{model}',horizontal=True)
@@ -241,7 +244,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
 
 def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
     """B13 output types on the library route: parameter SE/CI, eight charts as 300 dpi PNG, report bundle."""
-    from core.irt_binary_inference import parameter_inference,STATUS
+    from core.irt_binary_inference import STATUS
+    from core.irt_common_a_inference import parameter_inference
     from reports.irt_binary_report import kinds,png_bytes,bundle
     with st.expander('Ek bilimsel çıktılar — parametre SH/GA, grafikler (300 dpi PNG) ve rapor paketi',expanded=False):
         if not st.checkbox('Ek çıktıları göster',value=False,key=f'python_mirt_extras_{model}'):return
@@ -261,7 +265,10 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
             st.dataframe(apa_p_frame(safe_frame(inference)).round(4),hide_index=True,use_container_width=True)
             st.download_button('Parametre SH/GA — CSV',_csv(inference),f'{model}_parameter_se_ci.csv','text/csv',
                                key=f'python_mirt_se_csv_{model}',on_click='ignore')
-        st.caption(STATUS)
+        if model=='1PL':
+            from core.irt_python_mirt_report import common_a_evidence_note
+            st.caption(common_a_evidence_note()[1])
+        else:st.caption(STATUS)
         kind=st.selectbox('Grafik',kinds(model),key=f'python_mirt_extra_kind_{model}')
         chosen=None
         if kind in ('ICC','IIC'):

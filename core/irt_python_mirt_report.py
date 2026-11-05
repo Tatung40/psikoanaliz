@@ -23,12 +23,30 @@ class LibraryReport:
     errors: list=field(default_factory=list)
 
 
+def common_a_evidence_note():
+    import json
+    from pathlib import Path
+    try:
+        evidence=json.loads((Path(__file__).resolve().parents[1]/'validation/evidence/p9_1pl_common_se/coverage.json').read_text())
+        return ('info' if evidence['status']=='CERTIFIED' else 'warning',
+                f"Q4 ortak serbest a: {evidence['status']}, {evidence['planned']} bağımsız veri seti. "
+                "Kapsam: ML, N=1000, J=12, gerçek ortak a=1, kayıtlı b ızgarası, normal θ, GH21/tol1e-4. "
+                "Ortak a veri seti başına tek aralıktır; MCSE tekrar kümelidir. Bu veriye veya kapsam dışına sertifika değildir. "
+                "Bağımsız referans yerel σ-serbest Rasch ve tam Jacobian kovaryans dönüşümüdür; yeni R uyumu yapılmadı.")
+    except (OSError,ValueError,KeyError):
+        return 'warning','Q4 ortak-a SE/GA kanıtı henüz arşivlenmedi; sabit-a kanıtı ortak-a modeline aktarılamaz (NOT VERIFIED).'
+
+
 def binary_evidence_label(outcome, *, common_discrimination=False, converged=None):
     """Presentation only: never rewrite adapter status codes or infer normality."""
     if outcome.model=='1PL' and common_discrimination:
+        from core.irt_common_a_inference import evidence_scope
+        if converged is True and evidence_scope(getattr(outcome,'fit',None)):
+            return ('Q4 KOŞULLU SE/GA KANITI — ortak serbest a, ML/N1000/J12/GH21; '
+                    'gerçek a=1 ve kayıtlı b/normal θ tasarımı. Bu veriye genel sertifika değildir.')
         # tests/test_scientific_gap_closure.py: identical to native sigma-free Rasch (one fixture).
         return ('POINT ESTIMATES NUMERICALLY VERIFIED (yerel σ-serbest Rasch eşdeğerliği, tek fikstür); '
-                'SE/GA, R ve Monte Carlo: NOT VERIFIED — ortak serbest a; sabit-a kanıtı aktarılamaz')
+                'SE/GA bu kapsamda NOT VERIFIED — ortak serbest a; sabit-a kanıtı aktarılamaz. '+common_a_evidence_note()[1])
     if converged is not True:
         return 'Yakınsama doğrulanmadı — geçici sonuç; koşullu doğrulama uygulanmaz'
     if (outcome.estimation=='ML' and outcome.n_persons==1000 and outcome.n_items==12

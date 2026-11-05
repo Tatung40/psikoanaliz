@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from core.irt_common_a_inference import common_a_basis,parameter_inference
-from validation.common_a_se_study import summarize,fit_one,OUT
+from validation.common_a_se_study import summarize,fit_one,OUT,read_rows
 
 
 def fake(cov=None):
@@ -87,3 +87,80 @@ def test_preflight_independent_scale_and_full_covariance_transform():
     assert p['initial_planned_R']==300 and p['R']==4300
     assert p['precision_planning']['R300_shared_a_expected_MCSE']>.004
     assert p['R']>=p['precision_planning']['R_min_with_95pct_eligible']
+
+
+def recorded_fit():
+    row=read_rows()[0];k=12;cov=np.asarray(row['independent_covariance'])
+    j=np.zeros((24,13));j[:12,0]=1;j[12:,1:]=np.eye(12)
+    co=pd.DataFrame({'discrimination':np.full(k,row['estimate'][0]),'difficulty':row['estimate'][1:]},
+                    index=[f'Item_{i+1}' for i in range(k)])
+    labels=[f'{p}[{i}]' for p in ('discrimination','difficulty') for i in co.index]
+    group=SimpleNamespace(parameter='discrimination',items=tuple(range(k)),column=None)
+    return SimpleNamespace(coef=lambda:co,vcov=j@cov@j.T,vcov_labels=labels,converged=True,
+        n_parameters=13,n_observations=1000,latent_mean=None,latent_covariance=None,
+        refit_recipe=SimpleNamespace(latent_density=None,options={'constraints':(group,),
+            'n_quadpts':21,'tol':1e-4,'max_iter':500,'item_priors':None}))
+
+
+def test_frozen_campaign_reproduces_every_gate_with_independent_parameter_counts():
+    import hashlib
+    from pathlib import Path
+    rows=read_rows();p=json.loads((OUT/'protocol.json').read_text());saved=json.loads((OUT/'coverage.json').read_text())
+    actual=summarize(rows,p)
+    assert len(rows)==4300 and len({r['index'] for r in rows})==4300
+    assert len({r['data_sha256'] for r in rows})==4300
+    assert actual['checks']==saved['checks'] and all(actual['checks'].values())
+    assert actual['status']==saved['status']=='CERTIFIED'
+    assert saved['protocol_commit']=='a1db06887affb3c3bbb4dbcc8aa420f3b82259e4'
+    assert actual['parameters']['a_common']['eligible']==4300
+    assert actual['pooled_b']['eligible']==51600 and actual['pooled_b']['independent_replications']==4300
+    for key in ('coverage','coverage_mcse','mean_bias','rmse'):
+        assert actual['parameters']['a_common'][key]==pytest.approx(saved['parameters']['a_common'][key],abs=1e-12)
+    root=Path(__file__).resolve().parents[1]
+    for path,digest in saved['source_sha256'].items():assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest
+    assert all(r['covariance_min_eigenvalue']>0 and r['covariance_condition']<=1e8 for r in rows)
+
+
+def test_recorded_scoped_fit_and_csv_xlsx_zip_share_one_inference_table(monkeypatch):
+    import io,zipfile
+    from core.irt_common_a_inference import evidence_scope
+    from core.irt_python_mirt_report import LibraryReport,binary_evidence_label
+    from reports import irt_binary_report as reports
+    from ui.irt_python_library_view import _csv
+    fit=recorded_fit();assert evidence_scope(fit)
+    table,reason=parameter_inference(fit,'1PL',[f'M{i}' for i in range(12)],'ML')
+    assert reason is None and len(table)==13 and (table.Parametre=='a').sum()==1
+    assert table[['SH','GA %95 alt','GA %95 üst']].notna().all().all()
+    outcome=SimpleNamespace(model='1PL',fit=fit)
+    label=binary_evidence_label(outcome,common_discrimination=True,converged=True)
+    assert 'Q4 KOŞULLU' in label and 'genel sertifika değildir' in label
+    monkeypatch.setattr(reports,'png_bytes',lambda *a,**kw:b'png')
+    report=LibraryReport('1PL',{'N':1000,'Madde':12,'Yakınsama':True,'Kullanım durumu':label})
+    xlsx,archive=reports.bundle(report,pd.DataFrame(),table,None)
+    exported=[pd.read_csv(io.BytesIO(_csv(table))),pd.read_excel(io.BytesIO(xlsx),sheet_name='Parametre_SH_GA')]
+    with zipfile.ZipFile(io.BytesIO(archive)) as z:exported.append(pd.read_csv(io.BytesIO(z.read('tablolar/Parametre_SH_GA.csv'))))
+    for df in exported:
+        assert len(df)==13 and (df.Parametre=='a').sum()==1
+        np.testing.assert_allclose(df[['SH','GA %95 alt','GA %95 üst']],table[['SH','GA %95 alt','GA %95 üst']],atol=1e-12,rtol=1e-12)
+    fit.n_observations=999
+    assert not evidence_scope(fit) and parameter_inference(fit,'1PL',[f'M{i}' for i in range(12)],'ML')[0] is None
+
+
+def test_apptest_recorded_result_labels_and_download_have_no_refit():
+    from streamlit.testing.v1 import AppTest
+    script='''
+import streamlit as st,runpy
+from core.irt_common_a_inference import parameter_inference
+from core.irt_python_mirt_report import common_a_evidence_note
+from ui.irt_python_library_view import _csv
+fit=runpy.run_path('tests/test_common_a_se.py')['recorded_fit']()
+table,why=parameter_inference(fit,'1PL',[f'M{i}' for i in range(12)],'ML')
+if table is None:st.error(why)
+else:
+ st.caption(common_a_evidence_note()[1]);st.dataframe(table)
+ st.download_button('Ortak-a parametre SH/GA',_csv(table),'common_a.csv')
+'''
+    at=AppTest.from_string(script,default_timeout=30).run()
+    assert not at.exception and not at.error
+    assert len(at.dataframe[0].value)==13 and len(at.get('download_button'))==1
+    assert any('4300 bağımsız' in c.value for c in at.caption)
