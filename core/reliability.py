@@ -67,7 +67,7 @@ def compute_reliability_indices(
     if total_var > 1e-12:
         alpha = (k_items / (k_items - 1)) * (1.0 - (sum_item_vars / total_var))
     else:
-        alpha = 0.0
+        alpha = float("nan")  # undefined without total-score variance; never report 0
     results["cronbach_alpha"] = round(alpha, 6)
 
     # 2. Maddeler Arası Korelasyon Matrisi ve Ortalama Korelasyon
@@ -95,7 +95,7 @@ def compute_reliability_indices(
     if mean_inter_item_r > -1.0 / (k_items - 1):
         alpha_std = (k_items * mean_inter_item_r) / (1.0 + (k_items - 1) * mean_inter_item_r)
     else:
-        alpha_std = 0.0
+        alpha_std = float("nan")  # undefined; never report 0
     results["standardized_alpha"] = round(alpha_std, 6)
 
     # 4. Kuder-Richardson 20 (KR-20)
@@ -111,7 +111,7 @@ def compute_reliability_indices(
         if total_var > 1e-12:
             kr20 = (k_items / (k_items - 1)) * (1.0 - (sum_pq_corrected / total_var))
         else:
-            kr20 = 0.0
+            kr20 = float("nan")  # undefined without total-score variance
         results["kr20"] = round(kr20, 6)
 
         # Doğrulama Farkı (|Alfa - KR-20|)
@@ -122,7 +122,7 @@ def compute_reliability_indices(
         if total_var > 1e-12 and k_items > 1:
             kr21 = (k_items / (k_items - 1)) * (1.0 - (total_mean * (k_items - total_mean)) / (k_items * total_var))
         else:
-            kr21 = 0.0
+            kr21 = float("nan")  # undefined; never report 0
         results["kr21"] = round(kr21, 6)
     else:
         results["kr20"] = None
@@ -143,7 +143,7 @@ def compute_reliability_indices(
         if r_half > -1.0:
             sb_odd_even = (2.0 * r_half) / (1.0 + r_half)
         else:
-            sb_odd_even = 0.0
+            sb_odd_even = float("nan")  # undefined; never report 0
 
         # Guttman Split-Half Lambda 4
         s1_sq = float(half1_scores.var(ddof=1))
@@ -151,7 +151,7 @@ def compute_reliability_indices(
         if total_var > 1e-12:
             guttman_l4 = 2.0 * (1.0 - ((s1_sq + s2_sq) / total_var))
         else:
-            guttman_l4 = 0.0
+            guttman_l4 = float("nan")  # undefined; never report 0
 
         results["split_half_odd_even_r"] = round(r_half, 4)
         results["spearman_brown_odd_even"] = round(sb_odd_even, 4)
@@ -172,7 +172,7 @@ def compute_reliability_indices(
         if r_first_second > -1.0:
             sb_first_second = (2.0 * r_first_second) / (1.0 + r_first_second)
         else:
-            sb_first_second = 0.0
+            sb_first_second = float("nan")  # undefined; never report 0
         results["split_half_first_second_r"] = round(r_first_second, 4)
         results["spearman_brown_first_second"] = round(sb_first_second, 4)
     else:
