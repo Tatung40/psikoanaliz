@@ -12,7 +12,9 @@ HERE = Path(__file__).resolve().parent
 def main(output, classpath):
     output = Path(output); output.mkdir(parents=True, exist_ok=True)
     z, w = gh(61); pd.DataFrame({'node': z, 'weight': w}).to_csv(output / 'gh61.csv', index=False)
-    run = subprocess.run(['java', '-cp', classpath, 'Fit4PL', str(DATA), str(output / 'gh61.csv'), str(output / 'java.csv')],
+    src = pd.read_csv(DATA); ints = src.astype(int); assert (ints == src).all().all()   # same values, integer text
+    ints.to_csv(output / 'data_int.csv', index=False)
+    run = subprocess.run(['java', '-cp', classpath, 'Fit4PL', str(output / 'data_int.csv'), str(output / 'gh61.csv'), str(output / 'java.csv')],
                          capture_output=True, text=True)
     rep = dict(status='FIXTURE NUMERICAL COMPARISON / NOT CERTIFIED', monte_carlo_executions=0, exit=run.returncode,
                stderr_tail=run.stderr[-3000:])
