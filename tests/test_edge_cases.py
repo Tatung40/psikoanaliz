@@ -36,8 +36,9 @@ def test_zero_total_score_variance():
     summary_df, meta = compute_item_statistics(df, ["M1", "M2"], is_dichotomous=True)
     rel_res = compute_reliability_indices(df, ["M1", "M2"], is_dichotomous=True)
 
-    # Uygulama sıfıra bölme hatası vermemeli, alfa güvenli şekilde 0 dönmeli
-    assert rel_res["cronbach_alpha"] == 0.0
+    # Toplam puan varyansı sıfırken alfa matematiksel olarak tanımsızdır.
+    # Uygulama çökmeden NaN döndürmelidir; 0.0 geçerli bir güvenirlik tahmini değildir.
+    assert np.isnan(rel_res["cronbach_alpha"])
 
 
 def test_negative_discrimination_item():
