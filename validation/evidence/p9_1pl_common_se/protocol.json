@@ -1,0 +1,117 @@
+{
+  "version": 2,
+  "base": "41c0a560d549d1fba281f2e6fb8ee144c7be8ee5",
+  "initial_planned_R": 300,
+  "R": 4300,
+  "N": 1000,
+  "J": 12,
+  "DGP": {
+    "a_common": 1.0,
+    "b": [
+      -1.5,
+      -1.2272727272727273,
+      -0.9545454545454546,
+      -0.6818181818181818,
+      -0.40909090909090917,
+      -0.13636363636363646,
+      0.13636363636363646,
+      0.40909090909090917,
+      0.6818181818181817,
+      0.9545454545454546,
+      1.227272727272727,
+      1.5
+    ],
+    "theta": "iid N(0,1)",
+    "responses": "independent Bernoulli conditional on theta; existing p6 simulate()",
+    "D": 1,
+    "priors": null
+  },
+  "seeds": {
+    "numpy": "default_rng(SeedSequence([20261029,4,replicate_index]))",
+    "indices": [
+      0,
+      4299
+    ],
+    "reason": "New Q4 stream, no repeated p6 data batches"
+  },
+  "estimation": {
+    "API": "fit_python_mirt(model=1PL, common_discrimination=True)",
+    "implementation": "public 2PL equality constraints, all12 a tied/free; theta mean0 variance1 fixed",
+    "n_quadpts": 21,
+    "tol": 0.0001,
+    "max_iter": 500,
+    "estimation": "ML"
+  },
+  "SE_CI": {
+    "library": "mirt1.2.0 Oakes observed covariance JVJt",
+    "basis": "select ONE declared shared-a representative plus12 difficulties, retain all cross-covariances; no pseudoinverse",
+    "CI": "estimate +/-1.959963984540054 *SE",
+    "deduplication": "Shared-a one CI per dataset, never12 independent copies",
+    "bounds": "Any common-a fit with a/b at library bounds within existing1e-6 rejected for all Wald CI",
+    "information": "Finite positive-definite independent covariance, condition<=1e8; true singularity rejected"
+  },
+  "criteria": {
+    "convergence_rate_min": 0.99,
+    "abs_mean_bias_max": 0.05,
+    "coverage_abs_error_max": 0.02,
+    "valid_CI_proportion_min": 0.95,
+    "coverage_MCSE_max": 0.004,
+    "eligible_intervals_min": 3600,
+    "scope": "All13 distinct coordinates AND pooled b block must pass; no cherry-picking coordinates"
+  },
+  "precision_planning": {
+    "R300_shared_a_expected_MCSE": 0.012583057392117916,
+    "shared_a_not_pooled_over_items": true,
+    "worst_variance_in_coverage_acceptance_band": 0.0651,
+    "R_min_with_95pct_eligible": 4283,
+    "R_min_3600_eligible": 3790,
+    "fixed_R_chosen_before_results": 4300,
+    "expected_nominal_MCSE_at_min_eligibility": 0.003409971697352367,
+    "note": "Planning does not guarantee precision. Evaluate observed replication-cluster ratio MCSE, never extend R after seeing results."
+  },
+  "coverage": {
+    "coordinate": "covered / eligible for EACH distinct a,b_j",
+    "pooled_b": "sum covered difficulties / sum eligible difficulties; replication-cluster delta MCSE from existing coverage_precision",
+    "all_parameters_pooled": "descriptive only, a once; cannot replace any coordinate gate",
+    "effective_sample_size": "p(1-p)/cluster_MCSE^2; also report independent dataset count and eligible clusters",
+    "failure_sensitivity": "Coverage lower=covered/R and upper=(covered+ineligible)/R; both must remain in[.93,.97] for coordinate certification; failures never silently removed"
+  },
+  "uncertainty": {
+    "a_and_each_b": "95% exact Clopper-Pearson; independent dataset denominator",
+    "pooled": "replicate-cluster delta/t interval, NOT iid interval CP",
+    "bias": "mean error and replication MCSE; RMSE and average SE / empirical SD",
+    "multiple_coordinates": "Bonferroni95% simultaneous exact Clopper-Pearson intervals across13; point+MCSE gates unchanged, no equivalence claim from unadjusted intervals"
+  },
+  "failure_policy": {
+    "fit_exception": "record failure, no retry/replacement",
+    "nonconvergence": "record estimates if finite; CI ineligible",
+    "constant_item": "record failure, no replacement",
+    "invalid_information": "record why, CI ineligible",
+    "point_bias": "all converged finite estimates, independently of CI availability",
+    "checkpoint": "durable claim before dataset generation; atomic result per seed. On resume completed seeds reused; claimed-but-incomplete seeds recorded INTERRUPTED/unknown, never refitted"
+  },
+  "stopping": "Fixed4300. No interim statistical decisions, optional stopping, seed selection, post-result tolerance changes or repeat campaign. Resource interruption preserves all records.",
+  "reference": "Existing native free-SD Rasch point equivalence reused; new deterministic fixture SE/full-Jacobian check in preflight.json. No new R refits.",
+  "outcome": "CERTIFIED only if every preregistered gate and required CI pass; otherwise PARTIAL or NOT CERTIFIED with exact failures. No other DGP/model extrapolation.",
+  "allowed_campaigns": [
+    "Q4 common-a only"
+  ],
+  "deferred": [
+    "Q5",
+    "Q6",
+    "Q7",
+    "Q8",
+    "Q9",
+    "Q10"
+  ],
+  "source_sha256": {
+    "core/irt_common_a_inference.py": "3d788bdfd884681a651fdfe33407157db56ce53d6846bb54563d58f0a4a5a342",
+    "core/irt_binary_inference.py": "bd3d178076f6661b27ded41161ebe951de811921e612fd9a526ed93c375ceb00",
+    "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
+    "validation/binary_se_coverage_study.py": "48fa0c98d8beb5be660ca0b2d34cbd5e398f50f78dcd3dc96de9c82bc361733a",
+    "validation/coverage_precision.py": "97d6d6e858371555fa0657a86e782cdcffe75585073670bd8f5740c4c00fb3ba",
+    "validation/common_a_se_study.py": "199153145fc1845aff7a9cb460e9827c8846b297d9807db087400a1cc19593d2"
+  },
+  "previous_protocol_commit": "b5d332f574068e03d9074183dcf3a1bb71efbc67",
+  "pre_execution_revision": "Before any campaign result: explicit outside-box/label validation; original design and statistical thresholds unchanged."
+}

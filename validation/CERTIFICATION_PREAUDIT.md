@@ -83,3 +83,7 @@ Gerekmeyenler: R nokta eşdeğerliği, formüller, eğriler, dışa aktarımlar 
   - p4 ön kayıt sırası denetlenmedi (görev Q2).
   - Bifaktör UI uyarısı denetlenmedi (görev Q5).
 - Bütün modellerin sertifikalanabileceği iddia edilmiyor. 4PL ML bu fikstür/ayarlar ve N ≤ 500 bifaktör mevcut kanıtla sertifikalanamaz; bu evrensel bir olanaksızlık iddiası değildir.
+
+## Q4 ek kanıt — genel modele genişletilmez
+
+`evidence/p9_1pl_common_se/REPORT.md` ve `coverage.json`: ortak-a için bir veri seti bir bağımsız a aralığıdır. R300 hassasiyeti yeterli olmadığından önceden R4300 seçildi; tek kampanya ve tüm13 koordinatta bağımsız/kümeli MCSE kapıları geçti. SE/GA sertifikası yalnız kayıtlı DGP/ML ayarları ve CI başarısı içindir. Önceki sabit-a p6 kanıtı değiştirilmedi veya yeniden çalıştırılmadı. Diğer boşluklar ve Q5–Q10 bu görev kapsamında ele alınmadı.

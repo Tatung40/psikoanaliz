@@ -24,3 +24,7 @@ tekrarı ve 4PL ML için Monte Carlo (tanımlanabilirliği düzeltmez).
 ## Q1–Q3 sonuç kaydı
 
 Bkz. `q1_q3/REPORT.md`. Q1 arşiv bütünlüğü PASS,4PL sayısal karşılaştırması başarısız/eksik olarak korundu. Q2 iki ailede de VERIFIED Git atalık sırası; NRM yöntem onarımı post-hoc, eşikler aynı. Q3 beş GH61 stationarity PASS; GH101 0/5: NOT CERTIFIED. Q4–Q10 uygulanmadı; Q4/Q7 Monte Carlo DEFERRED.
+
+## Q4 sonuç kaydı
+
+`evidence/p9_1pl_common_se/REPORT.md`: önkayıt a1db06887affb3c3bbb4dbcc8aa420f3b82259e4. R300 ortak-a MCSE hedefini karşılayamadığından sonuçlar öncesinde R4300 olarak sabitlendi. Tek kampanya:4300/4300 yakınsama, a kapsaması.9500/MCSE.003324; b havuzu.951240/MCSE.001031. Tüm13 ayrı koordinat geçti; dar koşullarda SE/GA CERTIFIED (zorunlu CI şartıyla). Q5–Q10, özellikle Q7 MC, DEFERRED.

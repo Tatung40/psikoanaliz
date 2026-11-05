@@ -29,8 +29,33 @@ jobs:
         id: mode
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- evidence-only-no-mc -->')
         run: python -m validation.q1_q3.ci_mode --base '${{ github.event.pull_request.base.sha }}'
+      - name: Validate Q4 single-campaign archived-evidence request
+        id: q4_mode
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- q4-archived-only -->')
+        env:
+          Q4_BASE: ${{ github.event.pull_request.base.sha }}
+        # The preregistered runner is frozen. Include the derived UI import inventory
+        # here without changing the campaign code or its source identity after results.
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          from validation.common_a_se_study import ROOT, PROTOCOL, digest
+          allowed = {'.github/workflows/mtk-scientific-gates.yml', '.github/workflows/pytest.yml',
+                     'core/irt_common_a_inference.py', 'core/irt_python_mirt_report.py',
+                     'ui/irt_python_library_view.py', 'tests/test_common_a_se.py',
+                     'validation/common_a_se_study.py', 'validation/CODEX_CERTIFICATION_QUEUE.md',
+                     'validation/CERTIFICATION_PREAUDIT.md', 'validation/SCIENTIFIC_MODEL_CERTIFICATION_MATRIX.md',
+                     'validation/REPRODUCIBLE_ANALYSIS_INVENTORY.json'}
+          paths = subprocess.check_output(['git', 'diff', '--name-only', os.environ['Q4_BASE'], 'HEAD'], text=True).splitlines()
+          assert paths and all(p in allowed or p.startswith('validation/evidence/p9_1pl_common_se/') for p in paths), 'Q4 scope violation'
+          protocol = json.loads(PROTOCOL.read_text())
+          assert all(digest(ROOT/p) == h for p,h in protocol['source_sha256'].items()), 'Frozen campaign source changed'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write('evidence_only=true\n')
+          print('No new Monte Carlo; original campaign sources intact; all evidence/browser checks retained.')
+          PY
       - name: Pre-registered studies execute (quick mode; full evidence is committed)
-        if: steps.mode.outputs.evidence_only != 'true'
+        if: steps.mode.outputs.evidence_only != 'true' && steps.q4_mode.outputs.evidence_only != 'true'
         run: |
           python validation/irt_3pl4pl_root_cause.py /tmp/p1 --quick
           python validation/dif_validation_study.py /tmp/p2 --quick
@@ -42,6 +67,9 @@ jobs:
       - name: Q1-Q3 archived independent evidence (no fits, no Monte Carlo)
         if: steps.mode.outputs.evidence_only == 'true'
         run: python -m pytest -q tests/test_certification_q123.py
+      - name: Q4 fixed campaign evidence and covariance gates (no simulation)
+        if: steps.q4_mode.outputs.evidence_only == 'true'
+        run: python -m pytest -q tests/test_common_a_se.py
       - name: Real browser end-to-end (RSM, DIF, GRM/PCM/GPCM/NRM)
         timeout-minutes: 20
         run: python validation/browser_e2e_polytomous_dif.py --output /tmp/browser && python -c "import json;assert json.load(open('/tmp/browser/result.json'))['status']=='PASS'"

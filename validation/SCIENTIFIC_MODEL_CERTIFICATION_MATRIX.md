@@ -13,7 +13,7 @@ Kısaltmalar: **V** = VERIFIED, **P** = PARTIAL, **NV** = NOT VERIFIED, **NS** =
 | Model | Parametre | Uyum (LL/AIC/BIC) | SE/CI/p | Kişi (EAP) | Eğriler / Wright | Kararlılık | Genel durum |
 |---|---|---|---|---|---|---|---|
 | Rasch / 1PL (a = 1) | V — R mirt 1.48 ≤4.4e-4 (`r_mirt_phase1`); yerel ↔ R 1.3e-6 | V — AIC/BIC özdeşliği; R logLik | P — Monte Carlo 300/300, b GA kapsaması .953 (yalnız çalışılan koşullar) | V — bağımsız kareleme ≤1e-10 (bu PR) | V eğriler (#138); P Wright (statik) | P — yakınsama kapıları | NOT CERTIFIED |
-| 1PL ortak serbest a | P — yerel σ-serbest Rasch ile özdeşlik, tek fikstür (#138) | V — ΔLL 1.4e-8 (#138) | NV | V (ortak EAP fonksiyonu) | V eğriler; NS Wright | P | NOT CERTIFIED |
+| 1PL ortak serbest a | P — yerel σ-serbest Rasch ile özdeşlik, tek fikstür (#138) | V — ΔLL 1.4e-8 (#138) | SE/%95 Wald GA: CERTIFIED yalnız p9 tasarımı; p testi sertifikalanmadı | V (ortak EAP fonksiyonu) | V eğriler; NS Wright | P | NOT CERTIFIED |
 | 2PL | V — R mirt (`r_mirt_phase1`) | V | P — SE kapsama çalışması (`binary_se_coverage_study`); S-X² yalnız LSAT7 (#132) | V | V | P | NOT CERTIFIED |
 | 3PL | P — MAP N ≥ 3000, ML N ≥ 10000; R eşlenmiş fit (`r_mirt_phase1/matched_fit.py`) | P | NV — SE/GA kapsaması doğrulanmadı; bootstrap DIF p kapalı | V | V eğriler (#138) | P — sınır çözümleri raporlanıyor | NOT CERTIFIED |
 | 4PL | NV — ML: R yakınsamadı, zayıf tanımlanabilirlik; MAP: P (çalışılan koşullarda nokta geri kazanımı) | NV | NS — GA kapalı | V | V eğriler | NV — ML | NOT CERTIFIED |
@@ -70,3 +70,7 @@ GRM/PCM/GPCM/NRM için `evidence/r_polytomous.json`, RSM için `evidence/r_rsm.j
 p4 ve p8 önkayıt atalıkları Q2'de doğrulandı; p4 NRM yöntem düzeltmesi sonuç sonrası, sayısal eşikler değişmemiştir. N500 p4 kapsaması ve N500 bifaktör geri kazanımı sertifikalanmadı. `q1_q3/preregistration.json`.
 
 4PL ML için `FOUR_PL_ML_DECISION.md`: beş yerel GH61 profil noktası stationarity sağladı, aynı çözümler GH101'de sağlamadı. Zayıf pratik tanımlama/sayısal duyarlılık vardır; bu tek fikstürden kalıcı veya yapısal desteklenemezlik çıkarılmaz. Üretim SE/GA kapıları değişmedi. **Yeni CERTIFIED hücre:0.** Q4–Q10 etiket/uygulama senkronu bu batch kapsamında yapılmadı.
+
+## Q4 — ortak serbest a SE/GA (dar kapsam)
+
+`evidence/p9_1pl_common_se/REPORT.md`: sonuçlardan önce commit edilmiş R4300/N1000/J12; gerçek ortak a1, kayıtlı b ızgarası, θ~N(0,1), ML/GH21/tol1e-4/max_iter500. Ortak a4300 bağımsız aralık, b51600 aralık; MCSE veri setine göre kümeli. Tüm13 ayrı koordinat ve b havuzu eşikleri karşıladı. SE/GA yalnız bu kayıtlı koşullarda CERTIFIED ve zorunlu CI başarısına bağlıdır; genel1PL/model veya p-değeri sertifikası değildir. Kapsam dışı ortak-a GA kapısı kapalıdır. Q5–Q10 uygulanmadı.

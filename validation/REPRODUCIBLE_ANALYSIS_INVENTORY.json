@@ -179,8 +179,8 @@
     "core_imports": [
       "core.irt_b14.prepare_polytomous",
       "core.irt_binary_inference.STATUS",
-      "core.irt_binary_inference.parameter_inference",
       "core.irt_binary_usage_policy.evidence_note",
+      "core.irt_common_a_inference.parameter_inference",
       "core.irt_library_diagnostics.library_fit_diagnostics",
       "core.irt_library_diagnostics.library_itemfit",
       "core.irt_person_abilities.person_abilities",
@@ -188,6 +188,7 @@
       "core.irt_python_mirt_report.BINARY",
       "core.irt_python_mirt_report.MODELS",
       "core.irt_python_mirt_report.build_report",
+      "core.irt_python_mirt_report.common_a_evidence_note",
       "core.irt_rasch_wright.rasch_wright_tables",
       "core.irt_rasch_wright.wright_exports",
       "core.irt_rasch_wright.wright_figure"
