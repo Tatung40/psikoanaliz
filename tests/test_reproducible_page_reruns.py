@@ -75,22 +75,17 @@ def test_bootstrap_dif_stays_explicitly_unsupported_after_rerun():
     assert any("bootstrap DIF inference is gated" in u for u in manifest["unsupported"])
 
 
-def test_comparison_page_links_fits_from_the_model_pages_and_closes_capture():
-    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=600)
+def test_comparison_page_records_its_own_four_ml_fits_and_closes_capture():
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=900)
     for key, value in _state("irt_006", "MTK: Karşılaştırma").items():
         at.session_state[key] = value
-    at.run()
-    for model in ("1PL", "2PL"):
-        at.session_state["nav_page"] = f"MTK: {model}"
-        at.run(); at.button(key=f"py_mirt_run_{model}").click().run()
-    at.session_state["nav_page"] = "MTK: Karşılaştırma"
-    at.run()
+    at.run(); at.button(key="irt_compare_run").click().run()
     recorder = at.session_state["_repro_history"]
     assert recorder.page == "MTK: Karşılaştırma"             # st.stop() no longer skips the panel
     calls = recorder.manifest()["calls"]
-    models = [dict(c["arguments"]["values"])["model"] for c in calls if c["function"] == "fit_python_mirt"]
-    assert sorted(models) == ["1PL", "2PL"]
-    assert [c["function"] for c in calls].count("library_fit_diagnostics") == 2
+    fits = [dict(c["arguments"]["values"]) for c in calls if c["function"] == "fit_python_mirt"]
+    assert [f["model"] for f in fits] == ["1PL", "2PL", "3PL", "4PL"]
+    assert all(f["estimation"] == "ML" for f in fits)
 
 
 def test_missing_data_page_keeps_applied_imputation_after_rerun():
