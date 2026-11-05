@@ -15,6 +15,8 @@ jobs:
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -23,7 +25,12 @@ jobs:
           pip install -r requirements.txt
           python -m pip install --only-binary=:all: 'mirt==1.2.0' playwright
           python -m playwright install --with-deps chromium
+      - name: Validate explicit zero-Monte-Carlo evidence-only request
+        id: mode
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- evidence-only-no-mc -->')
+        run: python -m validation.q1_q3.ci_mode --base '${{ github.event.pull_request.base.sha }}'
       - name: Pre-registered studies execute (quick mode; full evidence is committed)
+        if: steps.mode.outputs.evidence_only != 'true'
         run: |
           python validation/irt_3pl4pl_root_cause.py /tmp/p1 --quick
           python validation/dif_validation_study.py /tmp/p2 --quick
@@ -32,6 +39,9 @@ jobs:
           python validation/dif34_bootstrap_size_study.py /tmp/p5 --quick
       - name: Evidence-consistency tests
         run: python -m pytest -q tests/test_irt_binary_usage_policy.py tests/test_mtk_evidence.py
+      - name: Q1-Q3 archived independent evidence (no fits, no Monte Carlo)
+        if: steps.mode.outputs.evidence_only == 'true'
+        run: python -m pytest -q tests/test_certification_q123.py
       - name: Real browser end-to-end (RSM, DIF, GRM/PCM/GPCM/NRM)
         timeout-minutes: 20
         run: python validation/browser_e2e_polytomous_dif.py --output /tmp/browser && python -c "import json;assert json.load(open('/tmp/browser/result.json'))['status']=='PASS'"
