@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "parent_protocol_commit": "dbf19bcf6fc85138f0208e1832568960f02ece5c",
+  "original_results": "validation/q1_q3/profile_uncentered.json",
+  "original_sha256": "c8dcc8f1e2bc9bb8fd7532e014338ff237535cb1281180d9d85513930df90543",
+  "demonstrated_issue": "All10 uncentered objectives stopped by relative function reduction while physical nuisance scores exceeded1e-5; these are NOT valid stationary profiles.",
+  "correction": "Subtract the constant objective value at the fixed common initialization for each point. Same likelihood, gradients, feasible region, parameters, grid, preconditioner and optimizer settings. This makes relative-function stopping stricter near the optimum; statistical acceptance is unchanged.",
+  "additional_attempts": "Exactly one centered attempt at each of the SAME10 points, no further retries.20 total optimizations,10 unique grid values.",
+  "stationarity_limit_unchanged": 1e-05,
+  "monte_carlo": false,
+  "interpretation": "Retain every failure. If stationarity remains unresolved, diagnose numerical failure, not structural nonidentifiability. No profile confidence intervals or production inference release."
+}
