@@ -70,3 +70,5 @@ GRM/PCM/GPCM/NRM için `evidence/r_polytomous.json`, RSM için `evidence/r_rsm.j
 p4 ve p8 önkayıt atalıkları Q2'de doğrulandı; p4 NRM yöntem düzeltmesi sonuç sonrası, sayısal eşikler değişmemiştir. N500 p4 kapsaması ve N500 bifaktör geri kazanımı sertifikalanmadı. `q1_q3/preregistration.json`.
 
 4PL ML için `FOUR_PL_ML_DECISION.md`: beş yerel GH61 profil noktası stationarity sağladı, aynı çözümler GH101'de sağlamadı. Zayıf pratik tanımlama/sayısal duyarlılık vardır; bu tek fikstürden kalıcı veya yapısal desteklenemezlik çıkarılmaz. Üretim SE/GA kapıları değişmedi. **Yeni CERTIFIED hücre:0.** Q4–Q10 etiket/uygulama senkronu bu batch kapsamında yapılmadı.
+
+4PL ML GH101/GH161 (ön kayıt `daf5e24`): GH101 durağan (1.5e-6), GH161 denetimi FAIL (7.75e-3), 11/48 sınır; NOT CERTIFIED (`validation/four_pl_gh_refinement/REPORT.md`). Model karşılaştırmasında 4PL kanıta bağlı kapıyla görünür ama seçilemez.

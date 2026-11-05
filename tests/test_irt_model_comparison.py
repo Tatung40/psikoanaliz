@@ -102,3 +102,20 @@ def test_page_one_click_one_table_one_paragraph_and_cache():
     at.session_state["item_cols"] = list(at.session_state["item_cols"])[:-1]
     at.run()
     assert "irt_model_comparison" not in at.session_state  # changed data invalidates the cache
+
+
+def test_4pl_gate_is_evidence_scoped_not_unconditional(monkeypatch):
+    import core.irt_model_comparison as C
+    rows = _rows([-3000., -2990., -2985., -2000.])
+    assert not rows[3]["eligible"] and "FOUR_PL_ML_DECISION.md" in rows[3]["reason"]
+    assert comparison_table(rows).iloc[3]["LogLik"] != "—"          # stays visible with its statistics
+    monkeypatch.setattr(C, "FOUR_PL_ML_CERTIFIED_SCOPE", dict(min_n=400, min_items=0))  # hypothetical record
+    assert C.summarize_fit("4PL", _fake(-2000., 40), 500)["eligible"]
+    assert not C.summarize_fit("4PL", _fake(-2000., 40), 300)["eligible"]   # outside scope
+    assert C.FOUR_PL_ML_CERTIFIED_SCOPE is not None and C.four_pl_gate(500, 20, 3)[0] is False  # boundary blocks
+
+
+def test_4pl_gh_refinement_record_keeps_failed_audit():
+    r = json.loads((ROOT / "validation/four_pl_gh_refinement/result.json").read_text())
+    assert r["gate_stationary_GH101"] and not r["gate_audit_GH161"] and r["monte_carlo_executions"] == 0
+    assert r["score_GH161_audit"] > 1e-5 and r["status"].endswith("NOT CERTIFIED")

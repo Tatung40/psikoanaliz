@@ -18,6 +18,19 @@ BOUNDS = {"discrimination": (.1, 5.), "difficulty": (-6., 6.), "guessing": (0., 
 DESCRIPTION = {"1PL": "tüm maddelerde ortak (a = 1) ayırt edicilik", "2PL": "maddeye göre değişen ayırt edicilik",
                "3PL": "ek olarak alt asimptot (şans) parametresi", "4PL": "alt ve üst asimptot parametreleri"}
 _DASH = "—"
+# Evidence-based 4PL ML gate (not an unconditional exclusion): selectable only when a certification
+# record supports it. Current evidence (validation/FOUR_PL_ML_DECISION.md, four_pl_gh_refinement/result.json,
+# evidence/p1_3pl4pl, evidence/p7_binary34_se): weak practical identification, many boundary estimates,
+# GH101 solution not stationary under the GH161 audit, R EM nonconvergence, failed CI coverage.
+FOUR_PL_ML_CERTIFIED_SCOPE = None
+
+
+def four_pl_gate(n_persons, n_items, boundary):
+    scope = FOUR_PL_ML_CERTIFIED_SCOPE
+    if scope and n_persons >= scope["min_n"] and n_items >= scope["min_items"] and boundary == 0:
+        return True, ""
+    return False, ("4PL ML seçime alınmadı: tanımlanabilirlik, kuadratür durağanlığı ve GA kapsaması "
+                   "kanıtlanmadı (FOUR_PL_ML_DECISION.md)" + (f"; {boundary} sınır kestirimi" if boundary else ""))
 
 
 def boundary_count(fit, tol=1e-4):
@@ -33,7 +46,7 @@ def boundary_count(fit, tol=1e-4):
     return count
 
 
-def summarize_fit(model, fit, n_persons):
+def summarize_fit(model, fit, n_persons, n_items=None):
     """Row dict for one model; never raises for an unusable fit."""
     row = dict(Model=model, k=None, LogLik=None, AIC=None, BIC=None, converged=False, boundary=0,
                eligible=False, reason="")
@@ -47,6 +60,11 @@ def summarize_fit(model, fit, n_persons):
         row["reason"] = "kestirim çıktısı okunamadı"
         return row
     row.update(converged=converged, boundary=boundary_count(fit))
+    if n_items is None:
+        try:
+            n_items = len(fit.coef())
+        except Exception:
+            n_items = 0
     if not math.isfinite(ll) or k < 1:
         row["reason"] = "sonlu olmayan logLik"
         return row
@@ -58,8 +76,8 @@ def summarize_fit(model, fit, n_persons):
         row["reason"] = "Karşılaştırılamaz: kütüphane AIC/BIC tanımı farklı"
     elif not converged:
         row["reason"] = "yakınsamadı"
-    elif model == "4PL":
-        row["reason"] = "4PL ML tanımlanabilirliği doğrulanmadı; seçime alınmadı"
+    elif model == "4PL" and not four_pl_gate(n_persons, n_items, row["boundary"])[0]:
+        row["reason"] = four_pl_gate(n_persons, n_items, row["boundary"])[1]
     else:
         row.update(eligible=True, reason="uygun")
     return row
