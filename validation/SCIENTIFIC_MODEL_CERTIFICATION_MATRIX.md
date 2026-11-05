@@ -24,7 +24,7 @@ Kısaltmalar: **V** = VERIFIED, **P** = PARTIAL, **NV** = NOT VERIFIED, **NS** =
 | NRM | P — Monte Carlo; SE kusuru `oakes` ile düzeltildi | V | P — ağırlıklı kategori etkisi GA'sı kapalı | NV — tek 2PL EAP fikstürü bu modele genellenmez | V eğriler; NS madde uyumu ve Wright | P | NOT CERTIFIED |
 | MIRT (1–4PL/GRM, bifaktör) | P — R Stage 1 sayısal eşdeğerlik (run 40383677441) | V — formüller | NS — interaktif SE/GA/LR kapalı; MAP NV | P | P — kodda yüzey değişmezleri | P | NOT CERTIFIED |
 | DIF: MH, lojistik, düzeltmeler | V — statsmodels / sklearn ≤1e-10 / ≤1e-5 (bu PR) | NA | P — impact altında sıralı DIF FWER şişmesi belgelenmiş (#118–#121) | NA | NA | V | NOT CERTIFIED |
-| DIF: Lord/Wald (2PL), GRM-LR | V — R mirt ≤7.4e-4 (#130); GRM GH101/GH161 kapıları | NA | NV — FWER yalnız 30 çift (NOT CERTIFIED); eski sabit-SD 1PL Lord betimsel; yeni serbest-SD yolunda R sayısal karşılaştırması geçti (#131), FWER doğrulanmadı | NA | NA | V — sayısal kapılar | NOT CERTIFIED |
+| DIF: Lord/Wald (2PL), GRM-LR | V — R mirt ≤7.4e-4 (#130); GRM GH101/GH161 kapıları | NA | NV — FWER: 852 tamamlanan çift; önkayıtlı bakış500 INCONCLUSIVE / NOT CERTIFIED; eski sabit-SD 1PL Lord betimsel; yeni serbest-SD yolunda R sayısal karşılaştırması geçti (#131), FWER doğrulanmadı | NA | NA | V — sayısal kapılar | NOT CERTIFIED |
 | KTK (α, KR-20/21, λ1–λ6) | V — pingouin α ≤1e-6 (bu PR); psych λ (#132) | NA | P — Feldt GA | NA | NA | V — tanımsız katsayı artık NaN (bu PR) | NOT CERTIFIED |
 | G Kuramı | V — p×i bağımsız ANOVA (#138); diğer dengeli desenler P (R CI) | NA | NS — F/p ve GA üretilmiyor | NA | NA | P | NOT CERTIFIED |
 | Eksik veri | V — gözlenen değer ve maske bütünlüğü (Faz 2 betiği) | NA | NS — tekli atama belirsizliği yansıtmaz | NA | NA | V | NOT CERTIFIED |
