@@ -26,7 +26,7 @@ jobs:
       # Opt in once per PR using <!-- full-regression --> in its body.
       - name: Regression tests (pull requests; full integration suite)
         if: github.event_name == 'pull_request'
-        timeout-minutes: ${{ (github.head_ref == 'integration/73-75-main' || github.head_ref == 'feat/reproducible-python-r-code' || contains(github.event.pull_request.body, '<!-- full-regression -->')) && 55 || 30 }}
+        timeout-minutes: ${{ (github.head_ref == 'integration/73-75-main' || github.head_ref == 'feat/reproducible-python-r-code' || contains(github.event.pull_request.body, '<!-- full-regression -->')) && 55 || 40 }}
         env:
           FULL_REGRESSION: ${{ contains(github.event.pull_request.body, '<!-- full-regression -->') }}
           OPENBLAS_NUM_THREADS: '1'

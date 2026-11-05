@@ -71,7 +71,9 @@ control for any DIF method. No sampling-inference certificate follows.
 ## Reproduction and integration
 
 No Rscript is installed in this workspace; no packages were downloaded and no
-R or Python fits were run. Original R evidence, Monte Carlo archives, protocols,
+new R/Python IRT reference calibrations or new Monte Carlo campaigns were run.
+Existing regression tests and required CI quick gates still execute their original fits.
+Original R evidence, Monte Carlo archives, protocols,
 acceptance limits, production engines and inference gates are unchanged.
 
 Rebuild the **new** records only:
@@ -91,3 +93,9 @@ diagnostic using the saved fixture and exact matched constraints in an actual
 R environment. Do not infer convergence from small objective increments or
 increase iteration limits blindly. SE/CI and general error-control certification
 remain separate work even if numerical optimization succeeds.
+
+CI resource note: standard PR regression reached93% without a reported test
+failure before its30-minute timeout (run41984664654). The same executable
+sources passed the single full regression stage (run41983772125). The normal
+PR step budget is now40 minutes; its full test selection and all scientific
+criteria are unchanged. Full-regression opt-in remains55 minutes.
