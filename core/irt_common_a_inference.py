@@ -38,7 +38,9 @@ def common_a_basis(fit):
     if covariance.shape!=(len(labels),len(labels)):raise ValueError('Kovaryans boyutu geçersiz.')
     a=[i for i,s in enumerate(labels) if s.startswith('discrimination[')]
     b=[i for i,s in enumerate(labels) if s.startswith('difficulty[')]
-    if len(a)!=k or len(b)!=k or len(labels)!=2*k:raise ValueError('Ortak-a koordinatları geçersiz.')
+    expected={f'{name}[{item}]' for name in ('discrimination','difficulty') for item in coef.index}
+    if len(a)!=k or len(b)!=k or len(labels)!=2*k or set(labels)!=expected:
+        raise ValueError('Ortak-a koordinatları geçersiz.')
     if not np.array_equal(coef.discrimination.to_numpy(),np.full(k,coef.discrimination.iloc[0])):
         raise ValueError('Beyan edilen ortak-a eşitliği sağlanmadı.')
     for j in a[1:]:
@@ -49,7 +51,8 @@ def common_a_basis(fit):
     for name in ('discrimination','difficulty'):
         lo,hi=_ITEM_PARAMETER_BOUNDS[name]
         v=coef[name].to_numpy(float)
-        if not np.isfinite(v).all() or np.any(np.minimum(abs(v-lo),abs(v-hi))<=1e-6):
+        if (not np.isfinite(v).all() or np.any(v<lo) or np.any(v>hi)
+                or np.any(np.minimum(abs(v-lo),abs(v-hi))<=1e-6)):
             raise ValueError('Ortak-a modelinde sınır/geçersiz parametre; Wald çıkarımı kapalı.')
     indices=[a[0],*b]
     return covariance[np.ix_(indices,indices)],[labels[i] for i in indices]

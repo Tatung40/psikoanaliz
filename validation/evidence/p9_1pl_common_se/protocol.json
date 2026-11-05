@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "base": "41c0a560d549d1fba281f2e6fb8ee144c7be8ee5",
   "initial_planned_R": 300,
   "R": 4300,
@@ -105,10 +105,13 @@
     "Q10"
   ],
   "source_sha256": {
-    "core/irt_common_a_inference.py": "a792427f6f96283cbc692ef792b8173281c7821b31bc5c7f87d19e8157bb09c6",
+    "core/irt_common_a_inference.py": "3d788bdfd884681a651fdfe33407157db56ce53d6846bb54563d58f0a4a5a342",
     "core/irt_binary_inference.py": "bd3d178076f6661b27ded41161ebe951de811921e612fd9a526ed93c375ceb00",
     "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
     "validation/binary_se_coverage_study.py": "48fa0c98d8beb5be660ca0b2d34cbd5e398f50f78dcd3dc96de9c82bc361733a",
-    "validation/coverage_precision.py": "97d6d6e858371555fa0657a86e782cdcffe75585073670bd8f5740c4c00fb3ba"
-  }
+    "validation/coverage_precision.py": "97d6d6e858371555fa0657a86e782cdcffe75585073670bd8f5740c4c00fb3ba",
+    "validation/common_a_se_study.py": "199153145fc1845aff7a9cb460e9827c8846b297d9807db087400a1cc19593d2"
+  },
+  "previous_protocol_commit": "b5d332f574068e03d9074183dcf3a1bb71efbc67",
+  "pre_execution_revision": "Before any campaign result: explicit outside-box/label validation; original design and statistical thresholds unchanged."
 }
