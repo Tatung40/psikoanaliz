@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "status": "COMMITTED BEFORE PROFILE OPTIMIZATION",
+  "task": "Q3 deterministic diagnosis, not certification",
+  "base": "b72d6d4ae19de64dface769369e1de0490a009a9",
+  "data": "tests/fixtures/irt_b11/data_irt4pl_ok.csv",
+  "data_sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c",
+  "source_run": 40151828898,
+  "source_artifact": 12582966948,
+  "model": "4PL ML, N(0,1), D=1, all12 items; no priors",
+  "profile_parameter": "M12:d (physical upper asymptote)",
+  "grid": [
+    0.5,
+    0.55,
+    0.6,
+    0.619828261494883,
+    0.6290267572195359,
+    0.65,
+    0.7,
+    0.8,
+    0.9,
+    1.0
+  ],
+  "grid_rationale": "Endpoints, coarse interior coverage and BOTH preserved Python/R M12 estimates, chosen before profile results",
+  "initialization": "Same complete preserved R parameter vector at every point; no retries or alternative starts",
+  "nuisance": "All other47 physical coordinates reoptimized, original box bounds unchanged",
+  "bounds": {
+    "a": [
+      0.1,
+      5.0
+    ],
+    "b": [
+      -6.0,
+      6.0
+    ],
+    "c": [
+      0.0,
+      0.5
+    ],
+    "d": [
+      0.5,
+      1.0
+    ]
+  },
+  "quadrature": {
+    "optimize": 61,
+    "independent_evaluation": 101,
+    "distribution": "standard normal Gauss-Hermite"
+  },
+  "optimizer": {
+    "method": "L-BFGS-B",
+    "gtol": 1e-08,
+    "ftol": 1e-13,
+    "maxiter": 3000,
+    "maxfun": 6000,
+    "maxls": 40,
+    "maxcor": 20,
+    "preconditioner": "sqrt diagonal of preserved fine observed-information matrix; fixed before optimization"
+  },
+  "limits": {
+    "point_seconds": 120,
+    "total_seconds": 1200
+  },
+  "stationarity": "Report raw and per-person box-projected physical nuisance scores; raw max<=1e-5 required (existing preaudit). Optimizer flag alone insufficient. Exclude fixed profile coordinate.",
+  "curvature": "Descriptive nonuniform three-point second differences only; no chi-square CI, p-value or permanent nonidentifiability claim",
+  "independence": "Reuse actual archived R solution and existing independently checked common likelihood/score. This protocol does not claim a new independent R optimizer run.",
+  "failure_policy": "Keep every point, timeout and nonconvergence; no replacement, no threshold changes. A grid diagnosis is not proof of global optimum or of structural identification.",
+  "monte_carlo": false,
+  "production_changes": false
+}
