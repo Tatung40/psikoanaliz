@@ -62,3 +62,11 @@ Yerelde R yok; R kanıtları CI çalıştırmalarından alındı.
 ## CI
 
 Testler: `tests/test_independent_references.py` (6 test). Tam regresyon PR'da `<!-- full-regression -->` ile tek sefer çalıştırılıyor.
+
+## Q1–Q3 kanıt eki (2026-11-05; yalnız bu görevlerin kapsamı)
+
+GRM/PCM/GPCM/NRM için `evidence/r_polytomous.json`, RSM için `evidence/r_rsm.json`, 3PL/4PL için `evidence/r_34.json`, mevcut dengeli G Kuramı referansları için `evidence/r_gt.json` asıl R çıktıları ve sayısal karşılaştırmaları korur. Bu alanlar **PARTIAL / NOT CERTIFIED**: eski V işareti genel bilimsel sertifika değildir; native quadrature/eksik stationarity kayıtları kapsamı sınırlar.
+
+p4 ve p8 önkayıt atalıkları Q2'de doğrulandı; p4 NRM yöntem düzeltmesi sonuç sonrası, sayısal eşikler değişmemiştir. N500 p4 kapsaması ve N500 bifaktör geri kazanımı sertifikalanmadı. `q1_q3/preregistration.json`.
+
+4PL ML için `FOUR_PL_ML_DECISION.md`: beş yerel GH61 profil noktası stationarity sağladı, aynı çözümler GH101'de sağlamadı. Zayıf pratik tanımlama/sayısal duyarlılık vardır; bu tek fikstürden kalıcı veya yapısal desteklenemezlik çıkarılmaz. Üretim SE/GA kapıları değişmedi. **Yeni CERTIFIED hücre:0.** Q4–Q10 etiket/uygulama senkronu bu batch kapsamında yapılmadı.

@@ -1,0 +1,121 @@
+{
+  "base": "b72d6d4ae19de64dface769369e1de0490a009a9",
+  "records": [
+    {
+      "family": "p4_polytomous",
+      "status": "VERIFIED GIT PREREGISTRATION",
+      "criteria_commit": "81b3cfef2024b7106b68ba3da440c236583be6ec",
+      "results_commit": "7951225dfb0787587ddb7d9c5bcd497e0b429b9d",
+      "criteria_committer_date": "2026-10-24T16:19:33Z",
+      "results_committer_date": "2026-10-24T16:19:33Z",
+      "ordering_proof": {
+        "status": "ahead",
+        "commits_after_criteria": 3,
+        "commit_chain": [
+          "d3cefdf6fca3efe6ac31df825eeb9f966160ca6e",
+          "5308a3b463fe1f45f6c2ee7656418bf8f6567219",
+          "7951225dfb0787587ddb7d9c5bcd497e0b429b9d"
+        ],
+        "parent_chain": [
+          {
+            "sha": "d3cefdf6fca3efe6ac31df825eeb9f966160ca6e",
+            "parents": [
+              "81b3cfef2024b7106b68ba3da440c236583be6ec"
+            ]
+          },
+          {
+            "sha": "5308a3b463fe1f45f6c2ee7656418bf8f6567219",
+            "parents": [
+              "d3cefdf6fca3efe6ac31df825eeb9f966160ca6e"
+            ]
+          },
+          {
+            "sha": "7951225dfb0787587ddb7d9c5bcd497e0b429b9d",
+            "parents": [
+              "5308a3b463fe1f45f6c2ee7656418bf8f6567219"
+            ]
+          }
+        ]
+      },
+      "criteria": {
+        "converged_rate": 0.95,
+        "curve_rmse": 0.02,
+        "coverage": [
+          0.925,
+          0.975
+        ],
+        "info_rel": 0.0001,
+        "eap_corr": 0.85
+      },
+      "criteria_changed_after_results": false,
+      "criteria_source": {
+        "sha256": "711371b7d344bff2449df0f33cad225014b96c242198c2cfcf312a5920b54ea0",
+        "zlib_base64": "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"
+      },
+      "current_source_sha256": "73087cf654b518d5b698459dd9f3e0f8ce2a3aee44a27cace8dad4877ab73b0d",
+      "results_sha256": {
+        "validation/evidence/p4_polytomous/polytomous_mc_study.json": "2efbd659e6dd2cfa1cf01761061c9a01a7cfb0393a02b8a9d758d0e75acd820b",
+        "validation/evidence/p4_polytomous/polytomous_mc_study_adapter.json": "4033c9000c0d061b51031e97d985f336c8efb53370a286c4268c0c24e3705dd8"
+      },
+      "threshold_comparison": "Original CRITERIA AST equals current source and archived result criteria. No threshold inferred from outcomes.",
+      "limitations": [
+        "Original PR62 ancestry is retained; main squash co-commits criteria/results. Original committer timestamps coincide; ancestry establishes commit order, not actual execution wall time.",
+        "NRM adapter/Oakes method repair followed default-SE failure: post-hoc method repair, not threshold alteration or fresh blind validation.",
+        "Coverage/curve criteria in summarize apply only at N2000, not N500. Pooled interval CP ignores replicate clustering; preregistration alone cannot certify coverage.",
+        "Preaudit coverage/gradient thresholds postdate these results and are not the original p4 preregistration."
+      ],
+      "certification": "NOT PROMOTED"
+    },
+    {
+      "family": "p8_bifactor",
+      "status": "VERIFIED GIT PREREGISTRATION",
+      "criteria_commit": "b77b6a19ae6453c59ad33331695166f81ed3fc8e",
+      "results_commit": "467ca897c63c8d22360f86bf722e167337689ed5",
+      "criteria_committer_date": "2026-10-29T19:40:40Z",
+      "results_committer_date": "2026-10-29T19:44:08Z",
+      "ordering_proof": {
+        "status": "ahead",
+        "commits_after_criteria": 2,
+        "commit_chain": [
+          "910e7306e1199dbdd04c449808bb7b077a2bc633",
+          "467ca897c63c8d22360f86bf722e167337689ed5"
+        ],
+        "parent_chain": [
+          {
+            "sha": "910e7306e1199dbdd04c449808bb7b077a2bc633",
+            "parents": [
+              "b77b6a19ae6453c59ad33331695166f81ed3fc8e"
+            ]
+          },
+          {
+            "sha": "467ca897c63c8d22360f86bf722e167337689ed5",
+            "parents": [
+              "910e7306e1199dbdd04c449808bb7b077a2bc633"
+            ]
+          }
+        ]
+      },
+      "criteria": {
+        "convergence_rate_min": 0.95,
+        "rmse_max": 0.3,
+        "abs_mean_bias_max": 0.1,
+        "rationale": "Declared before running; RMSE limit as for 3PL/4PL a/b usability (irt_3pl4pl_root_cause)."
+      },
+      "criteria_changed_after_results": false,
+      "criteria_source": {
+        "sha256": "b09f4bb50b3b904a595019fa62d5d816c315621be46cff0cad4ccd944509a998",
+        "zlib_base64": "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"
+      },
+      "current_source_sha256": "b09f4bb50b3b904a595019fa62d5d816c315621be46cff0cad4ccd944509a998",
+      "results_sha256": {
+        "validation/evidence/p8_bifactor/recovery.json": "9296d0506c95fa763849ef0044578ec291e40efda05b5d0d177bb0fcfb301ae7"
+      },
+      "threshold_comparison": "Original CRITERIA AST equals current source and archived result criteria. No threshold inferred from outcomes.",
+      "limitations": [
+        "NOT MET remains NOT MET; N500 general-factor RMSE exceeds .30. Chronology gives no additional recovery, MAP or inference certificate."
+      ],
+      "certification": "NOT PROMOTED"
+    }
+  ],
+  "new_simulations": 0
+}

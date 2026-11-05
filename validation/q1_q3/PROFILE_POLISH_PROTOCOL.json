@@ -1,0 +1,21 @@
+{
+  "parent_commit": "ea9ab5e5abd1208b038f4fb771d06990a75c7b34",
+  "reason": "Centered float64 scalar stopping still leaves raw physical scores above1e-5. Preserve both failed attempts. Change numerical strategy, not acceptance.",
+  "scope": "Five preselected existing centered solutions only: lower/upper endpoints, u=.6 and both ORIGINAL R/Python u estimates. No other grid points or L-BFGS retries.",
+  "grid": [
+    0.5,
+    0.6,
+    0.619828261494883,
+    0.6290267572195359,
+    1.0
+  ],
+  "algorithm": "At most3 Newton stationarity corrections per point, using EXISTING information_audit.information(score,...). Active physical box face, fixed profile coordinate excluded; require PD and condition<=1e8; backtrack<=10, nondecreasing original logLik and decreasing projected nuisance score required. Stop immediately at raw nuisance score<=1e-5.",
+  "independent_audit": "Evaluate final fixed coefficients at GH101; record all failures, original/source hashes, bounds and information eigenvalues. No claim of a new R optimizer execution.",
+  "acceptance_unchanged": {
+    "physical_nuisance_score_max": 1e-05,
+    "covariance_condition_max": 100000000.0
+  },
+  "no_more_repair_attempts": true,
+  "monte_carlo": false,
+  "production_changes": false
+}
