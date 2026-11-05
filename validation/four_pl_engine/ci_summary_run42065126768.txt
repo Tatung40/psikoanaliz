@@ -1,0 +1,50 @@
+{
+ "R_mirt_GH61": {
+  "PASS": false,
+  "score_objective": 4.758443498200542,
+  "score_GH161": 4.755008212191621,
+  "boundaries": [
+   "M9:a"
+  ],
+  "vs_python": {
+   "logLik_GH161": -0.004114988361834548,
+   "max_param": 0.051045713535391,
+   "max_ICC": 0.008033204597490129,
+   "max_IIF": 0.013446396035304842
+  }
+ },
+ "R_mirt_GH101": {
+  "PASS": false,
+  "score_objective": 4.746121724302313,
+  "score_GH161": 4.746068364464149,
+  "boundaries": [
+   "M9:a"
+  ],
+  "vs_python": {
+   "logLik_GH161": -0.004515642314800061,
+   "max_param": 0.051488617126410285,
+   "max_ICC": 0.006369316184808849,
+   "max_IIF": 0.013659596538723007
+  }
+ },
+ "python_mirt_GH101_PR145": {
+  "PASS": false,
+  "score_objective": 1.505155563192888e-06,
+  "score_GH161": 0.007751113898637703,
+  "boundaries": [
+   "M1:c",
+   "M1:d",
+   "M2:c",
+   "M3:d",
+   "M5:d",
+   "M6:d",
+   "M8:d",
+   "M9:a",
+   "M10:c",
+   "M10:d",
+   "M11:c"
+  ],
+  "vs_python": null
+ }
+}
+decision D UNSUPPORTED (no estimated upper asymptote in API)
