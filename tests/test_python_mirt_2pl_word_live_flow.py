@@ -45,7 +45,7 @@ def _downloads(at):
 def test_2pl_word_download_is_last_output_and_docx_holds_real_results():
     at, items = _app("2PL", "irt_006")
     labels = [d.proto.label for d in _downloads(at)]
-    assert labels[-1] == "📄 Akademik 2PL Raporu — Word İndir", labels
+    assert labels[-1] == "2PL Akademik Rapor", labels
     assert any(m.value == "### 📄 Akademik 2PL Raporu" for m in at.markdown)
     store = at.session_state["python_mirt_2pl_word"]
     assert store["error"] is None and store["key"] == at.session_state["python_mirt_fit_2PL"]["key"]
@@ -59,7 +59,7 @@ def test_2pl_word_download_is_last_output_and_docx_holds_real_results():
     _assert_python_code_panel(at)
     first = store["docx"]
     at.run()                                                    # ordinary rerun: button stays, no rebuild
-    assert [d.proto.label for d in _downloads(at)][-1] == "📄 Akademik 2PL Raporu — Word İndir"
+    assert [d.proto.label for d in _downloads(at)][-1] == "2PL Akademik Rapor"
     assert at.session_state["python_mirt_2pl_word"]["docx"] is first
     _assert_python_code_panel(at)                               # code panel also survives the rerun
 
@@ -67,4 +67,4 @@ def test_2pl_word_download_is_last_output_and_docx_holds_real_results():
 @pytest.mark.parametrize("model,case", [("1PL", "irt_003"), ("3PL", "irt_009")])
 def test_other_models_have_no_2pl_word_button(model, case):
     at, _ = _app(model, case)
-    assert "📄 Akademik 2PL Raporu — Word İndir" not in [d.proto.label for d in _downloads(at)]
+    assert "2PL Akademik Rapor" not in [d.proto.label for d in _downloads(at)]

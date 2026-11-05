@@ -173,3 +173,71 @@ reproducibility. `tests/test_word_standard.py` covers mixed figure sources and l
 normalization; existing 2PL, DIF, CTT and bundle safeguards remain active.
 
 Reference execution: all 3 table cell grids and all 17 image SHA-256 values were preserved; normalization was checked for idempotence. Native Word/LibreOffice pagination was not rendered in this environment; OOXML dimensions, table widths, caption order and image placement bounds are tested.
+
+
+## Compact result panels and contextual downloads
+
+All output tables, Plotly/Matplotlib/native charts and JSON diagnostics use the
+existing screen observer and `ui.result_panels`. New result expanders start closed;
+existing result expanders are reused, never nested. Controls/metrics stay in their
+original layout. Warnings/errors and downloads inside existing expanders are
+routed to visible page-level anchors. Actual data, report content, widget keys,
+producer recording and input/cache fingerprints are unchanged. Open/close is a
+frontend action and does not trigger calibration.
+
+Only DOCX button labels and download filenames change. CSV/XLSX/PNG/ZIP payloads,
+labels and internal filenames remain. Dynamic models are read from the active
+route's actual selection after existing result-validity gates; naming never grants
+scientific certification.
+
+| Analysis | Academic DOCX label | Filename | Result panels | Evidence |
+|---|---|---|---|---|
+| 3B. Betimsel İstatistikler | Betimsel İstatistikler Akademik Rapor | betimsel_istatistikler_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 4. Test İstatistikleri | Test İstatistikleri Akademik Rapor | test_istatistikleri_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 5. Madde Analizi | Madde Analizi Akademik Rapor | madde_analizi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 6. Çeldirici Analizi | Çeldirici Analizi Akademik Rapor | celdirici_analizi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 7. Güvenirlik & Ölçme Hatası | Güvenirlik & Ölçme Hatası Akademik Rapor | guvenirlik_olcme_hatasi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 8. Grup Bazlı Analizler | Grup Bazlı Analizler Akademik Rapor | grup_bazli_analizler_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 9. Bilimsel Grafikler | Bilimsel Grafikler Akademik Rapor | bilimsel_grafikler_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| KTK: Çift Motor Rapor | KTK Çift Motor Akademik Rapor | ktk_cift_motor_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Rasch | Rasch Akademik Rapor | rasch_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: 1PL | 1PL Akademik Rapor | 1pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: 2PL | 2PL Akademik Rapor | 2pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: 3PL | 3PL Akademik Rapor | 3pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: 4PL | 4PL Akademik Rapor | 4pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Karşılaştırma | MTK Model Karşılaştırması Akademik Rapor | mtk_model_karsilastirmasi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Varsayım Denetimi | Varsayım Denetimi Akademik Rapor | varsayim_denetimi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Çok Modelli DIF Taraması | Çok Modelli DIF Taraması Akademik Rapor | cok_modelli_dif_taramasi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Çok Kategorili B14 | {b14_model} Akademik Rapor | {model}_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: RSM | RSM Akademik Rapor | rsm_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt DIF | {pmd_model} DIF Akademik Rapor | {model}_dif_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: DIF Analiz Merkezi | DIF Analiz Merkezi Akademik Rapor | dif_analiz_merkezi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: GRM Formel DIF | GRM DIF Akademik Rapor | grm_dif_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Çok Kategorili Formel DIF | {poly_model} DIF Akademik Rapor | {model}_dif_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Gözlenen Puan DIF | Gözlenen Puan DIF Akademik Rapor | gozlenen_puan_dif_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: 3PL/4PL Bootstrap DIF | {b34_model} Bootstrap DIF Akademik Rapor | {model}_bootstrap_dif_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| Boyutluluk ve Faktör Analizi | Boyutluluk ve Faktör Analizi Akademik Rapor | boyutluluk_ve_faktor_analizi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| Yerel Bağımsızlık ve Madde Uyumu | Yerel Bağımsızlık ve Madde Uyumu Akademik Rapor | yerel_bagimsizlik_ve_madde_uyumu_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| Genellenebilirlik Kuramı (G ve D Çalışmaları) | Genellenebilirlik Kuramı Akademik Rapor | genellenebilirlik_kurami_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| Çok Boyutlu MTK (MIRT) | {md_model} MIRT Akademik Rapor | {model}_mirt_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| Eksik Veri ve Atama | Kayıp Veri ve Atama Akademik Rapor | kayip_veri_ve_atama_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt Rasch | Rasch Akademik Rapor | rasch_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt 1PL | 1PL Akademik Rapor | 1pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt 2PL | 2PL Akademik Rapor | 2pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt 3PL | 3PL Akademik Rapor | 3pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt 4PL | 4PL Akademik Rapor | 4pl_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt GRM | GRM Akademik Rapor | grm_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt PCM | PCM Akademik Rapor | pcm_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt GPCM | GPCM Akademik Rapor | gpcm_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| MTK: Python mirt NRM | NRM Akademik Rapor | nrm_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| 10. Raporlama | KTK Toplu Rapor Akademik Rapor | ktk_toplu_rapor_akademik_rapor.docx | Shared presentation; existing aggregate content | Shared adapter/name tests |
+
+`tests/test_result_panels.py` checks every route/model naming rule, column-method
+placement, one expander ancestor, initially closed state, visible controls/critical
+warnings/downloads, unchanged tables/figures and DOCX contents. Existing real-result
+tests now assert the same panel contract for all 38 analysis routes.
+The existing browser E2E flows additionally open/close a result panel, verify another
+panel stays closed, check the DOCX button remains accessible, then open panels for
+the original numerical/export checks. No model/test/assertion or numeric tolerance
+was removed, and no extra calibration is added. Actual frontend toggle evidence is
+produced by CI (local Playwright/browser is not installed).

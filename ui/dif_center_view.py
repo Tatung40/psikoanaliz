@@ -14,7 +14,7 @@ KEY='dif_center_result'
 def render(data=None,item_cols=(),id_col=None,group_col=None):
     st.subheader('⚖️ DIF Analiz Merkezi')
     st.warning(LIMITATIONS)
-    with st.expander('Yedi yöntem — gerçek destek ve kanıt durumu',expanded=True):
+    with st.expander('Yedi yöntem — gerçek destek ve kanıt durumu',expanded=False):
         st.dataframe(support_matrix(),hide_index=True)
         st.caption('Uysal ve ark. (2019), DOI 10.21031/epod.534312: PDF bu oturumda sağlanmadı; makaleyle eşdeğerlik iddiası yok.')
     uploaded=st.file_uploader('DIF merkezi verisi (CSV/XLSX)',type=['csv','xlsx'],key='dc_file')

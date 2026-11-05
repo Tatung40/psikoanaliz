@@ -21,6 +21,10 @@ SCREENS += [('MTK: RSM','irt_027',None,'rsm_run'),('MTK: Çok Kategorili B14','i
 
 def _assert_word(at,page):
     assert not at.exception,[e.value for e in at.exception]
+    from tests.test_result_panels import assert_result_panels
+    from ui.result_panels import docx_download
+    assert_result_panels(at)
+    assert docx_download(page,at.session_state)[0] in [d.label for d in at.get('download_button')]
     history=at.session_state['_academic_history']
     assert page in history,[x.value for x in at.warning]+[x.value for x in at.caption]
     if 'legacy_docx' in history[page]:raw=history[page]['legacy_docx'][0]
