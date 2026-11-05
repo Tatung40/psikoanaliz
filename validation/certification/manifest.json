@@ -1,0 +1,31 @@
+{
+  "base": "d9a62666ec6bdc879b6cac9c391cd5bbcb8ae480",
+  "scope": "Conservative claim inventory, not an exhaustive output certificate",
+  "counts": {
+    "CERTIFIED": 4,
+    "NOT CERTIFIED": 83,
+    "PARTIALLY CERTIFIED": 72,
+    "UNSUPPORTED": 4
+  },
+  "routes": 40,
+  "sha256": {
+    "core/dif_lord_policy.py": "e2b20203b3b7b3a94afecd13ebb20269b5ee1f227e4b0a7ae9c645ba49d8149b",
+    "core/generalizability.py": "786ae542cbf81a32b48e034ccdd687406d3419d8248f8805df67123a58e41f51",
+    "core/irt_b14_diagnostics.py": "f881c75974dd3dbb378dd7b7646dd48b0e51b29dc820163d65146641d24d5039",
+    "core/irt_dif34_bootstrap.py": "585d014d1ff7935f634981b021fb0f4047baa6a23cf57caab20d2952379bb2ea",
+    "tests/test_certification_registry.py": "6e6d49644e7dbd169e6dae85e9f7696e8bba690979369abba53c2c81318b57f4",
+    "tests/test_independent_references.py": "a3289705ddbf0488f3751650b4714decafac35b2de9c6aa6e43c99a281e1209a",
+    "tests/test_result_panels.py": "d43bd7fddb8b2a624fd9bdb2bdbabb3b25b1a9e93f52f6934692b75cad826193",
+    "tests/test_scientific_gap_closure.py": "9623bfacaa422b5e0374d1cdacb3f56b57792d22b7e58a427c0d3d44b7c56463",
+    "tests/test_word_standard.py": "4cc4f3022ebd9cf90512fe148ef88e5218a543f1110f375b13e43884826c2ee4",
+    "validation/DIF_CENTER.md": "a8bc18d6e726d3b4aa287879263eeec1d915b417172dbab4eeca8310d52ef992",
+    "validation/DIF_VALIDATION.md": "2f95dfd673e0c41b1c45f0a90c2c8949b5f96110183c3e7c92953b194ab92598",
+    "validation/SCIENTIFIC_AUDIT_PHASE2.md": "3df05cef699792baecc554751b942d27d9c03849547661c0d53e5be878926a36",
+    "validation/SCIENTIFIC_READINESS_2026-10-31.md": "83fe7d06c5af27cbfae0ca44c1d8c5ae620a383155b47c7d1ab8daea427f3cb8",
+    "validation/certification/multiplicity.json": "3fb327afbbf3a383b98d2a40273a9d6e32abf5d1000ad33b1f5d875612b55109",
+    "validation/evidence/p7_binary34_se/coverage.json": "669c0c5faeff7fb95b43d7860e6866962a31958d6ac85833090539bb64b4a224",
+    "validation/grm_fwer_sequential/results/summary.json": "21ee37a6e863b45267de6b66cec5518a949b2b9225d2b1ed1e0275c885112942",
+    "validation/lord_rasch_free_scale/results/wide/report.json": "f54d08f932f862d4e0bd55eef3ff6d2f5a60ae363d577811b04309614cc69496",
+    "validation/r_mirt_phase1/final_summary.json": "548fc836fdf61e2738cc3b46ef9e35a31c2a5a9ac666325f9335c8ee03fafb64"
+  }
+}
