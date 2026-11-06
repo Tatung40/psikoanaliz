@@ -486,9 +486,11 @@ def versions():
 def run(method, data):
     result = compute(method, data)
     keep = validated_outputs(method)
-    shown = {k: v for k, v in result.items() if k in ("estimate", "bias", "sd", "loa", "chi2", "df", "n", "pairs",
-                                                       "pairable_units", "all_agree", "mean", "difference", "F", "df1", "df2")
-             or k in keep}
+    # Evidence is output-specific: an unvalidated statistic must not leak via
+    # the generic result display, even when it is a primary coefficient.
+    # Metadata and plotting coordinates are not inferential results.
+    metadata = {"n", "pairs", "pairable_units", "mean", "difference"}
+    shown = {k: v for k, v in result.items() if k in keep or k in metadata}
     return {"method": method, "result": result, "shown": shown, "status": status(method),
             "interpretation": interpret(method, result, data), "n_units": data.n_units, "n_raters": data.n_raters,
             "categories": [_label(c) for c in data.categories()], "engine": METHODS[method]["engine"], "versions": versions()}
