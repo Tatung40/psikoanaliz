@@ -18,7 +18,8 @@ def exports(result, target, tables=None):
     tables = gt.report_tables(result, target) if tables is None else tables
     report = (f"{PAGE}\nDurum: {result['status']}\n" + result['method'] +
               '\n\nBirey katsayıları:\n' + result['g'].to_string() +
-              '\nHata varyansları:\n' + result['errors'].to_string() +
+              '\nHata varyansları ve SEM:\n' + result['errors'].to_string() +
+              ('\nHata bütçesi (σ²/n′, sıfıra kırpılmış bileşenler):\n' + result['budget'].to_string() if 'budget' in result else '') +
               f'\nHedef: {target:.3f}; D senaryoları:\n' + tables['d'].to_string(index=False))
     files = {f'{k}.csv': _safe(v).to_csv(index=True).encode('utf-8-sig') for k, v in tables.items()}
     files['G_D.xlsx'] = _xlsx(tables)
@@ -126,6 +127,12 @@ def render(data, item_cols=()):
         with st.expander('GeneralizIT özgün Henderson tablosu (T ≠ SS)'):
             st.dataframe(result['henderson'])
         st.dataframe(result['errors'])
+        if 'budget' in result:
+            e = result['errors'].iloc[0]
+            st.caption(f"Göreli SEM = √σ²(δ) = {e.relative_sem:.4g}; mutlak SEM = √σ²(Δ) = {e.absolute_sem:.4g} (puan birimi). "
+                       'Göreli hata yalnız birey içeren etkileşimlerden, mutlak hata buna ek olarak yüzey ana etkilerinden oluşur.')
+            st.dataframe(result['budget'])
+            st.caption('Hata bütçesi: her bileşenin σ²/n′ katkısı; sütun toplamları hata varyanslarına eşittir.')
     with tabs[2]:
         st.dataframe(result['variance'])
         if (result['variance'].Variance < 0).any():

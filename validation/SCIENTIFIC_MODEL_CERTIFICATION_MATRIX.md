@@ -79,3 +79,9 @@ p4 ve p8 önkayıt atalıkları Q2'de doğrulandı; p4 NRM yöntem düzeltmesi s
 - Projected Newton, **sınırlı KKT durağan** nokta buldu: skor 3e-6, GH241 denetimi geçti, sınırda I23 c = 0, I26 d = 1, I27 d = 1.
 
 Düzenli sayısal PASS, geri kazanım ve SE/GA kapsamı **sertifikalanmadı**. `FOUR_PL_ML_CERTIFIED_SCOPE = None`.
+
+G Kuramı son denetimi (ön kayıt `f57ac34`, `generalizability/EVIDENCE_FINAL.md`):
+- Beş dengeli rastgele desen, R `aov` ile ≤ 3e-13 uyumlu. Üç çapraz desen ayrıca gtheoryr 0.2.0 ile ≤ 5.5e-13 uyumlu.
+- Kütüphanenin dört ondalıklı yuvarlamasından kaynaklanan ölçek kusuru düzeltildi.
+- SEM ve hata bütçesi eklendi.
+- Durum **fikstür düzeyinde NUMERICALLY VALIDATED**; genel olarak NOT CERTIFIED.
