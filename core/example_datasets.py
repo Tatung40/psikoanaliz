@@ -17,6 +17,7 @@ IRT_MODELS = ('Rasch','1PL','2PL','3PL','4PL','GRM','PCM','GPCM','NRM','RSM')
 G_PAGE = 'Genellenebilirlik Kuramı (G ve D Çalışmaları)'
 M_PAGE = 'Çok Boyutlu MTK (MIRT)'
 MISSING_PAGE = 'Eksik Veri ve Atama'
+RATER_PAGE = 'Puanlayıcı Güvenirliği ve Uyum'
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,7 @@ def registry():
     for level in range(3):
         add('factor','Sürekli iki faktör',level,(150,300,500)[level],(8,12,16)[level],dimensions=2)
         add('missing','MCAR öğretim verisi',level,(100,200,300)[level],8)
+    for level,(n,k) in enumerate(((30,2),(60,3),(120,5))):add('rater','Sıralı puanlayıcı verisi',level,n,k)
     return {d.id:d for d in entries}
 
 
@@ -84,7 +86,7 @@ def analysis_catalog():
         'MTK: Çok Kategorili B14','MTK: RSM','MTK: Python mirt DIF','MTK: DIF Analiz Merkezi',
         'MTK: GRM Formel DIF','MTK: Çok Kategorili Formel DIF','MTK: Gözlenen Puan DIF',
         'MTK: 3PL/4PL Bootstrap DIF','Boyutluluk ve Faktör Analizi',
-        'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE]
+        'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE,RATER_PAGE]
     common += [f'MTK: Python mirt {m}' for m in IRT_MODELS if m!='RSM']
     return tuple(common)
 
@@ -95,6 +97,7 @@ def available(page):
     if page==G_PAGE:return [d for d in datasets if d.family=='g']
     if page==M_PAGE:return [d for d in datasets if d.family=='mirt']
     if page==MISSING_PAGE:return [d for d in datasets if d.family=='missing']
+    if page==RATER_PAGE:return [d for d in datasets if d.family=='rater']
     if 'DIF' in page:
         choices=[d for d in datasets if d.family=='dif']
         if page=='MTK: GRM Formel DIF':choices=[d for d in choices if d.model=='GRM']
@@ -181,6 +184,15 @@ def _generate(dataset_id):
                         counts=counts,scenarios=scenarios,columns={f:f for f in facets},
                         realized_effects={'p':vp.tolist(),'i':vi.tolist(),'r':vr.tolist()},
                         status='LIBRARY TESTED — all 15 G/D examples exercised by regression; NOT CERTIFIED')
+    elif spec.family=='rater':
+        # Units x raters 1–5 rubric: true level plus rater-specific shift and +-1 disagreement (no personal data).
+        truth=rng.choice(5,spec.n,p=[.1,.2,.35,.25,.1])+1;shift=rng.choice([-1,0,0,1],spec.k)
+        x=np.clip(truth[:,None]+np.where(rng.uniform(size=(spec.n,spec.k))<.25+.05*spec.level,rng.choice([-1,1],(spec.n,spec.k)),0)
+                  +np.where(rng.uniform(size=(spec.n,spec.k))<.15,shift,0),1,5)
+        items=[f'Puanlayici_{j+1}' for j in range(spec.k)];person='Birim_ID';group=None
+        df=pd.DataFrame(x,columns=items);df.insert(0,person,[f'B{i+1:03d}' for i in range(spec.n)])
+        metadata.update(status='GENERATED teaching data; methods validated only on examples/rater_reliability fixtures',
+                        layout='wide: row = rated unit, column = rater',category_semantics='1–5 ordinal rubric')
     elif spec.family=='factor':
         z=rng.normal(size=(spec.n,2));loads=np.zeros((spec.k,2));loads[:spec.k//2,0]=.8;loads[spec.k//2:,1]=.8
         df=pd.DataFrame(z@loads.T+rng.normal(0,.6,(spec.n,spec.k)),columns=[f'M{j+1:02d}' for j in range(spec.k)])
@@ -248,7 +260,7 @@ def _generate(dataset_id):
             df=df.astype(float).mask(mask);metadata.update(mechanism='MCAR by independent Bernoulli mask',missing_rate=(.03,.10,.20)[spec.level])
         if model=='NRM':
             settings.update(python_mirt_nominal_labels='A,B,C,D',pmd_labels='A,B,C,D',md_labels='A,B,C,D')
-    if spec.family!='g':
+    if spec.family not in ('g','rater'):
         df.insert(0,person,[f'O{i+1:04d}' for i in range(len(df))])
         df[group]=np.where(np.arange(len(df))<len(df)//2,'Referans','Odak')
     return {'data':df,'items':items,'id':person,'group':group,'key':key,

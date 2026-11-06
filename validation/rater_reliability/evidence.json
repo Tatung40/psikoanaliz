@@ -1,0 +1,415 @@
+{
+ "protocol": "validation/rater_reliability/PROTOCOL.json",
+ "status": {
+  "cohen_kappa": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "ci95",
+    "estimate",
+    "p",
+    "se",
+    "z0"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kappa2",
+    "psych::cohen.kappa"
+   ],
+   "max_abs_diff": 2.6645352591003757e-15
+  },
+  "cohen_kappa_linear": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "ci95",
+    "estimate",
+    "p",
+    "se",
+    "z0"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kappa2",
+    "psych::cohen.kappa"
+   ],
+   "max_abs_diff": 1.3322676295501878e-14
+  },
+  "cohen_kappa_quadratic": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "ci95",
+    "estimate",
+    "p",
+    "se",
+    "z0"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kappa2",
+    "psych::cohen.kappa"
+   ],
+   "max_abs_diff": 2.220446049250313e-14
+  },
+  "fleiss_kappa": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kappam.fleiss",
+    "irrCAC::fleiss.kappa.dist"
+   ],
+   "max_abs_diff": 6.661338147750939e-16
+  },
+  "conger_kappa": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kappam.fleiss(exact)",
+    "irrCAC::conger.kappa.raw"
+   ],
+   "max_abs_diff": 4.6591889574232326e-07
+  },
+  "light_kappa": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kappam.light"
+   ],
+   "max_abs_diff": 4.996003610813204e-16
+  },
+  "scott_pi": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "analytic",
+    "irrCAC::fleiss.kappa.raw"
+   ],
+   "max_abs_diff": 3.055126223672211e-06
+  },
+  "gwet_ac1": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irrCAC::gwet.ac1.raw"
+   ],
+   "max_abs_diff": 4.450127877198007e-06
+  },
+  "gwet_ac2": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irrCAC::gwet.ac1.raw(quadratic)"
+   ],
+   "max_abs_diff": 4.270462633737537e-06
+  },
+  "brennan_prediger": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irrCAC::bp.coeff.raw"
+   ],
+   "max_abs_diff": 3.333333333466193e-06
+  },
+  "kripp_nominal": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kripp.alpha",
+    "irrCAC::krippen.alpha.raw"
+   ],
+   "max_abs_diff": 4.0763932372955836e-06
+  },
+  "kripp_ordinal": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kripp.alpha"
+   ],
+   "max_abs_diff": 3.3306690738754696e-16
+  },
+  "kripp_interval": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kripp.alpha",
+    "irrCAC::krippen.alpha.raw"
+   ],
+   "max_abs_diff": 4.3026834404269465e-06
+  },
+  "kripp_ratio": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kripp.alpha",
+    "irrCAC::krippen.alpha.raw"
+   ],
+   "max_abs_diff": 4.642109297847696e-06
+  },
+  "percent_agreement": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "all_agree",
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::agree",
+    "irrCAC::pa.coeff.raw"
+   ],
+   "max_abs_diff": 3.3306690738754696e-16
+  },
+  "pabak": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "analytic",
+    "irrCAC::bp.coeff.raw"
+   ],
+   "max_abs_diff": 0.0
+  },
+  "bangdiwala_b": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "analytic"
+   ],
+   "max_abs_diff": 2.220446049250313e-16
+  },
+  "icc_1_1": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "F",
+    "ci95",
+    "df1",
+    "df2",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::icc",
+    "psych::ICC"
+   ],
+   "max_abs_diff": 2.4868995751603507e-14
+  },
+  "icc_1_k": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "F",
+    "ci95",
+    "df1",
+    "df2",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::icc",
+    "psych::ICC"
+   ],
+   "max_abs_diff": 2.4868995751603507e-14
+  },
+  "icc_2_1": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "F",
+    "ci95",
+    "df1",
+    "df2",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::icc",
+    "psych::ICC"
+   ],
+   "max_abs_diff": 9.237055564881302e-14
+  },
+  "icc_2_k": {
+   "label": "NUMERICALLY VALIDATED (kısmi; başarısız çıktılar gizli)",
+   "validated_outputs": [
+    "F",
+    "df1",
+    "df2",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [
+    "ci95"
+   ],
+   "references": [
+    "irr::icc",
+    "psych::ICC"
+   ],
+   "max_abs_diff": 0.000736507513270479
+  },
+  "icc_3_1": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "F",
+    "ci95",
+    "df1",
+    "df2",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::icc",
+    "psych::ICC"
+   ],
+   "max_abs_diff": 9.237055564881302e-14
+  },
+  "icc_3_k": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "F",
+    "ci95",
+    "df1",
+    "df2",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::icc",
+    "psych::ICC"
+   ],
+   "max_abs_diff": 9.237055564881302e-14
+  },
+  "kendall_w": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "chi2",
+    "df",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "irr::kendall"
+   ],
+   "max_abs_diff": 4.404571325722362e-20
+  },
+  "spearman": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "stats::cor.test"
+   ],
+   "max_abs_diff": 3.3306690738754696e-16
+  },
+  "pearson": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "ci95",
+    "estimate",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "stats::cor.test"
+   ],
+   "max_abs_diff": 7.771561172376096e-16
+  },
+  "mcnemar": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "chi2",
+    "df",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "stats::mcnemar.test"
+   ],
+   "max_abs_diff": 2.220446049250313e-16
+  },
+  "stuart_maxwell": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "chi2",
+    "df",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "analytic"
+   ],
+   "max_abs_diff": 1.5987211554602254e-14
+  },
+  "bhapkar": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "chi2",
+    "df",
+    "p"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "analytic"
+   ],
+   "max_abs_diff": 3.375077994860476e-14
+  },
+  "bland_altman": {
+   "label": "NUMERICALLY VALIDATED",
+   "validated_outputs": [
+    "bias",
+    "ci95_bias",
+    "ci95_loa",
+    "loa",
+    "sd"
+   ],
+   "failed_outputs": [],
+   "references": [
+    "analytic"
+   ],
+   "max_abs_diff": 4.618527782440651e-14
+  }
+ },
+ "n_comparisons": 154,
+ "max_abs_diff": 0.000736507513270479,
+ "scope": "examples/rater_reliability fixtures only; not CERTIFIED"
+}

@@ -85,3 +85,8 @@ G Kuramı son denetimi (ön kayıt `f57ac34`, `generalizability/EVIDENCE_FINAL.m
 - Kütüphanenin dört ondalıklı yuvarlamasından kaynaklanan ölçek kusuru düzeltildi.
 - SEM ve hata bütçesi eklendi.
 - Durum **fikstür düzeyinde NUMERICALLY VALIDATED**; genel olarak NOT CERTIFIED.
+
+Puanlayıcı güvenirliği ve uyum modülü (ön kayıt `e615be4`, `rater_reliability/EVIDENCE.md`):
+- 30 yöntemin kestirimi, kendi örnek verisinde bağımsız R referanslarıyla (irr, irrCAC, psych, stats, analitik) uyumlu.
+- ICC(2,k) %95 GA'sında referanslar kendi aralarında uyuşmadığı için bu GA gizli.
+- Durum **fikstür düzeyinde NUMERICALLY VALIDATED**; genel olarak NOT CERTIFIED.
