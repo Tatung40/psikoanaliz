@@ -44,10 +44,10 @@ if (nested) {
 }
 write.csv(data.frame(source=rownames(a),SS=a[['Sum Sq']],df=a[['Df']],MS=a[['Mean Sq']]),
           file.path(out,'anova.csv'),row.names=FALSE)
-write.csv(data.frame(source=names(v),raw_variance=unname(v),Variance=round(unname(v),4)),
+write.csv(data.frame(source=names(v),raw_variance=unname(v),Variance=unname(v)),
           file.path(out,'variance.csv'),row.names=FALSE)
-# GeneralizIT rounds components to four decimals BEFORE coefficient calculation.
-w <- pmax(round(v,4),0)
+# Unrounded reference: components truncated at zero for coefficients (the adapter's documented policy).
+w <- pmax(v,0)
 rows <- list()
 for (mult in c(1,2)) {
   if (nested) {
@@ -63,7 +63,7 @@ for (mult in c(1,2)) {
   }
   rows[[length(rows)+1]] <- data.frame(multiplier=mult,universe=unname(w[1]),
       relative_error=unname(relative),absolute_error=unname(absolute),
-      rho=round(unname(w[1]/(w[1]+relative)),4),phi=round(unname(w[1]/(w[1]+absolute)),4))
+      rho=unname(w[1]/(w[1]+relative)),phi=unname(w[1]/(w[1]+absolute)))
 }
 write.csv(do.call(rbind,rows),file.path(out,'coefficients.csv'),row.names=FALSE)
 writeLines(capture.output(sessionInfo()),file.path(out,'sessionInfo.txt'))

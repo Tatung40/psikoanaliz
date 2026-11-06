@@ -30,8 +30,11 @@ ve katsayı güven aralıkları doğrulanmadığı için üretilmez.
 Ham negatif varyanslar aynen saklanır. Katsayılarda GeneralizIT'in mevcut
 sıfıra kırpması kullanılır; katkı yüzdeleri bu kırpılmış toplam üzerinden
 hesaplanır ve ayrı sütun olarak gösterilir. Sıfır birey varyansı çıkarımı engeller.
-Kütüphane hem varyansları hem katsayıları dört ondalığa yuvarlar; yeni hassasiyet
-uydurulmaz. Hata varyansları, **sürüme sabitlenmiş** `_get_tau_facets`,
+Kütüphane T toplamlarını, varyansları ve katsayıları dört ondalığa yuvarlar. Bu,
+küçük ölçekli puanlarda katsayıları bozuyordu: ×0.01 ile Eρ² .9943 yerine 1.0000 çıkıyor, ×0.001 ile analiz çöküyordu.
+Düzeltme: kütüphane z = (y − ȳ)·k ile çalıştırılır (k, var(z) ≥ 1e8 olacak en küçük 10 kuvveti).
+Bileşenler ve hata varyansları k²'ye bölünür; katsayılar değişmez. Bu dönüşüm cebirsel olarak tamdır.
+k ve merkez `settings.library_input` alanında saklanır. Henderson tablosundaki T, dönüştürülmüş puana aittir. Hata varyansları, **sürüme sabitlenmiş** `_get_tau_facets`,
 `_calculate_tau`, `_get_little_delta_facets`, `_calculate_little_delta`,
 `_get_big_delta_facets`, `_calculate_big_delta` kütüphane metotlarıyla okunur;
 kamusal API bu değerleri yalnız stdout'a yazar. Sürüm değişirse adaptör durur.
@@ -58,13 +61,17 @@ Bağımsız referans `reference.R`, **gerçek R stats::aov** kullanır. Dengeli
 ortogonal random-effect expected-MS kimlikleriyle bileşenleri hesaplar;
 GeneralizIT'i veya Python adaptörünü çağırmaz. ANOVA referansı için REML
 `lme4` çıktısını eşdeğer gibi kullanmak yerine aynı ANOVA kestirimi seçilmiştir.
-R gtheory/EduG karşılaştırması yapıldığı iddia edilmez.
+Bağımsız referans C: gtheoryr 0.2.0. CRAN aynası `cran/gtheoryr` @3b53991 kaynaktan
+yüklenir (`gtheoryr_compare.R`, CI'da `GTHEORYR_SRC`). Yalnız çapraz desenlerde (p×i, p×r, p×i×r) kullanılır.
+Yuvalanmış desenlerde gtheoryr, maddeleri bireylerin içinde yuvalar; bu yüzden NOT COMPARABLE. EduG karşılaştırması yapılmadı.
 
 Önceden belirlenmiş kontroller:
 
-- SS/df/MS: rtol=atol=1e-10 (küçük, iyi koşullu deterministik doğrusal problem).
-- Dört ondalığa yuvarlanmış varyanslar: atol=1e-12, rtol=0 (yalnız CSV/binary temsil).
-- Hata/evren varyansları: rtol=atol=1e-12; dört ondalıklı katsayılar eşit olmalıdır.
+Kontroller `PROTOCOL_FINAL.json` dosyasında; karşılaştırmalardan önce commit edildi (`f57ac34`).
+- SS/df/MS: rtol = atol = 1e-10.
+- Ham bileşenler ve hata varyansları: 1e-9·max(1, max|bileşen|).
+- Katsayılar: |fark| ≤ 5e-5 + 1e-9. Bu yalnız kütüphanenin dört ondalıklı gösterimi.
+- Önceki yuvarlama-eşlemeli kanıt `validation/evidence/r_gt.json` olarak korunuyor.
 - G tasarımı ve iki kat yüzey düzeyli D tasarımı, her desen için ayrı karşılaştırılır.
 - Hata, eksik R veya uyumsuzluk CI'yi düşürür; `REQUIRE_GTHEORY_R=1` skip'i engeller.
 

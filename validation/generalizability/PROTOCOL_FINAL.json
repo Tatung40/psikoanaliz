@@ -1,0 +1,30 @@
+{
+ "purpose": "Final G Theory validation of the GeneralizIT 0.1.2 adapter (Henderson Method I, balanced random facets). Committed before any numerical comparison.",
+ "engine": {"generalizit": "0.1.2 (upstream commit 8af4faefa4027e5e7e5b45495a5540b2093dc173)", "replacement": "none"},
+ "inventory_finding": "GeneralizIT rounds T (uncorrected sums, design.py:197), variance components and coefficients to 4 decimals. Observed before this protocol: p x i x r fixture x0.01 gives rho^2 1.0000 instead of 0.9943; x0.001 raises an uninformative error. Coefficients must be invariant to affine score changes.",
+ "fix": "adapter fits the library on z = (y - mean(y)) * k with k = 10^m the smallest power of ten such that var(z) >= 1e8; components and error variances are divided by k^2; coefficients unchanged; k and the centering are recorded in settings. Exact by shift invariance and k^2 scaling of random-effects ANOVA components. Library rounding then affects at most ~5e-13 of the score variance.",
+ "references": {
+  "A": "Python GeneralizIT 0.1.2 through core/generalizability.analyze",
+  "B": "R stats::aov expected-mean-square identities, validation/generalizability/reference.R (R 4.3.3), rounding emulation removed: raw components, coefficients from max(component, 0)",
+  "C": "gtheoryr 0.2.0 sourced from the CRAN GitHub mirror cran/gtheoryr commit 3b53991557bfe2046119d37bf028a4647faedc18 (MIT; CRAN binary not installable on R 4.3.3); functions gstudy_pxi, gstudy_pxif, dstudy_pxi, dstudy_pxif"
+ },
+ "data": {"fixture": "validation/generalizability/balanced.csv", "sha256": "bd385f8ca519d1dce211d73515a23e3453925fd7802841b27beb0697222f5a74",
+          "derived": ["the same fixture with score -> 100 + 0.001*score (affine invariance case)", "existing negative-component case in tests/test_generalizability.py"]},
+ "matrix": {
+  "designs": ["p x i", "p x r", "p x i x r", "p x (r:i)", "p x (i:r)"],
+  "outputs": ["SS/df/MS", "raw variance components", "negative-component truncation", "universe, relative and absolute error variance", "Erho^2", "Phi", "D study at x1 and x2 facet counts", "G/D identity at original counts", "relative/absolute SEM", "error budget"],
+  "gtheoryr_comparable": {"p x i": "gstudy_pxi", "p x r": "gstudy_pxi with r as item", "p x i x r": "gstudy_pxif", "p x (r:i)": "NOT COMPARABLE (gtheoryr nests items within persons)", "p x (i:r)": "NOT COMPARABLE"}
+ },
+ "tolerances": {
+  "ss_df_ms": "rtol 1e-10, atol 1e-10 (small well-conditioned linear problem)",
+  "variance_and_error_variance": "|diff| <= 1e-9 * max(1, max|reference component|) (library 4-dp rounding at var(z) >= 1e8 contributes <= ~1e-12 relative)",
+  "coefficients": "|GeneralizIT 4-dp coefficient - unrounded reference| <= 5e-5 + 1e-9 (library display rounding only)",
+  "gd_identity": "D-study coefficients at original counts equal G-study coefficients exactly; error variances within 1e-12 relative",
+  "affine": "coefficients identical; components scale by b^2 within 1e-9 relative",
+  "sem_budget": "SEM = sqrt(error variance); budget rows sum to error variance within 1e-12 relative",
+  "gtheoryr_coefficients": "compared only when all raw components >= 0, because gtheoryr does not truncate negatives; otherwise NOT COMPARABLE"
+ },
+ "acceptance": "a design x output is NUMERICALLY VALIDATED only if every executed reference comparison is within tolerance on these fixtures; a missing or skipped reference is NOT VALIDATED; any out-of-tolerance value is FAIL. Fixture-level only; status shown in the app remains LIBRARY TESTED, never CERTIFIED.",
+ "unsupported": "fixed facets, unbalanced/missing/replicated data, (p:r) x i and other designs, F/p, coefficient CIs, bootstrap, cost optimization",
+ "compute_budget": "local deterministic runs < 10 min; one full regression in CI; no Monte Carlo/bootstrap"
+}

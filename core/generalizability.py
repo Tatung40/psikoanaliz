@@ -19,7 +19,8 @@ DESIGNS = {
 METHOD = """GeneralizIT 0.1.2; Henderson Method I (ANOVA, REML değil).
 Yalnız dengeli, eksiksiz, tek gözlem/hücre ve rastgele yüzeyler.
 Ham negatif bileşenler korunur; katsayılarda kütüphanenin sıfırlama politikası uygulanır.
-Kütüphane varyansları ve katsayıları 4 ondalığa yuvarlar.
+Kütüphane T, varyans ve katsayıları 4 ondalığa yuvarlar; bu yüzden kütüphane merkezlenmiş ve
+10'un kuvvetiyle ölçeklenmiş puanlarda çalıştırılır (bileşenler k² ile geri ölçeklenir, katsayılar değişmez).
 Tamamlayıcı SS/df/MS: dengeli ortogonal altuzaylar için ardışık en küçük kareler;
 T, düzeltilmiş SS değildir. Rastgele-etki F/p ve katsayı güven aralığı üretilmez.
 D çalışmasında yuvalanmış yüzey sayısı ebeveyn başınadır; birey sayısı sabittir.
@@ -119,6 +120,25 @@ def _anova(df, tuples):
     return pd.DataFrame(rows, columns=['source', 'SS', 'df', 'MS']).set_index('source')
 
 
+def _scale(y):
+    """Smallest power of ten k with var(k (y - mean)) >= 1e8: library 4-dp rounding becomes negligible (exact algebra)."""
+    v = float(np.var(y))
+    return 10.0 ** max(0, int(np.ceil(np.log10(1e8 / v) / 2))) if v > 0 else 1.0
+
+
+def _budget(variance, tuples, counts):
+    """Each truncated component's contribution sigma^2 / n' to relative (contains p) and absolute error."""
+    rows = []
+    for name, value in variance.coefficient_variance.items():
+        facets = [f for f in tuples[name] if f != 'p']
+        if not facets:
+            continue
+        divisor = float(np.prod([counts[f] for f in facets]))
+        share = value / divisor
+        rows.append(dict(source=name, divisor=divisor, relative=share if 'p' in tuples[name] else 0., absolute=share))
+    return pd.DataFrame(rows).set_index('source')
+
+
 def analyze(data, design, columns, score, scenarios=None, fixed_facets=None):
     """Fit one G study and library D scenarios; exact inputs are replayable."""
     from generalizit import GeneralizIT
@@ -138,30 +158,40 @@ def analyze(data, design, columns, score, scenarios=None, fixed_facets=None):
     if len(designs) > 25 or any(np.prod(list(s.values())) > 10000 for s in designs):
         raise ValueError('D çalışması sınırı: 25 senaryo ve senaryo başına 10000 hücre.')
     log = io.StringIO()
+    center, k = float(df.score.mean()), _scale(df.score.to_numpy(float))
+    fit_df = df.assign(score=(df.score - center) * k)        # shift-invariant; components scale by k^2
     with contextlib.redirect_stdout(log):
-        engine = GeneralizIT(df, design, 'score')
+        engine = GeneralizIT(fit_df, design, 'score')
         engine.calculate_anova()
         anova = _anova(df, engine.design.variance_tuple_dictionary)
         engine.calculate_g_coefficients()
         g = engine.design.g_coeffs_table.loc[['p']].copy()
-        errors = _errors(engine, engine.design.levels_coeffs)
+        errors = {key: value / k ** 2 for key, value in _errors(engine, engine.design.levels_coeffs).items()}
         engine.calculate_d_study(d_study_design=scenarios)
         rows = []
         for scenario, (label, table) in zip(designs, engine.design.d_study_dict.items()):
             pseudo = create_pseudo_df(scenario, engine.design.variance_tuple_dictionary)
             levels = engine.design._calculate_levels_coeffs(df=pseudo)
-            rows.append({**scenario, **table.loc['p'].to_dict(), **_errors(engine, levels)})
-    raw = engine.design.anova_table[['T', 'Variance']].drop(index='mean', errors='ignore').copy()
+            err = {key: value / k ** 2 for key, value in _errors(engine, levels).items()}
+            rows.append({**scenario, **table.loc['p'].to_dict(), **err,
+                         'relative_sem': err['relative_error'] ** .5, 'absolute_sem': err['absolute_error'] ** .5})
+    henderson = engine.design.anova_table.copy()
+    henderson['Variance'] = henderson['Variance'] / k ** 2
+    henderson = henderson.rename(columns={'T': 'T (dönüştürülmüş puan)'})
+    raw = henderson[['Variance']].drop(index='mean', errors='ignore').copy()
     if not np.isfinite(raw.to_numpy()).all():
         raise ValueError('Sonlu olmayan varyans kestirimi; sonuçlar engellendi.')
     raw['coefficient_variance'] = raw.Variance.clip(lower=0)
     total = raw.coefficient_variance.sum()
     raw['contribution_pct'] = 100 * raw.coefficient_variance / total if total > 0 else np.nan
-    return {'anova': anova, 'henderson': engine.design.anova_table.copy(), 'variance': raw,
+    budget = _budget(raw, engine.design.variance_tuple_dictionary, counts)
+    errors.update(relative_sem=errors['relative_error'] ** .5, absolute_sem=errors['absolute_error'] ** .5)
+    return {'anova': anova, 'henderson': henderson, 'variance': raw, 'budget': budget,
             'g': g, 'errors': pd.DataFrame([errors], index=['p']), 'd': pd.DataFrame(rows),
             'counts': counts, 'status': 'LIBRARY TESTED', 'method': METHOD, 'log': log.getvalue(),
             'settings': {'design': design, 'columns': columns, 'score': score,
                          'scenarios': scenarios, 'fixed_facets': [], 'generalizit': version('generalizit'),
+                         'library_input': {'center': center, 'scale_k': k, 'note': 'kütüphaneye (y - center) * k verilir'},
                          'input_sha256': hashlib.sha256(data.to_csv(index=True).encode()).hexdigest(),
                          'versions': {name: version(name) for name in ('generalizit','numpy','pandas','scipy')},
                          'python': sys.version.split()[0], 'seed': 'Not applicable: deterministic ANOVA'}}
@@ -169,7 +199,7 @@ def analyze(data, design, columns, score, scenarios=None, fixed_facets=None):
 
 def report_tables(result, target):
     """Read cached tables; retain their original computation in Python replay history."""
-    tables = {k: result[k] for k in ('anova', 'henderson', 'variance', 'g', 'errors', 'd')}
+    tables = {k: result[k] for k in ('anova', 'henderson', 'variance', 'g', 'errors', 'd', 'budget') if k in result}
     d = tables['d'].copy()
     d['measurement_units_per_person'] = d[[f for f in result['counts'] if f != 'p']].prod(axis=1)
     d['target_met'] = (d['rho^2'] >= target) & (d['phi^2'] >= target)

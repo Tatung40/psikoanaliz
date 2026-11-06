@@ -66,10 +66,11 @@ def test_independent_balanced_two_way_expected_mean_squares():
     msi=np_*((i-mean)**2).sum()/(ni-1)
     mse=((y-p[:,None]-i[None,:]+mean)**2).sum()/((np_-1)*(ni-1))
     r=calculation('p x i')
-    np.testing.assert_allclose(r['variance'].Variance, np.round([(msp-mse)/ni,(msi-mse)/np_,mse],4),atol=1e-12)
+    ref = np.array([(msp-mse)/ni,(msi-mse)/np_,mse])
+    np.testing.assert_allclose(r['variance'].Variance, ref, rtol=0, atol=1e-9*max(1, abs(ref).max()))
 
 
-@pytest.mark.parametrize('change', ['missing','cell','duplicate','constant','one','nested_ids','unbalanced'])
+@pytest.mark.parametrize('change', ['missing','cell','duplicate','constant','one','nested_ids','unbalanced','inf','text'])
 def test_invalid_designs_fail_closed(change):
     ds='p x (r:i)' if change in ('nested_ids','unbalanced') else 'p x i'
     d=data_for(ds)
@@ -80,6 +81,8 @@ def test_invalid_designs_fail_closed(change):
     if change=='one': d=d[d.i==0]
     if change=='nested_ids': d.r=d.r%2
     if change=='unbalanced': d=d[d.r!=0]
+    if change=='inf': d.loc[0,'score']=np.inf
+    if change=='text': d['score']=d.score.astype(object); d.loc[0,'score']='x'
     with pytest.raises(ValueError):
         gt.analyze(d,ds,{f:f for f in gt.DESIGNS[ds]},'score')
 
@@ -151,9 +154,9 @@ def test_independent_r_anova_and_g_d(design,tmp_path):
         actual[name].to_csv(tmp_path/f'python_{name}.csv')
     (tmp_path/'python_settings.json').write_text(json.dumps(actual['settings'],indent=2))
     reference=pd.read_csv(out/'variance.csv').set_index('source')
-    # One unit in library output is 1e-4; compare already-rounded components exactly
-    # up to CSV/binary conversion, NOT a discrepancy-calibrated tolerance.
-    np.testing.assert_allclose(actual['variance'].Variance,reference.loc[actual['variance'].index,'Variance'],rtol=0,atol=1e-12)
+    # PROTOCOL_FINAL.json: unrounded reference; library rounding acts on rescaled scores only.
+    tol=1e-9*max(1,reference.raw_variance.abs().max())
+    np.testing.assert_allclose(actual['variance'].Variance,reference.loc[actual['variance'].index,'raw_variance'],rtol=0,atol=tol)
     anova=pd.read_csv(out/'anova.csv').set_index('source')
     np.testing.assert_allclose(actual['anova'],anova.loc[actual['anova'].index,['SS','df','MS']],rtol=1e-10,atol=1e-10)
     expected=pd.read_csv(out/'coefficients.csv')
@@ -161,11 +164,56 @@ def test_independent_r_anova_and_g_d(design,tmp_path):
     for idx,row in expected.iterrows():
         measured=actual['d'].iloc[0 if idx==0 else -1]
         for key in ('universe','relative_error','absolute_error'):
-            np.testing.assert_allclose(measured[key],row[key],rtol=1e-12,atol=1e-12)
+            np.testing.assert_allclose(measured[key],row[key],rtol=0,atol=tol)
             deltas[f'{idx}_{key}']=float(measured[key]-row[key])
-        assert measured['rho^2']==row.rho and measured['phi^2']==row.phi
+        for mine,theirs in (('rho^2','rho'),('phi^2','phi')):
+            assert abs(measured[mine]-row[theirs])<=5e-5+1e-9   # library 4-dp display rounding only
+            deltas[f'{idx}_{mine}']=float(measured[mine]-row[theirs])
     (tmp_path/'comparison.json').write_text(json.dumps({'design':design,'status':'NUMERICALLY VALIDATED',
         'scope':'Only this balanced deterministic fixture; random facets; G and two D scenarios',
         'differences':deltas,'generalizit':'0.1.2',
         'fixture_sha256':hashlib.sha256(FIXTURE.read_bytes()).hexdigest(),
         'python_settings':actual['settings']},indent=2))
+
+
+@pytest.mark.parametrize('design', gt.DESIGNS)
+def test_affine_invariance_gd_identity_sem_and_budget(design):
+    """Regression for the library 4-dp rounding defect: results must not depend on score units/location."""
+    d = data_for(design); cols = {f: f for f in gt.DESIGNS[design]}
+    base = gt.analyze(d, design, cols, 'score')
+    moved = gt.analyze(d.assign(score=100 + .001 * d.score), design, cols, 'score')
+    pd.testing.assert_frame_equal(base['g'], moved['g'])
+    np.testing.assert_allclose(moved['variance'].Variance / 1e-6, base['variance'].Variance, rtol=1e-9, atol=1e-9)
+    e = base['errors'].iloc[0]; budget = base['budget'].sum()
+    np.testing.assert_allclose([budget.relative, budget.absolute], [e.relative_error, e.absolute_error], rtol=1e-12)
+    np.testing.assert_allclose([e.relative_sem, e.absolute_sem], np.sqrt([e.relative_error, e.absolute_error]), rtol=1e-15)
+    first = base['d'].iloc[0]                                   # D study at the original counts = G study
+    assert first['rho^2'] == base['g'].loc['p', 'rho^2'] and first['phi^2'] == base['g'].loc['p', 'phi^2']
+    np.testing.assert_allclose(first[['universe', 'relative_error', 'absolute_error']].to_numpy(float),
+                               e[['universe', 'relative_error', 'absolute_error']].to_numpy(float), rtol=1e-12)
+
+
+@pytest.mark.parametrize('design', ['p x i', 'p x r', 'p x i x r'])
+def test_independent_gtheoryr_crossed(design, tmp_path):
+    src = os.getenv('GTHEORYR_SRC'); r = shutil.which('Rscript')
+    if not (src and r):
+        if os.getenv('REQUIRE_GTHEORY_R') == '1': pytest.fail('gtheoryr comparison required')
+        pytest.skip('NOT EXECUTED: GTHEORYR_SRC/Rscript unavailable')
+    out = tmp_path / 'g'
+    run = subprocess.run([r, str(ROOT / 'validation/generalizability/gtheoryr_compare.R'), src, str(FIXTURE), design, str(out)],
+                         capture_output=True, text=True, timeout=60)
+    assert run.returncode == 0, run.stderr
+    ref = pd.read_csv(out / 'gtheoryr.csv'); actual = calculation(design)
+    vc = pd.read_csv(out / 'components.csv').set_index('source')
+    tol = 1e-9 * max(1, vc.value.abs().max())
+    np.testing.assert_allclose(actual['variance'].Variance.to_numpy(), vc.value.to_numpy(), rtol=0, atol=tol)
+    an = pd.read_csv(out / 'anova.csv').set_index('source')
+    np.testing.assert_allclose(actual['anova'][['SS', 'df', 'MS']].to_numpy(), an[['SS', 'df', 'MS']].to_numpy(), rtol=1e-10, atol=1e-10)
+    if (vc.value >= 0).all():                                    # gtheoryr does not truncate negative components
+        for i, row in ref.iterrows():
+            m = actual['d'].iloc[0 if i == 0 else -1]
+            np.testing.assert_allclose(m[['relative_error', 'absolute_error']].to_numpy(float), [row.relative_error, row.absolute_error], rtol=0, atol=tol)
+            assert abs(m['rho^2'] - row.g) <= 5e-5 + 1e-9 and abs(m['phi^2'] - row.phi) <= 5e-5 + 1e-9
+    (tmp_path / 'comparison.json').write_text(json.dumps(dict(design=design, reference='gtheoryr 0.2.0 @3b53991',
+        max_component_diff=float((actual['variance'].Variance.to_numpy() - vc.value.to_numpy()).__abs__().max()),
+        coefficients_compared=bool((vc.value >= 0).all())), indent=2))

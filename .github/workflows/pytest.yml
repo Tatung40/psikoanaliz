@@ -54,6 +54,8 @@ jobs:
           python tools/golden_master.py capture /tmp/golden-reference.json.gz --root /tmp/golden-reference
           python tools/golden_master.py capture /tmp/golden-current.json.gz
           # Intended: bifactor teaching data regenerated with 3 specific groups (screen requires 3–4);
+          # G Theory (PR gtheory-final): library run on centered, power-of-ten scaled scores, so components are no longer
+          # 4-dp rounded and SEM/error-budget tables are added (validation/generalizability/PROTOCOL_FINAL.json).
           # B14 "Bilimsel durum" text now states the R mirt / Monte Carlo evidence (PR #97; no numerical change).
           python tools/golden_master.py compare /tmp/golden-reference.json.gz /tmp/golden-current.json.gz \
             --intended /example_library/mirt_051 --intended /example_library/mirt_052 --intended /example_library/mirt_053 \
@@ -63,7 +65,8 @@ jobs:
             --intended '/python_mirt_models/2PL/metadata/Kullanım durumu:' \
             --intended '/python_mirt_models/1PL/usage_labels' --intended '/python_mirt_models/2PL/usage_labels' \
             --intended '/python_mirt_models/1PL/warnings[1]:' \
-            --intended '/python_dif/2PL/tables/Raju_area:'
+            --intended '/python_dif/2PL/tables/Raju_area:' \
+            --intended /generalizability
       - name: Real public LSAT6 KTK benchmark (independent Pingouin)
         if: github.event_name == 'push'
         timeout-minutes: 3
@@ -131,7 +134,9 @@ jobs:
       - name: Independent R ANOVA reference for crossed and nested G/D studies
         env:
           REQUIRE_GTHEORY_R: '1'
-        run: python -m pytest -q tests/test_generalizability.py::test_independent_r_anova_and_g_d --basetemp=gtheory-r-diagnostics
+        run: |
+          git clone -q https://github.com/cran/gtheoryr /tmp/gtheoryr && git -C /tmp/gtheoryr checkout -q 3b53991557bfe2046119d37bf028a4647faedc18
+          GTHEORYR_SRC=/tmp/gtheoryr python -m pytest -q tests/test_generalizability.py::test_independent_r_anova_and_g_d tests/test_generalizability.py::test_independent_gtheoryr_crossed --basetemp=gtheory-r-diagnostics
       - uses: actions/upload-artifact@v4
         if: always()
         with:

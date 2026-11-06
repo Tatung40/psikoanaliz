@@ -1,0 +1,52 @@
+{
+  "design": "p x r",
+  "status": "NUMERICALLY VALIDATED",
+  "scope": "Only this balanced deterministic fixture; random facets; G and two D scenarios",
+  "differences": {
+    "0_universe": 0.0,
+    "0_relative_error": -9.992007221626409e-16,
+    "0_absolute_error": 1.9984014443252818e-15,
+    "0_rho^2": 9.468822171010416e-06,
+    "0_phi^2": 2.505677516995153e-05,
+    "1_universe": 0.0,
+    "1_relative_error": -4.996003610813204e-16,
+    "1_absolute_error": 9.992007221626409e-16,
+    "1_rho^2": -4.3930635837963194e-05,
+    "1_phi^2": -4.70768055020887e-05
+  },
+  "generalizit": "0.1.2",
+  "fixture_sha256": "bd385f8ca519d1dce211d73515a23e3453925fd7802841b27beb0697222f5a74",
+  "python_settings": {
+    "design": "p x r",
+    "columns": {
+      "p": "p",
+      "r": "r"
+    },
+    "score": "score",
+    "scenarios": {
+      "p": [
+        6
+      ],
+      "r": [
+        2,
+        4
+      ]
+    },
+    "fixed_facets": [],
+    "generalizit": "0.1.2",
+    "library_input": {
+      "center": 18.25,
+      "scale_k": 10000.0,
+      "note": "k\u00fct\u00fcphaneye (y - center) * k verilir"
+    },
+    "input_sha256": "26e44566d51582b4cfa409b7abd1164f7ad3e750f7c30f98ea14be9478f2f3da",
+    "versions": {
+      "generalizit": "0.1.2",
+      "numpy": "2.5.3",
+      "pandas": "3.0.5",
+      "scipy": "1.18.1"
+    },
+    "python": "3.13.16",
+    "seed": "Not applicable: deterministic ANOVA"
+  }
+}
