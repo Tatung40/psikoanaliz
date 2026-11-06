@@ -192,7 +192,7 @@ def _docx(results, data, cfg):
 def _exports(results, data, cfg):
     t = _results_table(results)
     details = pd.DataFrame([{"method": k, **{a: json.dumps(b) if isinstance(b, (list, dict)) else b
-                                            for a, b in o["result"].items() if a not in ("mean", "difference")}}
+                                            for a, b in o["shown"].items() if a not in ("mean", "difference")}}
                             for k, o in results.items()])
     xbuf = io.BytesIO()
     with pd.ExcelWriter(xbuf) as w:
