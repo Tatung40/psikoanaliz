@@ -260,6 +260,11 @@ with st.sidebar:
         st.button("📊 G ve D Çalışmaları", key="nav_generalizability", use_container_width=True,
                   on_click=navigate_to, args=("Genellenebilirlik Kuramı (G ve D Çalışmaları)",))
     st.markdown("---")
+    st.markdown("### IV. Puanlayıcı Güvenirliği")
+    with st.expander("🧑‍⚖️ Puanlayıcılar Arası Uyum", expanded=True):
+        st.button("🤝 Puanlayıcı Güvenirliği ve Uyum", key="nav_rater_reliability", use_container_width=True,
+                  on_click=navigate_to, args=("Puanlayıcı Güvenirliği ve Uyum",))
+    st.markdown("---")
     st.markdown("### Ortak Araçlar")
     for label, page in [
         ("📄 Raporlama", "10. Raporlama"),
@@ -1563,6 +1568,11 @@ elif selected_page == "Genellenebilirlik Kuramı (G ve D Çalışmaları)":
     src = st.session_state.raw_df
     if src is None: st.warning("Önce CSV/XLSX verisini Veri Yükleme ekranından yükleyin.")
     else: render_generalizability(src, list(st.session_state.item_cols))
+elif selected_page == "Puanlayıcı Güvenirliği ve Uyum":
+    render_academic_header()
+    from ui.rater_reliability_view import render as render_rater_reliability
+    instrument_code_capture(globals())
+    render_rater_reliability()        # own upload/examples; no prior data load required
 elif selected_page in ("Boyutluluk ve Faktör Analizi", "Yerel Bağımsızlık ve Madde Uyumu"):
     render_academic_header()
     from ui import dimensionality_localfit_view as dlv

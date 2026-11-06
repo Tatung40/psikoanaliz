@@ -1,0 +1,1318 @@
+{
+ "seed": 20261106,
+ "workbook": "rater_reliability_examples.xlsx",
+ "examples": [
+  {
+   "id": "cohen_kappa_nominal",
+   "method": "cohen_kappa",
+   "file": "cohen_kappa_nominal.csv",
+   "sheet": "cohen_kappa_nominal",
+   "sha256": "69bd3d62e79f8444acba8162510c3f2611185cfd2d696e14548d591017222187",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İki puanlayıcı 40 öğrenci yanıtını üç nominal kategoriye ayırıyor; prevalans dengesiz.",
+   "level": "nominal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok (tam çiftler)",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.672466734902764,
+     "source": "irr::kappa2"
+    },
+    "z0": {
+     "value": 5.89072444482556,
+     "source": "irr::kappa2"
+    },
+    "p": {
+     "value": 3.8450624906261105e-09,
+     "source": "irr::kappa2"
+    },
+    "se": {
+     "value": 0.0980014524641979,
+     "source": "psych::cohen.kappa"
+    },
+    "ci_low": {
+     "value": 0.480387417640322,
+     "source": "psych::cohen.kappa"
+    },
+    "ci_high": {
+     "value": 0.864546052165206,
+     "source": "psych::cohen.kappa"
+    }
+   }
+  },
+  {
+   "id": "cohen_kappa_linear_ordinal",
+   "method": "cohen_kappa_linear",
+   "file": "ordinal_two_raters.csv",
+   "sheet": "ordinal_two_raters",
+   "sha256": "92ea95813dab5038eb9c0cc5d356096989bae697cad7df770158228b2e0f725f",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İki puanlayıcı 1–5 sıralı rubrik; komşu kategori farkları kısmen tolere edilir.",
+   "level": "ordinal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.626168224299065,
+     "source": "irr::kappa2"
+    },
+    "z0": {
+     "value": 6.43480103504839,
+     "source": "irr::kappa2"
+    },
+    "p": {
+     "value": 1.23635102156072e-10,
+     "source": "irr::kappa2"
+    },
+    "se": {
+     "value": 0.0774344196941475,
+     "source": "psych::cohen.kappa"
+    },
+    "ci_low": {
+     "value": 0.474399550534777,
+     "source": "psych::cohen.kappa"
+    },
+    "ci_high": {
+     "value": 0.777936898063354,
+     "source": "psych::cohen.kappa"
+    }
+   }
+  },
+  {
+   "id": "cohen_kappa_quadratic_ordinal",
+   "method": "cohen_kappa_quadratic",
+   "file": "ordinal_two_raters.csv",
+   "sheet": "ordinal_two_raters",
+   "sha256": "92ea95813dab5038eb9c0cc5d356096989bae697cad7df770158228b2e0f725f",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "Aynı sıralı veri; büyük farklar karesel olarak cezalandırılır.",
+   "level": "ordinal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.794871794871795,
+     "source": "irr::kappa2"
+    },
+    "z0": {
+     "value": 5.28545613089619,
+     "source": "irr::kappa2"
+    },
+    "p": {
+     "value": 1.25391920624551e-07,
+     "source": "irr::kappa2"
+    },
+    "se": {
+     "value": 0.051204445738393,
+     "source": "psych::cohen.kappa"
+    },
+    "ci_low": {
+     "value": 0.694512925376209,
+     "source": "psych::cohen.kappa"
+    },
+    "ci_high": {
+     "value": 0.89523066436738,
+     "source": "psych::cohen.kappa"
+    }
+   }
+  },
+  {
+   "id": "fleiss_kappa_counts",
+   "method": "fleiss_kappa",
+   "file": "fleiss_kappa_counts.csv",
+   "sheet": "fleiss_kappa_counts",
+   "sha256": "62dc65e6102947749e0f3f43be6e7daecbb11dc33e2585f31f39ec940911bd01",
+   "config": {
+    "layout": "counts",
+    "id_col": "Birim_ID",
+    "category_cols": [
+     "Kategori_A",
+     "Kategori_B",
+     "Kategori_C",
+     "Kategori_D"
+    ]
+   },
+   "scenario": "25 birimi altışar puanlayıcı dört kategoriye ayırıyor (sıklık tablosu).",
+   "level": "nominal",
+   "raters": "≥2 (birim başına sabit sayı)",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok; her birimde aynı puanlayıcı sayısı",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Kategori_A": "Bu kategoriyi seçen puanlayıcı sayısı.",
+    "Kategori_B": "Bu kategoriyi seçen puanlayıcı sayısı.",
+    "Kategori_C": "Bu kategoriyi seçen puanlayıcı sayısı.",
+    "Kategori_D": "Bu kategoriyi seçen puanlayıcı sayısı."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.560278490289483,
+     "source": "irr::kappam.fleiss"
+    }
+   }
+  },
+  {
+   "id": "conger_kappa_multirater",
+   "method": "conger_kappa",
+   "file": "nominal_multirater.csv",
+   "sheet": "nominal_multirater",
+   "sha256": "d3489d6ac15ec74078a96d3d49503439440cd0ffd8e44470b8deb093fc5496a4",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Dört sabit puanlayıcı 30 birimi üç kategoriye ayırıyor.",
+   "level": "nominal",
+   "raters": "≥2 (aynı puanlayıcılar)",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.490940465918895,
+     "source": "irr::kappam.fleiss(exact)"
+    }
+   }
+  },
+  {
+   "id": "light_kappa_multirater",
+   "method": "light_kappa",
+   "file": "nominal_multirater.csv",
+   "sheet": "nominal_multirater",
+   "sha256": "d3489d6ac15ec74078a96d3d49503439440cd0ffd8e44470b8deb093fc5496a4",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Dört puanlayıcının tüm çiftlerindeki Cohen κ ortalaması.",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.489686489118043,
+     "source": "irr::kappam.light"
+    }
+   }
+  },
+  {
+   "id": "scott_pi_nominal",
+   "method": "scott_pi",
+   "file": "cohen_kappa_nominal.csv",
+   "sheet": "cohen_kappa_nominal",
+   "sha256": "69bd3d62e79f8444acba8162510c3f2611185cfd2d696e14548d591017222187",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İki puanlayıcı, ortak marjinal varsayımıyla.",
+   "level": "nominal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.670273055126224,
+     "source": "analytic"
+    }
+   }
+  },
+  {
+   "id": "gwet_ac1_multirater",
+   "method": "gwet_ac1",
+   "file": "nominal_multirater.csv",
+   "sheet": "nominal_multirater",
+   "sha256": "d3489d6ac15ec74078a96d3d49503439440cd0ffd8e44470b8deb093fc5496a4",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Dört puanlayıcı; prevalansa daha az duyarlı katsayı.",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.51714,
+     "source": "irrCAC::gwet.ac1.raw"
+    }
+   }
+  },
+  {
+   "id": "gwet_ac2_ordinal",
+   "method": "gwet_ac2",
+   "file": "ordinal_multirater.csv",
+   "sheet": "ordinal_multirater",
+   "sha256": "b095e85631342b78d6dce719772bb960e57bc988536beb2c6643dad058fc7e95",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3"
+    ]
+   },
+   "scenario": "Üç puanlayıcı 1–5 sıralı rubrik; karesel ağırlık.",
+   "level": "ordinal",
+   "raters": "≥2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.8452,
+     "source": "irrCAC::gwet.ac1.raw(quadratic)"
+    }
+   }
+  },
+  {
+   "id": "brennan_prediger_multirater",
+   "method": "brennan_prediger",
+   "file": "nominal_multirater.csv",
+   "sheet": "nominal_multirater",
+   "sha256": "d3489d6ac15ec74078a96d3d49503439440cd0ffd8e44470b8deb093fc5496a4",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Dört puanlayıcı; şans uyumu kategori sayısından (1/q).",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.50833,
+     "source": "irrCAC::bp.coeff.raw"
+    }
+   }
+  },
+  {
+   "id": "krippendorff_alpha_missing_nominal",
+   "method": "kripp_nominal",
+   "file": "krippendorff_alpha_missing.csv",
+   "sheet": "krippendorff_alpha_missing",
+   "sha256": "e7937d09a426e4e09d659fc556d6e7aa83409100c2a3ed63b7da9f7fd0d6ad17",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Dört puanlayıcı, eksik puanlar var; kategoriler nominal kabul edilir.",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli (en az iki puanı olan birimler)",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.623825923606763,
+     "source": "irr::kripp.alpha"
+    }
+   }
+  },
+  {
+   "id": "krippendorff_alpha_missing_ordinal",
+   "method": "kripp_ordinal",
+   "file": "krippendorff_alpha_missing.csv",
+   "sheet": "krippendorff_alpha_missing",
+   "sha256": "e7937d09a426e4e09d659fc556d6e7aa83409100c2a3ed63b7da9f7fd0d6ad17",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı eksik veri; puanlar sıralı.",
+   "level": "ordinal",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.912640433085046,
+     "source": "irr::kripp.alpha"
+    }
+   }
+  },
+  {
+   "id": "krippendorff_alpha_missing_interval",
+   "method": "kripp_interval",
+   "file": "krippendorff_alpha_missing.csv",
+   "sheet": "krippendorff_alpha_missing",
+   "sha256": "e7937d09a426e4e09d659fc556d6e7aa83409100c2a3ed63b7da9f7fd0d6ad17",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı eksik veri; eşit aralıklı puan.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.92311430268344,
+     "source": "irr::kripp.alpha"
+    }
+   }
+  },
+  {
+   "id": "krippendorff_alpha_missing_ratio",
+   "method": "kripp_ratio",
+   "file": "krippendorff_alpha_missing.csv",
+   "sheet": "krippendorff_alpha_missing",
+   "sha256": "e7937d09a426e4e09d659fc556d6e7aa83409100c2a3ed63b7da9f7fd0d6ad17",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı eksik veri; oran düzeyi (pozitif puanlar).",
+   "level": "ratio",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli; puanlar > 0",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.869614642109298,
+     "source": "irr::kripp.alpha"
+    }
+   }
+  },
+  {
+   "id": "percent_agreement_multirater",
+   "method": "percent_agreement",
+   "file": "nominal_multirater.csv",
+   "sheet": "nominal_multirater",
+   "sha256": "d3489d6ac15ec74078a96d3d49503439440cd0ffd8e44470b8deb093fc5496a4",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Dört puanlayıcı; çift bazlı tam uyum ve tümünün aynı olduğu birim oranı.",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "all_agree": {
+     "value": 0.466666666666667,
+     "source": "irr::agree"
+    }
+   }
+  },
+  {
+   "id": "pabak_binary",
+   "method": "pabak",
+   "file": "binary_two_raters.csv",
+   "sheet": "binary_two_raters",
+   "sha256": "794d7631765b7268bc48c5e8c4388fbc2c7d3fd279a925c10247a1f14f736ce8",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İki puanlayıcı ikili karar; yüksek prevalans (≈%85 '1').",
+   "level": "nominal (ikili)",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; tam olarak iki kategori",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.8,
+     "source": "analytic"
+    }
+   }
+  },
+  {
+   "id": "bangdiwala_b_nominal",
+   "method": "bangdiwala_b",
+   "file": "cohen_kappa_nominal.csv",
+   "sheet": "cohen_kappa_nominal",
+   "sha256": "69bd3d62e79f8444acba8162510c3f2611185cfd2d696e14548d591017222187",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İki puanlayıcı; uyum tablosunun köşegen alanı.",
+   "level": "nominal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.7223113964687,
+     "source": "analytic"
+    }
+   }
+  },
+  {
+   "id": "icc_1_1_two_way",
+   "method": "icc_1_1",
+   "file": "icc_two_way.csv",
+   "sheet": "icc_two_way",
+   "sha256": "3d8eacda03f0ce24568a6f39ce0b41eea9a8087693323311a1113e35cf954ed0",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "20 birim dört puanlayıcı; puanlayıcılar birimler arasında farklı kabul edilir.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz, eksiksiz)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.860372752115597,
+     "source": "irr::icc"
+    },
+    "F": {
+     "value": 25.6477035149443,
+     "source": "irr::icc"
+    },
+    "df1": {
+     "value": 19.0,
+     "source": "irr::icc"
+    },
+    "df2": {
+     "value": 60.0,
+     "source": "irr::icc"
+    },
+    "p": {
+     "value": 6.25471910539456e-22,
+     "source": "irr::icc"
+    },
+    "ci_low": {
+     "value": 0.750955173142246,
+     "source": "irr::icc"
+    },
+    "ci_high": {
+     "value": 0.934649927246517,
+     "source": "irr::icc"
+    }
+   }
+  },
+  {
+   "id": "icc_1_k_two_way",
+   "method": "icc_1_k",
+   "file": "icc_two_way.csv",
+   "sheet": "icc_two_way",
+   "sha256": "3d8eacda03f0ce24568a6f39ce0b41eea9a8087693323311a1113e35cf954ed0",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı veri; dört puanlayıcı ortalamasının güvenirliği.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.961010154401647,
+     "source": "irr::icc"
+    },
+    "F": {
+     "value": 25.6477035149443,
+     "source": "irr::icc"
+    },
+    "df1": {
+     "value": 19.0,
+     "source": "irr::icc"
+    },
+    "df2": {
+     "value": 60.0,
+     "source": "irr::icc"
+    },
+    "p": {
+     "value": 6.25471910539456e-22,
+     "source": "irr::icc"
+    },
+    "ci_low": {
+     "value": 0.923438326801274,
+     "source": "irr::icc"
+    },
+    "ci_high": {
+     "value": 0.982820469116814,
+     "source": "irr::icc"
+    }
+   }
+  },
+  {
+   "id": "icc_2_1_two_way",
+   "method": "icc_2_1",
+   "file": "icc_two_way.csv",
+   "sheet": "icc_two_way",
+   "sha256": "3d8eacda03f0ce24568a6f39ce0b41eea9a8087693323311a1113e35cf954ed0",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı veri; puanlayıcılar rastgele örneklem, mutlak uyum.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.8617461562826,
+     "source": "irr::icc"
+    },
+    "F": {
+     "value": 35.8500715674086,
+     "source": "irr::icc"
+    },
+    "df1": {
+     "value": 19.0,
+     "source": "irr::icc"
+    },
+    "df2": {
+     "value": 57.0,
+     "source": "irr::icc"
+    },
+    "p": {
+     "value": 7.29190196670616e-25,
+     "source": "irr::icc"
+    },
+    "ci_low": {
+     "value": 0.720243279058702,
+     "source": "irr::icc"
+    },
+    "ci_high": {
+     "value": 0.939393667787398,
+     "source": "irr::icc"
+    }
+   }
+  },
+  {
+   "id": "icc_2_k_two_way",
+   "method": "icc_2_k",
+   "file": "icc_two_way.csv",
+   "sheet": "icc_two_way",
+   "sha256": "3d8eacda03f0ce24568a6f39ce0b41eea9a8087693323311a1113e35cf954ed0",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı veri; rastgele puanlayıcılar, ortalama puan.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.961438034061419,
+     "source": "irr::icc"
+    },
+    "F": {
+     "value": 35.8500715674086,
+     "source": "irr::icc"
+    },
+    "df1": {
+     "value": 19.0,
+     "source": "irr::icc"
+    },
+    "df2": {
+     "value": 57.0,
+     "source": "irr::icc"
+    },
+    "p": {
+     "value": 7.29190196670616e-25,
+     "source": "irr::icc"
+    },
+    "ci_low": {
+     "value": 0.910753327001899,
+     "source": "irr::icc"
+    },
+    "ci_high": {
+     "value": 0.984181993348949,
+     "source": "irr::icc"
+    }
+   }
+  },
+  {
+   "id": "icc_3_1_two_way",
+   "method": "icc_3_1",
+   "file": "icc_two_way.csv",
+   "sheet": "icc_two_way",
+   "sha256": "3d8eacda03f0ce24568a6f39ce0b41eea9a8087693323311a1113e35cf954ed0",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı veri; yalnız bu puanlayıcılar (sabit), tutarlılık.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.897040086707186,
+     "source": "irr::icc"
+    },
+    "F": {
+     "value": 35.8500715674086,
+     "source": "irr::icc"
+    },
+    "df1": {
+     "value": 19.0,
+     "source": "irr::icc"
+    },
+    "df2": {
+     "value": 57.0,
+     "source": "irr::icc"
+    },
+    "p": {
+     "value": 7.29190196670616e-25,
+     "source": "irr::icc"
+    },
+    "ci_low": {
+     "value": 0.810780098258639,
+     "source": "irr::icc"
+    },
+    "ci_high": {
+     "value": 0.952722871777337,
+     "source": "irr::icc"
+    }
+   }
+  },
+  {
+   "id": "icc_3_k_two_way",
+   "method": "icc_3_k",
+   "file": "icc_two_way.csv",
+   "sheet": "icc_two_way",
+   "sha256": "3d8eacda03f0ce24568a6f39ce0b41eea9a8087693323311a1113e35cf954ed0",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4"
+    ]
+   },
+   "scenario": "Aynı veri; sabit puanlayıcılar, ortalama puan.",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.972106052895328,
+     "source": "irr::icc"
+    },
+    "F": {
+     "value": 35.8500715674086,
+     "source": "irr::icc"
+    },
+    "df1": {
+     "value": 19.0,
+     "source": "irr::icc"
+    },
+    "df2": {
+     "value": 57.0,
+     "source": "irr::icc"
+    },
+    "p": {
+     "value": 7.29190196670616e-25,
+     "source": "irr::icc"
+    },
+    "ci_low": {
+     "value": 0.944871462183002,
+     "source": "irr::icc"
+    },
+    "ci_high": {
+     "value": 0.987746225492896,
+     "source": "irr::icc"
+    }
+   }
+  },
+  {
+   "id": "kendall_w_rankings",
+   "method": "kendall_w",
+   "file": "kendall_w_rankings.csv",
+   "sheet": "kendall_w_rankings",
+   "sha256": "8a4fa04552b147bdf314db9615c5292d2928c16837a3e48201cf89a60ac2c461",
+   "config": {
+    "layout": "wide",
+    "id_col": "Kompozisyon_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2",
+     "Puanlayici_3",
+     "Puanlayici_4",
+     "Puanlayici_5"
+    ]
+   },
+   "scenario": "Beş puanlayıcı on kompozisyonu puanlıyor; puanlar sıraya çevrilir (bağlar var).",
+   "level": "ordinal",
+   "raters": "≥2",
+   "layout": "wide (satır = sıralanan nesne)",
+   "missing": "eksik yok",
+   "columns": {
+    "Kompozisyon_ID": "Sıralanan nesnenin (kompozisyon) kimliği.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_3": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_4": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_5": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.87422934648582,
+     "source": "irr::kendall"
+    },
+    "chi2": {
+     "value": 39.3403205918619,
+     "source": "irr::kendall"
+    },
+    "df": {
+     "value": 9.0,
+     "source": "irr::kendall"
+    },
+    "p": {
+     "value": 1.0001385514218e-05,
+     "source": "irr::kendall"
+    }
+   }
+  },
+  {
+   "id": "spearman_paired",
+   "method": "spearman",
+   "file": "bland_altman_paired.csv",
+   "sheet": "bland_altman_paired",
+   "sha256": "1f3feefd95eef83585d0144d403aceed9986166a82b564d3424a28127549c45d",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Yontem_A",
+     "Yontem_B"
+    ]
+   },
+   "scenario": "İki yöntemin ölçümleri arasındaki sıra ilişkisi.",
+   "level": "ordinal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Yontem_A": "Birinci yöntem/puanlayıcının nicel ölçümü.",
+    "Yontem_B": "İkinci yöntem/puanlayıcının aynı birim için nicel ölçümü."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.925114059360139,
+     "source": "stats::cor.test"
+    },
+    "p": {
+     "value": 2.6907659104776e-13,
+     "source": "stats::cor.test"
+    }
+   }
+  },
+  {
+   "id": "pearson_paired",
+   "method": "pearson",
+   "file": "bland_altman_paired.csv",
+   "sheet": "bland_altman_paired",
+   "sha256": "1f3feefd95eef83585d0144d403aceed9986166a82b564d3424a28127549c45d",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Yontem_A",
+     "Yontem_B"
+    ]
+   },
+   "scenario": "İki yöntemin ölçümleri arasındaki doğrusal ilişki.",
+   "level": "interval",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Yontem_A": "Birinci yöntem/puanlayıcının nicel ölçümü.",
+    "Yontem_B": "İkinci yöntem/puanlayıcının aynı birim için nicel ölçümü."
+   },
+   "expected": {
+    "estimate": {
+     "value": 0.939295251643824,
+     "source": "stats::cor.test"
+    },
+    "p": {
+     "value": 1.55561576369755e-14,
+     "source": "stats::cor.test"
+    },
+    "ci_low": {
+     "value": 0.87518939347994,
+     "source": "stats::cor.test"
+    },
+    "ci_high": {
+     "value": 0.97098422001023,
+     "source": "stats::cor.test"
+    }
+   }
+  },
+  {
+   "id": "mcnemar_binary",
+   "method": "mcnemar",
+   "file": "binary_two_raters.csv",
+   "sheet": "binary_two_raters",
+   "sha256": "794d7631765b7268bc48c5e8c4388fbc2c7d3fd279a925c10247a1f14f736ce8",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İkinci puanlayıcının '1' kararını daha sık vermesi (sistematik fark).",
+   "level": "nominal (ikili)",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; iki kategori",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "chi2": {
+     "value": 3.2,
+     "source": "stats::mcnemar.test"
+    },
+    "df": {
+     "value": 1.0,
+     "source": "stats::mcnemar.test"
+    },
+    "p": {
+     "value": 0.0736382701203028,
+     "source": "stats::mcnemar.test"
+    }
+   }
+  },
+  {
+   "id": "stuart_maxwell_ordinal",
+   "method": "stuart_maxwell",
+   "file": "ordinal_two_raters.csv",
+   "sheet": "ordinal_two_raters",
+   "sha256": "92ea95813dab5038eb9c0cc5d356096989bae697cad7df770158228b2e0f725f",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "İki puanlayıcının kategori marjinallerinin homojenliği.",
+   "level": "nominal / sıralı",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; ≥ 3 kategori",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "chi2": {
+     "value": 9.66666666666667,
+     "source": "analytic"
+    },
+    "df": {
+     "value": 4.0,
+     "source": "analytic"
+    },
+    "p": {
+     "value": 0.0464330057841209,
+     "source": "analytic"
+    }
+   }
+  },
+  {
+   "id": "bhapkar_ordinal",
+   "method": "bhapkar",
+   "file": "ordinal_two_raters.csv",
+   "sheet": "ordinal_two_raters",
+   "sha256": "92ea95813dab5038eb9c0cc5d356096989bae697cad7df770158228b2e0f725f",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Puanlayici_1",
+     "Puanlayici_2"
+    ]
+   },
+   "scenario": "Aynı tablo; Bhapkar marjinal homojenlik testi.",
+   "level": "nominal / sıralı",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; ≥ 3 kategori",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Puanlayici_1": "Bu puanlayıcının birime verdiği puan.",
+    "Puanlayici_2": "Bu puanlayıcının birime verdiği puan."
+   },
+   "expected": {
+    "chi2": {
+     "value": 12.7472527472527,
+     "source": "analytic"
+    },
+    "df": {
+     "value": 4.0,
+     "source": "analytic"
+    },
+    "p": {
+     "value": 0.012579123010062,
+     "source": "analytic"
+    }
+   }
+  },
+  {
+   "id": "bland_altman_paired",
+   "method": "bland_altman",
+   "file": "bland_altman_paired.csv",
+   "sheet": "bland_altman_paired",
+   "sha256": "1f3feefd95eef83585d0144d403aceed9986166a82b564d3424a28127549c45d",
+   "config": {
+    "layout": "wide",
+    "id_col": "Birim_ID",
+    "rater_cols": [
+     "Yontem_A",
+     "Yontem_B"
+    ]
+   },
+   "scenario": "Yöntem B ortalama +1.5 birim yüksek ölçüyor.",
+   "level": "interval",
+   "raters": "2",
+   "layout": "wide (eşleşmiş nicel ölçümler)",
+   "missing": "eksik yok",
+   "columns": {
+    "Birim_ID": "Puanlanan birimin benzersiz kimliği (öğrenci, kompozisyon, hasta vb.); puanlayıcı DEĞİLDİR.",
+    "Yontem_A": "Birinci yöntem/puanlayıcının nicel ölçümü.",
+    "Yontem_B": "İkinci yöntem/puanlayıcının aynı birim için nicel ölçümü."
+   },
+   "expected": {
+    "bias": {
+     "value": -2.47,
+     "source": "analytic"
+    },
+    "sd": {
+     "value": 4.91115198228516,
+     "source": "analytic"
+    },
+    "loa_low": {
+     "value": -12.0958578852789,
+     "source": "analytic"
+    },
+    "loa_high": {
+     "value": 7.15585788527891,
+     "source": "analytic"
+    },
+    "bias_ci_low": {
+     "value": -4.30385428873698,
+     "source": "analytic"
+    },
+    "bias_ci_high": {
+     "value": -0.636145711263014,
+     "source": "analytic"
+    },
+    "loa_low_ci_low": {
+     "value": -15.2721866870495,
+     "source": "analytic"
+    },
+    "loa_high_ci_high": {
+     "value": 10.3321866870495,
+     "source": "analytic"
+    }
+   }
+  }
+ ],
+ "teaching": {
+  "invalid": {
+   "file": "invalid_teaching.csv",
+   "sha256": "03dd6a1e37f1c926c46b96672a0fa7b1af6f25a46dd28770599c00fc51cf1644",
+   "problems": [
+    "B003 kimliği iki kez",
+    "Puanlayici_2 boş hücre",
+    "Puanlayici_3 '2' metin olarak kodlanmış"
+   ]
+  },
+  "long": {
+   "file": "long_format_example.csv",
+   "sha256": "382b0a9abe8e6baf5adb8d961c21d84c7595ede596d5244759bea75a75a71183",
+   "config": {
+    "layout": "long",
+    "unit_col": "Birim_ID",
+    "rater_col": "Puanlayici_ID",
+    "score_col": "Puan"
+   }
+  },
+  "templates": {
+   "wide_template": "wide_template.csv",
+   "long_template": "long_template.csv",
+   "counts_template": "counts_template.csv"
+  }
+ }
+}

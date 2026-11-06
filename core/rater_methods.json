@@ -1,0 +1,604 @@
+{
+ "version": 1,
+ "methods": [
+  {
+   "id": "cohen_kappa",
+   "name": "Cohen Kappa",
+   "abbr": "κ",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok (tam çiftler)",
+   "formula": "κ = (Po − Pe)/(1 − Pe), Pe = Σ p1k p2k",
+   "engine": "statsmodels.stats.inter_rater.cohens_kappa(wt=None)",
+   "reference": "R irr::kappa2(weight='unweighted'); psych::cohen.kappa (SE/GA)",
+   "outputs": [
+    "estimate",
+    "se",
+    "ci95",
+    "z0",
+    "p"
+   ],
+   "example": "cohen_kappa_nominal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "cohen_kappa_linear",
+   "name": "Doğrusal ağırlıklı Cohen Kappa",
+   "abbr": "κw (doğrusal)",
+   "group": "kategorik",
+   "level": "ordinal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "κw = 1 − Σ v_kl p_kl / Σ v_kl p1k p2l, v_kl = |k − l| (sıralı kategori konumu)",
+   "engine": "statsmodels cohens_kappa(wt='linear')",
+   "reference": "R irr::kappa2(weight='equal'); psych::cohen.kappa(w=linear)",
+   "outputs": [
+    "estimate",
+    "se",
+    "ci95",
+    "z0",
+    "p"
+   ],
+   "example": "cohen_kappa_linear_ordinal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "cohen_kappa_quadratic",
+   "name": "Karesel ağırlıklı Cohen Kappa",
+   "abbr": "κw (karesel)",
+   "group": "kategorik",
+   "level": "ordinal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "v_kl = (k − l)²",
+   "engine": "statsmodels cohens_kappa(wt='quadratic')",
+   "reference": "R irr::kappa2(weight='squared'); psych::cohen.kappa",
+   "outputs": [
+    "estimate",
+    "se",
+    "ci95",
+    "z0",
+    "p"
+   ],
+   "example": "cohen_kappa_quadratic_ordinal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "fleiss_kappa",
+   "name": "Fleiss Kappa",
+   "abbr": "κF",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2 (birim başına sabit sayı)",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok; her birimde aynı puanlayıcı sayısı",
+   "formula": "κF = (P̄ − P̄e)/(1 − P̄e), P̄e = Σ πk²",
+   "engine": "statsmodels fleiss_kappa(method='fleiss')",
+   "reference": "R irr::kappam.fleiss; irrCAC::fleiss.kappa.raw / fleiss.kappa.dist",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "fleiss_kappa_counts",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "conger_kappa",
+   "name": "Conger Kappa",
+   "abbr": "κC",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2 (aynı puanlayıcılar)",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "Pe = Σk [p̄k² − s²k / r], s²k: puanlayıcı marjinallerinin varyansı (r − 1 paydası)",
+   "engine": "core (kapalı form, numpy)",
+   "reference": "R irrCAC::conger.kappa.raw; irr::kappam.fleiss(exact=TRUE)",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "conger_kappa_multirater",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "light_kappa",
+   "name": "Light Kappa",
+   "abbr": "κL",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "tüm puanlayıcı çiftlerinin Cohen κ ortalaması",
+   "engine": "statsmodels cohens_kappa (çiftler) + ortalama",
+   "reference": "R irr::kappam.light",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "light_kappa_multirater",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "scott_pi",
+   "name": "Scott Pi",
+   "abbr": "π",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "π = (Po − Pe)/(1 − Pe), Pe = Σ ((p1k + p2k)/2)²",
+   "engine": "statsmodels fleiss_kappa (iki puanlayıcı)",
+   "reference": "R irrCAC::fleiss.kappa.raw (2 puanlayıcı); R analitik",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "scott_pi_nominal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "gwet_ac1",
+   "name": "Gwet AC1",
+   "abbr": "AC1",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok",
+   "formula": "Pe = Σ πk(1 − πk)/(q − 1)",
+   "engine": "core (kapalı form)",
+   "reference": "R irrCAC::gwet.ac1.raw / gwet.ac1.dist",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "gwet_ac1_multirater",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "gwet_ac2",
+   "name": "Gwet AC2 (karesel ağırlık)",
+   "abbr": "AC2",
+   "group": "kategorik",
+   "level": "ordinal",
+   "raters": "≥2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "Pa = Σ r_ik (r*_ik − 1)/(n r (r − 1)), Pe = Tw Σ πk(1 − πk)/(q(q − 1)), w = 1 − (xk − xl)²/(xmax − xmin)²",
+   "engine": "core (kapalı form)",
+   "reference": "R irrCAC::gwet.ac1.raw(weights='quadratic')",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "gwet_ac2_ordinal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "brennan_prediger",
+   "name": "Brennan–Prediger katsayısı",
+   "abbr": "BP",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok",
+   "formula": "Pe = 1/q",
+   "engine": "statsmodels fleiss_kappa(method='randolph')",
+   "reference": "R irrCAC::bp.coeff.raw / bp.coeff.dist",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "brennan_prediger_multirater",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "kripp_nominal",
+   "name": "Krippendorff Alfa — nominal",
+   "abbr": "α (nominal)",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli (en az iki puanı olan birimler)",
+   "formula": "α = 1 − Do/De, δ = [c ≠ k]",
+   "engine": "krippendorff 0.9.0 alpha(level='nominal')",
+   "reference": "R irr::kripp.alpha; irrCAC::krippen.alpha.raw",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "krippendorff_alpha_missing_nominal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "kripp_ordinal",
+   "name": "Krippendorff Alfa — sıralı",
+   "abbr": "α (sıralı)",
+   "group": "sirali",
+   "level": "ordinal",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli",
+   "formula": "Krippendorff sıralı uzaklığı (marjinal sıklıklarla)",
+   "engine": "krippendorff alpha(level='ordinal')",
+   "reference": "R irr::kripp.alpha(method='ordinal'); irrCAC ordinal ağırlıkları farklı tanım: NOT COMPARABLE",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "krippendorff_alpha_missing_ordinal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "kripp_interval",
+   "name": "Krippendorff Alfa — aralık",
+   "abbr": "α (aralık)",
+   "group": "sirali",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli",
+   "formula": "δ² = (c − k)²",
+   "engine": "krippendorff alpha(level='interval')",
+   "reference": "R irr::kripp.alpha('interval'); irrCAC quadratic",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "krippendorff_alpha_missing_interval",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "kripp_ratio",
+   "name": "Krippendorff Alfa — oran",
+   "abbr": "α (oran)",
+   "group": "sirali",
+   "level": "ratio",
+   "raters": "≥2",
+   "layout": "wide (eksik izinli)",
+   "missing": "eksik izinli; puanlar > 0",
+   "formula": "δ² = ((c − k)/(c + k))²",
+   "engine": "krippendorff alpha(level='ratio')",
+   "reference": "R irr::kripp.alpha('ratio'); irrCAC ratio",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "krippendorff_alpha_missing_ratio",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "percent_agreement",
+   "name": "Tam yüzde uyum",
+   "abbr": "Po",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "≥2",
+   "layout": "wide veya kategori-sıklık",
+   "missing": "eksik yok",
+   "formula": "Po = Σi Σk r_ik(r_ik − 1)/(n r(r − 1)) (çift bazlı); ek: tüm puanlayıcıların aynı olduğu birim oranı",
+   "engine": "core (kapalı form)",
+   "reference": "R irrCAC::pa.coeff.raw; irr::agree (tüm puanlayıcılar aynı)",
+   "outputs": [
+    "estimate",
+    "all_agree"
+   ],
+   "example": "percent_agreement_multirater",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "pabak",
+   "name": "PABAK",
+   "abbr": "PABAK",
+   "group": "kategorik",
+   "level": "nominal (ikili)",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; tam olarak iki kategori",
+   "formula": "PABAK = 2Po − 1",
+   "engine": "core",
+   "reference": "R irrCAC::bp.coeff.raw (2 puanlayıcı, ikili); R analitik",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "pabak_binary",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "bangdiwala_b",
+   "name": "Bangdiwala B",
+   "abbr": "B",
+   "group": "kategorik",
+   "level": "nominal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "B = Σ n_kk² / Σ n_k+ n_+k",
+   "engine": "core",
+   "reference": "R analitik (bağımsız kod)",
+   "outputs": [
+    "estimate"
+   ],
+   "example": "bangdiwala_b_nominal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "icc_1_1",
+   "name": "ICC(1,1)",
+   "abbr": "ICC1",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz, eksiksiz)",
+   "missing": "eksik yok",
+   "formula": "tek yönlü rastgele etkiler, mutlak uyum, tek ölçüm: (MSR − MSW)/(MSR + (k − 1)MSW)",
+   "engine": "pingouin.intraclass_corr ICC1",
+   "reference": "R irr::icc(oneway, single); psych::ICC",
+   "outputs": [
+    "estimate",
+    "F",
+    "df1",
+    "df2",
+    "p",
+    "ci95"
+   ],
+   "example": "icc_1_1_two_way",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "icc_1_k",
+   "name": "ICC(1,k)",
+   "abbr": "ICC1k",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "formula": "tek yönlü rastgele, ortalama ölçüm: (MSR − MSW)/MSR",
+   "engine": "pingouin ICC1k",
+   "reference": "R irr::icc(oneway, average); psych::ICC",
+   "outputs": [
+    "estimate",
+    "F",
+    "df1",
+    "df2",
+    "p",
+    "ci95"
+   ],
+   "example": "icc_1_k_two_way",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "icc_2_1",
+   "name": "ICC(2,1)",
+   "abbr": "ICC2",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "formula": "iki yönlü rastgele, mutlak uyum, tek ölçüm: (MSR − MSE)/(MSR + (k − 1)MSE + k(MSC − MSE)/n)",
+   "engine": "pingouin ICC2",
+   "reference": "R irr::icc(twoway, agreement, single); psych::ICC",
+   "outputs": [
+    "estimate",
+    "F",
+    "df1",
+    "df2",
+    "p",
+    "ci95"
+   ],
+   "example": "icc_2_1_two_way",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "icc_2_k",
+   "name": "ICC(2,k)",
+   "abbr": "ICC2k",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "formula": "iki yönlü rastgele, mutlak uyum, ortalama: (MSR − MSE)/(MSR + (MSC − MSE)/n)",
+   "engine": "pingouin ICC2k",
+   "reference": "R irr::icc(twoway, agreement, average); psych::ICC",
+   "outputs": [
+    "estimate",
+    "F",
+    "df1",
+    "df2",
+    "p",
+    "ci95"
+   ],
+   "example": "icc_2_k_two_way",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "icc_3_1",
+   "name": "ICC(3,1)",
+   "abbr": "ICC3",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "formula": "iki yönlü karma (puanlayıcı sabit), tutarlılık, tek ölçüm: (MSR − MSE)/(MSR + (k − 1)MSE)",
+   "engine": "pingouin ICC3",
+   "reference": "R irr::icc(twoway, consistency, single); psych::ICC",
+   "outputs": [
+    "estimate",
+    "F",
+    "df1",
+    "df2",
+    "p",
+    "ci95"
+   ],
+   "example": "icc_3_1_two_way",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "icc_3_k",
+   "name": "ICC(3,k)",
+   "abbr": "ICC3k",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "≥2",
+   "layout": "wide (tam çapraz)",
+   "missing": "eksik yok",
+   "formula": "iki yönlü karma, tutarlılık, ortalama: (MSR − MSE)/MSR",
+   "engine": "pingouin ICC3k",
+   "reference": "R irr::icc(twoway, consistency, average); psych::ICC",
+   "outputs": [
+    "estimate",
+    "F",
+    "df1",
+    "df2",
+    "p",
+    "ci95"
+   ],
+   "example": "icc_3_k_two_way",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "kendall_w",
+   "name": "Kendall W",
+   "abbr": "W",
+   "group": "sirali",
+   "level": "ordinal",
+   "raters": "≥2",
+   "layout": "wide (satır = sıralanan nesne)",
+   "missing": "eksik yok",
+   "formula": "W = 12 Σ Ri² − 3k²n(n + 1)² / (k²n(n² − 1) − k Σ(t³ − t)), χ² = k(n − 1)W",
+   "engine": "core (scipy.stats.rankdata)",
+   "reference": "R irr::kendall(correct=TRUE)",
+   "outputs": [
+    "estimate",
+    "chi2",
+    "df",
+    "p"
+   ],
+   "example": "kendall_w_rankings",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "spearman",
+   "name": "Spearman sıra korelasyonu",
+   "abbr": "ρs",
+   "group": "sirali",
+   "level": "ordinal",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "sıralar üzerinde Pearson r; p: t yaklaşımı",
+   "engine": "scipy.stats.spearmanr",
+   "reference": "R cor.test(method='spearman', exact=FALSE)",
+   "outputs": [
+    "estimate",
+    "p"
+   ],
+   "example": "spearman_paired",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "pearson",
+   "name": "Pearson korelasyonu",
+   "abbr": "r",
+   "group": "surekli",
+   "level": "interval",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok",
+   "formula": "r; p: t(n − 2); GA: Fisher z",
+   "engine": "scipy.stats.pearsonr",
+   "reference": "R cor.test(method='pearson')",
+   "outputs": [
+    "estimate",
+    "p",
+    "ci95"
+   ],
+   "example": "pearson_paired",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "mcnemar",
+   "name": "McNemar testi",
+   "abbr": "McNemar",
+   "group": "sistematik",
+   "level": "nominal (ikili)",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; iki kategori",
+   "formula": "χ² = (|b − c| − 1)²/(b + c) (süreklilik düzeltmeli)",
+   "engine": "statsmodels mcnemar(exact=False, correction=True)",
+   "reference": "R stats::mcnemar.test(correct=TRUE)",
+   "outputs": [
+    "chi2",
+    "df",
+    "p"
+   ],
+   "example": "mcnemar_binary",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "stuart_maxwell",
+   "name": "Stuart–Maxwell testi",
+   "abbr": "SM",
+   "group": "sistematik",
+   "level": "nominal / sıralı",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; ≥ 3 kategori",
+   "formula": "χ² = d′ S⁻¹ d (marjinal homojenlik)",
+   "engine": "statsmodels SquareTable.homogeneity('stuart_maxwell'), shift_zeros=False",
+   "reference": "R analitik matris formülü",
+   "outputs": [
+    "chi2",
+    "df",
+    "p"
+   ],
+   "example": "stuart_maxwell_ordinal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "bhapkar",
+   "name": "Bhapkar testi",
+   "abbr": "Bhapkar",
+   "group": "sistematik",
+   "level": "nominal / sıralı",
+   "raters": "2",
+   "layout": "wide",
+   "missing": "eksik yok; ≥ 3 kategori",
+   "formula": "χ²B = χ²SM / (1 − χ²SM / n)",
+   "engine": "statsmodels SquareTable.homogeneity('bhapkar')",
+   "reference": "R analitik",
+   "outputs": [
+    "chi2",
+    "df",
+    "p"
+   ],
+   "example": "bhapkar_ordinal",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  },
+  {
+   "id": "bland_altman",
+   "name": "Bland–Altman uyum analizi",
+   "abbr": "BA",
+   "group": "sistematik",
+   "level": "interval",
+   "raters": "2",
+   "layout": "wide (eşleşmiş nicel ölçümler)",
+   "missing": "eksik yok",
+   "formula": "d = x1 − x2; yanlılık d̄; uyum sınırları d̄ ± 1.96 s; GA: d̄ ± t s/√n, sınırlar ± t s √(3/n)",
+   "engine": "core (numpy/scipy)",
+   "reference": "R analitik (Bland ve Altman 1999)",
+   "outputs": [
+    "bias",
+    "sd",
+    "loa",
+    "ci95_bias",
+    "ci95_loa"
+   ],
+   "example": "bland_altman_paired",
+   "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
+  }
+ ]
+}

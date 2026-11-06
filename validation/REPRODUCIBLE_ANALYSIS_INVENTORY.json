@@ -247,6 +247,11 @@
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {
+    "screen": "ui/rater_reliability_view.py",
+    "core_imports": [],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
     "screen": "ui/reproducible_capture.py",
     "core_imports": [
       "core.reproducible"
