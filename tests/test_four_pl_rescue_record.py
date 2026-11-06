@@ -39,3 +39,9 @@ def test_protocol_committed_before_verdicts():
     if not proto or not verdict:
         pytest.skip("shallow clone")
     assert int(proto[-1]) <= int(verdict[-1])
+
+
+def test_design_b_newton_record_keeps_stagnation():
+    r = json.loads((ROOT / "validation/four_pl_newton_b/result.json").read_text())
+    assert r["protocol_commit"] == "10b89eb" and r["prechecks"]["ok"] and not r["numerical_pass"]
+    assert r["history"][-1]["stop"] == "STAGNATION" and r["final"]["score_GH161"] > 1e-5 and "recovery" not in r
