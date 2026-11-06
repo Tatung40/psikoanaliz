@@ -45,3 +45,11 @@ def test_design_b_newton_record_keeps_stagnation():
     r = json.loads((ROOT / "validation/four_pl_newton_b/result.json").read_text())
     assert r["protocol_commit"] == "10b89eb" and r["prechecks"]["ok"] and not r["numerical_pass"]
     assert r["history"][-1]["stop"] == "STAGNATION" and r["final"]["score_GH161"] > 1e-5 and "recovery" not in r
+
+
+def test_design_b_projected_newton_is_stationary_boundary_solution():
+    r = json.loads((ROOT / "validation/four_pl_pnewton_b/result.json").read_text())
+    assert r["protocol_commit"] == "7c5b1ab" and r["stop"] == "STATIONARY" and all(r["gates"].values())
+    assert r["classification"] == "BOUNDARY SOLUTION" and not r["numerical_pass"] and "recovery" not in r
+    assert len(r["boundaries"]) == 3 and all(b["kkt_sign_ok"] for b in r["boundaries"])
+    assert all(b["f"] >= a["f"] for a, b in zip(r["history"], r["history"][1:]))
