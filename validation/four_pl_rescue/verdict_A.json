@@ -1,0 +1,221 @@
+{
+ "design": "A",
+ "protocol_commit": "dd3d646",
+ "stages": [
+  {
+   "stage": "EM_GH61",
+   "quadpts": 61,
+   "r_converged": true,
+   "iterations": 153,
+   "seconds": 2.753,
+   "r_loglik": -23272.578673699,
+   "common_loglik": -23272.578673699034,
+   "projected_score": 4.766320473091874
+  },
+  {
+   "stage": "BL_GH61_r1",
+   "quadpts": 61,
+   "r_converged": false,
+   "iterations": 191,
+   "seconds": 49.567,
+   "r_loglik": -23272.3211427552,
+   "common_loglik": -23272.321142754678,
+   "projected_score": 5.0642655291142455
+  },
+  {
+   "stage": "BL_GH61_r2",
+   "quadpts": 61,
+   "r_converged": true,
+   "iterations": 39,
+   "seconds": 3.195,
+   "r_loglik": -23272.321152241,
+   "common_loglik": -23272.32115224048,
+   "projected_score": 5.047071737611263
+  },
+  {
+   "stage": "BL_GH101_r1",
+   "quadpts": 101,
+   "r_converged": false,
+   "iterations": 7,
+   "seconds": 2.33900000000001,
+   "r_loglik": NaN,
+   "common_loglik": NaN,
+   "projected_score": NaN
+  },
+  {
+   "stage": "BL_GH101_r2",
+   "quadpts": 101,
+   "r_converged": false,
+   "iterations": 1,
+   "seconds": 0.715000000000003,
+   "r_loglik": NaN,
+   "common_loglik": NaN,
+   "projected_score": NaN
+  },
+  {
+   "stage": "BL_GH101_r3",
+   "quadpts": 101,
+   "r_converged": false,
+   "iterations": 1,
+   "seconds": 0.713000000000001,
+   "r_loglik": NaN,
+   "common_loglik": NaN,
+   "projected_score": NaN
+  },
+  {
+   "stage": "BL_GH161_r1",
+   "quadpts": 161,
+   "r_converged": false,
+   "iterations": 1,
+   "seconds": 1.148,
+   "r_loglik": NaN,
+   "common_loglik": NaN,
+   "projected_score": NaN
+  },
+  {
+   "stage": "BL_GH161_r2",
+   "quadpts": 161,
+   "r_converged": false,
+   "iterations": 1,
+   "seconds": 0.951999999999998,
+   "r_loglik": NaN,
+   "common_loglik": NaN,
+   "projected_score": NaN
+  },
+  {
+   "stage": "BL_GH161_r3",
+   "quadpts": 161,
+   "r_converged": false,
+   "iterations": 1,
+   "seconds": 0.818999999999996,
+   "r_loglik": NaN,
+   "common_loglik": NaN,
+   "projected_score": NaN
+  }
+ ],
+ "objective": {
+  "grid": 161,
+  "loglik": NaN,
+  "projected_score": NaN
+ },
+ "audit": {
+  "grid": 241,
+  "loglik": NaN,
+  "projected_score": NaN,
+  "delta_loglik": NaN
+ },
+ "information": {
+  "min_eigenvalue": NaN,
+  "condition": NaN
+ },
+ "boundaries": [
+  "M5:d"
+ ],
+ "outside": [
+  "M9:a=87.68",
+  "M9:c=0.6484",
+  "M9:d=0.01299",
+  "M10:a=0.05559",
+  "M10:b=26.46"
+ ],
+ "gates": {
+  "inside_bounds": false,
+  "stationary_objective": false,
+  "audit": false,
+  "information": false
+ },
+ "numerical_pass": false,
+ "classification": "OUTSIDE COMMON BOUNDS",
+ "parameters": {
+  "M1": {
+   "a": 1.26700998233124,
+   "b": 0.682244301542924,
+   "c": 6.31383464473011e-05,
+   "d": 0.999996653284277
+  },
+  "M2": {
+   "a": 1.48907027882042,
+   "b": -1.21332673495256,
+   "c": 8.98495008599873e-06,
+   "d": 0.803564403392694
+  },
+  "M3": {
+   "a": 0.980373491714074,
+   "b": 0.823470277748991,
+   "c": 0.180496872019761,
+   "d": 0.999991534349088
+  },
+  "M4": {
+   "a": 3.27395262261206,
+   "b": 0.0766656923331234,
+   "c": 0.310546680043159,
+   "d": 0.724688357154104
+  },
+  "M5": {
+   "a": 1.85224132131303,
+   "b": 1.05839143888147,
+   "c": 0.166608169907798,
+   "d": 1.0
+  },
+  "M6": {
+   "a": 0.691302655216993,
+   "b": 1.8825955731893,
+   "c": 0.107817600964912,
+   "d": 0.999995378267165
+  },
+  "M7": {
+   "a": 1.68752846841113,
+   "b": 1.20209637811025,
+   "c": 0.14012883943114,
+   "d": 0.999930930456519
+  },
+  "M8": {
+   "a": 2.80515626829341,
+   "b": 1.45354678236513,
+   "c": 0.216785480178036,
+   "d": 0.99998360322888
+  },
+  "M9": {
+   "a": 87.6765765209087,
+   "b": 0.427740748567753,
+   "c": 0.648441362980291,
+   "d": 0.0129858163259308
+  },
+  "M10": {
+   "a": 0.0555916759601818,
+   "b": 26.4597247486325,
+   "c": 0.0001302852559985,
+   "d": 0.999945896696433
+  },
+  "M11": {
+   "a": 0.44001405507786,
+   "b": -0.503998897491926,
+   "c": 0.0004259100979717,
+   "d": 0.591300027778053
+  },
+  "M12": {
+   "a": 2.57007108442568,
+   "b": 1.4493189305211,
+   "c": 0.159353629090262,
+   "d": 0.640071759915351
+  }
+ },
+ "vs_python_pr145": {
+  "python_loglik_GH161": -23272.574355390992,
+  "r_minus_python_GH161": NaN,
+  "max_abs_param": 82.6765765209087,
+  "python_boundaries": [
+   "M1:c",
+   "M1:d",
+   "M2:c",
+   "M3:d",
+   "M5:d",
+   "M6:d",
+   "M8:d",
+   "M9:a",
+   "M10:c",
+   "M10:d",
+   "M11:c"
+  ]
+ }
+}

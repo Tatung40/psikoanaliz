@@ -22,7 +22,7 @@ def load(design):
 def params(path, columns):
     p = pd.read_csv(path).set_index("item").loc[columns, list(BOUNDS)]
     for k, (lo, hi) in BOUNDS.items():                    # preregistered snap of asymptotic bounds (L-BFGS-B on logit scale)
-        v = p[k].to_numpy(); v[np.abs(v - lo) <= G["snap"]] = lo; v[np.abs(v - hi) <= G["snap"]] = hi; p[k] = v
+        v = p[k].to_numpy(copy=True); v[np.abs(v - lo) <= G["snap"]] = lo; v[np.abs(v - hi) <= G["snap"]] = hi; p[k] = v
     return p
 
 
@@ -42,12 +42,15 @@ def verdict(design, fits, commit):
     ll, lla = evaluate(X, p, *gh(q))[2], evaluate(X, p, *gh(qa))[2]
     s_obj, s_aud = projected(X, p, q), projected(X, p, qa)
     bnd = [f"{i}:{k}" for i in p.index for k, (lo, hi) in BOUNDS.items() if p.loc[i, k] in (lo, hi)]
-    z, w = gh(q); h, _ = information(lambda v: scores(X, v, z, w), p, float(np.cbrt(np.finfo(float).eps))); h = (h + h.T) / 2
-    free = [j for j, (i, k) in enumerate((i, k) for i in p.index for k in BOUNDS) if f"{i}:{k}" not in bnd]
-    face = h[np.ix_(free, free)]; eig = np.linalg.eigvalsh(face); cond = float(eig[-1] / eig[0]) if eig[0] > 0 else float("inf")
+    eig, cond, h = np.array([np.nan]), float("nan"), None
+    if inside:                                            # information is undefined outside the common parameter space
+        z, w = gh(q); h, _ = information(lambda v: scores(X, v, z, w), p, float(np.cbrt(np.finfo(float).eps))); h = (h + h.T) / 2
+        free = [j for j, (i, k) in enumerate((i, k) for i in p.index for k in BOUNDS) if f"{i}:{k}" not in bnd]
+        face = h[np.ix_(free, free)]; eig = np.linalg.eigvalsh(face); cond = float(eig[-1] / eig[0]) if eig[0] > 0 else float("inf")
     gates = dict(inside_bounds=inside, stationary_objective=s_obj <= G["projected_score"],
                  audit=bool(s_aud <= G["projected_score"] and abs(lla - ll) <= G["audit_loglik"]),
-                 information=bool(eig[0] > 0 and cond <= G["condition"]))
+                 information=bool(inside and eig[0] > 0 and cond <= G["condition"]))
+    outside = [f"{i}:{k}={p.loc[i, k]:.4g}" for i in p.index for k, (lo, hi) in BOUNDS.items() if not lo <= p.loc[i, k] <= hi]
     if not inside: cls = "OUTSIDE COMMON BOUNDS"
     elif not gates["stationary_objective"]: cls = "CONVERGENCE FAILURE"
     elif not gates["audit"]: cls = "QUADRATURE ERROR"
@@ -56,7 +59,7 @@ def verdict(design, fits, commit):
     else: cls = "NUMERICAL PASS"
     out = dict(design=design, protocol_commit=commit, stages=stages, objective=dict(grid=q, loglik=ll, projected_score=s_obj),
                audit=dict(grid=qa, loglik=lla, projected_score=s_aud, delta_loglik=lla - ll),
-               information=dict(min_eigenvalue=float(eig[0]), condition=cond), boundaries=bnd, gates=gates,
+               information=dict(min_eigenvalue=float(eig[0]), condition=cond), boundaries=bnd, outside=outside, gates=gates,
                numerical_pass=bool(all(gates.values()) and not bnd), classification=cls, parameters=p.to_dict("index"))
     if design == "A":
         py = json.loads((ROOT / "validation/four_pl_gh_refinement/result.json").read_text())
