@@ -1,41 +1,51 @@
 {
-  "base": "b72d6d4ae19de64dface769369e1de0490a009a9",
-  "Q1": "ARCHIVED ACTUAL R / numerical-only; 4PL failure preserved",
-  "Q2": "VERIFIED ancestry and unchanged thresholds; NRM method repair post-hoc",
-  "Q3": "Five GH61 stationary profiles; GH101 stationarity not met; not structural nonidentifiability proof",
-  "new_certified_cells": 0,
-  "monte_carlo_executions": 0,
-  "sha256": {
-    "validation/evidence/r_polytomous.json": "2b9ef04c15b9742f11d77a71a743397be1060d493170ec0314ec0d0ce9a248b0",
-    "validation/evidence/r_rsm.json": "2ecfa43d623ad925e95f340f5c05950aba69be47e1e96b59a74760d4691b05d4",
-    "validation/evidence/r_34.json": "846c1bc7af0eee81ae2ec5daab075eca087b5ac9b899f90cc169db6c28dd5257",
-    "validation/evidence/r_gt.json": "f135843bbfa6628c0953a4d2ba3cbb6edb1f5bdb65d0dfda142d1dbff9064ae2",
-    "validation/q1_q3/preregistration.json": "ed30a61b25659b74654ccda1ba59fff437f2f58c289340c37218c3c0d43922ac",
-    "validation/q1_q3/reference_sources.json": "c0025055a1564845142b91b0797d4951409ea385ace657ea6ad28b37e24ebe67",
-    "validation/q1_q3/profile_uncentered.json": "c8dcc8f1e2bc9bb8fd7532e014338ff237535cb1281180d9d85513930df90543",
-    "validation/q1_q3/profile_centered.json": "d17567c25fc51cf30adee4e5ab1fbdb8d076f4f1e0839beff416ed743fb7030c",
-    "validation/q1_q3/profile_polished.json": "a74b8ffbacc2142c545a85c44a33b98a19ceb98531780cc786e77cb1482a441a",
-    "validation/q1_q3/PROFILE_PROTOCOL.json": "1942f18a750241e529916b9a7559ab8f274726409e5f5ba94bb61fa3fc157570",
-    "validation/q1_q3/PROFILE_NUMERICAL_AMENDMENT.json": "b7e5f3d651f794443ce99d9f25b8eda13d5d1985b5374a4b4cf8f407c5a82d4d",
-    "validation/q1_q3/PROFILE_POLISH_PROTOCOL.json": "a8569524b3509b2889e68c37e5bf491711f95ec206974a4c33f3c42ae77f88c4"
-  },
-  "existing_evidence_sha256": {
-    "validation/evidence/p4_polytomous/polytomous_mc_study.json": "2efbd659e6dd2cfa1cf01761061c9a01a7cfb0393a02b8a9d758d0e75acd820b",
-    "validation/evidence/p4_polytomous/polytomous_mc_study_adapter.json": "4033c9000c0d061b51031e97d985f336c8efb53370a286c4268c0c24e3705dd8",
-    "validation/evidence/p8_bifactor/recovery.json": "9296d0506c95fa763849ef0044578ec291e40efda05b5d0d177bb0fcfb301ae7"
-  },
-  "source_sha256": {
-    "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
-    "core/irt_binary_inference.py": "bd3d178076f6661b27ded41161ebe951de811921e612fd9a526ed93c375ceb00",
-    "core/irt_rsm.py": "2db444ccb231eb4c885b2aa7e0ab8fef29ec0d234deec7ee6c5d0edde762f44b",
-    "core/generalizability.py": "786ae542cbf81a32b48e034ccdd687406d3419d8248f8805df67123a58e41f51",
-    "validation/r_mirt_phase1/equivalence_audit.py": "73cf4e3561b5ba8f314240bbf363ad1c014d03f0c3016b79ddddffc889fae8bf",
-    "validation/r_mirt_phase1/m12_diagnostic.py": "504a59e8df063ae474be134fed66e62d2ac68cc7b7996040f70032cb7f77c5e9",
-    "validation/r_mirt_phase1/information_audit.py": "80b0077233c9c65856d280b2bee4aefaa94e2297748790386526b09577f28396",
-    "validation/q1_q3/archive.py": "a4fd4bdb22b7f4ad964d7f9f49d6afa886eeace901f6f401ee084fd20b43e8dc",
-    "validation/q1_q3/profile.py": "938d72f5f3e1e670608366a0f7def5bb1aeb0e6591a2bbb1b37e13059f20c85f",
-    "validation/q1_q3/polish.py": "b925abbb9244281249472c70b0af268053d04bdcec1c104498721a6eea3fbdff",
-    "validation/q1_q3/ci_mode.py": "a9226ecd1dfbaaac5ddbea345ca825bea52eae0e467bff9774f62b8198c048e6",
-    "tests/test_certification_q123.py": "8facc82a6451a2a16fc1362145ff81d7d780c0589d2dce223741333386cd85dd"
+ "base": "b72d6d4ae19de64dface769369e1de0490a009a9",
+ "Q1": "ARCHIVED ACTUAL R / numerical-only; 4PL failure preserved",
+ "Q2": "VERIFIED ancestry and unchanged thresholds; NRM method repair post-hoc",
+ "Q3": "Five GH61 stationary profiles; GH101 stationarity not met; not structural nonidentifiability proof",
+ "new_certified_cells": 0,
+ "monte_carlo_executions": 0,
+ "sha256": {
+  "validation/evidence/r_polytomous.json": "2b9ef04c15b9742f11d77a71a743397be1060d493170ec0314ec0d0ce9a248b0",
+  "validation/evidence/r_rsm.json": "2ecfa43d623ad925e95f340f5c05950aba69be47e1e96b59a74760d4691b05d4",
+  "validation/evidence/r_34.json": "846c1bc7af0eee81ae2ec5daab075eca087b5ac9b899f90cc169db6c28dd5257",
+  "validation/evidence/r_gt.json": "f135843bbfa6628c0953a4d2ba3cbb6edb1f5bdb65d0dfda142d1dbff9064ae2",
+  "validation/q1_q3/preregistration.json": "ed30a61b25659b74654ccda1ba59fff437f2f58c289340c37218c3c0d43922ac",
+  "validation/q1_q3/reference_sources.json": "c0025055a1564845142b91b0797d4951409ea385ace657ea6ad28b37e24ebe67",
+  "validation/q1_q3/profile_uncentered.json": "c8dcc8f1e2bc9bb8fd7532e014338ff237535cb1281180d9d85513930df90543",
+  "validation/q1_q3/profile_centered.json": "d17567c25fc51cf30adee4e5ab1fbdb8d076f4f1e0839beff416ed743fb7030c",
+  "validation/q1_q3/profile_polished.json": "a74b8ffbacc2142c545a85c44a33b98a19ceb98531780cc786e77cb1482a441a",
+  "validation/q1_q3/PROFILE_PROTOCOL.json": "1942f18a750241e529916b9a7559ab8f274726409e5f5ba94bb61fa3fc157570",
+  "validation/q1_q3/PROFILE_NUMERICAL_AMENDMENT.json": "b7e5f3d651f794443ce99d9f25b8eda13d5d1985b5374a4b4cf8f407c5a82d4d",
+  "validation/q1_q3/PROFILE_POLISH_PROTOCOL.json": "a8569524b3509b2889e68c37e5bf491711f95ec206974a4c33f3c42ae77f88c4"
+ },
+ "existing_evidence_sha256": {
+  "validation/evidence/p4_polytomous/polytomous_mc_study.json": "2efbd659e6dd2cfa1cf01761061c9a01a7cfb0393a02b8a9d758d0e75acd820b",
+  "validation/evidence/p4_polytomous/polytomous_mc_study_adapter.json": "4033c9000c0d061b51031e97d985f336c8efb53370a286c4268c0c24e3705dd8",
+  "validation/evidence/p8_bifactor/recovery.json": "9296d0506c95fa763849ef0044578ec291e40efda05b5d0d177bb0fcfb301ae7"
+ },
+ "source_sha256": {
+  "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
+  "core/irt_binary_inference.py": "bd3d178076f6661b27ded41161ebe951de811921e612fd9a526ed93c375ceb00",
+  "core/irt_rsm.py": "2db444ccb231eb4c885b2aa7e0ab8fef29ec0d234deec7ee6c5d0edde762f44b",
+  "core/generalizability.py": "0968d481086e427231146f7e7287e66184cf5a7cab5c22ad36d3a00b6b3ed2ae",
+  "validation/r_mirt_phase1/equivalence_audit.py": "73cf4e3561b5ba8f314240bbf363ad1c014d03f0c3016b79ddddffc889fae8bf",
+  "validation/r_mirt_phase1/m12_diagnostic.py": "504a59e8df063ae474be134fed66e62d2ac68cc7b7996040f70032cb7f77c5e9",
+  "validation/r_mirt_phase1/information_audit.py": "80b0077233c9c65856d280b2bee4aefaa94e2297748790386526b09577f28396",
+  "validation/q1_q3/archive.py": "a4fd4bdb22b7f4ad964d7f9f49d6afa886eeace901f6f401ee084fd20b43e8dc",
+  "validation/q1_q3/profile.py": "938d72f5f3e1e670608366a0f7def5bb1aeb0e6591a2bbb1b37e13059f20c85f",
+  "validation/q1_q3/polish.py": "b925abbb9244281249472c70b0af268053d04bdcec1c104498721a6eea3fbdff",
+  "validation/q1_q3/ci_mode.py": "a9226ecd1dfbaaac5ddbea345ca825bea52eae0e467bff9774f62b8198c048e6",
+  "tests/test_certification_q123.py": "8facc82a6451a2a16fc1362145ff81d7d780c0589d2dce223741333386cd85dd"
+ },
+ "source_amendments": {
+  "core/generalizability.py": {
+   "q1_q3_original_sha256": "786ae542cbf81a32b48e034ccdd687406d3419d8248f8805df67123a58e41f51",
+   "amended_sha256": "0968d481086e427231146f7e7287e66184cf5a7cab5c22ad36d3a00b6b3ed2ae",
+   "reason": "GeneralizIT 0.1.2 4-dp rounding made G/D results scale-dependent; adapter now fits centered, power-of-ten scaled scores (exact).",
+   "protocol_commit": "f57ac34",
+   "pr": "gtheory-final",
+   "evidence_effect": "validation/evidence/r_gt.json refers to the original source and is kept unchanged as history; current evidence is validation/generalizability/EVIDENCE_FINAL.md."
   }
+ }
 }
