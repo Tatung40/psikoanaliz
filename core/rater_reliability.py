@@ -134,6 +134,8 @@ def from_long(df, unit_col, rater_col, score_col):
     if any(c not in df for c in (unit_col, rater_col, score_col)) or len({unit_col, rater_col, score_col}) < 3:
         raise RaterDataError("Uzun biçimde birim, puanlayıcı ve puan için üç farklı sütun seçin.")
     issues = []
+    if df[unit_col].isna().any() or df[rater_col].isna().any():
+        raise RaterDataError("Birim veya puanlayıcı kimliği boş olamaz.")
     key = df[[unit_col, rater_col]].astype(str)
     dup = key[key.duplicated(keep=False)].drop_duplicates()
     if len(dup):
@@ -150,8 +152,12 @@ def from_long(df, unit_col, rater_col, score_col):
 
 def from_counts(df, id_col, category_cols):
     issues = []
-    if id_col not in df or not category_cols:
+    if id_col not in df or not category_cols or any(c not in df for c in category_cols):
         raise RaterDataError("Kategori-sıklık biçiminde birim kimliği ve kategori sütunları seçilmelidir.")
+    if id_col in category_cols or len(set(category_cols)) != len(category_cols):
+        raise RaterDataError("Kategori sütunları benzersiz olmalı ve birim kimliğini içermemelidir.")
+    if df[id_col].isna().any():
+        raise RaterDataError("Birim kimliği boş olamaz.")
     counts = df[list(category_cols)]
     if not all(pd.api.types.is_numeric_dtype(counts[c]) for c in counts):
         raise RaterDataError("Kategori-sıklık hücreleri sayı (puanlayıcı sayısı) olmalıdır.")
