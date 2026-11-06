@@ -135,7 +135,8 @@ def _data(df, cfg):
 
 
 def _result_row(out):
-    m = R.METHODS[out["method"]]; s = out["shown"]; f = lambda v: "—" if v is None else f"{v:.4f}"
+    m = R.METHODS[out["method"]]; s = out["shown"]
+    f = lambda v: "—" if v is None or not np.isfinite(v) else f"{v:.4f}"
     main = s.get("estimate", s.get("chi2", s.get("bias")))
     ci = s.get("ci95") or s.get("ci95_bias")
     stat = (f"χ²({s['df']}) = {s['chi2']:.4f}" if "chi2" in s and "df" in s else
@@ -151,7 +152,7 @@ def _results_table(results):
 
 def _ba_png(out):
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-    r = out["result"]; fig, ax = plt.subplots(figsize=(6, 4), dpi=150)
+    r = out["shown"]; fig, ax = plt.subplots(figsize=(6, 4), dpi=150)       # validated values only
     ax.scatter(r["mean"], r["difference"], s=14, color="#2b5f8a")
     for y, ls in ((r["bias"], "-"), (r["loa"][0], "--"), (r["loa"][1], "--")):
         ax.axhline(y, color="#b5452f" if ls == "--" else "#333", ls=ls, lw=1)
@@ -180,7 +181,7 @@ def _docx(results, data, cfg):
         doc.add_paragraph(f"Ölçme düzeyi: {m['level']}; puanlayıcı: {m['raters']}; tahminci: {m['formula']}; motor: {m['engine']}.")
         doc.add_paragraph(out["interpretation"])
         doc.add_paragraph(f"Bilimsel kanıt durumu: {out['status']} (bağımsız referans: {m['reference']}).")
-        if out["method"] == "bland_altman":
+        if out["method"] == "bland_altman" and {"bias", "loa"} <= set(out["shown"]):
             doc.add_picture(io.BytesIO(_ba_png(out)))
     doc.add_heading("Sınırlılıklar", 1)
     doc.add_paragraph("Kanıt durumu yalnız depodaki deterministik örnek veriler için geçerlidir; genel sertifika değildir. SE/GA/p "
@@ -202,7 +203,7 @@ def _exports(results, data, cfg):
               "evidence": "validation/rater_reliability/evidence.json"}
     files = {"bulgular.csv": _csv(t), "ayrinti.csv": _csv(details), "bulgular.xlsx": xbuf.getvalue(),
              "rapor.docx": _docx(results, data, cfg), "analiz_yapilandirmasi.json": json.dumps(config, ensure_ascii=False, indent=1).encode()}
-    if "bland_altman" in results:
+    if "bland_altman" in results and {"bias", "loa"} <= set(results["bland_altman"]["shown"]):
         files["bland_altman.png"] = _ba_png(results["bland_altman"])
     zbuf = io.BytesIO()
     with zipfile.ZipFile(zbuf, "w", zipfile.ZIP_DEFLATED) as z:
@@ -269,7 +270,7 @@ def render():
                 st.markdown(f"**{meta['name']} ({meta['abbr']})** — {out['interpretation']}")
                 st.caption(f"Amaç/model: {meta['formula']}. Düzey: {meta['level']}; puanlayıcı: {meta['raters']}; düzen: {meta['layout']}; "
                            f"eksik veri: {meta['missing']}. Motor: {meta['engine']}. Kanıt: {out['status']}.")
-                if m == "bland_altman":
+                if m == "bland_altman" and {"bias", "loa"} <= set(out["shown"]):
                     st.image(_ba_png(out), caption="Bland–Altman grafiği")
     with st.expander("9. Raporlar ve Dışa Aktarma", expanded=False):
         if saved:

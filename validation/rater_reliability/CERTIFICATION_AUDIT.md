@@ -21,3 +21,21 @@ Base: d7ec24b. Scope: source review of core/rater_reliability.py, core/rater_met
 - No Monte Carlo required for deterministic formula validation. If coverage properties or interval coverage are claimed, separately preregister simulation design and seed.
 
 **Status: audit fixes committed; CI execution and broader numerical validation not yet performed. No CERTIFIED labels authorized.**
+
+## Ön-birleştirme kapanışı (PR #153, PR #152 dalına entegre edildi)
+
+- **P0 sızıntı:** kapatıldı. Ekran tablosu, yorum metni, CSV/XLSX ayrıntısı, DOCX, ZIP ve Bland–Altman PNG yalnız doğrulanmış
+  `shown` çıktılarından üretiliyor. Kanıt yoksa yorum "raporlanmamıştır" diyor; NaN değer "—" olarak gösteriliyor.
+- **P1 ICC(2,k) %95 GA:** **WITHHELD.** Mevcut R kanıtı birbiriyle uyuşmayan iki referans içeriyor: irr (McGraw–Wong ICC(A,k)
+  Satterthwaite) ve psych (Spearman–Brown). Python'a uyduğu için bir referans seçilmedi.
+- **P1 kapsam:** `matrix.py`, 30 yöntemin beyan edilen tüm çıktılarını `evidence.json` ile eşliyor (`CERTIFICATION_MATRIX.md`).
+  Kanıtsız çıktı **yok**; tek uyuşmazlık ICC(2,k) GA'sı. Test: `test_narrative_png_and_matrix_follow_evidence`.
+- **P1 girdi:** boş kimlik (geniş, uzun ve sıklık biçimleri), eksik ya da tekrarlı sütun, tekrarlı puanlayıcı sütunu, sabit
+  puan, eksik veri ve tekil tablo durumlarında analiz Türkçe açıklamayla durduruluyor.
+- **Açık kalan (engelleyici değil, sertifika için gerekli):**
+  - Genişletilmiş sınır durumu matrisi.
+  - Birden fazla fikstür.
+  - psych ve R bağımlılıklarının özet değerleriyle sabitlenmesi.
+  - GPL dağıtım incelemesi.
+
+Durum: **CERTIFIED 0 / kısmi 1 (ICC(2,k)) / NOT CERTIFIED 30** (fikstür düzeyinde NUMERICALLY VALIDATED).

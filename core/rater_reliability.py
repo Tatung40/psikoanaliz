@@ -119,6 +119,8 @@ def from_wide(df, id_col, rater_cols):
         raise RaterDataError("Birim kimliği ve puanlayıcı sütunları veride bulunmalıdır.")
     if id_col in rater_cols:
         raise RaterDataError("Birim kimliği sütunu puanlayıcı olarak seçilemez.")
+    if len(set(rater_cols)) != len(rater_cols):
+        raise RaterDataError("Aynı puanlayıcı sütunu birden fazla seçilmiş.")
     ids = df[id_col]
     if ids.isna().any():
         issues.append(("error", "Birim kimliği boş olan satırlar var."))
@@ -453,8 +455,12 @@ def validated_outputs(method):
 
 
 def interpret(method, result, data):
-    """Short Turkish interpretation built only from the computed values (no universal thresholds)."""
+    """Short Turkish interpretation built only from VALIDATED displayed values (no universal thresholds)."""
     m = METHODS[method]
+    need = ("chi2", "df", "p") if m["group"] == "sistematik" and method != "bland_altman" else \
+        ("bias", "loa") if method == "bland_altman" else ("estimate",)
+    if any(k not in result for k in need):
+        return f"{m['name']}: bu çıktı için bağımsız sayısal kanıt bulunmadığından değer raporlanmamıştır."
     f = lambda v: f"{v:.3f}"
     if m["group"] == "sistematik" and method != "bland_altman":
         sig = "istatistiksel olarak anlamlı" if result["p"] < .05 else "α = .05 düzeyinde anlamlı değil"
@@ -470,7 +476,7 @@ def interpret(method, result, data):
             "kendall_w": "puanlayıcılar arası sıralama uyumunu"}.get(method, "şansa göre düzeltilmiş uyumu" if "kappa" in method or method in
             {"scott_pi", "gwet_ac1", "gwet_ac2", "brennan_prediger", "pabak"} or method.startswith("kripp") else "uyum/güvenirliği")
     text = f"{m['name']} ({m['abbr']}) = {f(est)}; {data.n_units} birim ve {data.n_raters} puanlayıcı. Bu değer {kind} yansıtır."
-    if "ci95" in result and "ci95" in validated_outputs(method):
+    if "ci95" in result:
         text += f" %95 GA [{f(result['ci95'][0])}, {f(result['ci95'][1])}]."
     text += (" Yorum için evrensel eşik kullanılmamıştır; değer, kategori sayısı, prevalans ve çalışmanın amacıyla birlikte "
              "değerlendirilmelidir.")
@@ -498,5 +504,5 @@ def run(method, data):
     metadata = {"n", "pairs", "pairable_units", "mean", "difference"}
     shown = {k: v for k, v in result.items() if k in keep or k in metadata}
     return {"method": method, "result": result, "shown": shown, "status": status(method),
-            "interpretation": interpret(method, result, data), "n_units": data.n_units, "n_raters": data.n_raters,
+            "interpretation": interpret(method, shown, data), "n_units": data.n_units, "n_raters": data.n_raters,
             "categories": [_label(c) for c in data.categories()], "engine": METHODS[method]["engine"], "versions": versions()}
