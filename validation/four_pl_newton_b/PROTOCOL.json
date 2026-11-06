@@ -1,0 +1,17 @@
+{
+ "purpose": "ONE bounded Newton refinement of the classical 4PL marginal ML on Design B (no priors, no MAP/MCMC). Committed before execution.",
+ "data": {"path": "validation/four_pl_rescue/design_b_data.csv", "sha256": "0a928a9c9efea9f15636aad38de67e1fd822c0f6dcf181075d52f4b8d237f773",
+          "truth": "validation/four_pl_rescue/design_b_truth.csv", "truth_sha256": "ffbdb346d3a45d34db15eafa474115152e66ade7e36bd003144797e80022c4b4"},
+ "start": "validation/four_pl_rescue/verdict_B.json parameters (R mirt 1.48 BL_GH161, PR #148; projected score 2.757, logLik -179462.838063)",
+ "model": "P = c + (d - c)/(1 + exp(-a(theta - b))), D = 1, theta ~ N(0,1); bounds a [.1,5], b [-6,6], c [0,.5], d [.5,1]; no priors",
+ "objective": "common logLik equivalence_audit.evaluate on GH161 (validation.q1_q3.profile.gh)",
+ "prechecks": {"mapping": "R-reported logLik equals common GH161 logLik within 1e-6 (PR #148 metadata)",
+               "gradient": "analytic m12_diagnostic.scores vs central difference of the common logLik (h = 1e-5) on 12 fixed coordinates (items I01, I10, I20 x a,b,c,d): max relative error <= 1e-4, else STOP (no fit)"},
+ "newton": {"max_steps": 15, "information": "information_audit.information on GH161, step cbrt(eps), symmetrized; active face = coordinates not at a bound with outward score",
+            "direction": "solve(face information, face score)", "backtracking": "step 0.5^k, k = 0..9; accept the first feasible step with logLik >= previous and projected score < previous",
+            "stop": "STATIONARY (projected score <= 1e-5) | INFORMATION GATE (min eig <= 0 or condition > 1e8) | STAGNATION (no acceptable step) | BUDGET (elapsed > 15 min before a step)",
+            "single_run": "no restarts, no alternative starts, no setting changes"},
+ "gates": {"GH161_projected_score": 1e-5, "GH241_projected_score": 1e-5, "audit_loglik_abs": 1e-3, "information": "active-face PD, condition <= 1e8", "boundaries": 0},
+ "recovery": "only after NUMERICAL PASS: PR #148 PROTOCOL recovery (RMSE a .15, b .10, c .03, d .03; max |z| <= 4, Wald SE from inverse GH161 information)",
+ "not_done": "Monte Carlo, SE/CI certification, production switch"
+}
