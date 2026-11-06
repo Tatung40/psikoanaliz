@@ -1,0 +1,20 @@
+{
+ "purpose": "ONE bound-aware fit of the SAME classical 4PL marginal ML (no priors/MAP/Bayes) on Design B; resolves PR #149 step-0 stagnation. Committed before execution.",
+ "reuse": {"data": "validation/four_pl_rescue/design_b_data.csv (sha256 0a928a9c9efea9f15636aad38de67e1fd822c0f6dcf181075d52f4b8d237f773)",
+           "start": "validation/four_pl_rescue/verdict_B.json parameters (R mirt BL_GH161; score 2.757, logLik -179462.838063)",
+           "prechecks": "PR #149 result.json: mapping |R - common logLik| = 0; analytic vs central-difference gradient max rel 3.5e-6"},
+ "inspection": "PR #149 Newton: information_audit.information returns -dScore = -Hessian (PD at a maximum); d = info^-1 g is an ASCENT direction for logLik; stagnation came from rejecting every infeasible trial point (I23 c = 1.7e-4, I26 d = .99992) with no projection or active set.",
+ "algorithm": {"name": "Bertsekas (1982) projected Newton for maximization (algorithm.py)",
+   "active_set": "x_i - lo_i <= eps & g_i < 0, or hi_i - x_i <= eps & g_i > 0; eps = min(1e-3, ||x - P(x + g)||)",
+   "direction": "free: solve(info_FF, g_F); active: g_i / info_ii",
+   "line_search": "projected arc x(t) = P(x + t d), t = 0.5^k, k = 0..20; accept first t with f(x(t)) - f(x) >= 1e-4 [t g_F.d_F + g_A.(x(t) - x)_A] (implies nondecreasing logLik, feasibility by construction)",
+   "information": "information_audit.information on GH161, step cbrt(eps), symmetrized; stop if free-face min eig <= 0 or condition > 1e8",
+   "stopping": "STATIONARY projected score <= 1e-5 | STAGNATION (no t accepted) | INFORMATION GATE | BUDGET 900 s | MAX STEPS 30",
+   "single_run": "one start, no restarts, no setting changes",
+   "pre_fit_tests": "test_algorithm.py: bounded concave quadratic reaches the known KKT point with nondecreasing f; ascent sign under the -Hessian convention"},
+ "objective": "common logLik on GH161 (equivalence_audit.evaluate, q1_q3.profile.gh); bounds a [.1,5], b [-6,6], c [0,.5], d [.5,1]",
+ "gates_unchanged": {"GH161_projected_score": 1e-5, "GH241_projected_score": 1e-5, "audit_loglik_abs": 1e-3, "active_face_information": "PD, condition <= 1e8"},
+ "boundaries": "recorded separately with KKT multiplier signs; regular NUMERICAL PASS still requires zero boundary estimates (PR #148 definition); a stationary boundary solution is reported as BOUNDARY SOLUTION, not PASS",
+ "recovery": "only after regular NUMERICAL PASS: PR #148 criteria (RMSE a .15, b .10, c .03, d .03; max |z| <= 4)",
+ "not_done": "Monte Carlo, SE/CI certification, production switch"
+}
