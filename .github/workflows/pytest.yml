@@ -54,6 +54,7 @@ jobs:
           python tools/golden_master.py capture /tmp/golden-reference.json.gz --root /tmp/golden-reference
           python tools/golden_master.py capture /tmp/golden-current.json.gz
           # Intended: bifactor teaching data regenerated with 3 specific groups (screen requires 3–4);
+          # Rater reliability module: three new teaching datasets (rater_117–119) in the shared example library.
           # G Theory (PR gtheory-final): library run on centered, power-of-ten scaled scores, so components are no longer
           # 4-dp rounded and SEM/error-budget tables are added (validation/generalizability/PROTOCOL_FINAL.json).
           # B14 "Bilimsel durum" text now states the R mirt / Monte Carlo evidence (PR #97; no numerical change).
@@ -66,7 +67,8 @@ jobs:
             --intended '/python_mirt_models/1PL/usage_labels' --intended '/python_mirt_models/2PL/usage_labels' \
             --intended '/python_mirt_models/1PL/warnings[1]:' \
             --intended '/python_dif/2PL/tables/Raju_area:' \
-            --intended /generalizability
+            --intended /generalizability \
+            --intended /example_library/rater_117 --intended /example_library/rater_118 --intended /example_library/rater_119
       - name: Real public LSAT6 KTK benchmark (independent Pingouin)
         if: github.event_name == 'push'
         timeout-minutes: 3
