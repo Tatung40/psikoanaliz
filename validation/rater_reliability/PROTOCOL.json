@@ -1,0 +1,36 @@
+{
+ "purpose": "Puanlayıcı güvenirliği/uyum modülü: 30 yöntem için ön kayıt. Sayısal karşılaştırmalardan önce commit edildi.",
+ "registry": "core/rater_methods.json (yöntem, tanım, düzey, puanlayıcı sayısı, düzen, eksik veri, motor, referans, çıktılar, örnek)",
+ "python": {
+  "statsmodels": "0.15.0",
+  "pingouin": "0.6.1",
+  "scipy": "1.18.1",
+  "krippendorff": "0.9.0 (GPL-3.0; pingouin zaten GPL-3.0)",
+  "irrCAC_python": "REDDEDİLDİ: scipy==1.12 ve pandas<3 sabitlemesi proje ile çakışıyor; Gwet/BP/Conger kapalı formla"
+ },
+ "r_references": {
+  "irr": "0.85, cran/irr @98e4535cece091e099e7ad7ad96fb132a53fc2d8 (kaynaktan; CRAN dizini bu ortamda erişilemez)",
+  "irrCAC": "1.4, cran/irrCAC @720ab226e407e238bf85f86e9458b93e7793e8a3 (kaynaktan; dplyr, magrittr gerekli)",
+  "psych": "CRAN sürümü (ICC, cohen.kappa)",
+  "base": "stats::mcnemar.test, cor.test ve bağımsız analitik formüller"
+ },
+ "tolerances": {
+  "irr_psych_unrounded": "|fark| ≤ 1e-9 (kapalı form, çift duyarlık)",
+  "irrCAC_rounded": "|fark| ≤ 5e-6 + 1e-9 (irrCAC katsayıları 5 ondalığa yuvarlar)",
+  "p_values": "|fark| ≤ 1e-9 + 1e-6·p",
+  "confidence_intervals_F_quantiles": "|fark| ≤ 1e-8",
+  "analytic_R": "|fark| ≤ 1e-10",
+  "invariance_roundtrip": "puanlayıcı sırası (simetrik yöntemler), nominal yeniden etiketleme, wide↔long, CSV/XLSX gidiş-dönüş: |fark| ≤ 1e-12"
+ },
+ "acceptance": "Bir yöntem × çıktı NUMERICALLY VALIDATED sayılır yalnız: yürütülen her bağımsız referans toleransta. Referans yok/atlandı → NOT CERTIFIED; tolerans dışı → FAIL (çıktı gizlenir). Kanıtsız SE/GA/p ekranda gösterilmez. CERTIFIED etiketi kullanılmaz.",
+ "datasets": "examples/rater_reliability/*.csv (deterministik üretici build.py, sabit tohum 20261106); SHA256 registry.json içinde; kişisel veri yok",
+ "invalid_example": "invalid_teaching.csv: tekrarlı birim kimliği, eksik puan, karışık kodlama; yalnız hata tespiti öğretimi",
+ "compute_budget": "yalnız deterministik hesap; Monte Carlo/bootstrap yok; yerel R referansı < 5 dk; CI'da tek tam regresyon",
+ "not_comparable": "Krippendorff sıralı ↔ irrCAC ordinal ağırlıkları (farklı tanım); irr::agree ↔ çift bazlı Po (> 2 puanlayıcı)",
+ "unsupported": [
+  "eksik veride Fleiss/Conger/Gwet/BP/Light (kapalı başarısızlık)",
+  "Fleiss/Conger/Gwet/BP/Krippendorff SE-GA-p (Python motoru yok)",
+  "dengesiz ICC tasarımları",
+  "bootstrap GA"
+ ]
+}
