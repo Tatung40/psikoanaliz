@@ -1,8 +1,7 @@
 name: jMetrik psychometrics 4PL benchmark
+# Manual only: the preregistered run (PR #147, job 127400205616) exceeded its 45-min budget; its FAIL is recorded
+# in validation/four_pl_java/RESULT.md. Re-running on every PR would only re-create a cancelled check.
 on:
-  pull_request:
-    branches: [main]
-    paths: ['validation/four_pl_java/**', '.github/workflows/java-4pl-benchmark.yml']
   workflow_dispatch:
 permissions:
   contents: read

@@ -72,3 +72,10 @@ p4 ve p8 önkayıt atalıkları Q2'de doğrulandı; p4 NRM yöntem düzeltmesi s
 4PL ML için `FOUR_PL_ML_DECISION.md`: beş yerel GH61 profil noktası stationarity sağladı, aynı çözümler GH101'de sağlamadı. Zayıf pratik tanımlama/sayısal duyarlılık vardır; bu tek fikstürden kalıcı veya yapısal desteklenemezlik çıkarılmaz. Üretim SE/GA kapıları değişmedi. **Yeni CERTIFIED hücre:0.** Q4–Q10 etiket/uygulama senkronu bu batch kapsamında yapılmadı.
 
 4PL ML GH101/GH161 (ön kayıt `daf5e24`): GH101 durağan (1.5e-6), GH161 denetimi FAIL (7.75e-3), 11/48 sınır; NOT CERTIFIED (`validation/four_pl_gh_refinement/REPORT.md`). Model karşılaştırmasında 4PL kanıta bağlı kapıyla görünür ama seçilemez.
+
+4PL ML kurtarma zinciri (PR #148–#150; ön kayıtlar `dd3d646`, `10b89eb`, `7c5b1ab`):
+- A: kutu dışı, M9 a → ∞.
+- B: R mirt durağan değil; sınırlı Newton adım 0'da durdu.
+- Projected Newton, **sınırlı KKT durağan** nokta buldu: skor 3e-6, GH241 denetimi geçti, sınırda I23 c = 0, I26 d = 1, I27 d = 1.
+
+Düzenli sayısal PASS, geri kazanım ve SE/GA kapsamı **sertifikalanmadı**. `FOUR_PL_ML_CERTIFIED_SCOPE = None`.

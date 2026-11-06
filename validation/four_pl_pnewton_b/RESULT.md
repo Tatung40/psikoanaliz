@@ -17,3 +17,34 @@ N = 10000 ve J = 30'da bile ML çözümü bu parametreleri sınıra koyuyor. Say
 asimptotların pratik tanımlanabilirliği. Ön kayıt gereği düzenli PASS sıfır sınır kestirimi gerektirdiğinden, geri kazanım
 kriteri **uygulanmadı**. Sınırdaki parametreler için Wald çıkarımı düzenli değildir.
 Monte Carlo, SE/GA sertifikasyonu ve üretim değişikliği yapılmadı.
+
+## Ön-birleştirme denetimi (yeniden fit yapılmadı)
+Kayıtlı parametrelerle yeniden hesaplandı:
+- Tüm kestirimler sınırların içinde.
+- logLik monoton.
+- GH161 ve GH241 projected score 3.0e-6.
+- logLik GH161 = GH241 = −179462.833991.
+- Üç sınırda da KKT işareti doğru.
+
+`profile_approx.json` dosyasında **ikinci dereceden profil yaklaşımı** var. Bu tam bir yardımcı-parametre profillemesi
+değil. GH161 gözlenen bilgisinin Schur tümleyeni kullanıldı. Eğim, sınırdaki skor olarak alındı. Kesim χ²₁/2 = 1.92; sınır
+karışımı (χ̄²) göz ardı edildi.
+
+| Parametre | Yaklaşık 95% bölge | Gerçek değerde logLik düşüşü |
+|---|---|---|
+| I23 c | [0, .35] | 0.37 |
+| I26 d | [.66, 1] | 0.87 |
+| I27 d | [.68, 1] | 0.32 |
+
+Profil SD .17–.26 aralığında ve üç gerçek değer de bölgenin içinde. Bu, asimptotların zayıf pratik tanımlanmasıyla
+tutarlı. Yapısal tanımsızlık ya da global optimallik **iddia edilmez**.
+
+Etiketler:
+- BOUNDED KKT STATIONARY: desteklendi.
+- REGULAR NUMERICAL PASS: desteklenmedi.
+- PARAMETER RECOVERY: sertifikalanmadı.
+- SE/CI COVERAGE: sertifikalanmadı.
+
+Düzeltme: `algorithm.maximize` artık olurlu olmayan ya da sonlu olmayan bir başlangıcı sessizce kırpmıyor, hata veriyor.
+Bu, kayıtlı fiti değiştirmiyor; başlangıç olurlu ve sonluydu. Sonlu olmayan deneme noktaları zaten reddediliyordu; bu da
+test ediliyor.

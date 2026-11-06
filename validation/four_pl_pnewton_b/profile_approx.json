@@ -1,0 +1,41 @@
+{
+ "method": "QUADRATIC PROFILE APPROXIMATION at the KKT point (Schur complement of GH161 observed information over free + this coordinate; envelope slope = boundary score). Not full nuisance profiling; chi2_1/2 = 1.92 cutoff ignores the boundary chi-bar-square mixture.",
+ "checks": {
+  "in_bounds": true
+ },
+ "boundaries": [
+  {
+   "item": "I23",
+   "parameter": "c",
+   "bound": 0.0,
+   "score": -1.467561475145828,
+   "kkt": true,
+   "profile_curvature_sd": 0.2091526903561382,
+   "approx_95_halfwidth": 0.3506530832838323,
+   "truth": 0.1273920302800509,
+   "approx_drop_at_truth": 0.3724486729362359
+  },
+  {
+   "item": "I26",
+   "parameter": "d",
+   "bound": 1.0,
+   "score": 3.1230910402604155,
+   "kkt": true,
+   "profile_curvature_sd": 0.2599694516622121,
+   "approx_95_halfwidth": 0.3403578130193879,
+   "truth": 0.8082725863098463,
+   "approx_drop_at_truth": 0.8707351314196078
+  },
+  {
+   "item": "I27",
+   "parameter": "d",
+   "bound": 1.0,
+   "score": 0.6490693926775843,
+   "kkt": true,
+   "profile_curvature_sd": 0.17144296094720496,
+   "approx_95_halfwidth": 0.31742157228046286,
+   "truth": 0.8799459075753523,
+   "approx_drop_at_truth": 0.3231032020948358
+  }
+ ]
+}

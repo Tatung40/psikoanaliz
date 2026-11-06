@@ -14,7 +14,9 @@ def projected_score(x, g, lo, hi):
 
 def maximize(f, grad, info, x0, lo, hi, tol=1e-5, eps0=1e-3, sigma=1e-4, max_back=20, max_steps=30, budget=900.,
              cond_max=1e8, log=None):
-    x = np.clip(np.asarray(x0, float), lo, hi); fx = f(x); t0 = time.monotonic(); history = []
+    x = np.asarray(x0, float).copy(); fx = f(x); t0 = time.monotonic(); history = []
+    if not (np.all(np.isfinite(x)) and np.all((x >= lo) & (x <= hi)) and np.isfinite(fx)):
+        raise ValueError("start must be finite, feasible and have a finite objective")  # never clipped silently
     for step in range(max_steps + 1):
         g = grad(x); ps = float(np.abs(projected_score(x, g, lo, hi)).max())
         rec = dict(step=step, elapsed=time.monotonic() - t0, score=ps, f=fx,
