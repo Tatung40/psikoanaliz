@@ -46,5 +46,5 @@ def test_coverage_inventory_has_exactly_the_live_analysis_routes():
     from pathlib import Path
     text=(Path(__file__).resolve().parents[1]/'validation/ACADEMIC_WORD_PYTHON_COVERAGE.md').read_text()
     analyses=[p for p in analysis_catalog() if domain(p) is not None]
-    assert len(analyses)==38
+    assert len(analyses)==39                     # + Puanlayıcı Güvenirliği ve Uyum
     assert all('| '+page+' |' in text for page in analyses)

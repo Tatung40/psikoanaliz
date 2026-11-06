@@ -1,6 +1,6 @@
 # Universal academic Word and faithful Python exports
 
-Scope: **38 real analysis routes**, including the standalone missing-data page;
+Scope: **39 real analysis routes**, including the standalone missing-data page;
 6 auxiliary routes have explicit exclusions below. The existing module inventory
 also lists helpers and is not an analysis-screen count.
 
@@ -38,6 +38,7 @@ certification or VERIFIED code execution is made by the UI.
 | Boyutluluk ve Faktör Analizi | Shared academic_docx; FACTOR | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Yerel Bağımsızlık ve Madde Uyumu | Shared academic_docx; FACTOR | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Genellenebilirlik Kuramı (G ve D Çalışmaları) | Shared academic_docx; GT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
+| Puanlayıcı Güvenirliği ve Uyum | ui.rater_reliability_view._docx (page-specific python-docx report) | Report only after a recorded run; fixture-level NUMERICALLY VALIDATED evidence (validation/rater_reliability/EVIDENCE.md); not CERTIFIED |
 | Çok Boyutlu MTK (MIRT) | Shared academic_docx; MIRT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Eksik Veri ve Atama | Shared academic_docx; DATA | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | MTK: Python mirt Rasch | Shared academic_docx; IRT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
@@ -219,6 +220,7 @@ scientific certification.
 | Boyutluluk ve Faktör Analizi | Boyutluluk ve Faktör Analizi Akademik Rapor | boyutluluk_ve_faktor_analizi_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
 | Yerel Bağımsızlık ve Madde Uyumu | Yerel Bağımsızlık ve Madde Uyumu Akademik Rapor | yerel_bagimsizlik_ve_madde_uyumu_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
 | Genellenebilirlik Kuramı (G ve D Çalışmaları) | Genellenebilirlik Kuramı Akademik Rapor | genellenebilirlik_kurami_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
+| Puanlayıcı Güvenirliği ve Uyum | Puanlayıcı Güvenirliği ve Uyum Raporu | rapor.docx (ZIP: puanlayici_guvenirligi.zip) | Panel 9 after a run; stale results cleared | Page AppTest + DOCX content check (tests/test_rater_reliability.py) |
 | Çok Boyutlu MTK (MIRT) | {md_model} MIRT Akademik Rapor | {model}_mirt_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
 | Eksik Veri ve Atama | Kayıp Veri ve Atama Akademik Rapor | kayip_veri_ve_atama_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
 | MTK: Python mirt Rasch | Rasch Akademik Rapor | rasch_akademik_rapor.docx | Closed initially; independent; existing panels reused | Real-result route AppTest + panel/DOCX checks |
