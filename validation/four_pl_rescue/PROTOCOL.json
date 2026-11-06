@@ -1,0 +1,42 @@
+{
+ "purpose": "4PL ML rescue: one preregistered R mirt strategy on two fixed designs. Committed before any design fit.",
+ "reuse": {
+  "python_mirt_A": "PR #145 four_pl_gh_refinement/result.json: GH101 stationary 1.5e-6, GH161 audit 7.75e-3 FAIL, 11 boundaries; not refit",
+  "r_mirt_EM_A": "PR #146 run 42065126768: EM GH61/GH101 projected score 4.76/4.75 (EM stopped before optimum); not rerun as a verdict",
+  "java_A": "PR #147: not completed within 45 min; not rerun",
+  "tooling_smoke": "simdata N2000 J10 seed 1 (not a design dataset): mirt 1.48 bounded BL crashes (optim method 'nlminb' invalid); after patching to L-BFGS-B, 300 iterations made no logLik progress; native unbounded BFGS BL improved EM logLik. Only timing/feasibility was inspected."
+ },
+ "designs": {
+  "A": {"data": "tests/fixtures/irt_b11/data_irt4pl_ok.csv", "sha256": "ff503e39dfe0ac2c7683c10158248305280070b17133548fd6e43f6ab413ae4c", "N": 3000, "J": 12, "role": "existing failure fixture, unchanged; its failures stay on record"},
+  "B": {"data": "validation/four_pl_rescue/design_b_data.csv", "sha256": "0a928a9c9efea9f15636aad38de67e1fd822c0f6dcf181075d52f4b8d237f773",
+        "truth": "validation/four_pl_rescue/design_b_truth.csv", "truth_sha256": "ffbdb346d3a45d34db15eafa474115152e66ade7e36bd003144797e80022c4b4",
+        "N": 10000, "J": 30, "seed": 20261106, "generator": "make_design_b.py (numpy default_rng)",
+        "truth_ranges": {"a": [1.3, 2.3], "b": "linspace(-1.5, 1.5, 30) shuffled", "c": [0.10, 0.20], "d": [0.80, 0.90]},
+        "role": "identifiable-design candidate; never replaces A"}
+ },
+ "model": "P = c + (d - c)/(1 + exp(-a(theta - b))), D = 1, theta ~ N(0,1) fixed (customPriorFun = GH weights), marginal ML, no priors. Common bounds a [.1,5], b [-6,6], c [0,.5], d [.5,1]. R mirt slope-intercept: a = a1, b = -d_R/a1, c = g, d = u.",
+ "strategy": {
+  "engine": "R mirt 1.48, fit.R",
+  "step1": "EM on GH61, TOL 1e-8, NCYCLES 20000, bounded M-step a1 [.1,5], g [0,.5], u [.5,1], default deterministic starts (identical to PR #146)",
+  "step2": "native mirt BL (stats::optim BFGS, analytic BL.grad, reltol TOL = 1e-12, maxit fixed by mirt at 100) with lbound/ubound set to +-Inf, warm-started on GH61 -> GH101 -> GH161; at most 3 BL calls per grid, stopping early when mirt reports convergence",
+  "equivalence": "the unbounded BL optimum equals the bounded MLE only if it lies inside the common box; an estimate outside the box is FAIL (OUTSIDE COMMON BOUNDS), never clipped",
+  "snap": "values within 1e-6 of a bound are set to the bound before evaluation (c = 0 and d = 1 are reached only asymptotically on mirt's logit scale)",
+  "no_other_strategy": "no other optimizer, start, TOL, grid or prior is tried after seeing results",
+  "objective_stage": "BL_GH161"
+ },
+ "objective_stage": "BL_GH161", "objective_grid": 161, "audit_grid": 241,
+ "numerical_gates": {"projected_score": 1e-5, "audit_loglik": 1e-3, "condition": 1e8, "snap": 1e-6,
+  "definition": "common evaluator (equivalence_audit.evaluate, m12_diagnostic.scores + feasible_scores, information_audit.information on the active face, step cbrt(eps)); stationary on GH161 objective; GH241 independent audit score <= 1e-5 and |logLik_GH241 - logLik_GH161| <= 1e-3; information PD with condition <= 1e8; inside bounds; zero boundary estimates required for a NUMERICAL PASS"},
+ "classification": "OUTSIDE COMMON BOUNDS > CONVERGENCE FAILURE (objective score) > QUADRATURE ERROR (audit) > WEAK IDENTIFICATION (information) > BOUNDARY SOLUTION (stationary but non-regular) > NUMERICAL PASS",
+ "recovery": {"applies": "design B only, after NUMERICAL PASS", "rmse_max": {"a": 0.15, "b": 0.10, "c": 0.03, "d": 0.03}, "max_abs_z": 4.0,
+  "z": "(estimate - truth) / Wald SE from the inverse observed information of the common evaluator (GH161)"},
+ "monte_carlo": {"runs_only_if": "B NUMERICAL PASS and recovery PASS",
+  "design": "R = 100 replications: same truth, response seeds 20261106 + r (r = 1..100), same fit.R and gates per replicate",
+  "criteria": {"numerical_pass_rate": ">= 0.99", "boundary_frequency": "<= 0.01 of estimates", "abs_mean_bias": {"a": 0.05, "b": 0.05, "c": 0.01, "d": 0.01},
+               "wald95_coverage_pooled_per_type": [0.93, 0.97], "min_item_parameter_coverage": 0.88},
+  "budget": "20 parallel CI jobs x 5 replications, 330 min per job; if (B fit seconds x 5) > 330 min, MC is NOT RUN and SE/CI is INCONCLUSIVE (compute blocker)",
+  "profile_intervals": "only if Wald coverage fails; requires a separate preregistration; labeled PROFILE"},
+ "compute_budget": {"design_fit_wall_min": 180, "machine": "2-core container, local R 4 + mirt 1.48", "exceeded": "FAIL (runtime)"},
+ "decision": {"R_pass": "B NUMERICAL + recovery + MC PASS -> optional R 4PL adapter, scoped to design B ranges, ML, Wald", "python": "Python remains the engine unless R passes",
+  "none": "no production switch; FOUR_PL_ML_CERTIFIED_SCOPE stays None", "A_and_B": "certification scope never extends to A-type data; A failure stays documented", "MAP_substitution": "never"}
+}
