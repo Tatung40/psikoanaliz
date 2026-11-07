@@ -1,0 +1,83 @@
+{
+ "purpose": "MFRM module validation protocol. Committed before any cross-package comparison (only a TAM tooling run and the Python logLik mapping identity on the balanced fixture preceded it).",
+ "model": "rating-scale MFRM: log P(k)/P(k-1) = theta - delta_item - lambda_rater [- gamma_task] - tau_k; theta ~ N(mu, sigma^2)",
+ "engine": {
+  "package": "TAM 4.3-25 (cran/TAM @ca84c6e6f8c0f4313811a40e59dbe43e6db9eac6), CDM 8.3-14 (@9fe02443b8386a81092e0e48edd253e172c0b123)",
+  "function": "tam.mml.mfr(formulaA = ~ item + <facets> + step, constraint = 'items')",
+  "estimation": "MML (EM)",
+  "controls": {
+   "nodes": "seq(-6, 6, length.out = 61)",
+   "conv": 1e-07,
+   "convD": 1e-07,
+   "maxiter": 3000,
+   "acceleration": "Ramsay"
+  },
+  "identification": "item, each facet and step parameters sum to zero; mu and sigma^2 estimated",
+  "convergence_gate": "iterations < maxiter, else every output is withheld",
+  "person": "WLE (tam.wle) and EAP/posterior SD (tam.mml.mfr)"
+ },
+ "references": {
+  "identity_python": "independent Python likelihood/probability code using TAM's reported parameters, mean, variance and nodes",
+  "mfrmr": "mfrmr 0.2.4 fit_mfrm(model = 'RSM', method = 'MML', quad_points = 61): same objective (MML, normal latent), different quadrature (Gauss–Hermite) and optimizer",
+  "rasch": "rasch 1.12.1 rasch_mfrm: pairwise conditional ML (different objective) — recovery of known truth only, never equality with MML",
+  "facets_software": "not used: no legally available FACETS output; no FACETS-equivalence is claimed"
+ },
+ "fixtures": {
+  "balanced_3facet": {
+   "file": "examples/mfrm/balanced_3facet.csv",
+   "sha256": "c2721be0f24fff2423b7ef666764b03d2d80b1598e9407ad30d5646e4e6e20da"
+  },
+  "unbalanced_linked": {
+   "file": "examples/mfrm/unbalanced_linked.csv",
+   "sha256": "1293c6ac6c2144d0bbe0868357088580d115acff062431498012ddcb9fce2765"
+  },
+  "four_facet": {
+   "file": "examples/mfrm/four_facet.csv",
+   "sha256": "b5f2e01d3fe59f6015ce81f1098aa0e4c4a5375267fcb2a3d9108070cca22132"
+  },
+  "interaction_bias": {
+   "file": "examples/mfrm/interaction_bias.csv",
+   "sha256": "74030dcd1470aadad886335190772c1439725c0b0cecf814f44742ab8cee8773"
+  },
+  "sparse_category": {
+   "file": "examples/mfrm/sparse_category.csv",
+   "sha256": "85d54463fde0b9395bc0850f5971873c427792a267fba8ac7d5053da18c41233"
+  },
+  "disconnected": {
+   "file": "examples/mfrm/disconnected.csv",
+   "sha256": "6f618b629114e03e50bfa09dc3ae9198e2c9e6b41807f3bb4e1cedc24dc50243"
+  },
+  "invalid_duplicate_missing": {
+   "file": "examples/mfrm/invalid_duplicate_missing.csv",
+   "sha256": "38492b46becd83e4407313a8ff128d1e891356d074f35abbf6d7f2a09d04f9d5"
+  }
+ },
+ "tolerances": {
+  "identity_loglik": "|Python - TAM| <= 1e-5",
+  "identity_eap_sd": "<= 1e-6 (same nodes and weights)",
+  "identity_wle": "<= 1e-4 for WLE and SE (independent Newton solution of Warm's equation)",
+  "mfrmr_facets_thresholds": "<= 5e-3 logits after both are centred to sum zero (quadrature rule and optimizer differ)",
+  "mfrmr_sigma": "<= 5e-3",
+  "mfrmr_loglik": "<= 0.05",
+  "recovery": "TAM and rasch facet/threshold estimates within max(3 SE, 0.15) of the generating value (balanced, unbalanced, four-facet)",
+  "fit_separation": "Python formulas recomputed independently; compared with mfrmr only if its documented definition is identical, else not certified",
+  "interaction": "LR = deviance(main) - deviance(item:rater); df = npars difference; requires both fits converged"
+ },
+ "status_rules": {
+  "CERTIFIED": "fixture-scope only: identity checks pass and mfrmr agreement within tolerance on balanced AND unbalanced fixtures",
+  "PARTIAL": "identity/formula evidence or a single fixture only, or a definition that differs from FACETS; shown with an explicit label",
+  "NOT CERTIFIED": "no valid evidence: output withheld with a Turkish explanation"
+ },
+ "fail_closed": [
+  "missing person/item/rater/score columns or empty IDs",
+  "duplicate person-item-rater(-task) rows",
+  "non-integer or negative scores",
+  "empty intermediate category",
+  "facet with one level",
+  "disconnected person-element network",
+  "R/TAM missing or wrong version",
+  "non-converged estimation"
+ ],
+ "privacy": "person identifiers are not exported unless the user opts in",
+ "compute_budget": "deterministic fixtures only; no Monte Carlo; each fit < 60 s"
+}
