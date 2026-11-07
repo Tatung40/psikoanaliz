@@ -130,20 +130,20 @@ def ets_mh_class(delta, se_log_or, p, alpha=.05):
 
 # ---------------------------------------------------------------- Mantel (ordinal) + SMD
 def mantel_ordinal(y, gf, match):
-    F = EF = VF = 0.; smd_num = 0.; nF_total = (gf == 1).sum(); used = 0
+    F = EF = VF = 0.; smd_num = 0.; nF_total = 0; used = 0
     for s in np.unique(match):
         ix = match == s
         r, f = ix & (gf == 0), ix & (gf == 1)
         nR, nF = r.sum(), f.sum(); T = nR + nF
         if nR == 0 or nF == 0 or T < 2:
             continue
+        nF_total += nF; smd_num += nF * (y[f].mean() - y[r].mean())   # SMD: strata with both groups only
         ys = y[ix]; sy, sy2 = ys.sum(), (ys ** 2).sum()
         v = nR * nF / (T * T * (T - 1)) * (T * sy2 - sy * sy)
         if v <= 0:
             continue
         used += 1
         F += y[f].sum(); EF += nF * sy / T; VF += v
-        smd_num += nF * (y[f].mean() - y[r].mean())
     if used == 0 or VF <= 0:
         return {"chi2": np.nan, "p": np.nan, "smd": np.nan, "strata_used": used,
                 "reason": "Kullanılabilir eşleştirme katmanı yok."}
@@ -172,7 +172,9 @@ def _ordinal_ll(y, X):
     from statsmodels.miscmodels.ordinal_model import OrderedModel
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        res = OrderedModel(y, X, distr="logit").fit(method="bfgs", disp=False, maxiter=500)
+        model = OrderedModel(y, X, distr="logit")
+        start = model.fit(method="bfgs", disp=False, maxiter=500)       # robust start, then Newton polish of the
+        res = model.fit(method="newton", start_params=start.params, disp=False, maxiter=50, tol=1e-8)  # same logL
     if not np.isfinite(res.llf) or not res.mle_retvals.get("converged", False):
         raise RuntimeError("Sıralı lojistik model yakınsamadı.")
     return float(res.llf), res
@@ -198,10 +200,16 @@ def logistic_dif(y, gf, match, ordinal=False):
             beta_group = float(fits["M1"][1].params[2])
     except Exception as exc:
         return {"reason": str(exc), **{k: np.nan for k in ("lr_uniform", "p_uniform", "lr_nonuniform", "p_nonuniform",
-                                                              "lr_omnibus", "p_omnibus", "delta_r2", "beta_group")}}
+                                                              "lr_omnibus", "p_omnibus", "delta_r2", "delta_r2_uniform",
+                                                              "beta_group")}}
     r2 = {m: _nagelkerke(v, ll_null, n) for m, v in ll.items()}
     lr_u, lr_n, lr_o = 2 * (ll["M1"] - ll["M0"]), 2 * (ll["M2"] - ll["M1"]), 2 * (ll["M2"] - ll["M0"])
-    lr_u, lr_n, lr_o = (max(v, 0.) for v in (lr_u, lr_n, lr_o))
+    if min(lr_u, lr_n, lr_o) < -2e-6:                     # same 1e-6 logL rule as irt_dif / irt_dif34
+        return {"reason": "İç içe modellerde geniş modelin olabilirliği dar modelden düşük çıktı (optimizasyon "
+                          "başarısız); LR ve p raporlanmadı.",
+                **{k: np.nan for k in ("lr_uniform", "p_uniform", "lr_nonuniform", "p_nonuniform", "lr_omnibus",
+                                       "p_omnibus", "delta_r2", "delta_r2_uniform", "beta_group")}}
+    lr_u, lr_n, lr_o = (max(v, 0.) for v in (lr_u, lr_n, lr_o))   # only roundoff is clipped
     return {"lr_uniform": lr_u, "p_uniform": float(chi2.sf(lr_u, 1)), "lr_nonuniform": lr_n,
             "p_nonuniform": float(chi2.sf(lr_n, 1)), "lr_omnibus": lr_o, "p_omnibus": float(chi2.sf(lr_o, 2)),
             "delta_r2": r2["M2"] - r2["M0"], "delta_r2_uniform": r2["M1"] - r2["M0"], "beta_group": beta_group,
@@ -240,21 +248,31 @@ def dif_screen(data, group, reference, focal, *, method="MH", ordinal=False, adj
         frame["p_adj"] = adjust_pvalues(frame["p"], adjust)
         return frame
 
-    frame = run(matching); rounds = 1
+    frame = run(matching); rounds = 1; failure = None
     if purify:
+        seen = {matching.tobytes()}
         for rounds in range(1, max_rounds + 1):
             flagged = (frame["p_adj"] < alpha).to_numpy()
             new = ~flagged
             if new.sum() < 2:
-                history.append("Saflaştırma durduruldu: eşleştirme için 2'den az madde kalırdı.")
-                break
+                failure = "eşleştirme için 2'den az DIF'siz madde kalırdı"; break
             if np.array_equal(new, matching):
                 break
-            matching = new; frame = run(matching)
+            if new.tobytes() in seen:
+                failure = "eşleştirme kümesi döngüye girdi (durağan olmayan saflaştırma)"; break
+            seen.add(new.tobytes()); matching = new; frame = run(matching)
         else:
-            history.append("Saflaştırma azami tur sayısında durağanlaşmadı; sonuçlar son tura aittir.")
+            failure = f"{max_rounds} turda durağanlaşmadı"
+        if failure is None and not matching.all():
+            history.append("Eşleştirme maddeleri bu veriden saflaştırmayla seçildi; p değerleri seçim sonrası koşulludur "
+                           "ve koşulsuz çıkarım olarak yorumlanmamalıdır.")
+    if failure:
+        history.append(f"Saflaştırma başarısız: {failure}. p, düzeltilmiş p, DIF kararı ve sınıflar raporlanmadı; "
+                       "istatistikler ve etki büyüklükleri yalnız betimseldir.")
     frame["Eşleştirmede"] = matching
     frame["DIF (düzeltilmiş p < alpha)"] = frame["p_adj"] < alpha
+    if failure:
+        frame[[c for c in frame.columns if c.startswith("p")]] = np.nan
     if method == "MH" and not ordinal:
         frame["ETS sınıfı"] = [ets_mh_class(d, s, p, alpha) for d, s, p in
                                zip(frame["delta"], frame["se_log_or"], frame["p"])]
@@ -263,6 +281,11 @@ def dif_screen(data, group, reference, focal, *, method="MH", ordinal=False, adj
         frame["lnOR %95 üst"] = frame["log_or"] + z * frame["se_log_or"]
     if method == "LR":
         frame["Jodoin–Gierl sınıfı"] = [jodoin_gierl(d, p, alpha) for d, p in zip(frame["delta_r2"], frame["p_adj"])]
+    if failure:
+        frame["DIF (düzeltilmiş p < alpha)"] = None
+        for c in ("ETS sınıfı", "Jodoin–Gierl sınıfı"):
+            if c in frame:
+                frame[c] = "Raporlanmadı"
     tot = x.sum(1); r_, f_ = tot[gf == 0], tot[gf == 1]
     pooled = np.sqrt(((len(r_) - 1) * r_.var(ddof=1) + (len(f_) - 1) * f_.var(ddof=1)) / (len(tot) - 2))
     impact_d = float((f_.mean() - r_.mean()) / pooled) if pooled > 0 else np.nan
@@ -275,6 +298,7 @@ def dif_screen(data, group, reference, focal, *, method="MH", ordinal=False, adj
              "ikili maddelerde madde başına I. tip hata %4–7, aile bazlı hata %4–9 bulundu; sınırda sonuçları "
              "MTK-LR DIF ile doğrulayın."))
     meta = {"method": method, "ordinal": ordinal, "adjust": adjust, "alpha": alpha, "purify": purify,
+            "purification_status": "failed" if failure else ("stable" if purify else "not requested"),
             "impact_cohen_d": impact_d,
             "rounds": rounds, "notes": history, "n_reference": int((gf == 0).sum()), "n_focal": int((gf == 1).sum())}
     return frame, meta

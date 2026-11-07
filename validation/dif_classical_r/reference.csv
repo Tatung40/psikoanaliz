@@ -1,0 +1,257 @@
+"kind","item","key","value"
+"binary","M1","chi2",4.02719523719986
+"binary","M1","p",0.0447723165139354
+"binary","M1","alpha_mh",1.40577151163674
+"binary","M1","delta",-0.800377736093119
+"binary","M1","lnOR %95 alt",0.0207367430170855
+"binary","M1","lnOR %95 üst",0.66043579833876
+"binary","M1","lr_uniform",4.47127822659627
+"binary","M1","p_uniform",0.0344691960155801
+"binary","M1","lr_nonuniform",0.851991203299576
+"binary","M1","p_nonuniform",0.355989645691959
+"binary","M1","lr_omnibus",5.32326942989584
+"binary","M1","p_omnibus",0.0698339697511525
+"binary","M1","delta_r2",0.00399530968876161
+"binary","M1","delta_r2_uniform",0.00335657349868307
+"binary","M2","chi2",0.762542932338834
+"binary","M2","p",0.382533888263127
+"binary","M2","alpha_mh",0.889064584573178
+"binary","M2","delta",0.276325684226654
+"binary","M2","lnOR %95 alt",-0.363554857821559
+"binary","M2","lnOR %95 üst",0.128384062735045
+"binary","M2","lr_uniform",0.955835977299103
+"binary","M2","p_uniform",0.328238234861976
+"binary","M2","lr_nonuniform",0.60082466281915
+"binary","M2","p_nonuniform",0.43826355273887
+"binary","M2","lr_omnibus",1.55666064011825
+"binary","M2","p_omnibus",0.459172041962123
+"binary","M2","delta_r2",0.000899599613739643
+"binary","M2","delta_r2_uniform",0.0005524639139175
+"binary","M3","chi2",75.624869537825
+"binary","M3","p",3.43013911192468e-18
+"binary","M3","alpha_mh",3.20129267118829
+"binary","M3","delta",-2.73435351675828
+"binary","M3","lnOR %95 alt",0.897317821770813
+"binary","M3","lnOR %95 üst",1.42979155419368
+"binary","M3","lr_uniform",75.9066419619101
+"binary","M3","p_uniform",2.97398033100937e-18
+"binary","M3","lr_nonuniform",0.00256520983339215
+"binary","M3","p_nonuniform",0.959606092634236
+"binary","M3","lr_omnibus",75.9092071717434
+"binary","M3","p_omnibus",3.28492228797144e-17
+"binary","M3","delta_r2",0.0345403145263636
+"binary","M3","delta_r2_uniform",0.0345391693109035
+"binary","M4","chi2",0.315785171492408
+"binary","M4","p",0.574151680932616
+"binary","M4","alpha_mh",1.06778553979147
+"binary","M4","delta",-0.1541292500977
+"binary","M4","lnOR %95 alt",-0.143698355777798
+"binary","M4","lnOR %95 üst",0.274872185648181
+"binary","M4","lr_uniform",0.266716937978345
+"binary","M4","p_uniform",0.605542629239119
+"binary","M4","lr_nonuniform",0.229877318159197
+"binary","M4","p_nonuniform",0.631614810141219
+"binary","M4","lr_omnibus",0.496594256137541
+"binary","M4","p_omnibus",0.780128110878804
+"binary","M4","delta_r2",0.000271737743587797
+"binary","M4","delta_r2_uniform",0.000145956629989785
+"binary","M5","chi2",0.0517606897475835
+"binary","M5","p",0.82002738278812
+"binary","M5","alpha_mh",1.03572408418599
+"binary","M5","delta",-0.0824868338457359
+"binary","M5","lnOR %95 alt",-0.20372099559964
+"binary","M5","lnOR %95 üst",0.273922556319416
+"binary","M5","lr_uniform",0.0817072567758714
+"binary","M5","p_uniform",0.774996984075804
+"binary","M5","lr_nonuniform",0.0880490516349255
+"binary","M5","p_nonuniform",0.766672189796995
+"binary","M5","lr_omnibus",0.169756308410797
+"binary","M5","p_omnibus",0.918624208079178
+"binary","M5","delta_r2",7.16475755156987e-05
+"binary","M5","delta_r2_uniform",3.44862336338903e-05
+"binary","M6","chi2",1.68363547366596
+"binary","M6","p",0.194442083149179
+"binary","M6","alpha_mh",0.865010655948503
+"binary","M6","delta",0.340781614809736
+"binary","M6","lnOR %95 alt",-0.355712792956291
+"binary","M6","lnOR %95 üst",0.0656858867352385
+"binary","M6","lr_uniform",1.70415349807899
+"binary","M6","p_uniform",0.191745684745496
+"binary","M6","lr_nonuniform",0.750076120421454
+"binary","M6","p_nonuniform",0.38645213166679
+"binary","M6","lr_omnibus",2.45422961850045
+"binary","M6","p_omnibus",0.293137115262371
+"binary","M6","delta_r2",0.00122198720760658
+"binary","M6","delta_r2_uniform",0.000848675375524799
+"binary","M7","chi2",15.6550357076389
+"binary","M7","p",7.60099169446628e-05
+"binary","M7","alpha_mh",0.668279019088617
+"binary","M7","delta",0.947166323610209
+"binary","M7","lnOR %95 alt",-0.604274365393324
+"binary","M7","lnOR %95 üst",-0.201824633423875
+"binary","M7","lr_uniform",16.651228923839
+"binary","M7","p_uniform",4.49211956959449e-05
+"binary","M7","lr_nonuniform",39.1921900561206
+"binary","M7","p_nonuniform",3.84073482607211e-10
+"binary","M7","lr_omnibus",55.8434189799596
+"binary","M7","p_omnibus",7.47748659600144e-13
+"binary","M7","delta_r2",0.0294841467177931
+"binary","M7","delta_r2_uniform",0.00887779760998636
+"binary","M8","chi2",0.0192648639183231
+"binary","M8","p",0.88960983391257
+"binary","M8","alpha_mh",0.975729530127532
+"binary","M8","delta",0.0577391516009194
+"binary","M8","lnOR %95 alt",-0.264646839106674
+"binary","M8","lnOR %95 üst",0.215507135616529
+"binary","M8","lr_uniform",0.0792780417866652
+"binary","M8","p_uniform",0.778278180296029
+"binary","M8","lr_nonuniform",0.0213127209046888
+"binary","M8","p_nonuniform",0.883930253853014
+"binary","M8","lr_omnibus",0.100590762691354
+"binary","M8","p_omnibus",0.950948490566622
+"binary","M8","delta_r2",4.69182581204763e-05
+"binary","M8","delta_r2_uniform",3.69776244542597e-05
+"binary","M9","chi2",0.189947129452165
+"binary","M9","p",0.662960624849764
+"binary","M9","alpha_mh",0.938098550666114
+"binary","M9","delta",0.150165636424159
+"binary","M9","lnOR %95 alt",-0.313674989729743
+"binary","M9","lnOR %95 üst",0.185874448092161
+"binary","M9","lr_uniform",0.323194993714651
+"binary","M9","p_uniform",0.569693867614224
+"binary","M9","lr_nonuniform",0.0919418258936275
+"binary","M9","p_nonuniform",0.761722889963466
+"binary","M9","lr_omnibus",0.415136819608279
+"binary","M9","p_omnibus",0.812557652961819
+"binary","M9","delta_r2",0.000206845465007821
+"binary","M9","delta_r2_uniform",0.000161038366596755
+"binary","M10","chi2",0.281527491678125
+"binary","M10","p",0.5957017880231
+"binary","M10","alpha_mh",0.92148789604279
+"binary","M10","delta",0.192149246992054
+"binary","M10","lnOR %95 alt",-0.349844967722091
+"binary","M10","lnOR %95 üst",0.1863136936863
+"binary","M10","lr_uniform",0.19538579596292
+"binary","M10","p_uniform",0.658471364621794
+"binary","M10","lr_nonuniform",3.44524218559491
+"binary","M10","p_nonuniform",0.063434124331646
+"binary","M10","lr_omnibus",3.64062798155783
+"binary","M10","p_omnibus",0.161974884328381
+"binary","M10","delta_r2",0.00212521987078468
+"binary","M10","delta_r2_uniform",0.000114154899562513
+"binary","M11","chi2",0.000839887681267446
+"binary","M11","p",0.976879890985044
+"binary","M11","alpha_mh",0.986356858033188
+"binary","M11","delta",0.0322821024576617
+"binary","M11","lnOR %95 alt",-0.286671483071598
+"binary","M11","lnOR %95 üst",0.259197353320396
+"binary","M11","lr_uniform",3.59149225914734e-07
+"binary","M11","p_uniform",0.999521835309673
+"binary","M11","lr_nonuniform",0.00220931852913964
+"binary","M11","p_nonuniform",0.96251052689443
+"binary","M11","lr_omnibus",0.00220967767836555
+"binary","M11","p_omnibus",0.998895771270536
+"binary","M11","delta_r2",1.404649997927e-06
+"binary","M11","delta_r2_uniform",2.28304375404775e-10
+"binary","M12","chi2",4.78566103740246
+"binary","M12","p",0.0286976308009003
+"binary","M12","alpha_mh",0.753995266106992
+"binary","M12","delta",0.663567595011463
+"binary","M12","lnOR %95 alt",-0.529175791350315
+"binary","M12","lnOR %95 üst",-0.0355625873828458
+"binary","M12","lr_uniform",5.13160957131163
+"binary","M12","p_uniform",0.0234939311520471
+"binary","M12","lr_nonuniform",0.251633888350625
+"binary","M12","p_nonuniform",0.615926948990806
+"binary","M12","lr_omnibus",5.38324345966225
+"binary","M12","p_omnibus",0.0677709440428778
+"binary","M12","delta_r2",0.00343693254482164
+"binary","M12","delta_r2_uniform",0.00327648287512189
+"ordinal","M01","chi2",0.0020094298422568
+"ordinal","M01","p",0.964245471324115
+"ordinal","M01","smd",-0.00598359667323263
+"ordinal","M01","lr_uniform",0.165398527434718
+"ordinal","M01","p_uniform",0.684234086370882
+"ordinal","M01","lr_nonuniform",0.0185639177586836
+"ordinal","M01","p_nonuniform",0.891624069281958
+"ordinal","M01","lr_omnibus",0.183962445193401
+"ordinal","M01","p_omnibus",0.912122276672136
+"ordinal","M01","delta_r2",0.000252982946542246
+"ordinal","M01","delta_r2_uniform",0.000227457588217128
+"ordinal","M02","chi2",0.347524388442777
+"ordinal","M02","p",0.555517870198256
+"ordinal","M02","smd",-0.0647476091487961
+"ordinal","M02","lr_uniform",0.00369534374613067
+"ordinal","M02","p_uniform",0.951526980799343
+"ordinal","M02","lr_nonuniform",0.137005872387363
+"ordinal","M02","p_nonuniform",0.711275912254429
+"ordinal","M02","lr_omnibus",0.140701216133493
+"ordinal","M02","p_omnibus",0.932066972412337
+"ordinal","M02","delta_r2",0.000172469604220793
+"ordinal","M02","delta_r2_uniform",4.53021842344858e-06
+"ordinal","M03","chi2",0.28216675534661
+"ordinal","M03","p",0.595284552723037
+"ordinal","M03","smd",0.0560954394092836
+"ordinal","M03","lr_uniform",0.144587754331269
+"ordinal","M03","p_uniform",0.703762099778806
+"ordinal","M03","lr_nonuniform",0.0294665266883385
+"ordinal","M03","p_nonuniform",0.863706274545743
+"ordinal","M03","lr_omnibus",0.174054281019608
+"ordinal","M03","p_omnibus",0.916652216887064
+"ordinal","M03","delta_r2",0.000217879498177032
+"ordinal","M03","delta_r2_uniform",0.000180998023776024
+"ordinal","M04","chi2",0.406888307483136
+"ordinal","M04","p",0.523553117866367
+"ordinal","M04","smd",0.0563496738589857
+"ordinal","M04","lr_uniform",0.27402519611087
+"ordinal","M04","p_uniform",0.600644328436575
+"ordinal","M04","lr_nonuniform",0.0108133987378096
+"ordinal","M04","p_nonuniform",0.917179273755758
+"ordinal","M04","lr_omnibus",0.284838594848679
+"ordinal","M04","p_omnibus",0.867257541385498
+"ordinal","M04","delta_r2",0.000301693628499911
+"ordinal","M04","delta_r2_uniform",0.000290242973121357
+"ordinal","M05","chi2",1.34273002365571
+"ordinal","M05","p",0.246553096293352
+"ordinal","M05","smd",-0.0949153147212675
+"ordinal","M05","lr_uniform",1.4896366206674
+"ordinal","M05","p_uniform",0.222272848754395
+"ordinal","M05","lr_nonuniform",0.344527829963454
+"ordinal","M05","p_nonuniform",0.557227259836105
+"ordinal","M05","lr_omnibus",1.83416445063085
+"ordinal","M05","p_omnibus",0.399683527882816
+"ordinal","M05","delta_r2",0.00211667901236728
+"ordinal","M05","delta_r2_uniform",0.00171957729987315
+"ordinal","M06","chi2",0.679539638301038
+"ordinal","M06","p",0.409745293081515
+"ordinal","M06","smd",-0.0378483681629976
+"ordinal","M06","lr_uniform",2.2389189467674
+"ordinal","M06","p_uniform",0.134575037574044
+"ordinal","M06","lr_nonuniform",1.62003314693447
+"ordinal","M06","p_nonuniform",0.203087165772599
+"ordinal","M06","lr_omnibus",3.85895209370187
+"ordinal","M06","p_omnibus",0.145224269266323
+"ordinal","M06","delta_r2",0.0043091890094924
+"ordinal","M06","delta_r2_uniform",0.00250351582476771
+"ordinal","M07","chi2",2.68907463458672
+"ordinal","M07","p",0.101038476342022
+"ordinal","M07","smd",0.0955045078531364
+"ordinal","M07","lr_uniform",4.13504069907503
+"ordinal","M07","p_uniform",0.0420040574091488
+"ordinal","M07","lr_nonuniform",0.000173651467775926
+"ordinal","M07","p_nonuniform",0.989486030288615
+"ordinal","M07","lr_omnibus",4.13521435054281
+"ordinal","M07","p_omnibus",0.126488083697503
+"ordinal","M07","delta_r2",0.00443391360390522
+"ordinal","M07","delta_r2_uniform",0.00443372804992354
+"ordinal","M08","chi2",0.00058900595822813
+"ordinal","M08","p",0.980637685346139
+"ordinal","M08","smd",-0.00445473241511191
+"ordinal","M08","lr_uniform",0.0749937414154829
+"ordinal","M08","p_uniform",0.78420001111488
+"ordinal","M08","lr_nonuniform",0.0657201665997036
+"ordinal","M08","p_nonuniform",0.797673297541254
+"ordinal","M08","lr_omnibus",0.140713908015186
+"ordinal","M08","p_omnibus",0.932061057589232
+"ordinal","M08","delta_r2",0.00016577020222952
+"ordinal","M08","delta_r2_uniform",8.8352378951051e-05
