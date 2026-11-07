@@ -237,6 +237,8 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: Çok Kategorili Formel DIF",))
         st.button("📏 RSM — Derecelendirme Ölçeği Modeli",key="nav_irt_rsm",
                   use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
+        st.button("🧩 Çok Yüzeyli Rasch (MFRM)",key="nav_mfrm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: Çok Yüzeyli Rasch (MFRM)",))
         st.button("⚖️ Gözlenen Puan DIF (MH / Lojistik)",key="nav_classical_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
         st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
@@ -1568,6 +1570,11 @@ elif selected_page == "Genellenebilirlik Kuramı (G ve D Çalışmaları)":
     src = st.session_state.raw_df
     if src is None: st.warning("Önce CSV/XLSX verisini Veri Yükleme ekranından yükleyin.")
     else: render_generalizability(src, list(st.session_state.item_cols))
+elif selected_page == "MTK: Çok Yüzeyli Rasch (MFRM)":
+    render_academic_header()
+    from ui.mfrm_view import render as render_mfrm
+    instrument_code_capture(globals())
+    render_mfrm()                   # own long-format upload/examples; R TAM required, no substitute estimator
 elif selected_page == "Puanlayıcı Güvenirliği ve Uyum":
     render_academic_header()
     from ui.rater_reliability_view import render as render_rater_reliability

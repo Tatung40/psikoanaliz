@@ -60,7 +60,7 @@ def test_deterministic_schema_real_loader_and_no_shared_mutation(dataset_id):
         assert np.linalg.matrix_rank(np.asarray(first['metadata']['loadings']))==d.dimensions
     actual=E.input_frame(first)
     pd.testing.assert_frame_equal(actual,frame,check_dtype=False,rtol=1e-14,atol=1e-14)
-    if d.family not in ('g','rater'):assert frame[first['id']].is_unique and frame[first['group']].nunique()==2
+    if d.family not in ('g','rater','mfrm'):assert frame[first['id']].is_unique and frame[first['group']].nunique()==2
     if d.family=='rater':assert frame[first['id']].is_unique and first['group'] is None
     if d.family not in ('missing',):assert not frame.isna().any().any()
     first['data'].loc[0,first['id']]='MUTATED'

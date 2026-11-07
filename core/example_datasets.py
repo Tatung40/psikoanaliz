@@ -2,6 +2,7 @@
 from dataclasses import dataclass, asdict
 from functools import lru_cache
 import io
+from pathlib import Path
 import json
 
 import numpy as np
@@ -18,6 +19,7 @@ G_PAGE = 'Genellenebilirlik Kuramı (G ve D Çalışmaları)'
 M_PAGE = 'Çok Boyutlu MTK (MIRT)'
 MISSING_PAGE = 'Eksik Veri ve Atama'
 RATER_PAGE = 'Puanlayıcı Güvenirliği ve Uyum'
+MFRM_PAGE = 'MTK: Çok Yüzeyli Rasch (MFRM)'
 
 
 @dataclass(frozen=True)
@@ -73,6 +75,7 @@ def registry():
         add('factor','Sürekli iki faktör',level,(150,300,500)[level],(8,12,16)[level],dimensions=2)
         add('missing','MCAR öğretim verisi',level,(100,200,300)[level],8)
     for level,(n,k) in enumerate(((30,2),(60,3),(120,5))):add('rater','Sıralı puanlayıcı verisi',level,n,k)
+    for level,(n,k) in enumerate(((3600,3),(3200,5),(3600,3))):add('mfrm','Çok yüzeyli Rasch puanlama verisi',level,n,k)
     return {d.id:d for d in entries}
 
 
@@ -86,7 +89,7 @@ def analysis_catalog():
         'MTK: Çok Kategorili B14','MTK: RSM','MTK: Python mirt DIF','MTK: DIF Analiz Merkezi',
         'MTK: GRM Formel DIF','MTK: Çok Kategorili Formel DIF','MTK: Gözlenen Puan DIF',
         'MTK: 3PL/4PL Bootstrap DIF','Boyutluluk ve Faktör Analizi',
-        'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE,RATER_PAGE]
+        'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE,RATER_PAGE,MFRM_PAGE]
     common += [f'MTK: Python mirt {m}' for m in IRT_MODELS if m!='RSM']
     return tuple(common)
 
@@ -98,6 +101,7 @@ def available(page):
     if page==M_PAGE:return [d for d in datasets if d.family=='mirt']
     if page==MISSING_PAGE:return [d for d in datasets if d.family=='missing']
     if page==RATER_PAGE:return [d for d in datasets if d.family=='rater']
+    if page==MFRM_PAGE:return [d for d in datasets if d.family=='mfrm']
     if 'DIF' in page:
         choices=[d for d in datasets if d.family=='dif']
         if page=='MTK: GRM Formel DIF':choices=[d for d in choices if d.model=='GRM']
@@ -184,6 +188,13 @@ def _generate(dataset_id):
                         counts=counts,scenarios=scenarios,columns={f:f for f in facets},
                         realized_effects={'p':vp.tolist(),'i':vi.tolist(),'r':vr.tolist()},
                         status='LIBRARY TESTED — all 15 G/D examples exercised by regression; NOT CERTIFIED')
+    elif spec.family=='mfrm':
+        # Shipped deterministic fixtures with known generating parameters (examples/mfrm/fixtures.json); long format.
+        name=('balanced_3facet','unbalanced_linked','interaction_bias')[spec.level]
+        df=pd.read_csv(Path(__file__).resolve().parents[1]/'examples/mfrm'/f'{name}.csv')
+        items=['item_id','rater_id','score'];person='person_id';group=None
+        metadata.update(status='GENERATED fixture; see validation/mfrm/evidence.json',layout='long: person_id, item_id, rater_id, score',
+                        fixture=name)
     elif spec.family=='rater':
         # Units x raters 1–5 rubric: true level plus rater-specific shift and +-1 disagreement (no personal data).
         truth=rng.choice(5,spec.n,p=[.1,.2,.35,.25,.1])+1;shift=rng.choice([-1,0,0,1],spec.k)
@@ -260,7 +271,7 @@ def _generate(dataset_id):
             df=df.astype(float).mask(mask);metadata.update(mechanism='MCAR by independent Bernoulli mask',missing_rate=(.03,.10,.20)[spec.level])
         if model=='NRM':
             settings.update(python_mirt_nominal_labels='A,B,C,D',pmd_labels='A,B,C,D',md_labels='A,B,C,D')
-    if spec.family not in ('g','rater'):
+    if spec.family not in ('g','rater','mfrm'):
         df.insert(0,person,[f'O{i+1:04d}' for i in range(len(df))])
         df[group]=np.where(np.arange(len(df))<len(df)//2,'Referans','Odak')
     return {'data':df,'items':items,'id':person,'group':group,'key':key,

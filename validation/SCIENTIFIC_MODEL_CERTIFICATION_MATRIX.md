@@ -90,3 +90,8 @@ Puanlayıcı güvenirliği ve uyum modülü (ön kayıt `e615be4`, `rater_reliab
 - 30 yöntemin kestirimi, kendi örnek verisinde bağımsız R referanslarıyla (irr, irrCAC, psych, stats, analitik) uyumlu.
 - ICC(2,k) %95 GA'sında referanslar kendi aralarında uyuşmadığı için bu GA gizli.
 - Durum **fikstür düzeyinde NUMERICALLY VALIDATED**; genel olarak NOT CERTIFIED.
+
+MFRM (ön kayıt `b3b9e42`, `mfrm/RESULT.md`):
+- R TAM MML; mfrmr MML ile yüzey, eşik, logLik ve σ farkı ≤ 4.2e-6.
+- 5 çıktı CERTIFIED (fikstür kapsamı), 11 PARTIAL, 4 NOT CERTIFIED; 4+ yüzeyli model desteklenmiyor.
+- FACETS eşdeğerliği iddia edilmez.

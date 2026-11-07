@@ -80,7 +80,13 @@ def _extremes(d, K):
 
 
 def components(d, facets):
-    """Connected components of the person–element graph (elements = items and facet levels)."""
+    """Largest number of connected components over the per-facet person–level graphs. A crossed facet (e.g. items)
+    cannot link rater subsets: severity is only separable from person ability when each facet's person–level graph is
+    connected (FACETS-style subset check; necessary condition)."""
+    return max(_components(d, f) for f in ("item", *facets))
+
+
+def _components(d, facet):
     parent = {}
 
     def find(x):
@@ -89,12 +95,10 @@ def components(d, facets):
             parent[x] = parent[parent[x]]; x = parent[x]
         return x
 
-    for row in d[["person", "item", *facets]].itertuples(index=False):
-        a = find(("p", row[0]))
-        for k, v in enumerate(row[1:]):
-            b = find((k, v))
-            if a != b:
-                parent[b] = a
+    for pid, lv in d[["person", facet]].itertuples(index=False):
+        a, b = find(("p", pid)), find(("l", lv))
+        if a != b:
+            parent[b] = a
     return len({find(x) for x in list(parent)})
 
 

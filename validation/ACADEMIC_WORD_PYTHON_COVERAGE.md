@@ -1,6 +1,6 @@
 # Universal academic Word and faithful Python exports
 
-Scope: **39 real analysis routes**, including the standalone missing-data page;
+Scope: **40 real analysis routes**, including the standalone missing-data page;
 6 auxiliary routes have explicit exclusions below. The existing module inventory
 also lists helpers and is not an analysis-screen count.
 
@@ -39,6 +39,7 @@ certification or VERIFIED code execution is made by the UI.
 | Yerel Bağımsızlık ve Madde Uyumu | Shared academic_docx; FACTOR | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Genellenebilirlik Kuramı (G ve D Çalışmaları) | Shared academic_docx; GT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Puanlayıcı Güvenirliği ve Uyum | ui.rater_reliability_view._docx (page-specific python-docx report) | Report only after a recorded run; fixture-level NUMERICALLY VALIDATED evidence (validation/rater_reliability/EVIDENCE.md); not CERTIFIED |
+| MTK: Çok Yüzeyli Rasch (MFRM) | ui.mfrm_view._docx (page-specific python-docx report) | Output-level CERTIFIED/PARTIAL/NOT CERTIFIED from validation/mfrm/evidence.json; R TAM required; not FACETS-equivalent |
 | Çok Boyutlu MTK (MIRT) | Shared academic_docx; MIRT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Eksik Veri ve Atama | Shared academic_docx; DATA | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | MTK: Python mirt Rasch | Shared academic_docx; IRT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
