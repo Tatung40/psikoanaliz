@@ -114,8 +114,15 @@ def _verify_result_panels(page):
     expect(first.locator('[data-testid=stExpanderDetails]').first).to_be_hidden()
     page.get_by_role('button',name=re.compile(r'Akademik Rapor$')).first.wait_for(state='visible',timeout=60_000)
     # Existing scientific checks below still inspect fully rendered charts/tables.
+    # A click that lands while the preceding close animation is still running can be swallowed by Streamlit;
+    # verify every reopen and retry the click (bounded) instead of assuming the panel opened.
     for panel in visible:
-        if panel.get_attribute('open') is None:panel.locator('summary').click()
+        for _ in range(3):
+            if panel.evaluate('d => d.open'):break
+            panel.locator('summary').click()
+            try:expect(panel).to_have_js_property('open',True,timeout=5_000)
+            except AssertionError:continue
+        expect(panel).to_have_js_property('open',True)
     return {'closed_by_default':True,'open_close_round_trip':True,'panels':len(visible)}
 
 
