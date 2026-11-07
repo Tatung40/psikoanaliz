@@ -1,0 +1,136 @@
+{
+ "seed": 20261107,
+ "model": "RSM-MFRM",
+ "fixtures": {
+  "balanced_3facet": {
+   "file": "balanced_3facet.csv",
+   "sha256": "c2721be0f24fff2423b7ef666764b03d2d80b1598e9407ad30d5646e4e6e20da",
+   "rows": 3600,
+   "truth": {
+    "items": {
+     "K1": -0.5,
+     "K2": -0.1,
+     "K3": 0.2,
+     "K4": 0.4
+    },
+    "raters": {
+     "P1": -0.8,
+     "P2": 0.0,
+     "P3": 0.8
+    },
+    "thresholds": [
+     -1.2,
+     0.0,
+     1.2
+    ],
+    "sigma": 1.0
+   }
+  },
+  "unbalanced_linked": {
+   "file": "unbalanced_linked.csv",
+   "sha256": "1293c6ac6c2144d0bbe0868357088580d115acff062431498012ddcb9fce2765",
+   "rows": 3200,
+   "truth": {
+    "items": {
+     "K1": -0.5,
+     "K2": -0.1,
+     "K3": 0.2,
+     "K4": 0.4
+    },
+    "raters": {
+     "P1": -0.8,
+     "P2": -0.3,
+     "P3": 0.0,
+     "P4": 0.3,
+     "P5": 0.8
+    },
+    "thresholds": [
+     -1.2,
+     0.0,
+     1.2
+    ],
+    "sigma": 1.0,
+    "design": "each person rated by 2 of 5 raters in a cyclic (connected) rotation"
+   }
+  },
+  "four_facet": {
+   "file": "four_facet.csv",
+   "sha256": "b5f2e01d3fe59f6015ce81f1098aa0e4c4a5375267fcb2a3d9108070cca22132",
+   "rows": 6000,
+   "truth": {
+    "items": {
+     "K1": -0.5,
+     "K2": -0.1,
+     "K3": 0.2,
+     "K4": 0.4
+    },
+    "raters": {
+     "P1": -0.8,
+     "P2": 0.0,
+     "P3": 0.8
+    },
+    "tasks": {
+     "G1": -0.3,
+     "G2": 0.3
+    },
+    "thresholds": [
+     -1.2,
+     0.0,
+     1.2
+    ],
+    "sigma": 1.0
+   }
+  },
+  "interaction_bias": {
+   "file": "interaction_bias.csv",
+   "sha256": "74030dcd1470aadad886335190772c1439725c0b0cecf814f44742ab8cee8773",
+   "rows": 3600,
+   "truth": {
+    "items": {
+     "K1": -0.5,
+     "K2": -0.1,
+     "K3": 0.2,
+     "K4": 0.4
+    },
+    "raters": {
+     "P1": -0.8,
+     "P2": 0.0,
+     "P3": 0.8
+    },
+    "thresholds": [
+     -1.2,
+     0.0,
+     1.2
+    ],
+    "sigma": 1.0,
+    "interaction": {
+     "P2:K3": 1.0
+    }
+   }
+  },
+  "sparse_category": {
+   "file": "sparse_category.csv",
+   "sha256": "85d54463fde0b9395bc0850f5971873c427792a267fba8ac7d5053da18c41233",
+   "rows": 2400,
+   "truth": {
+    "note": "top category rarely used (tau3 = 3.5); category diagnostics must warn"
+   }
+  },
+  "disconnected": {
+   "file": "disconnected.csv",
+   "sha256": "6f618b629114e03e50bfa09dc3ae9198e2c9e6b41807f3bb4e1cedc24dc50243",
+   "rows": 960,
+   "truth": {
+    "note": "persons 0-59 rated only by P1/P2, persons 60-119 only by P3/P4: not connected"
+   }
+  },
+  "invalid_duplicate_missing": {
+   "file": "invalid_duplicate_missing.csv",
+   "sha256": "38492b46becd83e4407313a8ff128d1e891356d074f35abbf6d7f2a09d04f9d5",
+   "rows": 41,
+   "truth": {
+    "note": "one duplicated person-item-rater row and one missing score"
+   }
+  }
+ }
+}

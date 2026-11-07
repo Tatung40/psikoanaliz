@@ -54,6 +54,7 @@ jobs:
           python tools/golden_master.py capture /tmp/golden-reference.json.gz --root /tmp/golden-reference
           python tools/golden_master.py capture /tmp/golden-current.json.gz
           # Intended: bifactor teaching data regenerated with 3 specific groups (screen requires 3–4);
+          # MFRM module: three shipped long-format fixtures (mfrm_120–122) added to the shared example library.
           # Rater reliability module: three new teaching datasets (rater_117–119) in the shared example library.
           # G Theory (PR gtheory-final): library run on centered, power-of-ten scaled scores, so components are no longer
           # 4-dp rounded and SEM/error-budget tables are added (validation/generalizability/PROTOCOL_FINAL.json).
@@ -68,7 +69,8 @@ jobs:
             --intended '/python_mirt_models/1PL/warnings[1]:' \
             --intended '/python_dif/2PL/tables/Raju_area:' \
             --intended /generalizability \
-            --intended /example_library/rater_117 --intended /example_library/rater_118 --intended /example_library/rater_119
+            --intended /example_library/rater_117 --intended /example_library/rater_118 --intended /example_library/rater_119 \
+            --intended /example_library/mfrm_120 --intended /example_library/mfrm_121 --intended /example_library/mfrm_122
       - name: Real public LSAT6 KTK benchmark (independent Pingouin)
         if: github.event_name == 'push'
         timeout-minutes: 3
@@ -111,7 +113,7 @@ jobs:
   reproducible-native-r:
     name: Native R reproducible code and frequentist references
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -159,6 +161,16 @@ jobs:
             python -m pytest -q tests/test_gtheory_advanced.py::test_independent_r_reml_mapping_and_balanced_mom tests/test_gtheory_advanced.py::test_independent_r_multivariate_polarization tests/test_gtheory_advanced.py::test_r_profile_and_affine_and_singular_diagnostics --basetemp=gtheory-advanced-diagnostics
             python -m validation.gtheory_advanced.archive --collect gtheory-advanced-diagnostics --output gtheory-advanced-evidence.json
           fi
+      - name: MFRM engine (TAM 4.3-25) and independent references (mfrmr 0.2.4, rasch 1.12.1)
+        env:
+          REQUIRE_MFRM_R: '1'
+        run: |
+          python -m pip install 'scipy>=1.11' 'openpyxl>=3.1' 'python-docx>=1.1' 'matplotlib>=3.7' 'streamlit>=1.37'
+          Rscript -e 'install.packages(c("CDM", "mvtnorm", "polycor", "Rcpp", "RcppArmadillo", "cpp11", "dplyr", "tidyr", "tibble", "purrr", "stringr", "psych", "lifecycle", "rlang", "cli", "Matrix"))'
+          for spec in TAM:ca84c6e6f8c0f4313811a40e59dbe43e6db9eac6 mfrmr:38f6fe90f4be20f551282aafff59af4f946e7e77 rasch:8ff517c0f44332d13e27cb1880319e195398c9aa; do
+            p=${spec%%:*}; c=${spec#*:}; git clone -q https://github.com/cran/$p /tmp/$p && git -C /tmp/$p checkout -q $c && R CMD INSTALL --no-docs /tmp/$p > /tmp/$p.log 2>&1 || { tail -20 /tmp/$p.log; exit 1; }
+          done
+          python -m pytest -q tests/test_mfrm.py --basetemp=mfrm-r-diagnostics
       - name: Independent R references for the 30 inter-rater methods (irr, irrCAC, psych, stats)
         env:
           REQUIRE_RATER_R: '1'
@@ -178,3 +190,4 @@ jobs:
             gtheory-advanced-diagnostics/
             gtheory-advanced-evidence.json
             rater-r-diagnostics/
+            mfrm-r-diagnostics/

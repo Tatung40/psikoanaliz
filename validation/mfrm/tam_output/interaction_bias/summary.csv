@@ -1,0 +1,17 @@
+key,value
+loglik,-4144.33146127851
+deviance,8288.66292255702
+AIC,8306.66292255702
+BIC,8339.99696482893
+npars,9.0
+n_persons,300.0
+mean,-0.0669548340844624
+variance,0.911984421022189
+eap_rel,0.860692426948073
+wle_rel,0.854009564936697
+iterations,280.0
+maxiter,3000.0
+converged,1.0
+interaction_deviance,8198.82863447693
+interaction_npars,15.0
+interaction_converged,0.0
