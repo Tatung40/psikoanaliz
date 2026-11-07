@@ -221,7 +221,9 @@ def flow_dif(browser, outdir, log):
                 page.get_by_text(label, exact=True).click(); wait_idle(page)
                 page.get_by_role("button", name="▶️ DIF analizini çalıştır").click(); wait_idle(page)
                 rec['panels']=verify_result_panels(page,outdir/f'{method}_panel_dom.html')
-                page.locator("[data-testid=stPlotlyChart]").first.wait_for(timeout=60_000)
+                # Streamlit can retain a hidden Plotly node from a previous rerun.
+                # Require a genuinely visible chart, not merely the first DOM match.
+                page.locator("[data-testid=stPlotlyChart]:visible").first.wait_for(timeout=60_000)
                 path = download(page, "DIF tablosu — CSV", outdir / f"dif_{method}")
                 xpath = download(page, "DIF tablosu — XLSX", outdir / f"dif_{method}")
                 got = pd.read_csv(path); gx = pd.read_excel(xpath, sheet_name="DIF")
