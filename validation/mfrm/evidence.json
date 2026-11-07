@@ -1,0 +1,198 @@
+{
+ "protocol": "validation/mfrm/PROTOCOL.json",
+ "outputs": {
+  "facet_measures": {
+   "status": "CERTIFIED",
+   "max_diff": 1.6596064910112673e-06,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "mfrmr MML within preregistered tolerance + Python identity"
+  },
+  "thresholds": {
+   "status": "CERTIFIED",
+   "max_diff": 8.970502198835106e-07,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "mfrmr MML within preregistered tolerance + Python identity"
+  },
+  "model_fit": {
+   "status": "CERTIFIED",
+   "max_diff": 4.20736023443169e-06,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "mfrmr MML within preregistered tolerance + Python identity"
+  },
+  "latent": {
+   "status": "CERTIFIED",
+   "max_diff": 5.395903246441236e-07,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "mfrmr MML within preregistered tolerance + Python identity"
+  },
+  "rater_ranking": {
+   "status": "CERTIFIED",
+   "max_diff": 1.6596064910112673e-06,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "ranking of certified facet measures"
+  },
+  "facet_se": {
+   "status": "PARTIAL",
+   "max_diff": 2.9629892345228726e-08,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "threshold_se": {
+   "status": "PARTIAL",
+   "max_diff": null,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "facet_ci": {
+   "status": "PARTIAL",
+   "max_diff": null,
+   "fixtures": [],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "person_wle": {
+   "status": "PARTIAL",
+   "max_diff": null,
+   "fixtures": [],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "person_eap": {
+   "status": "PARTIAL",
+   "max_diff": 5.417414253725255e-06,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "PARTIAL: TAM-reported EAP differs from the Python posterior at the final parameters by up to 1.8e-06 (> preregistered 1e-6 identity tolerance); the app shows the Python EAP recomputed from the final TAM parameters, which agrees with mfrmr within 5.4e-06 (no preregistered tolerance)"
+  },
+  "fit_mnsq": {
+   "status": "PARTIAL",
+   "max_diff": 5.518444745611362e-07,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "observed_expected": {
+   "status": "PARTIAL",
+   "max_diff": 4.376365698721685e-07,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "separation": {
+   "status": "PARTIAL",
+   "max_diff": 1.4171420199105e-05,
+   "fixtures": [
+    "balanced_3facet",
+    "interaction_bias",
+    "unbalanced_linked"
+   ],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "interaction_lr": {
+   "status": "NOT CERTIFIED",
+   "basis": "no comparison could be made (e.g. TAM did not converge); withheld"
+  },
+  "fair_average": {
+   "status": "PARTIAL",
+   "max_diff": null,
+   "fixtures": [],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "category_diagnostics": {
+   "status": "PARTIAL",
+   "max_diff": null,
+   "fixtures": [],
+   "basis": "formula/identity evidence or agreement without a preregistered tolerance; definition documented"
+  },
+  "fit_zstd": {
+   "status": "NOT CERTIFIED",
+   "basis": "no independent evidence; withheld"
+  },
+  "interaction_estimates": {
+   "status": "NOT CERTIFIED",
+   "basis": "no independent evidence; withheld"
+  },
+  "interaction_se": {
+   "status": "NOT CERTIFIED",
+   "basis": "no independent evidence; withheld"
+  },
+  "four_facet_model": {
+   "status": "NOT CERTIFIED",
+   "attempt": {
+    "status": "FAILED under preregistered TAM controls",
+    "message": "R TAM kestirimi ba\u015far\u0131s\u0131z oldu; sonu\u00e7 raporlanmad\u0131 (Error in if (accel < thre1) { : missing value where TRUE/FALSE needed)."
+   },
+   "basis": "TAM four-facet fit under the preregistered controls; production refuses 4+ facets"
+  },
+  "identity": {
+   "status": "CHECK",
+   "all_ok": false,
+   "max_diff": 1.849911632767487e-06,
+   "n": 9,
+   "failures": [
+    {
+     "fixture": "unbalanced_linked",
+     "key": "eap",
+     "diff": 1.8315946479496859e-06,
+     "tol": 1e-06
+    },
+    {
+     "fixture": "interaction_bias",
+     "key": "eap",
+     "diff": 1.0660696019293425e-06,
+     "tol": 1e-06
+    }
+   ]
+  },
+  "recovery_tam": {
+   "status": "CHECK",
+   "all_ok": true,
+   "max_diff": 0.08159761742843197,
+   "n": 16,
+   "failures": []
+  },
+  "recovery_rasch": {
+   "status": "CHECK",
+   "all_ok": true,
+   "max_diff": 0.08935535218706492,
+   "n": 16,
+   "failures": []
+  }
+ },
+ "scope": "examples/mfrm fixtures; not FACETS-equivalent"
+}
