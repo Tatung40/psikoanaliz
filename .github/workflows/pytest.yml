@@ -155,7 +155,7 @@ jobs:
           if [ -f validation/gtheory_advanced/evidence.json ]; then
             python -m validation.gtheory_advanced.archive --audit validation/gtheory_advanced/evidence.json
           else
-            Rscript -e 'install.packages(c("lme4", "jsonlite")); stopifnot(as.character(packageVersion("lme4")) == "2.1-0")'
+            Rscript -e 'install.packages(c("lme4", "jsonlite")); stopifnot(packageVersion("lme4") == package_version("2.1-0")); stopifnot(as.character(package_version("2.1-0")) == "2.1.0")'
             python -m pytest -q tests/test_gtheory_advanced.py::test_independent_r_reml_mapping_and_balanced_mom tests/test_gtheory_advanced.py::test_independent_r_multivariate_polarization tests/test_gtheory_advanced.py::test_r_profile_and_affine_and_singular_diagnostics --basetemp=gtheory-advanced-diagnostics
             python -m validation.gtheory_advanced.archive --collect gtheory-advanced-diagnostics --output gtheory-advanced-evidence.json
           fi

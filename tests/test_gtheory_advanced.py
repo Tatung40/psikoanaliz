@@ -109,6 +109,13 @@ def _r():
     return r
 
 
+def test_r_version_pin_uses_numeric_version_not_printed_punctuation():
+    bridge=(ROOT/'scripts/gtheory_reml.R').read_text()
+    reference=(ROOT/'validation/gtheory_advanced/reference.R').read_text()
+    assert "package_version('2.1-0')" in bridge and "package_version('2.1-0')" in reference
+    assert "as.character(utils::packageVersion('lme4')) !=" not in bridge
+
+
 @pytest.mark.parametrize('design',gt.DESIGNS)
 @pytest.mark.parametrize('missing',[False,True])
 def test_independent_r_reml_mapping_and_balanced_mom(design,missing,tmp_path):

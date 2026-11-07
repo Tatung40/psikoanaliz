@@ -4,7 +4,7 @@ args <- commandArgs(trailingOnly=TRUE)
 stopifnot(length(args)==4L, args[4] %in% c('none','profile'))
 if (!requireNamespace('lme4', quietly=TRUE) || !requireNamespace('jsonlite', quietly=TRUE))
   stop('R lme4 2.1-0 ve jsonlite gereklidir; otomatik paket kurulmaz.')
-if (as.character(utils::packageVersion('lme4')) != '2.1-0') stop('Unvalidated lme4 version')
+if (utils::packageVersion('lme4') != package_version('2.1-0')) stop('Unvalidated lme4 version')
 specs <- list('p x i'=c('p','i'), 'p x r'=c('p','r'),
               'p x i x r'=c('p','i','r','p:i','p:r','i:r'),
               'p x (r:i)'=c('p','i','i:r','p:i'),
@@ -44,6 +44,7 @@ diag <- list(converged=converged, singular=lme4::isSingular(fit,tol=1e-4),
              intercept=as.numeric(lme4::fixef(fit)[1]), logLik=as.numeric(logLik(fit)),
              AIC=AIC(fit), BIC=BIC(fit), observations=nrow(d), REML=TRUE,
              versions=list(R=R.version.string,lme4=as.character(packageVersion('lme4')),
+                           lme4_DESCRIPTION=utils::packageDescription('lme4')$Version,
                            Matrix=as.character(packageVersion('Matrix')),jsonlite=as.character(packageVersion('jsonlite'))))
 jsonlite::write_json(diag,file.path(args[3],'diagnostics.json'),auto_unbox=TRUE,pretty=TRUE,na='null',digits=16)
 re <- lme4::ranef(fit,condVar=TRUE)

@@ -2,7 +2,7 @@
 # Input scores are the identical standardized CSV used by the adapter.
 args <- commandArgs(trailingOnly=TRUE)
 stopifnot(length(args)==3L, requireNamespace('lme4',quietly=TRUE))
-stopifnot(as.character(packageVersion('lme4'))=='2.1-0')
+stopifnot(packageVersion('lme4')==package_version('2.1-0'))
 d <- read.csv(args[1]); for(f in intersect(c('p','i','r'),names(d))) d[[f]]<-factor(d[[f]])
 formulas <- list('p x i'=score~1+(1|p)+(1|i), 'p x r'=score~1+(1|p)+(1|r),
  'p x i x r'=score~1+(1|p)+(1|i)+(1|r)+(1|p:i)+(1|p:r)+(1|i:r),
