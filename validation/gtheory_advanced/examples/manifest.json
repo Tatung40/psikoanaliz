@@ -1,0 +1,42 @@
+{
+  "generation": "deterministic orthogonal contrasts; no random sampling",
+  "protocol_commit": "29dd0c2bede3e9cd29114537321bffdb9843aed5",
+  "canonical_columns": {
+    "p": "Person",
+    "i": "Item",
+    "r": "Rater",
+    "score": "Score"
+  },
+  "files": {
+    "reml_1.csv": {
+      "design": "p x i",
+      "sha256": "f4be5376905514f2777575574f8a06a87201530c6d69c3a46c87bf16e13531dc",
+      "rows": 29
+    },
+    "reml_2.csv": {
+      "design": "p x r",
+      "sha256": "90768bf4611d2dd01bea1c39c879f8d0d0390177def452e6c590d2192f7cec12",
+      "rows": 21
+    },
+    "reml_3.csv": {
+      "design": "p x i x r",
+      "sha256": "8f40f83de613689a2ad9582206a8eb67387b0ace35efff1e396945c8958191ed",
+      "rows": 93
+    },
+    "reml_4.csv": {
+      "design": "p x (r:i)",
+      "sha256": "c0d904c688785d571a7f642495b7eefa4ddfb82656f6a1c09708c48b0e117baf",
+      "rows": 93
+    },
+    "reml_5.csv": {
+      "design": "p x (i:r)",
+      "sha256": "6bd86f3ee5d38786651b8a5771a9c4b8b04a0b86f36bccfb7268bae6e8b81b24",
+      "rows": 93
+    },
+    "multivariate.csv": {
+      "design": "balanced p x i, two dimensions",
+      "sha256": "09c9366d73a14eab023a7e88a29dd287930f14d79f42a76871ac35a5aac06ba8",
+      "rows": 64
+    }
+  }
+}

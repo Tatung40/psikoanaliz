@@ -26,3 +26,4 @@ Uygulamaya GPL kaynak kopyalanmayacak. lme4 GPL≥2 ayrı R sürecinden standart
 ## Gerçek engeller ve sınırlar
 
 Yerel Rscript yok; yerel R kontrolleri NOT EXECUTED. CI gerçek R çalıştıracak. Uygulama R/lme4 bulunmadığında açık Türkçe hata verir, sessiz başka motora geçmez. GeneralizIT varsayılan dengeli davranışı ve mevcut raporlar korunur. Genel çok değişkenli REML ve keyfi sabit yüzey modelleri bu kanıtla açılmaz.
+

@@ -126,3 +126,4 @@
   "statuses": "NUMERICALLY VALIDATED fixture/output only after actual independent execution; LIBRARY TESTED for working engine APIs; EXPERIMENTAL for unsupported generalization/local weight optimization; NOT CERTIFIED missing evidence; UNSUPPORTED unavailable/invalid design. No blanket CERTIFIED.",
   "execution": "targeted tests, native R in CI if local unavailable, one final full regression in CI; no MC and no new unrelated calibrations. Logs/artifacts even on failure."
 }
+
