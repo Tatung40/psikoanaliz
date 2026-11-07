@@ -18,7 +18,7 @@
  },
  "references": {
   "identity_python": "independent Python likelihood/probability code using TAM's reported parameters, mean, variance and nodes",
-  "mfrmr": "mfrmr 0.2.4 fit_mfrm(model = 'RSM', method = 'MML', quad_points = 61): same objective (MML, normal latent), different quadrature (Gauss–Hermite) and optimizer",
+  "mfrmr": "mfrmr 0.2.4 fit_mfrm(model = 'RSM', method = 'MML', quad_points = 61): same objective (MML, normal latent), different quadrature (Gauss–Hermite) and optimizer; population_formula = ~ 1 (estimated normal population, as TAM)",
   "rasch": "rasch 1.12.1 rasch_mfrm: pairwise conditional ML (different objective) — recovery of known truth only, never equality with MML",
   "facets_software": "not used: no legally available FACETS output; no FACETS-equivalence is claimed"
  },
@@ -79,5 +79,13 @@
   "non-converged estimation"
  ],
  "privacy": "person identifiers are not exported unless the user opts in",
- "compute_budget": "deterministic fixtures only; no Monte Carlo; each fit < 60 s"
+ "compute_budget": "deterministic fixtures only; no Monte Carlo; each fit < 60 s",
+ "amendments": [
+  {
+   "date": "2026-11-07",
+   "type": "specification alignment (no tolerance change)",
+   "finding": "mfrmr 0.2.4 RSM/PCM MML fixes the latent distribution at N(0,1) unless population_formula is supplied (documented in fit_mfrm). A first balanced-fixture run with the default therefore estimated a different model (logLik -4062.75 vs TAM -4061.71).",
+   "action": "mfrmr is called with population_formula = ~ 1 and person_data, which estimates N(beta0, sigma^2) as TAM does. Tolerances, fixtures and the TAM engine are unchanged."
+  }
+ ]
 }
