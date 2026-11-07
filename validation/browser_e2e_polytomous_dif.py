@@ -114,8 +114,15 @@ def _verify_result_panels(page):
     expect(first.locator('[data-testid=stExpanderDetails]').first).to_be_hidden()
     page.get_by_role('button',name=re.compile(r'Akademik Rapor$')).first.wait_for(state='visible',timeout=60_000)
     # Existing scientific checks below still inspect fully rendered charts/tables.
+    # A click that lands while the preceding close animation is still running can be swallowed by Streamlit;
+    # verify every reopen and retry the click (bounded) instead of assuming the panel opened.
     for panel in visible:
-        if panel.get_attribute('open') is None:panel.locator('summary').click()
+        for _ in range(3):
+            if panel.evaluate('d => d.open'):break
+            panel.locator('summary').click()
+            try:expect(panel).to_have_js_property('open',True,timeout=5_000)
+            except AssertionError:continue
+        expect(panel).to_have_js_property('open',True)
     return {'closed_by_default':True,'open_close_round_trip':True,'panels':len(visible)}
 
 
@@ -221,7 +228,9 @@ def flow_dif(browser, outdir, log):
                 page.get_by_text(label, exact=True).click(); wait_idle(page)
                 page.get_by_role("button", name="▶️ DIF analizini çalıştır").click(); wait_idle(page)
                 rec['panels']=verify_result_panels(page,outdir/f'{method}_panel_dom.html')
-                page.locator("[data-testid=stPlotlyChart]").first.wait_for(timeout=60_000)
+                # Streamlit can retain a hidden Plotly node from a previous rerun.
+                # Require a genuinely visible chart, not merely the first DOM match.
+                page.locator("[data-testid=stPlotlyChart]:visible").first.wait_for(timeout=60_000)
                 path = download(page, "DIF tablosu — CSV", outdir / f"dif_{method}")
                 xpath = download(page, "DIF tablosu — XLSX", outdir / f"dif_{method}")
                 got = pd.read_csv(path); gx = pd.read_excel(xpath, sheet_name="DIF")
