@@ -1,0 +1,38 @@
+{
+ "purpose": "Independent R references for observed-score DIF outputs not previously compared. Committed before comparison.",
+ "code_under_test": "core/dif_classical.py (after purification/negative-LR/SMD repairs on this branch)",
+ "data": {
+  "binary": {
+   "path": "tests/fixtures/irt_b10/data_dif2pl_mixed.csv",
+   "sha256": "ce1e577b79fc77a17f34eb467af71c64d11fc1d37579d096f1c3a1bc4d79f4dd",
+   "group": "Grup",
+   "reference": "R",
+   "focal": "F"
+  },
+  "ordinal": {
+   "path": "validation/dif_classical_r/ordinal_dif078.csv",
+   "sha256": "f20af1d222602c119b95b18afcfe385d90220ad075a867bf092817e7dca414bd",
+   "source": "core.example_datasets dif_078 (existing deterministic example)",
+   "group": "grup"
+  }
+ },
+ "design": "purify=False (fixed total-score matching including the studied item) so both engines receive identical matching scores",
+ "references": {
+  "MH chi2 (continuity), alpha_MH, 95% CI of ln alpha (RGB)": "R stats::mantelhaen.test(correct=TRUE) on 2x2xK tables",
+  "ETS D": "-2.35 ln(alpha_MH) from R alpha (analytic)",
+  "binary logistic LR (uniform, nonuniform, omnibus) and Nagelkerke R2": "R stats::glm(binomial) logLik; Nagelkerke from R logLik",
+  "ordinal logistic LR and Nagelkerke R2": "R MASS::polr(logistic) logLik (independent optimizer)",
+  "Mantel (1963) ordinal chi2 and SMD": "R analytic code written separately"
+ },
+ "tolerances": {
+  "mh_chi2_alpha": "abs <= 1e-9",
+  "mh_ci_bounds": "abs <= 1e-8 (z quantile)",
+  "glm_lr_r2": "abs <= 1e-6 (both Newton, tight)",
+  "polr_lr": "abs <= 1e-3 (different quasi-Newton optimizers; statsmodels BFGS gtol 1e-5)",
+  "polr_r2": "abs <= 1e-5",
+  "mantel_ordinal_chi2_smd": "abs <= 1e-10",
+  "p_values": "abs <= 1e-9 + 1e-6 p"
+ },
+ "acceptance": "all compared outputs within tolerance -> NUMERICALLY VALIDATED for this fixture; any failure -> FAIL and output gated; not a general Type I/FDR claim",
+ "compute_budget": "deterministic; < 2 min; no Monte Carlo"
+}
