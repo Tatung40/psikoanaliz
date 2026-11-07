@@ -96,7 +96,8 @@ def render(data, item_cols=(), id_col=None, group_col=None):
         st.warning(note)
     show = frame.drop(columns=[c for c in ("reason",) if c in frame.columns and frame[c].eq("").all()])
     st.dataframe(apa_p_frame(show).round(4), hide_index=True, use_container_width=True)
-    st.metric("DIF işaretlenen madde", int(frame["DIF (düzeltilmiş p < alpha)"].sum()))
+    st.metric("DIF işaretlenen madde", "Raporlanmadı" if meta.get("purification_status") == "failed"
+              else int(frame["DIF (düzeltilmiş p < alpha)"].sum()))
     if method == "MH" and not meta["ordinal"]:
         fig = go.Figure()
         fig.add_scatter(x=frame["Madde"], y=frame["delta"], mode="markers", name="MH D-DIF",

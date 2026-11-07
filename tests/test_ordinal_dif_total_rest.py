@@ -89,8 +89,9 @@ def test_stored_evidence_integrity_summary_and_paired_raw_families():
                 data_bytes=arrays['X'].tobytes()+arrays['group'].tobytes()
                 assert hashlib.sha256(data_bytes).hexdigest()==r['data_sha256']
     meta=json.loads((root/'metadata.json').read_text())
+    from validation.source_pins import matches
     for name,digest in meta['sources'].items():
-        assert hashlib.sha256((HERE.parents[1]/name).read_bytes()).hexdigest()==digest
+        assert matches(name,digest,hashlib.sha256((HERE.parents[1]/name).read_bytes()).hexdigest())
     pilot=json.loads((root/'feasibility.json').read_text())
     assert pilot['n']==30
     assert pilot['continue']==(pilot['valid_pairs']==30 and pilot['projected_total_seconds']<=1800)

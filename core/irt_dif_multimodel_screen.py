@@ -25,10 +25,10 @@ def screen_mtk_groups(data,items,group,reference,focal,model,*,permutations=199,
             tab=pd.crosstab(g,x[item])
             tab=tab.reindex(index=[0,1],fill_value=0)
             if tab.shape[1]<2:raise ValueError("Constant nominal item")
-            stat,p=chi2_contingency(tab,correction=False)[:2]
+            stat,p,_,expected=chi2_contingency(tab,correction=False)
             rows.append({"Madde":str(item),"Model":model,"Yöntem":"Ham nominal seçenek dağılımı; DIF DEĞİL",
-                         "Etki":float(stat),"p":float(p),"Karar":"Grup dağılımı farklılığı (DIF kanıtı değil)" if p<.05 else "Belirgin ham farklılık bulunmadı"})
-        return pd.DataFrame(rows)
+                         "Etki":float(stat),"p":float(p),"Seyrek hücre":bool((expected<5).any())})
+        return _family(pd.DataFrame(rows),"Grup dağılımı farklılığı (DIF kanıtı değil)","Belirgin ham farklılık bulunmadı")
     numeric=x.apply(pd.to_numeric,errors="raise").to_numpy(float)
     if not np.isfinite(numeric).all():raise ValueError("Nonfinite responses")
     if model in ("Rasch","1PL","2PL","3PL","4PL") and not np.isin(numeric,[0,1]).all():
@@ -42,7 +42,7 @@ def screen_mtk_groups(data,items,group,reference,focal,model,*,permutations=199,
         eligible=[ix for ix in strata if len(np.unique(g[ix]))==2 and len(ix)>=4]
         if not eligible:
             rows.append({"Madde":str(item),"Model":model,"Yöntem":"Rest puanı koşullu permütasyon taraması; MTK DIF DEĞİL",
-                         "Etki":np.nan,"p":np.nan,"Karar":"Örtüşen grup-rest puanı katmanı yok"})
+                         "Etki":np.nan,"p":np.nan,"Not":"Örtüşen grup-rest puanı katmanı yok"})
             continue
         def statistic(groups):
             vals=[];weights=[]
@@ -59,6 +59,17 @@ def screen_mtk_groups(data,items,group,reference,focal,model,*,permutations=199,
         p=(ge+1)/(permutations+1)
         rows.append({"Madde":str(item),"Model":model,
             "Yöntem":"Rest puanı koşullu permütasyon taraması; MTK DIF DEĞİL",
-            "Etki":observed,"p":p,
-            "Karar":"Koşullu fark incelemesi önerilir" if p<.05 else "Bu taramada belirgin fark yok"})
-    return pd.DataFrame(rows)
+            "Etki":observed,"p":p})
+    return _family(pd.DataFrame(rows),"Koşullu fark incelemesi önerilir","Bu taramada belirgin fark yok")
+
+
+def _family(frame,flag,none,alpha=.05):
+    """Decisions use BH-adjusted p over the items of this screen (one family); raw p is kept for transparency."""
+    from core.dif_classical import adjust_pvalues
+    frame["p (BH)"]=adjust_pvalues(frame["p"],"BH")
+    note=frame.pop("Not") if "Not" in frame else pd.Series([None]*len(frame))
+    sparse=frame.get("Seyrek hücre",pd.Series(False,index=frame.index))
+    frame["Karar"]=[n if isinstance(n,str) else "Raporlanmadı (p hesaplanamadı)" if not np.isfinite(q) else
+                    (flag if q<alpha else none)+(" — seyrek hücre (beklenen < 5); χ² yaklaşımı güvenilir olmayabilir" if sp else "")
+                    for n,q,sp in zip(note,frame["p (BH)"],sparse)]
+    return frame

@@ -117,3 +117,47 @@ def test_impact_warning_is_reported():
     data, g = binary(n=1500, seed=8, mu=0.)
     _, meta = dif_screen(data, g, 0, 1, method="MH")
     assert not any("Cohen d" in n for n in meta["notes"])
+
+
+def test_failed_purification_withholds_inference_but_keeps_descriptives(monkeypatch):
+    import core.dif_classical as C
+    data, g = binary(n=3000, seed=5, shift=1.0)
+    calls = {"n": 0}
+    real = C.adjust_pvalues
+
+    def flip(p, method="BH"):                        # force an A->B->A matching cycle
+        calls["n"] += 1; q = real(p, method)
+        return q * 0 + (.001 if calls["n"] % 2 else .9) if len(q) else q
+    monkeypatch.setattr(C, "adjust_pvalues", flip)
+    frame, meta = C.dif_screen(data, g, 0, 1, method="MH")
+    assert meta["purification_status"] == "failed" and any("Saflaştırma başarısız" in n for n in meta["notes"])
+    assert frame[["p", "p_adj"]].isna().all().all() and frame["DIF (düzeltilmiş p < alpha)"].isna().all()
+    assert set(frame["ETS sınıfı"]) == {"Raporlanmadı"} and frame["chi2"].notna().all() and frame["delta"].notna().all()
+    csv = frame.to_csv(index=False)
+    assert "Raporlanmadı" in csv
+
+
+def test_post_selection_note_and_stable_status():
+    data, g = binary(n=3000, seed=5, shift=1.0)
+    _, meta = dif_screen(data, g, 0, 1, method="MH", adjust="Holm")
+    assert meta["purification_status"] == "stable" and any("seçim sonrası koşulludur" in n for n in meta["notes"])
+
+
+def test_materially_negative_lr_is_rejected_not_clipped(monkeypatch):
+    import core.dif_classical as C
+    y = np.r_[np.zeros(60), np.ones(60)]; gf = np.tile([0, 1], 60); m = np.arange(120) % 7
+    real = C._logit_ll
+    def worse(yy, X):
+        ll, res = real(yy, X)
+        return (ll - 1.0 if X.shape[1] == 4 else ll), res   # M2 below M1: non-nested maxima
+    monkeypatch.setattr(C, "_logit_ll", worse)
+    r = C.logistic_dif(y, gf, m)
+    assert np.isnan(r["p_omnibus"]) and np.isnan(r["lr_nonuniform"]) and "raporlanmadı" in r["reason"]
+    assert set(r) >= {"delta_r2", "delta_r2_uniform", "beta_group"}
+
+
+def test_smd_uses_only_strata_with_both_groups():
+    from core.dif_classical import mantel_ordinal
+    y = np.array([2, 1, 2, 1, 0, 0, 0]); gf = np.array([1, 0, 1, 0, 1, 1, 1]); m = np.array([5, 5, 6, 6, 9, 9, 9])
+    r = mantel_ordinal(y, gf, m)                     # stratum 9 has no reference respondents
+    assert abs(r["smd"] - 1.0) < 1e-12

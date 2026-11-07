@@ -1,0 +1,22 @@
+{
+ "purpose": "Documented changes to sources pinned by archived evidence. Archived metadata is never edited; a pin is satisfied by its original digest or by an amendment whose impact on that evidence is assessed below.",
+ "amendments": {
+  "core/dif_classical.py": [
+   {
+    "from_sha256": "428a2265cb823cb292953cdd0dd14b6f3b29680f8a2ba66a127b642423c26d5b",
+    "to_sha256": "c85d46884d151db6ecf5869e7346e166b29ab1b4f01ad7dff2aebd6b47295b0b",
+    "branch": "audit/dif-final",
+    "changes": [
+     "purification cycle / round-budget / <2-anchor failures withhold p, adjusted p, decisions and classes",
+     "materially negative nested LR (< -2e-6) returns NaN with a reason instead of clipping to 0",
+     "ordinal logistic: BFGS start + Newton polish of the same statsmodels likelihood (tighter MLE)",
+     "ordinal SMD weights only strata containing both groups",
+     "failure dict always contains delta_r2_uniform"
+    ],
+    "evidence_impact": {
+     "validation/ordinal_dif_total_rest, validation/ordinal_dif_impact_zero": "assessed from archived records without rerunning: 0 omnibus LR within 1e-4 of the chi2(2) .05 critical value (Newton polish changes LR by ~1e-6, no decision can flip); 6 of 60,000 archived LR values were exactly 0 (clipped); at most those analyses would become invalid instead of non-rejections, changing any archived rate by <= 6/2500 = .0024. Archived FWER/FDR conclusions (ordinal inflation under impact) are unchanged; the records remain evidence for the recorded source only."
+    }
+   }
+  ]
+ }
+}

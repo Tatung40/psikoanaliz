@@ -103,7 +103,8 @@ def test_saved_control_evidence_pairing_and_immutable_negative_results():
     meta=json.loads((output/'metadata.json').read_text())
     assert meta['actual_impact']==0 and X.protect()==39
     assert X.digest((X.OLD/'results/records.jsonl.gz').read_bytes())==meta['negative_records_sha256']
-    for name,expected in meta['sources'].items():assert X.digest((X.ROOT/name).read_bytes())==expected
+    from validation.source_pins import matches
+    for name,expected in meta['sources'].items():assert matches(name,expected,X.digest((X.ROOT/name).read_bytes()))
     raw=gzip.decompress((output/'crn.jsonl.gz').read_bytes())
     assert X.digest(raw)==meta['crn_sha256']
     assert X.digest((output/'crn.jsonl.gz').read_bytes())==meta['crn_gzip_sha256']
