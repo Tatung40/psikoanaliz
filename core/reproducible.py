@@ -256,7 +256,7 @@ class Recorder:
             errors.append('UNSUPPORTED: bootstrap DIF inference is gated by the UI; a raw-core replay must not expose suppressed p-values.')
         if not completed:
             errors.append('No completed calculation: preflight-only calls cannot export an analysis recipe.')
-        return {'schema': 1, 'page': self.page, 'source_commit': source_commit(), 'runtime_sha256': runtime_hashes(),
+        return {'schema': 1, 'page': self.page, 'source_commit': source_commit(), 'runtime_sha256': runtime_hashes(self.calls),
                 'python': sys.version.split()[0], 'packages': versions, 'calls': self.calls,
                 'unsupported': errors,
                 'preparation_history': 'UNAVAILABLE: exact post-preparation inputs are preserved; raw preprocessing steps are not guessed.',
@@ -358,10 +358,19 @@ def source_commit():
         return 'UNKNOWN; see exact runtime_sha256'
 
 
-def runtime_hashes():
-    return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+def runtime_hashes(calls=()):
+    hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
             for folder in ('core', 'reports') for p in sorted((ROOT / folder).glob('*.py'))
             if not p.name.startswith('reproducible')}
+    for path in _runtime_assets(calls):
+        hashes[str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return hashes
+
+
+def _runtime_assets(calls):
+    path = ROOT / 'scripts' / 'gtheory_reml.R'
+    needed = any(c.get('module')=='core.generalizability_advanced' and c.get('function')=='analyze' for c in calls)
+    return [path] if needed and path.is_file() else []
 
 
 def python_code(manifest):
@@ -403,7 +412,9 @@ if not (RUNTIME / "core").is_dir():
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
         for item in archive.infolist():
             parts = Path(item.filename).parts[1:]
-            if not parts or parts[0] not in ("core", "reports") or ".." in parts or not item.filename.endswith(".py"):
+            if not parts or ".." in parts:
+                continue
+            if not ((parts[0] in ("core", "reports") and item.filename.endswith(".py")) or ("/".join(parts)=="scripts/gtheory_reml.R" and "scripts/gtheory_reml.R" in MANIFEST["runtime_sha256"])):
                 continue
             target = RUNTIME.joinpath(*parts)
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -440,9 +451,12 @@ def bundle(manifest, python):
         for directory in ('core', 'reports'):
             for path in sorted((ROOT / directory).glob('*.py')):
                 archive.write(path, 'runtime/' + str(path.relative_to(ROOT)))
+        for path in _runtime_assets(manifest.get('calls',())):
+            archive.write(path, 'runtime/' + str(path.relative_to(ROOT)))
         archive.writestr('README.txt', 'Exact prepared inputs are embedded in analysis.py and analysis-input.json.\n'
                          'Do not reapply category coding, filtering or missing-value preprocessing.\n'
                          'Install requirements-repro.txt in a virtual environment. No packages are installed automatically.\n'
                          'Python reuses the bundled PsikoAnaliz engine; this is not an independent reference.\n'
+                         'Only REML G-theory calls additionally require R, lme4 2.1-0 and jsonlite; no auto-install.\n'
                          'Code generation is not scientific validation.\n')
     return output.getvalue()

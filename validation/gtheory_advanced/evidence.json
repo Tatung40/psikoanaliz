@@ -1,0 +1,1311 @@
+{
+  "status": "PARTIAL / NUMERICALLY VALIDATED OUTPUTS AND CONFIRMED SAFETY REJECTIONS",
+  "scope": "Only executed deterministic fixtures; singular fits remain NOT CERTIFIED",
+  "source_sha256": {
+    "core/generalizability.py": "0968d481086e427231146f7e7287e66184cf5a7cab5c22ad36d3a00b6b3ed2ae",
+    "core/generalizability_advanced.py": "5dac03e6a67b5638959d6cf839c07d80bb7403f4d599c9947af585e0bc532c26",
+    "scripts/gtheory_reml.R": "07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589",
+    "tests/test_gtheory_advanced.py": "53ab1a469bfb115ef6a6c46a3e0264c1279f78639ded7fc59e383d5d355a52b9",
+    "validation/gtheory_advanced/reference.R": "71193d6b3b50590d431282c4bd535be4784e0874bbbc4aa195a15d6e9c4b3534",
+    "validation/gtheory_advanced/multivariate_reference.R": "757d31016c3647df470d02eda105b949fb5cdc7abc37a475a80964f9b7a0e907",
+    "validation/gtheory_advanced/PROTOCOL.json": "167edcaf4ef3680e20fe90c03988aef5d8311d5d11e2e2b1121910b8104ecdee"
+  },
+  "audit_sha256": {
+    "validation/gtheory_advanced/verify.py": "67d66624bf3347f1a5a5d95eb060b319614a93cb245bc3744fdeef4b343aecfc",
+    "validation/gtheory_advanced/archive.py": "837877864e2b2b4457be776c4bc23186dacc69b9be9ab9a91f0f02130fc737a1"
+  },
+  "execution_sources_sha256": {
+    "core/generalizability.py": "0968d481086e427231146f7e7287e66184cf5a7cab5c22ad36d3a00b6b3ed2ae",
+    "core/generalizability_advanced.py": "5dac03e6a67b5638959d6cf839c07d80bb7403f4d599c9947af585e0bc532c26",
+    "scripts/gtheory_reml.R": "07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589",
+    "tests/test_gtheory_advanced.py": "53e1b862242fbcf76015b766c3b89bf272e9c99a922912f76246404238408b07",
+    "validation/gtheory_advanced/reference.R": "71193d6b3b50590d431282c4bd535be4784e0874bbbc4aa195a15d6e9c4b3534",
+    "validation/gtheory_advanced/multivariate_reference.R": "757d31016c3647df470d02eda105b949fb5cdc7abc37a475a80964f9b7a0e907",
+    "validation/gtheory_advanced/PROTOCOL.json": "167edcaf4ef3680e20fe90c03988aef5d8311d5d11e2e2b1121910b8104ecdee"
+  },
+  "protocol_commit": "29dd0c2bede3e9cd29114537321bffdb9843aed5",
+  "execution_commit": "fa509747e5ce65565df02eb10dc74413803fdd35",
+  "run_id": "42323674735",
+  "workflow_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/42323674735",
+  "comparisons": [
+    {
+      "case": "test_independent_r_reml_mappin0",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x i",
+        "observations": 32,
+        "variance_differences": {
+          "p": 0.0,
+          "i": 0.0,
+          "p:i": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "0576deb26a1cf29eae4019176dbb78383f82d288f00e3eea2c8afc1aaf117258"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin1",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x r",
+        "observations": 24,
+        "variance_differences": {
+          "p": 0.0,
+          "r": 0.0,
+          "p:r": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "0cdae177927ed4bb5bc5bbefa5a5f3db659ca73960ec7a77f7a8601540a116d2"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin2",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x i x r",
+        "observations": 96,
+        "variance_differences": {
+          "p": 0.0,
+          "i": 0.0,
+          "r": 0.0,
+          "p:i": 0.0,
+          "p:r": 0.0,
+          "i:r": 0.0,
+          "p:i:r": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "38a8c31d1bdbfd534889d7e28f65b0bddf009b3e80ed1cf4190c4f6b12407938"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin3",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x (r:i)",
+        "observations": 96,
+        "variance_differences": {
+          "p": 0.0,
+          "i": 0.0,
+          "i:r": 0.0,
+          "p:i": 0.0,
+          "p:i:r": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "19681e8d705a8985d0482014db7702079cc3e66807d6b783c947581f36c5d2a0"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin4",
+      "result": {
+        "status": "SAFETY REJECTION CONFIRMED",
+        "scientific_fit_status": "NOT CERTIFIED",
+        "design": "p x (i:r)",
+        "observations": 96,
+        "variance_differences": {
+          "p": 0.0,
+          "r": 0.0,
+          "r:i": 0.0,
+          "p:r": 0.0,
+          "p:r:i": 0.0
+        },
+        "converged": false,
+        "singular": true,
+        "hessian_pd": false,
+        "coefficients_status": "NOT CERTIFIED / SAFETY REJECTION CONFIRMED",
+        "boundary_components": [
+          "p:r"
+        ],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "606b06e1f9b8da841c3d87498d9e30836325670187d16405bd740b3cb62faddf"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin5",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x i",
+        "observations": 29,
+        "variance_differences": {
+          "p": 0.0,
+          "i": 0.0,
+          "p:i": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "c77c1d48686cf3afe224f5d857b1a777344c375f2d40d1e81733bd62a3a71dca"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin6",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x r",
+        "observations": 21,
+        "variance_differences": {
+          "p": 0.0,
+          "r": 0.0,
+          "p:r": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "72a941c2dc2bdf252f60f3b85d31635546742f64d68baebd0e334e9082d46d85"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin7",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x i x r",
+        "observations": 93,
+        "variance_differences": {
+          "p": 0.0,
+          "i": 0.0,
+          "r": 0.0,
+          "p:i": 0.0,
+          "p:r": 0.0,
+          "i:r": 0.0,
+          "p:i:r": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "c79ad046ff008d3eb4ae4504762f55f95a7768236811b8b1cc462b783062f3d3"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin8",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scientific_fit_status": "CONVERGED / NONSINGULAR",
+        "design": "p x (r:i)",
+        "observations": 93,
+        "variance_differences": {
+          "p": 0.0,
+          "i": 0.0,
+          "i:r": 0.0,
+          "p:i": 0.0,
+          "p:i:r": 0.0
+        },
+        "converged": true,
+        "singular": false,
+        "hessian_pd": true,
+        "coefficients_status": "NUMERICALLY VALIDATED: balanced target G/D, SEM and errors",
+        "boundary_components": [],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "e43b1d412bd9ae53be1ab498c27a1d37ff305ca1aea991c3427dbcb92cf24c9e"
+      }
+    },
+    {
+      "case": "test_independent_r_reml_mappin9",
+      "result": {
+        "status": "SAFETY REJECTION CONFIRMED",
+        "scientific_fit_status": "NOT CERTIFIED",
+        "design": "p x (i:r)",
+        "observations": 93,
+        "variance_differences": {
+          "p": 0.0,
+          "r": 0.0,
+          "r:i": 0.0,
+          "p:r": 0.0,
+          "p:r:i": 0.0
+        },
+        "converged": false,
+        "singular": true,
+        "hessian_pd": false,
+        "coefficients_status": "NOT CERTIFIED / SAFETY REJECTION CONFIRMED",
+        "boundary_components": [
+          "p:r"
+        ],
+        "versions": {
+          "R": "R version 4.6.1 (2026-06-24)",
+          "lme4": "2.1.0",
+          "lme4_DESCRIPTION": "2.1-0",
+          "Matrix": "1.7.5",
+          "jsonlite": "2.0.0",
+          "Python": "3.11.18",
+          "numpy": "2.4.6",
+          "pandas": "3.1.1",
+          "scipy": "1.17.1"
+        },
+        "fixture_sha256": "c26ce0af7b4479d5510d98201799dbd183d44c701be2f25b1d3b4aeaef130b62"
+      }
+    },
+    {
+      "case": "test_independent_r_multivariat0",
+      "result": {
+        "status": "NUMERICALLY VALIDATED",
+        "scope": "balanced two-dimensional p x i fixture, weights and D counts only",
+        "matrix_max_differences": {
+          "universe": 3.552713678800501e-15,
+          "facet": 9.769962616701378e-15,
+          "residual": 4.85722573273506e-15
+        }
+      }
+    }
+  ],
+  "profile_test": "test_r_profile_and_affine_and_0",
+  "profile_intervals": [
+    {
+      "Unnamed: 0": 0,
+      "source": "p",
+      "lower": 9.77724946540713,
+      "upper": 76.20531175438572
+    },
+    {
+      "Unnamed: 0": 1,
+      "source": "i",
+      "lower": 0.6921933290532392,
+      "upper": 20.89730824131451
+    },
+    {
+      "Unnamed: 0": 2,
+      "source": "p:i",
+      "lower": 0.9238784089110669,
+      "upper": 3.1385932420724068
+    }
+  ],
+  "files": [
+    {
+      "path": "test_independent_r_multivariat0/R.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_multivariat0/R.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_multivariat0/comparison.json",
+      "sha256": "12652a9bb81be9a1b1022f6bbd859391464f9b600f69cc7afd352e65ce6ffb8a",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"balanced two-dimensional p x i fixture, weights and D counts only\",\n  \"matrix_max_differences\": {\n    \"universe\": 3.552713678800501e-15,\n    \"facet\": 9.769962616701378e-15,\n    \"residual\": 4.85722573273506e-15\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_multivariat0/input.csv",
+      "sha256": "24d61f61754d61c4126670b286c7c9a714e76d43e7ab74cc49185c0457674546",
+      "content": "p,i,score,Dimension\n0,0,31.7,A\n0,1,31.0,A\n0,2,32.650000000000006,A\n0,3,36.65,A\n1,0,32.4,A\n1,1,32.1,A\n1,2,33.85,A\n1,3,37.65,A\n2,0,33.65,A\n2,1,33.650000000000006,A\n2,2,35.5,A\n2,3,39.199999999999996,A\n3,0,35.45,A\n3,1,35.65,A\n3,2,37.6,A\n3,3,41.3,A\n4,0,37.8,A\n4,1,38.1,A\n4,2,40.15,A\n4,3,43.95,A\n5,0,40.699999999999996,A\n5,1,41.0,A\n5,2,43.150000000000006,A\n5,3,47.15,A\n6,0,44.15,A\n6,1,44.35,A\n6,2,46.6,A\n6,3,50.9,A\n7,0,48.15,A\n7,1,48.150000000000006,A\n7,2,50.5,A\n7,3,55.199999999999996,A\n0,0,33.300000000000004,B\n0,1,31.0,B\n0,2,32.349999999999994,B\n0,3,37.35,B\n1,0,28.8,B\n1,1,26.1,B\n1,2,27.15,B\n1,3,31.95,B\n2,0,26.150000000000002,B\n2,1,23.15,B\n2,2,24.0,B\n2,3,28.7,B\n3,0,25.35,B\n3,1,22.15,B\n3,2,22.9,B\n3,3,27.6,B\n4,0,26.4,B\n4,1,23.1,B\n4,2,23.85,B\n4,3,28.65,B\n5,0,29.3,B\n5,1,26.0,B\n5,2,26.85,B\n5,3,31.85,B\n6,0,34.05,B\n6,1,30.85,B\n6,2,31.9,B\n6,3,37.2,B\n7,0,40.65,B\n7,1,37.650000000000006,B\n7,2,39.0,B\n7,3,44.699999999999996,B\n"
+    },
+    {
+      "path": "test_independent_r_multivariat0/reference/coefficients.csv",
+      "sha256": "04d4873b23f1abc193e79175dda74c8173ecd7ca4c809ff8e3cb22384d0db36c",
+      "content": "\"n\",\"w1\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\",\"cut0\",\"cut40\"\n4,0.5,27.735,0.015,1.700625,0.999459459459459,0.942225619466208,0.122474487139159,1.3040801355745,0.99864431066361,0.968758969884152\n4,0.25,27.16875,0.0187500000000005,1.68828125,0.999310344827586,0.941494977935403,0.136930639376293,1.2993387741463,0.998444133895202,0.980162846415818\n8,0.5,27.735,0.00750000000000002,0.8503125,0.999729656663963,0.970253517431373,0.086602540378444,0.922123907075399,0.999321695546748,0.984131612557079\n8,0.25,27.16875,0.00937500000000027,0.844140625,0.999655053466713,0.969865993613431,0.0968245836551868,0.918771258257462,0.999221461296611,0.989982059495719\n"
+    },
+    {
+      "path": "test_independent_r_multivariat0/reference/facet.csv",
+      "sha256": "fe60a4dadab663338baa20b08cdabada9470490767408d456b535044490664ea",
+      "content": "\"\",\"A\",\"B\"\n\"A\",7.98500000000001,6\n\"B\",6,6.985\n"
+    },
+    {
+      "path": "test_independent_r_multivariat0/reference/residual.csv",
+      "sha256": "7b70fd1f1a1d6636d4cf616cae3a89990d2c8fa4c3a209ac99ae3afdc7c19c00",
+      "content": "\"\",\"A\",\"B\"\n\"A\",0.119999999999997,-1.17961196366423e-16\n\"B\",-1.17961196366423e-16,0.120000000000004\n"
+    },
+    {
+      "path": "test_independent_r_multivariat0/reference/sessionInfo.txt",
+      "sha256": "325a42b41a615b53031f6b54da84990bf8df8d9da8949106c688e39c01845d0d",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n[1] compiler_4.6.1\n"
+    },
+    {
+      "path": "test_independent_r_multivariat0/reference/universe.csv",
+      "sha256": "295dc83aa0a01adee3f1c8c45f1ad9620952a34817a0345b1d4254d7894e9f2b",
+      "content": "\"\",\"A\",\"B\"\n\"A\",38.97,21\n\"B\",21,29.97\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/comparison.json",
+      "sha256": "d340048d26e3f07c42924e6a69b147be24a8b4d8178905bc8993b85c138aa1f2",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"i\": 0.0,\n    \"p:i\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NUMERICALLY VALIDATED: balanced interior only\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"0576deb26a1cf29eae4019176dbb78383f82d288f00e3eea2c8afc1aaf117258\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/normalized.csv",
+      "sha256": "3bd2db6d8eaccc17c0778891ffc6b9386cc38e1d56b14c1c9efde0f8fc2a343f",
+      "content": "p,i,score\n0,0,-1.4236996001765994\n0,1,-1.4236996001765987\n0,2,-1.4236996001765987\n0,3,-1.423699600176598\n1,0,-1.133148661365048\n1,1,-1.0556684110153014\n1,2,-0.9781881606655535\n1,3,-0.9007079103158069\n2,0,-0.8425977225534973\n2,1,-0.6876372218540028\n2,2,-0.5326767211545096\n2,3,-0.3777162204550151\n3,0,-0.5520467837419453\n3,1,-0.3196060326927055\n3,2,-0.08716528164346439\n3,3,0.14527546940577535\n4,0,-0.2614958449303973\n4,1,0.048425156468590407\n4,2,0.3583461578675795\n4,3,0.6682671592665672\n5,0,0.029055093881154796\n5,1,0.4164563456298877\n5,2,0.8038575973786247\n5,3,1.1912588491273577\n6,0,0.3196060326927055\n6,1,0.7844875347911864\n6,2,1.2493690368896686\n6,3,1.7142505389881495\n7,0,0.6101569715042562\n7,1,1.152518723952485\n7,2,1.6948804764007124\n7,3,2.2372422288489413\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_d.csv",
+      "sha256": "ef1fb0e2b227d870dbc5d31199ca57733bb697263213caff8576d865ca742893",
+      "content": ",p,i,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,4,26.059998595294683,0.4000000039347194,1.1666667147543968,0.6324555351443447,1.0801234719949366,0.9848828410767049,0.9571498491839252\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_diagnostics.csv",
+      "sha256": "7e8f39fc48aeefd0cbe1eb4f30dcdd6483205cbe13885987812c665741c4b61c",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,1.2373181578624564,1.296180089485721e-07,bobyqa,[],[],-1.8375635889094503e-15,-71.86656786518078,151.73313573036157,157.59607934156048,32,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-20.981882065122136,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_errors.csv",
+      "sha256": "35fbe526fe9dae8d1ad383ec693fbb0bff1e9e8413afd7bc2991ef2dae125df5",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,26.059998595294683,0.4000000039347194,1.1666667147543968,0.6324555351443447,1.0801234719949366\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_g.csv",
+      "sha256": "8044bc2b11910c284dc9c0dac7b9cfde1fda62ace9965e5c3374775030dfce16",
+      "content": ",rho^2,phi^2\np,0.9848828410767049,0.9571498491839252\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_random_effects.csv",
+      "sha256": "ae526b8ca0ee34bdb700fea094d29de1cdce2cd64e14e534c4ce26ad4e8c1e0d",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p,0,-7.238888881913745,0.9988367538985017,31.261111118086248,0\n1,p,1,-5.170634915652682,0.9988367538985017,33.32936508434731,1\n2,p,2,-3.102380949391609,0.9988367538985017,35.397619050608384,2\n3,p,3,-1.034126983130526,0.9988367538985017,37.465873016869466,3\n4,p,4,1.0341269831305517,0.9988367538985017,39.53412698313055,4\n5,p,5,3.1023809493916294,0.9988367538985017,41.60238094939162,5\n6,p,6,5.170634915652734,0.9988367538985017,43.67063491565273,6\n7,p,7,7.238888881913796,0.9988367538985017,45.73888888191379,7\n8,i,0,-1.9714285771924827,0.8736209529718996,,0\n9,i,1,-0.657142859064166,0.8736209529718996,,1\n10,i,2,0.6571428590641557,0.8736209529718996,,2\n11,i,3,1.9714285771924722,0.8736209529718996,,3\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/python_variance.csv",
+      "sha256": "4bdf13111e737c8eed30a0a46f5b9de25410c8e434852e5ec840511f8c86b240",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,26.059998595294683,26.059998595294683,84.8123224892187\ni,3.066666843278709,3.066666843278709,9.980473956207716\np:i,1.6000000157388776,1.6000000157388776,5.20720355457357\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/reference/coefficients.csv",
+      "sha256": "14dadb8e0a7ad6d59d01e8e7d5c7e45ed371c850c7a6a61f51d7b1668ad018a4",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.977769387310559,0.015007973133279,0.0437732563457236,0.984882841076705,0.957149849183925,0.122507032995167,0.209220592547014\n2,0.977769387310559,0.00750398656663951,0.0218866281728618,0.99238385328824,0.978105840575293,0.086625553773927,0.147941299753861\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/reference/fit.csv",
+      "sha256": "1b77b9bd14ab47cf7e21c259cdd7e786d1c905c60e99338eee565ec8f8dbec36",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-20.9818820651221,49.9637641302443,55.8267077414432,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/reference/variance.csv",
+      "sha256": "22a861c4bd4034ef50b8113d31e3d895ba0e5d6f0f407490081d0823c0bfee5a",
+      "content": "\"source\",\"Variance\"\n\"p\",0.977769387310559\n\"i\",0.115061132849778\n\"p:i\",0.0600318925331161\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin0/settings.json",
+      "sha256": "5a74c1dbff3148e6fb7cf324f39f19fbdbaf79e8aa8bb60b83fdcecf39990da5",
+      "content": "{\n  \"design\": \"p x i\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"i\": \"i\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"0576deb26a1cf29eae4019176dbb78383f82d288f00e3eea2c8afc1aaf117258\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 38.5,\n  \"score_scale\": 5.162605931116572,\n  \"model_mean\": 38.49999999999999,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 1.2373181578624564,\n    \"max_scaled_gradient\": 1.296180089485721e-07,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": -1.8375635889094503e-15,\n    \"logLik\": -71.86656786518078,\n    \"AIC\": 151.73313573036157,\n    \"BIC\": 157.59607934156048,\n    \"observations\": 32,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -20.981882065122136,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"i\": [\n      4\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/comparison.json",
+      "sha256": "6f117e1822f0608be4f8d52644ed77257af663b2d5a196b4df3a29b0012e8580",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"r\": 0.0,\n    \"p:r\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NUMERICALLY VALIDATED: balanced interior only\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"0cdae177927ed4bb5bc5bbefa5a5f3db659ca73960ec7a77f7a8601540a116d2\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/normalized.csv",
+      "sha256": "3b47d49699f865390d283e9f32c623543ccd5b7f70c86aaadcd08f5e99c414e9",
+      "content": "p,r,score\n0,0,-1.5796394093295827\n0,1,-1.5121334516659244\n0,2,-1.444627494002266\n1,0,-1.1746036633476378\n1,1,-1.080095322618517\n1,2,-0.9855869818893965\n2,0,-0.7695679173656939\n2,1,-0.6480571935711099\n2,2,-0.526546469776526\n3,0,-0.364532171383748\n3,1,-0.21601906452370265\n3,2,-0.06750595766365731\n4,0,0.04050357459819209\n4,1,0.21601906452370265\n4,2,0.3915345544492132\n5,0,0.4455393205801379\n5,1,0.6480571935711099\n5,2,0.8505750665620818\n6,0,0.8505750665620818\n6,1,1.080095322618517\n6,2,1.3096155786749524\n7,0,1.2556108125440257\n7,1,1.5121334516659244\n7,2,1.7686560907878228\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_d.csv",
+      "sha256": "127fdafaf33547cf40718f6c787faa407b4f31f5221ec6dd28eda61af5cdc428",
+      "content": ",p,r,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,3,15.340000428901588,0.01999999883715048,0.13750003612622042,0.14142135212601553,0.37080997306736563,0.9986979167786328,0.9911161342597333\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_diagnostics.csv",
+      "sha256": "c7906a8356adf4f477a45e21ade445b3f1fc1b302fe0cd7e459148d5ae9df0d4",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.07264416772013568,4.6563612055831455e-07,bobyqa,[],[],3.870276892543299e-14,-28.99485501306576,65.98971002613152,70.7019253475233,24,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",1.1177814174142569,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_errors.csv",
+      "sha256": "957b5f353318d55b3c7bc692bd7d8d20e65ef4035242379dc3bcfea7ec9db968",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,15.340000428901588,0.01999999883715048,0.13750003612622042,0.14142135212601553,0.37080997306736563\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_g.csv",
+      "sha256": "26c0ce85b9849d7793d49052c74c332f7d8d0421cb8a13a93d3c90fc9a016d31",
+      "content": ",rho^2,phi^2\np,0.9986979167786328,0.9911161342597333\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_random_effects.csv",
+      "sha256": "819f9bab7ff7386c746c5c182ce280e56c2a996a85d429035caff62da631216f",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p,0,-5.592708333960485,0.3611229166754618,31.407291666039658,0\n1,p,1,-3.994791667114648,0.3611229166754618,33.005208332885495,1\n2,p,2,-2.396875000268848,0.3611229166754618,34.60312499973129,2\n3,p,3,-0.7989583334230334,0.3611229166754618,36.20104166657711,3\n4,p,4,0.7989583334227741,0.3611229166754618,37.79895833342292,4\n5,p,5,2.3968750002685852,0.3611229166754618,39.39687500026873,5\n6,p,6,3.994791667114389,0.3611229166754618,40.994791667114534,6\n7,p,7,5.592708333960227,0.3611229166754618,42.59270833396037,7\n8,r,0,-0.5875000045959324,0.34002910575040096,,0\n9,r,1,-1.2210352568983544e-14,0.34002910575040096,,1\n10,r,2,0.5875000045959066,0.34002910575040096,,2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/python_variance.csv",
+      "sha256": "b16c98f88c76c56fa2a716bc140bdfb5abdf82a0579901660eb5ebe3af33d97c",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,15.340000428901588,15.340000428901588,97.3813674381256\nr,0.35250011186720986,0.35250011186720986,2.2377406750945643\np:r,0.05999999651145144,0.05999999651145144,0.3808918867798417\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/reference/coefficients.csv",
+      "sha256": "0a855ca10344fdf75f5343fe3c3ef1ed8c77cebb3d5ad6e7822b127e55aef7e5",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,1.11848344359472,0.0014582572976413,0.0100255221382589,0.998697916778633,0.991116134259734,0.0381871352374239,0.10012752937259\n2,1.11848344359472,0.000729128648820651,0.00501276106912944,0.99934853425801,0.995538248328458,0.0270023822804702,0.0708008550028136\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/reference/fit.csv",
+      "sha256": "f7f5766b531937f29c628679727c99d638a9a28094b3801d8fb763b920f02a37",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n1.11778141741426,5.76443716517149,10.4766524865633,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/reference/variance.csv",
+      "sha256": "d81ae1acfe775cd528bf5d6209e52c94e2e2dc03c98eb1b0d57e401e59cc9273",
+      "content": "\"source\",\"Variance\"\n\"p\",1.11848344359472\n\"r\",0.0257017945218527\n\"p:r\",0.00437477189292391\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin1/settings.json",
+      "sha256": "715fb291ee8c1c27477e0ede20b93e67a34d12f4dbb909a1936fb0cab0e1ed66",
+      "content": "{\n  \"design\": \"p x r\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"r\": \"r\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"0cdae177927ed4bb5bc5bbefa5a5f3db659ca73960ec7a77f7a8601540a116d2\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 37.0,\n  \"score_scale\": 3.7033768374282414,\n  \"model_mean\": 37.00000000000014,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.07264416772013568,\n    \"max_scaled_gradient\": 4.6563612055831455e-07,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": 3.870276892543299e-14,\n    \"logLik\": -28.99485501306576,\n    \"AIC\": 65.98971002613152,\n    \"BIC\": 70.7019253475233,\n    \"observations\": 24,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": 1.1177814174142569,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"r\": [\n      3\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/comparison.json",
+      "sha256": "2239d77dba33ef2dce6d3c2aec8c3725eb049ef687a5918750e10dc50015e594",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"i\": 0.0,\n    \"r\": 0.0,\n    \"p:i\": 0.0,\n    \"p:r\": 0.0,\n    \"i:r\": 0.0,\n    \"p:i:r\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NUMERICALLY VALIDATED: balanced interior only\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"38a8c31d1bdbfd534889d7e28f65b0bddf009b3e80ed1cf4190c4f6b12407938\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/normalized.csv",
+      "sha256": "c9870d5f6be9f0fa40bf10c40afd7d24ec4f97f8f775ed9d95152c5ff0e59313",
+      "content": "p,i,r,score\n0,0,0,-1.3541865156527881\n0,0,1,-1.315932659278415\n0,0,2,-1.277678802904042\n0,1,0,-1.3541865156527875\n0,1,1,-1.3312342018281638\n0,1,2,-1.3082818880035403\n0,2,0,-1.3541865156527875\n0,2,1,-1.346535744377913\n0,2,2,-1.3388849731030377\n0,3,0,-1.354186515652787\n0,3,1,-1.3618372869276616\n0,3,2,-1.3694880582025362\n1,0,0,-1.1246633774065524\n1,0,1,-1.0711079784824307\n1,0,2,-1.017552579558309\n1,1,0,-1.0634572072075565\n1,1,1,-0.9946002657336855\n1,1,2,-0.9257433242598146\n1,2,0,-1.0022510370085596\n1,2,1,-0.9180925529849405\n1,2,2,-0.8339340689613214\n1,3,0,-0.9410448668095639\n1,3,1,-0.8415848402361955\n1,3,2,-0.7421248136628271\n2,0,0,-0.8951402391603173\n2,0,1,-0.8262832976864463\n2,0,2,-0.7574263562125753\n2,1,0,-0.7727278987623245\n2,1,1,-0.657966329639207\n2,1,2,-0.5432047605160893\n2,2,0,-0.6503155583643329\n2,2,1,-0.4896493615919687\n2,2,2,-0.32898316481960455\n2,3,0,-0.5279032179663402\n2,3,1,-0.3213323935447294\n2,3,2,-0.11476156912311866\n3,0,0,-0.665617100914081\n3,0,1,-0.581458616890462\n3,0,2,-0.49730013286684277\n3,1,0,-0.4819985903170936\n3,1,1,-0.3213323935447294\n3,1,2,-0.16066619677236524\n3,2,0,-0.29838007972010505\n3,2,1,-0.06120617019899582\n3,2,2,0.17596773932211338\n3,3,0,-0.11476156912311757\n3,3,1,0.1989200531467367\n3,3,2,0.512601675416591\n4,0,0,-0.43609396266784806\n4,0,1,-0.3366339360944786\n4,0,2,-0.2371739095211092\n4,1,0,-0.1912692818718637\n4,1,1,0.015301542549749227\n4,1,2,0.22187236697136214\n4,2,0,0.05355539892412175\n4,2,1,0.367237021193976\n4,2,2,0.6809186434638302\n4,3,0,0.2983800797201061\n4,3,1,0.7191724998382039\n4,3,2,1.1399649199563016\n5,0,0,-0.20657082442161184\n5,0,1,-0.09180925529849428\n5,0,2,0.022952313824623295\n5,1,0,0.09946002657336725\n5,1,1,0.35193547864422675\n5,1,2,0.6044109307150863\n5,2,0,0.4054908775683496\n5,2,1,0.7956802125869489\n5,2,2,1.1858695476055483\n5,3,0,0.7115217285633287\n5,3,1,1.23942494652967\n5,3,2,1.7673281644960113\n6,0,0,0.022952313824623295\n6,0,1,0.1530154254974901\n6,0,2,0.28307853717035686\n6,1,0,0.3901893350185993\n6,1,1,0.6885694147387054\n6,1,2,0.9869494944588115\n6,2,0,0.7574263562125764\n6,2,1,1.2241234039799207\n6,2,2,1.6908204517472651\n6,3,0,1.1246633774065524\n6,3,1,1.759677393221136\n6,3,2,2.39469140903572\n7,0,0,0.2524754520708584\n7,0,1,0.39784010629347444\n7,0,2,0.5432047605160905\n7,1,0,0.6809186434638314\n7,1,1,1.0252033508331841\n7,1,2,1.3694880582025368\n7,2,0,1.109361834856803\n7,2,1,1.6525665953728925\n7,2,2,2.195771355888982\n7,3,0,1.537805026249776\n7,3,1,2.2799298399126022\n7,3,2,3.0220546535754282\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_d.csv",
+      "sha256": "00e87ca3d2fb326677165e5cd2a932e64ee0739fb5d6b591456dcabf7cea1ef2",
+      "content": ",p,i,r,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,4,3,36.31329024919311,1.1866669164862884,3.405002919989846,1.0893424238898843,1.8452649999362818,0.9683555127478293,0.9142711670542842\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_diagnostics.csv",
+      "sha256": "a44034eaaeaf93e319dd6f1d4057388341147ce820f27fbcd52bf2e1149420b1",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.24781237424074654,3.4161053259987043e-06,bobyqa,[],[],-7.891631387601902e-15,-190.22041149067473,396.44082298134947,416.95560851309216,96,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-11.88483996013943,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_errors.csv",
+      "sha256": "7ba8c6c3b67f4f43e9e24562ad994f72a5e69ba8219e4d2c149e12fa659e1385",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,36.31329024919311,1.1866669164862884,3.405002919989846,1.0893424238898843,1.8452649999362818\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_g.csv",
+      "sha256": "db1ceb06c03cbd6657adbc9d575e37ca6be6018f44f2a52a64b38c6797e2d401",
+      "content": ",rho^2,phi^2\np,0.9683555127478293,0.9142711670542842\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_random_effects.csv",
+      "sha256": "d87523a8b806dd8ae96cd8ed40ea6921c34e7352f17715e1a8d4a4c501bd13f8",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p:i,0:0,2.636111162456699,1.1115646398342691,,0:0\n1,p:i,0:1,0.7438887067968784,1.1115646398342691,,0:1\n2,p:i,0:2,-1.1483337488628962,1.1115646398342691,,0:2\n3,p:i,0:3,-3.040556204522717,1.1115646398342691,,0:3\n4,p:i,1:0,1.8272223494015716,1.1115646398342691,,1:0\n5,p:i,1:1,0.5127776778800319,1.1115646398342691,,1:1\n6,p:i,1:2,-0.801666993641462,1.1115646398342691,,1:2\n7,p:i,1:3,-2.1161116651630016,1.1115646398342691,,1:3\n8,p:i,2:0,1.018333536346425,1.1115646398342691,,2:0\n9,p:i,2:1,0.28166664896317106,1.1115646398342691,,2:1\n10,p:i,2:2,-0.4550002384200488,1.1115646398342691,,2:2\n11,p:i,2:3,-1.1916671258033,1.1115646398342691,,2:3\n12,p:i,3:0,0.20944472329129774,1.1115646398342691,,3:0\n13,p:i,3:1,0.05055562004632121,1.1115646398342691,,3:1\n14,p:i,3:2,-0.10833348319860997,1.1115646398342691,,3:2\n15,p:i,3:3,-0.26722258644358904,1.1115646398342691,,3:3\n16,p:i,4:0,-0.5994440897638444,1.1115646398342691,,4:0\n17,p:i,4:1,-0.1805554088705323,1.1115646398342691,,4:1\n18,p:i,4:2,0.23833327202281313,1.1115646398342691,,4:2\n19,p:i,4:3,0.6572219529161233,1.1115646398342691,,4:3\n20,p:i,5:0,-1.4083329028189762,1.1115646398342691,,5:0\n21,p:i,5:1,-0.4116664377873847,1.1115646398342691,,5:1\n22,p:i,5:2,0.5850000272442487,1.1115646398342691,,5:2\n23,p:i,5:3,1.581666492275838,1.1115646398342691,,5:3\n24,p:i,6:0,-2.217221715874123,1.1115646398342691,,6:0\n25,p:i,6:1,-0.6427774667042502,1.1115646398342691,,6:1\n26,p:i,6:2,0.9316667824656633,1.1115646398342691,,6:2\n27,p:i,6:3,2.5061110316355335,1.1115646398342691,,6:3\n28,p:i,7:0,-3.0261105289292503,1.1115646398342691,,7:0\n29,p:i,7:1,-0.8738884956210927,1.1115646398342691,,7:1\n30,p:i,7:2,1.2783335376870908,1.1115646398342691,,7:2\n31,p:i,7:3,3.4305555709952418,1.1115646398342691,,7:3\n32,p:r,0:0,1.1156109745593792,0.6364453892029442,,0:0\n33,p:r,0:1,-0.06688895546473571,0.6364453892029442,,0:1\n34,p:r,0:2,-1.2493888854889004,0.6364453892029442,,0:2\n35,p:r,1:0,0.7763887782673367,0.6364453892029442,,1:0\n36,p:r,1:1,-0.04777782533195137,0.6364453892029442,,1:1\n37,p:r,1:2,-0.8719444289312877,0.6364453892029442,,1:2\n38,p:r,2:0,0.43716658197529334,0.6364453892029442,,2:0\n39,p:r,2:1,-0.028666695199160826,0.6364453892029442,,2:1\n40,p:r,2:2,-0.4944999723736641,0.6364453892029442,,2:2\n41,p:r,3:0,0.09794438568324625,0.6364453892029442,,3:0\n42,p:r,3:1,-0.009555565066376486,0.6364453892029442,,3:1\n43,p:r,3:2,-0.11705551581604756,0.6364453892029442,,3:2\n44,p:r,4:0,-0.24127781060880746,0.6364453892029442,,4:0\n45,p:r,4:1,0.009555565066407723,0.6364453892029442,,4:1\n46,p:r,4:2,0.2603889407415735,0.6364453892029442,,4:2\n47,p:r,5:0,-0.5805000069008559,0.6364453892029442,,5:0\n48,p:r,5:1,0.028666695199189445,0.6364453892029442,,5:1\n49,p:r,5:2,0.6378333972991873,0.6364453892029442,,5:2\n50,p:r,6:0,-0.9197222031929024,0.6364453892029442,,6:0\n51,p:r,6:1,0.0477778253319713,0.6364453892029442,,6:1\n52,p:r,6:2,1.0152778538568012,0.6364453892029442,,6:2\n53,p:r,7:0,-1.2589443994849516,0.6364453892029442,,7:0\n54,p:r,7:1,0.06688895546475729,0.6364453892029442,,7:1\n55,p:r,7:2,1.3927223104144137,0.6364453892029442,,7:2\n56,i:r,0:0,0.6508334770483205,0.5368698526521791,,0:0\n57,i:r,0:1,-0.08249979394271571,0.5368698526521805,,0:1\n58,i:r,0:2,-0.8158330649338008,0.5368698526521805,,0:2\n59,i:r,1:0,0.15583336607704448,0.5368698526521785,,1:0\n60,i:r,1:1,-0.02749993131423395,0.5368698526521805,,1:1\n61,i:r,1:2,-0.2108332287055639,0.5368698526521798,,1:2\n62,i:r,2:0,-0.33916674489421117,0.5368698526521785,,2:0\n63,i:r,2:1,0.02749993131426336,0.5368698526521805,,2:1\n64,i:r,2:2,0.3941666075226861,0.5368698526521798,,2:2\n65,i:r,3:0,-0.8341668558654872,0.5368698526521785,,3:0\n66,i:r,3:1,0.0824997939427484,0.5368698526521805,,3:1\n67,i:r,3:2,0.9991664437509263,0.5368698526521798,,3:2\n68,p,0,-8.473110736543596,1.600335487843673,31.526889263456354,0\n69,p,1,-6.052221954674037,1.600335487843673,33.94777804532591,1\n70,p,2,-3.631333172804446,1.600335487843673,36.368666827195504,2\n71,p,3,-1.2104443909348677,1.600335487843673,38.78955560906508,3\n72,p,4,1.2104443909347238,1.600335487843673,41.210444390934676,4\n73,p,5,3.631333172804302,1.600335487843673,43.631333172804254,5\n74,p,6,6.0522219546739064,1.600335487843673,46.052221954673854,6\n75,p,7,8.473110736543465,1.600335487843673,48.47311073654342,7\n76,i,0,-2.7150005372334594,1.268372366271213,,0\n77,i,1,-0.9050001790778045,1.268372366271213,,1\n78,i,2,0.9050001790777915,1.268372366271213,,2\n79,i,3,2.71500053723344,1.268372366271213,,3\n80,r,0,-1.328333257927672,0.8673583158022325,,0\n81,r,1,1.0313351888172514e-13,0.8673583158022325,,1\n82,r,2,1.3283332579279858,0.8673583158022325,,2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/python_variance.csv",
+      "sha256": "a75f46c8a849ff3f08622f98a49c26f65f94a065c733c2d8ce605ebcf933dd51",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,36.31329024919311,36.31329024919311,73.18896104404482\ni,6.033346351422586,6.033346351422586,12.160130576141043\nr,1.992498320898208,1.992498320898208,4.015854277809045\np:i,3.4666678293367776,3.4666678293367776,6.9870236206318586\np:r,0.8599998736408536,0.8599998736408536,1.7333184852667678\ni:r,0.5499997041820976,0.5499997041820976,1.10851720258299\np:i:r,0.40000001526171397,0.40000001526171397,0.806194793523493\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/reference/coefficients.csv",
+      "sha256": "92857fed4087c700713b28a2a7d70dfc381c5bbb179e1cc5ef7232631f62c2d3",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.850229226157647,0.0277842874382179,0.0797237864666317,0.968355512747829,0.914271167054284,0.166686194503978,0.282354009120876\n2,0.850229226157647,0.013697029374663,0.0393984968197887,0.984145603531608,0.955713501499337,0.117034308536698,0.198490545920426\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/reference/fit.csv",
+      "sha256": "274a6c3e35f3611e652994beeda09add80dda1f058f29f726a43fcb1cc31dfef",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-11.8848399601394,39.7696799202789,60.2844654520215,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/reference/variance.csv",
+      "sha256": "716298f5caa56661c3a59b153cb185478075727a57557a17b7398ff37f4645de",
+      "content": "\"source\",\"Variance\"\n\"p:i\",0.0811675914150498\n\"p:r\",0.0201357966200153\n\"i:r\",0.0128775393159002\n\"p\",0.850229226157647\n\"i\",0.141263084790976\n\"r\",0.0466517986630346\n\"p:i:r\",0.00936548853340468\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin2/settings.json",
+      "sha256": "bccbc912a05ef5f018d447c0b9bf11cc760a5397b751b7c8dc86a1ef7c7e5ca1",
+      "content": "{\n  \"design\": \"p x i x r\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"i\": \"i\",\n    \"r\": \"r\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"38a8c31d1bdbfd534889d7e28f65b0bddf009b3e80ed1cf4190c4f6b12407938\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 40.0,\n  \"score_scale\": 6.535288822997803,\n  \"model_mean\": 39.99999999999995,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.24781237424074654,\n    \"max_scaled_gradient\": 3.4161053259987043e-06,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": -7.891631387601902e-15,\n    \"logLik\": -190.22041149067473,\n    \"AIC\": 396.44082298134947,\n    \"BIC\": 416.95560851309216,\n    \"observations\": 96,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -11.88483996013943,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"i\": [\n      4\n    ],\n    \"r\": [\n      3\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/comparison.json",
+      "sha256": "2788cc6ff12ed030bc9227b6d9a69dc7472309a676a280dd134a625bc5d6327a",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"i\": 0.0,\n    \"i:r\": 0.0,\n    \"p:i\": 0.0,\n    \"p:i:r\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NUMERICALLY VALIDATED: balanced interior only\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"19681e8d705a8985d0482014db7702079cc3e66807d6b783c947581f36c5d2a0\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/normalized.csv",
+      "sha256": "23b6bd8be798cc242e6ec8bb0f1e8d450b53c2657ba5b12aa7fb82529029175d",
+      "content": "p,i,r,score\n0,0,0,-1.3541865156527881\n0,0,1,-1.315932659278415\n0,0,2,-1.277678802904042\n0,1,3,-1.3541865156527875\n0,1,4,-1.3312342018281638\n0,1,5,-1.3082818880035403\n0,2,6,-1.3541865156527875\n0,2,7,-1.346535744377913\n0,2,8,-1.3388849731030377\n0,3,9,-1.354186515652787\n0,3,10,-1.3618372869276616\n0,3,11,-1.3694880582025362\n1,0,0,-1.1246633774065524\n1,0,1,-1.0711079784824307\n1,0,2,-1.017552579558309\n1,1,3,-1.0634572072075565\n1,1,4,-0.9946002657336855\n1,1,5,-0.9257433242598146\n1,2,6,-1.0022510370085596\n1,2,7,-0.9180925529849405\n1,2,8,-0.8339340689613214\n1,3,9,-0.9410448668095639\n1,3,10,-0.8415848402361955\n1,3,11,-0.7421248136628271\n2,0,0,-0.8951402391603173\n2,0,1,-0.8262832976864463\n2,0,2,-0.7574263562125753\n2,1,3,-0.7727278987623245\n2,1,4,-0.657966329639207\n2,1,5,-0.5432047605160893\n2,2,6,-0.6503155583643329\n2,2,7,-0.4896493615919687\n2,2,8,-0.32898316481960455\n2,3,9,-0.5279032179663402\n2,3,10,-0.3213323935447294\n2,3,11,-0.11476156912311866\n3,0,0,-0.665617100914081\n3,0,1,-0.581458616890462\n3,0,2,-0.49730013286684277\n3,1,3,-0.4819985903170936\n3,1,4,-0.3213323935447294\n3,1,5,-0.16066619677236524\n3,2,6,-0.29838007972010505\n3,2,7,-0.06120617019899582\n3,2,8,0.17596773932211338\n3,3,9,-0.11476156912311757\n3,3,10,0.1989200531467367\n3,3,11,0.512601675416591\n4,0,0,-0.43609396266784806\n4,0,1,-0.3366339360944786\n4,0,2,-0.2371739095211092\n4,1,3,-0.1912692818718637\n4,1,4,0.015301542549749227\n4,1,5,0.22187236697136214\n4,2,6,0.05355539892412175\n4,2,7,0.367237021193976\n4,2,8,0.6809186434638302\n4,3,9,0.2983800797201061\n4,3,10,0.7191724998382039\n4,3,11,1.1399649199563016\n5,0,0,-0.20657082442161184\n5,0,1,-0.09180925529849428\n5,0,2,0.022952313824623295\n5,1,3,0.09946002657336725\n5,1,4,0.35193547864422675\n5,1,5,0.6044109307150863\n5,2,6,0.4054908775683496\n5,2,7,0.7956802125869489\n5,2,8,1.1858695476055483\n5,3,9,0.7115217285633287\n5,3,10,1.23942494652967\n5,3,11,1.7673281644960113\n6,0,0,0.022952313824623295\n6,0,1,0.1530154254974901\n6,0,2,0.28307853717035686\n6,1,3,0.3901893350185993\n6,1,4,0.6885694147387054\n6,1,5,0.9869494944588115\n6,2,6,0.7574263562125764\n6,2,7,1.2241234039799207\n6,2,8,1.6908204517472651\n6,3,9,1.1246633774065524\n6,3,10,1.759677393221136\n6,3,11,2.39469140903572\n7,0,0,0.2524754520708584\n7,0,1,0.39784010629347444\n7,0,2,0.5432047605160905\n7,1,3,0.6809186434638314\n7,1,4,1.0252033508331841\n7,1,5,1.3694880582025368\n7,2,6,1.109361834856803\n7,2,7,1.6525665953728925\n7,2,8,2.195771355888982\n7,3,9,1.537805026249776\n7,3,10,2.2799298399126022\n7,3,11,3.0220546535754282\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_d.csv",
+      "sha256": "d0868071a726fc21508e17cc0b38d089cacc8b2e00cfaadb9be954cee6d3793a",
+      "content": ",p,i,r,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,4,3,36.59999452649616,0.9000000548544659,2.454167616417331,0.9486833269613554,1.5665783148050183,0.9759999950692779,0.9371598958534398\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_diagnostics.csv",
+      "sha256": "3d2dcf886e50740bc143814006659c3fbd7fd0d0d0f548a4135f36f7e5031f16",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.8161101043580549,9.522657834285374e-07,bobyqa,[],[],1.1659398821339248e-13,-209.8235978668061,431.6471957336122,447.0332848824192,96,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-31.488026336270778,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_errors.csv",
+      "sha256": "cb219dc8a5fc2acb2185ff9b8fc921561dee4b2a84ffe561c994f59eba7a00e5",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,36.59999452649616,0.9000000548544659,2.454167616417331,0.9486833269613554,1.5665783148050183\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_g.csv",
+      "sha256": "41040884be39a36b94858d3e5cfcdb3ca9acef59e4f7f910aca46182bf88d7b6",
+      "content": ",rho^2,phi^2\np,0.9759999950692779,0.9371598958534398\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_random_effects.csv",
+      "sha256": "f4d59b427a9a09e8c81bc11c7c2be368c294adf4081c5faca85d8de5d5e1b7db",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p:i,0:0,2.418125086073791,1.1412662706626495,,0:0\n1,p:i,0:1,0.6823750013253318,1.1412662706626495,,0:1\n2,p:i,0:2,-1.0533750834231213,1.1412662706626495,,0:2\n3,p:i,0:3,-2.789125168171587,1.1412662706626495,,0:3\n4,p:i,1:0,1.6761250852083338,1.1412662706626495,,1:0\n5,p:i,1:1,0.470375008855683,1.1412662706626495,,1:1\n6,p:i,1:2,-0.7353750674969676,1.1412662706626495,,1:2\n7,p:i,1:3,-1.9411251438496182,1.1412662706626495,,1:3\n8,p:i,2:0,0.9341250843428694,1.1412662706626495,,2:0\n9,p:i,2:1,0.2583750163860316,1.1412662706626495,,2:1\n10,p:i,2:2,-0.4173750515708135,1.1412662706626495,,2:2\n11,p:i,2:3,-1.093125119527656,1.1412662706626495,,2:3\n12,p:i,3:0,0.1921250834774094,1.1412662706626495,,3:0\n13,p:i,3:1,0.04637502391637579,1.1412662706626495,,3:1\n14,p:i,3:2,-0.0993750356446522,1.1412662706626495,,3:2\n15,p:i,3:3,-0.2451250952056866,1.1412662706626495,,3:3\n16,p:i,4:0,-0.5498749173880598,1.1412662706626495,,4:0\n17,p:i,4:1,-0.1656249685532744,1.1412662706626495,,4:1\n18,p:i,4:2,0.21862498028150193,1.1412662706626495,,4:2\n19,p:i,4:3,0.6028749291162842,1.1412662706626495,,4:3\n20,p:i,5:0,-1.2918749182535227,1.1412662706626495,,5:0\n21,p:i,5:1,-0.3776249610229343,1.1412662706626495,,5:1\n22,p:i,5:2,0.5366249962076587,1.1412662706626495,,5:2\n23,p:i,5:3,1.4508749534382503,1.1412662706626495,,5:3\n24,p:i,6:0,-2.0338749191189933,1.1412662706626495,,6:0\n25,p:i,6:1,-0.5896249534925915,1.1412662706626495,,6:1\n26,p:i,6:2,0.8546250121338062,1.1412662706626495,,6:2\n27,p:i,6:3,2.298874977760206,1.1412662706626495,,6:3\n28,p:i,7:0,-2.7758749199844313,1.1412662706626495,,7:0\n29,p:i,7:1,-0.8016249459622161,1.1412662706626495,,7:1\n30,p:i,7:2,1.172625028059986,1.1412662706626495,,7:2\n31,p:i,7:3,3.146875002082194,1.1412662706626495,,7:3\n32,i:r,0:0,-0.9463748747677032,0.9264875540037588,,0:0\n33,i:r,0:1,-0.38137486652608965,0.9264875540037588,,0:1\n34,i:r,0:2,0.18362514171552452,0.9264875540037588,,0:2\n35,i:r,1:3,-1.25712497199194,0.9264875540037588,,1:3\n36,i:r,1:4,-0.1271249555087142,0.9264875540037588,,1:4\n37,i:r,1:5,1.0028750609745103,0.9264875540037588,,1:5\n38,i:r,2:6,-1.5678750692161636,0.9264875540037588,,2:6\n39,i:r,2:7,0.12712495550866845,0.9264875540037588,,2:7\n40,i:r,2:8,1.8221249802335018,0.9264875540037588,,2:8\n41,i:r,3:9,-1.8786251664404003,0.9264875540037588,,3:9\n42,i:r,3:10,0.38137486652604197,0.9264875540037588,,3:10\n43,i:r,3:11,2.641374899492487,0.9264875540037588,,3:11\n44,p,0,-8.539999956856798,1.4107548749171819,31.460000043143964,0\n45,p,1,-6.099999969183587,1.4107548749171819,33.900000030817175,1\n46,p,2,-3.6599999815103823,1.4107548749171819,36.34000001849038,2\n47,p,3,-1.219999993837184,1.4107548749171819,38.780000006163576,3\n48,p,4,1.2199999938360209,1.4107548749171819,41.21999999383678,4\n49,p,5,3.6599999815092255,1.4107548749171819,43.65999998150998,5\n50,p,6,6.099999969182437,1.4107548749171819,46.099999969183195,6\n51,p,7,8.539999956855622,1.4107548749171819,48.539999956856384,7\n52,i,0,-2.4161252306947594,1.3554919796653322,,0\n53,i,1,-0.8053750768983511,1.3554919796653322,,1\n54,i,2,0.8053750768980635,1.3554919796653322,,2\n55,i,3,2.4161252306944783,1.3554919796653322,,3\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/python_variance.csv",
+      "sha256": "b11af0ac707fe328d0acf4cf099680382a29b6111d00334906e68168a310a13f",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,36.59999452649616,36.59999452649616,74.76761888948346\ni,5.369170084318927,5.369170084318927,10.968309362083518\ni:r,2.5425004857975955,2.5425004857975955,5.193899884624922\np:i,3.1800002441939745,3.1800002441939745,6.496204423042603\np:i:r,1.2599999256716672,1.2599999256716672,2.573967440765502\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/reference/coefficients.csv",
+      "sha256": "a6b54bb3cd3850b71e81da80527ec37ebb3028873b0784fc45685d9f76c61e8a",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.856942039955424,0.0210723496805073,0.0574611944841332,0.975999995069278,0.93715989585344,0.145163182937366,0.239710647415031\n2,0.856942039955424,0.00992156471495528,0.0268757913752374,0.988554641512804,0.96959125464263,0.099607051532285,0.163938376761628\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/reference/fit.csv",
+      "sha256": "89f0232d633e97bf19bab6d0b4faf0b90ba1a70319738b645e1d0fa643e6cc6a",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-31.4880263362708,74.9760526725416,90.3621418213486,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/reference/variance.csv",
+      "sha256": "10bf9a8fbdbeebfe8c439f817f3444dc813ea36966d2ec80fc944f1afa4aceba",
+      "content": "\"source\",\"Variance\"\n\"p:i\",0.0744556367172553\n\"i:r\",0.0595293955934815\n\"p\",0.856942039955424\n\"i\",0.12571224735001\n\"p:i:r\",0.0295012860143214\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin3/settings.json",
+      "sha256": "a1b1d57f37b6a22708c2204c8a02192eb4aef88846b297094f4d5d5189b330cd",
+      "content": "{\n  \"design\": \"p x (r:i)\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"i\": \"i\",\n    \"r\": \"r\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"8\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"9\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"10\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"11\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"19681e8d705a8985d0482014db7702079cc3e66807d6b783c947581f36c5d2a0\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 40.0,\n  \"score_scale\": 6.535288822997803,\n  \"model_mean\": 40.00000000000076,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.8161101043580549,\n    \"max_scaled_gradient\": 9.522657834285374e-07,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": 1.1659398821339248e-13,\n    \"logLik\": -209.8235978668061,\n    \"AIC\": 431.6471957336122,\n    \"BIC\": 447.0332848824192,\n    \"observations\": 96,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -31.488026336270778,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"i\": [\n      4\n    ],\n    \"r\": [\n      3\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/adapter.log",
+      "sha256": "b7af91cbc3e989151239db0dcc4ac7f6678628c205557e1802875252909dd295",
+      "content": "R lme4 REML executed; converged= FALSE  singular= TRUE \n\nSTDERR\nboundary (singular) fit: see help('isSingular')\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/normalized.csv",
+      "sha256": "b9c465fc28b96a87a094439d3e3debbe9a48ba10fc3266b186fabb0d4f6ada65",
+      "content": "p,r,i,score\n0,0,0,-1.3541865156527881\n0,1,1,-1.315932659278415\n0,2,2,-1.277678802904042\n0,0,3,-1.3541865156527875\n0,1,4,-1.3312342018281638\n0,2,5,-1.3082818880035403\n0,0,6,-1.3541865156527875\n0,1,7,-1.346535744377913\n0,2,8,-1.3388849731030377\n0,0,9,-1.354186515652787\n0,1,10,-1.3618372869276616\n0,2,11,-1.3694880582025362\n1,0,0,-1.1246633774065524\n1,1,1,-1.0711079784824307\n1,2,2,-1.017552579558309\n1,0,3,-1.0634572072075565\n1,1,4,-0.9946002657336855\n1,2,5,-0.9257433242598146\n1,0,6,-1.0022510370085596\n1,1,7,-0.9180925529849405\n1,2,8,-0.8339340689613214\n1,0,9,-0.9410448668095639\n1,1,10,-0.8415848402361955\n1,2,11,-0.7421248136628271\n2,0,0,-0.8951402391603173\n2,1,1,-0.8262832976864463\n2,2,2,-0.7574263562125753\n2,0,3,-0.7727278987623245\n2,1,4,-0.657966329639207\n2,2,5,-0.5432047605160893\n2,0,6,-0.6503155583643329\n2,1,7,-0.4896493615919687\n2,2,8,-0.32898316481960455\n2,0,9,-0.5279032179663402\n2,1,10,-0.3213323935447294\n2,2,11,-0.11476156912311866\n3,0,0,-0.665617100914081\n3,1,1,-0.581458616890462\n3,2,2,-0.49730013286684277\n3,0,3,-0.4819985903170936\n3,1,4,-0.3213323935447294\n3,2,5,-0.16066619677236524\n3,0,6,-0.29838007972010505\n3,1,7,-0.06120617019899582\n3,2,8,0.17596773932211338\n3,0,9,-0.11476156912311757\n3,1,10,0.1989200531467367\n3,2,11,0.512601675416591\n4,0,0,-0.43609396266784806\n4,1,1,-0.3366339360944786\n4,2,2,-0.2371739095211092\n4,0,3,-0.1912692818718637\n4,1,4,0.015301542549749227\n4,2,5,0.22187236697136214\n4,0,6,0.05355539892412175\n4,1,7,0.367237021193976\n4,2,8,0.6809186434638302\n4,0,9,0.2983800797201061\n4,1,10,0.7191724998382039\n4,2,11,1.1399649199563016\n5,0,0,-0.20657082442161184\n5,1,1,-0.09180925529849428\n5,2,2,0.022952313824623295\n5,0,3,0.09946002657336725\n5,1,4,0.35193547864422675\n5,2,5,0.6044109307150863\n5,0,6,0.4054908775683496\n5,1,7,0.7956802125869489\n5,2,8,1.1858695476055483\n5,0,9,0.7115217285633287\n5,1,10,1.23942494652967\n5,2,11,1.7673281644960113\n6,0,0,0.022952313824623295\n6,1,1,0.1530154254974901\n6,2,2,0.28307853717035686\n6,0,3,0.3901893350185993\n6,1,4,0.6885694147387054\n6,2,5,0.9869494944588115\n6,0,6,0.7574263562125764\n6,1,7,1.2241234039799207\n6,2,8,1.6908204517472651\n6,0,9,1.1246633774065524\n6,1,10,1.759677393221136\n6,2,11,2.39469140903572\n7,0,0,0.2524754520708584\n7,1,1,0.39784010629347444\n7,2,2,0.5432047605160905\n7,0,3,0.6809186434638314\n7,1,4,1.0252033508331841\n7,2,5,1.3694880582025368\n7,0,6,1.109361834856803\n7,1,7,1.6525665953728925\n7,2,8,2.195771355888982\n7,0,9,1.537805026249776\n7,1,10,2.2799298399126022\n7,2,11,3.0220546535754282\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_d.csv",
+      "sha256": "37acefd8b8825f433dfa56865675c51c95fbf024f6d3a63b2624c305858a992a",
+      "content": ",p,r,i,rho^2,phi^2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_diagnostics.csv",
+      "sha256": "e25850f1856754d89e35756b378e480227ee534910c261b114f572391711efe1",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,False,True,False,{},{},bobyqa,\"[\"\"boundary (singular) fit: see help('isSingular')\"\"]\",\"[\"\"p:r\"\"]\",1.8823399199308673e-14,-232.91592137418343,477.83184274836685,493.21793189717386,96,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-54.58034984364811,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_errors.csv",
+      "sha256": "4a5d590f11ffa112686b921ae51208f3cebae3129cd971329a33afe4ec546d26",
+      "content": ",universe,relative_error,absolute_error\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_g.csv",
+      "sha256": "f0160f0e761e33f4becd26d135f47d143d129e0b92141f15fe0d71efc1448723",
+      "content": ",rho^2,phi^2\np,,\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_random_effects.csv",
+      "sha256": "28a454db2a65ca205af1b37774a431003437e9ed2fb68d1b92624be70567da73",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p:r,0:0,0.0,0.0,,0:0\n1,p:r,0:1,0.0,0.0,,0:1\n2,p:r,0:2,0.0,0.0,,0:2\n3,p:r,1:0,0.0,0.0,,1:0\n4,p:r,1:1,0.0,0.0,,1:1\n5,p:r,1:2,0.0,0.0,,1:2\n6,p:r,2:0,0.0,0.0,,2:0\n7,p:r,2:1,0.0,0.0,,2:1\n8,p:r,2:2,0.0,0.0,,2:2\n9,p:r,3:0,0.0,0.0,,3:0\n10,p:r,3:1,0.0,0.0,,3:1\n11,p:r,3:2,0.0,0.0,,3:2\n12,p:r,4:0,0.0,0.0,,4:0\n13,p:r,4:1,0.0,0.0,,4:1\n14,p:r,4:2,0.0,0.0,,4:2\n15,p:r,5:0,0.0,0.0,,5:0\n16,p:r,5:1,0.0,0.0,,5:1\n17,p:r,5:2,0.0,0.0,,5:2\n18,p:r,6:0,0.0,0.0,,6:0\n19,p:r,6:1,0.0,0.0,,6:1\n20,p:r,6:2,0.0,0.0,,6:2\n21,p:r,7:0,0.0,0.0,,7:0\n22,p:r,7:1,0.0,0.0,,7:1\n23,p:r,7:2,0.0,0.0,,7:2\n24,r:i,0:0,-3.0538705115284923,1.0605560750909386,,0:0\n25,r:i,0:3,-1.7495051940354676,1.0605560750909386,,0:3\n26,r:i,0:6,-0.4451398765424389,1.0605560750909386,,0:6\n27,r:i,0:9,0.859225440950583,1.0605560750909386,,0:9\n28,r:i,1:1,-2.7950685374850677,1.0605560750909386,,1:1\n29,r:i,1:4,-0.9316895124950356,1.0605560750909386,,1:4\n30,r:i,1:7,0.931689512495003,1.0605560750909386,,1:7\n31,r:i,1:10,2.7950685374850353,1.0605560750909386,,1:10\n32,r:i,2:2,-2.536266563441643,1.0605560750909386,,2:2\n33,r:i,2:5,-0.11387383095459427,1.0605560750909386,,2:5\n34,r:i,2:8,2.308518901532448,1.0605560750909386,,2:8\n35,r:i,2:11,4.730911634019494,1.0605560750909386,,2:11\n36,p,0,-8.674909033986141,0.9617459083320518,31.32509096601398,0\n37,p,1,-6.196363595704436,0.9617459083320518,33.80363640429569,1\n38,p,2,-3.7178181574226996,0.9617459083320518,36.28218184257742,2\n39,p,3,-1.2392727191409698,0.9617459083320518,38.76072728085915,3\n40,p,4,1.239272719140767,0.9617459083320518,41.239272719140885,4\n41,p,5,3.717818157422497,0.9617459083320518,43.71781815742262,5\n42,p,6,6.196363595704234,0.9617459083320518,46.196363595704355,6\n43,p,7,8.674909033985944,0.9617459083320518,48.67490903398607,7\n44,r,0,-0.32222293953877446,0.6397709467684836,,0\n45,r,1,-4.037265304068172e-15,0.6397709467684836,,1\n46,r,2,0.32222293953876274,0.6397709467684836,,2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/python_variance.csv",
+      "sha256": "319fe43e622ec17b1e83647cfb5b602e0bc337231af2b9ccd65da9ec247bbf01",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,37.1781565276958,37.1781565276958,77.2818209723124\nr,0.48333457193146945,0.48333457193146945,1.0047022054445072\nr:i,6.5839374269730735,6.5839374269730735,13.685957590317765\np:r,0.0,0.0,0.0\np:r:i,3.861818507622026,3.861818507622026,8.027519231925325\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/reference/coefficients.csv",
+      "sha256": "81bb8a05f2a2618dc3ad45f7536a77f5ae0a700ca514211acee4ff6e6053dbfd",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.870478963420646,0.00753496157734727,0.0241533876186704,0.991418175312693,0.97300188441586,0.0868041564520229,0.155413601781409\n2,0.870478963420646,0.00188374039433682,0.00698140195019065,0.997840645426382,0.992043627010731,0.0434020782260115,0.0835547841250915\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/reference/fit.csv",
+      "sha256": "a77d8ccc7bc59a758a63a4c4b3ac1ca20330dff00dad1926d3ab41f2f05798e7",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-54.5803498436481,121.160699687296,136.546788836103,TRUE,1\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/reference/variance.csv",
+      "sha256": "22934717e2658e98c0b127909e1bab6550826c9152a79f04b712606ccdd9ab37",
+      "content": "\"source\",\"Variance\"\n\"p:r\",0\n\"r:i\",0.154154470310772\n\"p\",0.870478963420646\n\"r\",0.0113166605462765\n\"p:i:r\",0.0904195389281673\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/reference.stderr",
+      "sha256": "5a3879685cb752b8d915edf33c1d08046e06c45d55088ac9b6a57f73bcdc10c8",
+      "content": "boundary (singular) fit: see help('isSingular')\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin4/settings.json",
+      "sha256": "79686e89e5bc81752dd972705f9dd5763e6a0765710189c107835fb43a080c55",
+      "content": "{\n  \"design\": \"p x (i:r)\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"r\": \"r\",\n    \"i\": \"i\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"8\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"9\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"10\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"11\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"606b06e1f9b8da841c3d87498d9e30836325670187d16405bd740b3cb62faddf\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 40.0,\n  \"score_scale\": 6.535288822997803,\n  \"model_mean\": 40.00000000000012,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": false,\n    \"singular\": true,\n    \"hessian_pd\": false,\n    \"hessian_min\": {},\n    \"max_scaled_gradient\": {},\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [\n      \"boundary (singular) fit: see help('isSingular')\"\n    ],\n    \"boundary_components\": [\n      \"p:r\"\n    ],\n    \"intercept\": 1.8823399199308673e-14,\n    \"logLik\": -232.91592137418343,\n    \"AIC\": 477.83184274836685,\n    \"BIC\": 493.21793189717386,\n    \"observations\": 96,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -54.58034984364811,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"r\": [\n      3\n    ],\n    \"i\": [\n      4\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/comparison.json",
+      "sha256": "8a637de8504c4bada93258ee2767ce70189a629d342019cf33952b188059f221",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"i\": 0.0,\n    \"p:i\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NOT COMPARABLE: missing cells or variance boundary\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"c77c1d48686cf3afe224f5d857b1a777344c375f2d40d1e81733bd62a3a71dca\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/normalized.csv",
+      "sha256": "85ccd60717c7e340f9f682e983522cac84529a10eb64a09d4399f7745a51dbf0",
+      "content": "p,i,score\n0,0,-1.4940703646453406\n0,1,-1.4940703646453406\n0,2,-1.4940703646453397\n1,3,-1.2030176962079364\n1,0,-1.1254036512912955\n1,1,-1.0477896063746532\n2,3,-0.9119650277705322\n2,0,-0.7567369379372492\n2,1,-0.6015088481039674\n2,2,-0.4462807582706844\n3,3,-0.6209123593331266\n3,0,-0.38807022458320417\n3,1,-0.1552280898332803\n3,2,0.07761404491664221\n4,3,-0.32985969089572525\n4,0,-0.019403511229160553\n4,2,0.6015088481039702\n5,3,-0.038807022458319726\n5,0,0.34926320212488443\n5,1,0.7373334267080928\n5,2,1.1254036512912968\n6,3,0.25224564597908444\n6,0,0.7179299154789308\n6,1,1.1836141849787785\n6,2,1.6492984544786249\n7,3,0.5432983144164886\n7,0,1.0865966288329771\n7,1,1.6298949432494643\n7,2,2.173193257665953\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_d.csv",
+      "sha256": "8aeb755b98796d28a676f464be69d6936be6677c45aca0a56ddf9d80b3d55f5c",
+      "content": ",p,i,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,4,26.997921812372798,0.319233377097424,1.3548324069773612,0.5650074133119175,1.163972683088981,0.9883138132472713,0.9522151394359876\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_diagnostics.csv",
+      "sha256": "9b1b8fb4e0479464f8424534244d471d165c12b4dd964fb747aecf0639cf470c",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.9089928953276559,6.615017410789662e-08,bobyqa,[],[],-0.07287749483338563,-64.77839020262466,137.55678040524933,143.02596372519523,29,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-18.866338139771177,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_errors.csv",
+      "sha256": "2a97f38631b325ec91ac77e66241800cb71bca34824fcea8c050548e458ae6f7",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,26.997921812372798,0.319233377097424,1.3548324069773612,0.5650074133119175,1.163972683088981\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_g.csv",
+      "sha256": "19de0180647e74ff6e41a9d2c54f251b8691f68912f9f357215f3861d2ac1684",
+      "content": ",rho^2,phi^2\np,0.9883138132472713,0.9522151394359876\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_random_effects.csv",
+      "sha256": "c53e6cfcdc0a8d0096c2ad47b4d7e231d232dda39b6b9c65ef437beac8a56157",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p,0,-7.9855872129864345,1.0971617933615416,30.48882357549053,0\n1,p,1,-4.574417717340474,1.0971617933615416,33.89999307113649,1\n2,p,2,-3.08789834051061,1.0449507132515556,35.38651244796635,2\n3,p,3,-1.0124393326913423,1.0449507132515556,37.46197145578562,3\n4,p,4,1.018529531230234,1.0971617933615416,39.4929403197072,4\n5,p,5,3.138478682947192,1.0449507132515556,41.61288947142416,5\n6,p,6,5.21393769076646,1.0449507132515556,43.68834847924342,6\n7,p,7,7.289396698585727,1.0449507132515556,45.76380748706269,7\n8,i,0,-0.6493882649326561,0.9553219643129459,,0\n9,i,1,0.6769948332721576,0.9648643364376694,,1\n10,i,2,2.3336208097799367,0.9648643364376694,,2\n11,i,3,-2.361227378119309,0.9648643364376694,,3\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/python_variance.csv",
+      "sha256": "99b1fcd60d2041308e2b564986e059daebce42d10500842eb991cb0f8cc0dc40",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,26.997921812372798,26.997921812372798,83.28257521186607\ni,4.1423961195197485,4.1423961195197485,12.778369341863248\np:i,1.276933508389696,1.276933508389696,3.939055446270673\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/reference/coefficients.csv",
+      "sha256": "19f509cffaabba3084d60bbfdeaa9920f176ef4838f398e254620599ad5550e2",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,1.01646162666997,0.0120190168719982,0.0510089317923083,0.988313813247271,0.952215139435988,0.109631276887566,0.225851570267528\n2,1.01646162666997,0.00600950843599908,0.0255044658961542,0.994122564217545,0.97552274869776,0.0775210193173379,0.159701176877799\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/reference/fit.csv",
+      "sha256": "32ac9f3bdf09fab4ff29322eb7edff4de784d53a237a5b51a91bcdb828603800",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-18.8663381397712,45.7326762795424,51.2018595994883,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/reference/variance.csv",
+      "sha256": "0dad1e32f79d5315ffb264401d6b7810d19de9d042dbc7b1b1ba7b2f1e8d1241",
+      "content": "\"source\",\"Variance\"\n\"p\",1.01646162666997\n\"i\",0.155959659681241\n\"p:i\",0.0480760674879926\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin5/settings.json",
+      "sha256": "eb5c374621fe4316d4445b63d85ba55892416c3533cf55919e4999ac0e005273",
+      "content": "{\n  \"design\": \"p x i\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"i\": \"i\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"c77c1d48686cf3afe224f5d857b1a777344c375f2d40d1e81733bd62a3a71dca\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 38.849999999999994,\n  \"score_scale\": 5.153706399783792,\n  \"model_mean\": 38.474410788476966,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.9089928953276559,\n    \"max_scaled_gradient\": 6.615017410789662e-08,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": -0.07287749483338563,\n    \"logLik\": -64.77839020262466,\n    \"AIC\": 137.55678040524933,\n    \"BIC\": 143.02596372519523,\n    \"observations\": 29,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -18.866338139771177,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"i\": [\n      4\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/comparison.json",
+      "sha256": "bd7850d1b62455cc5b0a9aaaa5cfac62ff06ef64060574a4f756d968626b4b39",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"r\": 0.0,\n    \"p:r\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NOT COMPARABLE: missing cells or variance boundary\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"72a941c2dc2bdf252f60f3b85d31635546742f64d68baebd0e334e9082d46d85\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/normalized.csv",
+      "sha256": "23467155f8751d72f3acfdb679262c11724a9b606aea2d348eb3d115df1ca5c5",
+      "content": "p,r,score\n0,0,-1.6058304371420782\n0,1,-1.537121310858492\n1,2,-1.2622848057241522\n1,0,-1.1660920289271326\n1,1,-1.069899252130113\n2,2,-0.8500300480226411\n2,1,-0.602677193401733\n3,2,-0.4377752903211281\n3,0,-0.2866152124972415\n3,1,-0.13545513467335488\n4,2,-0.025520532619620926\n4,0,0.1531231957177021\n4,1,0.33176692405502517\n5,2,0.38673422508189215\n5,0,0.5928616039326476\n5,1,0.7989889827834032\n6,0,1.0326000121475933\n6,1,1.2662110415117833\n7,2,1.2112437404849143\n7,0,1.4723384203625387\n7,1,1.7334331002401633\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_d.csv",
+      "sha256": "15999449eb870c2fb43a59be8c202262feaee8c594148579564204c140e69dda",
+      "content": ",p,r,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,3,15.765693094612505,0.016968469845165205,0.1393584079711875,0.1302630793631304,0.373307390726714,0.9989248663936773,0.9912381039477585\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_diagnostics.csv",
+      "sha256": "58c9f79b833f4b46457d24e9980efdfc2b16b4146139620d2a4a6024d15c9b99",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.05496444363150928,5.156604303523457e-07,bobyqa,[],[],-0.06837000270886953,-27.366328680242574,62.73265736048515,66.91074711137884,21,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-1.534750982224402,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_errors.csv",
+      "sha256": "44ce7205e4a61c2e620dfee32cf7072f5b74495f2302772116371df934ddaa05",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,15.765693094612505,0.016968469845165205,0.1393584079711875,0.1302630793631304,0.373307390726714\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_g.csv",
+      "sha256": "72f2e877bef67bc333be58dfc4211adbd11c3eeca87994933c6c4dc308ae835d",
+      "content": ",rho^2,phi^2\np,0.9989248663936773,0.9912381039477585\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_random_effects.csv",
+      "sha256": "461d4ef0edcf91ac06c1d645dfc6e4ac49aa08e15879dd890b9905419dbba1c9",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p,0,-5.761433700890808,0.3764229843266056,31.232657352194348,0\n1,p,1,-3.9897968715672896,0.3632420646597187,33.004294181517864,1\n2,p,2,-2.38638787781074,0.3762748252149763,34.607703175274416,2\n3,p,3,-0.7932372991075292,0.3632420646597187,36.200853753977626,3\n4,p,4,0.8050424871223493,0.3632420646597187,37.79913354020751,4\n5,p,5,2.4033222733522352,0.3632420646597187,39.397413326437395,5\n6,p,6,4.122609143092639,0.3764229843266056,41.116700196177796,6\n7,p,7,5.599881845811996,0.3632420646597187,42.59397289889715,7\n8,r,0,0.007701008861643546,0.34703523245759194,,0\n9,r,1,0.5955872203660368,0.34612473493158036,,1\n10,r,2,-0.603288229227605,0.3479803048575435,,2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/python_variance.csv",
+      "sha256": "3614191e3ef27434937da0ebd82cf4e63d51b810d94f841c68f827700237352c",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,15.765693094612505,15.765693094612505,97.41670038964301\nr,0.3671698143780669,0.3671698143780669,2.2687535260731337\np:r,0.05090540953549562,0.05090540953549562,0.3145460842838599\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/reference/coefficients.csv",
+      "sha256": "30f792d9153d8f24a806a812cf7d7272f589635ebc1e69e788f7670a602b6e21",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,1.19086327627506,0.00128171514388373,0.0105264519166465,0.998924866393677,0.991238103947758,0.0358010494802,0.10259849860815\n2,1.19086327627506,0.000640857571941865,0.00526322595832327,0.999462144063342,0.995599774816045,0.0253151648610446,0.0725480941053813\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/reference/fit.csv",
+      "sha256": "8d4f7ef7fd7bf8ea1a6103eef89584f1ac94ccdd730b21cb2c6fea656b0fea2c",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-1.5347509822244,11.0695019644488,15.2475917153425,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/reference/variance.csv",
+      "sha256": "cb9451c3fd4af34702d51017aa55e925da3acfce4c5656924ea9785b7cb4a7bf",
+      "content": "\"source\",\"Variance\"\n\"p\",1.19086327627506\n\"r\",0.0277342103182884\n\"p:r\",0.00384514543165119\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin6/settings.json",
+      "sha256": "b2fe424a0cd4ea663c02d53eef2bbae93700ad18dcbd1ea6f995cb3dd39af522",
+      "content": "{\n  \"design\": \"p x r\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"r\": \"r\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"72a941c2dc2bdf252f60f3b85d31635546742f64d68baebd0e334e9082d46d85\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 37.24285714285715,\n  \"score_scale\": 3.6385268380239286,\n  \"model_mean\": 36.99409105308516,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.05496444363150928,\n    \"max_scaled_gradient\": 5.156604303523457e-07,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": -0.06837000270886953,\n    \"logLik\": -27.366328680242574,\n    \"AIC\": 62.73265736048515,\n    \"BIC\": 66.91074711137884,\n    \"observations\": 21,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -1.534750982224402,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"r\": [\n      3\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/comparison.json",
+      "sha256": "8fe42414b1f10d7ee2aee793075f390828eafe72435fc82eecf7eb09f5492e4b",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"i\": 0.0,\n    \"r\": 0.0,\n    \"p:i\": 0.0,\n    \"p:r\": 0.0,\n    \"i:r\": 0.0,\n    \"p:i:r\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NOT COMPARABLE: missing cells or variance boundary\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"c79ad046ff008d3eb4ae4504762f55f95a7768236811b8b1cc462b783062f3d3\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/normalized.csv",
+      "sha256": "527488cd486d453b50b5328e2f114a5057b123176c68b7fe3ab9a1006bd7bd9e",
+      "content": "p,i,r,score\n0,0,0,-1.3690552642822331\n0,0,1,-1.3304259743616478\n0,1,2,-1.407684554202818\n0,1,0,-1.3845069802504668\n0,1,1,-1.361329406298116\n0,2,2,-1.407684554202818\n0,2,1,-1.3922328382345832\n0,3,2,-1.4076845542028176\n0,3,0,-1.4154104121869346\n0,3,1,-1.4231362701710517\n1,0,2,-1.1759088146793089\n1,0,0,-1.1218278087904898\n1,0,1,-1.0677468029016708\n1,1,2,-1.1141019508063734\n1,1,0,-1.04456922894932\n1,1,1,-0.975036507092267\n1,2,0,-0.9673106491081505\n1,2,1,-0.8823262112828641\n1,3,2,-0.9904882230605011\n1,3,0,-0.8900520692669807\n1,3,1,-0.7896159154734603\n2,0,2,-0.9441330751557997\n2,0,0,-0.8746003532987465\n2,0,1,-0.8050676314416934\n2,1,2,-0.8205193474099275\n2,1,0,-0.7046314776481729\n2,1,1,-0.5887436078864183\n2,2,2,-0.6969056196640564\n2,2,0,-0.5346626019976004\n2,2,1,-0.37241958433114447\n2,3,2,-0.5732918919181842\n2,3,0,-0.36469372634702685\n2,3,1,-0.15609556077586947\n3,0,2,-0.7123573356322894\n3,0,0,-0.6273728978070032\n3,0,1,-0.5423884599817169\n3,1,2,-0.5269367440134828\n3,1,0,-0.36469372634702685\n3,1,1,-0.20245070868057086\n3,2,2,-0.34151615239467503\n3,2,0,-0.10201455488704934\n3,2,1,0.13748704262057634\n3,3,2,-0.15609556077586836\n3,3,0,0.16066461657292702\n3,3,1,0.47742479392172243\n4,0,2,-0.4805815961087825\n4,0,0,-0.380145442315261\n4,0,1,-0.2797092885217395\n4,1,2,-0.23335414061703919\n4,1,0,-0.024755975045879633\n4,1,1,0.18384219052527992\n4,2,2,0.013873314874705228\n4,2,0,0.33063349222350064\n4,2,1,0.647393669572296\n4,3,2,0.2611007703664485\n4,3,0,0.686022959492882\n4,3,1,1.1109451486193154\n5,0,2,-0.24880585658527227\n5,0,0,-0.1329179868235177\n5,0,1,-0.0170301170617631\n5,1,2,0.06022846277940552\n5,1,0,0.31518177625526644\n5,1,1,0.5701350897311275\n5,2,2,0.3692627821440866\n5,2,0,0.7632815393340517\n5,2,1,1.157300296524017\n5,3,2,0.6782971015087643\n5,3,0,1.211381302412836\n5,3,1,1.7444655033169074\n6,0,2,-0.0170301170617631\n6,0,0,0.11430946866822564\n6,0,1,0.24564905439821438\n6,1,2,0.35381106617585134\n6,1,0,0.6551195275564137\n6,1,1,0.956427988936976\n6,2,2,0.7246522494134668\n6,2,0,1.1959295864446018\n6,2,1,1.6672069234757365\n6,3,2,1.0954934326510812\n6,3,0,1.7367396453327897\n6,3,1,2.3779858580144984\n7,0,2,0.21474562246174606\n7,0,0,0.36153692415996896\n7,0,1,0.5083282258581918\n7,1,2,0.6473936695722972\n7,1,0,0.9950572788575609\n7,1,1,1.3427208881428245\n7,2,2,1.080041716682847\n7,2,0,1.6285776335551516\n7,2,1,2.1771135504274564\n7,3,2,1.5126897637933983\n7,3,0,2.2620979882527434\n7,3,1,3.011506212712089\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_d.csv",
+      "sha256": "a30b99e8a267c58b49cc52253366f2218047c0271603f09bcf6a9823125d6838",
+      "content": ",p,i,r,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,4,3,35.99458391227333,1.2707155853571512,3.4138976157409284,1.1272602119107864,1.8476735685020036,0.9659008352948311,0.9133715006675887\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_diagnostics.csv",
+      "sha256": "fa588401fa6f553967fe6c969e38c077d9648a51c97986d3c7f0666c0f173685",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.22317607163108097,9.063000457798712e-06,bobyqa,[],[],-0.03866579369130453,-185.8116191855057,387.6232383710114,407.88403431623743,93,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-14.00620787809956,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_errors.csv",
+      "sha256": "75009dbeb29d4a33a81b313f34ef9b22df66536b66d7a757bf1bcbc77e7e38e0",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,35.99458391227333,1.2707155853571512,3.4138976157409284,1.1272602119107864,1.8476735685020036\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_g.csv",
+      "sha256": "cb2127db5228deaf2d236eac0667b13fb48c083129c84400983580c3749810fc",
+      "content": ",rho^2,phi^2\np,0.9659008352948311,0.9133715006675887\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_random_effects.csv",
+      "sha256": "e63cacf4b93f88801922e08fcc656a59d4e96652f4b3c640e0dc44361efd0642",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p:i,0:0,3.000555603427672,1.1599534370282787,,0:0\n1,p:i,0:1,0.6090673181858809,1.1434628811388396,,0:1\n2,p:i,0:2,-1.2915074050641557,1.1604486487103296,,0:2\n3,p:i,0:3,-3.173233530081288,1.1434628811388396,,0:3\n4,p:i,1:0,1.8065636902477111,1.1424566502548092,,1:0\n5,p:i,1:1,0.5618830575772205,1.1422298309024341,,1:1\n6,p:i,1:2,-0.9361622695042016,1.1570958209756943,,1:2\n7,p:i,1:3,-2.058568427664714,1.1422298309024341,,1:3\n8,p:i,2:0,0.9441530847640883,1.1408347344347982,,2:0\n9,p:i,2:1,0.28039713360621765,1.1405446732324427,,2:1\n10,p:i,2:2,-0.4191693654569264,1.1410513535343323,,2:2\n11,p:i,2:3,-1.1782049886104835,1.1405446732324427,,2:3\n12,p:i,3:0,0.13473850877948707,1.1408347344347982,,3:0\n13,p:i,3:1,0.05190723913422634,1.1405446732324427,,3:1\n14,p:i,3:2,-0.06673457841629139,1.1410513535343323,,3:2\n15,p:i,3:3,-0.2448455200572368,1.1405446732324427,,3:3\n16,p:i,4:0,-0.6746760672051375,1.1408347344347982,,4:0\n17,p:i,4:1,-0.1765826553377673,1.1405446732324427,,4:1\n18,p:i,4:2,0.2857002086243275,1.1410513535343323,,4:2\n19,p:i,4:3,0.68851394849601,1.1405446732324427,,4:3\n20,p:i,5:0,-1.4840906431897214,1.1408347344347982,,5:0\n21,p:i,5:1,-0.40507254980974006,1.1405446732324427,,5:1\n22,p:i,5:2,0.6381349956649819,1.1410513535343323,,5:2\n23,p:i,5:3,1.621873417049273,1.1405446732324427,,5:3\n24,p:i,6:0,-2.293505219174344,1.1408347344347982,,6:0\n25,p:i,6:1,-0.6335624442817419,1.1405446732324427,,6:1\n26,p:i,6:2,0.9905697827055904,1.1410513535343323,,6:2\n27,p:i,6:3,2.55523288560251,1.1405446732324427,,6:3\n28,p:i,7:0,-3.1029197951589533,1.1408347344347982,,7:0\n29,p:i,7:1,-0.8620523387537348,1.1405446732324427,,7:1\n30,p:i,7:2,1.3430045697462119,1.1410513535343323,,7:2\n31,p:i,7:3,3.4885923541557466,1.1405446732324427,,7:3\n32,p:r,0:0,-0.2132432379182336,0.6764423370429734,,0:0\n33,p:r,0:1,-1.3854892547938125,0.6660555484643685,,0:1\n34,p:r,0:2,1.378919159754562,0.6766303185942052,,0:2\n35,p:r,1:0,0.00942344698581004,0.6641744844646708,,1:0\n36,p:r,1:1,-0.8254754121010895,0.6641123630125308,,1:1\n37,p:r,1:2,0.6550618326370049,0.6724110875069376,,1:2\n38,p:r,2:0,-0.020121959992329158,0.6616549874310899,,2:0\n39,p:r,2:1,-0.48999215518968176,0.6614504658029097,,2:1\n40,p:r,2:2,0.41427738320147156,0.6617903012732481,,2:2\n41,p:r,3:0,0.0011185701703221352,0.6616549874310899,,3:0\n42,p:r,3:1,-0.10372296113748333,0.6614504658029097,,3:1\n43,p:r,3:2,0.07048924947457458,0.6617903012732481,,3:2\n44,p:r,4:0,0.02235910033297159,0.6616549874310899,,4:0\n45,p:r,4:1,0.2825462329147222,0.6614504658029097,,4:1\n46,p:r,4:2,-0.27329888425233145,0.6617903012732481,,4:2\n47,p:r,5:0,0.04359963049562678,0.6616549874310899,,5:0\n48,p:r,5:1,0.668815426966929,0.6614504658029097,,5:1\n49,p:r,5:2,-0.6170870179792258,0.6617903012732481,,5:2\n50,p:r,6:0,0.06484016065826127,0.6616549874310899,,6:0\n51,p:r,6:1,1.0550846210191072,0.6614504658029097,,6:1\n52,p:r,6:2,-0.9608751517061351,0.6617903012732481,,6:2\n53,p:r,7:0,0.08608069082091038,0.6616549874310899,,7:0\n54,p:r,7:1,1.4413538150713052,0.6614504658029097,,7:1\n55,p:r,7:2,-1.3046632854330424,0.6617903012732481,,7:2\n56,i:r,0:0,-0.15229422473074233,0.5722519958010307,,0:0\n57,i:r,0:1,-0.8869884770201267,0.5722042534967108,,0:1\n58,i:r,0:2,0.7514010805270398,0.5743092077707226,,0:2\n59,i:r,1:0,-0.021143995226931517,0.5718402111767908,,1:0\n60,i:r,1:1,-0.1958211204515359,0.5715952016968306,,1:1\n61,i:r,1:2,0.11796539432249696,0.5720056882926832,,1:2\n62,i:r,2:0,0.05989898392214428,0.5747528406264555,,2:0\n63,i:r,2:1,0.45939505901809347,0.5726665825664489,,2:1\n64,i:r,2:2,-0.42549930957207177,0.574932291770428,,2:2\n65,i:r,3:0,0.10955144829563446,0.5718402111767908,,3:0\n66,i:r,3:1,1.0549085772005895,0.5715952016968313,,3:1\n67,i:r,3:2,-0.8713734162845017,0.5720056882926832,,3:2\n68,p,0,-8.329903580823268,1.614055561770523,31.68007522881819,0\n69,p,1,-6.100777705182249,1.6129521444461075,33.909201104459214,1\n70,p,2,-3.6317666729238947,1.6114741303018951,36.378212136717565,2\n71,p,3,-1.217014584686811,1.6114741303018951,38.79296422495465,3\n72,p,4,1.1977375035502786,1.6114741303018951,41.20771631319174,4\n73,p,5,3.612489591787336,1.6114741303018951,43.6224684014288,5\n74,p,6,6.027241680024445,1.6114741303018951,46.037220489665906,6\n75,p,7,8.441993768261522,1.6114741303018951,48.45197257790298,7\n76,i,0,-2.625461437381444,1.2671723323437323,,0\n77,i,1,-0.9028709426695098,1.2668708824970762,,1\n78,i,2,0.8554017948096925,1.267410161573182,,2\n79,i,3,2.6729305852419216,1.2668708824970762,,3\n80,r,0,-0.011959424445152418,0.8633762134840529,,0\n81,r,1,1.2940559256428381,0.8631965322371024,,1\n82,r,2,-1.2820965011971905,0.8635043978104845,,2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/python_variance.csv",
+      "sha256": "eb4096368391762b54a3f323d11ae216f7807239f5f81d39015b0deb342d9b7d",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,35.99458391227333,35.99458391227333,72.91665920674376\ni,5.81199847702124,5.81199847702124,11.77375777677953\nr,1.9112259498680386,1.9112259498680386,3.8716994643767575\np:i,3.6950748342180955,3.6950748342180955,7.4853626058509795\np:r,0.9498416615993652,0.9498416615993652,1.9241583930518031\ni:r,0.6372851340694452,0.6372851340694452,1.2909915294956633\np:i:r,0.36399587523406846,0.36399587523406846,0.7373710237015128\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/reference/coefficients.csv",
+      "sha256": "75ca874d09169a2050ca2418649431e8eb3d168b82264818ab0730c93b85eeaf",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.859390582819112,0.0303390368439584,0.0815086922195533,0.965900835294831,0.913371500667589,0.174181046167367,0.285497271825062\n2,0.859390582819112,0.0149884641995095,0.0402563015797485,0.982858161742764,0.955253219593321,0.122427383372796,0.200639730810596\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/reference/fit.csv",
+      "sha256": "e38b98fd1a2fb133b80a47c9a9b37703304437169e80744165d6c04edd6fe787",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-14.0062078780996,44.0124157561991,64.2732117014252,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/reference/variance.csv",
+      "sha256": "a2b25305c6778f7b8ec181f9d0540328bdfb37f33670693ed528e92ca43c045f",
+      "content": "\"source\",\"Variance\"\n\"p:i\",0.0882219536994327\n\"p:r\",0.022677994587664\n\"i:r\",0.015215534762805\n\"p\",0.859390582819112\n\"i\",0.138764675560202\n\"r\",0.0456315757659322\n\"p:i:r\",0.00869060267854621\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin7/settings.json",
+      "sha256": "35bccf9283b1f4472d53dee717948903a9856b52bcf4fa30545e610283bacbfb",
+      "content": "{\n  \"design\": \"p x i x r\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"i\": \"i\",\n    \"r\": \"r\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"c79ad046ff008d3eb4ae4504762f55f95a7768236811b8b1cc462b783062f3d3\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 40.26021505376344,\n  \"score_scale\": 6.471773116046315,\n  \"model_mean\": 40.00997880964146,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.22317607163108097,\n    \"max_scaled_gradient\": 9.063000457798712e-06,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": -0.03866579369130453,\n    \"logLik\": -185.8116191855057,\n    \"AIC\": 387.6232383710114,\n    \"BIC\": 407.88403431623743,\n    \"observations\": 93,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -14.00620787809956,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"i\": [\n      4\n    ],\n    \"r\": [\n      3\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/adapter.log",
+      "sha256": "843282958b52e2b3bd9ae9fa62d4f66652f7e4c1c2f1470541e34877c6f86899",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/comparison.json",
+      "sha256": "4b815fe626439467061278a2db9112333cd28a90ea31c494a07e97c24193697d",
+      "content": "{\n  \"status\": \"NUMERICALLY VALIDATED\",\n  \"scope\": \"adapter vs direct R lmer on identical standardized data\",\n  \"variance_differences\": {\n    \"p\": 0.0,\n    \"i\": 0.0,\n    \"i:r\": 0.0,\n    \"p:i\": 0.0,\n    \"p:i:r\": 0.0\n  },\n  \"converged\": true,\n  \"singular\": false,\n  \"mom_status\": \"NOT COMPARABLE: missing cells or variance boundary\",\n  \"coefficients_status\": \"NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances\",\n  \"fixture_sha256\": \"e43b1d412bd9ae53be1ab498c27a1d37ff305ca1aea991c3427dbcb92cf24c9e\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/normalized.csv",
+      "sha256": "7f8cef706527b196e0afb6a551676d1b33e3bd19d6d163ee7684dd38d82b08ea",
+      "content": "p,i,r,score\n0,0,0,-1.3690552642822331\n0,0,1,-1.3304259743616478\n0,1,2,-1.407684554202818\n0,1,3,-1.3845069802504668\n0,1,4,-1.361329406298116\n0,2,5,-1.407684554202818\n0,2,6,-1.3922328382345832\n0,3,7,-1.4076845542028176\n0,3,8,-1.4154104121869346\n0,3,9,-1.4231362701710517\n1,0,10,-1.1759088146793089\n1,0,0,-1.1218278087904898\n1,0,1,-1.0677468029016708\n1,1,2,-1.1141019508063734\n1,1,3,-1.04456922894932\n1,1,4,-0.975036507092267\n1,2,11,-0.9673106491081505\n1,2,6,-0.8823262112828641\n1,3,7,-0.9904882230605011\n1,3,8,-0.8900520692669807\n1,3,9,-0.7896159154734603\n2,0,10,-0.9441330751557997\n2,0,0,-0.8746003532987465\n2,0,1,-0.8050676314416934\n2,1,2,-0.8205193474099275\n2,1,3,-0.7046314776481729\n2,1,4,-0.5887436078864183\n2,2,5,-0.6969056196640564\n2,2,11,-0.5346626019976004\n2,2,6,-0.37241958433114447\n2,3,7,-0.5732918919181842\n2,3,8,-0.36469372634702685\n2,3,9,-0.15609556077586947\n3,0,10,-0.7123573356322894\n3,0,0,-0.6273728978070032\n3,0,1,-0.5423884599817169\n3,1,2,-0.5269367440134828\n3,1,3,-0.36469372634702685\n3,1,4,-0.20245070868057086\n3,2,5,-0.34151615239467503\n3,2,11,-0.10201455488704934\n3,2,6,0.13748704262057634\n3,3,7,-0.15609556077586836\n3,3,8,0.16066461657292702\n3,3,9,0.47742479392172243\n4,0,10,-0.4805815961087825\n4,0,0,-0.380145442315261\n4,0,1,-0.2797092885217395\n4,1,2,-0.23335414061703919\n4,1,3,-0.024755975045879633\n4,1,4,0.18384219052527992\n4,2,5,0.013873314874705228\n4,2,11,0.33063349222350064\n4,2,6,0.647393669572296\n4,3,7,0.2611007703664485\n4,3,8,0.686022959492882\n4,3,9,1.1109451486193154\n5,0,10,-0.24880585658527227\n5,0,0,-0.1329179868235177\n5,0,1,-0.0170301170617631\n5,1,2,0.06022846277940552\n5,1,3,0.31518177625526644\n5,1,4,0.5701350897311275\n5,2,5,0.3692627821440866\n5,2,11,0.7632815393340517\n5,2,6,1.157300296524017\n5,3,7,0.6782971015087643\n5,3,8,1.211381302412836\n5,3,9,1.7444655033169074\n6,0,10,-0.0170301170617631\n6,0,0,0.11430946866822564\n6,0,1,0.24564905439821438\n6,1,2,0.35381106617585134\n6,1,3,0.6551195275564137\n6,1,4,0.956427988936976\n6,2,5,0.7246522494134668\n6,2,11,1.1959295864446018\n6,2,6,1.6672069234757365\n6,3,7,1.0954934326510812\n6,3,8,1.7367396453327897\n6,3,9,2.3779858580144984\n7,0,10,0.21474562246174606\n7,0,0,0.36153692415996896\n7,0,1,0.5083282258581918\n7,1,2,0.6473936695722972\n7,1,3,0.9950572788575609\n7,1,4,1.3427208881428245\n7,2,5,1.080041716682847\n7,2,11,1.6285776335551516\n7,2,6,2.1771135504274564\n7,3,7,1.5126897637933983\n7,3,8,2.2620979882527434\n7,3,9,3.011506212712089\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_d.csv",
+      "sha256": "97e5c060f512bda1df26738deeb05622473ecceae59c9d063a3ad2dfee068b5e",
+      "content": ",p,i,r,universe,relative_error,absolute_error,relative_sem,absolute_sem,rho^2,phi^2\n0,8,4,3,37.02429369230539,0.8911276482671046,2.4591850866360225,0.9439955764022968,1.5681789077257806,0.9764969604250837,0.9377160989181218\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_diagnostics.csv",
+      "sha256": "9a7614b0010cdbb47106fb26c4cac107a210d24cb37f6d1299f9f9f8d97ec5b2",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,0.8128719947513792,1.1357944786432341e-06,bobyqa,[],[],-0.044146375839604776,-204.98755631058995,421.9751126211799,437.17070958009947,93,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-33.18214500318382,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_errors.csv",
+      "sha256": "9d4a0fe7784cab8e7a42654281a455048e767958c3f898052f5a40269897d86b",
+      "content": ",universe,relative_error,absolute_error,relative_sem,absolute_sem\np,37.02429369230539,0.8911276482671046,2.4591850866360225,0.9439955764022968,1.5681789077257806\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_g.csv",
+      "sha256": "3cd3830dae016716f6dca5c70e5fc3416c823a0f689f7ef3702b946d5c36c1b5",
+      "content": ",rho^2,phi^2\np,0.9764969604250837,0.9377160989181218\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_random_effects.csv",
+      "sha256": "f6bdefb179b52630680da654e7e444005ea0d9d43826f0dae27ad2cf5032dfb9",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p:i,0:0,2.179088325132273,1.174678655659812,,0:0\n1,p:i,0:1,0.716483644604972,1.1441989559309975,,0:1\n2,p:i,0:2,-0.8746097024188447,1.1757734339873762,,0:2\n3,p:i,0:3,-2.7481816375817347,1.1441989559309975,,0:3\n4,p:i,1:0,1.8153855916415396,1.1410559050488402,,1:0\n5,p:i,1:1,0.5757389642156312,1.1405361196568804,,1:1\n6,p:i,1:2,-1.0860147766283892,1.1726051282777874,,1:2\n7,p:i,1:3,-1.8322759462809424,1.1405361196568804,,1:3\n8,p:i,2:0,0.9511257551007289,1.1374168707608105,,2:0\n9,p:i,2:1,0.2398043135198872,1.1368833042704318,,2:1\n10,p:i,2:2,-0.3876909100872855,1.137896720203943,,2:2\n11,p:i,2:3,-1.1115602252865626,1.1368833042704318,,2:3\n12,p:i,3:0,0.2103765086303794,1.1374168707608105,,3:0\n13,p:i,3:1,0.027380252894597706,1.1368833042704318,,3:1\n14,p:i,3:2,-0.07178978486750393,1.137896720203943,,3:2\n15,p:i,3:3,-0.26733391422172104,1.1368833042704318,,3:3\n16,p:i,4:0,-0.5303727378399733,1.1374168707608105,,4:0\n17,p:i,4:1,-0.1850438077306826,1.1368833042704318,,4:1\n18,p:i,4:2,0.24411134035227638,1.137896720203943,,4:2\n19,p:i,4:3,0.5768923968431303,1.1368833042704318,,4:3\n20,p:i,5:0,-1.2711219843103208,1.1374168707608105,,5:0\n21,p:i,5:1,-0.39746786835596876,1.1368833042704318,,5:1\n22,p:i,5:2,0.5600124655720625,1.137896720203943,,5:2\n23,p:i,5:3,1.4211187079079786,1.1368833042704318,,5:3\n24,p:i,6:0,-2.01187123078066,1.1374168707608105,,6:0\n25,p:i,6:1,-0.6098919289812452,1.1368833042704318,,6:1\n26,p:i,6:2,0.8759135907918462,1.137896720203943,,6:2\n27,p:i,6:3,2.26534501897283,1.1368833042704318,,6:3\n28,p:i,7:0,-2.7526204772510185,1.1374168707608105,,7:0\n29,p:i,7:1,-0.8223159896065354,1.1368833042704318,,7:1\n30,p:i,7:2,1.1918147160116166,1.137896720203943,,7:2\n31,p:i,7:3,3.109571330037662,1.1368833042704318,,7:3\n32,i:r,0:0,-0.3590941011020455,0.9471032520501436,,0:0\n33,i:r,0:1,0.20706234956573655,0.9471032520501436,,0:1\n34,i:r,0:10,-1.0479630236456101,0.9533363600384472,,0:10\n35,i:r,1:2,-1.2614780438177533,0.9457730381493408,,1:2\n36,i:r,1:3,-0.12916514248219274,0.9457730381493408,,1:3\n37,i:r,1:4,1.0031477588533693,0.9457730381493408,,1:4\n38,i:r,2:5,-1.7183204015034617,0.9550562647964518,,2:5\n39,i:r,2:6,1.8819287542261038,0.9482842823389552,,2:6\n40,i:r,2:11,0.22085265832286835,0.9550530843186523,,2:11\n41,i:r,3:7,-1.8636160721434456,0.9457730381493408,,3:7\n42,i:r,3:8,0.4010097305276674,0.9457730381493408,,3:8\n43,i:r,3:9,2.6656355331987873,0.9457730381493408,,3:9\n44,p,0,-8.578320077583836,1.4212679801289112,31.39618964784997,0\n45,p,1,-6.2184813825980125,1.4165897775216274,33.75602834283579,1\n46,p,2,-3.636972425959788,1.4119925824062607,36.337537299474015,2\n47,p,3,-1.1957300248970681,1.4119925824062607,38.77877970053674,3\n48,p,4,1.2455123761656515,1.4119925824062607,41.220022101599454,4\n49,p,5,3.6867547772283653,1.4119925824062607,43.66126450266217,5\n50,p,6,6.1279971782910785,1.4119925824062607,46.10250690372489,6\n51,p,7,8.569239579353772,1.4119925824062607,48.543749304787575,7\n52,i,0,-2.4176985117053826,1.3648631988741136,,0\n53,i,1,-0.7807093310786295,1.3643294093231695,,1\n54,i,2,0.7745957177793554,1.3653410375135875,,2\n55,i,3,2.423812125004637,1.3643294093231695,,3\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/python_variance.csv",
+      "sha256": "c153d716b31529904eb0fb3940f5bafe17069765cb4478f88aaaadccbff4ca23",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,37.02429369230539,37.02429369230539,74.80644323478924\ni,5.381828414246866,5.381828414246866,10.873818285786873\ni:r,2.6712040176864202,2.6712040176864202,5.397085313179886\np:i,3.1387012025492904,3.1387012025492904,6.3416489532726645\np:i:r,1.2774281715573839,1.2774281715573839,2.5810042129713295\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/reference/coefficients.csv",
+      "sha256": "5ee2b5acbfe5df4001de6e8e1c929174faa02ccf893870373fd53f7d2f8a9db7",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.883975472872378,0.0212761650718613,0.0587144029783763,0.976496960425084,0.937716098918122,0.145863515218376,0.242310550695541\n2,0.883975472872378,0.0100026803786576,0.0273931228292784,0.988811046061605,0.969942871678403,0.100013400995355,0.165508679014964\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/reference/fit.csv",
+      "sha256": "28d44b7f9e96de63eeb63bfc63fe45c69f4d85b74609b9fb0507504e26741870",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-33.1821450031838,78.3642900063676,93.5598869652872,FALSE,0\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/reference/variance.csv",
+      "sha256": "f3a223cd88216e9c1118cc2743d7b4640e0b697179670364e2c6de57653cc65d",
+      "content": "\"source\",\"Variance\"\n\"p:i\",0.0749382257710761\n\"i:r\",0.0637764721265617\n\"p\",0.883975472872378\n\"i\",0.128494127583873\n\"p:i:r\",0.0304993035491077\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/reference.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin8/settings.json",
+      "sha256": "550d6380fb262c66ab42b0cd32a51ce4ea3b03b6e86ac4b66af5b7f43786c714",
+      "content": "{\n  \"design\": \"p x (r:i)\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"i\": \"i\",\n    \"r\": \"r\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"8\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"9\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"10\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"11\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"e43b1d412bd9ae53be1ab498c27a1d37ff305ca1aea991c3427dbcb92cf24c9e\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 40.26021505376344,\n  \"score_scale\": 6.471773116046315,\n  \"model_mean\": 39.974509725433805,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": true,\n    \"singular\": false,\n    \"hessian_pd\": true,\n    \"hessian_min\": 0.8128719947513792,\n    \"max_scaled_gradient\": 1.1357944786432341e-06,\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [],\n    \"boundary_components\": [],\n    \"intercept\": -0.044146375839604776,\n    \"logLik\": -204.98755631058995,\n    \"AIC\": 421.9751126211799,\n    \"BIC\": 437.17070958009947,\n    \"observations\": 93,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -33.18214500318382,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"i\": [\n      4\n    ],\n    \"r\": [\n      3\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/adapter.log",
+      "sha256": "b7af91cbc3e989151239db0dcc4ac7f6678628c205557e1802875252909dd295",
+      "content": "R lme4 REML executed; converged= FALSE  singular= TRUE \n\nSTDERR\nboundary (singular) fit: see help('isSingular')\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/normalized.csv",
+      "sha256": "2d507b91a2bf6075e4a8adc089ed52d93ae063ffc024425163d7df04816570ac",
+      "content": "p,r,i,score\n0,0,0,-1.3690552642822331\n0,1,1,-1.3304259743616478\n0,2,2,-1.407684554202818\n0,0,3,-1.3845069802504668\n0,1,4,-1.361329406298116\n0,2,5,-1.407684554202818\n0,1,6,-1.3922328382345832\n0,2,7,-1.4076845542028176\n0,0,8,-1.4154104121869346\n0,1,9,-1.4231362701710517\n1,2,10,-1.1759088146793089\n1,0,0,-1.1218278087904898\n1,1,1,-1.0677468029016708\n1,2,2,-1.1141019508063734\n1,0,3,-1.04456922894932\n1,1,4,-0.975036507092267\n1,0,11,-0.9673106491081505\n1,1,6,-0.8823262112828641\n1,2,7,-0.9904882230605011\n1,0,8,-0.8900520692669807\n1,1,9,-0.7896159154734603\n2,2,10,-0.9441330751557997\n2,0,0,-0.8746003532987465\n2,1,1,-0.8050676314416934\n2,2,2,-0.8205193474099275\n2,0,3,-0.7046314776481729\n2,1,4,-0.5887436078864183\n2,2,5,-0.6969056196640564\n2,0,11,-0.5346626019976004\n2,1,6,-0.37241958433114447\n2,2,7,-0.5732918919181842\n2,0,8,-0.36469372634702685\n2,1,9,-0.15609556077586947\n3,2,10,-0.7123573356322894\n3,0,0,-0.6273728978070032\n3,1,1,-0.5423884599817169\n3,2,2,-0.5269367440134828\n3,0,3,-0.36469372634702685\n3,1,4,-0.20245070868057086\n3,2,5,-0.34151615239467503\n3,0,11,-0.10201455488704934\n3,1,6,0.13748704262057634\n3,2,7,-0.15609556077586836\n3,0,8,0.16066461657292702\n3,1,9,0.47742479392172243\n4,2,10,-0.4805815961087825\n4,0,0,-0.380145442315261\n4,1,1,-0.2797092885217395\n4,2,2,-0.23335414061703919\n4,0,3,-0.024755975045879633\n4,1,4,0.18384219052527992\n4,2,5,0.013873314874705228\n4,0,11,0.33063349222350064\n4,1,6,0.647393669572296\n4,2,7,0.2611007703664485\n4,0,8,0.686022959492882\n4,1,9,1.1109451486193154\n5,2,10,-0.24880585658527227\n5,0,0,-0.1329179868235177\n5,1,1,-0.0170301170617631\n5,2,2,0.06022846277940552\n5,0,3,0.31518177625526644\n5,1,4,0.5701350897311275\n5,2,5,0.3692627821440866\n5,0,11,0.7632815393340517\n5,1,6,1.157300296524017\n5,2,7,0.6782971015087643\n5,0,8,1.211381302412836\n5,1,9,1.7444655033169074\n6,2,10,-0.0170301170617631\n6,0,0,0.11430946866822564\n6,1,1,0.24564905439821438\n6,2,2,0.35381106617585134\n6,0,3,0.6551195275564137\n6,1,4,0.956427988936976\n6,2,5,0.7246522494134668\n6,0,11,1.1959295864446018\n6,1,6,1.6672069234757365\n6,2,7,1.0954934326510812\n6,0,8,1.7367396453327897\n6,1,9,2.3779858580144984\n7,2,10,0.21474562246174606\n7,0,0,0.36153692415996896\n7,1,1,0.5083282258581918\n7,2,2,0.6473936695722972\n7,0,3,0.9950572788575609\n7,1,4,1.3427208881428245\n7,2,5,1.080041716682847\n7,0,11,1.6285776335551516\n7,1,6,2.1771135504274564\n7,2,7,1.5126897637933983\n7,0,8,2.2620979882527434\n7,1,9,3.011506212712089\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_d.csv",
+      "sha256": "37acefd8b8825f433dfa56865675c51c95fbf024f6d3a63b2624c305858a992a",
+      "content": ",p,r,i,rho^2,phi^2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_diagnostics.csv",
+      "sha256": "1b183fc99d85cbc0b91218fe15ffd06e6bdd0b87d06d4568df26d1dd9733084a",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,False,True,False,{},{},bobyqa,\"[\"\"boundary (singular) fit: see help('isSingular')\"\"]\",\"[\"\"p:r\"\"]\",-0.04569291942059167,-226.04269046872128,464.08538093744255,479.28097789636206,93,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-54.23727916131513,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_errors.csv",
+      "sha256": "4a5d590f11ffa112686b921ae51208f3cebae3129cd971329a33afe4ec546d26",
+      "content": ",universe,relative_error,absolute_error\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_g.csv",
+      "sha256": "f0160f0e761e33f4becd26d135f47d143d129e0b92141f15fe0d71efc1448723",
+      "content": ",rho^2,phi^2\np,,\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_profile_ci.csv",
+      "sha256": "a2e251bc474ed3c94430db4648b3edf6524242ae15f0f5f11ea853d3d536cf8d",
+      "content": ",source,lower,upper\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_random_effects.csv",
+      "sha256": "0a2865908d49b5f45b04f297dcaa5575d4d76a920881277b9551ef443661e496",
+      "content": ",term,level,deviation,conditional_sd,estimated_universe_score,original_label\n0,p:r,0:0,0.0,0.0,,0:0\n1,p:r,0:1,0.0,0.0,,0:1\n2,p:r,0:2,0.0,0.0,,0:2\n3,p:r,1:0,0.0,0.0,,1:0\n4,p:r,1:1,0.0,0.0,,1:1\n5,p:r,1:2,0.0,0.0,,1:2\n6,p:r,2:0,0.0,0.0,,2:0\n7,p:r,2:1,0.0,0.0,,2:1\n8,p:r,2:2,0.0,0.0,,2:2\n9,p:r,3:0,0.0,0.0,,3:0\n10,p:r,3:1,0.0,0.0,,3:1\n11,p:r,3:2,0.0,0.0,,3:2\n12,p:r,4:0,0.0,0.0,,4:0\n13,p:r,4:1,0.0,0.0,,4:1\n14,p:r,4:2,0.0,0.0,,4:2\n15,p:r,5:0,0.0,0.0,,5:0\n16,p:r,5:1,0.0,0.0,,5:1\n17,p:r,5:2,0.0,0.0,,5:2\n18,p:r,6:0,0.0,0.0,,6:0\n19,p:r,6:1,0.0,0.0,,6:1\n20,p:r,6:2,0.0,0.0,,6:2\n21,p:r,7:0,0.0,0.0,,7:0\n22,p:r,7:1,0.0,0.0,,7:1\n23,p:r,7:2,0.0,0.0,,7:2\n24,r:i,0:0,-2.7885736764397357,1.0935950246393928,,0:0\n25,r:i,0:3,-0.9178347305881748,1.0935950246393928,,0:3\n26,r:i,0:8,2.8236431611149473,1.0935950246393928,,0:8\n27,r:i,0:11,1.06551372180069,1.1157961535192364,,0:11\n28,r:i,1:1,-2.578489667010457,1.0932595015988802,,1:1\n29,r:i,1:4,-0.146529037403423,1.0932595015988802,,1:4\n30,r:i,1:6,2.2854315922036004,1.0932595015988802,,1:6\n31,r:i,1:9,4.71739222181063,1.0932595015988802,,1:9\n32,r:i,2:2,-1.6421301766264471,1.093904468593665,,2:2\n33,r:i,2:5,-0.38958249891451213,1.1162846821308041,,2:5\n34,r:i,2:7,0.976904347565746,1.093904468593665,,2:7\n35,r:i,2:10,-3.405745257512939,1.1161442839429163,,2:10\n36,p,0,-8.88364418124015,1.0215112988684418,31.080856665023433,0\n37,p,1,-6.203260476426237,1.0032230521900247,33.761240369837346,1\n38,p,2,-3.6837138514925436,0.9876749551309666,36.28078699477104,2\n39,p,3,-1.204434667051112,0.9876749551309666,38.76006617921247,3\n40,p,4,1.2748445173903198,0.9876749551309666,41.239345363653904,4\n41,p,5,3.7541237018317517,0.9876749551309666,43.718624548095335,5\n42,p,6,6.233402886273183,0.9876749551309666,46.197903732536766,6\n43,p,7,8.71268207071464,0.9876749551309666,48.677182916978225,7\n44,r,0,0.01675282638115386,0.717692375740834,,0\n45,r,1,0.3921527987876206,0.7176108321860734,,1\n46,r,2,-0.40890562516878054,0.7177800328760275,,2\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/python_variance.csv",
+      "sha256": "194459886246f71d92e19be62de9cc592288625e52ae5dfc5b533509deb280ee",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,37.8846833140873,37.8846833140873,77.02040382734695\nr,0.6301096770643391,0.6301096770643391,1.28102698868195\nr:i,6.873561541541591,6.873561541541591,13.974103499099263\np:r,0.0,0.0,0.0\np:r:i,3.799498856145955,3.799498856145955,7.724465684871844\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/reference/coefficients.csv",
+      "sha256": "6badab810853dcd86eb55f1aca5de827c8b6b9f6889b0e967e5fc34a43439cde",
+      "content": "\"multiplier\",\"universe\",\"relative_error\",\"absolute_error\",\"rho\",\"phi\",\"relative_sem\",\"absolute_sem\"\n1,0.904517750574956,0.0075595945776221,0.0262501735300777,0.991711673776573,0.9717972946314,0.0869459290457126,0.162019052984758\n2,0.904517750574956,0.00188989864440552,0.00781622811263526,0.997914957308631,0.991432711819109,0.0434729645228563,0.0884094345227661\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/reference/fit.csv",
+      "sha256": "2060e49bc27568042835d76b55c2b56d1134be6eb545a23c5b41cffdc4ec78d9",
+      "content": "\"logLik\",\"AIC\",\"BIC\",\"singular\",\"convergence_messages\"\n-54.2372791613151,120.47455832263,135.67015528155,TRUE,1\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/reference/sessionInfo.txt",
+      "sha256": "f8c071c361db9b7460cf4ed5b391d4aaecfb7c9b705b1ad0259a6b986d022235",
+      "content": "R version 4.6.1 (2026-06-24)\nPlatform: x86_64-pc-linux-gnu\nRunning under: Ubuntu 26.04.1 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 \nLAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0\n\nlocale:\n [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       \n [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   \n [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          \n[10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   \n\ntime zone: UTC\ntzcode source: system (glibc)\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nloaded via a namespace (and not attached):\n [1] minqa_1.2.8      MASS_7.3-65      compiler_4.6.1   Matrix_1.7-5    \n [5] reformulas_0.4.4 tools_4.6.1      Rcpp_1.1.2       splines_4.6.1   \n [9] nlme_3.1-169     grid_4.6.1       nloptr_2.2.1     rbibutils_2.4.1 \n[13] boot_1.3-32      lme4_2.1-0       stats4_4.6.1     Rdpack_2.6.6    \n[17] lattice_0.22-9  \n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/reference/variance.csv",
+      "sha256": "918f330e5d6662d633b344c421450b803bf8671fb8f45dc11d40bded1551cc92",
+      "content": "\"source\",\"Variance\"\n\"p:r\",0\n\"r:i\",0.164110080383907\n\"p\",0.904517750574956\n\"r\",0.0150442167613901\n\"p:i:r\",0.0907151349314652\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/reference.stderr",
+      "sha256": "5a3879685cb752b8d915edf33c1d08046e06c45d55088ac9b6a57f73bcdc10c8",
+      "content": "boundary (singular) fit: see help('isSingular')\n"
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/reference.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content": ""
+    },
+    {
+      "path": "test_independent_r_reml_mappin9/settings.json",
+      "sha256": "17b807a7116da7fa8923dffc556b2a8a90cf72b18918c4da44d3dffb58f2a980",
+      "content": "{\n  \"design\": \"p x (i:r)\",\n  \"columns\": {\n    \"p\": \"p\",\n    \"r\": \"r\",\n    \"i\": \"i\"\n  },\n  \"score\": \"score\",\n  \"engine\": \"R lme4 REML\",\n  \"profile\": false,\n  \"fixed_facets\": [],\n  \"level_map\": {\n    \"p\": [\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      }\n    ],\n    \"r\": [\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      }\n    ],\n    \"i\": [\n      {\n        \"label\": \"4\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"8\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"1\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"5\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"9\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"2\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"10\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"3\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"7\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"11\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"0\",\n        \"type\": \"int\"\n      },\n      {\n        \"label\": \"6\",\n        \"type\": \"int\"\n      }\n    ]\n  },\n  \"input_sha256\": \"c26ce0af7b4479d5510d98201799dbd183d44c701be2f25b1d3b4aeaef130b62\",\n  \"target_note\": \"Yeni dengeli D deseni; g\\u00f6zlenen dengesiz ortalamalar\\u0131n katsay\\u0131s\\u0131 de\\u011fil.\",\n  \"versions\": {\n    \"R\": \"R version 4.6.1 (2026-06-24)\",\n    \"lme4\": \"2.1.0\",\n    \"lme4_DESCRIPTION\": \"2.1-0\",\n    \"Matrix\": \"1.7.5\",\n    \"jsonlite\": \"2.0.0\",\n    \"Python\": \"3.11.18\",\n    \"numpy\": \"2.4.6\",\n    \"pandas\": \"3.1.1\",\n    \"scipy\": \"1.17.1\"\n  },\n  \"score_center\": 40.26021505376344,\n  \"score_scale\": 6.471773116046315,\n  \"model_mean\": 39.96450084626358,\n  \"seed\": \"Not applicable: deterministic REML\",\n  \"convergence\": {\n    \"converged\": false,\n    \"singular\": true,\n    \"hessian_pd\": false,\n    \"hessian_min\": {},\n    \"max_scaled_gradient\": {},\n    \"optimizer\": \"bobyqa\",\n    \"messages\": [\n      \"boundary (singular) fit: see help('isSingular')\"\n    ],\n    \"boundary_components\": [\n      \"p:r\"\n    ],\n    \"intercept\": -0.04569291942059167,\n    \"logLik\": -226.04269046872128,\n    \"AIC\": 464.08538093744255,\n    \"BIC\": 479.28097789636206,\n    \"observations\": 93,\n    \"REML\": true,\n    \"versions\": {\n      \"R\": \"R version 4.6.1 (2026-06-24)\",\n      \"lme4\": \"2.1.0\",\n      \"lme4_DESCRIPTION\": \"2.1-0\",\n      \"Matrix\": \"1.7.5\",\n      \"jsonlite\": \"2.0.0\"\n    },\n    \"standardized_logLik\": -54.23727916131513,\n    \"likelihood_definition\": \"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n  },\n  \"r_script_sha256\": \"07f6c51165f7888618f8454c950a84936f77502098d47d182628133208a35589\",\n  \"scenarios\": {\n    \"p\": [\n      8\n    ],\n    \"r\": [\n      3\n    ],\n    \"i\": [\n      4\n    ]\n  }\n}"
+    },
+    {
+      "path": "test_r_profile_and_affine_and_0/R.log",
+      "sha256": "b77c6c457e2da09bbd2ff7ea3bc43ff27200b7f13499d7092db38a2a51e62dc1",
+      "content": "R lme4 REML executed; converged= TRUE  singular= FALSE \n\nSTDERR\nComputing profile confidence intervals ...\nWarning message:\n'oldNames' is deprecated. Please use 'signames' instead. \n"
+    },
+    {
+      "path": "test_r_profile_and_affine_and_0/diagnostics.csv",
+      "sha256": "7e8f39fc48aeefd0cbe1eb4f30dcdd6483205cbe13885987812c665741c4b61c",
+      "content": ",converged,singular,hessian_pd,hessian_min,max_scaled_gradient,optimizer,messages,boundary_components,intercept,logLik,AIC,BIC,observations,REML,versions,standardized_logLik,likelihood_definition\n0,True,False,True,1.2373181578624564,1.296180089485721e-07,bobyqa,[],[],-1.8375635889094503e-15,-71.86656786518078,151.73313573036157,157.59607934156048,32,True,\"{\"\"R\"\": \"\"R version 4.6.1 (2026-06-24)\"\", \"\"lme4\"\": \"\"2.1.0\"\", \"\"lme4_DESCRIPTION\"\": \"\"2.1-0\"\", \"\"Matrix\"\": \"\"1.7.5\"\", \"\"jsonlite\"\": \"\"2.0.0\"\"}\",-20.981882065122136,\"REML, N-1 residual contrasts; original score units. AIC/BIC not ML model-comparison statistics.\"\n"
+    },
+    {
+      "path": "test_r_profile_and_affine_and_0/profile_ci.csv",
+      "sha256": "3dbad725036f84933cc47e8a1feeb149252821189ec74db7374cad739af3affb",
+      "content": ",source,lower,upper\n0,p,9.77724946540713,76.20531175438572\n1,i,0.6921933290532392,20.89730824131451\n2,p:i,0.9238784089110669,3.1385932420724068\n"
+    },
+    {
+      "path": "test_r_profile_and_affine_and_0/variance.csv",
+      "sha256": "4bdf13111e737c8eed30a0a46f5b9de25410c8e434852e5ec840511f8c86b240",
+      "content": "source,Variance,coefficient_variance,contribution_pct\np,26.059998595294683,26.059998595294683,84.8123224892187\ni,3.066666843278709,3.066666843278709,9.980473956207716\np:i,1.6000000157388776,1.6000000157388776,5.20720355457357\n"
+    }
+  ],
+  "facet_status": "NOT EXECUTED: excluded mandatory dependencies",
+  "monte_carlo": 0,
+  "original_ci_conclusion": "failure",
+  "original_failed_tests": 2,
+  "execution_head_commit": "f52b3f3d191cffb9359c8317ae942b464d6d3b7d",
+  "artifact_id": 13554700692,
+  "original_artifact_sha256": "1bd6dacbf0f1547de6d593e047080f0a4c90137021dc60f42b72d0c470e3d7a4",
+  "executed_test_source": "\"\"\"Deterministic mathematical, real-engine and independent native R checks. No MC.\"\"\"\nimport hashlib\nimport io\nimport json\nimport os\nfrom pathlib import Path\nimport shutil\nimport subprocess\nimport zipfile\n\nimport numpy as np\nimport pandas as pd\nimport pytest\n\nfrom core import generalizability as gt\nfrom core import generalizability_advanced as ga\n\nROOT=Path(__file__).resolve().parents[1]\n\n\ndef fixture(design,missing=False):\n    d=ga.example('balanced')\n    if design=='p x i':d=d[d.r==0].drop(columns='r')\n    if design=='p x r':d=d[d.i==0].drop(columns='i')\n    if design=='p x (r:i)':d=d.assign(r=d.i*3+d.r)\n    if design=='p x (i:r)':d=d.assign(i=d.r*4+d.i)\n    d=d.reset_index(drop=True)\n    return d.drop(index=[0,7,18]).reset_index(drop=True) if missing else d\n\n\n@pytest.mark.parametrize('design',gt.DESIGNS)\ndef test_design_selection_and_kernel_identification(design):\n    cols={f:f for f in gt.DESIGNS[design]}\n    for missing in (False,True):\n        d=fixture(design,missing)\n        prepared,counts,info=ga.structure(d,design,cols,'score')\n        assert len(prepared)==len(d) and info['kernel_condition']<1e10\n        assert ga.select_engine(d,design,cols,'score')==('REML' if missing else 'ANOVA')\n    assert ga.select_engine(d,design,cols,'score','REML')=='REML'\n\n\n@pytest.mark.parametrize('change',['NA','duplicate','nested','confounded','fixed','constant'])\ndef test_invalid_and_confounded_fail_before_r(change):\n    design='p x (r:i)' if change=='nested' else 'p x i'\n    d=fixture(design);cols={f:f for f in gt.DESIGNS[design]}\n    kw={}\n    if change=='NA':d.loc[0,'score']=np.nan\n    if change=='duplicate':d=pd.concat([d,d.iloc[:1]])\n    if change=='nested':d.r=d.r%3\n    if change=='confounded':d=d[d.p==d.i]\n    if change=='fixed':kw['fixed_facets']=['i']\n    if change=='constant':d.score=1\n    with pytest.raises(ValueError):ga.structure(d,design,cols,'score',**kw)\n\n\ndef test_missing_runtime_is_explicit_and_anova_preserved(monkeypatch):\n    d=fixture('p x i');cols={'p':'p','i':'i'}\n    original=gt.analyze(d,'p x i',cols,'score')\n    actual=ga.analyze(d,'p x i',cols,'score')\n    for name in ('variance','g','errors','d','budget'):\n        pd.testing.assert_frame_equal(original[name],actual[name])\n    monkeypatch.setattr(ga.shutil,'which',lambda _:None)\n    with pytest.raises(ValueError,match='REML çalıştırılmadı'):\n        ga.analyze(d.iloc[1:],'p x i',cols,'score')\n\n\ndef test_matrix_covariance_composite_scaling_and_singular_rejection():\n    d=ga.example('multivariate');r=ga.multivariate(d,'p','i','Dimension','score')\n    assert r['status']=='LIBRARY TESTED' and abs(r['matrices']['universe'][0,1])>0\n    base=ga.composite(r,4,[.25,.75]);more=ga.composite(r,8,[.25,.75])\n    assert more['composite'].iloc[0]['phi^2']>base['composite'].iloc[0]['phi^2']\n    moved=ga.multivariate(d.assign(score=100+.001*d.score),'p','i','Dimension','score')\n    for k,m in r['matrices'].items():np.testing.assert_allclose(moved['matrices'][k]/1e-6,m,rtol=1e-10,atol=1e-10)\n    np.testing.assert_allclose(ga.composite(moved,4,[.25,.75])['composite'][['rho^2','phi^2']],base['composite'][['rho^2','phi^2']],atol=1e-10)\n    broken={**r,'matrices':{**r['matrices'],'universe':np.array([[1,2],[2,1.]])}}\n    with pytest.raises(ValueError,match='PSD'):ga.composite(broken)\n    with pytest.raises(ValueError,match='eşleşmeyen'):ga.multivariate(d.iloc[1:],'p','i','Dimension','score')\n    with pytest.raises(ValueError):ga.composite(r,weights=[-1,2])\n    assert ga.composite(r,weights=[-1,2],allow_negative=True)['weights'][0]==-1\n\n\ndef test_weight_objectives_phi_cut_and_d_search_are_analytical():\n    r=ga.multivariate(ga.example('multivariate'),'p','i','Dimension','score')\n    for absolute in (False,True):\n        opt=ga.optimize_weights(r,4,absolute,nonnegative=False)\n        c=ga.composite(r,4,opt['weights'],allow_negative=True)['composite'].iloc[0]\n        assert abs(opt['coefficient']-c['phi^2' if absolute else 'rho^2'])<1e-10\n        limited=ga.optimize_weights(r,4,absolute,nonnegative=True)\n        assert 'LOCAL' in limited['status'] and min(limited['weights'])>=0\n        assert limited['coefficient']<=opt['coefficient']+1e-10\n    assert ga.phi_cut(4,1,10,10)==.8\n    assert ga.phi_cut(4,1,10,0)==104/105\n    d=fixture('p x i');fit=gt.analyze(d,'p x i',{'p':'p','i':'i'},'score')\n    search=ga.optimize_design(fit,{'p':[8],'i':list(range(2,32))},.8,.8,event_cost=2,facet_costs={'i':3},budget=100)\n    table=search['candidates'];assert len(table)==30  # separate search expands the 25-scenario fit limit\n    np.testing.assert_allclose(table.cost_per_person,5*table.i)\n    assert table.loc[table.i==4,'rho^2'].iloc[0]==pytest.approx(fit['g'].iloc[0]['rho^2'],abs=5e-5)\n    for _,row in table.iterrows():\n        dominates=(table.cost_per_person<=row.cost_per_person)&(table['rho^2']>=row['rho^2'])&(table['phi^2']>=row['phi^2'])\n        strict=(table.cost_per_person<row.cost_per_person)|(table['rho^2']>row['rho^2'])|(table['phi^2']>row['phi^2'])\n        assert bool(row.pareto)==(not (dominates&strict).any())\n\n\ndef _r():\n    r=shutil.which('Rscript')\n    if not r:\n        if os.getenv('REQUIRE_GT_ADV_R')=='1':pytest.fail('Native R required; not executed')\n        pytest.skip('NOT EXECUTED: Rscript unavailable')\n    return r\n\n\ndef test_r_version_pin_uses_numeric_version_not_printed_punctuation():\n    bridge=(ROOT/'scripts/gtheory_reml.R').read_text()\n    reference=(ROOT/'validation/gtheory_advanced/reference.R').read_text()\n    assert \"package_version('2.1-0')\" in bridge and \"package_version('2.1-0')\" in reference\n    assert \"as.character(utils::packageVersion('lme4')) !=\" not in bridge\n\n\n@pytest.mark.parametrize('design',gt.DESIGNS)\n@pytest.mark.parametrize('missing',[False,True])\ndef test_independent_r_reml_mapping_and_balanced_mom(design,missing,tmp_path):\n    r=_r();d=fixture(design,missing);cols={f:f for f in gt.DESIGNS[design]}\n    actual=ga.analyze(d,design,cols,'score',engine='REML')\n    for name in ('variance','g','errors','d','diagnostics','random_effects','profile_ci'):\n        actual[name].to_csv(tmp_path/('python_'+name+'.csv'))\n    (tmp_path/'settings.json').write_text(json.dumps(actual['settings'],indent=2))\n    (tmp_path/'adapter.log').write_text(actual['log'])\n    normalized,_,_=ga.structure(d,design,cols,'score');scale=float(normalized.score.std(ddof=0))\n    normalized.score=(normalized.score-normalized.score.mean())/scale\n    normalized.to_csv(tmp_path/'normalized.csv',index=False)\n    done=subprocess.run([r,str(ROOT/'validation/gtheory_advanced/reference.R'),str(tmp_path/'normalized.csv'),design,str(tmp_path/'reference')],capture_output=True,text=True,timeout=180)\n    (tmp_path/'reference.stdout').write_text(done.stdout);(tmp_path/'reference.stderr').write_text(done.stderr)\n    assert done.returncode==0,done.stderr\n    reference=pd.read_csv(tmp_path/'reference/variance.csv')\n    key=lambda s:frozenset(s.split(':'))\n    expected={key(row.source):row.Variance*scale**2 for row in reference.itertuples()}\n    diff={name:float(row.Variance-expected[key(name)]) for name,row in actual['variance'].iterrows()}\n    tol=1e-8*max(1,max(expected.values()))\n    assert max(abs(x) for x in diff.values())<=tol\n    diag=actual['settings']['convergence'];assert diag['converged']\n    direct=pd.read_csv(tmp_path/'reference/fit.csv').iloc[0]\n    assert diag['singular']==bool(direct.singular)\n    assert abs(diag['standardized_logLik']-direct.logLik)<1e-8\n    assert abs(diag['logLik']-(direct.logLik-(len(d)-1)*np.log(scale)))<1e-8\n    coefficient_status='SUPPRESSED: singular/nonconverged/invalid information'\n    if actual['status']=='LIBRARY TESTED':\n        counts=actual['counts'];scenarios={f:[n] if f=='p' else [n,n*2] for f,n in counts.items()}\n        predictions=ga.d_study(actual,scenarios)\n        for ref in pd.read_csv(tmp_path/'reference/coefficients.csv').itertuples():\n            selected=predictions\n            for f,n in counts.items():selected=selected[selected[f]==(n if f=='p' else n*ref.multiplier)]\n            row=selected.iloc[0]\n            for name in ('universe','relative_error','absolute_error'):\n                assert row[name]==pytest.approx(getattr(ref,name)*scale**2,rel=1e-8,abs=tol)\n            for name in ('relative_sem','absolute_sem'):\n                assert row[name]==pytest.approx(getattr(ref,name)*scale,rel=1e-8,abs=tol)\n            assert row['rho^2']==pytest.approx(ref.rho,abs=1e-8)\n            assert row['phi^2']==pytest.approx(ref.phi,abs=1e-8)\n        coefficient_status='NUMERICALLY VALIDATED: balanced target G/D, SEM, error variances'\n    # Balanced-interior REML and ANOVA have matching EMS solutions; no assertion for boundary/unbalanced.\n    mom_status='NOT COMPARABLE: missing cells or variance boundary'\n    if not missing and actual['status']=='LIBRARY TESTED':\n        mom=gt.analyze(d,design,cols,'score')\n        if (mom['variance'].Variance>0).all():\n            reference_mom={frozenset(__import__('re').findall('[pir]',str(name))):row.Variance for name,row in mom['variance'].iterrows()}\n            np.testing.assert_allclose([row.Variance for _,row in actual['variance'].iterrows()],\n                [reference_mom[key(name)] for name in actual['variance'].index],rtol=2e-4,atol=2e-4*max(1,max(reference_mom.values())))\n            mom_status='NUMERICALLY VALIDATED: balanced interior only'\n    (tmp_path/'comparison.json').write_text(json.dumps({'status':'NUMERICALLY VALIDATED','scope':'adapter vs direct R lmer on identical standardized data',\n        'variance_differences':diff,'converged':diag['converged'],'singular':diag['singular'],'mom_status':mom_status,\n        'coefficients_status':coefficient_status,\n        'fixture_sha256':hashlib.sha256(d.to_csv(index=True).encode()).hexdigest(),'versions':actual['settings']['versions']},indent=2))\n\n\ndef test_independent_r_multivariate_polarization(tmp_path):\n    r=_r();d=ga.example('multivariate');d.to_csv(tmp_path/'input.csv',index=False)\n    done=subprocess.run([r,str(ROOT/'validation/gtheory_advanced/multivariate_reference.R'),str(tmp_path/'input.csv'),str(tmp_path/'reference')],capture_output=True,text=True,timeout=60)\n    (tmp_path/'R.stdout').write_text(done.stdout);(tmp_path/'R.stderr').write_text(done.stderr)\n    assert done.returncode==0,done.stderr\n    actual=ga.multivariate(d,'p','i','Dimension','score');deltas={}\n    for name,m in actual['matrices'].items():\n        ref=pd.read_csv(tmp_path/f'reference/{name}.csv',index_col=0).to_numpy()\n        np.testing.assert_allclose(m,ref,rtol=1e-10,atol=1e-10*max(1,abs(ref).max()))\n        deltas[name]=float(abs(m-ref).max())\n    table=pd.read_csv(tmp_path/'reference/coefficients.csv')\n    for row in table.itertuples():\n        w=[row.w1,1-row.w1];c=ga.composite(actual,int(row.n),w)['composite'].iloc[0]\n        for mine,theirs in [('universe','universe'),('relative_error','relative_error'),('absolute_error','absolute_error'),('rho^2','rho'),('phi^2','phi'),('relative_sem','relative_sem'),('absolute_sem','absolute_sem')]:\n            assert c[mine]==pytest.approx(getattr(row,theirs),rel=1e-10,abs=1e-10)\n        mean=float(np.array(w)@actual['mean'])\n        for cut,expected in [(0,row.cut0),(40,row.cut40)]:\n            assert ga.phi_cut(c.universe,c.absolute_error,mean,cut)==pytest.approx(expected,abs=1e-10)\n    (tmp_path/'comparison.json').write_text(json.dumps({'status':'NUMERICALLY VALIDATED','scope':'balanced two-dimensional p x i fixture, weights and D counts only','matrix_max_differences':deltas},indent=2))\n\n\ndef test_r_profile_and_affine_and_singular_diagnostics(tmp_path):\n    _r();d=fixture('p x i');cols={'p':'p','i':'i'}\n    base=ga.analyze(d,'p x i',cols,'score',engine='REML',profile=True)\n    assert base['status']=='LIBRARY TESTED' and len(base['profile_ci'])==3\n    assert (base['profile_ci'].lower>=0).all() and (base['profile_ci'].upper>=base['profile_ci'].lower).all()\n    for row in base['profile_ci'].itertuples():\n        assert row.lower <= base['variance'].loc[row.source,'Variance'] <= row.upper\n    moved=ga.analyze(d.assign(score=100+.001*d.score),'p x i',cols,'score',engine='REML')\n    np.testing.assert_allclose(moved['variance'].Variance/1e-6,base['variance'].Variance,rtol=2e-4,atol=2e-4*base['variance'].Variance.max())\n    np.testing.assert_allclose(moved['g'],base['g'],atol=2e-4)\n    zero=d.assign(score=d.p.astype(float))\n    # Degenerate residual/no facet variability must not produce usable G/Phi.\n    try:\n        singular=ga.analyze(zero,'p x i',cols,'score',engine='REML')\n    except ValueError as exc:\n        assert 'R REML başarısız' in str(exc) or 'Geçersiz' in str(exc)\n    else:\n        assert singular['status']=='NOT CERTIFIED' and singular['g'].isna().all().all() and singular['d'].empty\n    for name in ('variance','profile_ci','diagnostics'):base[name].to_csv(tmp_path/(name+'.csv'))\n    (tmp_path/'R.log').write_text(base['log'])\n",
+  "post_execution_audit": "Original test wrongly required every fit to converge. Both R paths rejected two p x (i:r) cases as singular. NOT CERTIFIED and suppressed coefficients preserved. No thresholds/data/fits changed; no refits. Corrected checker replayed from original files."
+}

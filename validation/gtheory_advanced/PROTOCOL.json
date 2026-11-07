@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "registered_before_implementation": true,
+  "base_commit": "03764ac1b62e55b33ff653e89a2d3c69ca9545bd",
+  "exclusions": [
+    "Bayesian estimation/dependencies",
+    "Monte Carlo/bootstrap",
+    "replacement or numerical changes to GeneralizIT",
+    "unrelated IRT/DIF/4PL changes"
+  ],
+  "references": {
+    "facet": {
+      "version": "0.0.11",
+      "commit": "0542448c004719a03510985cdbc21d60f379ce4e",
+      "license": "GPL-3",
+      "runtime": "UNSUPPORTED: mandatory brms/posterior dependencies conflict with exclusions; do not install or copy source"
+    },
+    "lme4": {
+      "version": "2.1-0",
+      "commit": "4370052c3e7b5a6d66480ee5c652a5f1d5a2eb89",
+      "license": "GPL >=2",
+      "interface": "separate Rscript process; no GPL source copied"
+    },
+    "theory": [
+      "Brennan (2001), Generalizability Theory, Springer",
+      "Shavelson & Webb (1991), Generalizability Theory: A Primer, Sage",
+      "Haberman (2008), When Can Subscores Have Value?, Journal of Educational and Behavioral Statistics 33, 204-229 (PRMSE requires independent definition audit)"
+    ]
+  },
+  "designs": {
+    "p x i": {
+      "random": [
+        "p",
+        "i"
+      ],
+      "residual": "p:i",
+      "crossed": true
+    },
+    "p x r": {
+      "random": [
+        "p",
+        "r"
+      ],
+      "residual": "p:r",
+      "crossed": true
+    },
+    "p x i x r": {
+      "random": [
+        "p",
+        "i",
+        "r",
+        "p:i",
+        "p:r",
+        "i:r"
+      ],
+      "residual": "p:i:r",
+      "crossed": true
+    },
+    "p x (r:i)": {
+      "random": [
+        "p",
+        "i",
+        "i:r",
+        "p:i"
+      ],
+      "residual": "p:i:r",
+      "nested": {
+        "r": "i"
+      }
+    },
+    "p x (i:r)": {
+      "random": [
+        "p",
+        "r",
+        "r:i",
+        "p:r"
+      ],
+      "residual": "p:r:i",
+      "nested": {
+        "i": "r"
+      }
+    }
+  },
+  "reml": {
+    "method": "Gaussian lme4::lmer REML, intercept fixed, all facets random; REML != ML != ANOVA MoM",
+    "validation": "missing cells/unbalanced allowed only if covariance-component kernels remain linearly independent after intercept projection; no duplicated cells, missing scores, reused nested IDs, singleton facets or unsupported fixed effects",
+    "numerical_identification": "normalized kernel Gram positive definite with condition <=1e10; at most 10000 observations, 100 levels/facet",
+    "optimizer": "bobyqa, maxfun=100000, lme4 documented convergence checks; no retries",
+    "inference": "nonconvergence/singular fit/invalid Hessian preserve diagnostics but suppress G/Phi/D/uncertainty; boundary estimates shown with warning",
+    "g_d": "p universe variance; relative error = sum components containing p other than p divided by non-p facet counts; absolute error = all non-p-universe components similarly divided; residual aliases highest interaction. For unbalanced observations coefficients describe a NEW balanced target D design, not reliability of unequal observed means.",
+    "profile": "optional deterministic lme4 profile VC intervals only; square SD endpoints, never call SEM a parameter CI; fail closed on mapping or profiling failure"
+  },
+  "multivariate": {
+    "method": "balanced complete p x one random facet, 2-5 fully aligned dimensions, matrix method-of-moments using cross-product mean squares (not separate univariate REML fits)",
+    "covariance": "U=(MS_person-MS_residual)/J; F=(MS_facet-MS_residual)/N; E=MS_residual; preserve raw matrices; reject coefficient calculation if any component not PSD within numerical roundoff; no projection/clipping/regularization",
+    "g_d": "relative error E/n_f; absolute error (F+E)/n_f; same facets and event cohort for all dimensions; composite quadratic forms w' V w",
+    "weights": "finite sum-one weights, equal default; negative weights only explicit; unconstrained generalized eigenproblem when total covariance PD; nonnegative SLSQP may only claim LOCAL solution",
+    "deferred": "unbalanced/multivariate REML, mixed/nested multivariate designs, PRMSE/VAR until published definition resolved independently; never label facet's PRMSE formulas as independent validation"
+  },
+  "advanced": {
+    "phi_cut": "squared-loss criterion-referenced dependability: [U+(mu-cut)^2]/[U+(mu-cut)^2+absolute_error]; not classification accuracy or standard Phi",
+    "d_search": "bounded Cartesian counts 2..100; <=10000 candidates; no model refits; explicit per-event and per-facet setup costs; target G/Phi, cheapest feasible and nondominated frontier only inside search bounds",
+    "unsupported": "arbitrary fixed facets/custom universe/error sets/aggregation and unsupported CI return explicit Turkish errors, never silently converted"
+  },
+  "fixtures": {
+    "source": "existing validation/generalizability/balanced.csv unchanged plus new deterministic orthogonal crossed pxixr construction (no RNG); remove prespecified observation indices [0,7,18] for missing-cell case; nest IDs by original parent identifiers; multivariate same event IDs with two deterministic nonproportional scores",
+    "cases": [
+      "five original designs",
+      "balanced crossed/nested",
+      "unbalanced/missing",
+      "singular and near-zero components",
+      "affine transformation",
+      "nonzero cross-dimension covariance",
+      "weighted composite and D changes",
+      "two cuts",
+      "invalid/nonidentifiable structures"
+    ]
+  },
+  "tolerances": {
+    "analytic": "rtol=1e-10, atol=1e-10*max(1,reference variance scale), dimensionless coefficients atol=1e-10",
+    "adapter_vs_direct_lme4": "rtol=1e-8, atol=1e-8*max(1,reference variance scale), coefficient atol=1e-8; same objective/options and transformed data",
+    "reml_vs_mom": "compare only balanced interior solutions, rtol=2e-4, atol=2e-4*max(1,reference variance scale), chosen for finite optimizer precision; boundary/unbalanced differences descriptive, never equate objectives",
+    "psd": "eigenvalue >= -1e-10*max(abs(matrix)), symmetry within 1e-12 relative; no substantive negative component accepted",
+    "affine_reml": "variance rtol=2e-4; coefficient atol=2e-4 (same optimizer on standardized data)"
+  },
+  "statuses": "NUMERICALLY VALIDATED fixture/output only after actual independent execution; LIBRARY TESTED for working engine APIs; EXPERIMENTAL for unsupported generalization/local weight optimization; NOT CERTIFIED missing evidence; UNSUPPORTED unavailable/invalid design. No blanket CERTIFIED.",
+  "execution": "targeted tests, native R in CI if local unavailable, one final full regression in CI; no MC and no new unrelated calibrations. Logs/artifacts even on failure."
+}
+

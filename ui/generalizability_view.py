@@ -7,6 +7,7 @@ import plotly.express as px
 import streamlit as st
 
 from core import generalizability as gt
+from core import generalizability_advanced as ga
 from core.python_mirt_dif import fingerprint
 from core.reproducible import capture_view
 from ui.dimensionality_localfit_view import _safe, _xlsx, _zip, _png_lines
@@ -16,6 +17,7 @@ PAGE = 'Genellenebilirlik Kuramı (G ve D Çalışmaları)'
 
 def exports(result, target, tables=None):
     tables = gt.report_tables(result, target) if tables is None else tables
+    tables = {**tables, **{name:result[name] for name in ('diagnostics','random_effects','profile_ci') if name in result}}
     report = (f"{PAGE}\nDurum: {result['status']}\n" + result['method'] +
               '\n\nBirey katsayıları:\n' + result['g'].to_string() +
               '\nHata varyansları ve SEM:\n' + result['errors'].to_string() +
@@ -46,13 +48,24 @@ def _levels(text):
 @capture_view
 def render(data, item_cols=()):
     st.header(PAGE)
-    st.caption('GeneralizIT 0.1.2 · ANOVA / Henderson I · Rastgele yüzeyler · CERTIFIED değildir')
+    st.caption('GeneralizIT ANOVA / isteğe bağlı R lme4 REML · Rastgele yüzeyler · Genel sertifika değildir')
     tabs = st.tabs(['Veri ve Desen', 'G Çalışması', 'Varyans Bileşenleri',
-                    'D Çalışması', 'Grafikler', 'Akademik Rapor'])
+                    'D Çalışması', 'Grafikler', 'Akademik Rapor', 'Gelişmiş Çalışmalar'])
     with tabs[0]:
-        st.info('CSV/XLSX için ortak Veri Yükleme ekranını kullanın. Eksik/dengesiz, sabit yüzeyli '
-                've (p:r) × i desenleri doğrulanmadığından kapalıdır; görev gibi yüzeyler i/r rollerine atanabilir.')
-        form = st.radio('Veri biçimi', ['Uzun', 'Geniş (birey × madde)'], key='gt_format', horizontal=True)
+        st.info('CSV/XLSX için ortak Veri Yükleme ekranını kullanın. ANOVA dengeli/tam veriyi kullanır. '
+                'Tanımlanabilir eksik hücre/dengesiz veride R lme4 REML seçilebilir; R kurulu değilse çalıştırılmaz. '
+                'Eksik puan sessiz silinmez. Sabit yüzeyler ve (p:r) × i kapalıdır.')
+        engine = st.selectbox('Kestirim yöntemi', ['auto', 'ANOVA', 'REML'], key='gt_engine',
+                              format_func=lambda x:{'auto':'Otomatik: dengeli ANOVA / uygun dengesiz REML',
+                                                    'ANOVA':'GeneralizIT ANOVA (mevcut)', 'REML':'R lme4 REML'}[x])
+        profile = st.checkbox('REML varyansları için profil GA (isteğe bağlı; daha yavaş)',
+                              value=False, disabled=engine=='ANOVA', key='gt_profile')
+        form = st.radio('Veri biçimi', ['Uzun', 'Geniş (birey × madde)', 'Çok değişkenli (uzun)'], key='gt_format', horizontal=True)
+        if form=='Çok değişkenli (uzun)':
+            st.session_state.pop('gt_result',None)
+            from ui.generalizability_advanced_view import render as render_advanced
+            render_advanced(data)
+            return
         source = data
         if form.startswith('Geniş'):
             person = st.selectbox('Birey kimliği', list(data.columns), key='gt_wide_person')
@@ -78,15 +91,22 @@ def render(data, item_cols=()):
                 index=options.index('score') if 'score' in options else len(options) - 1, key='gt_score')
         st.checkbox('Sabit yüzeyler (NOT VALIDATED)', value=False, disabled=True, key='gt_fixed')
         try:
-            prepared, counts = gt.prepare(source, design, columns, score)
+            chosen = ga.select_engine(source, design, columns, score, engine)
+            if profile and chosen != 'REML':
+                raise ValueError('Profil GA için REML yöntemini açıkça seçin.')
+            if chosen=='ANOVA':
+                prepared, counts = gt.prepare(source, design, columns, score)
+            else:
+                prepared, counts, _ = ga.structure(source, design, columns, score)
         except (ValueError, KeyError, TypeError) as exc:
             st.session_state.pop('gt_result', None)
             st.error(str(exc))
             return
         st.dataframe(pd.DataFrame({'Yüzey': list(counts), 'Düzey (yuvalı ise ebeveyn başına)': list(counts.values())}),
                      hide_index=True)
-        st.caption(f'{len(prepared)} gözlem; eksik/tekrarlı hücre yok; negatif bileşen politikası: '
-                   'ham değeri koru, yalnız katsayı hesabında kütüphane sıfırlaması.')
+        st.caption(f'{len(prepared)} gözlem · Seçilen kestirici: {chosen}. '+
+                   ('REML: sayılar yeni dengeli D hedefidir; gözlenen dengesiz ortalamaların güvenirliği değildir.' if chosen=='REML' else
+                    'Eksik/tekrarlı hücre yok; ham negatif bileşenler korunur, katsayıda kütüphane sıfırlaması uygulanır.'))
         scenarios = {'p': [counts['p']]}
         try:
             for f in counts:
@@ -100,7 +120,7 @@ def render(data, item_cols=()):
             st.error(str(exc))
             return
         target = float(st.number_input('Hedef güvenirlik (Eρ² ve Φ)', 0.01, 0.99, 0.80, 0.01, key='gt_target'))
-        key = fingerprint(data, (form, design, columns, score, scenarios, target, '0.1.2',
+        key = fingerprint(data, (form, design, columns, score, scenarios, target, engine, chosen, profile, '0.1.2',
                                  (person, tuple(items)) if form.startswith('Geniş') else ()))
         if st.session_state.get('gt_key') != key:
             st.session_state.pop('gt_result', None)
@@ -110,20 +130,27 @@ def render(data, item_cols=()):
             st.session_state.pop('gt_result', None)
             try:
                 with st.spinner('G/D çalışmaları hesaplanıyor…'):
-                    st.session_state['gt_result'] = gt.analyze(source, design, columns, score, scenarios)
+                    st.session_state['gt_result'] = (gt.analyze(source, design, columns, score, scenarios) if chosen=='ANOVA' else
+                        ga.analyze(source, design, columns, score, scenarios, engine='REML', profile=profile))
             except (ValueError, TypeError, ArithmeticError) as exc:
                 st.error(f'Analiz engellendi: {exc}')
+    with tabs[6]:
+        current=st.session_state.get('gt_result')
+        if current is not None or st.checkbox('Örnekler / gelişmiş analizleri göster',value=False,key='gt_advanced_show'):
+            from ui.generalizability_advanced_view import render as render_advanced
+            render_advanced(data,current)
     result = st.session_state.get('gt_result')
     if result is None:
         return
+    if result['status']=='NOT CERTIFIED':
+        st.warning('Yakınsama/tekillik/bilgi kapısı başarısız. Yalnız ham bileşenler ve tanılar korunur; G/Phi/D çıkarımları kapalı.')
     tables = gt.report_tables(result, target)
     with tabs[1]:
         st.subheader('G çalışması — birey evreni')
         st.metric('Eρ² (göreli)', f"{result['g'].loc['p', 'rho^2']:.4f}")
         st.metric('Φ (mutlak)', f"{result['g'].loc['p', 'phi^2']:.4f}")
         st.dataframe(result['anova'])
-        st.caption('SS/df/MS: dengeli ortogonal ANOVA; en yüksek etkileşim artıkla karışıktır. '
-                   'Rastgele-etki F/p ve doğrulanmamış güven aralıkları verilmez.')
+        st.caption(result['method'])
         with st.expander('GeneralizIT özgün Henderson tablosu (T ≠ SS)'):
             st.dataframe(result['henderson'])
         st.dataframe(result['errors'])

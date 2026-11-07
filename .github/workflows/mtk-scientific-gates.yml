@@ -29,8 +29,12 @@ jobs:
         id: mode
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- evidence-only-no-mc -->')
         run: python -m validation.q1_q3.ci_mode --base '${{ github.event.pull_request.base.sha }}'
+      - name: Validate closed G-Theory scope (zero unrelated Monte Carlo)
+        id: gt_mode
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- gtheory-no-mc -->')
+        run: python -m validation.gtheory_advanced.ci_scope --base '${{ github.event.pull_request.base.sha }}'
       - name: Pre-registered studies execute (quick mode; full evidence is committed)
-        if: steps.mode.outputs.evidence_only != 'true'
+        if: steps.mode.outputs.evidence_only != 'true' && steps.gt_mode.outputs.evidence_only != 'true'
         run: |
           python validation/irt_3pl4pl_root_cause.py /tmp/p1 --quick
           python validation/dif_validation_study.py /tmp/p2 --quick

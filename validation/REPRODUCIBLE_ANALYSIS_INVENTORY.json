@@ -116,9 +116,18 @@
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
   {
+    "screen": "ui/generalizability_advanced_view.py",
+    "core_imports": [
+      "core.generalizability_advanced",
+      "core.python_mirt_dif.fingerprint"
+    ],
+    "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
+  },
+  {
     "screen": "ui/generalizability_view.py",
     "core_imports": [
       "core.generalizability",
+      "core.generalizability_advanced",
       "core.python_mirt_dif.fingerprint"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
