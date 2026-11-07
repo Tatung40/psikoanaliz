@@ -37,10 +37,17 @@ def test_actual_multivariate_word_python_exports_and_stale_data():
     assert doc.tables and any('kovaryans' in p.text.lower() for p in doc.paragraphs)
     before=at.session_state['gt_mv_result']['coefficients']['composite'].copy()
     at.run();pd.testing.assert_frame_equal(before,at.session_state['gt_mv_result']['coefficients']['composite'])
+    assert {'academic_word','repro_py','repro_zip'}<={b.key for b in at.get('download_button')}
+    at.button(key='gt_mv_opt_run').click().run()
+    assert not at.exception and not at.error
+    assert {'gt_mv_optimization_xlsx','gt_mv_optimization_zip'}<={b.key for b in at.get('download_button')}
+    at.run()
+    assert not at.exception and 'gt_mv_opt_result' in at.session_state
+    assert {'academic_word','repro_py','repro_zip'}<={b.key for b in at.get('download_button')}
     changed=at.session_state['raw_df'].copy();changed.loc[0,'score']+=.1
     at.session_state['raw_df']=changed;at.run()
     assert not at.exception and 'gt_mv_result' not in at.session_state
-    assert not {b.key for b in at.get('download_button')}&{'gt_mv_xlsx','gt_mv_zip','academic_word','repro_py','repro_zip'}
+    assert not {b.key for b in at.get('download_button')}&{'gt_mv_xlsx','gt_mv_zip','gt_mv_optimization_xlsx','gt_mv_optimization_zip','academic_word','repro_py','repro_zip'}
 
 
 def test_d_optimization_downloads_and_settings_invalidation():

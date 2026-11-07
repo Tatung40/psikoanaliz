@@ -9,6 +9,7 @@ import streamlit as st
 
 from core import generalizability_advanced as ga
 from core.python_mirt_dif import fingerprint
+from core.reproducible import displayed
 from ui.dimensionality_localfit_view import _safe, _xlsx, _zip, _png_lines
 
 
@@ -46,6 +47,9 @@ def render(data, result=None):
         st.caption('Yerel R yoksa REML NOT EXECUTED. facet doğrudan kurulmaz: zorunlu dışlanan bağımlılıkları vardır. '
                    'Sabit yüzeyler, genel çok değişkenli REML ve keyfi evren/hata tanımları UNSUPPORTED. '
                    'PRMSE/VAR: bağımsız yöntem tanımı doğrulanmadı; hesap ve sertifikasyon kapalı.')
+        st.caption('Yeni REML G/D sayısal kanıtı: p×i, p×r, p×i×r ve p×(r:i) kayıtlı örnekleri. '
+                   'p×(i:r) örnekleri tekil bulundu; G/Phi doğrulaması NOT CERTIFIED, güvenli ret doğrulandı. '
+                   'Diğer veriler için genel geçerlilik iddiası yoktur.')
     if result is not None:
         if 'diagnostics' in result:
             st.subheader('REML tanıları')
@@ -117,6 +121,7 @@ def render(data, result=None):
     result_mv=st.session_state.get('gt_mv_result')
     if result_mv:
         raw=result_mv['raw'];c=result_mv['coefficients']
+        displayed(raw,c)
         st.caption('Matris MoM; ayrı tek değişkenli REML uyumları değildir. Boyut sırası: '+', '.join(raw['dimensions']))
         st.caption('Evren ve hata kovaryans bileşenleri aynı birey/yüzey olaylarından birlikte kestirilmiştir. '
                    'Katsayı güven aralığı ve genel sertifika verilmez; bağımsız sayısal kanıt yalnız kayıtlı fikstür kapsamındadır.')
@@ -149,6 +154,7 @@ def render(data, result=None):
             except ValueError as exc:st.error(str(exc))
         opt=st.session_state.get('gt_mv_opt_result')
         if opt:
+            displayed(opt)
             table=pd.DataFrame({'dimension':raw['dimensions'],'weight':opt['weights']})
             st.dataframe(table)
             st.caption(opt['status']+f" · Hedef katsayı={opt['coefficient']:.6f}")

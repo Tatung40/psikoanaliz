@@ -7,9 +7,10 @@ import subprocess
 
 ROOT=Path(__file__).resolve().parents[2]
 ALLOWED={'.github/workflows/pytest.yml','.github/workflows/mtk-scientific-gates.yml',
- 'core/generalizability_advanced.py','core/academic_result_adapters.py',
+ 'core/generalizability_advanced.py','core/academic_result_adapters.py','core/reproducible.py',
  'ui/generalizability_view.py','ui/generalizability_advanced_view.py',
  'scripts/gtheory_reml.R','tests/test_gtheory_advanced.py','tests/test_gtheory_advanced_ui.py',
+ 'tests/test_gtheory_advanced_evidence.py',
  'validation/REPRODUCIBLE_ANALYSIS_INVENTORY.json'}
 
 

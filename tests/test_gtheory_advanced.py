@@ -137,9 +137,13 @@ def test_independent_r_reml_mapping_and_balanced_mom(design,missing,tmp_path):
     diff={name:float(row.Variance-expected[key(name)]) for name,row in actual['variance'].iterrows()}
     tol=1e-8*max(1,max(expected.values()))
     assert max(abs(x) for x in diff.values())<=tol
-    diag=actual['settings']['convergence'];assert diag['converged']
+    diag=actual['settings']['convergence']
     direct=pd.read_csv(tmp_path/'reference/fit.csv').iloc[0]
+    assert diag['converged']==(int(direct.convergence_messages)==0)
     assert diag['singular']==bool(direct.singular)
+    if not diag['converged'] or diag['singular'] or not diag['hessian_pd']:
+        assert actual['status']=='NOT CERTIFIED'
+        assert actual['g'].isna().all().all() and actual['d'].empty
     assert abs(diag['standardized_logLik']-direct.logLik)<1e-8
     assert abs(diag['logLik']-(direct.logLik-(len(d)-1)*np.log(scale)))<1e-8
     coefficient_status='SUPPRESSED: singular/nonconverged/invalid information'
