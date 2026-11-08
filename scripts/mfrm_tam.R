@@ -30,7 +30,14 @@ s <- c(loglik = -mod$ic$deviance / 2, deviance = mod$ic$deviance, AIC = mod$ic$A
        eap_rel = mod$EAP.rel, wle_rel = w$WLE.rel[1], iterations = mod$iter, maxiter = ctrl$maxiter,
        converged = as.numeric(mod$iter < ctrl$maxiter))
 if (interaction && length(fac) >= 1) {
-  mod2 <- fit(as.formula(paste("~ item +", paste(fac, collapse = " + "), "+ item:", fac[1], " + step", sep = "")))
+  # The optional interaction fit must never discard the converged main model: an engine error (e.g. NaN in TAM's
+  # acceleration step) is recorded as non-convergence, which withholds the LR test downstream.
+  mod2 <- tryCatch(fit(as.formula(paste("~ item +", paste(fac, collapse = " + "), "+ item:", fac[1], " + step", sep = ""))),
+                   error = function(e) { writeLines(conditionMessage(e), file.path(out, "interaction_error.txt")); NULL })
+}
+if (interaction && length(fac) >= 1 && is.null(mod2)) {
+  s <- c(s, interaction_converged = 0)
+} else if (interaction && length(fac) >= 1) {
   x2 <- mod2$xsi.facets; x2 <- x2[x2$facet == paste0("item:", fac[1]), ]
   write.csv(data.frame(parameter = x2$parameter, xsi = x2$xsi, se = x2$se.xsi), file.path(out, "interaction.csv"), row.names = FALSE)
   s <- c(s, interaction_deviance = mod2$ic$deviance, interaction_npars = mod2$ic$Npars,

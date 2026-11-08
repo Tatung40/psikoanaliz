@@ -19,6 +19,10 @@ EXAMPLES = {"balanced_3facet": "Dengeli: 300 birey × 4 ölçüt × 3 puanlayıc
             "sparse_category": "Seyrek üst kategori (uyarı örneği)", "disconnected": "Bağlantısız tasarım (hata örneği)",
             "invalid_duplicate_missing": "Tekrarlanan satır ve eksik puan (hata örneği)"}
 EQUATION = "log[P(X = k) / P(X = k − 1)] = θₙ − δᵢ − λⱼ − τₖ,  θ ~ N(μ, σ²)"
+ENGINE_HELP = ("Bu analiz yalnız doğrulanmış R TAM 4.3-25 ile yapılır; R/TAM yokken Python ile yerine kestirim üretilmez. "
+               "Streamlit Community Cloud'da TAM için desteklenen bir sistem paketi yoktur (Debian'da r-cran-tam bulunmaz; "
+               "packages.txt yalnız apt paketleri kurar). Çalıştırmak için depodaki Dockerfile ile oluşturulan kapsayıcıyı "
+               "veya R ve TAM 4.3-25 kurulu bir ortamı kullanın: docs/MFRM_PRODUCTION_DEPLOYMENT.md.")
 
 
 def _csv(df):
@@ -148,18 +152,23 @@ def render():
     config = dict(person=person, item=item, rater=rater, score=score, interaction=interaction, show_ids=show_ids,
                   source=st.session_state.get("mfrm_source"))
     fp = hashlib.sha256(json.dumps(config, sort_keys=True, default=str).encode()).hexdigest()
+    data_error = None
     with st.expander("3. Veri denetimi", expanded=True):
         try:
             _, report = M.prepare(df, person, item, rater, score)
+            st.dataframe(pd.DataFrame([{k: str(v) for k, v in report.items()}]).T.rename(columns={0: "Değer"}))
+            if report["sparse_categories"]:
+                st.warning(f"Seyrek kategori(ler): {report['sparse_categories']} (< 10 gözlem).")
         except M.MFRMError as e:
-            st.error(str(e)); return
-        st.dataframe(pd.DataFrame([{k: str(v) for k, v in report.items()}]).T.rename(columns={0: "Değer"}))
-        if report["sparse_categories"]:
-            st.warning(f"Seyrek kategori(ler): {report['sparse_categories']} (< 10 gözlem).")
+            data_error = str(e); st.error(data_error)
     ok, why = M.engine_available()
     if not ok:
-        st.error(why); return
-    if st.button("MFRM kestirimini çalıştır", key="mfrm_run", type="primary"):
+        st.error("MFRM motoru kullanılamıyor: " + why)
+        st.info(ENGINE_HELP)
+    blocked = data_error or (None if ok else why)
+    # The run button is always rendered; it is disabled (never hidden) while data or engine checks fail.
+    if st.button("MFRM kestirimini çalıştır", key="mfrm_run", type="primary", disabled=bool(blocked),
+                 help=blocked or "R TAM ile marjinal ML kestirimi") and not blocked:
         try:
             res = M.analyze(df, person, item, rater, score, interaction=interaction, show_ids=show_ids)
             st.session_state["mfrm_result"] = {"fp": fp, "result": res}
