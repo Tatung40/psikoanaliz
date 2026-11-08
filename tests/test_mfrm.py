@@ -136,3 +136,45 @@ def test_reference_rerun_matches_archive_when_available(tmp_path):
     assert run.returncode == 0, run.stderr[-1500:]
     new, old = pd.read_csv(out), pd.read_csv(ROOT / "validation/mfrm/reference.csv")
     assert len(new) == len(old) and np.allclose(new.value, old.value, atol=1e-6, equal_nan=True)
+
+
+def test_run_button_always_visible_disabled_without_engine(monkeypatch):
+    from streamlit.testing.v1 import AppTest
+    monkeypatch.setattr(M, "engine_available", lambda: (False, "Rscript bulunamadı."))
+    at = AppTest.from_string("from ui.mfrm_view import render\nrender()", default_timeout=120)
+    at.run(); at.button(key="mfrm_load").click().run(); assert not at.exception
+    btn = at.button(key="mfrm_run"); assert btn.disabled
+    assert any("MFRM motoru kullanılamıyor" in e.value for e in at.error) and any("Dockerfile" in i.value for i in at.info)
+    assert "mfrm_result" not in at.session_state                                    # disabled: no estimate, no fake result
+    at.selectbox(key="mfrm_example").set_value("disconnected").run(); at.button(key="mfrm_load").click().run()
+    assert at.button(key="mfrm_run").disabled and any("bağlantılı değil" in e.value for e in at.error)
+
+
+@pytest.mark.parametrize("name", ["balanced_3facet", "unbalanced_linked", "interaction_bias"])
+def test_three_examples_end_to_end_on_page(monkeypatch, name):
+    """Real TAM when available (REQUIRE_MFRM_R=1 in the native R job); archived TAM output otherwise."""
+    from streamlit.testing.v1 import AppTest
+    ok, why = M.engine_available()
+    if not ok:
+        if os.getenv("REQUIRE_MFRM_R") == "1": pytest.fail(why)
+        if name not in {"balanced_3facet", "interaction_bias"}: pytest.skip("NOT EXECUTED: no engine and no archived TAM output")
+        monkeypatch.setattr(M, "engine_available", lambda: (True, "")); monkeypatch.setattr(M, "run_tam", archived(name))
+    at = AppTest.from_string("from ui.mfrm_view import render\nrender()", default_timeout=600)
+    at.run(); at.selectbox(key="mfrm_example").set_value(name).run(); at.button(key="mfrm_load").click().run()
+    if name == "interaction_bias":
+        at.checkbox(key="mfrm_interaction").check().run()
+    assert not at.button(key="mfrm_run").disabled
+    at.button(key="mfrm_run").click().run(); assert not at.exception
+    saved = at.session_state["mfrm_result"]; assert "result" in saved, saved.get("error")
+    r = saved["result"]; el = r["elements"]
+    ref = pd.read_csv(ROOT / "validation/mfrm/reference.csv")
+    mm = ref[(ref.fixture == name) & (ref.engine == "mfrmr") & (ref.kind == "element") & (ref.key == "Estimate")]
+    for e in el.itertuples():
+        q = mm[(mm.level == e.Düzey) & (mm.facet == {"item": "item_id", "rater": "rater_id"}[e.facet])].value.item()
+        assert abs(e._4 - q) <= 5e-3                                                      # preregistered tolerance
+    assert r["identity"]["loglik"] <= 1e-5
+    from ui.mfrm_view import _exports
+    view = M.present(r); files = _exports(r, view, {"example": name})
+    assert {"wright_haritasi.png", "kategori_egrileri.png", "mfrm_sonuclari.xlsx", "mfrm_raporu.docx", "mfrm.zip"} <= set(files)
+    assert all(f"{t}.csv" in files for t in view["tables"])
+    assert len(at.dataframe) >= len(view["tables"])
