@@ -1,0 +1,38 @@
+name: MFRM free-hosting R/TAM trial
+# Emulates the free Streamlit Community Cloud path for branch fix/mfrm-streamlit-free-r-tam-trial: Debian trixie,
+# apt packages from packages.txt, a non-root app user, the page's own TAM install command, then the three MFRM examples
+# end to end with the real engine. This does not deploy or touch any hosted app.
+on:
+  push:
+    branches: [fix/mfrm-streamlit-free-r-tam-trial]
+    paths: [packages.txt, ui/mfrm_view.py, tools/mfrm_free_trial.py, .github/workflows/mfrm-free-tam-trial.yml, core/mfrm.py, scripts/mfrm_tam.R]
+jobs:
+  trial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container: debian:trixie
+    steps:
+      - name: System packages from packages.txt (as Community Cloud does)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 python3-venv python3-pip git ca-certificates
+      - uses: actions/checkout@v4
+      - name: Install packages.txt
+        run: apt-get install -y --no-install-recommends $(grep -vE '^\s*(#|$)' packages.txt | tr '\n' ' ') && R --version | head -1
+      - name: Non-root app user with Python requirements
+        run: |
+          useradd -m appuser && chown -R appuser "$GITHUB_WORKSPACE"
+          su appuser -c "python3 -m venv /home/appuser/venv && /home/appuser/venv/bin/pip install -q -r $GITHUB_WORKSPACE/requirements.txt pytest"
+      - name: Button install command as appuser (TAM 4.3-25 into the per-user library)
+        run: su appuser -c "cd $GITHUB_WORKSPACE && /home/appuser/venv/bin/python tools/mfrm_free_trial.py /tmp/trial_report.json"
+      - name: Three MFRM examples end to end with the real engine (appuser)
+        if: always()
+        run: su appuser -c "cd $GITHUB_WORKSPACE && REQUIRE_MFRM_R=1 /home/appuser/venv/bin/python -m pytest -q tests/test_mfrm.py -k 'three_examples or live_tam or always_visible' -p no:cacheprovider --basetemp=/tmp/mfrm-trial"
+      - name: Report
+        if: always()
+        run: cat /tmp/trial_report.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mfrm-free-trial
+          path: /tmp/trial_report.json
