@@ -173,9 +173,13 @@ def render():
                 with st.spinner("R/TAM kuruluyor; bu işlem birkaç dakika sürebilir..."):
                     try:
                         import subprocess
-                        command = ('options(repos=c(CRAN="https://cloud.r-project.org")); '
-                                   'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes"); '
-                                   'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA); '
+                        # The app runs as a non-root user: system R libraries are read-only and non-interactive
+                        # install.packages() stops ("unable to install packages"). Install into the per-user library,
+                        # which R puts on .libPaths() automatically once it exists (so engine_available() finds TAM).
+                        command = ('lib <- path.expand(Sys.getenv("R_LIBS_USER")); dir.create(lib, recursive=TRUE, showWarnings=FALSE); '
+                                   '.libPaths(c(lib, .libPaths())); options(repos=c(CRAN="https://cloud.r-project.org")); '
+                                   'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes", lib=lib); '
+                                   'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA,lib=lib); '
                                    'stopifnot(gsub("-",".",as.character(packageVersion("TAM")))=="4.3.25")')
                         proc = subprocess.run(["Rscript", "-e", command], capture_output=True, text=True, timeout=900)
                         if proc.returncode:
