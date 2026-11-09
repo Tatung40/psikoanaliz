@@ -165,6 +165,29 @@ def render():
     if not ok:
         st.error("MFRM motoru kullanılamıyor: " + why)
         st.info(ENGINE_HELP)
+    # Opt-in installation trial: only attempt after Rscript is present; never run on page load.
+    if not ok and M.shutil.which("Rscript"):
+        with st.expander("Ücretsiz Streamlit Cloud: R/TAM kurulum denemesi", expanded=False):
+            st.warning("TAM kaynak koddan derlenecektir. İşlem uzun sürebilir veya ücretsiz sunucunun kaynak sınırına takılabilir. Kurulum yalnız bu sunucu örneği için geçerlidir.")
+            if st.button("TAM 4.3-25 kurulumunu dene", key="mfrm_install_tam"):
+                with st.spinner("R/TAM kuruluyor; bu işlem birkaç dakika sürebilir..."):
+                    try:
+                        import subprocess
+                        command = ('options(repos=c(CRAN="https://cloud.r-project.org")); '
+                                   'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes"); '
+                                   'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA); '
+                                   'stopifnot(gsub("-",".",as.character(packageVersion("TAM")))=="4.3.25")')
+                        proc = subprocess.run(["Rscript", "-e", command], capture_output=True, text=True, timeout=900)
+                        if proc.returncode:
+                            st.error("TAM kurulamadı. Sunucu günlüklerini inceleyin; istatistiksel kestirim başlatılmadı.")
+                            st.code((proc.stderr or proc.stdout)[-3000:])
+                        else:
+                            st.success("TAM kuruldu; motor yeniden kontrol ediliyor.")
+                            st.rerun()
+                    except subprocess.TimeoutExpired:
+                        st.error("Kurulum 15 dakikalık sınırı aştı; ücretsiz ortam uygun olmayabilir.")
+                    except OSError as exc:
+                        st.error(f"Kurulum başlatılamadı: {exc}")
     blocked = data_error or (None if ok else why)
     # The run button is always rendered; it is disabled (never hidden) while data or engine checks fail.
     if st.button("MFRM kestirimini çalıştır", key="mfrm_run", type="primary", disabled=bool(blocked),
