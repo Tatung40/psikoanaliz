@@ -4,7 +4,7 @@ name: MFRM free-hosting R/TAM trial
 # end to end with the real engine. This does not deploy or touch any hosted app.
 on:
   push:
-    branches: [fix/mfrm-streamlit-free-r-tam-trial]
+    branches: [fix/mfrm-streamlit-free-r-tam-trial, fix/mfrm-cloud-install-lock]
     paths: [packages.txt, ui/mfrm_view.py, tools/mfrm_free_trial.py, .github/workflows/mfrm-free-tam-trial.yml, core/mfrm.py, scripts/mfrm_tam.R]
 jobs:
   trial:
