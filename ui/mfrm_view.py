@@ -173,21 +173,37 @@ def render():
                 with st.spinner("R/TAM kuruluyor; bu işlem birkaç dakika sürebilir..."):
                     try:
                         import subprocess
-                        # The app runs as a non-root user: system R libraries are read-only and non-interactive
-                        # install.packages() stops ("unable to install packages"). Install into the per-user library,
-                        # which R puts on .libPaths() automatically once it exists (so engine_available() finds TAM).
-                        command = ('lib <- path.expand(Sys.getenv("R_LIBS_USER")); dir.create(lib, recursive=TRUE, showWarnings=FALSE); '
-                                   '.libPaths(c(lib, .libPaths())); options(repos=c(CRAN="https://cloud.r-project.org")); '
-                                   'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes", lib=lib); '
-                                   'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA,lib=lib); '
-                                   'stopifnot(gsub("-",".",as.character(packageVersion("TAM")))=="4.3.25")')
-                        proc = subprocess.run(["Rscript", "-e", command], capture_output=True, text=True, timeout=900)
-                        if proc.returncode:
-                            st.error("TAM kurulamadı. Sunucu günlüklerini inceleyin; istatistiksel kestirim başlatılmadı.")
-                            st.code((proc.stderr or proc.stdout)[-3000:])
-                        else:
-                            st.success("TAM kuruldu; motor yeniden kontrol ediliyor.")
-                            st.rerun()
+                        import fcntl
+                        import os
+                        from pathlib import Path
+                        # One installer per server instance, including concurrent Streamlit sessions.
+                        lock_path = Path("/tmp/psikoanaliz_mfrm_install.lock")
+                        with lock_path.open("a+") as lock_file:
+                            try:
+                                fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                            except BlockingIOError:
+                                st.warning("R/TAM kurulumu başka bir oturumda devam ediyor. Birkaç dakika sonra sayfayı yenileyin.")
+                                st.stop()
+                            # R's 00LOCK-* directories can survive interrupted installs. Clean only
+                            # known package locks while holding the installer mutex; never remove
+                            # the entire user library or an unrelated package installation.
+                            command = ('lib <- path.expand(Sys.getenv("R_LIBS_USER")); '
+                                       'dir.create(lib, recursive=TRUE, showWarnings=FALSE); '
+                                       '.libPaths(c(lib, .libPaths())); '
+                                       'for (pkg in c("CDM","TAM")) { '
+                                       'lock <- file.path(lib, paste0("00LOCK-",pkg)); '
+                                       'if (dir.exists(lock)) unlink(lock, recursive=TRUE) }; '
+                                       'options(repos=c(CRAN="https://cloud.r-project.org")); '
+                                       'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes", lib=lib); '
+                                       'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA,lib=lib); '
+                                       'stopifnot(as.character(packageVersion("TAM",lib.loc=lib))=="4.3-25")')
+                            proc = subprocess.run(["Rscript", "-e", command], capture_output=True, text=True, timeout=900)
+                            if proc.returncode:
+                                st.error("TAM kurulamadı. Kurulum günlüğünün son bölümü:")
+                                st.code((proc.stderr + "\\n" + proc.stdout)[-3500:])
+                            else:
+                                st.success("TAM kuruldu; motor yeniden kontrol ediliyor.")
+                                st.rerun()
                     except subprocess.TimeoutExpired:
                         st.error("Kurulum 15 dakikalık sınırı aştı; ücretsiz ortam uygun olmayabilir.")
                     except OSError as exc:
