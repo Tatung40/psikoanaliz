@@ -196,7 +196,7 @@ def render():
                                        'options(repos=c(CRAN="https://cloud.r-project.org")); '
                                        'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes", lib=lib); '
                                        'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA,lib=lib); '
-                                       'stopifnot(as.character(packageVersion("TAM",lib.loc=lib))=="4.3-25")')
+                                       'stopifnot(gsub("-",".",as.character(packageVersion("TAM",lib.loc=lib)))=="4.3.25")')
                             proc = subprocess.run(["Rscript", "-e", command], capture_output=True, text=True, timeout=900)
                             if proc.returncode:
                                 st.error("TAM kurulamadı. Kurulum günlüğünün son bölümü:")
