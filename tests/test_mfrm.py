@@ -178,3 +178,29 @@ def test_three_examples_end_to_end_on_page(monkeypatch, name):
     assert {"wright_haritasi.png", "kategori_egrileri.png", "mfrm_sonuclari.xlsx", "mfrm_raporu.docx", "mfrm.zip"} <= set(files)
     assert all(f"{t}.csv" in files for t in view["tables"])
     assert len(at.dataframe) >= len(view["tables"])
+
+
+def test_install_engine_lock_cleanup_timeout_and_no_false_success(tmp_path, monkeypatch):
+    import fcntl, time
+    if not shutil.which("Rscript"):
+        pytest.skip("NOT EXECUTED: Rscript unavailable")
+    lib = tmp_path / "Rlib"; (lib / "00LOCK-CDM").mkdir(parents=True); (lib / "00LOCK-Rcpp").mkdir(); (lib / "TAM").mkdir()
+    lockf = tmp_path / "install.lock"
+    with lockf.open("a+") as held:                                              # another session holds the installer lock
+        fcntl.flock(held, fcntl.LOCK_EX)
+        state, _ = M.install_engine(lock_path=lockf, library=lib, command="quit(status = 0)")
+        assert state == "busy" and (lib / "00LOCK-CDM").exists()               # nothing cleaned without the lock
+    state, log = M.install_engine(lock_path=lockf, library=lib, command="quit(status = 1)")
+    assert state == "failed" and not list(lib.glob("00LOCK*")) and (lib / "TAM").is_dir()  # only stale locks removed
+    assert "00LOCK-CDM" in log and "00LOCK-Rcpp" in log
+    marker = tmp_path / "orphan.txt"
+    t0 = time.monotonic()
+    state, log = M.install_engine(lock_path=lockf, library=lib, timeout=2,
+                                  command=f'system("sh -c \'sleep 4; touch {marker}\'", wait = TRUE)')
+    assert state == "failed" and "sınırı aştı" in log and time.monotonic() - t0 < 10
+    time.sleep(4); assert not marker.exists()                                   # whole process group killed
+    monkeypatch.setattr(M, "engine_available", lambda: (False, "TAM 4.3-25 bulunamadı"))
+    state, log = M.install_engine(lock_path=lockf, library=lib, command="quit(status = 0)")
+    assert state == "failed" and "doğrulanamadı" in log                          # R exit 0 is not success by itself
+    monkeypatch.setattr(M, "engine_available", lambda: (True, ""))
+    assert M.install_engine(lock_path=lockf, library=lib, command="quit(status = 0)")[0] == "ok"

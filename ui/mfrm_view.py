@@ -171,43 +171,13 @@ def render():
             st.warning("TAM kaynak koddan derlenecektir. İşlem uzun sürebilir veya ücretsiz sunucunun kaynak sınırına takılabilir. Kurulum yalnız bu sunucu örneği için geçerlidir.")
             if st.button("TAM 4.3-25 kurulumunu dene", key="mfrm_install_tam"):
                 with st.spinner("R/TAM kuruluyor; bu işlem birkaç dakika sürebilir..."):
-                    try:
-                        import subprocess
-                        import fcntl
-                        import os
-                        from pathlib import Path
-                        # One installer per server instance, including concurrent Streamlit sessions.
-                        lock_path = Path("/tmp/psikoanaliz_mfrm_install.lock")
-                        with lock_path.open("a+") as lock_file:
-                            try:
-                                fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                            except BlockingIOError:
-                                st.warning("R/TAM kurulumu başka bir oturumda devam ediyor. Birkaç dakika sonra sayfayı yenileyin.")
-                                st.stop()
-                            # R's 00LOCK-* directories can survive interrupted installs. Clean only
-                            # known package locks while holding the installer mutex; never remove
-                            # the entire user library or an unrelated package installation.
-                            command = ('lib <- path.expand(Sys.getenv("R_LIBS_USER")); '
-                                       'dir.create(lib, recursive=TRUE, showWarnings=FALSE); '
-                                       '.libPaths(c(lib, .libPaths())); '
-                                       'for (pkg in c("CDM","TAM")) { '
-                                       'lock <- file.path(lib, paste0("00LOCK-",pkg)); '
-                                       'if (dir.exists(lock)) unlink(lock, recursive=TRUE) }; '
-                                       'options(repos=c(CRAN="https://cloud.r-project.org")); '
-                                       'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes", lib=lib); '
-                                       'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA,lib=lib); '
-                                       'stopifnot(gsub("-",".",as.character(packageVersion("TAM",lib.loc=lib)))=="4.3.25")')
-                            proc = subprocess.run(["Rscript", "-e", command], capture_output=True, text=True, timeout=900)
-                            if proc.returncode:
-                                st.error("TAM kurulamadı. Kurulum günlüğünün son bölümü:")
-                                st.code((proc.stderr + "\\n" + proc.stdout)[-3500:])
-                            else:
-                                st.success("TAM kuruldu; motor yeniden kontrol ediliyor.")
-                                st.rerun()
-                    except subprocess.TimeoutExpired:
-                        st.error("Kurulum 15 dakikalık sınırı aştı; ücretsiz ortam uygun olmayabilir.")
-                    except OSError as exc:
-                        st.error(f"Kurulum başlatılamadı: {exc}")
+                    state, log = M.install_engine()
+                if state == "ok":
+                    st.success(log + " Motor yeniden kontrol ediliyor."); st.rerun()
+                elif state == "busy":
+                    st.warning(log + " Birkaç dakika sonra sayfayı yenileyin.")
+                else:
+                    st.error("TAM kurulamadı; istatistiksel kestirim başlatılmadı. Kurulum günlüğünün son bölümü:"); st.code(log)
     blocked = data_error or (None if ok else why)
     # The run button is always rendered; it is disabled (never hidden) while data or engine checks fail.
     if st.button("MFRM kestirimini çalıştır", key="mfrm_run", type="primary", disabled=bool(blocked),

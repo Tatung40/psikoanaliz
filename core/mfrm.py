@@ -423,3 +423,54 @@ def present(result):
     if not result["show_ids"]:
         notes.append("Birey kimlikleri takma adla gösteriliyor (Kişi_0001 …); gerçek kimlikler yalnız açık onayla gösterilir.")
     return {"notes": notes, "tables": {k: v for k, v in tables.items() if v is not None}}
+
+
+# ---------------------------------------------------------------- opt-in engine installation (free hosting trial)
+INSTALL_LOCK = Path("/tmp/psikoanaliz_mfrm_install.lock")
+INSTALL_R = ('lib <- path.expand(Sys.getenv("R_LIBS_USER")); dir.create(lib, recursive=TRUE, showWarnings=FALSE); '
+             '.libPaths(c(lib, .libPaths())); options(repos=c(CRAN="https://cloud.r-project.org")); '
+             'if (!requireNamespace("remotes",quietly=TRUE)) install.packages("remotes", lib=lib); '
+             'remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA,lib=lib); '
+             'stopifnot(gsub("-",".",as.character(packageVersion("TAM",lib.loc=lib)))=="4.3.25")')
+
+
+def user_r_library():
+    r = shutil.which("Rscript")
+    out = subprocess.run([r, "-e", 'cat(path.expand(Sys.getenv("R_LIBS_USER")))'], capture_output=True, text=True, timeout=60)
+    return Path(out.stdout.strip())
+
+
+def install_engine(timeout=900, lock_path=INSTALL_LOCK, command=INSTALL_R, library=None):
+    """Install the pinned TAM 4.3-25 into the per-user R library. Returns (status, log): status is 'ok', 'busy' or 'failed'.
+    - One installer per server instance (fcntl lock; concurrent Streamlit sessions get 'busy'). Other instances have
+      their own container filesystem and user library, so no cross-instance coordination is needed.
+    - Only while holding the lock, leftover R install locks (00LOCK*) in the per-user library are removed: every
+      install into that library runs under this lock, so any lock found then is from an interrupted install. Nothing
+      outside the user library is touched.
+    - R runs in its own process group; on timeout the whole group (R CMD INSTALL, compilers) is killed, so no orphan
+      keeps writing after the lock is released. Success requires engine_available() afterwards (no false success)."""
+    import fcntl, os, signal
+    if not shutil.which("Rscript"):
+        return "failed", "Rscript bulunamadı; önce sistem R paketleri kurulmalıdır."
+    lib = Path(library) if library else user_r_library()
+    with Path(lock_path).open("a+") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return "busy", "R/TAM kurulumu bu sunucuda başka bir oturumda sürüyor."
+        removed = []
+        if lib.is_dir():
+            for stale in lib.glob("00LOCK*"):
+                shutil.rmtree(stale, ignore_errors=True); removed.append(stale.name)
+        proc = subprocess.Popen([shutil.which("Rscript"), "-e", command], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                text=True, start_new_session=True)
+        try:
+            log, _ = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid, signal.SIGKILL); log, _ = proc.communicate()
+            return "failed", f"Kurulum {timeout} saniyelik sınırı aştı ve durduruldu; yarım kalan kilitler bir sonraki denemede temizlenir.\n" + (log or "")[-3000:]
+        note = f"Temizlenen eski kilitler: {', '.join(removed)}\n" if removed else ""
+        if proc.returncode != 0:
+            return "failed", note + (log or "")[-3500:]
+        ok, why = engine_available()
+        return ("ok", note + "TAM 4.3-25 kuruldu.") if ok else ("failed", note + "Kurulum bitti ama motor doğrulanamadı: " + why)
