@@ -33,5 +33,12 @@
   "PARTIAL": "V1 and the applicable identity checks pass AND recovery (V4 for global, V5 for extended models) passes on both fixtures",
   "NOT CERTIFIED": "any applicable check fails or no evidence (output withheld or shown with an explicit label)"
  },
- "compute_budget": "deterministic fixtures; no Monte Carlo; bootstrap only on explicit user choice"
+ "compute_budget": "deterministic fixtures; no Monte Carlo; bootstrap only on explicit user choice",
+ "amendment_2026_11_18": {
+  "committed_before": "V8-V10 results; V1-V7 rules, tolerances and the fixture statuses are unchanged",
+  "V8_independent_estimator": "independent re-implementation (own pair counting from long data, own parameterisation, scipy optimiser) of RaschPy's documented composite likelihood with ridge=0 and all smoothing constants 0; RaschPy run with the same settings; max |Δ step-location grid b[r,i,h]| after removing the common constant <= 1e-4 on balanced_3facet and unbalanced_linked, per model",
+  "V9_monte_carlo_recovery": "null data generated from the global model (fixture truth), designs: dense (all 3 raters) and linked (2 of 5 raters), N in {250, 1000}, 30 replications per cell, seed 20261118; per rater-side cell: bias, empirical SD, RMSE; gate: max |bias| at N=1000 <= max(3 MCSE, 0.05) and median SD ratio (N=1000 / N=250) <= 0.65; separates bias (fails bias gate) from variability (passes both but fails the fixed-fixture V5 floor)",
+  "V10_bootstrap_uncertainty": "for rater-side cells of bivector, centrality, bistretch (no per-cell SE from RaschPy): person-cluster nonparametric bootstrap (B=50, refit RaschPy per resample) normal 95% CI; over 30 null replications (dense, N=500): coverage of the generating value in [0.90, 0.99] and mean(bootstrap SE)/empirical SD in [0.80, 1.25]; otherwise cell SE/CI are not reported",
+  "status_rules": "CERTIFIED still requires an independent implementation of the estimator in the configuration shown in the app (default: regularised); V8 covers only the unregularised configuration, so it is evidence for the objective implementation, not a certification of the default fit. Fixture statuses follow V1-V5 unchanged; V9/V10 add diagnoses and decide whether bootstrap cell SE/CI may be shown."
+ }
 }
