@@ -21,6 +21,9 @@ Reproduce: `PYTHONPATH=. python -m validation.raschpy_mfrm.compare --write` (~20
   tolerance was not changed.
 * bivector, centrality and bistretch fail the preregistered V5 null recovery (max(3 SE, 0.30)) on threshold-level rater
   cells (lenient rater P1, sparse low categories); they stay NOT CERTIFIED. RaschPy reports no per-cell SE for them.
+  Diagnosis (`evidence.json` → `recovery_diagnosis`): identities exact (no API/model error); no common per-threshold
+  shift (no identification offset); ridge = 0 leaves deviations unchanged (not regularisation bias) → precision of
+  threshold-level rater cells with the criterion at its 0.30 floor. Status unchanged; tolerance unchanged.
 * SE, test summaries, category widths, model selection (AIC/BIC at non-ML estimates), DIF and DRF: RaschPy-reported,
   NOT CERTIFIED (shown with that label).
 * Unsupported (declared, not substituted): Andersen LR (disabled by RaschPy itself), >1 rater facet, TAM-style interaction LR.

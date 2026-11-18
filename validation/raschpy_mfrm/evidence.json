@@ -520,29 +520,85 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.164,
-  "balanced_3facet:items": 0.15,
-  "balanced_3facet:thresholds": 0.153,
-  "balanced_3facet:bivector": 0.192,
-  "balanced_3facet:matrix": 0.173,
-  "balanced_3facet:centrality": 0.207,
-  "balanced_3facet:pseudo_halo": 0.171,
-  "balanced_3facet:bistretch": 0.197,
-  "unbalanced_linked:global": 0.209,
-  "unbalanced_linked:items": 0.213,
-  "unbalanced_linked:thresholds": 0.268,
-  "unbalanced_linked:bivector": 0.286,
-  "unbalanced_linked:matrix": 0.194,
-  "unbalanced_linked:centrality": 0.214,
-  "unbalanced_linked:pseudo_halo": 0.243,
-  "unbalanced_linked:bistretch": 0.274,
-  "interaction_bias:global": 0.151,
-  "interaction_bias:items": 0.174,
-  "interaction_bias:thresholds": 0.157,
-  "interaction_bias:bivector": 0.164,
-  "interaction_bias:matrix": 0.164,
-  "interaction_bias:centrality": 0.226,
-  "interaction_bias:pseudo_halo": 0.253,
-  "interaction_bias:bistretch": 0.264
+  "balanced_3facet:global": 0.215,
+  "balanced_3facet:items": 0.234,
+  "balanced_3facet:thresholds": 0.174,
+  "balanced_3facet:bivector": 0.217,
+  "balanced_3facet:matrix": 0.234,
+  "balanced_3facet:centrality": 0.186,
+  "balanced_3facet:pseudo_halo": 0.208,
+  "balanced_3facet:bistretch": 0.244,
+  "unbalanced_linked:global": 0.231,
+  "unbalanced_linked:items": 0.215,
+  "unbalanced_linked:thresholds": 0.237,
+  "unbalanced_linked:bivector": 0.26,
+  "unbalanced_linked:matrix": 0.241,
+  "unbalanced_linked:centrality": 0.247,
+  "unbalanced_linked:pseudo_halo": 0.347,
+  "unbalanced_linked:bistretch": 0.271,
+  "interaction_bias:global": 0.188,
+  "interaction_bias:items": 0.23,
+  "interaction_bias:thresholds": 0.188,
+  "interaction_bias:bivector": 0.246,
+  "interaction_bias:matrix": 0.249,
+  "interaction_bias:centrality": 0.203,
+  "interaction_bias:pseudo_halo": 0.25,
+  "interaction_bias:bistretch": 0.257
+ },
+ "recovery_diagnosis": {
+  "bivector": {
+   "per_fixture": {
+    "balanced_3facet": {
+     "max_abs_cell_dev": 0.33937774297767365,
+     "max_abs_cell_dev_no_ridge": 0.3433479038782028,
+     "max_abs_threshold_column_shift": 8.326672684688674e-17,
+     "identities_exact": true
+    },
+    "unbalanced_linked": {
+     "max_abs_cell_dev": 0.4088554023580149,
+     "max_abs_cell_dev_no_ridge": 0.3961259755537172,
+     "max_abs_threshold_column_shift": 1.1102230246251565e-16,
+     "identities_exact": true
+    }
+   },
+   "classification": "precision of threshold-level rater cells, not an API/model error",
+   "basis": "V1-V3/V1b identities exact (API consistent); no common per-threshold shift (no identification offset); ridge=0 leaves deviations unchanged (not regularisation bias); RaschPy reports no per-cell SE for this model, so the preregistered criterion falls to its 0.30 floor (matrix passes only through 3 SE)"
+  },
+  "centrality": {
+   "per_fixture": {
+    "balanced_3facet": {
+     "max_abs_cell_dev": 0.22575977885048837,
+     "max_abs_cell_dev_no_ridge": 0.22607718813075528,
+     "max_abs_threshold_column_shift": 1.850371707708594e-17,
+     "identities_exact": true
+    },
+    "unbalanced_linked": {
+     "max_abs_cell_dev": 0.36836606921587095,
+     "max_abs_cell_dev_no_ridge": 0.3700135355637455,
+     "max_abs_threshold_column_shift": 6.661338147750939e-17,
+     "identities_exact": true
+    }
+   },
+   "classification": "precision of threshold-level rater cells, not an API/model error",
+   "basis": "V1-V3/V1b identities exact (API consistent); no common per-threshold shift (no identification offset); ridge=0 leaves deviations unchanged (not regularisation bias); RaschPy reports no per-cell SE for this model, so the preregistered criterion falls to its 0.30 floor (matrix passes only through 3 SE)"
+  },
+  "bistretch": {
+   "per_fixture": {
+    "balanced_3facet": {
+     "max_abs_cell_dev": 0.2549407238718644,
+     "max_abs_cell_dev_no_ridge": 0.25643648645468886,
+     "max_abs_threshold_column_shift": 4.625929269271486e-17,
+     "identities_exact": true
+    },
+    "unbalanced_linked": {
+     "max_abs_cell_dev": 0.4548524399775778,
+     "max_abs_cell_dev_no_ridge": 0.45924088604488805,
+     "max_abs_threshold_column_shift": 9.159339953157541e-17,
+     "identities_exact": true
+    }
+   },
+   "classification": "precision of threshold-level rater cells, not an API/model error",
+   "basis": "V1-V3/V1b identities exact (API consistent); no common per-threshold shift (no identification offset); ridge=0 leaves deviations unchanged (not regularisation bias); RaschPy reports no per-cell SE for this model, so the preregistered criterion falls to its 0.30 floor (matrix passes only through 3 SE)"
+  }
  }
 }
