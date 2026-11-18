@@ -1,0 +1,548 @@
+{
+ "protocol": "validation/raschpy_mfrm/PROTOCOL.json",
+ "engine": "raschpy 1.4.0",
+ "scope": "examples/mfrm fixtures only; experimental; not equivalent to TAM (MML) or FACETS (JMLE)",
+ "models": {
+  "global": {
+   "parameters": {
+    "status": "PARTIAL",
+    "basis": "identity V1-V3 + recovery V4 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.115,
+    "recovery_failures": []
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "PARTIAL",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 2.8213431590984328e-11
+   },
+   "fit": {
+    "status": "PARTIAL",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 5.551115123125783e-16
+   },
+   "probabilities": {
+    "status": "PARTIAL",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "items": {
+   "parameters": {
+    "status": "PARTIAL",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.18774395327763327,
+    "recovery_failures": []
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "PARTIAL",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 3.560618466735832e-11
+   },
+   "fit": {
+    "status": "PARTIAL",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 5.551115123125783e-16
+   },
+   "probabilities": {
+    "status": "PARTIAL",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "thresholds": {
+   "parameters": {
+    "status": "PARTIAL",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.28250984007503166,
+    "recovery_failures": []
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "PARTIAL",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 4.8117954065673985e-11
+   },
+   "fit": {
+    "status": "PARTIAL",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 5.551115123125783e-16
+   },
+   "probabilities": {
+    "status": "PARTIAL",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "bivector": {
+   "parameters": {
+    "status": "NOT CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.4088554023580149,
+    "recovery_failures": [
+     {
+      "fixture": "balanced_3facet",
+      "key": "rater:('P1', 'K3'):3",
+      "value": -1.1393777429776737,
+      "reference": -0.8,
+      "tol": 0.3
+     },
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P1', 'K1'):1",
+      "value": -0.39114459764198517,
+      "reference": -0.8,
+      "tol": 0.3
+     },
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P1', 'K1'):2",
+      "value": -0.45379335093844714,
+      "reference": -0.8,
+      "tol": 0.3
+     },
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P3', 'K4'):3",
+      "value": 0.3208559825977897,
+      "reference": 0.0,
+      "tol": 0.3
+     }
+    ]
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "NOT CERTIFIED",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 2.990763192656232e-11
+   },
+   "fit": {
+    "status": "NOT CERTIFIED",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 4.440892098500626e-16
+   },
+   "probabilities": {
+    "status": "NOT CERTIFIED",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "matrix": {
+   "parameters": {
+    "status": "PARTIAL",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.6559584644095042,
+    "recovery_failures": []
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "PARTIAL",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 4.994493707499714e-11
+   },
+   "fit": {
+    "status": "PARTIAL",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 5.551115123125783e-16
+   },
+   "probabilities": {
+    "status": "PARTIAL",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "centrality": {
+   "parameters": {
+    "status": "NOT CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.36836606921587095,
+    "recovery_failures": [
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:P1:1",
+      "value": -0.4316339307841291,
+      "reference": -0.8,
+      "tol": 0.35449354423494916
+     }
+    ]
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "NOT CERTIFIED",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 5.4532156568143364e-11
+   },
+   "fit": {
+    "status": "NOT CERTIFIED",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 1.1102230246251565e-15
+   },
+   "probabilities": {
+    "status": "NOT CERTIFIED",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "pseudo_halo": {
+   "parameters": {
+    "status": "PARTIAL",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.2301874479155943,
+    "recovery_failures": []
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "PARTIAL",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 3.08610914601104e-11
+   },
+   "fit": {
+    "status": "PARTIAL",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 2.220446049250313e-16
+   },
+   "probabilities": {
+    "status": "PARTIAL",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  },
+  "bistretch": {
+   "parameters": {
+    "status": "NOT CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "recovery_max_diff": 0.4548524399775778,
+    "recovery_failures": [
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P1', 'K1'):1",
+      "value": -0.34514756002242225,
+      "reference": -0.8,
+      "tol": 0.3
+     },
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P1', 'K2'):1",
+      "value": -0.3920248940809405,
+      "reference": -0.8,
+      "tol": 0.3
+     },
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P1', 'K3'):1",
+      "value": -0.43102856888102486,
+      "reference": -0.8,
+      "tol": 0.3
+     },
+     {
+      "fixture": "unbalanced_linked",
+      "key": "rater:('P1', 'K4'):1",
+      "value": -0.44967710493567975,
+      "reference": -0.8,
+      "tol": 0.3
+     }
+    ]
+   },
+   "se": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+   },
+   "persons": {
+    "status": "NOT CERTIFIED",
+    "basis": "V2 independent Warm WLE at RaschPy parameters",
+    "max_diff": 3.399369674639274e-11
+   },
+   "fit": {
+    "status": "NOT CERTIFIED",
+    "basis": "V3 independent infit/outfit recomputation (items, raters)",
+    "max_diff": 5.551115123125783e-16
+   },
+   "probabilities": {
+    "status": "NOT CERTIFIED",
+    "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
+   },
+   "category_counts": {
+    "status": "PARTIAL",
+    "basis": "descriptive counts; equal to the validated input frame"
+   },
+   "category_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy bootstrap category widths; no independent reference"
+   },
+   "test_stats": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+   },
+   "model_selection": {
+    "status": "NOT CERTIFIED",
+    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+   },
+   "dif": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy dif_test; no independent reference run"
+   },
+   "drf": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy drf_test; no independent reference run"
+   }
+  }
+ },
+ "tam_difference": {
+  "balanced_3facet": 0.01839505018537191,
+  "interaction_bias": 0.025918291284066086,
+  "unbalanced_linked": 0.02376383709926111
+ },
+ "edge_cases": [
+  {
+   "case": "disconnected",
+   "failed_closed": true,
+   "message": "Tasarım bağlantılı değil (2 ayrı bileşen): yüzey parametreleri ortak bir ölçekte tanımlanamaz. Bileşenleri ortak puanlayıcı veya madde ile bağlayın."
+  },
+  {
+   "case": "invalid_duplicate_missing",
+   "failed_closed": true,
+   "message": "Aynı birey–madde–puanlayıcı birleşimi için birden fazla puan var (2 satır). Puanlar ortalanmaz; tekrarları kaldırın."
+  },
+  {
+   "case": "four_facet_without_task (duplicates)",
+   "failed_closed": true,
+   "message": "Aynı birey–madde–puanlayıcı birleşimi için birden fazla puan var (6000 satır). Puanlar ortalanmaz; tekrarları kaldırın."
+  },
+  {
+   "case": "single_rater",
+   "failed_closed": true,
+   "message": "'rater' yüzeyinde en az iki düzey gerekir."
+  },
+  {
+   "case": "empty_middle_category",
+   "failed_closed": true,
+   "message": "Ara kategori(ler) hiç kullanılmamış: [1]. Eşik parametreleri tanımlanamaz; kategorileri yeniden kodlamak araştırmacının kararıdır ve otomatik yapılmaz."
+  },
+  {
+   "case": "sparse_category",
+   "failed_closed": false,
+   "warned": false,
+   "message": "sparse categories []"
+  },
+  {
+   "case": "missing_scores",
+   "failed_closed": false,
+   "reported": true,
+   "message": "excluded 7"
+  }
+ ],
+ "unsupported": {
+  "andersen_lr_test": "RaschPy 1.4.0 bu testi kendisi devre dışı bırakmıştır (NotImplementedError): RCL/PAIR bir olabilirlik kestiricisi olmadığından LR istatistiği geçersizdir.",
+  "extra_facets": "RaschPy MFRM yalnız bir puanlayıcı yüzeyi destekler (veri: (Puanlayıcı, Birey) × madde); görev/oturum gibi ek yüzeyler kestirilemez.",
+  "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
+ },
+ "seconds_per_fit": {
+  "balanced_3facet:global": 0.164,
+  "balanced_3facet:items": 0.15,
+  "balanced_3facet:thresholds": 0.153,
+  "balanced_3facet:bivector": 0.192,
+  "balanced_3facet:matrix": 0.173,
+  "balanced_3facet:centrality": 0.207,
+  "balanced_3facet:pseudo_halo": 0.171,
+  "balanced_3facet:bistretch": 0.197,
+  "unbalanced_linked:global": 0.209,
+  "unbalanced_linked:items": 0.213,
+  "unbalanced_linked:thresholds": 0.268,
+  "unbalanced_linked:bivector": 0.286,
+  "unbalanced_linked:matrix": 0.194,
+  "unbalanced_linked:centrality": 0.214,
+  "unbalanced_linked:pseudo_halo": 0.243,
+  "unbalanced_linked:bistretch": 0.274,
+  "interaction_bias:global": 0.151,
+  "interaction_bias:items": 0.174,
+  "interaction_bias:thresholds": 0.157,
+  "interaction_bias:bivector": 0.164,
+  "interaction_bias:matrix": 0.164,
+  "interaction_bias:centrality": 0.226,
+  "interaction_bias:pseudo_halo": 0.253,
+  "interaction_bias:bistretch": 0.264
+ }
+}

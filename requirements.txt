@@ -14,6 +14,9 @@ pingouin>=0.5.5,<0.7
 krippendorff>=0.8,<1.0
 scikit-learn>=1.3,<2
 
+# Experimental independent MFRM page (Apache-2.0; pulls seaborn, otherwise existing deps)
+raschpy==1.4.0
+
 # Primary IRT calibration engine (Python package, not R mirt)
 mirt==1.2.0
 

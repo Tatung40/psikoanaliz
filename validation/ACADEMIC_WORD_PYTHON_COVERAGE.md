@@ -1,6 +1,6 @@
 # Universal academic Word and faithful Python exports
 
-Scope: **40 real analysis routes**, including the standalone missing-data page;
+Scope: **41 real analysis routes**, including the standalone missing-data page;
 6 auxiliary routes have explicit exclusions below. The existing module inventory
 also lists helpers and is not an analysis-screen count.
 
@@ -40,6 +40,7 @@ certification or VERIFIED code execution is made by the UI.
 | Genellenebilirlik Kuramı (G ve D Çalışmaları) | Shared academic_docx; GT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Puanlayıcı Güvenirliği ve Uyum | ui.rater_reliability_view._docx (page-specific python-docx report) | Report only after a recorded run; fixture-level NUMERICALLY VALIDATED evidence (validation/rater_reliability/EVIDENCE.md); not CERTIFIED |
 | MTK: Çok Yüzeyli Rasch (MFRM) | ui.mfrm_view._docx (page-specific python-docx report) | Output-level CERTIFIED/PARTIAL/NOT CERTIFIED from validation/mfrm/evidence.json; R TAM required; not FACETS-equivalent |
+| MTK: RaschPy MFRM (Deneysel) | core.raschpy_mfrm.docx_report (page-specific python-docx report) | Per-model PARTIAL/NOT CERTIFIED from validation/raschpy_mfrm/evidence.json; RaschPy 1.4.0 RCL; not TAM/FACETS-equivalent |
 | Çok Boyutlu MTK (MIRT) | Shared academic_docx; MIRT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | Eksik Veri ve Atama | Shared academic_docx; DATA | GENERATED / UNVERIFIED; exact public-API inputs and producer references |
 | MTK: Python mirt Rasch | Shared academic_docx; IRT | GENERATED / UNVERIFIED; exact public-API inputs and producer references |

@@ -101,3 +101,4 @@ tests/test_universal_academic_word.py
 tests/test_academic_screen_results.py
 tests/test_word_standard.py
 tests/test_result_panels.py
+tests/test_raschpy_mfrm.py
