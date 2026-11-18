@@ -20,6 +20,7 @@ M_PAGE = 'Çok Boyutlu MTK (MIRT)'
 MISSING_PAGE = 'Eksik Veri ve Atama'
 RATER_PAGE = 'Puanlayıcı Güvenirliği ve Uyum'
 MFRM_PAGE = 'MTK: Çok Yüzeyli Rasch (MFRM)'
+RASCHPY_MFRM_PAGE = 'MTK: RaschPy MFRM (Deneysel)'
 
 
 @dataclass(frozen=True)
@@ -89,7 +90,7 @@ def analysis_catalog():
         'MTK: Çok Kategorili B14','MTK: RSM','MTK: Python mirt DIF','MTK: DIF Analiz Merkezi',
         'MTK: GRM Formel DIF','MTK: Çok Kategorili Formel DIF','MTK: Gözlenen Puan DIF',
         'MTK: 3PL/4PL Bootstrap DIF','Boyutluluk ve Faktör Analizi',
-        'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE,RATER_PAGE,MFRM_PAGE]
+        'Yerel Bağımsızlık ve Madde Uyumu',G_PAGE,M_PAGE,MISSING_PAGE,RATER_PAGE,MFRM_PAGE,RASCHPY_MFRM_PAGE]
     common += [f'MTK: Python mirt {m}' for m in IRT_MODELS if m!='RSM']
     return tuple(common)
 
@@ -101,7 +102,7 @@ def available(page):
     if page==M_PAGE:return [d for d in datasets if d.family=='mirt']
     if page==MISSING_PAGE:return [d for d in datasets if d.family=='missing']
     if page==RATER_PAGE:return [d for d in datasets if d.family=='rater']
-    if page==MFRM_PAGE:return [d for d in datasets if d.family=='mfrm']
+    if page in (MFRM_PAGE,RASCHPY_MFRM_PAGE):return [d for d in datasets if d.family=='mfrm']
     if 'DIF' in page:
         choices=[d for d in datasets if d.family=='dif']
         if page=='MTK: GRM Formel DIF':choices=[d for d in choices if d.model=='GRM']

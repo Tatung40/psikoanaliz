@@ -87,6 +87,22 @@ def ordinal_data(seed=1, n=500, k=8, C=4):
     return pd.DataFrame(x, columns=[f"I{j + 1}" for j in range(k)])
 
 
+def reopen_result_panels(page):
+    """A late Streamlit rerun can remount a verified-open panel collapsed (seen on main too, ~1/9 MH runs):
+    after the app is idle, reopen any collapsed result panel (bounded, verified) before inspecting its content."""
+    from playwright.sync_api import expect
+    wait_idle(page)
+    panels=page.locator('[class*="st-key-result_panel_"] [data-testid=stExpander] > details:visible')
+    for i in range(panels.count()):
+        panel=panels.nth(i)
+        for _ in range(3):
+            if panel.evaluate('d => d.open'):break
+            panel.locator('summary').click()
+            try:expect(panel).to_have_js_property('open',True,timeout=5_000)
+            except AssertionError:continue
+        expect(panel).to_have_js_property('open',True)
+
+
 def verify_result_panels(page,diagnostic_path=None):
     try:return _verify_result_panels(page)
     except Exception:
@@ -230,6 +246,7 @@ def flow_dif(browser, outdir, log):
                 rec['panels']=verify_result_panels(page,outdir/f'{method}_panel_dom.html')
                 # Streamlit can retain a hidden Plotly node from a previous rerun.
                 # Require a genuinely visible chart, not merely the first DOM match.
+                reopen_result_panels(page)
                 page.locator("[data-testid=stPlotlyChart]:visible").first.wait_for(timeout=60_000)
                 path = download(page, "DIF tablosu — CSV", outdir / f"dif_{method}")
                 xpath = download(page, "DIF tablosu — XLSX", outdir / f"dif_{method}")

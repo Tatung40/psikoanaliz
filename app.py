@@ -239,6 +239,8 @@ with st.sidebar:
                   use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
         st.button("🧩 Çok Yüzeyli Rasch (MFRM)",key="nav_mfrm",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Çok Yüzeyli Rasch (MFRM)",))
+        st.button("🧪 RaschPy MFRM (Deneysel)",key="nav_raschpy_mfrm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: RaschPy MFRM (Deneysel)",))
         st.button("⚖️ Gözlenen Puan DIF (MH / Lojistik)",key="nav_classical_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
         st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
@@ -1575,6 +1577,11 @@ elif selected_page == "MTK: Çok Yüzeyli Rasch (MFRM)":
     from ui.mfrm_view import render as render_mfrm
     instrument_code_capture(globals())
     render_mfrm()                   # own long-format upload/examples; R TAM required, no substitute estimator
+elif selected_page == "MTK: RaschPy MFRM (Deneysel)":
+    render_academic_header()
+    from ui.raschpy_mfrm_view import render as render_raschpy_mfrm
+    instrument_code_capture(globals())
+    render_raschpy_mfrm()           # independent RaschPy 1.4.0 engine; does not touch the R/TAM page
 elif selected_page == "Puanlayıcı Güvenirliği ve Uyum":
     render_academic_header()
     from ui.rater_reliability_view import render as render_rater_reliability

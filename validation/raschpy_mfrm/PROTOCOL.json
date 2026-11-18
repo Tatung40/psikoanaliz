@@ -1,0 +1,44 @@
+{
+ "purpose": "Independent RaschPy MFRM module: validation protocol, committed before any comparison (only API/timing probes preceded it).",
+ "engine": {
+  "package": "RaschPy 1.4.0 (PyPI wheel; Apache-2.0; github.com/MarkElliott999/RaschPy)",
+  "estimation": "calibrate(estimation='cp-full-rcl' default): regularised pairwise composite likelihood (persons cancel; ridge penalties, smoothing constants)",
+  "se": "std_errors(se_method='sandwich') default; 'bootstrap' (200 person resamples, seed 20261118) optional",
+  "persons": "Warm WLE (Newton-Raphson)",
+  "models": [
+   "global",
+   "items",
+   "thresholds",
+   "bivector",
+   "matrix",
+   "centrality",
+   "pseudo_halo",
+   "bistretch"
+  ],
+  "facets": "one rater facet (data (Rater, Person) x items); additional facets unsupported by RaschPy MFRM"
+ },
+ "not_equivalent": "TAM (MML) and RaschPy (RCL) have different objectives and person estimators; their differences are reported, never used as equality evidence",
+ "fixtures": "examples/mfrm (sha256 in examples/mfrm/fixtures.json); balanced_3facet, unbalanced_linked, interaction_bias; edge cases disconnected, invalid_duplicate_missing, sparse subsets",
+ "checks": {
+  "V1_probability_identity": "RaschPy cat_prob_<model> equals the documented log-numerator formula evaluated independently with its fitted parameters: |diff| <= 1e-12 (global, items, thresholds, bivector, matrix)",
+  "V2_wle_identity": "global model: RaschPy person estimates equal an independent Warm WLE (core.mfrm.wle) given RaschPy item/rater/threshold estimates: |diff| <= 1e-4 (non-extreme persons)",
+  "V3_fit_identity": "global model: item and rater Infit/Outfit MnSq recomputed independently (Wright & Masters residual definitions at RaschPy person estimates): |diff| <= 1e-6",
+  "V4_recovery_global": "global model on balanced_3facet and unbalanced_linked: item, rater and threshold estimates within max(3 SE, 0.15) of the generating values (same criterion as the TAM protocol)",
+  "V5_null_recovery_extended": "items/thresholds/bivector/matrix/centrality/pseudo_halo/bistretch on the same two fixtures (truth has no interaction/stretch): extra effects within max(3 SE, 0.30) of their null (0, or 1 for stretch)",
+  "V6_tam_difference": "descriptive only: max |RaschPy global - TAM| for centred item/rater/threshold estimates",
+  "V7_edge_cases": "disconnected design, duplicates, empty middle category, single-level facet, missing scores fail closed or are reported (core.mfrm.prepare reused)"
+ },
+ "status_rules": {
+  "CERTIFIED": "not attainable: no independent implementation of the same regularised composite-likelihood estimator exists",
+  "PARTIAL": "V1 and the applicable identity checks pass AND recovery (V4 for global, V5 for extended models) passes on both fixtures",
+  "NOT CERTIFIED": "any applicable check fails or no evidence (output withheld or shown with an explicit label)"
+ },
+ "compute_budget": "deterministic fixtures; no Monte Carlo; bootstrap only on explicit user choice",
+ "amendment_2026_11_18": {
+  "committed_before": "V8-V10 results; V1-V7 rules, tolerances and the fixture statuses are unchanged",
+  "V8_independent_estimator": "independent re-implementation (own pair counting from long data, own parameterisation, scipy optimiser) of RaschPy's documented composite likelihood with ridge=0 and all smoothing constants 0; RaschPy run with the same settings; max |Δ step-location grid b[r,i,h]| after removing the common constant <= 1e-4 on balanced_3facet and unbalanced_linked, per model",
+  "V9_monte_carlo_recovery": "null data generated from the global model (fixture truth), designs: dense (all 3 raters) and linked (2 of 5 raters), N in {250, 1000}, 30 replications per cell, seed 20261118; per rater-side cell: bias, empirical SD, RMSE; gate: max |bias| at N=1000 <= max(3 MCSE, 0.05) and median SD ratio (N=1000 / N=250) <= 0.65; separates bias (fails bias gate) from variability (passes both but fails the fixed-fixture V5 floor)",
+  "V10_bootstrap_uncertainty": "for rater-side cells of bivector, centrality, bistretch (no per-cell SE from RaschPy): person-cluster nonparametric bootstrap (B=50, refit RaschPy per resample) normal 95% CI; over 30 null replications (dense, N=500): coverage of the generating value in [0.90, 0.99] and mean(bootstrap SE)/empirical SD in [0.80, 1.25]; otherwise cell SE/CI are not reported",
+  "status_rules": "CERTIFIED still requires an independent implementation of the estimator in the configuration shown in the app (default: regularised); V8 covers only the unregularised configuration, so it is evidence for the objective implementation, not a certification of the default fit. Fixture statuses follow V1-V5 unchanged; V9/V10 add diagnoses and decide whether bootstrap cell SE/CI may be shown."
+ }
+}
