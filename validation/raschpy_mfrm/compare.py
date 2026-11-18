@@ -101,6 +101,27 @@ def recovery_diagnosis(truth):
     return out
 
 
+def independent_estimator():
+    """V8: own re-implementation of the composite likelihood (validation/raschpy_mfrm/independent.py), unregularised
+    (preregistered) and RaschPy's default regularisation (the configuration the app shows); tolerance 1e-4 for both."""
+    from core.mfrm import prepare
+    import validation.raschpy_mfrm.independent as V
+    rows = []
+    for fx in RECOVERY:
+        d, _ = prepare(pd.read_csv(EX / f"{fx}.csv"), "person_id", "item_id", "rater_id", "score")
+        assert V.thin_widths(d, 3) == []                               # no thin-width ridge in these fixtures
+        for model in R.MODELS:
+            for cfg, reg in (("unregularised", False), ("default", True)):
+                diff, ok, _ = V.compare(d, model, 3, reg)
+                rows.append(dict(fixture=fx, model=model, check=f"V8_{cfg}", key="max |Δ step grid|", value=diff, reference=0.,
+                                 diff=diff, tol=1e-4, ok=bool(diff <= 1e-4)))
+            g0 = V.fit(d, model, 3, False)[0]; g1 = V.fit(d, model, 3, True)[0]
+            dd = float(np.abs((g0 - g0.mean()) - (g1 - g1.mean())).max())
+            rows.append(dict(fixture=fx, model=model, check="V8_discrimination", key="max |default − unregularised grid|",
+                             value=dd, reference=None, diff=None, tol=None, ok=None))
+    return rows
+
+
 def edge_cases():
     out = []
     def expect_fail(name, df):
@@ -130,21 +151,27 @@ def evidence(df, edges):
         s = df[df.model == model]; ident = s[s.check.isin(["V1", "V1b", "V2", "V3", "identity_error"])]
         rec = s[s.check == ("V4" if model == "global" else "V5")]
         id_ok = bool(len(ident) and ident.ok.all()); rec_ok = bool(len(rec) and rec.ok.all() and set(rec.fixture) >= set(RECOVERY))
-        part = "PARTIAL" if id_ok and rec_ok else "NOT CERTIFIED"
+        v8 = s[s.check.isin(["V8_unregularised", "V8_default"])]
+        v8_ok = bool(len(v8) == 2 * len(RECOVERY) and v8.ok.all())          # both configurations x both fixtures
+        cert = id_ok and rec_ok and v8_ok
+        part = "CERTIFIED" if cert else "PARTIAL" if id_ok and rec_ok else "NOT CERTIFIED"
+        up = lambda ok: "CERTIFIED" if cert and ok else "PARTIAL" if ok and rec_ok else "NOT CERTIFIED"
         fail = rec[rec.ok == False][["fixture", "key", "value", "reference", "tol"]].to_dict("records")
         v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check == "V2"].ok.all())
         v3 = bool(ident[ident.check == "V3"].ok.all())
         models[model] = {
             "parameters": dict(status=part, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else "V5") +
-                               " on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+                               " on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation "
+                               "(unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+                               v8_ok=v8_ok, v8_max_diff=float(v8["diff"].max()) if len(v8) else None,
                                recovery_max_diff=float(rec["diff"].max()) if len(rec) else None, recovery_failures=fail),
             "se": dict(status="NOT CERTIFIED", basis="RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, "
                        "no independent SE reference"),
-            "persons": dict(status="PARTIAL" if v2 and rec_ok else "NOT CERTIFIED", basis="V2 independent Warm WLE at RaschPy parameters",
+            "persons": dict(status=up(v2), basis="V2 independent Warm WLE at RaschPy parameters",
                             max_diff=float(ident[ident.check == "V2"]["value"].max()) if len(ident) else None),
-            "fit": dict(status="PARTIAL" if v3 and rec_ok else "NOT CERTIFIED", basis="V3 independent infit/outfit recomputation (items, raters)",
+            "fit": dict(status=up(v3), basis="V3 independent infit/outfit recomputation (items, raters)",
                         max_diff=float(ident[ident.check == "V3"]["value"].max()) if len(ident) else None),
-            "probabilities": dict(status="PARTIAL" if v1 and rec_ok else "NOT CERTIFIED",
+            "probabilities": dict(status=up(v1),
                                   basis="V1 expected scores (and V1b stretch substitution) from the documented log-numerator"),
             "category_counts": dict(status="PARTIAL", basis="descriptive counts; equal to the validated input frame"),
             "category_stats": dict(status="NOT CERTIFIED", basis="RaschPy bootstrap category widths; no independent reference"),
@@ -163,7 +190,7 @@ if __name__ == "__main__":
     for fx in FIX:
         for model in R.MODELS:
             res = run(fx, model); rows += rows_for(fx, model, res, truth); timing[f"{fx}:{model}"] = round(res["seconds"], 3)
-    rows += tam_differences() + interaction_descriptive()
+    rows += tam_differences() + interaction_descriptive() + independent_estimator()
     df = pd.DataFrame(rows); edges = edge_cases(); ev = evidence(df, edges)
     print(df[df.ok.notna()].groupby(["model", "check"]).agg(n=("ok", "size"), ok=("ok", "all"), max_diff=("diff", "max")).to_string())
     print(df[df.ok == False].to_string() if (df.ok == False).any() else "no gate failures")
