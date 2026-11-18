@@ -5,27 +5,64 @@
  "models": {
   "global": {
    "parameters": {
-    "status": "PARTIAL",
-    "basis": "identity V1-V3 + recovery V4 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "status": "CERTIFIED",
+    "basis": "identity V1-V3 + recovery V4 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 5.254678847599337e-07,
     "recovery_max_diff": 0.115,
     "recovery_failures": []
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.988890851724628,
+      1.0390043070383224
+     ],
+     "linked": [
+      0.9338429015905678,
+      1.3181334255649497
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "UNSUPPORTED",
+    "basis": "not offered for this model",
+    "v10": null
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.0012332399939103955,
+      "max_sd_Nmax": 0.020874334933279625,
+      "median_sd_ratio": 0.4581104680663126
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.01933823098432826,
+      "max_sd_Nmax": 0.04800208253966779,
+      "median_sd_ratio": 0.5050849736098335
+     }
+    }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 2.8213431590984328e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -55,27 +92,64 @@
   },
   "items": {
    "parameters": {
-    "status": "PARTIAL",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "status": "CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 6.614032090901389e-07,
     "recovery_max_diff": 0.18774395327763327,
     "recovery_failures": []
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.8335981367455417,
+      1.2820835681314886
+     ],
+     "linked": [
+      0.8718019859723488,
+      1.2551270273112705
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "UNSUPPORTED",
+    "basis": "not offered for this model",
+    "v10": null
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.010586233322293167,
+      "max_sd_Nmax": 0.04361910450323674,
+      "median_sd_ratio": 0.448697002016866
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.02921930684948663,
+      "max_sd_Nmax": 0.07593019639695925,
+      "median_sd_ratio": 0.5014379314606467
+     }
+    }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 3.560618466735832e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -105,27 +179,64 @@
   },
   "thresholds": {
    "parameters": {
-    "status": "PARTIAL",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "status": "CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 4.141418987746448e-07,
     "recovery_max_diff": 0.28250984007503166,
     "recovery_failures": []
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.8803803717316651,
+      1.4307312048631557
+     ],
+     "linked": [
+      0.8595231845665173,
+      1.3154845979982732
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "UNSUPPORTED",
+    "basis": "not offered for this model",
+    "v10": null
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.017189722437889864,
+      "max_sd_Nmax": 0.0594671161198844,
+      "median_sd_ratio": 0.5146838086867486
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.03382321863981649,
+      "max_sd_Nmax": 0.12875448474521878,
+      "median_sd_ratio": 0.5140143317957453
+     }
+    }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 4.8117954065673985e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -156,7 +267,9 @@
   "bivector": {
    "parameters": {
     "status": "NOT CERTIFIED",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 7.333430818157183e-07,
     "recovery_max_diff": 0.4088554023580149,
     "recovery_failures": [
      {
@@ -191,7 +304,43 @@
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": null,
+     "linked": null
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "PARTIAL",
+    "basis": "V10 person-cluster bootstrap (B=50), dense N=500, 30 replications: coverage and SE ratio gate",
+    "v10": {
+     "coverage": 0.9537037037037037,
+     "min_cell_coverage": 0.8333333333333334,
+     "se_over_empirical_sd": 1.0516320025040715,
+     "n_reps": 30,
+     "boot_per_rep": 50,
+     "gate": true
+    }
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.025007158433941443,
+      "max_sd_Nmax": 0.07852793882651479,
+      "median_sd_ratio": 0.5119791801974722
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.03944974281246538,
+      "max_sd_Nmax": 0.1616882479240019,
+      "median_sd_ratio": 0.5044887529286104
+     }
+    }
    },
    "persons": {
     "status": "NOT CERTIFIED",
@@ -234,27 +383,64 @@
   },
   "matrix": {
    "parameters": {
-    "status": "PARTIAL",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "status": "CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 1.021216236685163e-06,
     "recovery_max_diff": 0.6559584644095042,
     "recovery_failures": []
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.7786884950782088,
+      1.3186125561851982
+     ],
+     "linked": [
+      0.7780495341393764,
+      1.3857904486796542
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "UNSUPPORTED",
+    "basis": "not offered for this model",
+    "v10": null
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.04863173355409908,
+      "max_sd_Nmax": 0.129760853672976,
+      "median_sd_ratio": 0.5145539596001947
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.05543278949752265,
+      "max_sd_Nmax": 0.27816119944239837,
+      "median_sd_ratio": 0.5275991016884245
+     }
+    }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 4.994493707499714e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -285,7 +471,9 @@
   "centrality": {
    "parameters": {
     "status": "NOT CERTIFIED",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 3.935441446056842e-07,
     "recovery_max_diff": 0.36836606921587095,
     "recovery_failures": [
      {
@@ -298,8 +486,50 @@
     ]
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "status": "PARTIAL",
+    "shown": "rater-side sandwich SE only",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.8845049012550782,
+      1.1185154501432621
+     ],
+     "linked": [
+      0.8788151818444961,
+      1.1963487457174131
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "PARTIAL",
+    "basis": "V10 person-cluster bootstrap (B=50), dense N=500, 30 replications: coverage and SE ratio gate",
+    "v10": {
+     "coverage": 0.9583333333333334,
+     "min_cell_coverage": 0.9,
+     "se_over_empirical_sd": 1.0725498956244293,
+     "n_reps": 30,
+     "boot_per_rep": 50,
+     "gate": true
+    }
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.011269647423087847,
+      "max_sd_Nmax": 0.04987609365278029,
+      "median_sd_ratio": 0.5237501737730321
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.02713202636585195,
+      "max_sd_Nmax": 0.10272517241063218,
+      "median_sd_ratio": 0.545579929139397
+     }
+    }
    },
    "persons": {
     "status": "NOT CERTIFIED",
@@ -342,27 +572,64 @@
   },
   "pseudo_halo": {
    "parameters": {
-    "status": "PARTIAL",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "status": "CERTIFIED",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 2.6628106697401677e-07,
     "recovery_max_diff": 0.2301874479155943,
     "recovery_failures": []
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.8877915817926443,
+      1.3206817139167242
+     ],
+     "linked": [
+      0.810553870212345,
+      1.309665773511529
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "UNSUPPORTED",
+    "basis": "not offered for this model",
+    "v10": null
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.009708958521760474,
+      "max_sd_Nmax": 0.05313957707166811,
+      "median_sd_ratio": 0.43781426612892094
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.022031126724935235,
+      "max_sd_Nmax": 0.11077097961307308,
+      "median_sd_ratio": 0.5192095248277261
+     }
+    }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 3.08610914601104e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 2.220446049250313e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -393,7 +660,9 @@
   "bistretch": {
    "parameters": {
     "status": "NOT CERTIFIED",
-    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked; no independent RCL implementation (CERTIFIED unattainable)",
+    "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
+    "v8_ok": true,
+    "v8_max_diff": 2.791349313913116e-07,
     "recovery_max_diff": 0.4548524399775778,
     "recovery_failures": [
      {
@@ -428,7 +697,49 @@
    },
    "se": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, no independent SE reference"
+    "shown": "hidden",
+    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+    "v9_ratio_range": {
+     "dense": [
+      0.843820384944333,
+      1.1429445051458038
+     ],
+     "linked": [
+      0.8595895757980414,
+      1.2716072650901535
+     ]
+    }
+   },
+   "cell_bootstrap_se": {
+    "status": "PARTIAL",
+    "basis": "V10 person-cluster bootstrap (B=50), dense N=500, 30 replications: coverage and SE ratio gate",
+    "v10": {
+     "coverage": 0.9476190476190476,
+     "min_cell_coverage": 0.8666666666666667,
+     "se_over_empirical_sd": 1.0821385638393146,
+     "n_reps": 30,
+     "boot_per_rep": 50,
+     "gate": true
+    }
+   },
+   "recovery_simulation": {
+    "status": "CHECK",
+    "v9": {
+     "dense": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.01635135279882161,
+      "max_sd_Nmax": 0.06961266515222692,
+      "median_sd_ratio": 0.5333915070734543
+     },
+     "linked": {
+      "bias_gate": true,
+      "consistency_gate": true,
+      "max_abs_bias_Nmax": 0.035764828190837844,
+      "max_sd_Nmax": 0.13721991841037556,
+      "median_sd_ratio": 0.5322914411847951
+     }
+    }
    },
    "persons": {
     "status": "NOT CERTIFIED",
@@ -520,30 +831,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.215,
-  "balanced_3facet:items": 0.234,
-  "balanced_3facet:thresholds": 0.174,
-  "balanced_3facet:bivector": 0.217,
-  "balanced_3facet:matrix": 0.234,
-  "balanced_3facet:centrality": 0.186,
-  "balanced_3facet:pseudo_halo": 0.208,
-  "balanced_3facet:bistretch": 0.244,
-  "unbalanced_linked:global": 0.231,
-  "unbalanced_linked:items": 0.215,
-  "unbalanced_linked:thresholds": 0.237,
-  "unbalanced_linked:bivector": 0.26,
-  "unbalanced_linked:matrix": 0.241,
-  "unbalanced_linked:centrality": 0.247,
-  "unbalanced_linked:pseudo_halo": 0.347,
-  "unbalanced_linked:bistretch": 0.271,
+  "balanced_3facet:global": 0.178,
+  "balanced_3facet:items": 0.197,
+  "balanced_3facet:thresholds": 0.186,
+  "balanced_3facet:bivector": 0.181,
+  "balanced_3facet:matrix": 0.248,
+  "balanced_3facet:centrality": 0.193,
+  "balanced_3facet:pseudo_halo": 0.239,
+  "balanced_3facet:bistretch": 0.278,
+  "unbalanced_linked:global": 0.214,
+  "unbalanced_linked:items": 0.221,
+  "unbalanced_linked:thresholds": 0.215,
+  "unbalanced_linked:bivector": 0.245,
+  "unbalanced_linked:matrix": 0.232,
+  "unbalanced_linked:centrality": 0.236,
+  "unbalanced_linked:pseudo_halo": 0.247,
+  "unbalanced_linked:bistretch": 0.298,
   "interaction_bias:global": 0.188,
-  "interaction_bias:items": 0.23,
-  "interaction_bias:thresholds": 0.188,
-  "interaction_bias:bivector": 0.246,
-  "interaction_bias:matrix": 0.249,
-  "interaction_bias:centrality": 0.203,
-  "interaction_bias:pseudo_halo": 0.25,
-  "interaction_bias:bistretch": 0.257
+  "interaction_bias:items": 0.24,
+  "interaction_bias:thresholds": 0.176,
+  "interaction_bias:bivector": 0.188,
+  "interaction_bias:matrix": 0.18,
+  "interaction_bias:centrality": 0.191,
+  "interaction_bias:pseudo_halo": 0.208,
+  "interaction_bias:bistretch": 0.205
  },
  "recovery_diagnosis": {
   "bivector": {

@@ -20,6 +20,7 @@ def test_all_models_fit_and_pass_independent_identities(model):
     r = FIT("unbalanced_linked", model); i = r["identity"]
     assert "error" not in i and r["seconds"] < 10
     assert i["V1_expected_score_max_diff"] <= 1e-12 and i["V2_wle_max_diff"] <= 1e-4 and i["V3_fit_max_diff"] <= 1e-6
+    assert i["V2b_csem_max_diff"] <= 1e-4
     if model in RP.STRETCH: assert i["V1b_stretch_reconstruction_max_diff"] <= 1e-12
     assert {"Estimate", "SE"} <= set(r["items"].columns) and len(r["rater_params"])
 
@@ -31,14 +32,17 @@ def test_global_recovers_generating_values_and_matches_archived_estimate():
     assert abs(r["_m"].raters_global["P3"] - 0.866293) < 1e-5                      # deterministic: matches the discovery probe
 
 
-def test_evidence_statuses_are_backed_and_never_certified():
-    st = {m: v["parameters"]["status"] for m, v in EV["models"].items()}
-    assert set(st) == set(RP.MODELS) and "CERTIFIED" not in st.values()
+def test_evidence_statuses_are_backed_by_gates():
+    st = {m: v["parameters"]["status"] for m, v in EV["models"].items()}; assert set(st) == set(RP.MODELS)
     cmp = pd.read_csv(ROOT / "validation/raschpy_mfrm/comparison.csv")
-    for m, s in st.items():                                           # PARTIAL only when every recovery row passed
-        rec = cmp[(cmp.model == m) & cmp.check.isin(["V4", "V5"])]
-        assert (s == "PARTIAL") == bool(rec.ok.astype(bool).all())
-    assert all(v["se"]["status"] == "NOT CERTIFIED" and v["model_selection"]["status"] == "NOT CERTIFIED" for v in EV["models"].values())
+    for m, s in st.items():                       # CERTIFIED = identities + recovery + V8 (both configs, both fixtures)
+        rec = cmp[(cmp.model == m) & cmp.check.isin(["V4", "V5"])]; v8 = cmp[(cmp.model == m) & cmp.check.str.startswith("V8_") & cmp.ok.notna()]
+        assert len(v8) == 4 and (s == "CERTIFIED") == bool(rec.ok.astype(bool).all() and v8.ok.astype(bool).all())
+        if not rec.ok.astype(bool).all(): assert s == "NOT CERTIFIED"
+    disc = cmp[cmp.check == "V8_discrimination"].value; assert disc.min() > 1e-3     # the two configurations differ
+    for m, v in EV["models"].items():
+        assert v["model_selection"]["status"] == "NOT CERTIFIED"
+        assert (v["se"]["status"] == "PARTIAL") == RP.rater_se_reliable(m)
     assert all(e["failed_closed"] for e in EV["edge_cases"] if e["case"] not in ("sparse_category", "missing_scores"))
 
 
@@ -68,6 +72,15 @@ def test_drf_with_person_covariate():
     tabs = RP.group_test(r, df, "person_id", "grup", "drf", n_boot=20); assert isinstance(tabs["tablo"], pd.DataFrame)
 
 
+def test_unreliable_uncertainty_is_hidden_and_cell_bootstrap_gated():
+    r = FIT("balanced_3facet", "matrix"); T = RP.tables(r)
+    assert "SE" not in T["Maddeler"] and "SE" not in T["Eşikler"] and "SE" not in T["Puanlayıcı parametreleri"]
+    with pytest.raises(MFRMError): RP.cell_bootstrap(r, B=5)                         # not validated for matrix
+    c = FIT("balanced_3facet", "centrality"); c["cell_bootstrap"] = RP.cell_bootstrap(c, B=10)
+    b = RP.tables(c)["Puanlayıcı hücreleri (bootstrap SE/GA)"]
+    assert (b["%95 GA alt"] < b.Kestirim).all() and (b["Bootstrap SE"] > 0).all() and "SE" in RP.tables(c)["Puanlayıcı parametreleri"]
+
+
 def test_exports_complete_and_pseudonymous():
     r = FIT("interaction_bias", "items"); files = RP.exports(r, {"source": "test"})
     pngs = [n for n in files if n.endswith(".png")]
@@ -91,6 +104,14 @@ def test_page_runs_example_and_isolates_sessions():
     assert "rpm_results" not in other.session_state                         # separate session: no shared fits
     at.selectbox(key="rpm_example").set_value("disconnected").run(); at.button(key="rpm_load").click().run()
     assert at.button(key="rpm_run").disabled and any("bağlantılı değil" in e.value for e in at.error)
+
+
+def test_independent_estimator_reproduces_default_fit():
+    from core.mfrm import prepare
+    import validation.raschpy_mfrm.independent as V
+    d, _ = prepare(pd.read_csv(EX / "unbalanced_linked.csv"), "person_id", "item_id", "rater_id", "score")
+    for model in ("global", "bistretch"):
+        assert V.compare(d, model, 3, regularised=True)[0] <= 1e-4
 
 
 def test_tam_engine_files_untouched():

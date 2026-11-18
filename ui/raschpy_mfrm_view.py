@@ -32,7 +32,7 @@ def _store(fp, value):
 def render():
     st.header("RaschPy Çok Yüzeyli Rasch (MFRM) — Deneysel")
     st.caption(f"Motor: RaschPy {RP.RASCHPY_VERSION} (Apache-2.0), düzenlileştirilmiş ikili bileşik olabilirlik (RCL). "
-               "R/TAM sayfasından bağımsızdır; TAM (MML) ile eşdeğer kestirim varsayılmaz. En yüksek kanıt düzeyi PARTIAL'dır.")
+               "R/TAM sayfasından bağımsızdır; TAM (MML) ile eşdeğer kestirim varsayılmaz. Durumlar modele ve çıktıya göre kanıta dayanır; kapsama kanıtı olmayan standart hatalar gösterilmez.")
     with st.expander("1. Veri ve örnekler", expanded="rpm_source" not in st.session_state):
         st.markdown("Uzun biçim: her satır bir birey–madde–puanlayıcı puanı. RaschPy yalnız **bir** puanlayıcı yüzeyi destekler.")
         ex = st.selectbox("Örnek veri", list(EXAMPLES), format_func=EXAMPLES.get, key="rpm_example")
@@ -91,6 +91,13 @@ def render():
         st.dataframe(stt, hide_index=True, use_container_width=True)
         st.caption("Durumlar yalnız depodaki fikstürler için geçerlidir (validation/raschpy_mfrm/evidence.json).")
         st.json(res["identity"], expanded=False)
+    if not RP.rater_se_reliable(model):
+        st.info("Bu modelde puanlayıcı SE'leri benzetimde güvenilir kapsama göstermedi; madde/eşik/kategori SE'leri için kapsama "
+                "kanıtı yok. Bu standart hatalar gizlendi.")
+    if RP.cell_bootstrap_validated(model):
+        if st.button("Puanlayıcı hücreleri için bootstrap SE ve %95 GA (B = 50, birey kümeli)", key="rpm_cellboot"):
+            with st.spinner("Bootstrap yeniden kestirimleri..."):
+                res["cell_bootstrap"] = RP.cell_bootstrap(res, B=50); saved.pop("files", None)
     T = RP.tables(res, show_ids)
     with st.expander("5. Sonuç tabloları", expanded=True):
         for k, t in T.items():

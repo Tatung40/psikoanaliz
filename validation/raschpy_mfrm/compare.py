@@ -11,8 +11,9 @@ import core.raschpy_mfrm as R
 from core.mfrm import MFRMError
 
 H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
+SIM = json.loads((H / "simulation.json").read_text())
 FIX = ("balanced_3facet", "unbalanced_linked", "interaction_bias"); RECOVERY = ("balanced_3facet", "unbalanced_linked")
-ID_TOL = {"V1_expected_score_max_diff": 1e-12, "V1b_stretch_reconstruction_max_diff": 1e-12, "V2_wle_max_diff": 1e-4,
+ID_TOL = {"V1_expected_score_max_diff": 1e-12, "V1b_stretch_reconstruction_max_diff": 1e-12, "V2_wle_max_diff": 1e-4, "V2b_csem_max_diff": 1e-4,
           "V3_fit_max_diff": 1e-6}
 
 
@@ -148,7 +149,7 @@ def edge_cases():
 def evidence(df, edges):
     models = {}
     for model in R.MODELS:
-        s = df[df.model == model]; ident = s[s.check.isin(["V1", "V1b", "V2", "V3", "identity_error"])]
+        s = df[df.model == model]; ident = s[s.check.isin(["V1", "V1b", "V2", "V2b", "V3", "identity_error"])]
         rec = s[s.check == ("V4" if model == "global" else "V5")]
         id_ok = bool(len(ident) and ident.ok.all()); rec_ok = bool(len(rec) and rec.ok.all() and set(rec.fixture) >= set(RECOVERY))
         v8 = s[s.check.isin(["V8_unregularised", "V8_default"])]
@@ -157,7 +158,7 @@ def evidence(df, edges):
         part = "CERTIFIED" if cert else "PARTIAL" if id_ok and rec_ok else "NOT CERTIFIED"
         up = lambda ok: "CERTIFIED" if cert and ok else "PARTIAL" if ok and rec_ok else "NOT CERTIFIED"
         fail = rec[rec.ok == False][["fixture", "key", "value", "reference", "tol"]].to_dict("records")
-        v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check == "V2"].ok.all())
+        v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check.isin(["V2", "V2b"])].ok.all())
         v3 = bool(ident[ident.check == "V3"].ok.all())
         models[model] = {
             "parameters": dict(status=part, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else "V5") +
@@ -165,8 +166,16 @@ def evidence(df, edges):
                                "(unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
                                v8_ok=v8_ok, v8_max_diff=float(v8["diff"].max()) if len(v8) else None,
                                recovery_max_diff=float(rec["diff"].max()) if len(rec) else None, recovery_failures=fail),
-            "se": dict(status="NOT CERTIFIED", basis="RaschPy sandwich/bootstrap SE; used only inside the recovery criterion, "
-                       "no independent SE reference"),
+            "se": dict(status="PARTIAL" if R.rater_se_reliable(model) else "NOT CERTIFIED",
+                       shown="rater-side sandwich SE only" if R.rater_se_reliable(model) else "hidden",
+                       basis="V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both "
+                             "designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
+                       v9_ratio_range={dz: SIM["V9"][f"{model}:{dz}"]["sandwich_se_over_sd_range"] for dz in ("dense", "linked")}),
+            "cell_bootstrap_se": dict(status="PARTIAL" if R.cell_bootstrap_validated(model) else "UNSUPPORTED",
+                       basis="V10 person-cluster bootstrap (B=50), dense N=500, 30 replications: coverage and SE ratio gate"
+                             if model in R.BOOT_MODELS else "not offered for this model", v10=SIM["V10"].get(model)),
+            "recovery_simulation": dict(status="CHECK", v9={dz: {k: SIM["V9"][f"{model}:{dz}"][k] for k in
+                       ("bias_gate", "consistency_gate", "max_abs_bias_Nmax", "max_sd_Nmax", "median_sd_ratio")} for dz in ("dense", "linked")}),
             "persons": dict(status=up(v2), basis="V2 independent Warm WLE at RaschPy parameters",
                             max_diff=float(ident[ident.check == "V2"]["value"].max()) if len(ident) else None),
             "fit": dict(status=up(v3), basis="V3 independent infit/outfit recomputation (items, raters)",

@@ -13,6 +13,9 @@ from core.mfrm import MFRMError, prepare
 
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "validation/raschpy_mfrm/evidence.json"
+SIMULATION = ROOT / "validation/raschpy_mfrm/simulation.json"
+SE_BAND = (0.80, 1.25)                     # preregistered V10 band for SE / empirical SD (PROTOCOL amendment)
+BOOT_MODELS = ("bivector", "centrality", "bistretch")
 RASCHPY_VERSION = "1.4.0"
 MODELS = {  # RaschPy MFRM._MODELS, in its order; label, rater term in the log-numerator of category k
     "global": ("Genel (global) katılık", "k·λ_r"),
@@ -28,7 +31,8 @@ STRETCH = {"centrality": ("lambda", "omega"), "pseudo_halo": ("lambda", "omega")
            "bistretch": ("lambda", "omega_items", "omega_thresholds")}
 EQUATION = "log P(X=k) ∝ k·(θ_n − δ_i) − Σ_{j≤k} τ_j − [puanlayıcı terimi]"
 OUTPUT_LABELS = {
-    "parameters": "Madde, eşik ve puanlayıcı parametreleri", "se": "Standart hatalar (sandviç / bootstrap)",
+    "parameters": "Madde, eşik ve puanlayıcı parametreleri", "se": "Puanlayıcı sandviç SE (yalnız benzetimde güvenilir modellerde)",
+    "cell_bootstrap_se": "Puanlayıcı hücreleri bootstrap SE / %95 GA",
     "persons": "Birey ölçüleri (Warm WLE) ve CSEM", "fit": "Infit/Outfit MnSq", "probabilities": "Kategori olasılıkları ve beklenen puan",
     "category_counts": "Kategori sıklıkları (betimsel)", "category_stats": "Kategori genişliği (bootstrap)",
     "test_stats": "Test düzeyi özetler (RaschPy)", "model_selection": "Model seçimi (AIC/BIC, RaschPy)",
@@ -49,6 +53,24 @@ def evidence():
         return json.loads(EVIDENCE.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+
+
+def simulation():
+    try:
+        return json.loads(SIMULATION.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def rater_se_reliable(model):
+    """Rater-side sandwich SE are shown only if, in V9, SE / empirical SD stayed inside SE_BAND for every reported cell in
+    both designs. Item/threshold/category SE have no coverage evidence and are never shown."""
+    v = [simulation().get("V9", {}).get(f"{model}:{d}", {}).get("sandwich_se_over_sd_range") for d in ("dense", "linked")]
+    return all(r is not None and SE_BAND[0] <= r[0] and r[1] <= SE_BAND[1] for r in v)
+
+
+def cell_bootstrap_validated(model):
+    return model in BOOT_MODELS and bool(simulation().get("V10", {}).get(model, {}).get("gate"))
 
 
 def status(model, output):
@@ -97,6 +119,7 @@ def fit(df, person, item, rater, score, model="global", se_method="sandwich", n_
                test=m.test_stats_df(model=model), category_counts=m.category_counts_df(),
                rater_params=_rater_params(m, model), versions=_versions())
     res["category_stats"] = m.category_stats_df(model=model) if se_method == "bootstrap" else None
+    res["cell_bootstrap"] = None
     res["identity"] = identity_checks(m, model, d)
     res["_m"] = m; res["_d"] = d
     return res
@@ -225,6 +248,11 @@ def identity_checks(m, model, d):
         both = w.dropna().index.intersection(persons.index)
         out["V2_wle_max_diff"] = float(np.abs(w[both] - persons[both]).max()) if len(both) else None
         out["V2_n_persons"] = int(len(both))
+        th_w = d.person.map(w).to_numpy(float); okc = np.isfinite(th_w) & nonext       # CSEM = 1/sqrt(test information)
+        _, _, var, _, _ = _moments(th_w[okc], c[okc])
+        mine = 1 / np.sqrt(pd.Series(var).groupby(d.person.to_numpy()[okc]).sum())
+        csem = getattr(m, f"csem_vector_{model}").reindex(mine.index)
+        out["V2b_csem_max_diff"] = float(np.abs(mine - csem).max())
         okf = np.isfinite(th)                                      # RaschPy fit includes extreme persons (adjusted WLE)
         diffs = []
         for key, facet in (("item", "item"), ("rater", "rater")):
@@ -235,6 +263,41 @@ def identity_checks(m, model, d):
         out["V3_fit_max_diff"] = max(diffs)
     except Exception as e:                                         # an identity that cannot be computed is reported, not passed
         out["error"] = f"{type(e).__name__}: {e}"
+    return out
+
+
+def cell_bootstrap(res, B=50, seed=None):
+    """V10-validated person-cluster bootstrap for the rater-side cells of bivector/centrality/bistretch (RaschPy reports
+    no per-cell SE): resample persons with replacement, refit, SE = SD of the B refits, normal 95% CI."""
+    model = res["model"]
+    if not cell_bootstrap_validated(model):
+        raise MFRMError("Hücre bootstrap SE'si bu model için doğrulanmadı; raporlanmaz.")
+    d = res["_d"]; rng = np.random.default_rng(res["seed"] if seed is None else seed); ix = d.groupby("person").indices
+    persons = list(ix); est = _cells(res["_m"], model); reps = []
+    for _ in range(int(B)):
+        pick = rng.choice(len(persons), len(persons), replace=True)
+        rows = np.concatenate([ix[persons[j]] for j in pick])
+        lab = np.repeat(np.arange(len(pick)), [len(ix[persons[j]]) for j in pick])
+        db = d.iloc[rows].assign(person=[f"B{j:05d}" for j in lab])
+        w = db.pivot(index=["rater", "person"], columns="item", values="score").astype(float)
+        w.index.names = ["Rater", "Person"]; w.columns.name = None; mb = _model(w, res["K"])
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            try: mb.calibrate(model=model); reps.append(_cells(mb, model))
+            except Exception: pass
+    bt = pd.DataFrame(reps); se = bt.std(ddof=1)
+    out = pd.DataFrame({"Kestirim": pd.Series(est), "Bootstrap SE": se})
+    out["%95 GA alt"] = out.Kestirim - 1.959964 * out["Bootstrap SE"]; out["%95 GA üst"] = out.Kestirim + 1.959964 * out["Bootstrap SE"]
+    out["B (başarılı)"] = len(bt)
+    return out.rename_axis("Parametre").reset_index()
+
+
+def _cells(m, model):
+    Rv = getattr(m, f"raters_{model}"); out = {}
+    for idx, row in Rv.iterrows():
+        for c, v in row.items(): out[f"{idx}:{c}"] = float(v)
+    for p in STRETCH.get(model, ())[1:]:
+        out.update({f"{p}:{r}": float(v) for r, v in getattr(m, f"{p}_{model}").items()})
     return out
 
 
@@ -328,11 +391,16 @@ def tables(res, show_ids=False):
     persons = res["persons"].copy()
     if not show_ids:
         persons.index = [f"Kişi_{i + 1:04d}" for i in range(len(persons))]
-    t = {"Maddeler": res["items"], "Eşikler": res["thresholds"], "Puanlayıcılar": res["raters"],
-         "Puanlayıcı parametreleri": res["rater_params"].set_index("Puanlayıcı"), "Bireyler": persons,
+    nose = lambda df: df.drop(columns=[c for c in df.columns if c == "SE" or (isinstance(c, tuple) and "SE" in c)])
+    rater_ok = rater_se_reliable(res["model"]); rp = res["rater_params"].set_index("Puanlayıcı")
+    t = {"Maddeler": nose(res["items"]), "Eşikler": nose(res["thresholds"]),
+         "Puanlayıcılar": res["raters"] if rater_ok else nose(res["raters"]),
+         "Puanlayıcı parametreleri": rp if rater_ok else rp.drop(columns="SE"), "Bireyler": persons,
          "Test özetleri": res["test"], "Kategori sıklıkları": res["category_counts"]}
     if res["category_stats"] is not None:
-        t["Kategori genişliği (bootstrap)"] = res["category_stats"]
+        t["Kategori genişliği (bootstrap)"] = nose(res["category_stats"])
+    if res.get("cell_bootstrap") is not None:
+        t["Puanlayıcı hücreleri (bootstrap SE/GA)"] = res["cell_bootstrap"]
     flat = lambda v: v.set_axis([" | ".join(map(str, c)) if isinstance(c, tuple) else c for c in v.columns], axis=1)
     return {k: flat(v.reset_index()).rename(columns={"index": "Öğe"}) for k, v in t.items()}
 
