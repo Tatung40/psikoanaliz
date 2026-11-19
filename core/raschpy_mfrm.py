@@ -340,7 +340,7 @@ def _rewide(res):
 
 
 # ---------------------------------------------------------------- plots (RaschPy figures + own Wright map of RaschPy estimates)
-def plots(res, max_items=6):
+def plots(res, max_items=6, fast=False):
     import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
     m, model = res["_m"], res["model"]; out = {}
     kw = dict(font="DejaVu Sans")
@@ -355,6 +355,8 @@ def plots(res, max_items=6):
             for i in list(res["items"].index)[:max_items]:
                 try: out[name.format(i=i)] = png(call(i))
                 except Exception: pass
+        if fast:
+            out = {k: v for k, v in out.items() if not k.startswith("madde_")}; return out
         for name, call in [("test_karakteristik.png", lambda: m.tcc(model=model, **kw)),
                            ("test_bilgi.png", lambda: m.test_info(model=model, **kw)),
                            ("standart_artiklar.png", lambda: m.std_residuals_plot(model=model, **kw))]:
@@ -411,15 +413,15 @@ def status_table(model):
     return pd.DataFrame(rows)
 
 
-def exports(res, config, show_ids=False, extra_tables=None):
+def exports(res, config, show_ids=False, extra_tables=None, figs=None):
     import io, zipfile
     T = tables(res, show_ids); T.update(extra_tables or {}); T["Kanıt durumu"] = status_table(res["model"])
-    figs = plots(res); files = {f"{k}.csv": v.to_csv(index=False).encode("utf-8-sig") for k, v in T.items()}
+    figs = figs if figs is not None else plots(res); files = {f"{k}.csv": v.to_csv(index=False).encode("utf-8-sig") for k, v in T.items()}
     xb = io.BytesIO()
     with pd.ExcelWriter(xb, engine="openpyxl") as w:
         for k, v in T.items(): v.to_excel(w, sheet_name=k[:31], index=False)
     files["raschpy_mfrm.xlsx"] = xb.getvalue(); files.update(figs)
-    files["raschpy_mfrm_raporu.docx"] = docx_report(res, T, figs)
+    files["raschpy_mfrm_raporu.docx"] = docx_report(res, figs, config, show_ids, extra_tables)
     files["analiz_yapilandirmasi.json"] = json.dumps(dict(config, model=res["model"], se_method=res["se_method"],
         n_boot=res["n_boot"], seed=res["seed"], versions=res["versions"], identity=res["identity"],
         convergence=res["convergence"]), ensure_ascii=False, indent=1, default=str).encode()
@@ -430,30 +432,245 @@ def exports(res, config, show_ids=False, extra_tables=None):
     return files
 
 
-def docx_report(res, T, figs):
+STATUS_TR = {"CERTIFIED": "CERTIFIED (kanıt kapsamında doğrulandı)", "PARTIAL": "PARTIAL (kısmi kanıt)",
+             "NOT CERTIFIED": "NOT CERTIFIED (doğrulanmadı)", "UNSUPPORTED": "UNSUPPORTED (desteklenmiyor)"}
+EVIDENCE_SCOPE = ("Kanıt kapsamı: depodaki örnek veri setleri (dengeli ve bağlantılı tasarımlar) ile benzetim koşulları "
+                  "(4 madde, 4 kategori, en çok 5 puanlayıcı). Durumlar başka tasarımlara kendiliğinden genellenmez.")
+GENERATED_NOTE = ("Raporun ve kodun üretilmiş olması (GENERATED) bilimsel doğrulama değildir; bilimsel durum yalnız "
+                  "CERTIFIED / PARTIAL / NOT CERTIFIED etiketleriyle ve belirtilen kanıt kapsamıyla gösterilir.")
+FIT_BAND = (0.5, 1.5)
+
+
+def _f(x, nd=3):
+    return "—" if x is None or (isinstance(x, float) and not np.isfinite(x)) else f"{x:.{nd}f}"
+
+
+def summary(res):
+    r = res["report"]; p = res["persons"]
+    extreme = int(((p["Score"] == 0) | (p["Score"] == p["Max score"])).sum())
+    return dict(n_persons=int(r["n_persons"]), n_items=int(res["_d"].item.nunique()), n_raters=int(res["_d"].rater.nunique()),
+                n_obs=int(r["n_rows"]), missing=int(r["missing_scores_excluded"]), extreme=extreme,
+                categories=list(map(int, r["categories"])), model=res["model"], model_label=MODELS[res["model"]][0],
+                status=status(res["model"], "parameters"))
+
+
+def rater_fit(res):
+    m, model = res["_m"], res["model"]
+    return pd.DataFrame({"Infit MnSq": getattr(m, f"rater_infit_ms_{model}"), "Outfit MnSq": getattr(m, f"rater_outfit_ms_{model}")})
+
+
+def academic_tables(res, show_ids=False, max_persons=None):
+    """Ordered (key, title, table, explanation) for the screen and the Word report; text uses computed values only."""
+    model = res["model"]; out = []; it = res["items"]; th = res["thresholds"]; S = summary(res)
+    items = pd.DataFrame({"Madde": it.index, "Güçlük (logit)": it["Estimate"].to_numpy(float), "Gözlem": it["Count"].to_numpy(int),
+                          "Ortalama puan / en yüksek puan": it["Facility"].to_numpy(float),
+                          "Infit MnSq": it["Infit MS"].to_numpy(float), "Outfit MnSq": it["Outfit MS"].to_numpy(float)})
+    hard, easy = it["Estimate"].idxmax(), it["Estimate"].idxmin()
+    misfit = int(((items[["Infit MnSq", "Outfit MnSq"]] < FIT_BAND[0]) | (items[["Infit MnSq", "Outfit MnSq"]] > FIT_BAND[1])).any(axis=1).sum())
+    out.append(("items", "Madde Parametreleri", items,
+                f"Güçlük, maddenin logit ölçeğindeki konumudur; yüksek değer daha zor maddeyi gösterir. En zor madde {hard} "
+                f"({_f(it['Estimate'][hard])}), en kolay madde {easy} ({_f(it['Estimate'][easy])}). Infit veya Outfit değeri yaygın "
+                f"kullanılan {FIT_BAND[0]}–{FIT_BAND[1]} aralığı dışında kalan madde sayısı: {misfit}."))
+    tau = np.asarray(th["Estimate"], float)
+    thr = pd.DataFrame({"Eşik": [f"{k - 1}→{k}" for k in range(1, len(tau) + 1)], "Konum (logit)": tau,
+                        "Infit MnSq": th["Infit MS"].to_numpy(float), "Outfit MnSq": th["Outfit MS"].to_numpy(float)})
+    ordered = bool(np.all(np.diff(tau) > 0))
+    out.append(("thresholds", "Eşik Parametreleri", thr,
+                "Eşik, iki komşu kategorinin eşit olasılıkla seçildiği konumdur (Andrich eşiği). Kestirilen eşikler "
+                + ("artan sıradadır." if ordered else "artan sırada değildir (sırasız eşik); kategori işleyişi incelenmelidir.")))
+    loc = rater_location(res); fit = rater_fit(res).reindex(loc.index)
+    n_obs = res["_d"].groupby("rater").size().reindex(loc.index)
+    lab = {"global": "Katılık λ (logit)"}.get(model, "Katılık λ (logit)" if model in STRETCH else "Ortalama katılık (λ hücre ort., logit)")
+    raters = pd.DataFrame({"Puanlayıcı": loc.index, lab: loc.to_numpy(float), "Gözlem": n_obs.to_numpy(int),
+                           "Infit MnSq": fit["Infit MnSq"].to_numpy(float), "Outfit MnSq": fit["Outfit MnSq"].to_numpy(float)})
+    if rater_se_reliable(model) and (model == "global" or model in STRETCH):
+        se = res["rater_params"]; se = se[se.Parametre.isin(["λ", "lambda"])].set_index("Puanlayıcı")["SE"]
+        raters.insert(2, "SE", se.reindex(loc.index).to_numpy(float))
+    sev, len_ = loc.idxmax(), loc.idxmin()
+    out.append(("raters", "Puanlayıcı Katılıkları", raters,
+                f"Yüksek katılık değeri, aynı bireye ve maddeye daha düşük puan verme eğilimini gösterir. En katı puanlayıcı {sev} "
+                f"({_f(loc[sev])}), en cömert puanlayıcı {len_} ({_f(loc[len_])}); aralık {_f(loc[sev] - loc[len_])} logit."
+                + ("" if model == "global" or model in STRETCH else " Bu modelde puanlayıcı başına tek katılık yoktur; sütun, "
+                   "puanlayıcının madde/eşik hücrelerinin ortalamasıdır.")))
+    if model != "global":
+        rp = res["rater_params"].copy()
+        names = {"items": ["Madde"], "thresholds": ["Eşik"], "bivector": ["Madde", "Eşik"], "matrix": ["Madde", "Eşik"],
+                 "bistretch": ["Madde", "Eşik"]}.get(model, [])
+        rp = rp.rename(columns={f"Düzey{i}": n for i, n in enumerate(names)})
+        if "Parametre" in rp:
+            rp["Parametre"] = rp["Parametre"].map({"lambda": "λ (konum)", "omega": "ω (germe)", "omega_items": "ω madde (germe)",
+                                                   "omega_thresholds": "ω eşik (germe)"}).fillna(rp["Parametre"])
+        if not rater_se_reliable(model): rp = rp.drop(columns="SE")
+        out.append(("rater_params", "Modele Özgü Puanlayıcı Parametreleri", rp,
+                    f"{MODELS[model][0]} modelinin puanlayıcı tarafı parametreleri (puanlayıcı terimi {MODELS[model][1]}). "
+                    + ("ω = 1 germe olmadığını, ω < 1 sıkışmayı (merkeze yığılma), ω > 1 yayılmayı gösterir." if model in STRETCH else
+                       "Değerler logit ölçeğindedir.")))
+    if res.get("cell_bootstrap") is not None:
+        out.append(("cell_bootstrap", "Puanlayıcı Hücreleri için Bootstrap Standart Hataları", res["cell_bootstrap"],
+                    "Birey kümeli bootstrap (bireyler yerine koyarak yeniden örneklenir, model her örneklemde yeniden kestirilir); "
+                    "%95 güven aralığı normal yaklaşımla hesaplanmıştır. Bu yöntem benzetimde bu model için kapsama kapısını geçmiştir."))
+    p = res["persons"]; est = p["Estimate"]
+    ps = pd.DataFrame({"İstatistik": ["Birey sayısı", "Ortalama (logit)", "Standart sapma", "En küçük", "En büyük",
+                                      "Ortalama CSEM", "Uç puanlı birey (0 veya tam puan)"],
+                       "Değer": [str(S["n_persons"]), *(_f(float(v)) for v in (est.mean(), est.std(), est.min(), est.max(),
+                                                                                 p["CSEM"].mean())), str(S["extreme"])]})
+    out.append(("persons_summary", "Birey Ölçüleri Özeti", ps,
+                "Birey ölçüleri Warm ağırlıklı olabilirlik (WLE) kestirimleridir; CSEM koşullu ölçme standart hatasıdır. "
+                f"Uç puanlı {S['extreme']} birey için RaschPy düzeltilmiş uç kestirim raporlar; bu değerler diğerlerinden daha belirsizdir."))
+    pt = p.copy()
+    pt.index = pt.index if show_ids else [f"Kişi_{i + 1:04d}" for i in range(len(pt))]
+    pt = pd.DataFrame({"Birey": pt.index, "Ölçü (logit)": pt["Estimate"].to_numpy(float), "CSEM": pt["CSEM"].to_numpy(float),
+                       "Ham puan": pt["Score"].to_numpy(), "En yüksek puan": pt["Max score"].to_numpy(),
+                       "Infit MnSq": pt["Infit MS"].to_numpy(float), "Outfit MnSq": pt["Outfit MS"].to_numpy(float)})
+    out.append(("persons", "Birey Ölçüleri", pt if max_persons is None else pt.head(max_persons),
+                "Her birey için WLE ölçüsü, CSEM, ham puan ve uyum değerleri." +
+                ("" if max_persons is None or len(pt) <= max_persons else
+                 f" Raporda ilk {max_persons} birey gösterilmiştir; {len(pt)} bireyin tam tablosu Excel/CSV dosyasındadır.")))
+    cc = res["category_counts"].copy(); cats = [c for c in cc.columns if c not in ("Total", "Missing")]
+    cc = cc[cats].T; cc.index = [f"Kategori {c}" for c in cc.index]; cc["Toplam"] = cc.sum(axis=1)
+    cc = cc.reset_index().rename(columns={"index": "Kategori"})
+    out.append(("category_counts", "Kategori Sıklıkları", cc,
+                "Her kategorinin madde bazında gözlenen sıklığıdır (betimsel). "
+                + (f"10'dan az gözlemli kategori(ler): {res['report']['sparse_categories']}." if res["report"]["sparse_categories"]
+                   else "Tüm kategorilerde en az 10 gözlem vardır.")))
+    t = res["test"].T.reset_index().rename(columns={"index": "Yüzey"})
+    t["Yüzey"] = t["Yüzey"].map({"Items": "Maddeler", "Persons": "Bireyler"}).fillna(t["Yüzey"])
+    t = t.rename(columns={"Mean": "Ortalama", "SD": "SS", "Separation ratio": "Ayırma oranı", "Strata": "Tabaka",
+                          "Reliability": "Güvenirlik"})
+    out.append(("test", "Ayırma ve Güvenirlik Özetleri", t,
+                "RaschPy tarafından raporlanan ayırma oranı, tabaka sayısı ve güvenirlik. Bu özetler bağımsız olarak yeniden "
+                "hesaplanmamıştır; yorumda bu sınırlılık dikkate alınmalıdır."))
+    return out
+
+
+def evidence_rows(model):
+    rows = [dict(Çıktı=lab, Durum=STATUS_TR.get(status(model, k), status(model, k))) for k, lab in OUTPUT_LABELS.items()]
+    return pd.DataFrame(rows)
+
+
+TABLE_STATUS = {"items": "parameters", "thresholds": "parameters", "raters": "parameters", "rater_params": "parameters",
+                "cell_bootstrap": "cell_bootstrap_se", "persons_summary": "persons", "persons": "persons",
+                "category_counts": "category_counts", "test": "test_stats"}
+
+
+def docx_report(res, figs, config=None, show_ids=False, extra_tables=None):
+    """Academic Word report built only from computed values (no HTML, API calls or debug output)."""
     import io
     from docx import Document
-    from docx.shared import Inches
-    doc = Document(); model = res["model"]; r = res["report"]
-    doc.add_heading("RaschPy Çok Yüzeyli Rasch (MFRM) Raporu — Deneysel", 0)
-    doc.add_paragraph(f"Model: {model} — {MODELS[model][0]}. {EQUATION}; puanlayıcı terimi {MODELS[model][1]}.")
-    doc.add_paragraph(f"Kestirim: RaschPy {RASCHPY_VERSION} MFRM.calibrate (yöntem {res['estimation']}: düzenlileştirilmiş ikili "
-                      f"bileşik olabilirlik). SE: {res['se_method']}" + (f" ({res['n_boot']} örneklem, tohum {res['seed']})" if res["n_boot"] else "")
-                      + ". Birey ölçüleri Warm WLE.")
-    doc.add_paragraph("Bu motor TAM'ın marjinal en çok olabilirlik kestirimiyle eşdeğer değildir; değerler doğrudan karşılaştırılamaz. "
-                      "Ridge düzenlileştirmesi uç parametreleri sıfıra doğru çeker.")
-    doc.add_paragraph(f"Veri: {r['n_rows']} puan, {r['n_persons']} birey, düzeyler {r['levels']}; eksik puan {r['missing_scores_excluded']}; "
-                      f"kategoriler {r['categories']} (sıklık {r['category_counts']}).")
-    for k, t in T.items():
-        doc.add_heading(k, 1); t = t.head(40)
-        tab = doc.add_table(rows=1, cols=len(t.columns)); tab.style = "Table Grid"
-        for i, c in enumerate(t.columns): tab.rows[0].cells[i].text = str(c)
-        for row in t.itertuples(index=False):
-            cells = tab.add_row().cells
-            for i, v in enumerate(row): cells[i].text = f"{v:.4f}" if isinstance(v, (float, np.floating)) else str(v)
-    doc.add_heading("Özdeşlik denetimleri", 1)
-    for k, v in res["identity"].items(): doc.add_paragraph(f"{k}: {v}", style="List Bullet")
-    for k, b in figs.items():
-        doc.add_paragraph(k); doc.add_picture(io.BytesIO(b), width=Inches(5.5))
-    doc.add_paragraph("Kanıt kapsamı: validation/raschpy_mfrm/evidence.json (yalnız depodaki fikstürler). Sürümler: " + "; ".join(res["versions"]))
+    from docx.enum.table import WD_TABLE_ALIGNMENT
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.shared import Inches, Pt
+    doc = Document(); model = res["model"]; S = summary(res); n_tab = [0]; n_fig = [0]
+    st_ = doc.styles["Normal"]; st_.font.name = "Times New Roman"; st_.font.size = Pt(11)
+    from docx.shared import RGBColor
+    for h in ("Title", "Heading 1", "Heading 2"):
+        doc.styles[h].font.name = "Times New Roman"; doc.styles[h].font.color.rgb = RGBColor(0, 0, 0)
+    def para(text, italic=False, size=None, bold=False):
+        p = doc.add_paragraph(); run = p.add_run(text); run.italic = italic; run.bold = bold
+        if size: run.font.size = Pt(size)
+        return p
+    def table(title, df, note, key=None):
+        n_tab[0] += 1
+        para(f"Tablo {n_tab[0]}", bold=True).paragraph_format.space_after = Pt(0)
+        para(title, italic=True)
+        t = doc.add_table(rows=1, cols=len(df.columns)); t.style = "Table Grid"; t.alignment = WD_TABLE_ALIGNMENT.CENTER
+        for i, c in enumerate(df.columns):
+            cell = t.rows[0].cells[i]; cell.text = str(c); cell.paragraphs[0].runs[0].bold = True
+        for row in df.itertuples(index=False):
+            cells = t.add_row().cells
+            for i, v in enumerate(row):
+                num = isinstance(v, (int, float, np.integer, np.floating)) and not isinstance(v, bool)
+                cells[i].text = (_f(float(v)) if isinstance(v, (float, np.floating)) else str(v))
+                if num: cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        for row in t.rows:
+            for c in row.cells:
+                for r_ in c.paragraphs[0].runs: r_.font.size = Pt(9)
+        lab = STATUS_TR.get(status(model, TABLE_STATUS[key]), "") if key in TABLE_STATUS else ""
+        para("Not. " + note + (f" Bilimsel durum: {lab}." if lab else ""), size=9)
+    doc.add_heading("Çok Yüzeyli Rasch Modeli (MFRM) Analiz Raporu", 0)
+    para(f"RaschPy {RASCHPY_VERSION} ile bağımsız deneysel analiz — model: {S['model']} ({S['model_label']})", italic=True)
+    doc.add_heading("1. Amaç ve Kapsam", 1)
+    para("Bu rapor, puanlayıcı katılığını madde güçlüğü ve birey yeteneğiyle aynı logit ölçeğinde kestiren çok yüzeyli Rasch "
+         "modelinin sonuçlarını sunar. Analiz deneysel RaschPy modülüyle yapılmıştır; platformun R/TAM tabanlı MFRM "
+         "analizinden bağımsızdır.")
+    doc.add_heading("2. Yöntem", 1)
+    doc.add_heading("2.1 Veri ve Örneklem", 2)
+    para(f"Analize {S['n_obs']} puan, {S['n_persons']} birey, {S['n_items']} madde ve {S['n_raters']} puanlayıcı girmiştir. "
+         f"Puan kategorileri: {', '.join(map(str, S['categories']))}. Eksik puan nedeniyle dışlanan satır: {S['missing']}. "
+         f"Uç puanlı (0 veya tam puan) birey: {S['extreme']}. Tasarım bağlantılılığı, tekrar eden puanlar ve kategori kullanımı "
+         "analiz öncesinde denetlenmiştir.")
+    doc.add_heading("2.2 Model", 2)
+    para(f"{EQUATION}. Puanlayıcı terimi: {MODELS[model][1]} ({S['model_label']}).")
+    doc.add_heading("2.3 Kestirim", 2)
+    se_text = ("Puanlayıcı standart hataları sandviç yöntemiyle hesaplanmış ve benzetimde güvenilir kapsama gösterdiği için raporlanmıştır."
+               if rater_se_reliable(model) else "Puanlayıcı standart hataları benzetimde güvenilir kapsama göstermediği için raporlanmamıştır.")
+    para("Parametreler RaschPy MFRM.calibrate ile düzenlileştirilmiş ikili bileşik koşullu olabilirlik (RCL) yöntemiyle "
+         "kestirilmiştir; bu yöntemde birey parametreleri koşullama ile elenir ve ridge cezası aşırı değerleri sıfıra doğru çeker. "
+         "Birey ölçüleri Warm WLE ile kestirilmiştir. Bu kestirim TAM'ın marjinal en çok olabilirlik kestirimiyle eşdeğer değildir; "
+         f"iki motorun değerleri doğrudan karşılaştırılamaz. {se_text} Madde, eşik ve kategori standart hataları için kapsama kanıtı "
+         "bulunmadığından raporlanmamıştır.")
+    doc.add_heading("3. Bulgular", 1)
+    for key, title, df, note in academic_tables(res, show_ids, max_persons=15):
+        table(title, df, note, key)
+    for name, df in (extra_tables or {}).items():
+        if isinstance(df, pd.DataFrame) and len(df):
+            table(name, df.head(30), "RaschPy tarafından raporlanmıştır; bağımsız olarak doğrulanmamıştır (NOT CERTIFIED).")
+    if figs:
+        doc.add_heading("4. Şekiller", 1)
+        for name, png in figs.items():
+            n_fig[0] += 1
+            doc.add_picture(io.BytesIO(png), width=Inches(5.8)); doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            para(f"Şekil {n_fig[0]}. {fig_title(name)}", italic=True, size=9)
+    doc.add_heading(f"{5 if figs else 4}. Bilimsel Durum ve Sınırlılıklar", 1)
+    table("Çıktıların Bilimsel Durumu", evidence_rows(model), EVIDENCE_SCOPE)
+    limits = [GENERATED_NOTE,
+              "NOT CERTIFIED olarak işaretlenen çıktılar doğrulanmış sonuç gibi yorumlanmamalıdır.",
+              "Uç puanlı bireylerin ölçüleri düzeltilmiş kestirimlerdir ve daha yüksek belirsizlik taşır.",
+              f"Eksik puanlar analizden dışlanmıştır ({S['missing']} satır); eksiklik mekanizması incelenmemiştir.",
+              "RaschPy yalnız bir puanlayıcı yüzeyini destekler; görev/oturum gibi ek yüzeyler modellenmemiştir. Andersen LR testi "
+              "RaschPy'de devre dışıdır."]
+    if S["status"] == "NOT CERTIFIED":
+        limits.insert(1, f"Bu modelin ({model}) parametreleri NOT CERTIFIED durumundadır: önceden kaydedilmiş geri kazanım "
+                         "ölçütü örnek veri setlerinde karşılanmamıştır. Bulgular betimsel olarak değerlendirilmelidir.")
+    for x in limits: doc.add_paragraph(x, style="List Bullet")
+    doc.add_heading(f"{6 if figs else 5}. Tekrarlanabilirlik", 1)
+    rep = pd.DataFrame({"Öğe": ["Yazılım", "Model", "Standart hata yöntemi", "Rastgele tohum", "Bağımsız özdeşlik denetimleri"],
+                        "Değer": [", ".join(res["versions"]), model, res["se_method"] + (f" (B = {res['n_boot']})" if res["n_boot"] else ""),
+                                  str(res["seed"]), "geçti" if identity_ok(res) else "başarısız veya hesaplanamadı"]})
+    src = (config or {}).get("source")
+    if isinstance(src, dict) and src.get("sha"):
+        rep.loc[len(rep)] = ["Veri parmak izi (SHA-256)", config["source"]["sha"][:16] + "…"]
+    table("Analiz Ayarları ve Yazılım", rep, "Aynı veri, model ve tohumla analiz aynı sonuçları üretir. Tam tablolar Excel/CSV dosyalarındadır.")
     buf = io.BytesIO(); doc.save(buf); return buf.getvalue()
+
+
+FIGURE_TITLES = {"wright_haritasi": "Wright haritası: bireyler, maddeler ve puanlayıcılar aynı logit ölçeğinde",
+                 "kategori_egrileri": "Kategori olasılık eğrileri", "madde_karakteristik": "Madde karakteristik eğrisi",
+                 "test_karakteristik": "Test karakteristik eğrisi", "test_bilgi": "Test bilgi fonksiyonu",
+                 "standart_artiklar": "Standartlaştırılmış artıklar"}
+
+
+def fig_title(name):
+    stem = name[:-4] if name.endswith(".png") else name
+    for k, v in FIGURE_TITLES.items():
+        if stem == k: return v
+        if stem.startswith(k + "_"): return f"{v} — {stem[len(k) + 1:]}"
+    return stem
+IDENTITY_TOL = {"V1_expected_score_max_diff": 1e-12, "V1b_stretch_reconstruction_max_diff": 1e-12, "V2_wle_max_diff": 1e-4,
+                "V2b_csem_max_diff": 1e-4, "V3_fit_max_diff": 1e-6}
+
+
+def identity_ok(res):
+    i = res["identity"]
+    return "error" not in i and all(i.get(k) is None or i[k] <= t for k, t in IDENTITY_TOL.items())
+
+
+def identity_table(res):
+    lab = {"V1_expected_score_max_diff": "Beklenen puan (bağımsız formül)", "V1b_stretch_reconstruction_max_diff": "Germe parametre yapısı",
+           "V2_wle_max_diff": "Warm WLE (bağımsız çözüm)", "V2b_csem_max_diff": "CSEM (bağımsız bilgi fonksiyonu)",
+           "V3_fit_max_diff": "Infit/Outfit (bağımsız artıklar)"}
+    i = res["identity"]
+    rows = [dict(Denetim=v, **{"En büyük fark": i[k], "Tolerans": IDENTITY_TOL[k], "Sonuç": "geçti" if i[k] <= IDENTITY_TOL[k] else "başarısız"})
+            for k, v in lab.items() if i.get(k) is not None]
+    if "error" in i: rows.append(dict(Denetim="Hesaplama hatası", **{"En büyük fark": np.nan, "Tolerans": np.nan, "Sonuç": i["error"]}))
+    return pd.DataFrame(rows)

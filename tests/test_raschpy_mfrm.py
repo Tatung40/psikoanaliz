@@ -89,8 +89,37 @@ def test_exports_complete_and_pseudonymous():
     persons = pd.read_csv(io.BytesIO(files["Bireyler.csv"])); assert persons.iloc[0, 0].startswith("Kişi_")
     from docx import Document
     text = "\n".join(p.text for p in Document(io.BytesIO(files["raschpy_mfrm_raporu.docx"])).paragraphs)
-    assert "eşdeğer değildir" in text and "RCL" not in text or "bileşik olabilirlik" in text
+    assert "eşdeğer değildir" in text and "Madde, eşik ve kategori standart hataları" in text
     assert len(zipfile.ZipFile(io.BytesIO(files["raschpy_mfrm.zip"])).namelist()) == len(files) - 1
+
+
+@pytest.mark.parametrize("model", ["global", "bistretch"])
+def test_academic_word_report_is_clean_numbered_and_honest(model):
+    from docx import Document
+    r = FIT("balanced_3facet", model); figs = RP.plots(r, fast=True)
+    doc = Document(io.BytesIO(RP.docx_report(r, figs, {"source": {"sha": "ab" * 32}})))
+    text = "\n".join(p.text for p in doc.paragraphs)
+    for leak in ("<div", "</", "{'", "core.", "raschpy.MFRM(", "calibrate(", "V1_", "_max_diff", "Traceback", "unsafe_allow_html"):
+        assert leak not in text, leak
+    titles = [doc.paragraphs[i + 1].text for i, p in enumerate(doc.paragraphs) if p.text.startswith("Tablo ")]
+    assert titles[:3] == ["Madde Parametreleri", "Eşik Parametreleri", "Puanlayıcı Katılıkları"]
+    assert "Birey Ölçüleri" in titles and "Çıktıların Bilimsel Durumu" in titles
+    nums = [int(p.text.split()[1]) for p in doc.paragraphs if p.text.startswith("Tablo ")]; assert nums == list(range(1, len(nums) + 1))
+    assert len(doc.inline_shapes) == len(figs) and sum(p.text.startswith("Şekil ") for p in doc.paragraphs) == len(figs)
+    for h in ("1. Amaç ve Kapsam", "2. Yöntem", "2.1 Veri ve Örneklem", "2.3 Kestirim", "3. Bulgular", "Bilimsel Durum ve Sınırlılıklar", "Tekrarlanabilirlik"):
+        assert any(p.text.endswith(h) or p.text == h for p in doc.paragraphs), h
+    persons = next(t for t, p in zip(doc.tables, [x for x in titles]) if p == "Birey Ölçüleri")
+    assert len(persons.rows) == 16 and "tam tablosu Excel/CSV" in text                 # 15 shown, 300 in Excel/CSV
+    assert "Uç puanlı" in text and "Eksik puanlar" in text and "GENERATED" in text
+    status = RP.status(model, "parameters")
+    assert (f"Bilimsel durum: {RP.STATUS_TR[status]}" in text) and (("parametreleri NOT CERTIFIED" in text) == (status == "NOT CERTIFIED"))
+    assert "SE" not in [c.text for c in doc.tables[0].rows[0].cells]                    # no SE without coverage evidence
+    assert not any(c.text in ("nan", "None") for t in doc.tables for row in t.rows for c in row.cells)
+
+
+def test_excel_keeps_full_person_table():
+    r = FIT("balanced_3facet"); files = RP.exports(r, {}, figs=RP.plots(r, fast=True))
+    assert len(pd.read_excel(io.BytesIO(files["raschpy_mfrm.xlsx"]), sheet_name="Bireyler")) == 300
 
 
 def test_page_runs_example_and_isolates_sessions():
@@ -100,6 +129,10 @@ def test_page_runs_example_and_isolates_sessions():
     at.button(key="rpm_load").click().run(); at.selectbox(key="rpm_model").set_value("matrix").run()
     at.button(key="rpm_run").click().run(); assert not at.exception
     assert len(at.session_state["rpm_results"]) == 1 and any("Kestirim tamamlandı" in s.value for s in at.success)
+    assert [t.label for t in at.tabs] == ["Genel Bakış", "Parametreler", "Bireyler", "Grafikler", "Tanılar", "İndir"]
+    assert any(e.label == "İleri Düzey / Teknik Ayrıntılar" and not e.proto.expanded for e in at.expander)
+    assert not at.json and any("Puanlayıcı Katılıkları" in m.value for m in at.markdown)
+    assert {m.label for m in at.metric} >= {"Birey (N)", "Madde", "Puanlayıcı", "Model", "Parametre durumu"}
     other = AppTest.from_string("from ui.raschpy_mfrm_view import render\nrender()", default_timeout=60); other.run()
     assert "rpm_results" not in other.session_state                         # separate session: no shared fits
     at.selectbox(key="rpm_example").set_value("disconnected").run(); at.button(key="rpm_load").click().run()

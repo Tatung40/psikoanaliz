@@ -64,7 +64,10 @@ def render():
     with st.expander("3. Veri denetimi", expanded=True):
         try:
             _, _, rep = RP.to_wide(df, person, item, rater, score)
-            st.dataframe(pd.DataFrame([{k: str(v) for k, v in rep.items()}]).T.rename(columns={0: "Değer"}))
+            c = st.columns(4)
+            c[0].metric("Birey", rep["n_persons"]); c[1].metric("Puan", rep["n_rows"])
+            c[2].metric("Dışlanan eksik puan", rep["missing_scores_excluded"]); c[3].metric("Kategori", len(rep["categories"]))
+            st.caption("Bağlantılılık, tekrar eden puanlar ve kategori kullanımı denetlendi; tasarım analize uygun.")
             if rep["sparse_categories"]:
                 st.warning(f"Seyrek kategori(ler): {rep['sparse_categories']} (< 10 gözlem).")
         except MFRMError as e:
@@ -73,7 +76,7 @@ def render():
                   source=st.session_state.get("rpm_source"))
     fp = hashlib.sha256(json.dumps(config, sort_keys=True, default=str).encode()).hexdigest()
     if st.button("RaschPy MFRM kestirimini çalıştır", type="primary", key="rpm_run", disabled=bool(data_error),
-                 help=data_error or "RaschPy calibrate + std_errors + fit_statistics"):
+                 help=data_error or "Seçilen modeli kestirir"):
         with st.spinner("RaschPy kestirimi..."):
             try:
                 _store(fp, {"result": RP.fit(df, person, item, rater, score, model, se, int(n_boot))})
@@ -84,51 +87,95 @@ def render():
         return
     if "error" in saved:
         st.error(saved["error"]); return
-    res = saved["result"]
-    st.success(f"Kestirim tamamlandı ({res['seconds']:.2f} sn; yöntem {res['estimation']}).")
-    with st.expander("4. Kanıt durumu", expanded=True):
-        stt = RP.status_table(model); stt["Durum"] = stt["Durum"].map(lambda s: BADGE.get(s, s))
-        st.dataframe(stt, hide_index=True, use_container_width=True)
-        st.caption("Durumlar yalnız depodaki fikstürler için geçerlidir (validation/raschpy_mfrm/evidence.json).")
-        st.json(res["identity"], expanded=False)
-    if not RP.rater_se_reliable(model):
-        st.info("Bu modelde puanlayıcı SE'leri benzetimde güvenilir kapsama göstermedi; madde/eşik/kategori SE'leri için kapsama "
-                "kanıtı yok. Bu standart hatalar gizlendi.")
-    if RP.cell_bootstrap_validated(model):
-        if st.button("Puanlayıcı hücreleri için bootstrap SE ve %95 GA (B = 50, birey kümeli)", key="rpm_cellboot"):
-            with st.spinner("Bootstrap yeniden kestirimleri..."):
-                res["cell_bootstrap"] = RP.cell_bootstrap(res, B=50); saved.pop("files", None)
-    T = RP.tables(res, show_ids)
-    with st.expander("5. Sonuç tabloları", expanded=True):
-        for k, t in T.items():
-            st.markdown(f"**{k}**"); st.dataframe(t, hide_index=True, use_container_width=True)
-    with st.expander("6. Model seçimi ve grup testleri (isteğe bağlı)", expanded=False):
-        st.caption("RaschPy tarafından raporlanır; bağımsız doğrulanmamıştır (NOT CERTIFIED). Andersen LR testi RaschPy'de devre dışıdır.")
+    _results(saved, df, config, person, item, rater, score, model, show_ids)
+
+
+def _show(title, table, note, status=None):
+    st.markdown(f"**{title}**")
+    st.caption(note + (f" Durum: {BADGE.get(status, status)}." if status else ""))
+    st.dataframe(table.round(3) if hasattr(table, "round") else table, hide_index=True, use_container_width=True)
+
+
+def _results(saved, df, config, person, item, rater, score, model, show_ids):
+    res = saved["result"]; S = RP.summary(res)
+    st.success(f"Kestirim tamamlandı ({res['seconds']:.2f} sn).")
+    c = st.columns(5)
+    c[0].metric("Birey (N)", S["n_persons"]); c[1].metric("Madde", S["n_items"]); c[2].metric("Puanlayıcı", S["n_raters"])
+    c[3].metric("Model", model); c[4].metric("Parametre durumu", S["status"])
+    if S["status"] == "NOT CERTIFIED":
+        st.warning(f"Bu modelin ({model}) parametreleri NOT CERTIFIED: önceden kaydedilmiş geri kazanım ölçütü örnek veri "
+                   "setlerinde karşılanmadı. Sonuçları doğrulanmış bulgu olarak yorumlamayın.")
+    if not RP.identity_ok(res):
+        st.error("Bağımsız özdeşlik denetimlerinden biri başarısız oldu; ayrıntılar Teknik Ayrıntılar bölümündedir.")
+    tables = {k: (t, d, n) for k, t, d, n in RP.academic_tables(res, show_ids)}
+    status_of = lambda k: RP.status(model, RP.TABLE_STATUS[k]) if k in RP.TABLE_STATUS else None
+    tab = st.tabs(["Genel Bakış", "Parametreler", "Bireyler", "Grafikler", "Tanılar", "İndir"])
+    with tab[0]:
+        st.markdown(f"**{RP.MODELS[model][0]}.** Bireyler, maddeler ve puanlayıcılar aynı logit ölçeğinde kestirildi "
+                    f"({S['n_obs']} puan; uç puanlı birey: {S['extreme']}; dışlanan eksik puan: {S['missing']}).")
+        ev = RP.evidence_rows(model); ev["Durum"] = [BADGE.get(RP.status(model, k), "") for k in RP.OUTPUT_LABELS]
+        st.dataframe(ev, hide_index=True, use_container_width=True)
+        st.caption(RP.EVIDENCE_SCOPE + " " + RP.GENERATED_NOTE)
+    with tab[1]:
+        for k in ("items", "thresholds", "raters", "rater_params", "cell_bootstrap"):
+            if k in tables: _show(*tables[k], status_of(k))
+        if RP.cell_bootstrap_validated(model) and res.get("cell_bootstrap") is None:
+            if st.button("Puanlayıcı hücreleri için bootstrap SE ve %95 GA hesapla (B = 50)", key="rpm_cellboot"):
+                with st.spinner("Bootstrap yeniden kestirimleri..."):
+                    res["cell_bootstrap"] = RP.cell_bootstrap(res, B=50); saved.pop("docx", None); st.rerun()
+        if not RP.rater_se_reliable(model):
+            st.caption("Standart hatalar: kapsama kanıtı olmayan madde, eşik ve puanlayıcı SE'leri gösterilmez.")
+    with tab[2]:
+        for k in ("persons_summary", "persons"): _show(*tables[k], status_of(k))
+    with tab[3]:
+        if "figs" not in saved:
+            with st.spinner("Grafikler hazırlanıyor..."):
+                saved["figs"] = RP.plots(res, fast=True)
+        for name, png in saved["figs"].items():
+            st.image(png, caption=RP.fig_title(name))
+        if not saved.get("figs_full") and st.button("Ek grafikler: madde ve test eğrileri, artıklar", key="rpm_more_plots"):
+            with st.spinner("Ek grafikler..."):
+                saved["figs"] = RP.plots(res); saved["figs_full"] = True; saved.pop("docx", None); st.rerun()
+    with tab[4]:
+        for k in ("category_counts", "test"): _show(*tables[k], status_of(k))
+        st.markdown("**Model karşılaştırması ve grup testleri (isteğe bağlı)**")
+        st.caption("RaschPy tarafından raporlanır; bağımsız doğrulanmamıştır (NOT CERTIFIED).")
         test = st.radio("Ölçüt", ["AIC", "BIC"], horizontal=True, key="rpm_ms_test")
         if st.button("8 modeli karşılaştır", key="rpm_ms"):
-            try: saved["selection"] = RP.model_selection(res, test)
+            try: saved["selection"] = RP.model_selection(res, test); saved.pop("docx", None)
             except Exception as e: st.error(f"Model seçimi başarısız: {e}")
         if saved.get("selection") is not None:
-            st.dataframe(saved["selection"], hide_index=True)
+            st.dataframe(saved["selection"].round(3), hide_index=True)
         cov = st.selectbox("Birey düzeyi grup değişkeni", ["—"] + [c for c in df.columns if c not in (person, item, rater, score)], key="rpm_cov")
         kind = st.radio("Test", ["drf", "dif"], horizontal=True, key="rpm_kind",
                         format_func={"drf": "DRF (puanlayıcı × grup)", "dif": "DIF (madde × grup)"}.get)
         if st.button("Grup testini çalıştır", key="rpm_group", disabled=cov == "—"):
-            try: saved["group"] = {kind: RP.group_test(res, df, person, cov, kind)}
+            try: saved["group"] = {kind: RP.group_test(res, df, person, cov, kind)}; saved.pop("docx", None)
             except MFRMError as e: st.error(str(e))
         for kk, tabs in (saved.get("group") or {}).items():
             for name, t in tabs.items():
                 st.markdown(f"**{kk.upper()} — {name}**"); st.dataframe(t, hide_index=True)
-    with st.expander("7. Grafikler ve raporlar", expanded=False):
-        if st.button("Grafik ve raporları hazırla (CSV/XLSX/DOCX/ZIP)", key="rpm_exports"):
-            extra = {"Model seçimi": saved["selection"]} if saved.get("selection") is not None else {}
-            for kk, tabs in (saved.get("group") or {}).items():
-                extra.update({f"{kk.upper()} {n}"[:31]: t for n, t in tabs.items() if isinstance(t, pd.DataFrame)})
+    extra = {"Model Karşılaştırması (AIC/BIC)": saved["selection"]} if saved.get("selection") is not None else {}
+    for kk, tabs in (saved.get("group") or {}).items():
+        extra.update({f"{kk.upper()} {n}": t for n, t in tabs.items() if isinstance(t, pd.DataFrame)})
+    with tab[5]:
+        st.caption("Word raporu ekranda üretilmiş grafikleri ve tabloları içerir; tüm bireylerin tam tablosu Excel/CSV dosyasındadır.")
+        if "docx" not in saved:
+            saved["docx"] = RP.docx_report(res, saved.get("figs") or {}, config, show_ids, extra)
+        c = st.columns(3)
+        c[0].download_button("Akademik Word raporu (.docx)", saved["docx"], file_name="raschpy_mfrm_raporu.docx",
+                             key="rpm_dl_docx", use_container_width=True)
+        if c[1].button("Excel ve CSV paketini hazırla", key="rpm_exports", use_container_width=True):
             with st.spinner("Hazırlanıyor..."):
-                saved["files"] = RP.exports(res, config, show_ids, extra)
-        files = saved.get("files") or {}
-        for name in [n for n in files if n.endswith(".png")]:
-            st.image(files[name], caption=name)
-        cs = st.columns(3)
-        for i, (name, b) in enumerate((n, b) for n, b in files.items() if not n.endswith(".png") and not n.endswith(".csv")):
-            cs[i % 3].download_button(name, b, file_name=name, key=f"rpm_dl_{name}", use_container_width=True)
+                saved["files"] = RP.exports(res, config, show_ids, extra, figs=saved.get("figs"))
+        for i, name in enumerate(n for n in ("raschpy_mfrm.xlsx", "raschpy_mfrm.zip") if n in (saved.get("files") or {})):
+            st.download_button(name, saved["files"][name], file_name=name, key=f"rpm_dl_{name}", use_container_width=True)
+    with st.expander("İleri Düzey / Teknik Ayrıntılar", expanded=False):
+        st.markdown(f"**Kestirim:** RaschPy {RP.RASCHPY_VERSION}, yöntem `{res['estimation']}` (düzenlileştirilmiş ikili bileşik "
+                    f"olabilirlik); SE yöntemi {res['se_method']}; tohum {res['seed']}. Denklem: {RP.EQUATION}; puanlayıcı terimi "
+                    f"{RP.MODELS[model][1]}.")
+        st.markdown("**Bağımsız özdeşlik denetimleri** (RaschPy kodu kullanılmadan yeniden hesaplanır)")
+        st.dataframe(RP.identity_table(res), hide_index=True, use_container_width=True)
+        st.markdown("**Desteklenmeyen özellikler**")
+        for k, v in RP.UNSUPPORTED.items(): st.caption(f"{k}: {v}")
+        st.caption("Sürümler: " + "; ".join(res["versions"]))
