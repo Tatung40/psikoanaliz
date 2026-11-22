@@ -54,6 +54,8 @@ def one(args):
             tab, om = t["tablo"], t.get("omnibus")
             row[f"{test}_rej"] = int((tab.p < ALPHA).sum()); row[f"{test}_n"] = int(len(tab))
             row[f"{test}_flag_any"] = bool(tab.Flagged.any()); row[f"{test}_om_rej"] = bool((om.p < ALPHA).any()) if om is not None else None
+            row[f"{test}_om_lr"] = float(om.LR.iloc[0]) if om is not None and len(om) == 1 else None
+            row[f"{test}_om_df"] = float(om.df.iloc[0]) if om is not None and len(om) == 1 else None
             row[f"{test}_identity"] = identity(tab)
             if kind == "power": row["k3_flagged"] = bool(tab[tab.Item == "K3"].Flagged.any())
     return row
