@@ -1,5 +1,5 @@
 """Independent parametric-null Monte Carlo calibration of RaschPy V15 omnibus LR.
-60 calibration and 60 held-out null replications, disjoint deterministic seeds.
+150 calibration and 150 held-out null replications, disjoint deterministic seeds.
 Not a conditional bootstrap for a particular observed dataset.
 """
 import json
@@ -10,7 +10,7 @@ from scipy.stats import chi2
 from validation.raschpy_mfrm.simulation_v15 import one, ALPHA
 
 def main():
-    jobs=[("null",r) for r in range(1000,1120)]
+    jobs=[("null",r) for r in range(2000,2300)]
     with Pool(2) as pool:
         rows=list(pool.imap_unordered(one,jobs))
     rows.sort(key=lambda x:x["rep"])
@@ -21,12 +21,12 @@ def main():
         if not np.isfinite(values).all() or not np.isfinite(dfs).all() or len(set(dfs))!=1:
             result[test]={"status":"NOT CERTIFIED","error":"missing/nonfinite LR or inconsistent df"}
             continue
-        calibration,heldout=values[:60],values[60:]
+        calibration,heldout=values[:150],values[150:]
         cutoff=float(np.quantile(calibration,0.95,method="higher"))
         # Conservative rank p-value using independent calibration sample.
         p_emp=np.array([(1+np.sum(calibration>=v))/(len(calibration)+1) for v in heldout])
         p_chi=chi2.sf(heldout,dfs[0])
-        result[test]={"df":float(dfs[0]),"calibration_n":60,"heldout_n":60,
+        result[test]={"df":float(dfs[0]),"calibration_n":150,"heldout_n":150,
             "chi_square_size":float(np.mean(p_chi<ALPHA)),
             "empirical_size":float(np.mean(p_emp<ALPHA)),
             "empirical_95pct_cutoff":cutoff,
