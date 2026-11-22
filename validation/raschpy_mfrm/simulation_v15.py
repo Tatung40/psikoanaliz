@@ -58,20 +58,51 @@ def one(args):
     return row
 
 
-def summarise(rows):
-    df = pd.DataFrame(rows); out = {}
+def summarise(rows, expected_null=60, expected_power=30):
+    """Fail closed: missing/invalid replicates cannot support a scientific gate."""
+    df = pd.DataFrame(rows)
+    out = {}
+    if df.empty or "kind" not in df:
+        return {"dif": {"gate_identity": False, "gate_size": False, "gate_omnibus": False},
+                "drf": {"gate_identity": False, "gate_size": False, "gate_omnibus": False}}
     nul = df[df.kind == "null"]
-    for t in ("dif", "drf"):
-        if f"{t}_rej" not in nul: continue
-        ok = nul[nul[f"{t}_rej"].notna()]
-        rej = float(ok[f"{t}_rej"].sum() / ok[f"{t}_n"].sum()); fw = float(ok[f"{t}_flag_any"].mean()); om = float(ok[f"{t}_om_rej"].mean())
-        ident = max(max(v.values()) for v in ok[f"{t}_identity"])
-        out[t] = dict(replications=int(len(ok)), errors=int(nul[f"{t}_rej"].isna().sum()), per_test_size=rej, familywise_flag_rate=fw,
-                      omnibus_size=om, identity_max_diff=float(ident),
-                      gate_identity=bool(ident <= 1e-8), gate_size=bool(.025 <= rej <= .075 and fw <= .10),
-                      gate_omnibus=bool(.025 <= om <= .075))
     pw = df[df.kind == "power"]
-    if len(pw): out["dif"]["power_k3_flagged"] = float(pw.k3_flagged.mean()); out["dif"]["power_replications"] = int(len(pw))
+    for t in ("dif", "drf"):
+        col = f"{t}_rej"
+        complete = (len(nul) == expected_null and nul.rep.nunique() == expected_null
+                    and col in nul and f"{t}_n" in nul
+                    and f"{t}_flag_any" in nul and f"{t}_om_rej" in nul
+                    and f"{t}_identity" in nul)
+        ok = nul[nul[col].notna()] if col in nul else nul.iloc[:0]
+        errors = int(len(nul) - len(ok))
+        valid = bool(complete and errors == 0 and
+                     pd.to_numeric(ok[f"{t}_n"], errors="coerce").gt(0).all() and
+                     ok[f"{t}_om_rej"].notna().all() and
+                     ok[f"{t}_flag_any"].notna().all())
+        ident = float("nan")
+        if valid:
+            try:
+                values = [float(v) for row in ok[f"{t}_identity"] for v in row.values()]
+                valid = bool(len(values) == 3 * len(ok) and np.isfinite(values).all())
+                if valid:
+                    ident = max(values)
+            except (TypeError, ValueError, AttributeError):
+                valid = False
+        rej = float(ok[col].sum() / ok[f"{t}_n"].sum()) if valid else float("nan")
+        fw = float(ok[f"{t}_flag_any"].mean()) if valid else float("nan")
+        om = float(ok[f"{t}_om_rej"].mean()) if valid else float("nan")
+        out[t] = dict(replications=int(len(ok)), expected_replications=int(expected_null),
+                      errors=errors, complete=valid,
+                      per_test_size=rej, familywise_flag_rate=fw, omnibus_size=om,
+                      identity_max_diff=ident,
+                      gate_identity=bool(valid and ident <= 1e-8),
+                      gate_size=bool(valid and .025 <= rej <= .075 and fw <= .10),
+                      gate_omnibus=bool(valid and .025 <= om <= .075))
+    power_complete = bool(len(pw) == expected_power and pw.rep.nunique() == expected_power
+                          and "k3_flagged" in pw and pw.k3_flagged.notna().all())
+    out["dif"]["power_k3_flagged"] = float(pw.k3_flagged.mean()) if power_complete else None
+    out["dif"]["power_replications"] = int(len(pw))
+    out["dif"]["power_complete"] = power_complete
     return out
 
 
@@ -81,7 +112,7 @@ if __name__ == "__main__":
     jobs = [("null", r) for r in range(a.null)] + [("power", r) for r in range(a.power)]
     with Pool(a.workers) as pool:
         rows = list(pool.imap_unordered(one, jobs))
-    res = summarise(rows)
+    res = summarise(rows, expected_null=a.null, expected_power=a.power)
     (H / "simulation_v15.json").write_text(json.dumps(dict(protocol="PROTOCOL.json amendment_2026_11_22b V15", seed=SEED, N=N,
                                                             null=a.null, power=a.power, results=res), indent=1) + "\n")
     print(json.dumps(res, indent=1))
