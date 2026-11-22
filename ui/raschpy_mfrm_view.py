@@ -138,14 +138,9 @@ def _results(saved, df, config, person, item, rater, score, model, show_ids):
                 saved["figs"] = RP.plots(res); saved["figs_full"] = True; saved.pop("docx", None); st.rerun()
     with tab[4]:
         for k in ("category_counts", "test"): _show(*tables[k], status_of(k))
-        st.markdown("**Model karşılaştırması ve grup testleri (isteğe bağlı)**")
-        st.caption("RaschPy tarafından raporlanır; bağımsız doğrulanmamıştır (NOT CERTIFIED).")
-        test = st.radio("Ölçüt", ["AIC", "BIC"], horizontal=True, key="rpm_ms_test")
-        if st.button("8 modeli karşılaştır", key="rpm_ms"):
-            try: saved["selection"] = RP.model_selection(res, test); saved.pop("docx", None)
-            except Exception as e: st.error(f"Model seçimi başarısız: {e}")
-        if saved.get("selection") is not None:
-            st.dataframe(saved["selection"].round(3), hide_index=True)
+        st.markdown("**Grup testleri: DIF ve DRF (isteğe bağlı)**")
+        st.caption(f"DIF: {BADGE.get(RP.status(model, 'dif'))}; DRF: {BADGE.get(RP.status(model, 'drf'))}. "
+                   "Model seçimi (AIC/BIC) sunulmaz: " + RP.UNSUPPORTED["model_selection_aic_bic"])
         cov = st.selectbox("Birey düzeyi grup değişkeni", ["—"] + [c for c in df.columns if c not in (person, item, rater, score)], key="rpm_cov")
         kind = st.radio("Test", ["drf", "dif"], horizontal=True, key="rpm_kind",
                         format_func={"drf": "DRF (puanlayıcı × grup)", "dif": "DIF (madde × grup)"}.get)
@@ -154,8 +149,11 @@ def _results(saved, df, config, person, item, rater, score, model, show_ids):
             except MFRMError as e: st.error(str(e))
         for kk, tabs in (saved.get("group") or {}).items():
             for name, t in tabs.items():
-                st.markdown(f"**{kk.upper()} — {name}**"); st.dataframe(t, hide_index=True)
-    extra = {"Model Karşılaştırması (AIC/BIC)": saved["selection"]} if saved.get("selection") is not None else {}
+                st.markdown(f"**{kk.upper()} — {name}**")
+                if not RP.group_part_validated(model, kk, name):
+                    st.caption("Bu tablo için bağımsız doğrulama yoktur (NOT CERTIFIED); RaschPy çıktısı olarak betimsel yorumlayın.")
+                st.dataframe(t, hide_index=True)
+    extra = {}
     for kk, tabs in (saved.get("group") or {}).items():
         extra.update({f"{kk.upper()} {n}": t for n, t in tabs.items() if isinstance(t, pd.DataFrame)})
     with tab[5]:

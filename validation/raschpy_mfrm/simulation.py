@@ -15,7 +15,7 @@ MODELS = ("global", "items", "thresholds", "bivector", "matrix", "centrality", "
 FOCUS = ("bivector", "centrality", "bistretch")
 
 
-def simulate(design, N, rng):
+def simulate(design, N, rng, return_theta=False):
     """Null data from the global rating-scale MFRM (no rater x item / threshold / stretch effects)."""
     raters = DESIGNS[design]; names = list(raters); th = rng.standard_normal(N); rows = []
     for n in range(N):
@@ -25,7 +25,8 @@ def simulate(design, N, rng):
                 k = np.arange(4); ln = k * (th[n] - dl - raters[r]) - np.concatenate([[0], np.cumsum(TAU)])
                 p = np.exp(ln - ln.max()); p /= p.sum()
                 rows.append((f"S{n:04d}", i, r, int(rng.choice(4, p=p))))
-    return pd.DataFrame(rows, columns=["person", "item", "rater", "score"])
+    df = pd.DataFrame(rows, columns=["person", "item", "rater", "score"])
+    return (df, pd.Series(th, index=[f"S{n:04d}" for n in range(N)])) if return_theta else df
 
 
 def fit(d, model, se=True):

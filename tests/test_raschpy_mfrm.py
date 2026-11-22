@@ -41,7 +41,7 @@ def test_evidence_statuses_are_backed_by_gates():
         if not rec.ok.astype(bool).all(): assert s == "NOT CERTIFIED"
     disc = cmp[cmp.check == "V8_discrimination"].value; assert disc.min() > 1e-3     # the two configurations differ
     for m, v in EV["models"].items():
-        assert v["model_selection"]["status"] == "NOT CERTIFIED"
+        assert v["model_selection"]["status"] == "UNSUPPORTED" and not hasattr(RP, "model_selection")
         assert (v["se"]["status"] == "PARTIAL") == any(RP.se_reliable(m, g) for g in ("rater", "items", "thresholds"))
         assert v["test_stats"]["status"] in ("PARTIAL", "NOT CERTIFIED") and v["test_stats"]["max_diff"] <= 1e-6
     for m in RP.BOOT_MODELS:                                                        # V11 failed -> stays NOT CERTIFIED
@@ -63,11 +63,29 @@ def test_unsupported_features_are_declared_not_faked():
         RP.fit(pd.read_csv(EX / "balanced_3facet.csv"), "person_id", "item_id", "rater_id", "score", model="facets4")
 
 
-def test_bootstrap_category_stats_and_model_selection():
-    r = FIT("balanced_3facet", se_method="bootstrap", n_boot=30)
-    assert r["category_stats"] is not None and "Disordered" in r["category_stats"].columns
-    assert FIT("balanced_3facet")["category_stats"] is None              # sandwich: RaschPy category widths unavailable
-    ms = RP.model_selection(r, "AIC"); assert set(ms.Model) == set(RP.MODELS)
+def test_bootstrap_se_never_shown_as_validated_and_widths_derived():
+    r = FIT("balanced_3facet", se_method="bootstrap", n_boot=30); T = RP.tables(r)
+    assert "SE" not in T["Maddeler"] and "SE" not in T["Eşikler"] and not any("genişliği (bootstrap)" in k for k in T)
+    thr = dict((k, d) for k, _, d, _ in RP.academic_tables(r))["thresholds"]
+    tau = r["thresholds"]["Estimate"].to_numpy(float); w = thr["Kategori genişliği (τ_k − τ_k−1)"].to_numpy(float)
+    assert np.isnan(w[0]) and np.allclose(w[1:], np.diff(tau))
+    raschpy_w = r["category_stats"]["Estimate"].to_numpy(float)                        # RaschPy's own widths (rounded)
+    assert np.allclose(raschpy_w, np.round(np.diff(tau), 3), atol=1e-3)
+
+
+def test_category_coding_from_one_fails_with_clear_message():
+    d = pd.read_csv(EX / "balanced_3facet.csv"); d["score"] += 1
+    with pytest.raises(MFRMError, match="0'dan başlamasını"):
+        RP.fit(d, "person_id", "item_id", "rater_id", "score")
+
+
+def test_reliability_definitions_reported_separately():
+    r = FIT("balanced_3facet"); t = dict((k, d) for k, _, d, _ in RP.academic_tables(r))["test"]
+    rows = t.set_index("Yüzey")
+    assert {"Bireyler (RaschPy, gerçek SEM)", "Bireyler (Wright–Masters, model SEM)"} <= set(rows.index)
+    p = r["persons"]; ne = p.index[(p.Score > 0) & (p.Score < p["Max score"])]; m = r["_m"]   # unrounded values
+    th = m.persons_global[ne]; v = np.var(th); mse = (m.csem_vector_global[ne] ** 2).mean(); g = np.sqrt((v - mse) / mse)
+    assert abs(rows.loc["Bireyler (Wright–Masters, model SEM)", "Güvenirlik"] - g ** 2 / (1 + g ** 2)) < 1e-6
 
 
 def test_drf_with_person_covariate():
@@ -172,3 +190,30 @@ def test_academic_category_counts_no_duplicate_total():
     assert len(item_cols) == 4
     assert (table["Toplam"] == table[item_cols].sum(axis=1)).all()
     assert int(table["Toplam"].sum()) == 3600
+
+
+def test_exported_values_match_fitted_model_and_screen():
+    from docx import Document
+    r = FIT("unbalanced_linked", "items"); files = RP.exports(r, {}, figs={})
+    doc = Document(io.BytesIO(files["raschpy_mfrm_raporu.docx"])); t1 = doc.tables[0]
+    word = {row.cells[0].text: float(row.cells[1].text) for row in t1.rows[1:]}
+    assert word == {k: round(float(v), 3) for k, v in r["_m"].items_items.items()}         # Word = fitted (3 dp)
+    xl = pd.read_excel(io.BytesIO(files["raschpy_mfrm.xlsx"]), sheet_name="Maddeler").set_index("Öğe")
+    assert np.allclose(xl["Estimate"].to_numpy(float), r["items"]["Estimate"].to_numpy(float))
+    cc = pd.read_excel(io.BytesIO(files["raschpy_mfrm.xlsx"]), sheet_name="Kategori sıklıkları")
+    screen = dict((k, d) for k, _, d, _ in RP.academic_tables(r))["category_counts"]
+    assert int(screen["Toplam"].sum()) == len(r["_d"])                                       # every score counted once
+    cc = cc[cc["Öğe"].astype(str) != "Total"]                                                   # RaschPy's labelled total row
+    assert int(cc.select_dtypes("number").drop(columns=["Total", "Missing"], errors="ignore").to_numpy().sum()) == len(r["_d"])
+
+
+@pytest.mark.parametrize("model", list(RP.MODELS))
+def test_page_all_models_render_with_consistent_status(model):
+    from streamlit.testing.v1 import AppTest
+    at = AppTest.from_string("from ui.raschpy_mfrm_view import render\nrender()", default_timeout=180)
+    at.run(); at.button(key="rpm_load").click().run(); at.selectbox(key="rpm_model").set_value(model).run()
+    at.button(key="rpm_run").click().run(); assert not at.exception
+    metric = {m.label: m.value for m in at.metric}["Parametre durumu"]
+    assert metric == RP.status(model, "parameters")
+    assert any(w for w in at.warning if "NOT CERTIFIED" in w.value) == (metric == "NOT CERTIFIED")
+    assert not any("AIC" in b.label for b in at.button)

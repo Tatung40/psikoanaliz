@@ -73,8 +73,8 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "status": "CERTIFIED",
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -87,16 +87,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9587587587587587,
+      "persons": 4995,
+      "extreme_share": 0.001,
+      "mean_csem": 0.3976367062482538,
+      "mean_error_sd": 0.39369445042212603,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.959953947039095,
+      "persons": 19977,
+      "extreme_share": 0.00115,
+      "mean_csem": 0.39727536228696747,
+      "mean_error_sd": 0.39317227735741866,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9545088566827697,
+      "persons": 4968,
+      "extreme_share": 0.0064,
+      "mean_csem": 0.48566313069344147,
+      "mean_error_sd": 0.4772608260373731,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9618562934596392,
+      "persons": 19846,
+      "extreme_share": 0.0077,
+      "mean_csem": 0.48677288894389237,
+      "mean_error_sd": 0.47450882312474685,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "items": {
@@ -169,8 +210,8 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "status": "CERTIFIED",
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -183,16 +224,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.958958958958959,
+      "persons": 4995,
+      "extreme_share": 0.001,
+      "mean_csem": 0.3979916419374892,
+      "mean_error_sd": 0.3944000151421694,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.959953947039095,
+      "persons": 19977,
+      "extreme_share": 0.00115,
+      "mean_csem": 0.3973634348259043,
+      "mean_error_sd": 0.39335516100225854,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9545088566827697,
+      "persons": 4968,
+      "extreme_share": 0.0064,
+      "mean_csem": 0.4868214040164721,
+      "mean_error_sd": 0.47869945362701366,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9618059054721354,
+      "persons": 19846,
+      "extreme_share": 0.0077,
+      "mean_csem": 0.4871407761503054,
+      "mean_error_sd": 0.4751407751505667,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "thresholds": {
@@ -265,8 +347,8 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "status": "CERTIFIED",
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -279,16 +361,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9579579579579579,
+      "persons": 4995,
+      "extreme_share": 0.001,
+      "mean_csem": 0.3976791810401695,
+      "mean_error_sd": 0.39332366361131216,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.9594533713770836,
+      "persons": 19977,
+      "extreme_share": 0.00115,
+      "mean_csem": 0.3973181191418974,
+      "mean_error_sd": 0.3933382873414685,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9535024154589372,
+      "persons": 4968,
+      "extreme_share": 0.0064,
+      "mean_csem": 0.48594911628339243,
+      "mean_error_sd": 0.47935361149549793,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9613020255970977,
+      "persons": 19846,
+      "extreme_share": 0.0077,
+      "mean_csem": 0.48686935974867096,
+      "mean_error_sd": 0.47507012355340417,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "bivector": {
@@ -397,7 +520,7 @@
    },
    "category_stats": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -410,16 +533,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9581581581581582,
+      "persons": 4995,
+      "extreme_share": 0.001,
+      "mean_csem": 0.3981073459658278,
+      "mean_error_sd": 0.3941623639598929,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.9593532562446814,
+      "persons": 19977,
+      "extreme_share": 0.00115,
+      "mean_csem": 0.3974213240479644,
+      "mean_error_sd": 0.3935405184340587,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9528985507246377,
+      "persons": 4968,
+      "extreme_share": 0.0064,
+      "mean_csem": 0.48744072528039606,
+      "mean_error_sd": 0.48181769127851604,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9613524135846014,
+      "persons": 19846,
+      "extreme_share": 0.0077,
+      "mean_csem": 0.48728442771113645,
+      "mean_error_sd": 0.47579368242817593,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "matrix": {
@@ -492,8 +656,8 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "status": "CERTIFIED",
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -506,16 +670,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9577577577577577,
+      "persons": 4995,
+      "extreme_share": 0.001,
+      "mean_csem": 0.3985443584102263,
+      "mean_error_sd": 0.39513072977663843,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.959603544075687,
+      "persons": 19977,
+      "extreme_share": 0.00115,
+      "mean_csem": 0.3975516385124791,
+      "mean_error_sd": 0.39385470486777124,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9524959742351047,
+      "persons": 4968,
+      "extreme_share": 0.0064,
+      "mean_csem": 0.4879423835550078,
+      "mean_error_sd": 0.48297996695538126,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9610500856595787,
+      "persons": 19846,
+      "extreme_share": 0.0077,
+      "mean_csem": 0.48758177415949155,
+      "mean_error_sd": 0.47647266734619553,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "centrality": {
@@ -604,7 +809,7 @@
    },
    "category_stats": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -617,16 +822,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9588305967160593,
+      "persons": 24970,
+      "extreme_share": 0.0012,
+      "mean_csem": 0.397859134084007,
+      "mean_error_sd": 0.3946175928287825,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.9594582419892489,
+      "persons": 99897,
+      "extreme_share": 0.00103,
+      "mean_csem": 0.3972017858732887,
+      "mean_error_sd": 0.39280437480853114,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9604287556415216,
+      "persons": 24816,
+      "extreme_share": 0.00736,
+      "mean_csem": 0.48730079766829254,
+      "mean_error_sd": 0.48190781306175895,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.962333907542285,
+      "persons": 99267,
+      "extreme_share": 0.00733,
+      "mean_csem": 0.48676257828679065,
+      "mean_error_sd": 0.4738162895260303,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "pseudo_halo": {
@@ -699,8 +945,8 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "status": "CERTIFIED",
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -713,16 +959,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9596716059271125,
+      "persons": 24970,
+      "extreme_share": 0.0012,
+      "mean_csem": 0.397891421638054,
+      "mean_error_sd": 0.39463795458305695,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.959768561618467,
+      "persons": 99897,
+      "extreme_share": 0.00103,
+      "mean_csem": 0.39721561765954144,
+      "mean_error_sd": 0.39284030386354374,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9604690522243714,
+      "persons": 24816,
+      "extreme_share": 0.00736,
+      "mean_csem": 0.4874131853551956,
+      "mean_error_sd": 0.4800507954948784,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9627570088750541,
+      "persons": 99267,
+      "extreme_share": 0.00733,
+      "mean_csem": 0.4868034174428124,
+      "mean_error_sd": 0.4735463212960111,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   },
   "bistretch": {
@@ -832,7 +1119,7 @@
    },
    "category_stats": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy bootstrap category widths; no independent reference"
+    "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
     "status": "PARTIAL",
@@ -845,16 +1132,57 @@
     }
    },
    "model_selection": {
-    "status": "NOT CERTIFIED",
-    "basis": "AIC/BIC from the response log-likelihood at RCL estimates, which are not ML estimates; RaschPy-reported, unvalidated"
+    "status": "UNSUPPORTED",
+    "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy dif_test; no independent reference run"
+    "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+    "v15": null
    },
    "drf": {
     "status": "NOT CERTIFIED",
-    "basis": "RaschPy drf_test; no independent reference run"
+    "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
+    "v15": null
+   },
+   "person_csem": {
+    "status": "PARTIAL",
+    "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+    "v14": {
+     "dense:N250": {
+      "coverage": 0.9589907889467361,
+      "persons": 24970,
+      "extreme_share": 0.0012,
+      "mean_csem": 0.39797606937222335,
+      "mean_error_sd": 0.3948544015823357,
+      "gate": true
+     },
+     "dense:N1000": {
+      "coverage": 0.9595583450954484,
+      "persons": 99897,
+      "extreme_share": 0.00103,
+      "mean_csem": 0.39722709337461465,
+      "mean_error_sd": 0.39285512934907874,
+      "gate": true
+     },
+     "linked:N250": {
+      "coverage": 0.9596631205673759,
+      "persons": 24816,
+      "extreme_share": 0.00736,
+      "mean_csem": 0.487810042292686,
+      "mean_error_sd": 0.483038037913459,
+      "gate": true
+     },
+     "linked:N1000": {
+      "coverage": 0.9622734644947465,
+      "persons": 99267,
+      "extreme_share": 0.00733,
+      "mean_csem": 0.48689437876827013,
+      "mean_error_sd": 0.4740469307687477,
+      "gate": true
+     },
+     "all_cells_pass": true
+    }
    }
   }
  },
@@ -905,33 +1233,34 @@
  "unsupported": {
   "andersen_lr_test": "RaschPy 1.4.0 bu testi kendisi devre dışı bırakmıştır (NotImplementedError): RCL/PAIR bir olabilirlik kestiricisi olmadığından LR istatistiği geçersizdir.",
   "extra_facets": "RaschPy MFRM yalnız bir puanlayıcı yüzeyi destekler (veri: (Puanlayıcı, Birey) × madde); görev/oturum gibi ek yüzeyler kestirilemez.",
+  "model_selection_aic_bic": "AIC/BIC en çok olabilirlik kestirimi gerektirir; RaschPy'nin RCL kestirimleri yanıt olabilirliğini en büyüklemez, bu nedenle AIC/BIC karşılaştırması geçerli değildir ve sunulmaz.",
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.249,
-  "balanced_3facet:items": 0.257,
-  "balanced_3facet:thresholds": 0.208,
-  "balanced_3facet:bivector": 0.204,
-  "balanced_3facet:matrix": 0.395,
-  "balanced_3facet:centrality": 0.265,
-  "balanced_3facet:pseudo_halo": 0.229,
-  "balanced_3facet:bistretch": 0.223,
-  "unbalanced_linked:global": 0.233,
-  "unbalanced_linked:items": 0.27,
-  "unbalanced_linked:thresholds": 0.299,
-  "unbalanced_linked:bivector": 0.255,
-  "unbalanced_linked:matrix": 0.249,
-  "unbalanced_linked:centrality": 0.237,
-  "unbalanced_linked:pseudo_halo": 0.261,
-  "unbalanced_linked:bistretch": 0.276,
-  "interaction_bias:global": 0.324,
-  "interaction_bias:items": 0.23,
-  "interaction_bias:thresholds": 0.192,
-  "interaction_bias:bivector": 0.202,
-  "interaction_bias:matrix": 0.215,
-  "interaction_bias:centrality": 0.201,
-  "interaction_bias:pseudo_halo": 0.21,
-  "interaction_bias:bistretch": 0.243
+  "balanced_3facet:global": 0.234,
+  "balanced_3facet:items": 0.224,
+  "balanced_3facet:thresholds": 0.186,
+  "balanced_3facet:bivector": 0.158,
+  "balanced_3facet:matrix": 0.168,
+  "balanced_3facet:centrality": 0.331,
+  "balanced_3facet:pseudo_halo": 0.163,
+  "balanced_3facet:bistretch": 0.233,
+  "unbalanced_linked:global": 0.216,
+  "unbalanced_linked:items": 0.299,
+  "unbalanced_linked:thresholds": 0.201,
+  "unbalanced_linked:bivector": 0.207,
+  "unbalanced_linked:matrix": 0.239,
+  "unbalanced_linked:centrality": 0.256,
+  "unbalanced_linked:pseudo_halo": 0.27,
+  "unbalanced_linked:bistretch": 0.223,
+  "interaction_bias:global": 0.143,
+  "interaction_bias:items": 0.149,
+  "interaction_bias:thresholds": 0.142,
+  "interaction_bias:bivector": 0.149,
+  "interaction_bias:matrix": 0.182,
+  "interaction_bias:centrality": 0.167,
+  "interaction_bias:pseudo_halo": 0.206,
+  "interaction_bias:bistretch": 0.177
  },
  "recovery_diagnosis": {
   "bivector": {

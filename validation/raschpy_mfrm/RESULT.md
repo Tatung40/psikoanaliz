@@ -53,3 +53,16 @@ Reproduce: `PYTHONPATH=. python -m validation.raschpy_mfrm.compare --write` (~20
 * Held (no independent reference built): category widths (RaschPy bootstrap), model selection (AIC/BIC at non-ML RCL
   estimates), DIF/DRF → NOT CERTIFIED.
 * Statuses of the 5 CERTIFIED models unchanged; R/TAM untouched.
+
+## Amendment 2026-11-22b (V14–V16; preregistered before running)
+
+* **V14 person CSEM** (all 8 models, dense/linked, N 250/1000, 0 fit failures): WLE ± 1.96 CSEM coverage 0.952–0.963
+  in every cell → `person_csem` **PARTIAL** (null generating model only).
+* **V14b stretch λ SE** (centrality, pseudo_halo, bistretch; 100 replications per cell): pooled coverage 0.947–0.976,
+  SE/SD 0.99–1.14 → λ SE now shown.
+* **V15 DIF/DRF: NOT COMPLETED** — the simulation process was terminated with the cloud session before writing results;
+  no evidence → DIF/DRF remain **NOT CERTIFIED** (re-run: `PYTHONPATH=. python -m validation.raschpy_mfrm.simulation_v15`).
+* **V16**: AIC/BIC declared **UNSUPPORTED** (RCL does not maximise the response likelihood) and removed from the app.
+* Category widths: derived from thresholds (status follows parameters); RaschPy bootstrap width SE / 'Prop disordered'
+  hidden. Bootstrap-method SE are never shown as validated (coverage evidence covers sandwich SE only).
+* Reliability: RaschPy ('real' SEM) and Wright–Masters (model SEM) person reliability are now reported side by side.
