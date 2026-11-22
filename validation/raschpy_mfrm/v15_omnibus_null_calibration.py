@@ -10,23 +10,23 @@ from scipy.stats import chi2
 from validation.raschpy_mfrm.simulation_v15 import one, ALPHA
 
 def main():
-    jobs=[("null",r) for r in range(2000,2300)]
+    jobs=[("null",r) for r in range(3000,3600)]
     with Pool(2) as pool:
         rows=list(pool.imap_unordered(one,jobs))
     rows.sort(key=lambda x:x["rep"])
-    result={"design":"independent parametric null Monte Carlo; 60 calibration / 60 held-out", "replications":len(rows)}
+    result={"design":"independent parametric null Monte Carlo; 300 calibration / 300 held-out", "replications":len(rows)}
     for test in ("dif","drf"):
         values=np.array([r.get(test+"_om_lr",np.nan) for r in rows],dtype=float)
         dfs=np.array([r.get(test+"_om_df",np.nan) for r in rows],dtype=float)
         if not np.isfinite(values).all() or not np.isfinite(dfs).all() or len(set(dfs))!=1:
             result[test]={"status":"NOT CERTIFIED","error":"missing/nonfinite LR or inconsistent df"}
             continue
-        calibration,heldout=values[:150],values[150:]
+        calibration,heldout=values[:300],values[300:]
         cutoff=float(np.quantile(calibration,0.95,method="higher"))
         # Conservative rank p-value using independent calibration sample.
         p_emp=np.array([(1+np.sum(calibration>=v))/(len(calibration)+1) for v in heldout])
         p_chi=chi2.sf(heldout,dfs[0])
-        result[test]={"df":float(dfs[0]),"calibration_n":150,"heldout_n":150,
+        result[test]={"df":float(dfs[0]),"calibration_n":300,"heldout_n":300,
             "chi_square_size":float(np.mean(p_chi<ALPHA)),
             "empirical_size":float(np.mean(p_emp<ALPHA)),
             "empirical_95pct_cutoff":cutoff,
