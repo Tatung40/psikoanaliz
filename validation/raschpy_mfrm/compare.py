@@ -14,7 +14,10 @@ H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
 SIM = json.loads((H / "simulation.json").read_text())
 FIX = ("balanced_3facet", "unbalanced_linked", "interaction_bias"); RECOVERY = ("balanced_3facet", "unbalanced_linked")
 ID_TOL = {"V1_expected_score_max_diff": 1e-12, "V1b_stretch_reconstruction_max_diff": 1e-12, "V2_wle_max_diff": 1e-4, "V2b_csem_max_diff": 1e-4,
-          "V3_fit_max_diff": 1e-6}
+          "V3_fit_max_diff": 1e-6, "V13_separation_max_diff": 1e-6}
+
+
+WM = {}                                            # descriptive Wright-Masters model reliability (CSEM), per model/fixture
 
 
 def run(fx, model):
@@ -28,6 +31,8 @@ def rows_for(fx, model, res, truth):
     for k, v in res["identity"].items():
         if k in ID_TOL and v is not None:
             add(k.split("_")[0], k, v, 0., ID_TOL[k])
+    if "V13_model_reliability_wright_masters" in res["identity"]:
+        WM.setdefault(model, {})[fx] = res["identity"]["V13_model_reliability_wright_masters"]
     if "error" in res["identity"]:
         out.append(dict(fixture=fx, model=model, check="identity_error", key=res["identity"]["error"], ok=False))
     if fx not in RECOVERY:
@@ -69,6 +74,23 @@ def tam_differences():
             else: continue
             rows.append(dict(fixture=fx, model="global", check="V6", key=r.key, value=ours, reference=r.python_tam,
                              diff=abs(ours - r.python_tam), tol=None, ok=None))
+    return rows
+
+
+def bootstrap_recovery(truth, B=200):
+    """V11 (amendment_2026_11_22): fixture recovery of bivector/centrality/bistretch with person-cluster bootstrap SE."""
+    rows = []
+    for fx in RECOVERY:
+        for model in R.BOOT_MODELS:
+            res = run(fx, model); bt = R.cell_bootstrap(res, B=B, seed=20261118); t = truth[fx]["truth"]["raters"]
+            n_ok = int(bt["B (başarılı)"].iloc[0])
+            rows.append(dict(fixture=fx, model=model, check="V11_convergence", key="bootstrap refits succeeded", value=n_ok / B,
+                             reference=0.95, diff=None, tol=None, ok=bool(n_ok / B >= .95)))
+            for r in bt.itertuples():
+                key = r.Parametre; ref = 1.0 if key.startswith("omega") else t[key.split(":")[0].strip("()'").split("'")[0]]
+                tol = max(3 * r._3, .30)
+                rows.append(dict(fixture=fx, model=model, check="V11", key=key, value=r.Kestirim, reference=ref,
+                                 diff=abs(r.Kestirim - ref), tol=tol, ok=bool(abs(r.Kestirim - ref) <= tol), se_boot=r._3))
     return rows
 
 
@@ -152,6 +174,10 @@ def evidence(df, edges):
         s = df[df.model == model]; ident = s[s.check.isin(["V1", "V1b", "V2", "V2b", "V3", "identity_error"])]
         rec = s[s.check == ("V4" if model == "global" else "V5")]
         id_ok = bool(len(ident) and ident.ok.all()); rec_ok = bool(len(rec) and rec.ok.all() and set(rec.fixture) >= set(RECOVERY))
+        v11 = s[s.check.isin(["V11", "V11_convergence"])]
+        v11_ok = bool(len(v11) and v11.ok.all() and set(v11.fixture) >= set(RECOVERY))
+        if model in R.BOOT_MODELS and not rec_ok and v11_ok:               # amendment_2026_11_22: V11 supplies the missing SE
+            rec, rec_ok = s[s.check == "V11"], True
         v8 = s[s.check.isin(["V8_unregularised", "V8_default"])]
         v8_ok = bool(len(v8) == 2 * len(RECOVERY) and v8.ok.all())          # both configurations x both fixtures
         cert = id_ok and rec_ok and v8_ok
@@ -161,16 +187,20 @@ def evidence(df, edges):
         v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check.isin(["V2", "V2b"])].ok.all())
         v3 = bool(ident[ident.check == "V3"].ok.all())
         models[model] = {
-            "parameters": dict(status=part, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else "V5") +
+            "parameters": dict(status=part, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else
+                               "V11 (V5 with person-cluster bootstrap SE)" if model in R.BOOT_MODELS and v11_ok and len(rec) and rec.check.iloc[0] == "V11" else "V5") +
                                " on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation "
                                "(unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
                                v8_ok=v8_ok, v8_max_diff=float(v8["diff"].max()) if len(v8) else None,
                                recovery_max_diff=float(rec["diff"].max()) if len(rec) else None, recovery_failures=fail),
-            "se": dict(status="PARTIAL" if R.rater_se_reliable(model) else "NOT CERTIFIED",
-                       shown="rater-side sandwich SE only" if R.rater_se_reliable(model) else "hidden",
-                       basis="V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both "
-                             "designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-                       v9_ratio_range={dz: SIM["V9"][f"{model}:{dz}"]["sandwich_se_over_sd_range"] for dz in ("dense", "linked")}),
+            "se": dict(status="PARTIAL" if any(R.se_reliable(model, g) for g in ("rater", "items", "thresholds")) else "NOT CERTIFIED",
+                       shown=[g for g in ("rater", "items", "thresholds") if R.se_reliable(model, g)] or "hidden",
+                       basis="V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter "
+                             "group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under "
+                             "the null generating model only. Category-width SE: no evidence, hidden",
+                       v12={g: R.simulation_v12().get("results", {}).get(model, {}).get(g, {}).get("all_cells_pass")
+                            for g in ("rater", "items", "thresholds")},
+                       v12_convergence=R.simulation_v12().get("results", {}).get(model, {}).get("convergence")),
             "cell_bootstrap_se": dict(status="PARTIAL" if R.cell_bootstrap_validated(model) else "UNSUPPORTED",
                        basis="V10 person-cluster bootstrap (B=50), dense N=500, 30 replications: coverage and SE ratio gate"
                              if model in R.BOOT_MODELS else "not offered for this model", v10=SIM["V10"].get(model)),
@@ -184,7 +214,13 @@ def evidence(df, edges):
                                   basis="V1 expected scores (and V1b stretch substitution) from the documented log-numerator"),
             "category_counts": dict(status="PARTIAL", basis="descriptive counts; equal to the validated input frame"),
             "category_stats": dict(status="NOT CERTIFIED", basis="RaschPy bootstrap category widths; no independent reference"),
-            "test_stats": dict(status="NOT CERTIFIED", basis="RaschPy separation/reliability summaries; not independently recomputed"),
+            "test_stats": dict(status="PARTIAL" if bool(s[s.check == "V13"].ok.all()) and len(s[s.check == "V13"]) else "NOT CERTIFIED",
+                               basis="V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and "
+                                     "information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no "
+                                     "floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on "
+                                     "the item sandwich SE",
+                               max_diff=float(s[s.check == "V13"]["value"].max()) if len(s[s.check == "V13"]) else None,
+                               wright_masters_model_reliability=WM.get(model)),
             "model_selection": dict(status="NOT CERTIFIED", basis="AIC/BIC from the response log-likelihood at RCL estimates, which are "
                                     "not ML estimates; RaschPy-reported, unvalidated"),
             "dif": dict(status="NOT CERTIFIED", basis="RaschPy dif_test; no independent reference run"),
@@ -199,7 +235,7 @@ if __name__ == "__main__":
     for fx in FIX:
         for model in R.MODELS:
             res = run(fx, model); rows += rows_for(fx, model, res, truth); timing[f"{fx}:{model}"] = round(res["seconds"], 3)
-    rows += tam_differences() + interaction_descriptive() + independent_estimator()
+    rows += tam_differences() + interaction_descriptive() + independent_estimator() + bootstrap_recovery(truth)
     df = pd.DataFrame(rows); edges = edge_cases(); ev = evidence(df, edges)
     print(df[df.ok.notna()].groupby(["model", "check"]).agg(n=("ok", "size"), ok=("ok", "all"), max_diff=("diff", "max")).to_string())
     print(df[df.ok == False].to_string() if (df.ok == False).any() else "no gate failures")
