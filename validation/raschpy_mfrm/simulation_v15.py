@@ -2,6 +2,7 @@
 PYTHONPATH=. python -m validation.raschpy_mfrm.simulation_v15 [--null 60] [--power 30] [--workers 1]   -> simulation_v15.json
 """
 import argparse, json, warnings
+from pathlib import Path
 from multiprocessing import Pool
 
 import numpy as np
@@ -106,13 +107,49 @@ def summarise(rows, expected_null=60, expected_power=30):
     return out
 
 
+def run_checkpointed(null=60, power=30, workers=1, checkpoint=None):
+    """Resume deterministic replications; preserve evidence across runner shutdowns."""
+    path = Path(checkpoint) if checkpoint else H / "simulation_v15_checkpoint.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    jobs = [("null", r) for r in range(null)] + [("power", r) for r in range(power)]
+    required = set(jobs)
+    done = {}
+    if path.exists():
+        for line in path.read_text().splitlines():
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            key = (row["kind"], int(row["rep"]))
+            if key in required:
+                done[key] = row
+    pending = [job for job in jobs if job not in done]
+    with path.open("a") as stream:
+        if pending:
+            with Pool(workers) as pool:
+                for row in pool.imap_unordered(one, pending):
+                    key = (row["kind"], int(row["rep"]))
+                    done[key] = row
+                    stream.write(json.dumps(row, allow_nan=False) + "\\n")
+                    stream.flush()
+                    print(f"V15 {len(done)}/{len(jobs)}", flush=True)
+    rows = [done[job] for job in jobs]
+    res = summarise(rows, expected_null=null, expected_power=power)
+    output = H / "simulation_v15.json"
+    payload = dict(protocol="PROTOCOL.json amendment_2026_11_22b V15",
+                   seed=SEED, N=N, null=null, power=power, results=res)
+    tmp = output.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(payload, indent=1, allow_nan=True) + "\\n")
+    tmp.replace(output)
+    return res
+
+
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(); ap.add_argument("--null", type=int, default=60); ap.add_argument("--power", type=int, default=30)
-    ap.add_argument("--workers", type=int, default=1); a = ap.parse_args()
-    jobs = [("null", r) for r in range(a.null)] + [("power", r) for r in range(a.power)]
-    with Pool(a.workers) as pool:
-        rows = list(pool.imap_unordered(one, jobs))
-    res = summarise(rows, expected_null=a.null, expected_power=a.power)
-    (H / "simulation_v15.json").write_text(json.dumps(dict(protocol="PROTOCOL.json amendment_2026_11_22b V15", seed=SEED, N=N,
-                                                            null=a.null, power=a.power, results=res), indent=1) + "\n")
-    print(json.dumps(res, indent=1))
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--null", type=int, default=60)
+    ap.add_argument("--power", type=int, default=30)
+    ap.add_argument("--workers", type=int, default=1)
+    ap.add_argument("--checkpoint", default=None)
+    a = ap.parse_args()
+    if a.null < 1 or a.power < 1 or a.workers < 1:
+        ap.error("null, power and workers must be positive")
+    print(json.dumps(run_checkpointed(a.null, a.power, a.workers, a.checkpoint), indent=1))
