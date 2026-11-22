@@ -153,3 +153,16 @@ def test_tam_engine_files_untouched():
                           "validation/mfrm"], cwd=ROOT, capture_output=True, text=True)
     if out.returncode: pytest.skip("git history unavailable")
     assert out.stdout.strip() == ""
+
+
+def test_academic_category_counts_no_duplicate_total():
+    """A RaschPy Total row must not be counted again in the report."""
+    res = FIT("balanced_3facet")
+    table = next(t for key, _, t, _ in RP.academic_tables(res, max_persons=15) if key == "category_counts")
+    assert "Total" not in table.columns
+    assert "Missing" not in table.columns
+    assert "Toplam" in table.columns
+    item_cols = [c for c in table.columns if c not in ("Kategori", "Toplam")]
+    assert len(item_cols) == 4
+    assert (table["Toplam"] == table[item_cols].sum(axis=1)).all()
+    assert int(table["Toplam"].sum()) == 3600

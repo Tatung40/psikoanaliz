@@ -527,7 +527,11 @@ def academic_tables(res, show_ids=False, max_persons=None):
                 ("" if max_persons is None or len(pt) <= max_persons else
                  f" Raporda ilk {max_persons} birey gösterilmiştir; {len(pt)} bireyin tam tablosu Excel/CSV dosyasındadır.")))
     cc = res["category_counts"].copy(); cats = [c for c in cc.columns if c not in ("Total", "Missing")]
-    cc = cc[cats].T; cc.index = [f"Kategori {c}" for c in cc.index]; cc["Toplam"] = cc.sum(axis=1)
+    cc = cc[cats].T
+    # RaschPy may include a precomputed Total row; never sum it again.
+    cc = cc.drop(columns=["Total", "Missing"], errors="ignore")
+    cc.index = [f"Kategori {c}" for c in cc.index]
+    cc["Toplam"] = cc.sum(axis=1)
     cc = cc.reset_index().rename(columns={"index": "Kategori"})
     out.append(("category_counts", "Kategori Sıklıkları", cc,
                 "Her kategorinin madde bazında gözlenen sıklığıdır (betimsel). "
