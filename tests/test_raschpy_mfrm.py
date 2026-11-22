@@ -20,7 +20,7 @@ def test_all_models_fit_and_pass_independent_identities(model):
     r = FIT("unbalanced_linked", model); i = r["identity"]
     assert "error" not in i and r["seconds"] < 10
     assert i["V1_expected_score_max_diff"] <= 1e-12 and i["V2_wle_max_diff"] <= 1e-4 and i["V3_fit_max_diff"] <= 1e-6
-    assert i["V2b_csem_max_diff"] <= 1e-4
+    assert i["V2b_csem_max_diff"] <= 1e-4 and i["V13_separation_max_diff"] <= 1e-6
     if model in RP.STRETCH: assert i["V1b_stretch_reconstruction_max_diff"] <= 1e-12
     assert {"Estimate", "SE"} <= set(r["items"].columns) and len(r["rater_params"])
 
@@ -42,7 +42,11 @@ def test_evidence_statuses_are_backed_by_gates():
     disc = cmp[cmp.check == "V8_discrimination"].value; assert disc.min() > 1e-3     # the two configurations differ
     for m, v in EV["models"].items():
         assert v["model_selection"]["status"] == "NOT CERTIFIED"
-        assert (v["se"]["status"] == "PARTIAL") == RP.rater_se_reliable(m)
+        assert (v["se"]["status"] == "PARTIAL") == any(RP.se_reliable(m, g) for g in ("rater", "items", "thresholds"))
+        assert v["test_stats"]["status"] in ("PARTIAL", "NOT CERTIFIED") and v["test_stats"]["max_diff"] <= 1e-6
+    for m in RP.BOOT_MODELS:                                                        # V11 failed -> stays NOT CERTIFIED
+        v11 = cmp[(cmp.model == m) & (cmp.check == "V11")]
+        assert len(v11) and (not v11.ok.astype(bool).all()) and EV["models"][m]["parameters"]["status"] == "NOT CERTIFIED"
     assert all(e["failed_closed"] for e in EV["edge_cases"] if e["case"] not in ("sparse_category", "missing_scores"))
 
 
@@ -74,11 +78,13 @@ def test_drf_with_person_covariate():
 
 def test_unreliable_uncertainty_is_hidden_and_cell_bootstrap_gated():
     r = FIT("balanced_3facet", "matrix"); T = RP.tables(r)
-    assert "SE" not in T["Maddeler"] and "SE" not in T["Eşikler"] and "SE" not in T["Puanlayıcı parametreleri"]
+    for name, g in (("Maddeler", "items"), ("Eşikler", "thresholds"), ("Puanlayıcı parametreleri", "rater")):
+        assert ("SE" in T[name]) == RP.se_reliable("matrix", g)                     # SE shown only with coverage evidence
     with pytest.raises(MFRMError): RP.cell_bootstrap(r, B=5)                         # not validated for matrix
     c = FIT("balanced_3facet", "centrality"); c["cell_bootstrap"] = RP.cell_bootstrap(c, B=10)
     b = RP.tables(c)["Puanlayıcı hücreleri (bootstrap SE/GA)"]
-    assert (b["%95 GA alt"] < b.Kestirim).all() and (b["Bootstrap SE"] > 0).all() and "SE" in RP.tables(c)["Puanlayıcı parametreleri"]
+    assert (b["%95 GA alt"] < b.Kestirim).all() and (b["Bootstrap SE"] > 0).all()
+    assert ("SE" in RP.tables(c)["Puanlayıcı parametreleri"]) == RP.se_reliable("centrality", "rater")
 
 
 def test_exports_complete_and_pseudonymous():
@@ -89,7 +95,7 @@ def test_exports_complete_and_pseudonymous():
     persons = pd.read_csv(io.BytesIO(files["Bireyler.csv"])); assert persons.iloc[0, 0].startswith("Kişi_")
     from docx import Document
     text = "\n".join(p.text for p in Document(io.BytesIO(files["raschpy_mfrm_raporu.docx"])).paragraphs)
-    assert "eşdeğer değildir" in text and "Madde, eşik ve kategori standart hataları" in text
+    assert "eşdeğer değildir" in text and "kategori standart hataları için kapsama kanıtı" in text.lower()
     assert len(zipfile.ZipFile(io.BytesIO(files["raschpy_mfrm.zip"])).namelist()) == len(files) - 1
 
 
@@ -113,7 +119,7 @@ def test_academic_word_report_is_clean_numbered_and_honest(model):
     assert "Uç puanlı" in text and "Eksik puanlar" in text and "GENERATED" in text
     status = RP.status(model, "parameters")
     assert (f"Bilimsel durum: {RP.STATUS_TR[status]}" in text) and (("parametreleri NOT CERTIFIED" in text) == (status == "NOT CERTIFIED"))
-    assert "SE" not in [c.text for c in doc.tables[0].rows[0].cells]                    # no SE without coverage evidence
+    assert ("SE" in [c.text for c in doc.tables[0].rows[0].cells]) == RP.se_reliable(model, "items")   # SE only with evidence
     assert not any(c.text in ("nan", "None") for t in doc.tables for row in t.rows for c in row.cells)
 
 

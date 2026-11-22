@@ -62,11 +62,29 @@ def simulation():
         return {}
 
 
-def rater_se_reliable(model):
-    """Rater-side sandwich SE are shown only if, in V9, SE / empirical SD stayed inside SE_BAND for every reported cell in
-    both designs. Item/threshold/category SE have no coverage evidence and are never shown."""
+def simulation_v12():
+    try:
+        return json.loads((ROOT / "validation/raschpy_mfrm/simulation_v12.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def se_reliable(model, group):
+    """Sandwich SE of a parameter group ('rater', 'items', 'thresholds') are shown only with coverage evidence: V12
+    (100 replications; pooled Wald coverage in [0.92, 0.98], each parameter >= 0.85, SE/SD in [0.80, 1.25], all four
+    design x N cells). Without V12, rater SE fall back to the V9 ratio rule and item/threshold SE are hidden.
+    Category-width SE are never shown."""
+    v12 = simulation_v12().get("results", {}).get(model, {}).get(group)
+    if v12 is not None:
+        return bool(v12.get("all_cells_pass"))
+    if group != "rater":
+        return False
     v = [simulation().get("V9", {}).get(f"{model}:{d}", {}).get("sandwich_se_over_sd_range") for d in ("dense", "linked")]
     return all(r is not None and SE_BAND[0] <= r[0] and r[1] <= SE_BAND[1] for r in v)
+
+
+def rater_se_reliable(model):
+    return se_reliable(model, "rater")
 
 
 def cell_bootstrap_validated(model):
@@ -230,6 +248,27 @@ def residual_fit_generic(c, y, theta, keys):
     g = f.groupby("key"); return pd.DataFrame({"infit": g.res2.sum() / g.W.sum(), "outfit": g.z2.mean()})
 
 
+def separation_check(m, model, d, c, y, wle, persons, nonext):
+    """V13: RaschPy's documented separation/strata/reliability recomputed from own WLE (non-extreme persons), own
+    residuals and information (RSEM = sqrt(sum res^2) / sum info, all persons) and RaschPy item estimates/SE."""
+    out = {}
+    if not hasattr(m, f"psi_{model}"):
+        return out
+    G = lambda x: (x, (4 * x + 1) / 3, x ** 2 / (1 + x ** 2))
+    it, ise = getattr(m, f"items_{model}"), getattr(m, f"item_se_{model}")
+    item = G(float((it.var() / (ise.reindex(it.index) ** 2).mean() - 1) ** .5))
+    theta = d.person.map(persons).to_numpy(float); ok = np.isfinite(theta)
+    _, E, V, _, _ = _moments(theta[ok], c[ok]); pid = d.person.to_numpy()[ok]
+    rsem = np.sqrt(pd.Series((y[ok] - E) ** 2).groupby(pid).sum()) / pd.Series(V).groupby(pid).sum()
+    th_ne = wle.dropna(); mr2 = float((rsem ** 2).mean())
+    person = G(float(((np.var(th_ne.to_numpy()) - mr2) / mr2) ** .5))
+    theirs = [getattr(m, f"{k}_{model}") for k in ("isi", "item_strata", "item_reliability", "psi", "person_strata", "person_reliability")]
+    out["V13_separation_max_diff"] = float(np.abs(np.array(item + person) - np.asarray(theirs, float)).max())
+    csem = 1 / np.sqrt(pd.Series(V).groupby(pid).sum()).reindex(th_ne.index)
+    v = np.var(th_ne.to_numpy()); out["V13_model_reliability_wright_masters"] = float((v - (csem ** 2).mean()) / v)
+    return out
+
+
 def identity_checks(m, model, d):
     """V1 (probabilities/expected scores), V1b (stretch substitution), V2 (WLE), V3 (fit) — independent code paths."""
     out = {}
@@ -261,6 +300,7 @@ def identity_checks(m, model, d):
                 theirs = getattr(m, f"{key}_{kind}_ms_{model}")
                 diffs.append(float(np.abs(mine[kind] - theirs.reindex(mine.index)).max()))
         out["V3_fit_max_diff"] = max(diffs)
+        out.update(separation_check(m, model, d, c, y, w, persons, nonext))
     except Exception as e:                                         # an identity that cannot be computed is reported, not passed
         out["error"] = f"{type(e).__name__}: {e}"
     return out
@@ -394,8 +434,9 @@ def tables(res, show_ids=False):
     if not show_ids:
         persons.index = [f"Kişi_{i + 1:04d}" for i in range(len(persons))]
     nose = lambda df: df.drop(columns=[c for c in df.columns if c == "SE" or (isinstance(c, tuple) and "SE" in c)])
-    rater_ok = rater_se_reliable(res["model"]); rp = res["rater_params"].set_index("Puanlayıcı")
-    t = {"Maddeler": nose(res["items"]), "Eşikler": nose(res["thresholds"]),
+    rater_ok = rater_se_reliable(res["model"]); rp = rater_params_shown(res).set_index("Puanlayıcı")
+    keep = lambda df, g: df if se_reliable(res["model"], g) else nose(df)
+    t = {"Maddeler": keep(res["items"], "items"), "Eşikler": keep(res["thresholds"], "thresholds"),
          "Puanlayıcılar": res["raters"] if rater_ok else nose(res["raters"]),
          "Puanlayıcı parametreleri": rp if rater_ok else rp.drop(columns="SE"), "Bireyler": persons,
          "Test özetleri": res["test"], "Kategori sıklıkları": res["category_counts"]}
@@ -454,6 +495,15 @@ def summary(res):
                 status=status(res["model"], "parameters"))
 
 
+def rater_params_shown(res):
+    """Rater-side parameters with SE only where V12 covered them: in the stretch models V12 covers the omegas, not
+    lambda, so lambda SE are blanked."""
+    rp = res["rater_params"].copy()
+    if res["model"] in STRETCH and "Parametre" in rp:
+        rp.loc[rp.Parametre == "lambda", "SE"] = np.nan
+    return rp
+
+
 def rater_fit(res):
     m, model = res["_m"], res["model"]
     return pd.DataFrame({"Infit MnSq": getattr(m, f"rater_infit_ms_{model}"), "Outfit MnSq": getattr(m, f"rater_outfit_ms_{model}")})
@@ -462,7 +512,8 @@ def rater_fit(res):
 def academic_tables(res, show_ids=False, max_persons=None):
     """Ordered (key, title, table, explanation) for the screen and the Word report; text uses computed values only."""
     model = res["model"]; out = []; it = res["items"]; th = res["thresholds"]; S = summary(res)
-    items = pd.DataFrame({"Madde": it.index, "Güçlük (logit)": it["Estimate"].to_numpy(float), "Gözlem": it["Count"].to_numpy(int),
+    items = pd.DataFrame({"Madde": it.index, "Güçlük (logit)": it["Estimate"].to_numpy(float),
+                          **({"SE": it["SE"].to_numpy(float)} if se_reliable(model, "items") else {}), "Gözlem": it["Count"].to_numpy(int),
                           "Ortalama puan / en yüksek puan": it["Facility"].to_numpy(float),
                           "Infit MnSq": it["Infit MS"].to_numpy(float), "Outfit MnSq": it["Outfit MS"].to_numpy(float)})
     hard, easy = it["Estimate"].idxmax(), it["Estimate"].idxmin()
@@ -473,6 +524,7 @@ def academic_tables(res, show_ids=False, max_persons=None):
                 f"kullanılan {FIT_BAND[0]}–{FIT_BAND[1]} aralığı dışında kalan madde sayısı: {misfit}."))
     tau = np.asarray(th["Estimate"], float)
     thr = pd.DataFrame({"Eşik": [f"{k - 1}→{k}" for k in range(1, len(tau) + 1)], "Konum (logit)": tau,
+                        **({"SE": th["SE"].to_numpy(float)} if se_reliable(model, "thresholds") else {}),
                         "Infit MnSq": th["Infit MS"].to_numpy(float), "Outfit MnSq": th["Outfit MS"].to_numpy(float)})
     ordered = bool(np.all(np.diff(tau) > 0))
     out.append(("thresholds", "Eşik Parametreleri", thr,
@@ -483,7 +535,7 @@ def academic_tables(res, show_ids=False, max_persons=None):
     lab = {"global": "Katılık λ (logit)"}.get(model, "Katılık λ (logit)" if model in STRETCH else "Ortalama katılık (λ hücre ort., logit)")
     raters = pd.DataFrame({"Puanlayıcı": loc.index, lab: loc.to_numpy(float), "Gözlem": n_obs.to_numpy(int),
                            "Infit MnSq": fit["Infit MnSq"].to_numpy(float), "Outfit MnSq": fit["Outfit MnSq"].to_numpy(float)})
-    if rater_se_reliable(model) and (model == "global" or model in STRETCH):
+    if rater_se_reliable(model) and model == "global":
         se = res["rater_params"]; se = se[se.Parametre.isin(["λ", "lambda"])].set_index("Puanlayıcı")["SE"]
         raters.insert(2, "SE", se.reindex(loc.index).to_numpy(float))
     sev, len_ = loc.idxmax(), loc.idxmin()
@@ -493,7 +545,7 @@ def academic_tables(res, show_ids=False, max_persons=None):
                 + ("" if model == "global" or model in STRETCH else " Bu modelde puanlayıcı başına tek katılık yoktur; sütun, "
                    "puanlayıcının madde/eşik hücrelerinin ortalamasıdır.")))
     if model != "global":
-        rp = res["rater_params"].copy()
+        rp = rater_params_shown(res)
         names = {"items": ["Madde"], "thresholds": ["Eşik"], "bivector": ["Madde", "Eşik"], "matrix": ["Madde", "Eşik"],
                  "bistretch": ["Madde", "Eşik"]}.get(model, [])
         rp = rp.rename(columns={f"Düzey{i}": n for i, n in enumerate(names)})
@@ -557,6 +609,15 @@ TABLE_STATUS = {"items": "parameters", "thresholds": "parameters", "raters": "pa
                 "category_counts": "category_counts", "test": "test_stats"}
 
 
+def other_se_text(model):
+    shown = [lab for g, lab in (("items", "madde"), ("thresholds", "eşik")) if se_reliable(model, g)]
+    hidden = [lab for g, lab in (("items", "Madde"), ("thresholds", "eşik")) if not se_reliable(model, g)]
+    out = (f"{' ve '.join(shown).capitalize()} standart hataları benzetimde güvenilir Wald kapsaması gösterdiği için "
+           "raporlanmıştır. ") if shown else ""
+    return out + (f"{', '.join(hidden)} ve kategori standart hataları için kapsama kanıtı bulunmadığından raporlanmamıştır."
+                  if hidden else "Kategori standart hataları için kapsama kanıtı bulunmadığından raporlanmamıştır.")
+
+
 def docx_report(res, figs, config=None, show_ids=False, extra_tables=None):
     """Academic Word report built only from computed values (no HTML, API calls or debug output)."""
     import io
@@ -611,8 +672,7 @@ def docx_report(res, figs, config=None, show_ids=False, extra_tables=None):
     para("Parametreler RaschPy MFRM.calibrate ile düzenlileştirilmiş ikili bileşik koşullu olabilirlik (RCL) yöntemiyle "
          "kestirilmiştir; bu yöntemde birey parametreleri koşullama ile elenir ve ridge cezası aşırı değerleri sıfıra doğru çeker. "
          "Birey ölçüleri Warm WLE ile kestirilmiştir. Bu kestirim TAM'ın marjinal en çok olabilirlik kestirimiyle eşdeğer değildir; "
-         f"iki motorun değerleri doğrudan karşılaştırılamaz. {se_text} Madde, eşik ve kategori standart hataları için kapsama kanıtı "
-         "bulunmadığından raporlanmamıştır.")
+         f"iki motorun değerleri doğrudan karşılaştırılamaz. {se_text} {other_se_text(model)}")
     doc.add_heading("3. Bulgular", 1)
     for key, title, df, note in academic_tables(res, show_ids, max_persons=15):
         table(title, df, note, key)
@@ -661,7 +721,7 @@ def fig_title(name):
         if stem.startswith(k + "_"): return f"{v} — {stem[len(k) + 1:]}"
     return stem
 IDENTITY_TOL = {"V1_expected_score_max_diff": 1e-12, "V1b_stretch_reconstruction_max_diff": 1e-12, "V2_wle_max_diff": 1e-4,
-                "V2b_csem_max_diff": 1e-4, "V3_fit_max_diff": 1e-6}
+                "V2b_csem_max_diff": 1e-4, "V3_fit_max_diff": 1e-6, "V13_separation_max_diff": 1e-6}
 
 
 def identity_ok(res):
@@ -672,7 +732,7 @@ def identity_ok(res):
 def identity_table(res):
     lab = {"V1_expected_score_max_diff": "Beklenen puan (bağımsız formül)", "V1b_stretch_reconstruction_max_diff": "Germe parametre yapısı",
            "V2_wle_max_diff": "Warm WLE (bağımsız çözüm)", "V2b_csem_max_diff": "CSEM (bağımsız bilgi fonksiyonu)",
-           "V3_fit_max_diff": "Infit/Outfit (bağımsız artıklar)"}
+           "V3_fit_max_diff": "Infit/Outfit (bağımsız artıklar)", "V13_separation_max_diff": "Ayırma, tabaka, güvenirlik (bağımsız)"}
     i = res["identity"]
     rows = [dict(Denetim=v, **{"En büyük fark": i[k], "Tolerans": IDENTITY_TOL[k], "Sonuç": "geçti" if i[k] <= IDENTITY_TOL[k] else "başarısız"})
             for k, v in lab.items() if i.get(k) is not None]

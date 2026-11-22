@@ -13,18 +13,21 @@
     "recovery_failures": []
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.988890851724628,
-      1.0390043070383224
-     ],
-     "linked": [
-      0.9338429015905678,
-      1.3181334255649497
-     ]
+    "status": "PARTIAL",
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -74,8 +77,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 8.737899293009832e-12,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8571401685580124,
+     "unbalanced_linked": 0.7813730291099615,
+     "interaction_bias": 0.8519833219681073
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -100,18 +109,21 @@
     "recovery_failures": []
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.8335981367455417,
-      1.2820835681314886
-     ],
-     "linked": [
-      0.8718019859723488,
-      1.2551270273112705
-     ]
+    "status": "PARTIAL",
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -161,8 +173,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 8.419043240337487e-12,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8577062250683449,
+     "unbalanced_linked": 0.7819179345036318,
+     "interaction_bias": 0.8569238582764167
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -187,18 +205,21 @@
     "recovery_failures": []
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.8803803717316651,
-      1.4307312048631557
-     ],
-     "linked": [
-      0.8595231845665173,
-      1.3154845979982732
-     ]
+    "status": "PARTIAL",
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -248,8 +269,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 1.1572520719482782e-11,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8568134051612779,
+     "unbalanced_linked": 0.7805702810213456,
+     "interaction_bias": 0.8536553842060124
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -303,12 +330,20 @@
     ]
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": null,
-     "linked": null
+    "status": "PARTIAL",
+    "shown": [
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": null,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -365,8 +400,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 2.0596857552845904e-12,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8575124584792057,
+     "unbalanced_linked": 0.7812938825020147,
+     "interaction_bias": 0.8580780062450559
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -391,18 +432,21 @@
     "recovery_failures": []
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.7786884950782088,
-      1.3186125561851982
-     ],
-     "linked": [
-      0.7780495341393764,
-      1.3857904486796542
-     ]
+    "status": "PARTIAL",
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -452,8 +496,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 4.622968674539152e-12,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8576641356637774,
+     "unbalanced_linked": 0.7809032974271297,
+     "interaction_bias": 0.8589097060499259
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -487,17 +537,20 @@
    },
    "se": {
     "status": "PARTIAL",
-    "shown": "rater-side sandwich SE only",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.8845049012550782,
-      1.1185154501432621
-     ],
-     "linked": [
-      0.8788151818444961,
-      1.1963487457174131
-     ]
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -554,8 +607,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 5.632827537738194e-12,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8568231137366726,
+     "unbalanced_linked": 0.7802705340831096,
+     "interaction_bias": 0.8530812449221344
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -580,18 +639,21 @@
     "recovery_failures": []
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.8877915817926443,
-      1.3206817139167242
-     ],
-     "linked": [
-      0.810553870212345,
-      1.309665773511529
-     ]
+    "status": "PARTIAL",
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -641,8 +703,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 1.48858703141741e-11,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8573081764889681,
+     "unbalanced_linked": 0.7817982945869296,
+     "interaction_bias": 0.8540994785804007
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -696,18 +764,21 @@
     ]
    },
    "se": {
-    "status": "NOT CERTIFIED",
-    "shown": "hidden",
-    "basis": "V9 Monte Carlo: rater-side sandwich SE / empirical SD inside [0.80, 1.25] for every cell in both designs -> shown (PARTIAL); otherwise hidden. Item, threshold and category SE: no coverage evidence, hidden",
-    "v9_ratio_range": {
-     "dense": [
-      0.843820384944333,
-      1.1429445051458038
-     ],
-     "linked": [
-      0.8595895757980414,
-      1.2716072650901535
-     ]
+    "status": "PARTIAL",
+    "shown": [
+     "rater",
+     "items",
+     "thresholds"
+    ],
+    "basis": "V12 (100 replications, dense/linked, N 250/1000): Wald 95% coverage and SE/SD gates per parameter group; a group's sandwich SE are shown only if all four cells pass. PARTIAL: simulation evidence under the null generating model only. Category-width SE: no evidence, hidden",
+    "v12": {
+     "rater": true,
+     "items": true,
+     "thresholds": true
+    },
+    "v12_convergence": {
+     "fit_failures": 0,
+     "fits": 400
     }
    },
    "cell_bootstrap_se": {
@@ -764,8 +835,14 @@
     "basis": "RaschPy bootstrap category widths; no independent reference"
    },
    "test_stats": {
-    "status": "NOT CERTIFIED",
-    "basis": "RaschPy separation/reliability summaries; not independently recomputed"
+    "status": "PARTIAL",
+    "basis": "V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no floor at 1, mean over all persons while the variance excludes extremes) and item rows depend on the item sandwich SE",
+    "max_diff": 7.736478124797941e-12,
+    "wright_masters_model_reliability": {
+     "balanced_3facet": 0.8570049202586159,
+     "unbalanced_linked": 0.7804501872058239,
+     "interaction_bias": 0.8545720410330842
+    }
    },
    "model_selection": {
     "status": "NOT CERTIFIED",
@@ -831,30 +908,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.178,
-  "balanced_3facet:items": 0.197,
-  "balanced_3facet:thresholds": 0.186,
-  "balanced_3facet:bivector": 0.181,
-  "balanced_3facet:matrix": 0.248,
-  "balanced_3facet:centrality": 0.193,
-  "balanced_3facet:pseudo_halo": 0.239,
-  "balanced_3facet:bistretch": 0.278,
-  "unbalanced_linked:global": 0.214,
-  "unbalanced_linked:items": 0.221,
-  "unbalanced_linked:thresholds": 0.215,
-  "unbalanced_linked:bivector": 0.245,
-  "unbalanced_linked:matrix": 0.232,
-  "unbalanced_linked:centrality": 0.236,
-  "unbalanced_linked:pseudo_halo": 0.247,
-  "unbalanced_linked:bistretch": 0.298,
-  "interaction_bias:global": 0.188,
-  "interaction_bias:items": 0.24,
-  "interaction_bias:thresholds": 0.176,
-  "interaction_bias:bivector": 0.188,
-  "interaction_bias:matrix": 0.18,
-  "interaction_bias:centrality": 0.191,
-  "interaction_bias:pseudo_halo": 0.208,
-  "interaction_bias:bistretch": 0.205
+  "balanced_3facet:global": 0.249,
+  "balanced_3facet:items": 0.257,
+  "balanced_3facet:thresholds": 0.208,
+  "balanced_3facet:bivector": 0.204,
+  "balanced_3facet:matrix": 0.395,
+  "balanced_3facet:centrality": 0.265,
+  "balanced_3facet:pseudo_halo": 0.229,
+  "balanced_3facet:bistretch": 0.223,
+  "unbalanced_linked:global": 0.233,
+  "unbalanced_linked:items": 0.27,
+  "unbalanced_linked:thresholds": 0.299,
+  "unbalanced_linked:bivector": 0.255,
+  "unbalanced_linked:matrix": 0.249,
+  "unbalanced_linked:centrality": 0.237,
+  "unbalanced_linked:pseudo_halo": 0.261,
+  "unbalanced_linked:bistretch": 0.276,
+  "interaction_bias:global": 0.324,
+  "interaction_bias:items": 0.23,
+  "interaction_bias:thresholds": 0.192,
+  "interaction_bias:bivector": 0.202,
+  "interaction_bias:matrix": 0.215,
+  "interaction_bias:centrality": 0.201,
+  "interaction_bias:pseudo_halo": 0.21,
+  "interaction_bias:bistretch": 0.243
  },
  "recovery_diagnosis": {
   "bivector": {

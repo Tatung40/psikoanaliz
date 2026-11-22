@@ -32,3 +32,24 @@ Reproduce: `PYTHONPATH=. python -m validation.raschpy_mfrm.compare --write` (~20
   NOT CERTIFIED; Andersen LR and >1 rater facet unsupported; TAM differences descriptive only (≤ 0.026 logit).
 * Remaining scientific limits: evidence covers the repository fixtures and the simulated conditions only (4 items, 4
   categories, ≤ 5 raters); V10 covers dense N=500 only; certification does not extend to other designs.
+
+## Amendment 2026-11-22 (V11–V13; preregistered in PROTOCOL.json before running)
+
+* **V13 separation / strata / reliability**: RaschPy's documented statistics recomputed from own WLE, residuals and
+  information for all 8 models × 3 fixtures: max 1.5e-11 (tolerance 1e-6) → `test_stats` NOT CERTIFIED → **PARTIAL**.
+  Caveat (descriptive): RaschPy's person RSEM is CSEM·√infit without a floor at 1 and is averaged over all persons while
+  the variance excludes extremes; the Wright–Masters model reliability (CSEM, same person set) is ≈ 0.01 lower
+  (e.g. 0.857 vs 0.868 on balanced_3facet).
+* **V12 SE coverage** (100 null replications, dense/linked, N 250/1000, 400 fits per model, 0 fit failures): every
+  model's sandwich SE groups pass (pooled Wald coverage 0.920–0.977, every parameter ≥ 0.85, SE/SD 0.80–1.20). Shown now:
+  rater, item and threshold SE for all models with RaschPy rater SE; for stretch models only ω SE (λ SE not covered,
+  blanked); bivector: item/threshold SE (RaschPy reports no per-cell rater SE; bootstrap SE/CI remains available).
+  `se` → **PARTIAL** for all 8 models (simulation evidence under the null generating model only).
+* **V11 fixture recovery with bootstrap SE (B = 200)**: bivector, centrality, bistretch still fail: rater P1's
+  first-threshold cells in `unbalanced_linked` (and one bivector cell in `balanced_3facet`) lie 3.1–3.4 bootstrap SE from
+  the generating value (|diff| 0.34–0.45). Combined with V9 (unbiased, consistent), this is a fixture-level sampling
+  excursion of strongly correlated threshold-level cells, but the preregistered gate is not met → parameters remain
+  **NOT CERTIFIED**.
+* Held (no independent reference built): category widths (RaschPy bootstrap), model selection (AIC/BIC at non-ML RCL
+  estimates), DIF/DRF → NOT CERTIFIED.
+* Statuses of the 5 CERTIFIED models unchanged; R/TAM untouched.
