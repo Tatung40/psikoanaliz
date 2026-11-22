@@ -1,12 +1,12 @@
 """Independent parametric-null Monte Carlo calibration of RaschPy V15 omnibus LR.
-150 calibration and 150 held-out null replications, disjoint deterministic seeds.
+300 calibration and 300 held-out null replications, disjoint deterministic seeds.
 Not a conditional bootstrap for a particular observed dataset.
 """
 import json
 from multiprocessing import Pool
 from pathlib import Path
 import numpy as np
-from scipy.stats import chi2
+from scipy.stats import chi2, binomtest
 from validation.raschpy_mfrm.simulation_v15 import one, ALPHA
 
 def main():
@@ -26,9 +26,20 @@ def main():
         # Conservative rank p-value using independent calibration sample.
         p_emp=np.array([(1+np.sum(calibration>=v))/(len(calibration)+1) for v in heldout])
         p_chi=chi2.sf(heldout,dfs[0])
+        n=len(heldout)
+        emp_k=int(np.sum(p_emp<ALPHA))
+        chi_k=int(np.sum(p_chi<ALPHA))
+        emp_ci=binomtest(emp_k,n).proportion_ci(method="exact")
+        chi_ci=binomtest(chi_k,n).proportion_ci(method="exact")
+        # Strict rank-p boundary: p=(1+#calibration LR >= observed LR)/(m+1)<alpha.
+        # Compute observed rejection directly; quantile cutoff is only descriptive.
+        rank_p_min=1/(len(calibration)+1)
         result[test]={"df":float(dfs[0]),"calibration_n":300,"heldout_n":300,
             "chi_square_size":float(np.mean(p_chi<ALPHA)),
+            "chi_square_rejections":chi_k,"chi_square_exact_95pct_ci":[chi_ci.low,chi_ci.high],
             "empirical_size":float(np.mean(p_emp<ALPHA)),
+            "empirical_rejections":emp_k,"empirical_exact_95pct_ci":[emp_ci.low,emp_ci.high],
+            "minimum_attainable_rank_p":rank_p_min,
             "empirical_95pct_cutoff":cutoff,
             "chi_square_95pct_cutoff":float(chi2.isf(ALPHA,dfs[0])),
             "heldout_lr":heldout.tolist(),
