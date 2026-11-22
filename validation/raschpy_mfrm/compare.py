@@ -12,6 +12,13 @@ from core.mfrm import MFRMError
 
 H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
 SIM = json.loads((H / "simulation.json").read_text())
+V15 = json.loads((H / "simulation_v15.json").read_text())["results"] if (H / "simulation_v15.json").exists() else {}
+
+
+def V15S(test, model):
+    """PARTIAL only for the global model (the configuration V15 tested) when identity and null-size gates pass."""
+    v = V15.get(test, {})
+    return "PARTIAL" if model == "global" and v.get("gate_identity") and v.get("gate_size") else "NOT CERTIFIED"
 FIX = ("balanced_3facet", "unbalanced_linked", "interaction_bias"); RECOVERY = ("balanced_3facet", "unbalanced_linked")
 ID_TOL = {"V1_expected_score_max_diff": 1e-12, "V1b_stretch_reconstruction_max_diff": 1e-12, "V2_wle_max_diff": 1e-4, "V2b_csem_max_diff": 1e-4,
           "V3_fit_max_diff": 1e-6, "V13_separation_max_diff": 1e-6}
@@ -213,7 +220,9 @@ def evidence(df, edges):
             "probabilities": dict(status=up(v1),
                                   basis="V1 expected scores (and V1b stretch substitution) from the documented log-numerator"),
             "category_counts": dict(status="PARTIAL", basis="descriptive counts; equal to the validated input frame"),
-            "category_stats": dict(status="NOT CERTIFIED", basis="RaschPy bootstrap category widths; no independent reference"),
+            "category_stats": dict(status=part, basis="widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived "
+                                   "quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' "
+                                   "not validated and not shown"),
             "test_stats": dict(status="PARTIAL" if bool(s[s.check == "V13"].ok.all()) and len(s[s.check == "V13"]) else "NOT CERTIFIED",
                                basis="V13: RaschPy's documented separation/strata/reliability recomputed from own WLE, residuals and "
                                      "information (<= 1e-6). PARTIAL at most: person rows use RaschPy's RSEM (sqrt(infit)-scaled, no "
@@ -221,10 +230,16 @@ def evidence(df, edges):
                                      "the item sandwich SE",
                                max_diff=float(s[s.check == "V13"]["value"].max()) if len(s[s.check == "V13"]) else None,
                                wright_masters_model_reliability=WM.get(model)),
-            "model_selection": dict(status="NOT CERTIFIED", basis="AIC/BIC from the response log-likelihood at RCL estimates, which are "
-                                    "not ML estimates; RaschPy-reported, unvalidated"),
-            "dif": dict(status="NOT CERTIFIED", basis="RaschPy dif_test; no independent reference run"),
-            "drf": dict(status="NOT CERTIFIED", basis="RaschPy drf_test; no independent reference run"),
+            "model_selection": dict(status="UNSUPPORTED", basis="AIC/BIC require a maximised likelihood; RCL estimates do not "
+                                    "maximise the response likelihood (V16). Removed from the app; no replacement"),
+            "dif": dict(status=V15S("dif", model), basis="V15: independent z/p/BH identity + empirical size under the null "
+                        "(global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
+                        v15=V15.get("dif")),
+            "drf": dict(status=V15S("drf", model), basis="V15: as DIF, rater x group; omnibus LR follows its own null gate",
+                        v15=V15.get("drf")),
+            "person_csem": dict(status="PARTIAL" if R.v14_pass(model, "csem") else "NOT CERTIFIED",
+                                basis="V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
+                                v14=R.simulation_v14().get("results", {}).get(model, {}).get("csem")),
         }
     return models
 

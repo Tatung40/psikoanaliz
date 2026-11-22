@@ -31,18 +31,21 @@ STRETCH = {"centrality": ("lambda", "omega"), "pseudo_halo": ("lambda", "omega")
            "bistretch": ("lambda", "omega_items", "omega_thresholds")}
 EQUATION = "log P(X=k) ∝ k·(θ_n − δ_i) − Σ_{j≤k} τ_j − [puanlayıcı terimi]"
 OUTPUT_LABELS = {
-    "parameters": "Madde, eşik ve puanlayıcı parametreleri", "se": "Puanlayıcı sandviç SE (yalnız benzetimde güvenilir modellerde)",
+    "parameters": "Madde, eşik ve puanlayıcı parametreleri", "se": "Sandviç SE (madde, eşik, puanlayıcı; kapsama kanıtı olan gruplar)",
     "cell_bootstrap_se": "Puanlayıcı hücreleri bootstrap SE / %95 GA",
     "persons": "Birey ölçüleri (Warm WLE) ve CSEM", "fit": "Infit/Outfit MnSq", "probabilities": "Kategori olasılıkları ve beklenen puan",
-    "category_counts": "Kategori sıklıkları (betimsel)", "category_stats": "Kategori genişliği (bootstrap)",
-    "test_stats": "Test düzeyi özetler (RaschPy)", "model_selection": "Model seçimi (AIC/BIC, RaschPy)",
-    "dif": "DIF (RaschPy dif_test)", "drf": "DRF — farklı puanlayıcı işlevi (RaschPy drf_test)",
+    "category_counts": "Kategori sıklıkları (betimsel)", "category_stats": "Kategori genişliği (eşik farkları)",
+    "test_stats": "Test düzeyi özetler (RaschPy)", "model_selection": "Model seçimi (AIC/BIC)",
+    "person_csem": "Birey CSEM aralık kapsaması", "dif": "DIF Wald tablosu (RaschPy dif_test)",
+    "drf": "DRF Wald tablosu — farklı puanlayıcı işlevi (RaschPy drf_test)",
 }
 UNSUPPORTED = {
     "andersen_lr_test": "RaschPy 1.4.0 bu testi kendisi devre dışı bırakmıştır (NotImplementedError): RCL/PAIR bir olabilirlik "
                         "kestiricisi olmadığından LR istatistiği geçersizdir.",
     "extra_facets": "RaschPy MFRM yalnız bir puanlayıcı yüzeyi destekler (veri: (Puanlayıcı, Birey) × madde); görev/oturum gibi "
                     "ek yüzeyler kestirilemez.",
+    "model_selection_aic_bic": "AIC/BIC en çok olabilirlik kestirimi gerektirir; RaschPy'nin RCL kestirimleri yanıt olabilirliğini "
+                               "en büyüklemez, bu nedenle AIC/BIC karşılaştırması geçerli değildir ve sunulmaz.",
     "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle "
                           "doğrudan kestirilir.",
 }
@@ -87,8 +90,34 @@ def rater_se_reliable(model):
     return se_reliable(model, "rater")
 
 
+def simulation_v14():
+    try:
+        return json.loads((ROOT / "validation/raschpy_mfrm/simulation_v14.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def v14_pass(model, key):
+    """V14: 'csem' (person CSEM coverage) or 'lambda' (stretch-model lambda SE coverage), all four design x N cells."""
+    return bool(simulation_v14().get("results", {}).get(model, {}).get(key, {}).get("all_cells_pass"))
+
+
+def se_shown(res, group):
+    """Coverage evidence (V12/V14b) exists for RaschPy's sandwich SE only; bootstrap SE are never shown as validated."""
+    return res.get("se_method", "sandwich") == "sandwich" and se_reliable(res["model"], group)
+
+
 def cell_bootstrap_validated(model):
     return model in BOOT_MODELS and bool(simulation().get("V10", {}).get(model, {}).get("gate"))
+
+
+def group_part_validated(model, test, part):
+    """V15 evidence for a DIF/DRF result table: 'tablo' (Wald) follows the dif/drf status; 'omnibus' needs its own null
+    gate; other tables (e.g. DRF thresholds) have no evidence."""
+    if part == "tablo":
+        return status(model, test) != "NOT CERTIFIED"
+    v = evidence().get("models", {}).get(model, {}).get(test, {}).get("v15") or {}
+    return part == "omnibus" and model == "global" and bool(v.get("gate_omnibus"))
 
 
 def status(model, output):
@@ -98,6 +127,10 @@ def status(model, output):
 # ---------------------------------------------------------------- data
 def to_wide(df, person, item, rater, score):
     """Validate with core.mfrm.prepare (duplicates, missing, categories, connectivity) and pivot to RaschPy layout."""
+    sc = pd.to_numeric(df[score], errors="coerce").dropna()
+    if len(sc) and sc.min() > 0 and float(sc.min()).is_integer():
+        raise MFRMError(f"Puanlar {int(sc.min())}'den başlıyor; RaschPy kategorilerin 0'dan başlamasını gerektirir. Örneğin 1–4 "
+                        f"kodlu puanlardan {int(sc.min())} çıkarın (yeniden kodlama araştırmacının kararıdır, otomatik yapılmaz).")
     d, report = prepare(df, person, item, rater, score)
     w = d.pivot(index=["rater", "person"], columns="item", values="score").astype(float)
     w.index.names = ["Rater", "Person"]; w.columns.name = None
@@ -265,7 +298,9 @@ def separation_check(m, model, d, c, y, wle, persons, nonext):
     theirs = [getattr(m, f"{k}_{model}") for k in ("isi", "item_strata", "item_reliability", "psi", "person_strata", "person_reliability")]
     out["V13_separation_max_diff"] = float(np.abs(np.array(item + person) - np.asarray(theirs, float)).max())
     csem = 1 / np.sqrt(pd.Series(V).groupby(pid).sum()).reindex(th_ne.index)
-    v = np.var(th_ne.to_numpy()); out["V13_model_reliability_wright_masters"] = float((v - (csem ** 2).mean()) / v)
+    v = np.var(th_ne.to_numpy()); mse = float((csem ** 2).mean()); out["V13_model_reliability_wright_masters"] = float((v - mse) / v)
+    g = float(np.sqrt(max(v - mse, 0) / mse)); out["V13_wm"] = dict(mean=float(th_ne.mean()), sd=float(th_ne.std()), separation=g,
+                                                                     strata=(4 * g + 1) / 3, reliability=g ** 2 / (1 + g ** 2))
     return out
 
 
@@ -342,13 +377,6 @@ def _cells(m, model):
 
 
 # ---------------------------------------------------------------- optional RaschPy analyses
-def model_selection(res, test="AIC"):
-    m = res["_m"]
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore"); m.model_selection(test=test, seed=res["seed"])
-    return getattr(m, f"model_comparison_mfrm_{test.lower()}_summary").reset_index()
-
-
 def group_test(res, df, person, covariate, kind="drf", n_boot=200):
     """DIF (person groups × items) or DRF (person groups × raters) with a person-level covariate column."""
     cov = df[[person, covariate]].dropna().astype({person: str}).drop_duplicates()
@@ -434,14 +462,12 @@ def tables(res, show_ids=False):
     if not show_ids:
         persons.index = [f"Kişi_{i + 1:04d}" for i in range(len(persons))]
     nose = lambda df: df.drop(columns=[c for c in df.columns if c == "SE" or (isinstance(c, tuple) and "SE" in c)])
-    rater_ok = rater_se_reliable(res["model"]); rp = rater_params_shown(res).set_index("Puanlayıcı")
-    keep = lambda df, g: df if se_reliable(res["model"], g) else nose(df)
+    rater_ok = se_shown(res, "rater"); rp = rater_params_shown(res).set_index("Puanlayıcı")
+    keep = lambda df, g: df if se_shown(res, g) else nose(df)
     t = {"Maddeler": keep(res["items"], "items"), "Eşikler": keep(res["thresholds"], "thresholds"),
          "Puanlayıcılar": res["raters"] if rater_ok else nose(res["raters"]),
          "Puanlayıcı parametreleri": rp if rater_ok else rp.drop(columns="SE"), "Bireyler": persons,
          "Test özetleri": res["test"], "Kategori sıklıkları": res["category_counts"]}
-    if res["category_stats"] is not None:
-        t["Kategori genişliği (bootstrap)"] = nose(res["category_stats"])
     if res.get("cell_bootstrap") is not None:
         t["Puanlayıcı hücreleri (bootstrap SE/GA)"] = res["cell_bootstrap"]
     flat = lambda v: v.set_axis([" | ".join(map(str, c)) if isinstance(c, tuple) else c for c in v.columns], axis=1)
@@ -496,10 +522,10 @@ def summary(res):
 
 
 def rater_params_shown(res):
-    """Rater-side parameters with SE only where V12 covered them: in the stretch models V12 covers the omegas, not
-    lambda, so lambda SE are blanked."""
+    """Rater-side parameters with SE only where coverage evidence exists: V12 covers the stretch omegas; lambda SE are
+    shown only if V14b passed."""
     rp = res["rater_params"].copy()
-    if res["model"] in STRETCH and "Parametre" in rp:
+    if res["model"] in STRETCH and "Parametre" in rp and not v14_pass(res["model"], "lambda"):
         rp.loc[rp.Parametre == "lambda", "SE"] = np.nan
     return rp
 
@@ -513,7 +539,7 @@ def academic_tables(res, show_ids=False, max_persons=None):
     """Ordered (key, title, table, explanation) for the screen and the Word report; text uses computed values only."""
     model = res["model"]; out = []; it = res["items"]; th = res["thresholds"]; S = summary(res)
     items = pd.DataFrame({"Madde": it.index, "Güçlük (logit)": it["Estimate"].to_numpy(float),
-                          **({"SE": it["SE"].to_numpy(float)} if se_reliable(model, "items") else {}), "Gözlem": it["Count"].to_numpy(int),
+                          **({"SE": it["SE"].to_numpy(float)} if se_shown(res, "items") else {}), "Gözlem": it["Count"].to_numpy(int),
                           "Ortalama puan / en yüksek puan": it["Facility"].to_numpy(float),
                           "Infit MnSq": it["Infit MS"].to_numpy(float), "Outfit MnSq": it["Outfit MS"].to_numpy(float)})
     hard, easy = it["Estimate"].idxmax(), it["Estimate"].idxmin()
@@ -524,18 +550,20 @@ def academic_tables(res, show_ids=False, max_persons=None):
                 f"kullanılan {FIT_BAND[0]}–{FIT_BAND[1]} aralığı dışında kalan madde sayısı: {misfit}."))
     tau = np.asarray(th["Estimate"], float)
     thr = pd.DataFrame({"Eşik": [f"{k - 1}→{k}" for k in range(1, len(tau) + 1)], "Konum (logit)": tau,
-                        **({"SE": th["SE"].to_numpy(float)} if se_reliable(model, "thresholds") else {}),
+                        **({"SE": th["SE"].to_numpy(float)} if se_shown(res, "thresholds") else {}),
+                        "Kategori genişliği (τ_k − τ_k−1)": np.concatenate([[np.nan], np.diff(tau)]),
                         "Infit MnSq": th["Infit MS"].to_numpy(float), "Outfit MnSq": th["Outfit MS"].to_numpy(float)})
     ordered = bool(np.all(np.diff(tau) > 0))
     out.append(("thresholds", "Eşik Parametreleri", thr,
-                "Eşik, iki komşu kategorinin eşit olasılıkla seçildiği konumdur (Andrich eşiği). Kestirilen eşikler "
+                "Eşik, iki komşu kategorinin eşit olasılıkla seçildiği konumdur (Andrich eşiği). Kategori genişliği ardışık iki "
+                "eşiğin farkıdır; negatif genişlik sırasız eşik demektir. Kestirilen eşikler "
                 + ("artan sıradadır." if ordered else "artan sırada değildir (sırasız eşik); kategori işleyişi incelenmelidir.")))
     loc = rater_location(res); fit = rater_fit(res).reindex(loc.index)
     n_obs = res["_d"].groupby("rater").size().reindex(loc.index)
     lab = {"global": "Katılık λ (logit)"}.get(model, "Katılık λ (logit)" if model in STRETCH else "Ortalama katılık (λ hücre ort., logit)")
     raters = pd.DataFrame({"Puanlayıcı": loc.index, lab: loc.to_numpy(float), "Gözlem": n_obs.to_numpy(int),
                            "Infit MnSq": fit["Infit MnSq"].to_numpy(float), "Outfit MnSq": fit["Outfit MnSq"].to_numpy(float)})
-    if rater_se_reliable(model) and model == "global":
+    if se_shown(res, "rater") and model == "global":
         se = res["rater_params"]; se = se[se.Parametre.isin(["λ", "lambda"])].set_index("Puanlayıcı")["SE"]
         raters.insert(2, "SE", se.reindex(loc.index).to_numpy(float))
     sev, len_ = loc.idxmax(), loc.idxmin()
@@ -552,7 +580,7 @@ def academic_tables(res, show_ids=False, max_persons=None):
         if "Parametre" in rp:
             rp["Parametre"] = rp["Parametre"].map({"lambda": "λ (konum)", "omega": "ω (germe)", "omega_items": "ω madde (germe)",
                                                    "omega_thresholds": "ω eşik (germe)"}).fillna(rp["Parametre"])
-        if not rater_se_reliable(model): rp = rp.drop(columns="SE")
+        if not se_shown(res, "rater"): rp = rp.drop(columns="SE")
         out.append(("rater_params", "Modele Özgü Puanlayıcı Parametreleri", rp,
                     f"{MODELS[model][0]} modelinin puanlayıcı tarafı parametreleri (puanlayıcı terimi {MODELS[model][1]}). "
                     + ("ω = 1 germe olmadığını, ω < 1 sıkışmayı (merkeze yığılma), ω > 1 yayılmayı gösterir." if model in STRETCH else
@@ -568,7 +596,9 @@ def academic_tables(res, show_ids=False, max_persons=None):
                                                                                  p["CSEM"].mean())), str(S["extreme"])]})
     out.append(("persons_summary", "Birey Ölçüleri Özeti", ps,
                 "Birey ölçüleri Warm ağırlıklı olabilirlik (WLE) kestirimleridir; CSEM koşullu ölçme standart hatasıdır. "
-                f"Uç puanlı {S['extreme']} birey için RaschPy düzeltilmiş uç kestirim raporlar; bu değerler diğerlerinden daha belirsizdir."))
+                + ("CSEM ile kurulan %95 aralıkların kapsaması benzetimde doğrulanmıştır (uç olmayan bireyler). "
+                   if v14_pass(model, "csem") else "CSEM'in kapsaması bu model için doğrulanmamıştır; aralık olarak yorumlanmamalıdır. ")
+                + f"Uç puanlı {S['extreme']} birey için RaschPy düzeltilmiş uç kestirim raporlar; bu değerler diğerlerinden daha belirsizdir."))
     pt = p.copy()
     pt.index = pt.index if show_ids else [f"Kişi_{i + 1:04d}" for i in range(len(pt))]
     pt = pd.DataFrame({"Birey": pt.index, "Ölçü (logit)": pt["Estimate"].to_numpy(float), "CSEM": pt["CSEM"].to_numpy(float),
@@ -593,9 +623,15 @@ def academic_tables(res, show_ids=False, max_persons=None):
     t["Yüzey"] = t["Yüzey"].map({"Items": "Maddeler", "Persons": "Bireyler"}).fillna(t["Yüzey"])
     t = t.rename(columns={"Mean": "Ortalama", "SD": "SS", "Separation ratio": "Ayırma oranı", "Strata": "Tabaka",
                           "Reliability": "Güvenirlik"})
+    t["Yüzey"] = t["Yüzey"].replace({"Bireyler": "Bireyler (RaschPy, gerçek SEM)"})
+    wm = res["identity"].get("V13_wm")
+    if wm:
+        t.loc[len(t)] = ["Bireyler (Wright–Masters, model SEM)", wm["mean"], wm["sd"], wm["separation"], wm["strata"], wm["reliability"]]
     out.append(("test", "Ayırma ve Güvenirlik Özetleri", t,
-                "RaschPy tarafından raporlanan ayırma oranı, tabaka sayısı ve güvenirlik. Bu özetler bağımsız olarak yeniden "
-                "hesaplanmamıştır; yorumda bu sınırlılık dikkate alınmalıdır."))
+                "Ayırma oranı G, tabaka (4G+1)/3 ve güvenirlik G²/(1+G²) bağımsız olarak yeniden hesaplanmıştır. RaschPy birey "
+                "satırı uyumla ölçeklenmiş 'gerçek' SEM (CSEM·√infit, alt sınırsız; uç bireyler dahil ortalanır) kullanır; "
+                "Wright–Masters satırı uç olmayan bireylerde model SEM (CSEM) ile hesaplanan geleneksel model güvenirliğidir. "
+                "İki tanım aynı değildir; raporlamada hangisinin kullanıldığı belirtilmelidir."))
     return out
 
 
@@ -609,9 +645,9 @@ TABLE_STATUS = {"items": "parameters", "thresholds": "parameters", "raters": "pa
                 "category_counts": "category_counts", "test": "test_stats"}
 
 
-def other_se_text(model):
-    shown = [lab for g, lab in (("items", "madde"), ("thresholds", "eşik")) if se_reliable(model, g)]
-    hidden = [lab for g, lab in (("items", "Madde"), ("thresholds", "eşik")) if not se_reliable(model, g)]
+def other_se_text(res):
+    shown = [lab for g, lab in (("items", "madde"), ("thresholds", "eşik")) if se_shown(res, g)]
+    hidden = [lab for g, lab in (("items", "Madde"), ("thresholds", "eşik")) if not se_shown(res, g)]
     out = (f"{' ve '.join(shown).capitalize()} standart hataları benzetimde güvenilir Wald kapsaması gösterdiği için "
            "raporlanmıştır. ") if shown else ""
     return out + (f"{', '.join(hidden)} ve kategori standart hataları için kapsama kanıtı bulunmadığından raporlanmamıştır."
@@ -668,17 +704,21 @@ def docx_report(res, figs, config=None, show_ids=False, extra_tables=None):
     para(f"{EQUATION}. Puanlayıcı terimi: {MODELS[model][1]} ({S['model_label']}).")
     doc.add_heading("2.3 Kestirim", 2)
     se_text = ("Puanlayıcı standart hataları sandviç yöntemiyle hesaplanmış ve benzetimde güvenilir kapsama gösterdiği için raporlanmıştır."
-               if rater_se_reliable(model) else "Puanlayıcı standart hataları benzetimde güvenilir kapsama göstermediği için raporlanmamıştır.")
+               if se_shown(res, "rater") else "Puanlayıcı standart hataları için bu SE yönteminde kapsama kanıtı bulunmadığından raporlanmamıştır.")
     para("Parametreler RaschPy MFRM.calibrate ile düzenlileştirilmiş ikili bileşik koşullu olabilirlik (RCL) yöntemiyle "
          "kestirilmiştir; bu yöntemde birey parametreleri koşullama ile elenir ve ridge cezası aşırı değerleri sıfıra doğru çeker. "
          "Birey ölçüleri Warm WLE ile kestirilmiştir. Bu kestirim TAM'ın marjinal en çok olabilirlik kestirimiyle eşdeğer değildir; "
-         f"iki motorun değerleri doğrudan karşılaştırılamaz. {se_text} {other_se_text(model)}")
+         f"iki motorun değerleri doğrudan karşılaştırılamaz. {se_text} {other_se_text(res)}")
     doc.add_heading("3. Bulgular", 1)
     for key, title, df, note in academic_tables(res, show_ids, max_persons=15):
         table(title, df, note, key)
     for name, df in (extra_tables or {}).items():
         if isinstance(df, pd.DataFrame) and len(df):
-            table(name, df.head(30), "RaschPy tarafından raporlanmıştır; bağımsız olarak doğrulanmamıştır (NOT CERTIFIED).")
+            test, _, part = name.partition(" "); ok = group_part_validated(model, test.lower(), part)
+            table(name, df.head(30), "RaschPy tarafından raporlanmıştır; " + (
+                f"Wald z/p/BH değerleri bağımsız yeniden hesaplanmış ve boş hipotez altında I. tip hata oranı benzetimle "
+                f"denetlenmiştir ({STATUS_TR[status(model, test.lower())] if part == 'tablo' else 'PARTIAL'})." if ok else
+                "bağımsız olarak doğrulanmamıştır (NOT CERTIFIED)."))
     if figs:
         doc.add_heading("4. Şekiller", 1)
         for name, png in figs.items():
