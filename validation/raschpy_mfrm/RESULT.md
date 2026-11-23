@@ -156,3 +156,21 @@ rater × threshold, interaction or stretch effects (generator written independen
   property rather than a defect. Status follows the preregistered rule: PARTIAL.
 * V18, V4/V5/V11 outcomes remain recorded (`historical_rule_status`, `v18_status`).
 * Scope: the two designs, 4 items, 4 categories, the stated effect sizes.
+
+## V20 — matrix confirmatory precision study (preregistered; V19 gates, designs and effect sizes unchanged)
+
+5000 replications per (scenario, design) (1000 calibration / 4000 confirmatory), fresh seeds 20261127, single run,
+0 fit failures; matrix only (other models not re-simulated).
+
+| Scenario × design | max abs bias | worst cell (bias, MCSE, 95% CI) | coverage | family-wise | pass |
+|---|---|---|---|---|---|
+| null × balanced | 0.008 | tau1 | 0.947 | 0.944 | ✓ |
+| null × linked | 0.019 | tau1 (−0.019, 0.001, [−0.021, −0.017]) | 0.945 | 0.936 | ✓ |
+| nonzero × balanced | 0.012 | P1×K2×1 (−0.012, 0.003, [−0.018, −0.006]) | 0.948 | 0.946 | ✓ |
+| nonzero × linked | 0.025 | P2×K3×3 (+0.025, 0.004, [0.018, 0.032]) | 0.945 | 0.939 | ✓ |
+
+* V19's failing cell P5×K3×step 3 (nonzero × linked): bias **−0.012** (MCSE 0.005, 95% CI [−0.022, −0.002]) vs −0.052
+  (MCSE 0.014) in V19 → the V19 excess was predominantly Monte Carlo noise; a small systematic finite-sample bias
+  (≤ 0.025 logit in every cell, CIs excluding 0 for some cells) remains, well inside the unchanged 0.05 gate.
+* No estimator defect (V8 independent estimator agrees); no estimator change.
+* Status: matrix PARTIAL → **CERTIFIED** within the V19/V20 scope (two designs, 4 items, 4 categories, stated effect sizes).

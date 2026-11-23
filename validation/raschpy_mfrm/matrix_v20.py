@@ -28,6 +28,8 @@ def job(args):
 
 def bias_ci(df, key):
     g = df[(df.key == key) & (df.rep >= CAL)]; dev = g.est - g.truth
+    if g.empty:
+        return None                                                             # e.g. P5 does not exist in the balanced design
     m, se = float(dev.mean()), float(dev.std() / np.sqrt(len(dev)))
     return dict(key=key, bias=m, mcse=se, ci95=[m - 1.959964 * se, m + 1.959964 * se], n=int(len(dev)))
 

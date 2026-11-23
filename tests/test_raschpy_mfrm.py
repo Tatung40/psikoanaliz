@@ -252,7 +252,8 @@ def test_v20_matrix_complete_and_precise():
     for sc in ("null", "nonzero"):
         for d in ("balanced", "linked"):
             x = r["results"][sc][d]; assert x["fit_failures"] == 0 and x["confirmatory_replications"] == 4000
-            assert x["focus_cell"]["n"] == 4000 and x["focus_cell"]["mcse"] < .008
+            assert x["worst_cell"]["n"] == 4000 and x["worst_cell"]["mcse"] < .008
+            if d == "linked": assert x["focus_cell"]["n"] == 4000 and x["focus_cell"]["mcse"] < .008
             assert x["pass"] == all(x[k] for k in ("gate_bias", "gate_se_ratio", "gate_coverage", "gate_familywise"))
 
 
