@@ -308,6 +308,9 @@ if st.session_state.pop("_example_loaded_notice", False):
 begin_code_capture(selected_page, globals(), st.session_state.get("_repro_pages", {}).get(selected_page, st.session_state.get("_repro_history")),
                    tuple(st.session_state.get("_repro_pages", {}).values()))
 begin_academic_screen(selected_page, st.session_state.get('raw_df'), st.session_state.get('scored_df'), st.session_state.get('item_cols', ()))
+from ui.missing_advisor_view import banner as missing_banner, global_panel as missing_global_panel
+missing_banner()                    # applied missing-data method (original data kept, revertible)
+missing_global_panel(selected_page)  # deterministic advice for analyses fed by the shared item matrix
 
 
 def end_page_code_capture():
@@ -1679,13 +1682,18 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         diagnostics = pd.DataFrame({
             "Madde": candidate_columns,
             "Ortalama (p)": raw_irt.mean(axis=0).to_numpy(),
-            "Eksik / sayısal olmayan": raw_irt.isna().sum(axis=0).to_numpy(),
+            "Sayısal olmayan": 0,
             "0/1 dışında": (~raw_irt.isin([0, 1]) & raw_irt.notna()).sum(axis=0).to_numpy()
         })
+        # Missingness is not an item defect: such items stay in the matrix and go to the missing-data advisor
+        # (no silent item deletion); only non-numeric entries count as unsuitable here.
+        nonnumeric = target.loc[:, candidate_columns].notna() & raw_irt.isna()
+        diagnostics["Sayısal olmayan"] = nonnumeric.sum(axis=0).to_numpy()
+        diagnostics.insert(3, "Kayıp (boş hücre)", target.loc[:, candidate_columns].isna().sum(axis=0).to_numpy())
         problematic = diagnostics[
             (diagnostics["Ortalama (p)"] <= .01) |
             (diagnostics["Ortalama (p)"] >= .99) |
-            (diagnostics["Eksik / sayısal olmayan"] > 0) |
+            (diagnostics["Sayısal olmayan"] > 0) |
             (diagnostics["0/1 dışında"] > 0)
         ]["Madde"].tolist()
         if problematic:
@@ -1702,11 +1710,10 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     "örneklem düzeyini ve maddenin içeriğini kontrol edin. "
                     "0,01–0,99 aralığı burada kullanılan yazılım filtresidir; "
                     "evrensel madde silme kuralı değildir.\n\n"
-                    "**Eksik / sayısal olmayan:** Seçili bir sütunda boş hücre "
-                    "veya sayıya dönüştürülemeyen yanıt vardır. MTK modeli "
-                    "eksiksiz 0/1 matrisi bekler. **Öneri:** Veri Hazırlama'da "
-                    "eksik veri politikasını bilinçli biçimde seçin; ham A/B/C/D "
-                    "yanıtları için önce cevap anahtarıyla puanlama yapın.\n\n"
+                    "**Sayısal olmayan:** Sayıya dönüştürülemeyen yanıt "
+                    "(örneğin ham A/B/C/D) vardır. **Öneri:** önce cevap anahtarıyla "
+                    "puanlama yapın. Boş hücreler (kayıp yanıtlar) maddeyi dışlatmaz; "
+                    "kayıp veri danışmanı uygun yöntemi önerir.\n\n"
                     "**0/1 dışında:** Sayısal ama ikili olmayan değerler "
                     "(örneğin 2, 3, 4, 5) bulunuyor. **Öneri:** Likert verisine "
                     "ikili model uygulamayın; uygun veri türünü ve modelini "
@@ -1730,6 +1737,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
             st.info(f"MTK analizine {len(irt_columns)} madde alınacak; "
                     f"{len(problematic)} sütun dışarıda bırakılacak. "
                     "Asıl veri dosyanız değiştirilmez.")
+        from ui.missing_advisor_view import panel as missing_panel
+        missing_panel(selected_page, target, irt_columns, key="missing_advisor_irt")
         model = selected_page.replace("MTK: ", "")
         if model == "Karşılaştırma":
             st.subheader("📊 Model Karşılaştırması")
