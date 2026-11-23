@@ -217,3 +217,15 @@ def test_page_all_models_render_with_consistent_status(model):
     assert metric == RP.status(model, "parameters")
     assert any(w for w in at.warning if "NOT CERTIFIED" in w.value) == (metric == "NOT CERTIFIED")
     assert not any("AIC" in b.label for b in at.button)
+
+
+def test_global_bh_decision_and_uncalibrated_omnibus_label():
+    df = pd.read_csv(EX / "balanced_3facet.csv"); df["grup"] = np.where(df.person_id.str[-1].astype(int) % 2, "A", "B")
+    r = RP.fit(df, "person_id", "item_id", "rater_id", "score")
+    tabs = RP.group_test(r, df, "person_id", "grup", "dif")
+    g = tabs["global_bh"].iloc[0]; pmin = float(tabs["tablo"]["p (corrected)"].min())
+    assert g["En küçük BH-düzeltilmiş p"] == pmin and (g["Karar (α = 0.05)"] == "global boş hipotez reddedildi") == (pmin < .05)
+    v = EV["models"]["global"]["dif"]["v15"] or {}
+    assert RP.group_part_validated("global", "dif", "omnibus") == bool(v.get("gate_omnibus"))
+    assert RP.group_part_validated("global", "dif", "global_bh") == bool(v.get("gate_global_bh"))
+    assert not RP.group_part_validated("matrix", "dif", "global_bh")                     # scope: global model only

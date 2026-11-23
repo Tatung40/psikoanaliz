@@ -38,6 +38,7 @@ OUTPUT_LABELS = {
     "test_stats": "Test düzeyi özetler (RaschPy)", "model_selection": "Model seçimi (AIC/BIC)",
     "person_csem": "Birey CSEM aralık kapsaması", "dif": "DIF Wald tablosu (RaschPy dif_test)",
     "drf": "DRF Wald tablosu — farklı puanlayıcı işlevi (RaschPy drf_test)",
+    "dif_omnibus_lr": "DIF omnibus olabilirlik oranı (RaschPy)", "global_bh": "Global DIF/DRF kararı (Wald + BH)",
 }
 UNSUPPORTED = {
     "andersen_lr_test": "RaschPy 1.4.0 bu testi kendisi devre dışı bırakmıştır (NotImplementedError): RCL/PAIR bir olabilirlik "
@@ -112,11 +113,13 @@ def cell_bootstrap_validated(model):
 
 
 def group_part_validated(model, test, part):
-    """V15 evidence for a DIF/DRF result table: 'tablo' (Wald) follows the dif/drf status; 'omnibus' needs its own null
-    gate; other tables (e.g. DRF thresholds) have no evidence."""
+    """V15 evidence for a DIF/DRF result table: 'tablo' (Wald) follows the dif/drf status; 'omnibus' (RaschPy LR) and
+    'global_bh' (V15c Wald+BH global test) need their own null gates; other tables (DRF thresholds) have no evidence."""
     if part == "tablo":
         return status(model, test) != "NOT CERTIFIED"
     v = evidence().get("models", {}).get(model, {}).get(test, {}).get("v15") or {}
+    if part == "global_bh":
+        return model == "global" and bool(v.get("gate_global_bh"))
     return part == "omnibus" and model == "global" and bool(v.get("gate_omnibus"))
 
 
@@ -399,6 +402,10 @@ def group_test(res, df, person, covariate, kind="drf", n_boot=200):
     tabs = {"tablo": getattr(m, f"{kind}_table", None), "omnibus": getattr(m, f"{kind}_omnibus_table", None)}
     if kind == "drf":
         tabs["eşik"] = getattr(m, "drf_threshold_table", None)
+    if isinstance(tabs["tablo"], pd.DataFrame) and "p (corrected)" in tabs["tablo"]:     # V15c BH/Simes global test
+        pmin = float(tabs["tablo"]["p (corrected)"].min())
+        tabs["global_bh"] = pd.DataFrame([{"Test": f"{kind.upper()} global (Wald + BH)", "En küçük BH-düzeltilmiş p": pmin,
+                                           "Karar (α = 0.05)": "global boş hipotez reddedildi" if pmin < .05 else "reddedilmedi"}])
     return {k: (v.reset_index() if isinstance(v, pd.DataFrame) else v) for k, v in tabs.items() if v is not None}
 
 
