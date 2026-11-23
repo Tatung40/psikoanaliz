@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         design: [balanced, linked]
-        scenario: [null, nonzero]
+        scenario: ['null', 'nonzero']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
