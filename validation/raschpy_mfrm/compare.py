@@ -12,6 +12,7 @@ from core.mfrm import MFRMError
 
 H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
 SIM = json.loads((H / "simulation.json").read_text())
+V18 = json.loads((H / "familywise_v18.json").read_text())["results"] if (H / "familywise_v18.json").exists() else {}
 HOLD = json.loads((H / "holdout_v17.json").read_text())["results"] if (H / "holdout_v17.json").exists() else {}
 V15 = json.loads((H / "simulation_v15.json").read_text())["results"] if (H / "simulation_v15.json").exists() else {}
 
@@ -188,14 +189,22 @@ def evidence(df, edges):
             rec, rec_ok = s[s.check == "V11"], True
         v8 = s[s.check.isin(["V8_unregularised", "V8_default"])]
         v8_ok = bool(len(v8) == 2 * len(RECOVERY) and v8.ok.all())          # both configurations x both fixtures
-        cert = id_ok and rec_ok and v8_ok
-        part = "CERTIFIED" if cert else "PARTIAL" if id_ok and rec_ok else "NOT CERTIFIED"
-        up = lambda ok: "CERTIFIED" if cert and ok else "PARTIAL" if ok and rec_ok else "NOT CERTIFIED"
+        cert_hist = id_ok and rec_ok and v8_ok                              # historical rule (V1-V8), unchanged
+        hist_status = "CERTIFIED" if cert_hist else "PARTIAL" if id_ok and rec_ok else "NOT CERTIFIED"
+        v18 = V18.get(model) if V18 else None                                  # V18 prospective family-wise protocol
+        v18_pass = bool(v18 and v18.get("pass_both_designs"))
+        cert = bool(id_ok and v8_ok and v18_pass) if v18 is not None else cert_hist
+        rec_ok = rec_ok or (v18 is not None and v18_pass)                       # V18 recovery replaces fixture recovery prospectively
+        part = "CERTIFIED" if cert else "PARTIAL" if id_ok and (rec_ok or cert_hist) else "NOT CERTIFIED"
+        up = lambda ok: "CERTIFIED" if cert and ok else "PARTIAL" if ok and (rec_ok or cert_hist) else "NOT CERTIFIED"
         fail = rec[rec.ok == False][["fixture", "key", "value", "reference", "tol"]].to_dict("records")
         v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check.isin(["V2", "V2b"])].ok.all())
         v3 = bool(ident[ident.check == "V3"].ok.all())
         models[model] = {
-            "parameters": dict(status=part, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else
+            "parameters": dict(status=part, historical_rule_status=hist_status,
+                               v18=dict(pass_both_designs=v18_pass, **{d: {k: v18[d][k] for k in ("max_abs_bias", "se_ratio",
+                                        "pooled_coverage", "min_param_coverage", "familywise_recovery", "gate_bias", "gate_se_ratio",
+                                        "gate_coverage", "gate_familywise")} for d in ("balanced", "linked")}) if v18 else None, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else
                                "V11 (V5 with person-cluster bootstrap SE)" if model in R.BOOT_MODELS and v11_ok and len(rec) and rec.check.iloc[0] == "V11" else "V5") +
                                " on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation "
                                "(unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",

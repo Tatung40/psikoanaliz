@@ -1,0 +1,35 @@
+name: RaschPy V18 family-wise recovery
+# Re-runs the preregistered V18 protocol (8 models x 2 designs x 200 replications) and requires the committed
+# evidence (validation/raschpy_mfrm/familywise_v18.json) to be reproduced: same gate outcomes, numbers within 1e-6.
+on:
+  pull_request:
+    paths: ['validation/raschpy_mfrm/familywise_v18.*', 'validation/raschpy_mfrm/PROTOCOL.json', 'examples/mfrm/build.py', 'requirements.txt']
+  workflow_dispatch:
+jobs:
+  v18:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - run: pip install -q raschpy==1.4.0 pandas numpy scipy
+      - name: Reproduce V18
+        run: |
+          cp validation/raschpy_mfrm/familywise_v18.json /tmp/committed.json
+          PYTHONPATH=. python -m validation.raschpy_mfrm.familywise_v18 --reps 200 --workers 4
+          python - <<'PY'
+          import json, math
+          a = json.load(open('/tmp/committed.json'))['results']; b = json.load(open('validation/raschpy_mfrm/familywise_v18.json'))['results']
+          bad = []
+          def walk(x, y, path):
+              if isinstance(x, dict):
+                  for k in x: walk(x[k], y.get(k), f"{path}/{k}")
+              elif isinstance(x, list):
+                  for i, (p, q) in enumerate(zip(x, y)): walk(p, q, f"{path}[{i}]")
+              elif isinstance(x, float):
+                  if y is None or not math.isclose(x, y, abs_tol=1e-6): bad.append((path, x, y))
+              elif x != y: bad.append((path, x, y))
+          walk(a, b, '')
+          print('differences:', len(bad), bad[:10]); assert not bad
+          PY
