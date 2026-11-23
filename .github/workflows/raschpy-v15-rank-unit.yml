@@ -1,0 +1,19 @@
+name: RaschPy V15 rank calibration unit
+on:
+  push:
+    branches: [validation/v15-omnibus-null-calibration]
+    paths:
+      - 'validation/raschpy_mfrm/test_v15_rank_calibration.py'
+      - '.github/workflows/raschpy-v15-rank-unit.yml'
+  workflow_dispatch:
+jobs:
+  rank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install numpy
+      - run: python -m unittest validation/raschpy_mfrm/test_v15_rank_calibration.py -v

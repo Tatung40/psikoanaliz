@@ -53,9 +53,12 @@ def one(args):
                 row[f"{test}_error"] = str(e)[:80]; continue
             tab, om = t["tablo"], t.get("omnibus")
             row[f"{test}_rej"] = int((tab.p < ALPHA).sum()); row[f"{test}_n"] = int(len(tab))
-            row[f"{test}_flag_any"] = bool(tab.Flagged.any()); row[f"{test}_om_rej"] = bool((om.p < ALPHA).any()) if om is not None else None
+            row[f"{test}_flag_any"] = bool(tab.Flagged.any()); row[f"{test}_bh_any"] = bool((tab["p (corrected)"] < ALPHA).any()); row[f"{test}_om_rej"] = bool((om.p < ALPHA).any()) if om is not None else None
+            row[f"{test}_om_lr"] = float(om.LR.iloc[0]) if om is not None and len(om) == 1 else None
+            row[f"{test}_om_df"] = float(om.df.iloc[0]) if om is not None and len(om) == 1 else None
             row[f"{test}_identity"] = identity(tab)
-            if kind == "power": row["k3_flagged"] = bool(tab[tab.Item == "K3"].Flagged.any())
+            if kind == "power":
+                row["k3_flagged"] = bool(tab[tab.Item == "K3"].Flagged.any()); row["dif_power_bh_any"] = row["dif_bh_any"]
     return row
 
 
@@ -99,11 +102,19 @@ def summarise(rows, expected_null=60, expected_power=30):
                       gate_identity=bool(valid and ident <= 1e-8),
                       gate_size=bool(valid and .025 <= rej <= .075 and fw <= .10),
                       gate_omnibus=bool(valid and .025 <= om <= .075))
+        if valid and f"{t}_bh_any" in ok and ok[f"{t}_bh_any"].notna().all():          # V15c (amendment_2026_11_23)
+            out[t]["global_bh_size"] = float(ok[f"{t}_bh_any"].mean())
+            out[t]["gate_global_bh"] = bool(out[t]["global_bh_size"] <= .075)
     power_complete = bool(len(pw) == expected_power and pw.rep.nunique() == expected_power
                           and "k3_flagged" in pw and pw.k3_flagged.notna().all())
     out["dif"]["power_k3_flagged"] = float(pw.k3_flagged.mean()) if power_complete else None
     out["dif"]["power_replications"] = int(len(pw))
     out["dif"]["power_complete"] = power_complete
+    if "global_bh_size" in out["dif"]:
+        out["dif"]["gate_global_bh"] = False                                    # DIF also needs the power gate
+    if power_complete and "dif_power_bh_any" in pw and pw.dif_power_bh_any.notna().all() and "global_bh_size" in out["dif"]:
+        out["dif"]["global_bh_power"] = float(pw.dif_power_bh_any.mean())
+        out["dif"]["gate_global_bh"] = bool(out["dif"]["global_bh_size"] <= .075 and out["dif"]["global_bh_power"] >= .80)
     return out
 
 
@@ -138,7 +149,7 @@ def run_checkpointed(null=60, power=30, workers=1, checkpoint=None):
     payload = dict(protocol="PROTOCOL.json amendment_2026_11_22b V15",
                    seed=SEED, N=N, null=null, power=power, results=res)
     tmp = output.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(payload, indent=1, allow_nan=True) + "\\n")
+    tmp.write_text(json.dumps(payload, indent=1, allow_nan=True) + "\n")
     tmp.replace(output)
     return res
 

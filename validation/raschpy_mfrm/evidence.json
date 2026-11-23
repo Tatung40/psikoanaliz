@@ -91,14 +91,64 @@
     "basis": "AIC/BIC require a maximised likelihood; RCL estimates do not maximise the response likelihood (V16). Removed from the app; no replacement"
    },
    "dif": {
-    "status": "NOT CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
-    "status": "NOT CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "PARTIAL",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -230,12 +280,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -367,12 +467,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -539,12 +689,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -676,12 +876,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -828,12 +1078,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -965,12 +1265,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -1138,12 +1488,62 @@
    "dif": {
     "status": "NOT CERTIFIED",
     "basis": "V15: independent z/p/BH identity + empirical size under the null (global model, dense N=500, 60 replications) + power (descriptive); evidence for the global model only",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.041666666666666664,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.11666666666666667,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": false,
+     "global_bh_size": 0.0,
+     "gate_global_bh": true,
+     "power_k3_flagged": 0.9666666666666667,
+     "power_replications": 30,
+     "power_complete": true,
+     "global_bh_power": 1.0
+    }
    },
    "drf": {
     "status": "NOT CERTIFIED",
     "basis": "V15: as DIF, rater x group; omnibus LR follows its own null gate",
-    "v15": null
+    "v15": {
+     "replications": 60,
+     "expected_replications": 60,
+     "errors": 0,
+     "complete": true,
+     "per_test_size": 0.07222222222222222,
+     "familywise_flag_rate": 0.0,
+     "omnibus_size": 0.03333333333333333,
+     "identity_max_diff": 0.0,
+     "gate_identity": true,
+     "gate_size": true,
+     "gate_omnibus": true,
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
+   },
+   "dif_omnibus_lr": {
+    "status": "NOT CERTIFIED",
+    "basis": "RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference (amendment_2026_11_23 root cause); V15 null size gate",
+    "omnibus_size": 0.11666666666666667
+   },
+   "global_bh": {
+    "status": "NOT CERTIFIED",
+    "basis": "V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+    "dif": {
+     "global_bh_size": 0.0,
+     "global_bh_power": 1.0,
+     "gate_global_bh": true
+    },
+    "drf": {
+     "global_bh_size": 0.06666666666666667,
+     "gate_global_bh": true
+    }
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -1237,30 +1637,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.234,
-  "balanced_3facet:items": 0.224,
-  "balanced_3facet:thresholds": 0.186,
-  "balanced_3facet:bivector": 0.158,
-  "balanced_3facet:matrix": 0.168,
-  "balanced_3facet:centrality": 0.331,
-  "balanced_3facet:pseudo_halo": 0.163,
-  "balanced_3facet:bistretch": 0.233,
-  "unbalanced_linked:global": 0.216,
-  "unbalanced_linked:items": 0.299,
-  "unbalanced_linked:thresholds": 0.201,
-  "unbalanced_linked:bivector": 0.207,
-  "unbalanced_linked:matrix": 0.239,
-  "unbalanced_linked:centrality": 0.256,
-  "unbalanced_linked:pseudo_halo": 0.27,
-  "unbalanced_linked:bistretch": 0.223,
-  "interaction_bias:global": 0.143,
-  "interaction_bias:items": 0.149,
-  "interaction_bias:thresholds": 0.142,
-  "interaction_bias:bivector": 0.149,
-  "interaction_bias:matrix": 0.182,
-  "interaction_bias:centrality": 0.167,
-  "interaction_bias:pseudo_halo": 0.206,
-  "interaction_bias:bistretch": 0.177
+  "balanced_3facet:global": 0.153,
+  "balanced_3facet:items": 0.16,
+  "balanced_3facet:thresholds": 0.149,
+  "balanced_3facet:bivector": 0.157,
+  "balanced_3facet:matrix": 0.164,
+  "balanced_3facet:centrality": 0.171,
+  "balanced_3facet:pseudo_halo": 0.168,
+  "balanced_3facet:bistretch": 0.178,
+  "unbalanced_linked:global": 0.181,
+  "unbalanced_linked:items": 0.192,
+  "unbalanced_linked:thresholds": 0.183,
+  "unbalanced_linked:bivector": 0.192,
+  "unbalanced_linked:matrix": 0.194,
+  "unbalanced_linked:centrality": 0.198,
+  "unbalanced_linked:pseudo_halo": 0.211,
+  "unbalanced_linked:bistretch": 0.225,
+  "interaction_bias:global": 0.146,
+  "interaction_bias:items": 0.159,
+  "interaction_bias:thresholds": 0.152,
+  "interaction_bias:bivector": 0.155,
+  "interaction_bias:matrix": 0.163,
+  "interaction_bias:centrality": 0.195,
+  "interaction_bias:pseudo_halo": 0.162,
+  "interaction_bias:bistretch": 0.173
  },
  "recovery_diagnosis": {
   "bivector": {

@@ -237,6 +237,14 @@ def evidence(df, edges):
                         v15=V15.get("dif")),
             "drf": dict(status=V15S("drf", model), basis="V15: as DIF, rater x group; omnibus LR follows its own null gate",
                         v15=V15.get("drf")),
+            "dif_omnibus_lr": dict(status="PARTIAL" if model == "global" and V15.get("dif", {}).get("gate_omnibus") else "NOT CERTIFIED",
+                                   basis="RaschPy omnibus LR at RCL estimates with plug-in persons: no chi-square reference "
+                                         "(amendment_2026_11_23 root cause); V15 null size gate", omnibus_size=V15.get("dif", {}).get("omnibus_size")),
+            "global_bh": dict(status="PARTIAL" if model == "global" and V15.get("dif", {}).get("gate_global_bh")
+                              and V15.get("drf", {}).get("gate_global_bh") else "NOT CERTIFIED",
+                              basis="V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
+                              dif=dict((k, V15.get("dif", {}).get(k)) for k in ("global_bh_size", "global_bh_power", "gate_global_bh")),
+                              drf=dict((k, V15.get("drf", {}).get(k)) for k in ("global_bh_size", "gate_global_bh"))),
             "person_csem": dict(status="PARTIAL" if R.v14_pass(model, "csem") else "NOT CERTIFIED",
                                 basis="V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
                                 v14=R.simulation_v14().get("results", {}).get(model, {}).get("csem")),
