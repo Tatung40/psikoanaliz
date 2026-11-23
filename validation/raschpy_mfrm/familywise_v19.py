@@ -92,11 +92,17 @@ def fit_params(df, model, design, lam, c, om):
 
 
 def job(args):
-    design, rep = args; rows = []
-    for scenario in ("null", "nonzero"):
+    design, rep, scenarios = args if len(args) == 3 else (*args, ("null", "nonzero")); rows = []
+    if scenarios == ("nonzero",):
+        scenarios = ("null", "nonzero"); only_global_null = True                 # global's nonzero scenario needs its null fit
+    else:
+        only_global_null = False
+    for scenario in scenarios:
         rng = np.random.default_rng([SEED, scenario == "nonzero", list(DESIGNS).index(design), rep])
         shared = simulate(design, truth("global", design, "null")[1], rng) if scenario == "null" else None
         for model in MODELS:
+            if only_global_null and scenario == "null" and model != "global":
+                continue
             if scenario == "nonzero" and model == "global":
                 continue                                                          # global's nonzero = null scenario
             lam, c, om = truth(model, design, scenario)
@@ -112,19 +118,22 @@ def job(args):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--reps", type=int, default=1000); ap.add_argument("--workers", type=int, default=4)
-    a = ap.parse_args()
+    ap.add_argument("--design", choices=list(DESIGNS)); ap.add_argument("--scenario", choices=["null", "nonzero"])
+    ap.add_argument("--out", default=str(H / "familywise_v19.json")); a = ap.parse_args()
+    designs = [a.design] if a.design else list(DESIGNS); scens = (a.scenario,) if a.scenario else ("null", "nonzero")
     with Pool(a.workers) as p:
-        df = pd.DataFrame([r for o in p.imap_unordered(job, [(d, r) for d in DESIGNS for r in range(a.reps)], chunksize=10) for r in o])
+        df = pd.DataFrame([r for o in p.imap_unordered(job, [(d, r, scens) for d in designs for r in range(a.reps)], chunksize=10) for r in o])
     res = {}
-    for scen in ("null", "nonzero"):
+    for scen in scens:
         sub = df[df.scenario == scen].drop(columns="scenario")
         if scen == "nonzero":                                                    # global: nonzero scenario is the null data
             sub = pd.concat([sub, df[(df.scenario == "null") & (df.model == "global")].drop(columns="scenario")])
         for m, r in evaluate(sub.rename(columns={"design": "design"}).assign(design=sub.design.map({"balanced": "balanced", "linked": "linked"})), a.reps).items():
             res.setdefault(m, {})[scen] = r
-    for m, r in res.items():
-        r["pass_all"] = all(r[s]["pass_both_designs"] for s in ("null", "nonzero"))
-    (H / "familywise_v19.json").write_text(json.dumps(dict(protocol="PROTOCOL.json V19_recovery_precision_and_nonzero", seed=SEED,
+    if a.design is None and a.scenario is None:
+        for m, r in res.items():
+            r["pass_all"] = all(r[s]["pass_both_designs"] for s in ("null", "nonzero"))
+    Path(a.out).write_text(json.dumps(dict(protocol="PROTOCOL.json V19_recovery_precision_and_nonzero", seed=SEED,
                                                             reps=a.reps, results=res), indent=1) + "\n")
     print(json.dumps({m: {s: {d: {k: r[s][d][k] for k in ("max_abs_bias", "se_ratio", "pooled_coverage", "familywise_recovery", "pass")}
-                              for d in DESIGNS} for s in ("null", "nonzero")} for m, r in res.items()}, indent=0))
+                              for d in designs} for s in scens} for m, r in res.items()}, indent=0))
