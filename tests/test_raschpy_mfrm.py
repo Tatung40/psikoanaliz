@@ -36,14 +36,16 @@ def test_evidence_statuses_are_backed_by_gates():
     st = {m: v["parameters"]["status"] for m, v in EV["models"].items()}; assert set(st) == set(RP.MODELS)
     cmp = pd.read_csv(ROOT / "validation/raschpy_mfrm/comparison.csv")
     V19 = json.loads((ROOT / "validation/raschpy_mfrm/familywise_v19.json").read_text())["results"]
+    V20 = json.loads((ROOT / "validation/raschpy_mfrm/matrix_v20.json").read_text())["results"]
     for m, s in st.items():                       # CERTIFIED = identities + V8 + V19 (null and nonzero, both designs)
         rec = cmp[(cmp.model == m) & cmp.check.isin(["V4", "V5"])]; v8 = cmp[(cmp.model == m) & cmp.check.str.startswith("V8_") & cmp.ok.notna()]
         hist = bool(rec.ok.astype(bool).all() and v8.ok.astype(bool).all())
         assert EV["models"][m]["parameters"]["historical_rule_status"] == ("CERTIFIED" if hist else "NOT CERTIFIED")  # history kept
         ok8 = bool(v8.ok.astype(bool).all()); assert len(v8) == 4
-        assert (s == "CERTIFIED") == bool(ok8 and V19[m]["pass_all"])
-        if not V19[m]["pass_all"]:
-            assert s == ("PARTIAL" if ok8 and V19[m]["null"]["pass_both_designs"] else "NOT CERTIFIED")
+        final = V20["pass_all"] if m == "matrix" else V19[m]["pass_all"]               # V20 supersedes V19 for matrix
+        assert (s == "CERTIFIED") == bool(ok8 and final)
+        if not final:
+            assert s == ("PARTIAL" if ok8 and (V19[m]["null"]["pass_both_designs"] or m == "matrix") else "NOT CERTIFIED")
     disc = cmp[cmp.check == "V8_discrimination"].value; assert disc.min() > 1e-3     # the two configurations differ
     for m, v in EV["models"].items():
         assert v["model_selection"]["status"] == "UNSUPPORTED" and not hasattr(RP, "model_selection")
@@ -242,6 +244,16 @@ def test_v17_holdout_diagnosis_recorded():
         for fx in ("balanced_3facet", "unbalanced_linked"):
             r = h[f"{m}:{fx}"]; assert r["replications"] == 200 and r["fit_failures"] == 0 and r["bias_gate"]
         assert EV["models"][m]["parameters"]["historical_rule_status"] == "NOT CERTIFIED"
+
+
+def test_v20_matrix_complete_and_precise():
+    r = json.loads((ROOT / "validation/raschpy_mfrm/matrix_v20.json").read_text())
+    assert r["reps"] == 5000 and r["calibration"] == 1000
+    for sc in ("null", "nonzero"):
+        for d in ("balanced", "linked"):
+            x = r["results"][sc][d]; assert x["fit_failures"] == 0 and x["confirmatory_replications"] == 4000
+            assert x["focus_cell"]["n"] == 4000 and x["focus_cell"]["mcse"] < .008
+            assert x["pass"] == all(x[k] for k in ("gate_bias", "gate_se_ratio", "gate_coverage", "gate_familywise"))
 
 
 def test_v19_complete_equal_and_reproducible_structure():
