@@ -110,9 +110,11 @@ def summarise(rows, expected_null=60, expected_power=30):
     out["dif"]["power_k3_flagged"] = float(pw.k3_flagged.mean()) if power_complete else None
     out["dif"]["power_replications"] = int(len(pw))
     out["dif"]["power_complete"] = power_complete
+    if "global_bh_size" in out["dif"]:
+        out["dif"]["gate_global_bh"] = False                                    # DIF also needs the power gate
     if power_complete and "dif_power_bh_any" in pw and pw.dif_power_bh_any.notna().all() and "global_bh_size" in out["dif"]:
         out["dif"]["global_bh_power"] = float(pw.dif_power_bh_any.mean())
-        out["dif"]["gate_global_bh"] = bool(out["dif"]["gate_global_bh"] and out["dif"]["global_bh_power"] >= .80)
+        out["dif"]["gate_global_bh"] = bool(out["dif"]["global_bh_size"] <= .075 and out["dif"]["global_bh_power"] >= .80)
     return out
 
 
