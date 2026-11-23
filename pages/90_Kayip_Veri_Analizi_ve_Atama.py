@@ -12,6 +12,7 @@ from core.missing_imputation import diagnose, apply, METHODS
 from core.missing_decision import assess_necessity
 from core.python_mirt_dif import fingerprint
 from ui.example_datasets_view import render as render_examples, own_file_changed
+from ui.missing_advisor_view import accept as accept_missing_result
 
 render_examples('Eksik Veri ve Atama')
 begin_code_capture("Eksik Veri ve Atama", globals(), st.session_state.get('_repro_pages',{}).get('Eksik Veri ve Atama', st.session_state.get("_repro_history")))
@@ -23,7 +24,11 @@ st.info("MCAR/MAR/MNAR mekanizması yalnızca kayıp oranlarından kesin olarak 
         "MTK için eksikleri olabilirlikte modellemek, tek atamadan daha uygun olabilir.")
 source = st.file_uploader("CSV veya Excel yükleyin", type=["csv","xlsx"], key="missing_lab_file",
                           on_change=own_file_changed,args=('missing_lab_file',))
-df = st.session_state.get('raw_df')
+advice = st.session_state.get("missing_advice")
+df = st.session_state.get(advice["source"]) if advice else st.session_state.get('raw_df')
+if advice and source is None:
+    st.info(f"**{advice['page']}** analizinden yönlendirildiniz. {advice['reason']} Veri ve analiz ayarlarınız "
+            "korunur; işlemi uyguladıktan sonra analiz ekranına dönebilirsiniz.")
 if source is not None or df is not None:
     if source is not None and source.name.lower().endswith(".csv"):
         df = pd.read_csv(source)
@@ -31,6 +36,8 @@ if source is not None or df is not None:
         df = pd.read_excel(source)
     defaults = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c]) and
                 c.lower() not in ("id", "participant_id", "score_total")]
+    if advice and source is None:
+        defaults = [c for c in advice["columns"] if c in df.columns]
     cols = st.multiselect("Analiz edilecek madde sütunları (ID, grup, toplam puan seçmeyin)",
                           list(df.columns), default=defaults)
     if cols:
@@ -60,8 +67,10 @@ if source is not None or df is not None:
                 "knn":"KNN — yakın yanıt örüntülerine göre atama; ikili maddelerde yuvarlama gerekir."
             }
             st.write("**Tanısal öneri:** "+("Atama yapmayın: eksik hücre yok." if report["missing"] == 0 else details[report["recommended"]]))
-            method = st.radio("Uygulanacak yöntem", METHODS,
-                              index=METHODS.index(report["recommended"]),
+            options = [m for m in METHODS if m in advice["allowed"]] if advice and source is None else list(METHODS)
+            preferred = advice["recommended"] if advice and source is None else report["recommended"]
+            method = st.radio("Uygulanacak yöntem", options,
+                              index=options.index(preferred) if preferred in options else 0,
                               format_func=lambda m:details[m])
             neighbors = st.number_input("KNN komşu sayısı", 1, 30, 5) if method=="knn" else 5
             rounding = False
@@ -81,6 +90,9 @@ if source is not None or df is not None:
                 displayed(result)
                 st.success(f"İşlem tamamlandı: {len(result)} satır; yöntem {st.session_state['missing_lab_method']}.")
                 st.dataframe(result.head(20),use_container_width=True)
+                if advice and source is None and st.button("✅ Sonucu analizde kullan ve analiz ekranına dön", type="primary",
+                                                           key="missing_accept"):
+                    accept_missing_result(result, st.session_state["missing_lab_method"], len(df), report["missing"])
                 st.download_button("⬇ İşlenmiş CSV indir",
                                    result.to_csv(index=False).encode("utf-8-sig"),
                                    file_name="psikoanaliz_kayip_veri_islenmis.csv",

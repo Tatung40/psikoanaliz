@@ -49,6 +49,9 @@ jobs:
       - name: Real browser end-to-end (RSM, DIF, GRM/PCM/GPCM/NRM)
         timeout-minutes: 20
         run: python validation/browser_e2e_polytomous_dif.py --output /tmp/browser && python -c "import json;assert json.load(open('/tmp/browser/result.json'))['status']=='PASS'"
+      - name: Real browser missing-data round trip (2PL -> Kayıp Veri -> apply -> return -> run -> export)
+        timeout-minutes: 6
+        run: python validation/browser_e2e_missing_roundtrip.py --output /tmp/missing-roundtrip
       - name: Real browser Rasch Wright Map (saved calibration; zero new fits)
         if: github.head_ref == 'validation-r-mirt-phase2-nine-models' || github.ref_name == 'validation-r-mirt-phase2-nine-models' || github.head_ref == 'integration/73-75-main' || github.ref == 'refs/heads/main'
         timeout-minutes: 3
