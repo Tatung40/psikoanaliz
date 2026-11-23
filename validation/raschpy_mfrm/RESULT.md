@@ -104,3 +104,26 @@ failures; ~50 s on 2 cores). Matrix (CERTIFIED) as control.
 * **Status unchanged: NOT CERTIFIED** — the preregistered fixture gate (V5/V11) is not met and acceptance criteria are
   not changed after the fact. Certifying these models would need a new criterion preregistered before evaluation on new
   fixtures (e.g. a family-wise rule); it is not adopted here.
+
+## V18 — prospective family-wise recovery (all 8 models; preregistered before data generation)
+
+Fixture generator, fresh seeds (20261124), balanced (300 × 3 raters) and linked (400, 2 of 5) designs, 200 replications
+each (100 calibration / 100 confirmatory), 0 fit failures, ~90 s on 2 cores. Family-wise: Bonferroni critical z over all
+K parameters with SDs from the calibration half.
+
+| Model | max abs bias (bal / link) | SE ratio range | coverage (bal / link) | family-wise recovery (bal / link) | V18 | Status |
+|---|---|---|---|---|---|---|
+| global | 0.010 / 0.014 | 0.85–1.12 | 0.940 / 0.957 | 0.94 / 0.98 | pass | CERTIFIED |
+| items | 0.011 / 0.033 | 0.87–1.19 | 0.942 / 0.952 | 0.95 / 0.94 | pass | CERTIFIED |
+| thresholds | 0.010 / **0.055** | 0.87–1.13 | 0.949 / 0.947 | 0.90 / 0.96 | fail (bias, linked) | CERTIFIED → **PARTIAL** |
+| bivector | 0.014 / **0.064** | 0.87–1.13 | 0.950 / 0.947 | 0.93 / 0.92 | fail (bias, linked) | NOT CERTIFIED |
+| matrix | 0.033 / **0.082** | 0.84–1.19 | 0.943 / 0.946 | **0.88** / 0.93 | fail (bias, linked; FW, balanced) | CERTIFIED → **PARTIAL** |
+| centrality | 0.010 / 0.033 | 0.84–1.14 | 0.945 / 0.951 | 0.95 / 0.96 | pass | NOT CERTIFIED → **CERTIFIED** |
+| pseudo_halo | 0.011 / 0.030 | 0.85–1.16 | 0.940 / 0.957 | 0.95 / 0.97 | pass | CERTIFIED |
+| bistretch | 0.013 / 0.039 | 0.84–1.19 | 0.940 / 0.949 | 0.94 / 0.96 | pass | NOT CERTIFIED → **CERTIFIED** |
+
+* The historical fixture outcomes (V4/V5/V11) are kept in `evidence.json` as `historical_rule_status`; V18 does not
+  reinterpret them. The bias failures are small-sample bias of threshold-level rater cells in the linked design
+  (0.055–0.082 logit, above the 0.05 / 3 MCSE gate), consistent with sparse lowest categories for the lenient rater.
+* Scope: null generating model (no true rater × item / threshold / stretch effects) and these two designs.
+* CI: `.github/workflows/raschpy-v18.yml` re-runs V18 and requires the committed evidence to be reproduced.
