@@ -65,5 +65,19 @@
  "amendment_2026_11_23b": {
   "committed_before": "V17 results; V1-V16 rules, tolerances and statuses unchanged; this is diagnostic and cannot by itself change a status",
   "V17_holdout_fixture_design": "independent holdout replications of the exact fixture designs with the fixture generator (examples/mfrm/build.py _rows; balanced: 300 persons x 3 raters; unbalanced_linked: 400 persons, 2 of 5 raters cyclic), fresh seeds 20261123+rep (never the fixture seeds), 200 replications each, models bivector, centrality, bistretch and matrix (certified control). Per rater-side cell: bias, empirical SD, RMSE; bias gate |bias| <= max(3 MCSE, 0.05) for every cell (the V9 bias gate). Also: P(a correct-by-construction replicate fails V5 with SE = empirical SD), and the empirical tail rank of the fixture's own max |dev|/SD. Bias-gate failure -> estimator small-sample bias (defect to investigate); pass -> fixture sampling excursion."
+ },
+ "V18_familywise_recovery": {
+  "committed_before": "any V18 dataset is generated. Historical results (V1-V17), their thresholds and the recorded V5/V11 fixture failures are retained unchanged; V18 is a separate prospective protocol.",
+  "data": "fixture generator examples/mfrm/build.py (_rows); designs balanced (300 persons x 3 raters P1..P3 = -0.8, 0, 0.8) and linked (400 persons, 2 of 5 raters cyclic, -0.8..0.8); items/thresholds as the fixtures; 200 replications per design, seeds [20261124, design, rep] (never used before). Replications 0-99 = calibration half, 100-199 = confirmatory half.",
+  "models": "all 8, identical data and rules",
+  "parameters": "items (4), thresholds (3), every rater-side cell of the model's full rater vector (truth lambda_r), stretch omegas (truth 1) and stretch lambda_r",
+  "gates_confirmatory_half_each_design": {
+   "bias": "every parameter |mean(est - truth)| <= max(3 MCSE, 0.05)",
+   "se_ratio": "every parameter with a RaschPy sandwich SE: mean(SE) / empirical SD in [0.80, 1.25]",
+   "coverage": "parameters with a RaschPy SE: pooled Wald 95% coverage in [0.92, 0.98] and every parameter >= 0.85",
+   "familywise": "z_j = |est_j - truth_j| / SD_j with SD_j from the calibration half; a replicate recovers the model if max_j z_j <= Phi^-1(1 - 0.025/K) (Bonferroni, K = number of parameters); family-wise recovery rate >= 0.90"
+  },
+  "status_rule": "parameters CERTIFIED (V18 scope) iff V1-V3 identities and V8 pass (existing evidence) AND all four V18 gates pass in both designs. A currently CERTIFIED model failing V18 is downgraded to PARTIAL. Models without any RaschPy rater SE are evaluated on items/thresholds for se_ratio/coverage and on all parameters for bias and family-wise recovery. The historical V5/V11 fixture outcomes remain recorded as failed.",
+  "scope": "null generating model (global RSM-MFRM), these two designs; does not extend to designs with true rater x item / threshold / stretch effects."
  }
 }

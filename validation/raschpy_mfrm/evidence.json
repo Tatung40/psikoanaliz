@@ -6,6 +6,38 @@
   "global": {
    "parameters": {
     "status": "CERTIFIED",
+    "historical_rule_status": "CERTIFIED",
+    "v18": {
+     "pass_both_designs": true,
+     "balanced": {
+      "max_abs_bias": 0.010014949384262012,
+      "se_ratio": [
+       0.8492912287668256,
+       1.1236821251679228
+      ],
+      "pooled_coverage": 0.94,
+      "min_param_coverage": 0.92,
+      "familywise_recovery": 0.94,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.013789188003837036,
+      "se_ratio": [
+       0.9424670173896789,
+       1.1186014235333317
+      ],
+      "pooled_coverage": 0.9566666666666667,
+      "min_param_coverage": 0.92,
+      "familywise_recovery": 0.98,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V4 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 5.254678847599337e-07,
@@ -198,6 +230,38 @@
   "items": {
    "parameters": {
     "status": "CERTIFIED",
+    "historical_rule_status": "CERTIFIED",
+    "v18": {
+     "pass_both_designs": true,
+     "balanced": {
+      "max_abs_bias": 0.011176281576911078,
+      "se_ratio": [
+       0.8675107620595207,
+       1.1202055476558554
+      ],
+      "pooled_coverage": 0.9415789473684211,
+      "min_param_coverage": 0.91,
+      "familywise_recovery": 0.95,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.03342868163921554,
+      "se_ratio": [
+       0.9375086829233622,
+       1.191409046021725
+      ],
+      "pooled_coverage": 0.9518518518518518,
+      "min_param_coverage": 0.9,
+      "familywise_recovery": 0.94,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 6.614032090901389e-07,
@@ -389,7 +453,39 @@
   },
   "thresholds": {
    "parameters": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
+    "historical_rule_status": "CERTIFIED",
+    "v18": {
+     "pass_both_designs": false,
+     "balanced": {
+      "max_abs_bias": 0.009946921326104417,
+      "se_ratio": [
+       0.8708726677899981,
+       1.1225677525474151
+      ],
+      "pooled_coverage": 0.94875,
+      "min_param_coverage": 0.92,
+      "familywise_recovery": 0.9,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.055314950203419685,
+      "se_ratio": [
+       0.9018716633031685,
+       1.1252958720189923
+      ],
+      "pooled_coverage": 0.9472727272727273,
+      "min_param_coverage": 0.88,
+      "familywise_recovery": 0.96,
+      "gate_bias": false,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 4.141418987746448e-07,
@@ -439,17 +535,17 @@
     }
    },
    "persons": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 4.8117954065673985e-11
    },
    "fit": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -457,7 +553,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -582,6 +678,38 @@
   "bivector": {
    "parameters": {
     "status": "NOT CERTIFIED",
+    "historical_rule_status": "NOT CERTIFIED",
+    "v18": {
+     "pass_both_designs": false,
+     "balanced": {
+      "max_abs_bias": 0.013599927694865701,
+      "se_ratio": [
+       0.8705360980501224,
+       1.1240744974114238
+      ],
+      "pooled_coverage": 0.95,
+      "min_param_coverage": 0.92,
+      "familywise_recovery": 0.93,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.0636064271149162,
+      "se_ratio": [
+       0.9503827701735592,
+       1.125518138574254
+      ],
+      "pooled_coverage": 0.9471428571428572,
+      "min_param_coverage": 0.92,
+      "familywise_recovery": 0.92,
+      "gate_bias": false,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 7.333430818157183e-07,
@@ -835,7 +963,39 @@
   },
   "matrix": {
    "parameters": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
+    "historical_rule_status": "CERTIFIED",
+    "v18": {
+     "pass_both_designs": false,
+     "balanced": {
+      "max_abs_bias": 0.03319351208746768,
+      "se_ratio": [
+       0.8359703320378249,
+       1.1795804099417362
+      ],
+      "pooled_coverage": 0.9434883720930233,
+      "min_param_coverage": 0.89,
+      "familywise_recovery": 0.88,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": false
+     },
+     "linked": {
+      "max_abs_bias": 0.08156967258150204,
+      "se_ratio": [
+       0.8674849382574246,
+       1.1939110975389091
+      ],
+      "pooled_coverage": 0.9462686567164179,
+      "min_param_coverage": 0.89,
+      "familywise_recovery": 0.93,
+      "gate_bias": false,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 1.021216236685163e-06,
@@ -885,17 +1045,17 @@
     }
    },
    "persons": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 4.994493707499714e-11
    },
    "fit": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -903,7 +1063,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "CERTIFIED",
+    "status": "PARTIAL",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -1054,7 +1214,39 @@
   },
   "centrality": {
    "parameters": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
+    "historical_rule_status": "NOT CERTIFIED",
+    "v18": {
+     "pass_both_designs": true,
+     "balanced": {
+      "max_abs_bias": 0.0100886477173927,
+      "se_ratio": [
+       0.8404409998754933,
+       1.1239822893528764
+      ],
+      "pooled_coverage": 0.9454545454545454,
+      "min_param_coverage": 0.88,
+      "familywise_recovery": 0.95,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.03321994140237344,
+      "se_ratio": [
+       0.9098398814124503,
+       1.1399548385840392
+      ],
+      "pooled_coverage": 0.950625,
+      "min_param_coverage": 0.9,
+      "familywise_recovery": 0.96,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 3.935441446056842e-07,
@@ -1119,17 +1311,17 @@
     }
    },
    "persons": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 5.4532156568143364e-11
    },
    "fit": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 1.1102230246251565e-15
    },
    "probabilities": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -1137,7 +1329,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -1289,6 +1481,38 @@
   "pseudo_halo": {
    "parameters": {
     "status": "CERTIFIED",
+    "historical_rule_status": "CERTIFIED",
+    "v18": {
+     "pass_both_designs": true,
+     "balanced": {
+      "max_abs_bias": 0.011442181417089081,
+      "se_ratio": [
+       0.8512043774573091,
+       1.135476753521999
+      ],
+      "pooled_coverage": 0.94,
+      "min_param_coverage": 0.9,
+      "familywise_recovery": 0.95,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.0295614574639481,
+      "se_ratio": [
+       0.9185093749351803,
+       1.15793426718706
+      ],
+      "pooled_coverage": 0.9572972972972973,
+      "min_param_coverage": 0.93,
+      "familywise_recovery": 0.97,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 2.6628106697401677e-07,
@@ -1480,7 +1704,39 @@
   },
   "bistretch": {
    "parameters": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
+    "historical_rule_status": "NOT CERTIFIED",
+    "v18": {
+     "pass_both_designs": true,
+     "balanced": {
+      "max_abs_bias": 0.01251112419075313,
+      "se_ratio": [
+       0.8444366585122721,
+       1.14308203450999
+      ],
+      "pooled_coverage": 0.94,
+      "min_param_coverage": 0.88,
+      "familywise_recovery": 0.94,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     },
+     "linked": {
+      "max_abs_bias": 0.03861826458577641,
+      "se_ratio": [
+       0.9235840160829286,
+       1.1854002238900925
+      ],
+      "pooled_coverage": 0.9486363636363636,
+      "min_param_coverage": 0.89,
+      "familywise_recovery": 0.96,
+      "gate_bias": true,
+      "gate_se_ratio": true,
+      "gate_coverage": true,
+      "gate_familywise": true
+     }
+    },
     "basis": "identity V1-V3 + recovery V5 on balanced_3facet and unbalanced_linked + V8 independent estimator re-implementation (unregularised and default regularisation, <= 1e-4); CERTIFIED requires all three",
     "v8_ok": true,
     "v8_max_diff": 2.791349313913116e-07,
@@ -1566,17 +1822,17 @@
     }
    },
    "persons": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 3.399369674639274e-11
    },
    "fit": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -1584,7 +1840,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -1785,30 +2041,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.226,
-  "balanced_3facet:items": 0.226,
-  "balanced_3facet:thresholds": 0.238,
-  "balanced_3facet:bivector": 0.219,
-  "balanced_3facet:matrix": 0.254,
-  "balanced_3facet:centrality": 0.238,
-  "balanced_3facet:pseudo_halo": 0.24,
-  "balanced_3facet:bistretch": 0.261,
-  "unbalanced_linked:global": 0.269,
-  "unbalanced_linked:items": 0.265,
-  "unbalanced_linked:thresholds": 0.243,
-  "unbalanced_linked:bivector": 0.272,
-  "unbalanced_linked:matrix": 0.274,
-  "unbalanced_linked:centrality": 0.266,
-  "unbalanced_linked:pseudo_halo": 0.323,
-  "unbalanced_linked:bistretch": 0.309,
-  "interaction_bias:global": 0.213,
-  "interaction_bias:items": 0.251,
-  "interaction_bias:thresholds": 0.209,
-  "interaction_bias:bivector": 0.235,
-  "interaction_bias:matrix": 0.235,
-  "interaction_bias:centrality": 0.23,
-  "interaction_bias:pseudo_halo": 0.259,
-  "interaction_bias:bistretch": 0.288
+  "balanced_3facet:global": 0.243,
+  "balanced_3facet:items": 0.235,
+  "balanced_3facet:thresholds": 0.26,
+  "balanced_3facet:bivector": 0.232,
+  "balanced_3facet:matrix": 0.241,
+  "balanced_3facet:centrality": 0.254,
+  "balanced_3facet:pseudo_halo": 0.335,
+  "balanced_3facet:bistretch": 0.263,
+  "unbalanced_linked:global": 0.265,
+  "unbalanced_linked:items": 0.283,
+  "unbalanced_linked:thresholds": 0.262,
+  "unbalanced_linked:bivector": 0.289,
+  "unbalanced_linked:matrix": 0.297,
+  "unbalanced_linked:centrality": 0.325,
+  "unbalanced_linked:pseudo_halo": 0.381,
+  "unbalanced_linked:bistretch": 0.496,
+  "interaction_bias:global": 0.297,
+  "interaction_bias:items": 0.313,
+  "interaction_bias:thresholds": 0.315,
+  "interaction_bias:bivector": 0.219,
+  "interaction_bias:matrix": 0.295,
+  "interaction_bias:centrality": 0.406,
+  "interaction_bias:pseudo_halo": 0.255,
+  "interaction_bias:bistretch": 0.272
  },
  "recovery_diagnosis": {
   "bivector": {

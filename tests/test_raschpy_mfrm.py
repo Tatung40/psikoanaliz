@@ -35,18 +35,22 @@ def test_global_recovers_generating_values_and_matches_archived_estimate():
 def test_evidence_statuses_are_backed_by_gates():
     st = {m: v["parameters"]["status"] for m, v in EV["models"].items()}; assert set(st) == set(RP.MODELS)
     cmp = pd.read_csv(ROOT / "validation/raschpy_mfrm/comparison.csv")
-    for m, s in st.items():                       # CERTIFIED = identities + recovery + V8 (both configs, both fixtures)
+    V18 = json.loads((ROOT / "validation/raschpy_mfrm/familywise_v18.json").read_text())["results"]
+    for m, s in st.items():                       # CERTIFIED = identities + V8 + V18 family-wise (both designs)
         rec = cmp[(cmp.model == m) & cmp.check.isin(["V4", "V5"])]; v8 = cmp[(cmp.model == m) & cmp.check.str.startswith("V8_") & cmp.ok.notna()]
-        assert len(v8) == 4 and (s == "CERTIFIED") == bool(rec.ok.astype(bool).all() and v8.ok.astype(bool).all())
-        if not rec.ok.astype(bool).all(): assert s == "NOT CERTIFIED"
+        hist = bool(rec.ok.astype(bool).all() and v8.ok.astype(bool).all())
+        assert EV["models"][m]["parameters"]["historical_rule_status"] == ("CERTIFIED" if hist else "NOT CERTIFIED")  # history kept
+        assert len(v8) == 4 and (s == "CERTIFIED") == bool(v8.ok.astype(bool).all() and V18[m]["pass_both_designs"])
+        if hist and not V18[m]["pass_both_designs"]: assert s == "PARTIAL"                 # downgrade rule
+        if not hist and not V18[m]["pass_both_designs"]: assert s == "NOT CERTIFIED"
     disc = cmp[cmp.check == "V8_discrimination"].value; assert disc.min() > 1e-3     # the two configurations differ
     for m, v in EV["models"].items():
         assert v["model_selection"]["status"] == "UNSUPPORTED" and not hasattr(RP, "model_selection")
         assert (v["se"]["status"] == "PARTIAL") == any(RP.se_reliable(m, g) for g in ("rater", "items", "thresholds"))
         assert v["test_stats"]["status"] in ("PARTIAL", "NOT CERTIFIED") and v["test_stats"]["max_diff"] <= 1e-6
-    for m in RP.BOOT_MODELS:                                                        # V11 failed -> stays NOT CERTIFIED
+    for m in RP.BOOT_MODELS:                                     # historical V11 failure stays recorded as failed
         v11 = cmp[(cmp.model == m) & (cmp.check == "V11")]
-        assert len(v11) and (not v11.ok.astype(bool).all()) and EV["models"][m]["parameters"]["status"] == "NOT CERTIFIED"
+        assert len(v11) and (not v11.ok.astype(bool).all())
     assert all(e["failed_closed"] for e in EV["edge_cases"] if e["case"] not in ("sparse_category", "missing_scores"))
 
 
@@ -231,11 +235,18 @@ def test_global_bh_decision_and_uncalibrated_omnibus_label():
     assert not RP.group_part_validated("matrix", "dif", "global_bh")                     # scope: global model only
 
 
-def test_v17_holdout_diagnosis_recorded_and_statuses_unchanged():
+def test_v17_holdout_diagnosis_recorded():
     h = json.loads((ROOT / "validation/raschpy_mfrm/holdout_v17.json").read_text())["results"]
     for m in RP.BOOT_MODELS:
         for fx in ("balanced_3facet", "unbalanced_linked"):
             r = h[f"{m}:{fx}"]; assert r["replications"] == 200 and r["fit_failures"] == 0 and r["bias_gate"]
-        assert EV["models"][m]["parameters"]["status"] == "NOT CERTIFIED"                # gate not met, criteria unchanged
-    assert [m for m, v in EV["models"].items() if v["parameters"]["status"] == "CERTIFIED"] == \
-        ["global", "items", "thresholds", "matrix", "pseudo_halo"]
+        assert EV["models"][m]["parameters"]["historical_rule_status"] == "NOT CERTIFIED"
+
+
+def test_v18_familywise_results_complete_and_equal_for_all_models():
+    r = json.loads((ROOT / "validation/raschpy_mfrm/familywise_v18.json").read_text())
+    assert r["reps"] == 200 and set(r["results"]) == set(RP.MODELS)
+    for m, v in r["results"].items():
+        for d in ("balanced", "linked"):
+            x = v[d]; assert x["fit_failures"] == 0 and x["confirmatory_replications"] == 100
+            assert x["pass"] == all(x[k] for k in ("gate_bias", "gate_se_ratio", "gate_coverage", "gate_familywise"))
