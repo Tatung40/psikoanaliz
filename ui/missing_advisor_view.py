@@ -33,6 +33,8 @@ def banner():
     st.info(f"Kayıp veri işlemi uygulandı: **{A.method_label(rec['method'])}** ({rec['columns_n']} madde; {rec['cells']} kayıp hücre; "
             f"satır {rec['n_before']} → {rec['n_after']}). Analizler işlenmiş veriyle çalışır; orijinal veri saklıdır. "
             "Tek atama standart hataları küçümseyebilir.")
+    st.download_button("Kayıp veri işlem kaydı (.txt)", provenance_text(rec).encode("utf-8"), "kayip_veri_islemi.txt",
+                       "text/plain", key="missing_provenance_download")
     if st.button("↩ Orijinal veriye dön", key="missing_revert"):
         st.session_state[rec["source"]] = st.session_state.pop(f"_missing_original_{rec['source']}")
         st.session_state.pop("missing_applied", None); st.rerun()
@@ -64,11 +66,24 @@ def panel(page, frame, columns, key="missing_advisor"):
 
 
 def global_panel(page):
+    """Show the advice; return False while an engine rule that changes scoring/sample (approval=True) awaits approval."""
     if any(str(page).startswith(s) for s in SKIP):
-        return
+        return True
     frame = st.session_state.get(source_key()); cols = list(st.session_state.get("item_cols") or ())
-    if frame is not None and cols:
-        panel(page, frame, cols, key="missing_advisor_global")
+    if frame is None or not cols:
+        return True
+    adv = panel(page, frame, cols, key="missing_advisor_global")
+    if not adv or not adv.get("approval"):
+        return True
+    rule = A.engine(page)["note"]; token = (str(page), _fp(frame[[c for c in cols if c in frame.columns]]))
+    approved = st.session_state.setdefault("missing_rule_approved", [])
+    if token in approved:
+        st.caption(f"Onaylanan motor kuralı: {rule}")
+        return True
+    if st.checkbox(f"Motorun kendi eksik veri kuralını bu analiz için onaylıyorum: {rule}", key=f"missing_rule_ok_{abs(hash(token))}"):
+        approved.append(token); return True
+    st.info("Analiz, eksik veri kuralını onaylamanızı veya Kayıp Veri İşlemleri'nde bir yöntem uygulamanızı bekliyor.")
+    return False
 
 
 def accept(result, method, n_before, cells):
@@ -89,7 +104,7 @@ def provenance_text(rec):
 
 
 def stamp(data, file_name, rec):
-    """Add missing-data provenance to an export: XLSX -> extra sheet, DOCX -> closing section, CSV -> leading '#' lines,
+    """Add missing-data provenance to an export: XLSX -> extra sheet, DOCX -> closing section, CSV -> unchanged (standard CSV; provenance is the separate banner download),
     ZIP -> provenance text file. Other types and non-bytes payloads are returned unchanged."""
     import io, zipfile
     name = str(file_name or "").lower(); text = provenance_text(rec)
@@ -106,8 +121,7 @@ def stamp(data, file_name, rec):
             doc = Document(io.BytesIO(raw)); doc.add_heading("Kayıp Veri İşlemi", 1); doc.add_paragraph(text)
             out = io.BytesIO(); doc.save(out); return out.getvalue()
         if name.endswith(".csv"):
-            bom = raw.startswith(b"\xef\xbb\xbf"); body = raw[3:] if bom else raw
-            return (b"\xef\xbb\xbf" if bom else b"") + ("# " + text + "\n").encode("utf-8") + body
+            return data
         if name.endswith(".zip"):
             src = zipfile.ZipFile(io.BytesIO(raw)); out = io.BytesIO()
             with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:

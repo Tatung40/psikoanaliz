@@ -46,7 +46,33 @@ def test_engine_audit_registers_verified_ctt_rules():
     assert tot.iloc[1] == x.iloc[1].sum() and A.engine("4. Test İstatistikleri")["native"] is False
     assert "%80" in A.engine("5. Madde Analizi")["note"]
     assert R.compute_reliability_indices(x, list(x))["n_examinees"] == 397 and "tam kayıt" in A.engine("7. Güvenirlik & Ölçme Hatası")["note"]
-    assert A.engine("Boyutluluk ve Faktör Analizi")["native"] is None                 # unverified stays unregistered
+    assert A.engine("Bilinmeyen Analiz")["native"] is None                            # unverified stays unregistered
+    assert A.engine("4. Test İstatistikleri")["approval"] and A.engine("7. Güvenirlik")["approval"]
+
+
+def test_listwise_text_states_mcar_sufficient_not_necessary():
+    t = A.LISTWISE
+    assert "yeterli" in t and "gerekli değildir" in t and "yalnız MCAR" not in t
+
+
+def test_registered_engine_probes():
+    """Small probes behind each registry entry: native engines run with NaN; refusing engines refuse."""
+    import core.irt_rsm as R, core.grm_dif as G, core.dimensionality as D, core.dif_classical as C
+    import core.irt_multidim as M
+    rng = np.random.default_rng(7)
+    x = pd.DataFrame(R.simulate(np.linspace(-1, 1, 4), np.array([-.8, .8]), 300, seed=5), columns=list("abcd")).astype(float)
+    x.iloc[:20, 1] = np.nan; g = np.r_[np.zeros(150), np.ones(150)]
+    assert R.fit(x)["converged"] and R.prepare(x)["missing"] == 20 and A.engine("MTK: RSM")["native"] is True
+    assert isinstance(G.test_dif(x, g, 0, 1, anchors=["a", "c"]), dict) and A.engine("MTK: GRM Formel DIF")["native"] is True
+    b = pd.DataFrame((rng.random((300, 5)) < .6).astype(float), columns=list("abcde")); b.iloc[:20, 1] = np.nan
+    n = D.correlation_matrix(b)["n_pairs"]; assert n.iloc[0, 1] == 280 and n.iloc[0, 2] == 300      # pairwise N
+    assert A.engine("Boyutluluk ve Faktör Analizi")["approval"]
+    with pytest.raises(ValueError, match="eksiksiz"):
+        C.dif_screen(b, g, 0, 1)
+    with pytest.raises(ValueError, match="eksiksiz"):
+        M.fit(pd.concat([b, b.add_prefix("z")], axis=1).iloc[:, :6], "2PL", np.c_[np.r_[1, 1, 1, 0, 0, 0], np.r_[0, 0, 0, 1, 1, 1]])
+    for page in ("MTK: Gözlenen Puan DIF", "Çok Boyutlu MTK (MIRT)", "Yerel Bağımsızlık ve Madde Uyumu"):
+        assert A.engine(page)["native"] is False
 
 
 def test_export_provenance_stamping():
@@ -55,7 +81,7 @@ def test_export_provenance_stamping():
     from ui.missing_advisor_view import stamp
     rec = dict(method="listwise", columns_n=8, cells=2, n_before=400, n_after=398, page="MTK: Python mirt 2PL")
     csv = stamp(b"\xef\xbb\xbfa,b\n1,2\n", "t.csv", rec)
-    assert csv.startswith(b"\xef\xbb\xbf# Kay") and pd.read_csv(io.BytesIO(csv), comment="#", encoding="utf-8-sig").shape == (1, 2)
+    assert csv == b"\xef\xbb\xbfa,b\n1,2\n"                                          # standard CSV, no comment lines
     xb = io.BytesIO(); pd.DataFrame({"a": [1]}).to_excel(xb, index=False)
     assert "Kayıp veri işlemi" in pd.read_excel(io.BytesIO(stamp(xb.getvalue(), "t.xlsx", rec)), sheet_name=None)
     db = io.BytesIO(); Document().save(db)
@@ -128,3 +154,6 @@ def test_other_analyses_get_the_shared_advice_without_data_change():
     at.session_state["nav_page"] = "4. Test İstatistikleri"; at.run()
     assert not at.exception and any("Kayıp veri danışmanı" in w.value and "%80" in w.value for w in at.warning)
     assert at.session_state["scored_df"].isna().sum().sum() == 2
+    assert not at.dataframe and any("onaylamanızı" in i.value for i in at.info)       # analysis waits for approval
+    at.checkbox[0].check().run()
+    assert not at.exception and at.session_state["missing_rule_approved"] and at.session_state["scored_df"].isna().sum().sum() == 2

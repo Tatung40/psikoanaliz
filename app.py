@@ -310,7 +310,7 @@ begin_code_capture(selected_page, globals(), st.session_state.get("_repro_pages"
 begin_academic_screen(selected_page, st.session_state.get('raw_df'), st.session_state.get('scored_df'), st.session_state.get('item_cols', ()))
 from ui.missing_advisor_view import banner as missing_banner, global_panel as missing_global_panel
 missing_banner()                    # applied missing-data method (original data kept, revertible)
-missing_global_panel(selected_page)  # deterministic advice for analyses fed by the shared item matrix
+_missing_rule_ok = missing_global_panel(selected_page)  # advice; False while a scoring/sample-changing engine rule awaits approval
 
 
 def end_page_code_capture():
@@ -327,6 +327,10 @@ def stop_page():
     """st.stop() that still closes code capture, so stopped pages keep a correct code panel."""
     end_page_code_capture()
     st.stop()
+
+
+if not _missing_rule_ok:
+    stop_page()
 
 if st.session_state.pop("_session_restored", False) and st.session_state.raw_df is None:
     st.warning("Sunucu oturumu yenilendi (bağlantı kesintisi, uzun hareketsizlik veya uygulamanın yeniden "

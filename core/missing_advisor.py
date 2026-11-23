@@ -5,14 +5,16 @@ import pandas as pd
 
 # Engine support per analysis route (prefix match on the page name). native=True: the estimator uses the observed
 # responses directly (no imputation needed); False: the engine requires a complete matrix (verified refusal);
-# None: not verified for this route.
+# None: not verified for this route. approval=True: the engine's own rule changes the score or the analysed sample, so
+# the analysis waits for the user's explicit approval of that rule (ui.missing_advisor_view.global_panel).
 _MIRT = dict(native=False, estimator="Python mirt marjinal ML (EM)", data="binary/polytomous",
              note="Python mirt adaptörü eksik yanıtı reddeder (doğrulanmış eksik veri politikası yok).")
 _TOTAL = dict(native=False, estimator="KTK toplam puan motoru (core.scoring.calculate_total_scores)", data="any",
               note="Motorun kendi kuralı (doğrulandı): maddelerin en az %80'i yanıtlanmışsa yanıtlanan maddelerin toplamı alınır "
-                   "(eksik yanıt toplamda 0 gibi etki eder), daha az yanıtta toplam puan hesaplanmaz.")
+                   "(eksik yanıt toplamda 0 gibi etki eder), daha az yanıtta toplam puan hesaplanmaz.", approval=True)
 _REL = dict(native=False, estimator="Güvenirlik motoru (core.reliability.compute_reliability_indices)", data="any",
-            note="Motorun kendi kuralı (doğrulandı): eksik yanıtı olan satırları dışlar (tam kayıt); kullanılan N raporlanır.")
+            note="Motorun kendi kuralı (doğrulandı): eksik yanıtı olan satırları dışlar (tam kayıt); kullanılan N raporlanır.", approval=True)
+_REFUSE = "Motor eksik yanıtı reddeder (doğrulandı); otomatik atama/silme yapılmaz."
 ENGINES = tuple((p, _TOTAL) for p in ("4. Test İstatistikleri", "5. Madde Analizi", "6. Çeldirici Analizi",
                                       "8. Grup Bazlı Analizler", "9. Bilimsel Grafikler", "10. Raporlama")) + \
     (("7. Güvenirlik", _REL),) + tuple((p, _MIRT) for p in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma", "MTK: Python mirt")) + (
@@ -20,11 +22,31 @@ ENGINES = tuple((p, _TOTAL) for p in ("4. Test İstatistikleri", "5. Madde Anali
                                note="Eksik puan satırları gözlenen puanlarla kestirilir ve raporlanır; atama gerekmez.")),
     ("MTK: Çok Yüzeyli Rasch", dict(native=True, estimator="R/TAM marjinal ML", data="long",
                                     note="Olabilirlik yalnız gözlenen puanlarla kurulur; eksik satırlar raporlanır.")),
+    # Verified by targeted probes (tests/test_missing_advisor.py::test_registered_engine_probes).
+    ("MTK: RSM", dict(native=True, estimator="RSM marjinal ML (core.irt_rsm)", data="ordinal",
+                      note="Olabilirlik yalnız gözlenen yanıtlarla kurulur (MAR varsayımı); tamamen boş satırlar çıkarılır.")),
+    ("MTK: GRM Formel DIF", dict(native=True, estimator="GRM DIF marjinal ML (core.grm_dif)", data="ordinal",
+                                 note="Olabilirlik yalnız gözlenen yanıtlarla kurulur; eksiklik için MAR varsayılır.")),
+    ("MTK: Çok Kategorili Formel DIF", dict(native=True, estimator="Çok kategorili DIF marjinal ML (core.polytomous_dif)",
+                                            data="ordinal", note="Olabilirlik yalnız gözlenen yanıtlarla kurulur; eksiklik için MAR varsayılır.")),
+    ("Boyutluluk ve Faktör Analizi", dict(native=False, estimator="Boyutluluk motoru (core.dimensionality)", data="any",
+                                          note="Motorun kendi kuralı (doğrulandı): korelasyonlar ikili (pairwise) tam gözlemlerle "
+                                               "hesaplanır; her madde çiftinin N'i farklı olabilir ve raporlanır.", approval=True)),
+    ("Yerel Bağımsızlık ve Madde Uyumu", dict(native=False, estimator="Yerel uyum motoru (Python mirt + S-X²)", data="binary",
+                                              note=_REFUSE)),
+    ("MTK: Gözlenen Puan DIF", dict(native=False, estimator="Gözlenen puan DIF (core.dif_classical)", data="any", note=_REFUSE)),
+    ("Çok Boyutlu MTK (MIRT)", dict(native=False, estimator="Çok boyutlu MTK (core.irt_multidim)", data="binary/polytomous",
+                                    note=_REFUSE)),
+    ("Puanlayıcı Güvenirliği ve Uyum", dict(native=False, estimator="Puanlayıcı güvenirliği (core.rater_reliability)", data="any",
+                                            note="Krippendorff alfa dışındaki tahminciler eksik puanı reddeder (doğrulandı).")),
 )
 REFERENCES = ("Little & Rubin (2019), Statistical Analysis with Missing Data (3rd ed.).",
               "Enders (2010), Applied Missing Data Analysis.",
               "Schafer & Graham (2002), Psychological Methods, 7(2), 147-177.")
 HIGH_ITEM_RATE = .30
+LISTWISE = ("Tam kayıt analizi (eksik satırları çıkar): MCAR yansızlık için yeterli bir koşuldur ama her durumda gerekli değildir; "
+            "ör. regresyonda eksiklik yalnız tam gözlenen yordayıcılara bağlıysa tam kayıt kestirimleri yansız kalabilir. Bunun "
+            "dışındaki MAR/MNAR durumlarında yanlı olabilir; her durumda örneklemi küçültür ve güç kaybettirir.")
 
 
 def engine(page):
@@ -70,8 +92,7 @@ def advise(frame, columns, page):
                     reason=f"{eng['estimator']} eksik gözlemleri doğrudan işler; atamaya zorlanmaz. {eng['note']}")
     allowed, excluded = {}, {}
     sens = "Duyarlılık analizi seçeneği — potansiyel olarak yanlı (tek atama): "
-    allowed["listwise"] = ("Tam kayıt analizi: yalnız MCAR varsayımı altında yansızdır; MAR/MNAR altında yanlı olabilir ve "
-                           f"güç kaybettirir (kayıp satır %{pattern['row_loss_pct']:.1f}). Düşük kayıp oranı tek başına gerekçe değildir.")
+    allowed["listwise"] = LISTWISE + f" Bu veride kayıp satır %{pattern['row_loss_pct']:.1f}; düşük kayıp oranı tek başına gerekçe değildir."
     if dtype in ("binary", "ordinal"):
         allowed["mode"] = sens + "en sık kategori; kategori yapısını korur ama dağılımı tek kategoriye yığar, ilişkileri zayıflatır ve standart hataları küçültür."
         allowed["knn"] = sens + ("KNN; ikili maddelerde 0,5 eşiğiyle yuvarlama onayı gerekir; " if dtype == "binary" else "KNN; ") + \
@@ -89,8 +110,9 @@ def advise(frame, columns, page):
                            "istatistiksel atama değil puanlama kararıdır; otomatik önerilmez.")
     else:
         excluded["zero"] = "0 ile doldurma yalnız ikili başarı testlerinde puanlama kuralı olarak savunulabilir."
-    excluded["keep"] = f"{eng['estimator']} eksik yanıtla doğrudan (olabilirlik temelli) çalışmaz." if eng["native"] is False else \
-        "Bu motorun eksik veri desteği doğrulanmadı; kayıpları koruyarak çalıştırma önerilmez."
+    if not eng.get("approval"):
+        excluded["keep"] = f"{eng['estimator']} eksik yanıtla doğrudan (olabilirlik temelli) çalışmaz." if eng["native"] is False else \
+            "Bu motorun eksik veri desteği doğrulanmadı; kayıpları koruyarak çalıştırma önerilmez."
     if pattern["all_missing_items"]:
         excluded.update({m: "Tamamen boş madde(ler) var; önce bu maddeleri analizden çıkarın: " +
                          ", ".join(pattern["all_missing_items"]) for m in ("mode", "knn", "median") if m in allowed})
@@ -98,10 +120,13 @@ def advise(frame, columns, page):
     reason = (f"{eng['estimator']}: {eng['note']} " if eng["native"] is False else "Bu motorun eksik veri desteği doğrulanmadı. ") + \
              ("Bu analiz için platformda bilimsel olarak savunulabilir birincil yöntem (olabilirlik temelli/FIML veya birleştirmeli "
               "çoklu atama) desteklenmiyor; bu nedenle önerilen birincil yöntem yoktur. Aşağıdaki seçenekler varsayımlarıyla "
-              "birlikte sunulur: tam kayıt analizi yalnız MCAR altında yansızdır; atama seçenekleri yalnız duyarlılık analizi içindir.")
+              "birlikte sunulur; atama seçenekleri yalnız duyarlılık analizi içindir.")
+    if eng.get("approval"):
+        reason += (" Motorun kendi kuralı puanlamayı veya örneklemi değiştirdiği için analiz, bu kuralı açıkça onaylamanızı "
+                   "ya da Kayıp Veri İşlemleri'nde bir yöntem seçmenizi bekler.")
     if pattern["high_missing_items"]:
         reason += f" %{100 * HIGH_ITEM_RATE:.0f}'dan fazla kayıp: {', '.join(pattern['high_missing_items'])} (madde düzeyinde inceleyin)."
-    return dict(out, status="action", recommended=None, allowed=allowed, excluded=excluded, reason=reason)
+    return dict(out, status="action", recommended=None, approval=bool(eng.get("approval")), allowed=allowed, excluded=excluded, reason=reason)
 
 
 def method_label(method):
