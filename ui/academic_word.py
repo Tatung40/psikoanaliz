@@ -60,6 +60,12 @@ def _observe(name,args,kwargs,original):
     # Preserve existing specialized Word exporters and their location, but do not
     # enqueue their download until current-data/settings provenance is confirmed.
     if name=='download_button':
+        from ui.missing_advisor_view import applied as _missing_applied, stamp as _missing_stamp
+        _rec=_missing_applied()
+        if _rec and values.get('data') is not None:   # missing-data provenance travels with every export
+            values['data']=_missing_stamp(values['data'],values.get('file_name'),_rec)
+            args=(values['self'],) if 'self' in values else ()
+            kwargs={k:v for k,v in values.items() if k!='self'}
         filename=values.get('file_name','') or ''
         if str(filename).lower().endswith('.docx'):
             target=values.pop('self',None) or getattr(original,'__self__',None) or st._main

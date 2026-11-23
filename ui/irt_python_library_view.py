@@ -78,6 +78,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         origin=1 if minimum==1 else 0
         inferred=int(maximum)-origin+1 if pd.notna(maximum) and np.isfinite(maximum) else 3
         categories=int(st.number_input('Kategori sayısı',min_value=3,max_value=20,value=max(3,min(20,inferred)),step=1,key=f'python_mirt_categories_{model}'))
+    from ui.missing_advisor_view import panel as missing_panel
+    missing_panel(f'MTK: Python mirt {model}',data,cols,key=f'missing_advisor_python_mirt_{model}')
     try:
         if len(cols)<3:raise ValueError('En az üç madde seçin.')
         if model in BINARY:

@@ -7,7 +7,7 @@ import core.missing_advisor as A
 MISSING_PAGE_FILE = "pages/90_Kayip_Veri_Analizi_ve_Atama.py"
 # Routes without item-matrix analyses or with their own long-format handling (MFRM) get no global panel.
 SKIP = ("1. Ana Sayfa", "2. Veri Yükleme", "3. Puanlama", "12. Kullanım", "MTK: RaschPy MFRM", "MTK: Çok Yüzeyli Rasch",
-        "MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma")
+        "MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma", "MTK: Python mirt ")
 
 
 def source_key():
@@ -50,12 +50,12 @@ def panel(page, frame, columns, key="missing_advisor"):
     with st.expander("Kayıp veri önerisinin gerekçesi", expanded=False):
         st.caption(adv["mechanism_note"] + " " + adv["multiple_imputation"])
         if adv["allowed"]:
-            st.markdown("**Uygun yöntemler:**\n" + "\n".join(f"- {A.method_label(m)}{' — önerilen' if m == adv['recommended'] else ''}: {r}"
-                                                             for m, r in adv["allowed"].items()))
+            st.markdown("**Kullanılabilir seçenekler (varsayımlarıyla):**\n" + "\n".join(f"- {A.method_label(m)}: {r}"
+                                                                                for m, r in adv["allowed"].items()))
         if adv["excluded"]:
             st.markdown("**Önerilmeyen yöntemler:**\n" + "\n".join(f"- {A.method_label(m)}: {r}" for m, r in adv["excluded"].items()))
         st.caption("Kaynaklar: " + "; ".join(adv["references"]))
-    if adv["status"] == "action" and st.button(f"🧩 Kayıp Veri İşlemleri'ne git (önerilen: {A.method_label(adv['recommended'])})",
+    if adv["status"] == "action" and st.button("🧩 Kayıp Veri İşlemleri'ne git (birincil önerilen yöntem yok; seçenekleri değerlendirin)",
                                                key=f"{key}_go"):
         st.session_state["missing_advice"] = dict(page=page, source=source_key(), columns=cols, recommended=adv["recommended"],
                                                   allowed=list(adv["allowed"]), reason=adv["reason"])
@@ -80,3 +80,40 @@ def accept(result, method, n_before, cells):
                                                cells=cells, n_before=n_before, n_after=len(result), fingerprint=_fp(result))
     st.session_state["nav_page"] = adv["page"]; st.session_state.pop("missing_advice", None)
     st.switch_page("app.py")
+
+
+def provenance_text(rec):
+    return (f"Kayıp veri işlemi: {A.method_label(rec['method'])}; {rec['columns_n']} madde; {rec['cells']} kayıp hücre; "
+            f"satır {rec['n_before']} -> {rec['n_after']}; analiz: {rec['page']}. Orijinal veri değiştirilmeden saklandı. "
+            "Kayıp mekanizması (MCAR/MAR/MNAR) doğrulanmadı; tek atama standart hataları küçümseyebilir.")
+
+
+def stamp(data, file_name, rec):
+    """Add missing-data provenance to an export: XLSX -> extra sheet, DOCX -> closing section, CSV -> leading '#' lines,
+    ZIP -> provenance text file. Other types and non-bytes payloads are returned unchanged."""
+    import io, zipfile
+    name = str(file_name or "").lower(); text = provenance_text(rec)
+    raw = data.encode("utf-8") if isinstance(data, str) else data
+    if not isinstance(raw, (bytes, bytearray)):
+        return data
+    try:
+        if name.endswith(".xlsx"):
+            from openpyxl import load_workbook
+            wb = load_workbook(io.BytesIO(raw)); ws = wb.create_sheet("Kayıp veri işlemi"); ws["A1"] = text
+            out = io.BytesIO(); wb.save(out); return out.getvalue()
+        if name.endswith(".docx"):
+            from docx import Document
+            doc = Document(io.BytesIO(raw)); doc.add_heading("Kayıp Veri İşlemi", 1); doc.add_paragraph(text)
+            out = io.BytesIO(); doc.save(out); return out.getvalue()
+        if name.endswith(".csv"):
+            bom = raw.startswith(b"\xef\xbb\xbf"); body = raw[3:] if bom else raw
+            return (b"\xef\xbb\xbf" if bom else b"") + ("# " + text + "\n").encode("utf-8") + body
+        if name.endswith(".zip"):
+            src = zipfile.ZipFile(io.BytesIO(raw)); out = io.BytesIO()
+            with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+                for n in src.namelist(): z.writestr(n, src.read(n))
+                z.writestr("kayip_veri_islemi.txt", text)
+            return out.getvalue()
+    except Exception:
+        return data                                                     # never break an export; the banner still shows it
+    return data

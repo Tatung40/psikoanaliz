@@ -8,7 +8,14 @@ import pandas as pd
 # None: not verified for this route.
 _MIRT = dict(native=False, estimator="Python mirt marjinal ML (EM)", data="binary/polytomous",
              note="Python mirt adaptörü eksik yanıtı reddeder (doğrulanmış eksik veri politikası yok).")
-ENGINES = tuple((p, _MIRT) for p in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma", "MTK: Python mirt")) + (
+_TOTAL = dict(native=False, estimator="KTK toplam puan motoru (core.scoring.calculate_total_scores)", data="any",
+              note="Motorun kendi kuralı (doğrulandı): maddelerin en az %80'i yanıtlanmışsa yanıtlanan maddelerin toplamı alınır "
+                   "(eksik yanıt toplamda 0 gibi etki eder), daha az yanıtta toplam puan hesaplanmaz.")
+_REL = dict(native=False, estimator="Güvenirlik motoru (core.reliability.compute_reliability_indices)", data="any",
+            note="Motorun kendi kuralı (doğrulandı): eksik yanıtı olan satırları dışlar (tam kayıt); kullanılan N raporlanır.")
+ENGINES = tuple((p, _TOTAL) for p in ("4. Test İstatistikleri", "5. Madde Analizi", "6. Çeldirici Analizi",
+                                      "8. Grup Bazlı Analizler", "9. Bilimsel Grafikler", "10. Raporlama")) + \
+    (("7. Güvenirlik", _REL),) + tuple((p, _MIRT) for p in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Karşılaştırma", "MTK: Python mirt")) + (
     ("MTK: RaschPy MFRM", dict(native=True, estimator="RaschPy RCL (ikili koşullu olabilirlik)", data="long",
                                note="Eksik puan satırları gözlenen puanlarla kestirilir ve raporlanır; atama gerekmez.")),
     ("MTK: Çok Yüzeyli Rasch", dict(native=True, estimator="R/TAM marjinal ML", data="long",
@@ -17,7 +24,6 @@ ENGINES = tuple((p, _MIRT) for p in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4
 REFERENCES = ("Little & Rubin (2019), Statistical Analysis with Missing Data (3rd ed.).",
               "Enders (2010), Applied Missing Data Analysis.",
               "Schafer & Graham (2002), Psychological Methods, 7(2), 147-177.")
-LISTWISE_MAX_ROW_LOSS = .05                              # complete-case analysis only when it loses <= 5% of rows
 HIGH_ITEM_RATE = .30
 
 
@@ -63,45 +69,39 @@ def advise(frame, columns, page):
         return dict(out, status="native", recommended="keep", allowed={"keep": eng["note"]}, excluded={},
                     reason=f"{eng['estimator']} eksik gözlemleri doğrudan işler; atamaya zorlanmaz. {eng['note']}")
     allowed, excluded = {}, {}
-    small_loss = pattern["row_loss_pct"] <= 100 * LISTWISE_MAX_ROW_LOSS
-    allowed["listwise"] = ("Tam kayıt analizi: MCAR altında yansız, ancak güç kaybı ve MCAR dışında seçilim yanlılığı riski "
-                           f"vardır (kayıp satır %{pattern['row_loss_pct']:.1f}).")
+    sens = "Duyarlılık analizi seçeneği — potansiyel olarak yanlı (tek atama): "
+    allowed["listwise"] = ("Tam kayıt analizi: yalnız MCAR varsayımı altında yansızdır; MAR/MNAR altında yanlı olabilir ve "
+                           f"güç kaybettirir (kayıp satır %{pattern['row_loss_pct']:.1f}). Düşük kayıp oranı tek başına gerekçe değildir.")
     if dtype in ("binary", "ordinal"):
-        allowed["mode"] = "En sık kategori: kategori yapısını korur; varyansı ve standart hataları küçültür (tek atama)."
-        allowed["knn"] = ("KNN (yuvarlamalı): benzer yanıt örüntülerinden atar; " +
-                          ("ikili maddelerde 0,5 eşiğiyle yuvarlama onayı gerekir; " if dtype == "binary" else "") +
-                          "tek atamadır, belirsizliği küçük gösterir.")
+        allowed["mode"] = sens + "en sık kategori; kategori yapısını korur ama dağılımı tek kategoriye yığar, ilişkileri zayıflatır ve standart hataları küçültür."
+        allowed["knn"] = sens + ("KNN; ikili maddelerde 0,5 eşiğiyle yuvarlama onayı gerekir; " if dtype == "binary" else "KNN; ") + \
+            "belirsizliği küçük gösterir."
         excluded["median"] = "Medyan sıralı/ikili kategorilerde kesirli değer üretebilir; kategori yapısını korumaz."
         if dtype == "ordinal":
             excluded["knn"] = "KNN sıralı kategorilerde kesirli değer üretebilir ve yuvarlama yalnız ikili maddede desteklenir."
             allowed.pop("knn")
     else:
-        allowed["median"] = "Medyan: sürekli puanlarda basit tek atama; varyansı küçültür."
-        allowed["knn"] = "KNN: sürekli puanlarda örüntü tabanlı tek atama; belirsizliği küçük gösterir."
+        allowed["median"] = sens + "medyan; varyansı ve ilişkileri küçültür."
+        allowed["knn"] = sens + "KNN; belirsizliği küçük gösterir."
         excluded["mode"] = "En sık değer sürekli puanlar için uygun değildir."
     if dtype == "binary":
         allowed["zero"] = ("0 puan: YALNIZ puanlama kuralınız atlanan yanıtı yanlış sayıyorsa (araştırmacı kararı). Bu bir "
                            "istatistiksel atama değil puanlama kararıdır; otomatik önerilmez.")
     else:
         excluded["zero"] = "0 ile doldurma yalnız ikili başarı testlerinde puanlama kuralı olarak savunulabilir."
-    excluded["keep"] = f"{eng['estimator']} eksik yanıtla çalışmaz." if eng["native"] is False else \
+    excluded["keep"] = f"{eng['estimator']} eksik yanıtla doğrudan (olabilirlik temelli) çalışmaz." if eng["native"] is False else \
         "Bu motorun eksik veri desteği doğrulanmadı; kayıpları koruyarak çalıştırma önerilmez."
     if pattern["all_missing_items"]:
         excluded.update({m: "Tamamen boş madde(ler) var; önce bu maddeleri analizden çıkarın: " +
                          ", ".join(pattern["all_missing_items"]) for m in ("mode", "knn", "median") if m in allowed})
         for m in ("mode", "knn", "median"): allowed.pop(m, None)
-    rec = "listwise" if small_loss else ("mode" if dtype in ("binary", "ordinal") else "knn")
-    if rec not in allowed: rec = "listwise"
-    reason = (f"{eng['estimator']} eksiksiz matris gerektirir ({eng['note']}). " if eng["native"] is False else
-              "Bu motorun eksik veri desteği doğrulanmadı. ") + \
-             (f"Kayıp satır oranı %{pattern['row_loss_pct']:.1f} (≤ %{100 * LISTWISE_MAX_ROW_LOSS:.0f}) olduğundan tam kayıt "
-              "analizi önerilir; tek atamanın belirsizliği küçültme riski yoktur." if small_loss else
-              f"Kayıp satır oranı %{pattern['row_loss_pct']:.1f} (> %{100 * LISTWISE_MAX_ROW_LOSS:.0f}); tam kayıt analizi çok "
-              f"gözlem kaybettirir. Kategori yapısını koruyan '{rec}' tek ataması önerilir ve tam kayıt analizi ile duyarlılık "
-              "karşılaştırması yapılmalıdır.")
+    reason = (f"{eng['estimator']}: {eng['note']} " if eng["native"] is False else "Bu motorun eksik veri desteği doğrulanmadı. ") + \
+             ("Bu analiz için platformda bilimsel olarak savunulabilir birincil yöntem (olabilirlik temelli/FIML veya birleştirmeli "
+              "çoklu atama) desteklenmiyor; bu nedenle önerilen birincil yöntem yoktur. Aşağıdaki seçenekler varsayımlarıyla "
+              "birlikte sunulur: tam kayıt analizi yalnız MCAR altında yansızdır; atama seçenekleri yalnız duyarlılık analizi içindir.")
     if pattern["high_missing_items"]:
         reason += f" %{100 * HIGH_ITEM_RATE:.0f}'dan fazla kayıp: {', '.join(pattern['high_missing_items'])} (madde düzeyinde inceleyin)."
-    return dict(out, status="action", recommended=rec, allowed=allowed, excluded=excluded, reason=reason)
+    return dict(out, status="action", recommended=None, allowed=allowed, excluded=excluded, reason=reason)
 
 
 def method_label(method):

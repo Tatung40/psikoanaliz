@@ -27,7 +27,7 @@ source = st.file_uploader("CSV veya Excel yükleyin", type=["csv","xlsx"], key="
 advice = st.session_state.get("missing_advice")
 df = st.session_state.get(advice["source"]) if advice else st.session_state.get('raw_df')
 if advice and source is None:
-    st.info(f"**{advice['page']}** analizinden yönlendirildiniz. Öneri: {advice['reason']} Veri ve analiz ayarlarınız "
+    st.info(f"**{advice['page']}** analizinden yönlendirildiniz. {advice['reason']} Veri ve analiz ayarlarınız "
             "korunur; işlemi uyguladıktan sonra analiz ekranına dönebilirsiniz.")
 if source is not None or df is not None:
     if source is not None and source.name.lower().endswith(".csv"):
