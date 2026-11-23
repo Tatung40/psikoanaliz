@@ -7,6 +7,53 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v18_status": "CERTIFIED",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.0034704761851177485,
+       "se_ratio": [
+        0.9922624181335222,
+        1.0784894960430988
+       ],
+       "pooled_coverage": 0.9588,
+       "familywise_recovery": 0.962,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.0028023581976916764,
+       "se_ratio": [
+        0.960069060953177,
+        1.030523287443431
+       ],
+       "pooled_coverage": 0.9476666666666667,
+       "familywise_recovery": 0.95,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.0034704761851177485,
+       "se_ratio": [
+        0.9922624181335222,
+        1.0784894960430988
+       ],
+       "pooled_coverage": 0.9588,
+       "familywise_recovery": 0.962,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.0028023581976916764,
+       "se_ratio": [
+        0.960069060953177,
+        1.030523287443431
+       ],
+       "pooled_coverage": 0.9476666666666667,
+       "familywise_recovery": 0.95,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": true,
      "balanced": {
@@ -231,6 +278,53 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v18_status": "CERTIFIED",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.006811391805505605,
+       "se_ratio": [
+        0.9244428803197268,
+        1.072365074371164
+       ],
+       "pooled_coverage": 0.9516842105263158,
+       "familywise_recovery": 0.954,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.016714056151827587,
+       "se_ratio": [
+        0.9498701568340012,
+        1.0631039184797748
+       ],
+       "pooled_coverage": 0.9454814814814815,
+       "familywise_recovery": 0.954,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.007805581895841064,
+       "se_ratio": [
+        0.957802442710321,
+        1.041825781335579
+       ],
+       "pooled_coverage": 0.9496842105263158,
+       "familywise_recovery": 0.968,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.0206322629326084,
+       "se_ratio": [
+        0.9327130688859994,
+        1.0511238544057002
+       ],
+       "pooled_coverage": 0.9491111111111111,
+       "familywise_recovery": 0.952,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": true,
      "balanced": {
@@ -453,8 +547,55 @@
   },
   "thresholds": {
    "parameters": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v18_status": "not passed",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.006113409988964374,
+       "se_ratio": [
+        0.9757228974900183,
+        1.0934010905760734
+       ],
+       "pooled_coverage": 0.955625,
+       "familywise_recovery": 0.956,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.01238136960324156,
+       "se_ratio": [
+        0.9272561708346635,
+        1.0385574842477703
+       ],
+       "pooled_coverage": 0.944,
+       "familywise_recovery": 0.952,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.004256305264122785,
+       "se_ratio": [
+        0.959598307418359,
+        1.058029100460024
+       ],
+       "pooled_coverage": 0.94925,
+       "familywise_recovery": 0.954,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.01428611446057065,
+       "se_ratio": [
+        0.9488551557211132,
+        1.0504644622742791
+       ],
+       "pooled_coverage": 0.9480909090909091,
+       "familywise_recovery": 0.948,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": false,
      "balanced": {
@@ -535,17 +676,17 @@
     }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 4.8117954065673985e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -553,7 +694,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -677,8 +818,55 @@
   },
   "bivector": {
    "parameters": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "historical_rule_status": "NOT CERTIFIED",
+    "v18_status": "not passed",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.01073528856565131,
+       "se_ratio": [
+        1.0006262785969744,
+        1.0684245735798972
+       ],
+       "pooled_coverage": 0.9574285714285714,
+       "familywise_recovery": 0.944,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.019583934491249885,
+       "se_ratio": [
+        0.982961584640208,
+        1.0167100003855956
+       ],
+       "pooled_coverage": 0.9497142857142857,
+       "familywise_recovery": 0.944,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.009918006945832693,
+       "se_ratio": [
+        0.9798977287213896,
+        1.0409140242396264
+       ],
+       "pooled_coverage": 0.9494285714285714,
+       "familywise_recovery": 0.946,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.023668799567440994,
+       "se_ratio": [
+        0.9345007107701656,
+        1.029874397810725
+       ],
+       "pooled_coverage": 0.9402857142857143,
+       "familywise_recovery": 0.938,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": false,
      "balanced": {
@@ -794,17 +982,17 @@
     }
    },
    "persons": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 2.990763192656232e-11
    },
    "fit": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 4.440892098500626e-16
    },
    "probabilities": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -812,7 +1000,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -965,6 +1153,53 @@
    "parameters": {
     "status": "PARTIAL",
     "historical_rule_status": "CERTIFIED",
+    "v18_status": "not passed",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.01831677632385338,
+       "se_ratio": [
+        0.9229434255909799,
+        1.1070273606347587
+       ],
+       "pooled_coverage": 0.948046511627907,
+       "familywise_recovery": 0.936,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.032762628413111554,
+       "se_ratio": [
+        0.9070328118607764,
+        1.0566083490771476
+       ],
+       "pooled_coverage": 0.9438507462686567,
+       "familywise_recovery": 0.94,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.021106807267460517,
+       "se_ratio": [
+        0.9163364409926705,
+        1.0662510581492255
+       ],
+       "pooled_coverage": 0.9466976744186046,
+       "familywise_recovery": 0.954,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.052390874840735506,
+       "se_ratio": [
+        0.9331895816991056,
+        1.0836184487446818
+       ],
+       "pooled_coverage": 0.9449850746268657,
+       "familywise_recovery": 0.952,
+       "pass": false
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": false,
      "balanced": {
@@ -1216,6 +1451,53 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "NOT CERTIFIED",
+    "v18_status": "CERTIFIED",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.0058128339466798785,
+       "se_ratio": [
+        0.9887482193150976,
+        1.0785191809806427
+       ],
+       "pooled_coverage": 0.9560909090909091,
+       "familywise_recovery": 0.968,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.011226839456808035,
+       "se_ratio": [
+        0.9218175335378179,
+        1.0280516723291382
+       ],
+       "pooled_coverage": 0.943875,
+       "familywise_recovery": 0.96,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.0026718723726849723,
+       "se_ratio": [
+        0.9528063398615615,
+        1.060894210343632
+       ],
+       "pooled_coverage": 0.9481818181818182,
+       "familywise_recovery": 0.964,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.016847123287329062,
+       "se_ratio": [
+        0.9546372470683046,
+        1.0636921650352351
+       ],
+       "pooled_coverage": 0.950625,
+       "familywise_recovery": 0.958,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": true,
      "balanced": {
@@ -1482,6 +1764,53 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v18_status": "CERTIFIED",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.0063175091924294255,
+       "se_ratio": [
+        0.9447407612341586,
+        1.0777345730716754
+       ],
+       "pooled_coverage": 0.95568,
+       "familywise_recovery": 0.962,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.017782554741088207,
+       "se_ratio": [
+        0.9516183067289911,
+        1.0674203567504772
+       ],
+       "pooled_coverage": 0.9477297297297297,
+       "familywise_recovery": 0.966,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.003858101147660562,
+       "se_ratio": [
+        0.914247448627746,
+        1.0641058537636736
+       ],
+       "pooled_coverage": 0.944,
+       "familywise_recovery": 0.954,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.0066153337273773755,
+       "se_ratio": [
+        0.939060025185582,
+        1.0497467956151654
+       ],
+       "pooled_coverage": 0.9512432432432433,
+       "familywise_recovery": 0.972,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": true,
      "balanced": {
@@ -1706,6 +2035,53 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "NOT CERTIFIED",
+    "v18_status": "CERTIFIED",
+    "v19": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.006945621494367562,
+       "se_ratio": [
+        0.9654973201690886,
+        1.0804970001993108
+       ],
+       "pooled_coverage": 0.95725,
+       "familywise_recovery": 0.968,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.0165147595272598,
+       "se_ratio": [
+        0.9341590215732024,
+        1.0553536244666626
+       ],
+       "pooled_coverage": 0.9452727272727273,
+       "familywise_recovery": 0.954,
+       "pass": true
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.010275415242427779,
+       "se_ratio": [
+        0.9148878763875601,
+        1.0668046866013807
+       ],
+       "pooled_coverage": 0.949875,
+       "familywise_recovery": 0.948,
+       "pass": true
+      },
+      "linked": {
+       "max_abs_bias": 0.009859636279430603,
+       "se_ratio": [
+        0.921610584972786,
+        1.0725276082520683
+       ],
+       "pooled_coverage": 0.9465454545454546,
+       "familywise_recovery": 0.952,
+       "pass": true
+      }
+     }
+    },
     "v18": {
      "pass_both_designs": true,
      "balanced": {
@@ -2041,30 +2417,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.243,
-  "balanced_3facet:items": 0.235,
-  "balanced_3facet:thresholds": 0.26,
-  "balanced_3facet:bivector": 0.232,
-  "balanced_3facet:matrix": 0.241,
-  "balanced_3facet:centrality": 0.254,
-  "balanced_3facet:pseudo_halo": 0.335,
-  "balanced_3facet:bistretch": 0.263,
-  "unbalanced_linked:global": 0.265,
-  "unbalanced_linked:items": 0.283,
-  "unbalanced_linked:thresholds": 0.262,
-  "unbalanced_linked:bivector": 0.289,
-  "unbalanced_linked:matrix": 0.297,
-  "unbalanced_linked:centrality": 0.325,
-  "unbalanced_linked:pseudo_halo": 0.381,
-  "unbalanced_linked:bistretch": 0.496,
-  "interaction_bias:global": 0.297,
-  "interaction_bias:items": 0.313,
-  "interaction_bias:thresholds": 0.315,
-  "interaction_bias:bivector": 0.219,
-  "interaction_bias:matrix": 0.295,
-  "interaction_bias:centrality": 0.406,
-  "interaction_bias:pseudo_halo": 0.255,
-  "interaction_bias:bistretch": 0.272
+  "balanced_3facet:global": 0.262,
+  "balanced_3facet:items": 0.257,
+  "balanced_3facet:thresholds": 0.225,
+  "balanced_3facet:bivector": 0.236,
+  "balanced_3facet:matrix": 0.235,
+  "balanced_3facet:centrality": 0.238,
+  "balanced_3facet:pseudo_halo": 0.277,
+  "balanced_3facet:bistretch": 0.256,
+  "unbalanced_linked:global": 0.251,
+  "unbalanced_linked:items": 0.334,
+  "unbalanced_linked:thresholds": 0.295,
+  "unbalanced_linked:bivector": 0.315,
+  "unbalanced_linked:matrix": 0.283,
+  "unbalanced_linked:centrality": 0.279,
+  "unbalanced_linked:pseudo_halo": 0.331,
+  "unbalanced_linked:bistretch": 0.383,
+  "interaction_bias:global": 0.223,
+  "interaction_bias:items": 0.217,
+  "interaction_bias:thresholds": 0.287,
+  "interaction_bias:bivector": 0.3,
+  "interaction_bias:matrix": 0.239,
+  "interaction_bias:centrality": 0.258,
+  "interaction_bias:pseudo_halo": 0.365,
+  "interaction_bias:bistretch": 0.278
  },
  "recovery_diagnosis": {
   "bivector": {

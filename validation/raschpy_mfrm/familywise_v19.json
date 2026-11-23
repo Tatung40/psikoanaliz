@@ -1,0 +1,719 @@
+{
+ "protocol": "PROTOCOL.json V19_recovery_precision_and_nonzero",
+ "seed": 20261126,
+ "reps": 1000,
+ "results": {
+  "bistretch": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 52,
+     "n_with_se": 16,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.006945621494367562,
+     "se_ratio": [
+      0.9654973201690886,
+      1.0804970001993108
+     ],
+     "pooled_coverage": 0.95725,
+     "min_param_coverage": 0.944,
+     "bonferroni_critical_z": 3.301545184757089,
+     "familywise_recovery": 0.968,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 82,
+     "n_with_se": 22,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0165147595272598,
+     "se_ratio": [
+      0.9341590215732024,
+      1.0553536244666626
+     ],
+     "pooled_coverage": 0.9452727272727273,
+     "min_param_coverage": 0.93,
+     "bonferroni_critical_z": 3.4272372410554066,
+     "familywise_recovery": 0.954,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 52,
+     "n_with_se": 16,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.010275415242427779,
+     "se_ratio": [
+      0.9148878763875601,
+      1.0668046866013807
+     ],
+     "pooled_coverage": 0.949875,
+     "min_param_coverage": 0.932,
+     "bonferroni_critical_z": 3.301545184757089,
+     "familywise_recovery": 0.948,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 82,
+     "n_with_se": 22,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.009859636279430603,
+     "se_ratio": [
+      0.921610584972786,
+      1.0725276082520683
+     ],
+     "pooled_coverage": 0.9465454545454546,
+     "min_param_coverage": 0.926,
+     "bonferroni_critical_z": 3.4272372410554066,
+     "familywise_recovery": 0.952,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  },
+  "bivector": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 43,
+     "n_with_se": 7,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.01073528856565131,
+     "se_ratio": [
+      1.0006262785969744,
+      1.0684245735798972
+     ],
+     "pooled_coverage": 0.9574285714285714,
+     "min_param_coverage": 0.95,
+     "bonferroni_critical_z": 3.2478536316402074,
+     "familywise_recovery": 0.944,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 67,
+     "n_with_se": 7,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.019583934491249885,
+     "se_ratio": [
+      0.982961584640208,
+      1.0167100003855956
+     ],
+     "pooled_coverage": 0.9497142857142857,
+     "min_param_coverage": 0.932,
+     "bonferroni_critical_z": 3.3719910787175387,
+     "familywise_recovery": 0.944,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 43,
+     "n_with_se": 7,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.009918006945832693,
+     "se_ratio": [
+      0.9798977287213896,
+      1.0409140242396264
+     ],
+     "pooled_coverage": 0.9494285714285714,
+     "min_param_coverage": 0.938,
+     "bonferroni_critical_z": 3.2478536316402074,
+     "familywise_recovery": 0.946,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 67,
+     "n_with_se": 7,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.023668799567440994,
+     "se_ratio": [
+      0.9345007107701656,
+      1.029874397810725
+     ],
+     "pooled_coverage": 0.9402857142857143,
+     "min_param_coverage": 0.926,
+     "bonferroni_critical_z": 3.3719910787175387,
+     "familywise_recovery": 0.938,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  },
+  "centrality": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 22,
+     "n_with_se": 22,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0058128339466798785,
+     "se_ratio": [
+      0.9887482193150976,
+      1.0785191809806427
+     ],
+     "pooled_coverage": 0.9560909090909091,
+     "min_param_coverage": 0.946,
+     "bonferroni_critical_z": 3.052065201864886,
+     "familywise_recovery": 0.968,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 32,
+     "n_with_se": 32,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.011226839456808035,
+     "se_ratio": [
+      0.9218175335378179,
+      1.0280516723291382
+     ],
+     "pooled_coverage": 0.943875,
+     "min_param_coverage": 0.926,
+     "bonferroni_critical_z": 3.1628179656213016,
+     "familywise_recovery": 0.96,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 22,
+     "n_with_se": 22,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0026718723726849723,
+     "se_ratio": [
+      0.9528063398615615,
+      1.060894210343632
+     ],
+     "pooled_coverage": 0.9481818181818182,
+     "min_param_coverage": 0.932,
+     "bonferroni_critical_z": 3.052065201864886,
+     "familywise_recovery": 0.964,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 32,
+     "n_with_se": 32,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.016847123287329062,
+     "se_ratio": [
+      0.9546372470683046,
+      1.0636921650352351
+     ],
+     "pooled_coverage": 0.950625,
+     "min_param_coverage": 0.928,
+     "bonferroni_critical_z": 3.1628179656213016,
+     "familywise_recovery": 0.958,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  },
+  "global": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 10,
+     "n_with_se": 10,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0034704761851177485,
+     "se_ratio": [
+      0.9922624181335222,
+      1.0784894960430988
+     ],
+     "pooled_coverage": 0.9588,
+     "min_param_coverage": 0.944,
+     "bonferroni_critical_z": 2.807033768343811,
+     "familywise_recovery": 0.962,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 12,
+     "n_with_se": 12,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0028023581976916764,
+     "se_ratio": [
+      0.960069060953177,
+      1.030523287443431
+     ],
+     "pooled_coverage": 0.9476666666666667,
+     "min_param_coverage": 0.94,
+     "bonferroni_critical_z": 2.8652602385321346,
+     "familywise_recovery": 0.95,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 10,
+     "n_with_se": 10,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0034704761851177485,
+     "se_ratio": [
+      0.9922624181335222,
+      1.0784894960430988
+     ],
+     "pooled_coverage": 0.9588,
+     "min_param_coverage": 0.944,
+     "bonferroni_critical_z": 2.807033768343811,
+     "familywise_recovery": 0.962,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 12,
+     "n_with_se": 12,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0028023581976916764,
+     "se_ratio": [
+      0.960069060953177,
+      1.030523287443431
+     ],
+     "pooled_coverage": 0.9476666666666667,
+     "min_param_coverage": 0.94,
+     "bonferroni_critical_z": 2.8652602385321346,
+     "familywise_recovery": 0.95,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  },
+  "items": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 19,
+     "n_with_se": 19,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.006811391805505605,
+     "se_ratio": [
+      0.9244428803197268,
+      1.072365074371164
+     ],
+     "pooled_coverage": 0.9516842105263158,
+     "min_param_coverage": 0.928,
+     "bonferroni_critical_z": 3.0077865564732638,
+     "familywise_recovery": 0.954,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 27,
+     "n_with_se": 27,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.016714056151827587,
+     "se_ratio": [
+      0.9498701568340012,
+      1.0631039184797748
+     ],
+     "pooled_coverage": 0.9454814814814815,
+     "min_param_coverage": 0.93,
+     "bonferroni_critical_z": 3.1130172634086897,
+     "familywise_recovery": 0.954,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 19,
+     "n_with_se": 19,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.007805581895841064,
+     "se_ratio": [
+      0.957802442710321,
+      1.041825781335579
+     ],
+     "pooled_coverage": 0.9496842105263158,
+     "min_param_coverage": 0.93,
+     "bonferroni_critical_z": 3.0077865564732638,
+     "familywise_recovery": 0.968,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 27,
+     "n_with_se": 27,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0206322629326084,
+     "se_ratio": [
+      0.9327130688859994,
+      1.0511238544057002
+     ],
+     "pooled_coverage": 0.9491111111111111,
+     "min_param_coverage": 0.93,
+     "bonferroni_critical_z": 3.1130172634086897,
+     "familywise_recovery": 0.952,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  },
+  "matrix": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 43,
+     "n_with_se": 43,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.01831677632385338,
+     "se_ratio": [
+      0.9229434255909799,
+      1.1070273606347587
+     ],
+     "pooled_coverage": 0.948046511627907,
+     "min_param_coverage": 0.922,
+     "bonferroni_critical_z": 3.2478536316402074,
+     "familywise_recovery": 0.936,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 67,
+     "n_with_se": 67,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.032762628413111554,
+     "se_ratio": [
+      0.9070328118607764,
+      1.0566083490771476
+     ],
+     "pooled_coverage": 0.9438507462686567,
+     "min_param_coverage": 0.914,
+     "bonferroni_critical_z": 3.3719910787175387,
+     "familywise_recovery": 0.94,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 43,
+     "n_with_se": 43,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.021106807267460517,
+     "se_ratio": [
+      0.9163364409926705,
+      1.0662510581492255
+     ],
+     "pooled_coverage": 0.9466976744186046,
+     "min_param_coverage": 0.926,
+     "bonferroni_critical_z": 3.2478536316402074,
+     "familywise_recovery": 0.954,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 67,
+     "n_with_se": 67,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.052390874840735506,
+     "se_ratio": [
+      0.9331895816991056,
+      1.0836184487446818
+     ],
+     "pooled_coverage": 0.9449850746268657,
+     "min_param_coverage": 0.908,
+     "bonferroni_critical_z": 3.3719910787175387,
+     "familywise_recovery": 0.952,
+     "gate_bias": false,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": false
+    },
+    "pass_both_designs": false
+   },
+   "pass_all": false
+  },
+  "pseudo_halo": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 25,
+     "n_with_se": 25,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0063175091924294255,
+     "se_ratio": [
+      0.9447407612341586,
+      1.0777345730716754
+     ],
+     "pooled_coverage": 0.95568,
+     "min_param_coverage": 0.928,
+     "bonferroni_critical_z": 3.090232306167813,
+     "familywise_recovery": 0.962,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 37,
+     "n_with_se": 37,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.017782554741088207,
+     "se_ratio": [
+      0.9516183067289911,
+      1.0674203567504772
+     ],
+     "pooled_coverage": 0.9477297297297297,
+     "min_param_coverage": 0.932,
+     "bonferroni_critical_z": 3.2048452050105642,
+     "familywise_recovery": 0.966,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 25,
+     "n_with_se": 25,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.003858101147660562,
+     "se_ratio": [
+      0.914247448627746,
+      1.0641058537636736
+     ],
+     "pooled_coverage": 0.944,
+     "min_param_coverage": 0.928,
+     "bonferroni_critical_z": 3.090232306167813,
+     "familywise_recovery": 0.954,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 37,
+     "n_with_se": 37,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.0066153337273773755,
+     "se_ratio": [
+      0.939060025185582,
+      1.0497467956151654
+     ],
+     "pooled_coverage": 0.9512432432432433,
+     "min_param_coverage": 0.928,
+     "bonferroni_critical_z": 3.2048452050105642,
+     "familywise_recovery": 0.972,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  },
+  "thresholds": {
+   "null": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 16,
+     "n_with_se": 16,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.006113409988964374,
+     "se_ratio": [
+      0.9757228974900183,
+      1.0934010905760734
+     ],
+     "pooled_coverage": 0.955625,
+     "min_param_coverage": 0.938,
+     "bonferroni_critical_z": 2.955166847497834,
+     "familywise_recovery": 0.956,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 22,
+     "n_with_se": 22,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.01238136960324156,
+     "se_ratio": [
+      0.9272561708346635,
+      1.0385574842477703
+     ],
+     "pooled_coverage": 0.944,
+     "min_param_coverage": 0.924,
+     "bonferroni_critical_z": 3.052065201864886,
+     "familywise_recovery": 0.952,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "nonzero": {
+    "balanced": {
+     "fit_failures": 0,
+     "n_params": 16,
+     "n_with_se": 16,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.004256305264122785,
+     "se_ratio": [
+      0.959598307418359,
+      1.058029100460024
+     ],
+     "pooled_coverage": 0.94925,
+     "min_param_coverage": 0.94,
+     "bonferroni_critical_z": 2.955166847497834,
+     "familywise_recovery": 0.954,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "linked": {
+     "fit_failures": 0,
+     "n_params": 22,
+     "n_with_se": 22,
+     "confirmatory_replications": 500,
+     "max_abs_bias": 0.01428611446057065,
+     "se_ratio": [
+      0.9488551557211132,
+      1.0504644622742791
+     ],
+     "pooled_coverage": 0.9480909090909091,
+     "min_param_coverage": 0.93,
+     "bonferroni_critical_z": 3.052065201864886,
+     "familywise_recovery": 0.948,
+     "gate_bias": true,
+     "gate_se_ratio": true,
+     "gate_coverage": true,
+     "gate_familywise": true,
+     "pass": true
+    },
+    "pass_both_designs": true
+   },
+   "pass_all": true
+  }
+ }
+}
