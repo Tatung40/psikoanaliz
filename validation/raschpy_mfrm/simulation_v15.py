@@ -126,7 +126,7 @@ def run_checkpointed(null=60, power=30, workers=1, checkpoint=None):
     required = set(jobs)
     done = {}
     if path.exists():
-        for line in path.read_text().splitlines():
+        for line in path.read_text().replace("}\\n", "}\n").splitlines():  # legacy files used a literal \\n separator
             if not line.strip():
                 continue
             row = json.loads(line)
@@ -140,7 +140,7 @@ def run_checkpointed(null=60, power=30, workers=1, checkpoint=None):
                 for row in pool.imap_unordered(one, pending):
                     key = (row["kind"], int(row["rep"]))
                     done[key] = row
-                    stream.write(json.dumps(row, allow_nan=False) + "\\n")
+                    stream.write(json.dumps(row, allow_nan=False) + "\n")
                     stream.flush()
                     print(f"V15 {len(done)}/{len(jobs)}", flush=True)
     rows = [done[job] for job in jobs]
