@@ -229,3 +229,13 @@ def test_global_bh_decision_and_uncalibrated_omnibus_label():
     assert RP.group_part_validated("global", "dif", "omnibus") == bool(v.get("gate_omnibus"))
     assert RP.group_part_validated("global", "dif", "global_bh") == bool(v.get("gate_global_bh"))
     assert not RP.group_part_validated("matrix", "dif", "global_bh")                     # scope: global model only
+
+
+def test_v17_holdout_diagnosis_recorded_and_statuses_unchanged():
+    h = json.loads((ROOT / "validation/raschpy_mfrm/holdout_v17.json").read_text())["results"]
+    for m in RP.BOOT_MODELS:
+        for fx in ("balanced_3facet", "unbalanced_linked"):
+            r = h[f"{m}:{fx}"]; assert r["replications"] == 200 and r["fit_failures"] == 0 and r["bias_gate"]
+        assert EV["models"][m]["parameters"]["status"] == "NOT CERTIFIED"                # gate not met, criteria unchanged
+    assert [m for m, v in EV["models"].items() if v["parameters"]["status"] == "CERTIFIED"] == \
+        ["global", "items", "thresholds", "matrix", "pseudo_halo"]

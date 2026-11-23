@@ -12,6 +12,7 @@ from core.mfrm import MFRMError
 
 H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
 SIM = json.loads((H / "simulation.json").read_text())
+HOLD = json.loads((H / "holdout_v17.json").read_text())["results"] if (H / "holdout_v17.json").exists() else {}
 V15 = json.loads((H / "simulation_v15.json").read_text())["results"] if (H / "simulation_v15.json").exists() else {}
 
 
@@ -245,6 +246,9 @@ def evidence(df, edges):
                               basis="V15c: global DIF/DRF decision = min BH-adjusted Wald p < .05; null size <= .075, DIF power >= .80",
                               dif=dict((k, V15.get("dif", {}).get(k)) for k in ("global_bh_size", "global_bh_power", "gate_global_bh")),
                               drf=dict((k, V15.get("drf", {}).get(k)) for k in ("global_bh_size", "gate_global_bh"))),
+            "holdout_v17": dict(status="CHECK", basis="V17 diagnostic: 200 independent holdout replications of each fixture design; "
+                                "bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+                                results={fx: HOLD.get(f"{model}:{fx}") for fx in RECOVERY} if f"{model}:{RECOVERY[0]}" in HOLD else None),
             "person_csem": dict(status="PARTIAL" if R.v14_pass(model, "csem") else "NOT CERTIFIED",
                                 basis="V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
                                 v14=R.simulation_v14().get("results", {}).get(model, {}).get("csem")),
