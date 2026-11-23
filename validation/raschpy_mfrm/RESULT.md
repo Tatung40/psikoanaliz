@@ -81,3 +81,26 @@ Reproduce: `PYTHONPATH=. python -m validation.raschpy_mfrm.compare --write` (~20
 * **V15c Wald + BH global test** (reject if min BH-adjusted p < .05): null size DIF 0.000, DRF 0.067 (local) / 0.033
   (CI); DIF power 1.00 → **PARTIAL**, offered as the global DIF/DRF decision.
 * Defect fixed: `simulation_v15.py` wrote a literal backslash-n after the JSON, making `simulation_v15.json` unreadable.
+
+## Amendment 2026-11-23b — V17 holdout diagnosis of the bivector / centrality / bistretch recovery failures
+
+200 independent holdout replications of each fixture design with the fixture generator itself (fresh seeds, 0 fit
+failures; ~50 s on 2 cores). Matrix (CERTIFIED) as control.
+
+| Model | max abs bias (bal / unbal) | bias gate | P(correct replicate fails V5) unbal | fixture tail prob unbal |
+|---|---|---|---|---|
+| bivector | 0.014 / 0.033 | pass | 0.145 | 0.53 |
+| centrality | 0.009 / 0.027 | pass | 0.050 | 0.105 |
+| bistretch | 0.009 / 0.035 | pass | 0.080 | 0.17 |
+| matrix (control) | 0.031 / 0.048 | pass | 0.170 | 0.885 |
+
+* **Root cause: no estimator defect.** V8 reproduces the estimator exactly; V17 shows every cell unbiased at the fixture
+  designs; the V11 bootstrap SE match the holdout empirical SD (mean ratio 0.96–1.02). The failing cells are 2.3–3.2
+  empirical-SD excursions of rater P1's first-threshold cells (where lenient P1 gives few 0 scores), and with 36–60
+  correlated cells per model a correct estimator fails the per-cell `max(3 SE, 0.30)` rule on one fixture in 5–15 % of
+  replicates (matrix 17 %; it passes only through its larger SE).
+* **No code change** — nothing to fix in the estimator; regularisation and smoothing were ruled out (identical
+  deviations with ridge = 0 and constants = 0).
+* **Status unchanged: NOT CERTIFIED** — the preregistered fixture gate (V5/V11) is not met and acceptance criteria are
+  not changed after the fact. Certifying these models would need a new criterion preregistered before evaluation on new
+  fixtures (e.g. a family-wise rule); it is not adopted here.

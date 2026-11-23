@@ -150,6 +150,11 @@
      "gate_global_bh": true
     }
    },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": null
+   },
    "person_csem": {
     "status": "PARTIAL",
     "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
@@ -337,6 +342,11 @@
      "gate_global_bh": true
     }
    },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": null
+   },
    "person_csem": {
     "status": "PARTIAL",
     "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
@@ -523,6 +533,11 @@
      "global_bh_size": 0.06666666666666667,
      "gate_global_bh": true
     }
+   },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": null
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -746,6 +761,38 @@
      "gate_global_bh": true
     }
    },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": {
+     "balanced_3facet": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.01400913999638631,
+      "worst_cell": "('P2', 'K4'):1",
+      "worst_cell_bias": 0.01400913999638631,
+      "max_sd": 0.1356032985994213,
+      "max_rmse": 0.1356266560203876,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.045,
+      "fixture_max_z": 3.387825922749006,
+      "fixture_tail_prob": 0.015
+     },
+     "unbalanced_linked": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.03315296905519057,
+      "worst_cell": "('P4', 'K1'):3",
+      "worst_cell_bias": -0.03315296905519057,
+      "max_sd": 0.22459687791658606,
+      "max_rmse": 0.2261906026626767,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.145,
+      "fixture_max_z": 2.375718429816858,
+      "fixture_tail_prob": 0.53
+     }
+    }
+   },
    "person_csem": {
     "status": "PARTIAL",
     "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
@@ -931,6 +978,38 @@
     "drf": {
      "global_bh_size": 0.06666666666666667,
      "gate_global_bh": true
+    }
+   },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": {
+     "balanced_3facet": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.031140591552262495,
+      "worst_cell": "('P2', 'K4'):1",
+      "worst_cell_bias": 0.031140591552262495,
+      "max_sd": 0.2229999011677683,
+      "max_rmse": 0.2235209730759321,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.06,
+      "fixture_max_z": 2.650530081582157,
+      "fixture_tail_prob": 0.19
+     },
+     "unbalanced_linked": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.04788570557841724,
+      "worst_cell": "('P5', 'K4'):3",
+      "worst_cell_bias": 0.04788570557841724,
+      "max_sd": 0.36190734180307293,
+      "max_rmse": 0.3622752318780455,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.17,
+      "fixture_max_z": 2.010810774906114,
+      "fixture_tail_prob": 0.885
+     }
     }
    },
    "person_csem": {
@@ -1135,6 +1214,38 @@
      "gate_global_bh": true
     }
    },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": {
+     "balanced_3facet": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.008536283817203413,
+      "worst_cell": "P3:1",
+      "worst_cell_bias": -0.008536283817203413,
+      "max_sd": 0.08398372691361504,
+      "max_rmse": 0.08403973818248472,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.0,
+      "fixture_max_z": 3.3437826531217767,
+      "fixture_tail_prob": 0.005
+     },
+     "unbalanced_linked": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.02650296306244258,
+      "worst_cell": "P1:1",
+      "worst_cell_bias": -0.02650296306244258,
+      "max_sd": 0.1570630401113146,
+      "max_rmse": 0.1576457040937322,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.05,
+      "fixture_max_z": 2.666061026056072,
+      "fixture_tail_prob": 0.105
+     }
+    }
+   },
    "person_csem": {
     "status": "PARTIAL",
     "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
@@ -1321,6 +1432,11 @@
      "global_bh_size": 0.06666666666666667,
      "gate_global_bh": true
     }
+   },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": null
    },
    "person_csem": {
     "status": "PARTIAL",
@@ -1545,6 +1661,38 @@
      "gate_global_bh": true
     }
    },
+   "holdout_v17": {
+    "status": "CHECK",
+    "basis": "V17 diagnostic: 200 independent holdout replications of each fixture design; bias gate per cell, probability that a correct-by-construction replicate fails V5, fixture tail rank",
+    "results": {
+     "balanced_3facet": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.00908403383874159,
+      "worst_cell": "('P3', 'K3'):1",
+      "worst_cell_bias": -0.00908403383874159,
+      "max_sd": 0.1157700426961435,
+      "max_rmse": 0.11585720943772543,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.0,
+      "fixture_max_z": 3.482409537463673,
+      "fixture_tail_prob": 0.0
+     },
+     "unbalanced_linked": {
+      "replications": 200,
+      "fit_failures": 0,
+      "max_abs_bias": 0.03542156271510881,
+      "worst_cell": "('P1', 'K1'):1",
+      "worst_cell_bias": -0.03542156271510881,
+      "max_sd": 0.19035645574029328,
+      "max_rmse": 0.19362403607813422,
+      "bias_gate": true,
+      "p_replicate_fails_v5": 0.08,
+      "fixture_max_z": 2.6695229841471395,
+      "fixture_tail_prob": 0.17
+     }
+    }
+   },
    "person_csem": {
     "status": "PARTIAL",
     "basis": "V14 coverage of the generating theta by WLE +/- 1.96 CSEM (non-extreme persons)",
@@ -1637,30 +1785,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.153,
-  "balanced_3facet:items": 0.16,
-  "balanced_3facet:thresholds": 0.149,
-  "balanced_3facet:bivector": 0.157,
-  "balanced_3facet:matrix": 0.164,
-  "balanced_3facet:centrality": 0.171,
-  "balanced_3facet:pseudo_halo": 0.168,
-  "balanced_3facet:bistretch": 0.178,
-  "unbalanced_linked:global": 0.181,
-  "unbalanced_linked:items": 0.192,
-  "unbalanced_linked:thresholds": 0.183,
-  "unbalanced_linked:bivector": 0.192,
-  "unbalanced_linked:matrix": 0.194,
-  "unbalanced_linked:centrality": 0.198,
-  "unbalanced_linked:pseudo_halo": 0.211,
-  "unbalanced_linked:bistretch": 0.225,
-  "interaction_bias:global": 0.146,
-  "interaction_bias:items": 0.159,
-  "interaction_bias:thresholds": 0.152,
-  "interaction_bias:bivector": 0.155,
-  "interaction_bias:matrix": 0.163,
-  "interaction_bias:centrality": 0.195,
-  "interaction_bias:pseudo_halo": 0.162,
-  "interaction_bias:bistretch": 0.173
+  "balanced_3facet:global": 0.226,
+  "balanced_3facet:items": 0.226,
+  "balanced_3facet:thresholds": 0.238,
+  "balanced_3facet:bivector": 0.219,
+  "balanced_3facet:matrix": 0.254,
+  "balanced_3facet:centrality": 0.238,
+  "balanced_3facet:pseudo_halo": 0.24,
+  "balanced_3facet:bistretch": 0.261,
+  "unbalanced_linked:global": 0.269,
+  "unbalanced_linked:items": 0.265,
+  "unbalanced_linked:thresholds": 0.243,
+  "unbalanced_linked:bivector": 0.272,
+  "unbalanced_linked:matrix": 0.274,
+  "unbalanced_linked:centrality": 0.266,
+  "unbalanced_linked:pseudo_halo": 0.323,
+  "unbalanced_linked:bistretch": 0.309,
+  "interaction_bias:global": 0.213,
+  "interaction_bias:items": 0.251,
+  "interaction_bias:thresholds": 0.209,
+  "interaction_bias:bivector": 0.235,
+  "interaction_bias:matrix": 0.235,
+  "interaction_bias:centrality": 0.23,
+  "interaction_bias:pseudo_halo": 0.259,
+  "interaction_bias:bistretch": 0.288
  },
  "recovery_diagnosis": {
   "bivector": {
