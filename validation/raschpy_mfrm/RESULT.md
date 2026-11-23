@@ -66,3 +66,18 @@ Reproduce: `PYTHONPATH=. python -m validation.raschpy_mfrm.compare --write` (~20
 * Category widths: derived from thresholds (status follows parameters); RaschPy bootstrap width SE / 'Prop disordered'
   hidden. Bootstrap-method SE are never shown as validated (coverage evidence covers sandwich SE only).
 * Reliability: RaschPy ('real' SEM) and Wright–Masters (model SEM) person reliability are now reported side by side.
+
+## Amendment 2026-11-23 (V15 completed, V15c; preregistered before running)
+
+* **V15** (global model, dense N=500, 60 null + 30 power replications, 0 errors): Wald z/p/BH identity exact (0.0);
+  per-test null size DIF 0.042, DRF 0.072 (local) / 0.061 (CI; DRF bootstrap is not seeded inside RaschPy, so DRF rates
+  vary slightly between runs — both pass); familywise flag rate 0.0; DIF power 0.97. → DIF and DRF Wald tables
+  NOT CERTIFIED → **PARTIAL** (global model, dense N=500 scope).
+* **DIF omnibus LR: NOT CERTIFIED** (null size 0.117; sensitivity runs 0.175 at N=250, 0.10 at N=750). Root cause: RaschPy's
+  LR compares joint log-likelihoods at RCL (non-ML) estimates with plug-in pooled person locations, so Wilks' theorem
+  does not apply and no chi-square reference exists. Independent-null rank calibration only holds for its own DGP;
+  a dataset-specific parametric bootstrap needs ~100–200 refits (~16 s each) per analysis. Labelled "not calibrated" in
+  the app. DRF omnibus passed its null gate (0.033) at this design only.
+* **V15c Wald + BH global test** (reject if min BH-adjusted p < .05): null size DIF 0.000, DRF 0.067 (local) / 0.033
+  (CI); DIF power 1.00 → **PARTIAL**, offered as the global DIF/DRF decision.
+* Defect fixed: `simulation_v15.py` wrote a literal backslash-n after the JSON, making `simulation_v15.json` unreadable.

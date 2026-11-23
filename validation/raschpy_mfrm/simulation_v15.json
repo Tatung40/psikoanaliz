@@ -1,0 +1,43 @@
+{
+ "protocol": "PROTOCOL.json amendment_2026_11_22b V15",
+ "seed": 20261118,
+ "N": 500,
+ "null": 60,
+ "power": 30,
+ "results": {
+  "dif": {
+   "replications": 60,
+   "expected_replications": 60,
+   "errors": 0,
+   "complete": true,
+   "per_test_size": 0.041666666666666664,
+   "familywise_flag_rate": 0.0,
+   "omnibus_size": 0.11666666666666667,
+   "identity_max_diff": 0.0,
+   "gate_identity": true,
+   "gate_size": true,
+   "gate_omnibus": false,
+   "global_bh_size": 0.0,
+   "gate_global_bh": true,
+   "power_k3_flagged": 0.9666666666666667,
+   "power_replications": 30,
+   "power_complete": true,
+   "global_bh_power": 1.0
+  },
+  "drf": {
+   "replications": 60,
+   "expected_replications": 60,
+   "errors": 0,
+   "complete": true,
+   "per_test_size": 0.07222222222222222,
+   "familywise_flag_rate": 0.0,
+   "omnibus_size": 0.03333333333333333,
+   "identity_max_diff": 0.0,
+   "gate_identity": true,
+   "gate_size": true,
+   "gate_omnibus": true,
+   "global_bh_size": 0.06666666666666667,
+   "gate_global_bh": true
+  }
+ }
+}

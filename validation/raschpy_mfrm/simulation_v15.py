@@ -149,7 +149,7 @@ def run_checkpointed(null=60, power=30, workers=1, checkpoint=None):
     payload = dict(protocol="PROTOCOL.json amendment_2026_11_22b V15",
                    seed=SEED, N=N, null=null, power=power, results=res)
     tmp = output.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(payload, indent=1, allow_nan=True) + "\\n")
+    tmp.write_text(json.dumps(payload, indent=1, allow_nan=True) + "\n")
     tmp.replace(output)
     return res
 
