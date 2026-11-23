@@ -12,6 +12,7 @@ from core.mfrm import MFRMError
 
 H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
 SIM = json.loads((H / "simulation.json").read_text())
+V20 = json.loads((H / "matrix_v20.json").read_text())["results"] if (H / "matrix_v20.json").exists() else {}
 V19 = json.loads((H / "familywise_v19.json").read_text())["results"] if (H / "familywise_v19.json").exists() else {}
 V18 = json.loads((H / "familywise_v18.json").read_text())["results"] if (H / "familywise_v18.json").exists() else {}
 HOLD = json.loads((H / "holdout_v17.json").read_text())["results"] if (H / "holdout_v17.json").exists() else {}
@@ -199,6 +200,9 @@ def evidence(df, edges):
         if v19 is not None:
             cert = bool(id_ok and v8_ok and v19.get("pass_all"))
             rec_ok = bool(v19["null"]["pass_both_designs"]) or cert
+        if model == "matrix" and V20:                                          # V20 supersedes V19 for matrix only
+            cert = bool(id_ok and v8_ok and V20.get("pass_all"))
+            rec_ok = rec_ok or cert
         rec_ok = rec_ok or (v18 is not None and v18_pass)                       # V18 recovery replaces fixture recovery prospectively
         base_ok = (rec_ok and v8_ok) if v19 is not None else (rec_ok or cert_hist)
         part = "CERTIFIED" if cert else "PARTIAL" if id_ok and base_ok else "NOT CERTIFIED"
@@ -207,7 +211,10 @@ def evidence(df, edges):
         v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check.isin(["V2", "V2b"])].ok.all())
         v3 = bool(ident[ident.check == "V3"].ok.all())
         models[model] = {
-            "parameters": dict(status=part, historical_rule_status=hist_status, v18_status="CERTIFIED" if v18_pass and id_ok and v8_ok else "not passed",
+            "parameters": dict(status=part, historical_rule_status=hist_status,
+                               v20=({sc: {d: {k: V20[sc][d][k] for k in ("max_abs_bias", "pooled_coverage", "familywise_recovery", "pass",
+                                    "worst_cell", "focus_cell")} for d in ("balanced", "linked")} for sc in ("null", "nonzero")}
+                                    if model == "matrix" and V20 else None), v18_status="CERTIFIED" if v18_pass and id_ok and v8_ok else "not passed",
                                v19=None if v19 is None else {sc: {d: {k: v19[sc][d][k] for k in ("max_abs_bias", "se_ratio", "pooled_coverage",
                                     "familywise_recovery", "pass")} for d in ("balanced", "linked")} for sc in ("null", "nonzero")},
                                v18=dict(pass_both_designs=v18_pass, **{d: {k: v18[d][k] for k in ("max_abs_bias", "se_ratio",

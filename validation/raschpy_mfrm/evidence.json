@@ -7,6 +7,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v20": null,
     "v18_status": "CERTIFIED",
     "v19": {
      "null": {
@@ -278,6 +279,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v20": null,
     "v18_status": "CERTIFIED",
     "v19": {
      "null": {
@@ -549,6 +551,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v20": null,
     "v18_status": "not passed",
     "v19": {
      "null": {
@@ -820,6 +823,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "NOT CERTIFIED",
+    "v20": null,
     "v18_status": "not passed",
     "v19": {
      "null": {
@@ -1151,8 +1155,100 @@
   },
   "matrix": {
    "parameters": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v20": {
+     "null": {
+      "balanced": {
+       "max_abs_bias": 0.0077144381315342155,
+       "pooled_coverage": 0.9467906976744186,
+       "familywise_recovery": 0.94375,
+       "pass": true,
+       "worst_cell": {
+        "key": "tau1",
+        "bias": -0.0077144381315342155,
+        "mcse": 0.0009561837938098687,
+        "ci95": [
+         -0.009588523944784981,
+         -0.00584035231828345
+        ],
+        "n": 4000
+       },
+       "focus_cell": null
+      },
+      "linked": {
+       "max_abs_bias": 0.019338571088639022,
+       "pooled_coverage": 0.945044776119403,
+       "familywise_recovery": 0.93625,
+       "pass": true,
+       "worst_cell": {
+        "key": "tau1",
+        "bias": -0.019338571088639022,
+        "mcse": 0.0010300522444510309,
+        "ci95": [
+         -0.02135743640588224,
+         -0.017319705771395803
+        ],
+        "n": 4000
+       },
+       "focus_cell": {
+        "key": "cell:('P5', 'K3'):3",
+        "bias": -0.010679659675014082,
+        "mcse": 0.004986489630013548,
+        "ci95": [
+         -0.020452999836213955,
+         -0.0009063195138142091
+        ],
+        "n": 4000
+       }
+      }
+     },
+     "nonzero": {
+      "balanced": {
+       "max_abs_bias": 0.01196110536323045,
+       "pooled_coverage": 0.9479941860465116,
+       "familywise_recovery": 0.946,
+       "pass": true,
+       "worst_cell": {
+        "key": "cell:('P1', 'K2'):1",
+        "bias": -0.01196110536323045,
+        "mcse": 0.003068843768761311,
+        "ci95": [
+         -0.017975928671626944,
+         -0.005946282054833957
+        ],
+        "n": 4000
+       },
+       "focus_cell": null
+      },
+      "linked": {
+       "max_abs_bias": 0.024974723317127166,
+       "pooled_coverage": 0.9454701492537313,
+       "familywise_recovery": 0.9385,
+       "pass": true,
+       "worst_cell": {
+        "key": "cell:('P2', 'K3'):3",
+        "bias": 0.024974723317127166,
+        "mcse": 0.0035619355132427435,
+        "ci95": [
+         0.017993457940849864,
+         0.03195598869340446
+        ],
+        "n": 4000
+       },
+       "focus_cell": {
+        "key": "cell:('P5', 'K3'):3",
+        "bias": -0.012124501340488082,
+        "mcse": 0.0049199191330893495,
+        "ci95": [
+         -0.021767365724254417,
+         -0.0024816369567217476
+        ],
+        "n": 4000
+       }
+      }
+     }
+    },
     "v18_status": "not passed",
     "v19": {
      "null": {
@@ -1280,17 +1376,17 @@
     }
    },
    "persons": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V2 independent Warm WLE at RaschPy parameters",
     "max_diff": 4.994493707499714e-11
    },
    "fit": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V3 independent infit/outfit recomputation (items, raters)",
     "max_diff": 5.551115123125783e-16
    },
    "probabilities": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "V1 expected scores (and V1b stretch substitution) from the documented log-numerator"
    },
    "category_counts": {
@@ -1298,7 +1394,7 @@
     "basis": "descriptive counts; equal to the validated input frame"
    },
    "category_stats": {
-    "status": "PARTIAL",
+    "status": "CERTIFIED",
     "basis": "widths tau_k - tau_(k-1) computed by the app from the threshold estimates (derived quantity; status follows the threshold parameters). RaschPy bootstrap width SE / 'Prop disordered' not validated and not shown"
    },
    "test_stats": {
@@ -1451,6 +1547,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "NOT CERTIFIED",
+    "v20": null,
     "v18_status": "CERTIFIED",
     "v19": {
      "null": {
@@ -1764,6 +1861,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "CERTIFIED",
+    "v20": null,
     "v18_status": "CERTIFIED",
     "v19": {
      "null": {
@@ -2035,6 +2133,7 @@
    "parameters": {
     "status": "CERTIFIED",
     "historical_rule_status": "NOT CERTIFIED",
+    "v20": null,
     "v18_status": "CERTIFIED",
     "v19": {
      "null": {
@@ -2417,30 +2516,30 @@
   "interaction_lr_tam": "TAM etkileşim LR testi bu motorda yoktur; puanlayıcı × madde etkileri 'items'/'matrix' modelleriyle doğrudan kestirilir."
  },
  "seconds_per_fit": {
-  "balanced_3facet:global": 0.262,
-  "balanced_3facet:items": 0.257,
-  "balanced_3facet:thresholds": 0.225,
-  "balanced_3facet:bivector": 0.236,
-  "balanced_3facet:matrix": 0.235,
-  "balanced_3facet:centrality": 0.238,
-  "balanced_3facet:pseudo_halo": 0.277,
-  "balanced_3facet:bistretch": 0.256,
-  "unbalanced_linked:global": 0.251,
-  "unbalanced_linked:items": 0.334,
-  "unbalanced_linked:thresholds": 0.295,
-  "unbalanced_linked:bivector": 0.315,
-  "unbalanced_linked:matrix": 0.283,
-  "unbalanced_linked:centrality": 0.279,
-  "unbalanced_linked:pseudo_halo": 0.331,
-  "unbalanced_linked:bistretch": 0.383,
-  "interaction_bias:global": 0.223,
-  "interaction_bias:items": 0.217,
-  "interaction_bias:thresholds": 0.287,
-  "interaction_bias:bivector": 0.3,
-  "interaction_bias:matrix": 0.239,
-  "interaction_bias:centrality": 0.258,
-  "interaction_bias:pseudo_halo": 0.365,
-  "interaction_bias:bistretch": 0.278
+  "balanced_3facet:global": 0.234,
+  "balanced_3facet:items": 0.223,
+  "balanced_3facet:thresholds": 0.206,
+  "balanced_3facet:bivector": 0.233,
+  "balanced_3facet:matrix": 0.233,
+  "balanced_3facet:centrality": 0.3,
+  "balanced_3facet:pseudo_halo": 0.257,
+  "balanced_3facet:bistretch": 0.25,
+  "unbalanced_linked:global": 0.293,
+  "unbalanced_linked:items": 0.31,
+  "unbalanced_linked:thresholds": 0.248,
+  "unbalanced_linked:bivector": 0.258,
+  "unbalanced_linked:matrix": 0.265,
+  "unbalanced_linked:centrality": 0.274,
+  "unbalanced_linked:pseudo_halo": 0.279,
+  "unbalanced_linked:bistretch": 0.304,
+  "interaction_bias:global": 0.19,
+  "interaction_bias:items": 0.219,
+  "interaction_bias:thresholds": 0.208,
+  "interaction_bias:bivector": 0.225,
+  "interaction_bias:matrix": 0.225,
+  "interaction_bias:centrality": 0.237,
+  "interaction_bias:pseudo_halo": 0.244,
+  "interaction_bias:bistretch": 0.251
  },
  "recovery_diagnosis": {
   "bivector": {
