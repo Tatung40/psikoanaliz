@@ -1,0 +1,38 @@
+name: RaschPy V19 recovery (precision + nonzero)
+# Re-runs the preregistered V19 protocol in 4 parallel shards (design x scenario) and requires each shard to reproduce
+# the committed evidence (validation/raschpy_mfrm/familywise_v19.json): same gate outcomes, numbers within 1e-6.
+on:
+  pull_request:
+    paths: ['validation/raschpy_mfrm/familywise_v1[89].*', 'validation/raschpy_mfrm/PROTOCOL.json', 'examples/mfrm/build.py', 'requirements.txt']
+  workflow_dispatch:
+jobs:
+  v19:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        design: [balanced, linked]
+        scenario: ['null', 'nonzero']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - run: pip install -q raschpy==1.4.0 pandas numpy scipy
+      - name: Reproduce V19 shard
+        run: |
+          PYTHONPATH=. python -m validation.raschpy_mfrm.familywise_v19 --reps 1000 --workers 4 --design ${{ matrix.design }} --scenario ${{ matrix.scenario }} --out /tmp/shard.json
+          python - <<'PY'
+          import json, math
+          a = json.load(open('validation/raschpy_mfrm/familywise_v19.json'))['results']; b = json.load(open('/tmp/shard.json'))['results']
+          d, s = '${{ matrix.design }}', '${{ matrix.scenario }}'; bad = []
+          for m in a:
+              x, y = a[m][s][d], b[m][s][d]
+              for k, v in x.items():
+                  w = y.get(k)
+                  if isinstance(v, float): ok = w is not None and math.isclose(v, w, abs_tol=1e-6)
+                  elif isinstance(v, list): ok = all(math.isclose(p, q, abs_tol=1e-6) for p, q in zip(v, w))
+                  else: ok = v == w
+                  if not ok: bad.append((m, k, v, w))
+          print('differences:', len(bad), bad[:10]); assert not bad
+          PY

@@ -35,14 +35,15 @@ def test_global_recovers_generating_values_and_matches_archived_estimate():
 def test_evidence_statuses_are_backed_by_gates():
     st = {m: v["parameters"]["status"] for m, v in EV["models"].items()}; assert set(st) == set(RP.MODELS)
     cmp = pd.read_csv(ROOT / "validation/raschpy_mfrm/comparison.csv")
-    V18 = json.loads((ROOT / "validation/raschpy_mfrm/familywise_v18.json").read_text())["results"]
-    for m, s in st.items():                       # CERTIFIED = identities + V8 + V18 family-wise (both designs)
+    V19 = json.loads((ROOT / "validation/raschpy_mfrm/familywise_v19.json").read_text())["results"]
+    for m, s in st.items():                       # CERTIFIED = identities + V8 + V19 (null and nonzero, both designs)
         rec = cmp[(cmp.model == m) & cmp.check.isin(["V4", "V5"])]; v8 = cmp[(cmp.model == m) & cmp.check.str.startswith("V8_") & cmp.ok.notna()]
         hist = bool(rec.ok.astype(bool).all() and v8.ok.astype(bool).all())
         assert EV["models"][m]["parameters"]["historical_rule_status"] == ("CERTIFIED" if hist else "NOT CERTIFIED")  # history kept
-        assert len(v8) == 4 and (s == "CERTIFIED") == bool(v8.ok.astype(bool).all() and V18[m]["pass_both_designs"])
-        if hist and not V18[m]["pass_both_designs"]: assert s == "PARTIAL"                 # downgrade rule
-        if not hist and not V18[m]["pass_both_designs"]: assert s == "NOT CERTIFIED"
+        ok8 = bool(v8.ok.astype(bool).all()); assert len(v8) == 4
+        assert (s == "CERTIFIED") == bool(ok8 and V19[m]["pass_all"])
+        if not V19[m]["pass_all"]:
+            assert s == ("PARTIAL" if ok8 and V19[m]["null"]["pass_both_designs"] else "NOT CERTIFIED")
     disc = cmp[cmp.check == "V8_discrimination"].value; assert disc.min() > 1e-3     # the two configurations differ
     for m, v in EV["models"].items():
         assert v["model_selection"]["status"] == "UNSUPPORTED" and not hasattr(RP, "model_selection")
@@ -241,6 +242,16 @@ def test_v17_holdout_diagnosis_recorded():
         for fx in ("balanced_3facet", "unbalanced_linked"):
             r = h[f"{m}:{fx}"]; assert r["replications"] == 200 and r["fit_failures"] == 0 and r["bias_gate"]
         assert EV["models"][m]["parameters"]["historical_rule_status"] == "NOT CERTIFIED"
+
+
+def test_v19_complete_equal_and_reproducible_structure():
+    r = json.loads((ROOT / "validation/raschpy_mfrm/familywise_v19.json").read_text())
+    assert r["reps"] == 1000 and set(r["results"]) == set(RP.MODELS)
+    for m, v in r["results"].items():
+        for sc in ("null", "nonzero"):
+            for d in ("balanced", "linked"):
+                x = v[sc][d]; assert x["fit_failures"] == 0 and x["confirmatory_replications"] == 500
+                assert x["pass"] == all(x[k] for k in ("gate_bias", "gate_se_ratio", "gate_coverage", "gate_familywise"))
 
 
 def test_v18_familywise_results_complete_and_equal_for_all_models():

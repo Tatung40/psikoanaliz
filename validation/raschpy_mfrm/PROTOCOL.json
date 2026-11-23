@@ -79,5 +79,17 @@
   },
   "status_rule": "parameters CERTIFIED (V18 scope) iff V1-V3 identities and V8 pass (existing evidence) AND all four V18 gates pass in both designs. A currently CERTIFIED model failing V18 is downgraded to PARTIAL. Models without any RaschPy rater SE are evaluated on items/thresholds for se_ratio/coverage and on all parameters for bias and family-wise recovery. The historical V5/V11 fixture outcomes remain recorded as failed.",
   "scope": "null generating model (global RSM-MFRM), these two designs; does not extend to designs with true rater x item / threshold / stretch effects."
+ },
+ "V19_recovery_precision_and_nonzero": {
+  "committed_before": "any V19 confirmatory dataset is generated. V18 results stay recorded unchanged. Exploratory diagnosis (diagnose_v19.json, seed 20261125, committed with this protocol, not a gate): 1000 linked null replications give max |bias| 0.015 (thresholds), 0.021 (bivector), 0.024 (matrix) at RaschPy defaults (all cells < 0.05; MCSE <= 0.006); independent re-implementation equals RaschPy (max grid diff 2.4e-6); generator equals the model (build._rows: eta = theta - delta - lambda). Reading: the V18 failures (0.055-0.082 with 100 confirmatory replications; family-wise 0.88 with SDs from 100 calibration replications) are consistent with Monte Carlo imprecision across many cells, not estimator bias, identification or generator mismatch; this is confirmed or refuted only by V19.",
+  "gates": "identical to V18 (bias <= max(3 MCSE, 0.05) every parameter; SE/SD in [0.80, 1.25]; pooled Wald coverage [0.92, 0.98] and each >= 0.85; family-wise Bonferroni recovery >= 0.90)",
+  "replications": "1000 per (scenario, design): 0-499 calibration, 500-999 confirmatory; seeds [20261126, scenario, design, rep], never used before; no seed selection, single run",
+  "designs": "V18 balanced (300 x 3 raters) and linked (400, 2 of 5)",
+  "scenarios": {
+   "null": "V18 null generator, all 8 models fitted to the same data",
+   "nonzero": "per model, data generated from that model's own structure with nonzero extra effects (generator written independently of RaschPy: P(X=k) prop. to exp(sum_{h<k}(theta - b[r,i,h])), b = delta_i + tau_h + c[r,i,h], c centred over raters): items a(r,i) +/-0.5 on K3; thresholds t(r,h) = (+0.4, 0, -0.4) for the most lenient rater; bivector both; matrix e(r,i,h) +0.5 on (second rater, K3, all steps); centrality / pseudo_halo omega = linearly spaced 0.7..1.3 (mean 1); bistretch omega_items and omega_thresholds both; global = V18 null (already nonzero lambda)"
+  },
+  "status_rule": "parameters CERTIFIED iff V1-V3 identities and V8 pass AND all V19 gates pass in both designs for both scenarios. Otherwise PARTIAL if V1-V3 and V8 pass and the null scenario passes, else NOT CERTIFIED. V19 supersedes V18 for the status (more precise, broader); V18 and the fixture outcomes remain recorded.",
+  "scope": "these two designs, the stated effect sizes, 4 items and 4 categories"
  }
 }

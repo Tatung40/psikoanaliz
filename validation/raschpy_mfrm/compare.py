@@ -12,6 +12,7 @@ from core.mfrm import MFRMError
 
 H = Path(__file__).resolve().parent; EX = H.parents[1] / "examples/mfrm"
 SIM = json.loads((H / "simulation.json").read_text())
+V19 = json.loads((H / "familywise_v19.json").read_text())["results"] if (H / "familywise_v19.json").exists() else {}
 V18 = json.loads((H / "familywise_v18.json").read_text())["results"] if (H / "familywise_v18.json").exists() else {}
 HOLD = json.loads((H / "holdout_v17.json").read_text())["results"] if (H / "holdout_v17.json").exists() else {}
 V15 = json.loads((H / "simulation_v15.json").read_text())["results"] if (H / "simulation_v15.json").exists() else {}
@@ -194,14 +195,21 @@ def evidence(df, edges):
         v18 = V18.get(model) if V18 else None                                  # V18 prospective family-wise protocol
         v18_pass = bool(v18 and v18.get("pass_both_designs"))
         cert = bool(id_ok and v8_ok and v18_pass) if v18 is not None else cert_hist
+        v19 = V19.get(model) if V19 else None                                  # V19 supersedes V18 (PROTOCOL V19)
+        if v19 is not None:
+            cert = bool(id_ok and v8_ok and v19.get("pass_all"))
+            rec_ok = bool(v19["null"]["pass_both_designs"]) or cert
         rec_ok = rec_ok or (v18 is not None and v18_pass)                       # V18 recovery replaces fixture recovery prospectively
-        part = "CERTIFIED" if cert else "PARTIAL" if id_ok and (rec_ok or cert_hist) else "NOT CERTIFIED"
-        up = lambda ok: "CERTIFIED" if cert and ok else "PARTIAL" if ok and (rec_ok or cert_hist) else "NOT CERTIFIED"
+        base_ok = (rec_ok and v8_ok) if v19 is not None else (rec_ok or cert_hist)
+        part = "CERTIFIED" if cert else "PARTIAL" if id_ok and base_ok else "NOT CERTIFIED"
+        up = lambda ok: "CERTIFIED" if cert and ok else "PARTIAL" if ok and base_ok else "NOT CERTIFIED"
         fail = rec[rec.ok == False][["fixture", "key", "value", "reference", "tol"]].to_dict("records")
         v1 = bool(ident[ident.check.isin(["V1", "V1b"])].ok.all()); v2 = bool(ident[ident.check.isin(["V2", "V2b"])].ok.all())
         v3 = bool(ident[ident.check == "V3"].ok.all())
         models[model] = {
-            "parameters": dict(status=part, historical_rule_status=hist_status,
+            "parameters": dict(status=part, historical_rule_status=hist_status, v18_status="CERTIFIED" if v18_pass and id_ok and v8_ok else "not passed",
+                               v19=None if v19 is None else {sc: {d: {k: v19[sc][d][k] for k in ("max_abs_bias", "se_ratio", "pooled_coverage",
+                                    "familywise_recovery", "pass")} for d in ("balanced", "linked")} for sc in ("null", "nonzero")},
                                v18=dict(pass_both_designs=v18_pass, **{d: {k: v18[d][k] for k in ("max_abs_bias", "se_ratio",
                                         "pooled_coverage", "min_param_coverage", "familywise_recovery", "gate_bias", "gate_se_ratio",
                                         "gate_coverage", "gate_familywise")} for d in ("balanced", "linked")}) if v18 else None, basis="identity V1-V3 + recovery " + ("V4" if model == "global" else

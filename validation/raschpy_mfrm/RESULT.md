@@ -127,3 +127,32 @@ K parameters with SDs from the calibration half.
   (0.055–0.082 logit, above the 0.05 / 3 MCSE gate), consistent with sparse lowest categories for the lenient rater.
 * Scope: null generating model (no true rater × item / threshold / stretch effects) and these two designs.
 * CI: `.github/workflows/raschpy-v18.yml` re-runs V18 and requires the committed evidence to be reproduced.
+
+## V19 — precision and nonzero-effect recovery (V18 gates unchanged; preregistered before data generation)
+
+1000 replications per scenario × design (500 calibration / 500 confirmatory), fresh seeds 20261126, single run, 0 fit
+failures. Null scenario = V18 generator; nonzero scenario = each model's own structure with nonzero rater × item,
+rater × threshold, interaction or stretch effects (generator written independently of RaschPy).
+
+| Model | max abs bias (null / nonzero, worst design) | SE ratio | coverage | family-wise | V19 | Status |
+|---|---|---|---|---|---|---|
+| global | 0.003 / 0.003 | 0.96–1.08 | 0.948–0.959 | 0.95–0.96 | pass | CERTIFIED |
+| items | 0.017 / 0.021 | 0.92–1.07 | 0.945–0.952 | 0.95–0.97 | pass | CERTIFIED |
+| thresholds | 0.012 / 0.014 | 0.93–1.09 | 0.944–0.956 | 0.95–0.96 | pass | PARTIAL → **CERTIFIED** |
+| bivector | 0.020 / 0.024 | 0.93–1.07 | 0.940–0.957 | 0.94–0.95 | pass | NOT CERTIFIED → **CERTIFIED** |
+| matrix | 0.033 / **0.052** | 0.91–1.11 | 0.944–0.948 | 0.94–0.95 | fail (bias, nonzero linked) | PARTIAL |
+| centrality | 0.011 / 0.017 | 0.92–1.08 | 0.944–0.956 | 0.96–0.97 | pass | CERTIFIED |
+| pseudo_halo | 0.018 / 0.007 | 0.91–1.08 | 0.944–0.956 | 0.95–0.97 | pass | CERTIFIED |
+| bistretch | 0.017 / 0.010 | 0.91–1.08 | 0.945–0.957 | 0.95–0.97 | pass | CERTIFIED |
+
+* **Root cause of the V18 failures (thresholds, bivector, matrix-null)**: Monte Carlo imprecision. With 100 confirmatory
+  replications the per-cell bias gate and the 100-replication SD calibration were too noisy across 40–60 cells; with
+  500/500 the same gates pass (exploratory 1000-replication diagnosis committed beforehand: max |bias| ≤ 0.024). Not
+  identification (nonzero scenarios recover), not generator mismatch (`build._rows` = model), not an implementation
+  defect (independent estimator equal to 2.4e-6). **No estimator change.**
+* **Matrix (remaining failure)**: post-hoc diagnosis (exploratory): the failing cell is P5 × K3 × step 3 (most severe
+  rater, top step: sparse category), bias −0.052 (MCSE 0.014); it is not the planted interaction cell and persists with
+  the interaction ridge off (−0.045) → genuine small-sample bias of the full matrix model in sparse cells, an estimator
+  property rather than a defect. Status follows the preregistered rule: PARTIAL.
+* V18, V4/V5/V11 outcomes remain recorded (`historical_rule_status`, `v18_status`).
+* Scope: the two designs, 4 items, 4 categories, the stated effect sizes.

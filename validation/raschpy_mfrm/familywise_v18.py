@@ -90,7 +90,7 @@ def evaluate(df, reps):
         res["pass"] = bool(fails == 0 and res["gate_bias"] and res["gate_se_ratio"] and res["gate_coverage"] and res["gate_familywise"])
         out.setdefault(model, {})[design] = res
     for model, r in out.items():
-        r["pass_both_designs"] = all(r[d]["pass"] for d in DESIGN)
+        r["pass_both_designs"] = all(r[d]["pass"] for d in DESIGN if d in r) and all(d in r for d in DESIGN)
     return out
 
 
