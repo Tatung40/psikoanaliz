@@ -91,5 +91,14 @@
   },
   "status_rule": "parameters CERTIFIED iff V1-V3 identities and V8 pass AND all V19 gates pass in both designs for both scenarios. Otherwise PARTIAL if V1-V3 and V8 pass and the null scenario passes, else NOT CERTIFIED. V19 supersedes V18 for the status (more precise, broader); V18 and the fixture outcomes remain recorded.",
   "scope": "these two designs, the stated effect sizes, 4 items and 4 categories"
+ },
+ "V20_matrix_confirmatory": {
+  "committed_before": "any V20 dataset is generated. V19 (and earlier) results remain recorded unchanged; single run, no re-run until pass.",
+  "question": "is the V19 nonzero-linked matrix cell bias (P5 x K3 x step 3, -0.052, MCSE 0.014 from 500 replications) sampling noise or systematic finite-sample bias?",
+  "precision_basis": "per-cell SD ~0.31 (V19) -> 4000 confirmatory replications give MCSE ~0.005, so the unchanged bias gate max(3 MCSE, 0.05) is effectively 0.05 and a true bias of 0.052 would fail while 0.040 would pass; 95% CI half-width ~0.010",
+  "design": "matrix model only; V19 generator, designs (balanced, linked), scenarios (null, nonzero) and effect sizes unchanged; 5000 replications per (scenario, design): reps 0-999 calibration (family-wise SDs), 1000-4999 confirmatory; seeds [20261127, scenario, design, rep] never used before",
+  "gates": "V19/V18 gates unchanged (bias, SE ratio, coverage, family-wise), all four (scenario, design) cells",
+  "status_rule": "matrix parameters CERTIFIED iff V1-V3 identities and V8 pass (existing) and all V20 gates pass; otherwise PARTIAL (unchanged). Also reported: per-cell bias with 95% CI for the worst cell and for P5 x K3 x step 3. No estimator change unless an implementation defect is shown (independent estimator V8 already agrees).",
+  "other_models": "not re-simulated; targeted regression tests only"
  }
 }

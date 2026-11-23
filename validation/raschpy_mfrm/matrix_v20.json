@@ -1,0 +1,155 @@
+{
+ "protocol": "PROTOCOL.json V20_matrix_confirmatory",
+ "seed": 20261127,
+ "reps": 5000,
+ "calibration": 1000,
+ "results": {
+  "null": {
+   "balanced": {
+    "fit_failures": 0,
+    "n_params": 43,
+    "n_with_se": 43,
+    "confirmatory_replications": 4000,
+    "max_abs_bias": 0.0077144381315342155,
+    "se_ratio": [
+     0.9687666347943293,
+     1.0130142275019056
+    ],
+    "pooled_coverage": 0.9467906976744186,
+    "min_param_coverage": 0.94,
+    "bonferroni_critical_z": 3.2478536316402074,
+    "familywise_recovery": 0.94375,
+    "gate_bias": true,
+    "gate_se_ratio": true,
+    "gate_coverage": true,
+    "gate_familywise": true,
+    "pass": true,
+    "worst_cell": {
+     "key": "tau1",
+     "bias": -0.0077144381315342155,
+     "mcse": 0.0009561837938098687,
+     "ci95": [
+      -0.009588523944784981,
+      -0.00584035231828345
+     ],
+     "n": 4000
+    },
+    "focus_cell": null
+   },
+   "linked": {
+    "fit_failures": 0,
+    "n_params": 67,
+    "n_with_se": 67,
+    "confirmatory_replications": 4000,
+    "max_abs_bias": 0.019338571088639022,
+    "se_ratio": [
+     0.9519025210134293,
+     1.005928915209804
+    ],
+    "pooled_coverage": 0.945044776119403,
+    "min_param_coverage": 0.935,
+    "bonferroni_critical_z": 3.3719910787175387,
+    "familywise_recovery": 0.93625,
+    "gate_bias": true,
+    "gate_se_ratio": true,
+    "gate_coverage": true,
+    "gate_familywise": true,
+    "pass": true,
+    "worst_cell": {
+     "key": "tau1",
+     "bias": -0.019338571088639022,
+     "mcse": 0.0010300522444510309,
+     "ci95": [
+      -0.02135743640588224,
+      -0.017319705771395803
+     ],
+     "n": 4000
+    },
+    "focus_cell": {
+     "key": "cell:('P5', 'K3'):3",
+     "bias": -0.010679659675014082,
+     "mcse": 0.004986489630013548,
+     "ci95": [
+      -0.020452999836213955,
+      -0.0009063195138142091
+     ],
+     "n": 4000
+    }
+   }
+  },
+  "nonzero": {
+   "balanced": {
+    "fit_failures": 0,
+    "n_params": 43,
+    "n_with_se": 43,
+    "confirmatory_replications": 4000,
+    "max_abs_bias": 0.01196110536323045,
+    "se_ratio": [
+     0.9654188952349,
+     1.012399789114946
+    ],
+    "pooled_coverage": 0.9479941860465116,
+    "min_param_coverage": 0.94175,
+    "bonferroni_critical_z": 3.2478536316402074,
+    "familywise_recovery": 0.946,
+    "gate_bias": true,
+    "gate_se_ratio": true,
+    "gate_coverage": true,
+    "gate_familywise": true,
+    "pass": true,
+    "worst_cell": {
+     "key": "cell:('P1', 'K2'):1",
+     "bias": -0.01196110536323045,
+     "mcse": 0.003068843768761311,
+     "ci95": [
+      -0.017975928671626944,
+      -0.005946282054833957
+     ],
+     "n": 4000
+    },
+    "focus_cell": null
+   },
+   "linked": {
+    "fit_failures": 0,
+    "n_params": 67,
+    "n_with_se": 67,
+    "confirmatory_replications": 4000,
+    "max_abs_bias": 0.024974723317127166,
+    "se_ratio": [
+     0.9515440340088581,
+     1.0099856787607544
+    ],
+    "pooled_coverage": 0.9454701492537313,
+    "min_param_coverage": 0.93325,
+    "bonferroni_critical_z": 3.3719910787175387,
+    "familywise_recovery": 0.9385,
+    "gate_bias": true,
+    "gate_se_ratio": true,
+    "gate_coverage": true,
+    "gate_familywise": true,
+    "pass": true,
+    "worst_cell": {
+     "key": "cell:('P2', 'K3'):3",
+     "bias": 0.024974723317127166,
+     "mcse": 0.0035619355132427435,
+     "ci95": [
+      0.017993457940849864,
+      0.03195598869340446
+     ],
+     "n": 4000
+    },
+    "focus_cell": {
+     "key": "cell:('P5', 'K3'):3",
+     "bias": -0.012124501340488082,
+     "mcse": 0.0049199191330893495,
+     "ci95": [
+      -0.021767365724254417,
+      -0.0024816369567217476
+     ],
+     "n": 4000
+    }
+   }
+  },
+  "pass_all": true
+ }
+}
