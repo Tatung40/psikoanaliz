@@ -33,7 +33,7 @@ def test_checkpoint_resume_does_not_repeat_completed_jobs(tmp_path, monkeypatch)
         return row
     monkeypatch.setattr(v15, "one", fake_one)
     ck = tmp_path / "checkpoint.jsonl"
-    ck.write_text(json.dumps(fake_one(("null", 0))) + "\\n")
+    ck.write_text(json.dumps(fake_one(("null", 0))) + "\n")
     seen.clear()
     out = v15.run_checkpointed(null=2, power=1, workers=1, checkpoint=ck)
     assert seen == [("null", 1), ("power", 0)]

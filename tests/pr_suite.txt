@@ -103,3 +103,4 @@ tests/test_word_standard.py
 tests/test_result_panels.py
 tests/test_raschpy_mfrm.py
 tests/test_missing_advisor.py
+tests/test_raschpy_v15_resume.py
