@@ -59,7 +59,7 @@ def test_map_se_default_is_the_library_posterior_covariance():
 
 def test_binary_screens_default_to_61_nodes_and_other_families_keep_21():
     src = (ROOT / "ui/irt_python_library_view.py").read_text()
-    assert "n_quadpts=61 if model in BINARY else 21" in src
+    assert "n_quadpts=61 if model in BINARY and model!='Rasch' else 21" in src
     assert 'solver_controls(f"py_mirt_solver_{model}", n_quadpts=61)' in (ROOT / "app.py").read_text()
     assert "solver_controls('pmd_solver')" in (ROOT / "ui/python_mirt_dif_view.py").read_text()
 
