@@ -343,5 +343,38 @@
    "validation": "Wright map outputs at 61 nodes: item locations equal the fitted b and person values equal the library EAP of the same fit (identity, <= 1e-12, browser and AppTest); historical reproducibility: the same screen with 21 nodes set explicitly reproduces the frozen phase-2 evidence (validation/r_mirt_phase2/evidence) to <= 1e-12",
    "scope": "Wright person values are EAP person estimates and stay outside the certified outputs"
   }
+ },
+ "amendment_D": {
+  "registered": "2026-11-24, after PR #181 and before any run below; all earlier gates, thresholds and failed evidence (incl. R mirt timeouts on 405-407) unchanged and reported",
+  "D1_4PL_independent_pathway": {
+   "rationale": "R mirt is a reference implementation, not ground truth. On 405-407 it did not reach any solution within 900 s per start (a timeout, not a numerical disagreement: R started at Python's solution stays there on all seven B2 fixtures, and on 403 R's own log-posterior is 452 higher at Python's solution).",
+   "reference": "validation/binary_certification/reference_numpy.py: own marginal log-posterior (121 GH nodes), exact gradient (Fisher identity), the Python mirt box, L-BFGS-B; no Python mirt, no R",
+   "fresh_holdout": [
+    "sim(N=3000, k=12, seed=408)",
+    "sim(N=3000, k=12, seed=409)",
+    "sim(N=3000, k=30, seed=410)",
+    "sim(N=3000, k=30, seed=411)",
+    "sim(N=10000, k=12, seed=412)",
+    "sim(N=10000, k=12, seed=413)",
+    "sim(N=10000, k=30, seed=414)",
+    "sim(N=10000, k=30, seed=415)"
+   ],
+   "multistart": "5 deterministic starts independent of Python: the data-only start and four starts with a in {.6, 1.8}, c in {.05, .3}, d in {.85, .99}, b = data-only b +/- .5 (all combinations in a fixed order: (.6,.05,.85,-.5), (1.8,.3,.99,+.5), (.6,.3,.99,+.5), (1.8,.05,.85,-.5))",
+   "criteria_per_fixture": {
+    "agreement": "Python vs the best start (highest reference log-posterior): |diff| a/b <= .002, c/d <= .001, |objective diff| <= .001, Python not worse by > 1e-4 (the original G1 numbers)",
+    "kkt": "at Python's solution, exact-gradient max |g| <= .05 over interior coordinates; coordinates within 1e-6 of a box bound must have the gradient pointing outward",
+    "hessian": "finite-difference Hessian (of the exact gradient, step 1e-4) of the negative log-posterior over interior coordinates is positive definite"
+   },
+   "reused": "G2 recovery (A2, four corners, p1 criteria incl. IRF RMSE) and G5 output identity (IRF/information <= 1e-10) already pass for 4PL",
+   "decision": "4PL G1 is satisfied by D1 iff all 8 holdout fixtures pass every criterion; certified outputs are then the original 4PL scope (item parameter estimates, IRF, item/test information; SE/CI excluded) with the label stating the independent-reference pathway and the recorded R mirt timeouts. One local run; failures are reported."
+  },
+  "D2_3PL_inference": {
+   "decision": "No further computation: no computationally efficient interval meets the unchanged two-sided criterion (posterior Wald over-covers, b .976 / c .975; penalized-likelihood sandwich under-covers .90-.93 and is not PD in up to 24 %; library crossprod .970-.972). Output-level certification is retained; SE/CI stay NOT CERTIFIED."
+  },
+  "D3_Rasch_sample": {
+   "sample": "tests/fixtures/rasch/data_rasch_inscope.csv: Rasch (a = 1), N = 2000, k = 20, b = linspace(-2, 2, 20), theta ~ N(0, 1), seed 20261124",
+   "validation": "Python mirt Rasch (61 nodes) vs an independent fixed-a reference (same numpy objective, exact gradient): max |diff b| <= .002, |objective diff| <= .001; recovery: every |b-hat - b| <= 3 SE; certification lookup returns 'certified'",
+   "historical": "tests/fixtures/rasch/data_rasch_main.csv and its frozen phase-2 tests stay unchanged"
+  }
  }
 }
