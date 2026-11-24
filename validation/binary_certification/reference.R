@@ -28,11 +28,12 @@ items <- list(
 settings <- list(quadpts = 101, theta_lim = c(-6, 6), TOL = 1e-8, verbose = FALSE, SE = TRUE, SE.type = "Oakes",
                  accelerate = "squarem", technical = list(NCYCLES = 5000))   # SQUAREM: speed only, same objective
 fit_with <- function(args) {
-  setTimeLimit(elapsed = 300, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
-  fit <- tryCatch(do.call(mirt, c(args, settings)), error = function(e) { message("fit error: ", conditionMessage(e)); NULL })
+  setTimeLimit(elapsed = 600, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
+  use <- settings; use[names(args)[names(args) %in% names(use)]] <- NULL
+  fit <- tryCatch(do.call(mirt, c(args, use)), error = function(e) { message("fit error: ", conditionMessage(e)); NULL })
   se_type <- "Oakes"
   if (is.null(fit) || !isTRUE(extract.mirt(fit, "secondordertest"))) {   # pre-registered fallback, recorded
-    s2 <- settings; s2$SE.type <- "Richardson"; fit <- do.call(mirt, c(args, s2)); se_type <- "Richardson"
+    s2 <- use; s2$SE.type <- "Richardson"; fit <- do.call(mirt, c(args, s2)); se_type <- "Richardson"
   }
   list(fit = fit, se_type = se_type)
 }
@@ -53,7 +54,10 @@ for (case in cases) {
     type <- if (model == "3PL") "irt3" else "irt4"; qs <- if (model == "3PL") c("a", "b", "c") else c("a", "b", "c", "d")
     sv <- mirt(dat, 1, itemtype = type, customItems = items[type], pars = "values")
     sv$value[sv$name == "b"] <- -qlogis(pmin(pmax(colMeans(dat), .02), .98))
-    res <- fit_with(list(data = dat, model = 1, itemtype = type, customItems = items[type], pars = sv))
+    # Custom items: Newton-Raphson M-step with the supplied Hessian and no SQUAREM extrapolation; the default quasi-Newton
+    # M-step stopped EM after 8-14 cycles below the posterior maximum (run 4ce2ee1). Objective and TOL unchanged.
+    res <- fit_with(list(data = dat, model = 1, itemtype = type, customItems = items[type], pars = sv,
+                         optimizer = "NR", accelerate = "none"))
     cf <- coef(res$fit, printSE = TRUE)[seq_len(k)]
     get <- function(row, p) unname(sapply(cf, function(m) if (row %in% rownames(m)) m[row, p] else NA_real_))
     par <- setNames(lapply(qs, function(p) get("par", p)), qs); se <- setNames(lapply(qs, function(p) get("SE", p)), qs)
