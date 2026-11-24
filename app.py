@@ -1806,7 +1806,7 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         from ui.irt_solver_controls import solver_controls
         instrument_code_capture(globals())
         with st.sidebar:
-            solver_options=solver_controls(f"py_mirt_solver_{model}")
+            solver_options=solver_controls(f"py_mirt_solver_{model}", n_quadpts=61)
         from core.irt_binary_usage_policy import evidence_note
         _level, _note = evidence_note(model)
         (st.info if _level == "info" else st.warning)("Etkin iki kategorili MTK motoru: Python mirt. " + _note)

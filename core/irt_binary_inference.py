@@ -11,21 +11,23 @@ import pandas as pd
 
 Z95 = 1.959963984540054
 NAMES = {"discrimination": "a", "difficulty": "b", "guessing": "c", "upper": "d"}
-STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. Önceden kayıtlı Monte Carlo kapsaması: 1PL/2PL (N = 1000, 12 madde) "
-          ".945–.953; 3PL MAP (N = 3000, 30 madde) .950–.968. Ölçütü (.95 ± .02, sınırda tutulan oran ≤ .05) "
+STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. Önceden kayıtlı Monte Carlo kapsaması (61 düğüm, N 1000–10000, "
+          "k 12–30): 1PL/2PL .944–.961 (CERTIFIED); 3PL MAP a .949–.960, b/c ≤ .976 (aşırı kapsama). Ölçütü (.95 ± .02, sınırda tutulan oran ≤ .05) "
           "sağlamayan 3PL/4PL parametrelerinde SH gösterilir, Wald GA gösterilmez; 4PL ML'de kullanım "
           "politikası gereği kapsama oranından bağımsız tüm Wald GA kapalıdır "
-          "(validation/evidence/p6_binary_se, p7_binary34_se).")
+          "(validation/evidence/binary_certification).")
 # Pre-registered 3PL/4PL decision (validation/binary34_se_coverage_study.py): (model, estimation, parameter) ->
 # (coverage farthest from .95 over the design cells, largest on-bound withheld rate, Wald CI supported).
+# MAP rows: binary certification amendment A2 (application default 61 GH nodes; four corners N 3000/10000 x k 12/30).
+# ML rows: p7_binary34_se (21 nodes); ML 3PL/4PL is outside the certified scope.
 EVIDENCE_34 = {
-    ("3PL", "MAP", "a"): (0.950, 0.000, True),
-    ("3PL", "MAP", "b"): (0.967, 0.000, True),
-    ("3PL", "MAP", "c"): (0.968, 0.000, True),
-    ("4PL", "MAP", "a"): (0.994, 0.000, False),
-    ("4PL", "MAP", "b"): (0.971, 0.000, False),
-    ("4PL", "MAP", "c"): (0.981, 0.000, False),
-    ("4PL", "MAP", "d"): (0.979, 0.000, False),
+    ("3PL", "MAP", "a"): (0.960, 0.000, True),
+    ("3PL", "MAP", "b"): (0.976, 0.000, False),
+    ("3PL", "MAP", "c"): (0.975, 0.000, False),
+    ("4PL", "MAP", "a"): (0.998, 0.000, False),
+    ("4PL", "MAP", "b"): (0.988, 0.000, False),
+    ("4PL", "MAP", "c"): (0.990, 0.000, False),
+    ("4PL", "MAP", "d"): (0.990, 0.000, False),
     ("3PL", "ML", "a"): (0.929, 0.000, False),
     ("3PL", "ML", "b"): (0.827, 0.000, False),
     ("3PL", "ML", "c"): (0.936, 0.128, False),
@@ -37,13 +39,13 @@ EVIDENCE_34 = {
 # Same study: (largest |mean bias|, largest RMSE) over the cells. Coverage is not estimation accuracy: where
 # |bias| exceeds the .05 limit used for 1PL/2PL (p6_binary_se), a kept CI carries an explicit warning.
 ACCURACY_34 = {
-    ("3PL", "MAP", "a"): (-0.022, 0.132),
-    ("3PL", "MAP", "b"): (+0.004, 0.133),
-    ("3PL", "MAP", "c"): (+0.000, 0.047),
-    ("4PL", "MAP", "a"): (+0.036, 0.176),
-    ("4PL", "MAP", "b"): (-0.019, 0.172),
-    ("4PL", "MAP", "c"): (+0.005, 0.045),
-    ("4PL", "MAP", "d"): (-0.018, 0.036),
+    ("3PL", "MAP", "a"): (-0.026, 0.162),
+    ("3PL", "MAP", "b"): (+0.013, 0.141),
+    ("3PL", "MAP", "c"): (+0.003, 0.050),
+    ("4PL", "MAP", "a"): (+0.044, 0.187),
+    ("4PL", "MAP", "b"): (-0.026, 0.187),
+    ("4PL", "MAP", "c"): (+0.008, 0.045),
+    ("4PL", "MAP", "d"): (-0.019, 0.036),
     ("3PL", "ML", "a"): (+0.018, 0.159),
     ("3PL", "ML", "b"): (+0.008, 0.230),
     ("3PL", "ML", "c"): (-0.002, 0.082),
@@ -55,11 +57,33 @@ ACCURACY_34 = {
 BIAS_LIMIT = 0.05
 
 
+# Negative second derivative of the Python mirt default log-priors (mirt.estimation.priors.default_priors):
+# a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8), d ~ Beta(8, 2). Used only for the MAP sandwich covariance.
+PRIOR_CURVATURE = {
+    "discrimination": lambda a: ((1 - np.log(a)) / 0.25 - 1) / a ** 2,
+    "difficulty": lambda b: np.full_like(np.asarray(b, float), 1 / 4),
+    "guessing": lambda c: 1 / c ** 2 + 7 / (1 - c) ** 2,
+    "upper": lambda d: 7 / d ** 2 + 1 / (1 - d) ** 2,
+}
+
+
+def map_sandwich(covariance, kinds, estimates):
+    """Penalized-likelihood (frequentist) covariance of a MAP estimate: V J V with J = V^-1 - P, i.e. V - V P V.
+
+    V is the library inverse log-posterior Hessian of the free (interior) parameters; P the diagonal prior curvature.
+    Returns None when the result is not positive definite (no SE is then reported)."""
+    V = np.asarray(covariance, float)
+    P = np.diag([float(PRIOR_CURVATURE[k](np.asarray(e, float))) for k, e in zip(kinds, estimates)])
+    S = V - V @ P @ V
+    S = (S + S.T) / 2
+    return S if np.isfinite(S).all() and np.linalg.eigvalsh(S)[0] > 0 else None
+
+
 def _matrix(value):
     return np.asarray(value() if callable(value) else value, float)
 
 
-def parameter_inference(fit, model, item_names, estimation=None):
+def parameter_inference(fit, model, item_names, estimation=None, se_method="posterior"):
     """Return (table, reason). table is None and reason explains why when SE cannot be reported.
 
     With estimation ("ML"/"MAP") coverage evidence is necessary but not sufficient:
@@ -101,15 +125,35 @@ def parameter_inference(fit, model, item_names, estimation=None):
     block = covariance[np.ix_(active, active)]
     if not np.isfinite(block).all():
         return None, "Kovaryans matrisi sınır dışı parametrelerde sonlu değil; SH üretilmedi."
+    # Equality constraints (common discrimination, 1PL with shared free a) are expanded by the library into one
+    # identical row/column per item; the covariance of the free parameters is the block of one representative.
+    # Verified against an independent observed-information Hessian (validation/binary_certification).
+    keep, positions = [], np.flatnonzero(active)
+    for i, p_i in enumerate(positions):
+        duplicate = any(parsed[p_i][1] == parsed[positions[j]][1] and parsed[p_i][2] == parsed[positions[j]][2]
+                        and np.allclose(block[i], block[j], rtol=0, atol=1e-12 * max(1.0, np.abs(block).max()))
+                        for j in keep)
+        if not duplicate:
+            keep.append(i)
+    block = block[np.ix_(keep, keep)]
     block = (block + block.T) / 2
     eigen = np.linalg.eigvalsh(block)
     if eigen[0] <= 0:
         return None, "Kovaryans matrisi pozitif tanımlı değil; SH üretilemez."
     if eigen[-1] / eigen[0] > 1e8:
         return None, f"Kovaryans matrisi kötü koşullanmış (koşul sayısı {eigen[-1] / eigen[0]:.3g}); SH üretilmedi."
+    variances = np.diag(covariance).astype(float)
+    if se_method == "sandwich":                       # MAP only: penalized-likelihood covariance (amendment A1b)
+        idx = np.flatnonzero(active)
+        S = map_sandwich(covariance[np.ix_(idx, idx)], [parsed[i][1] for i in idx], [parsed[i][2] for i in idx])
+        if S is None:
+            return None, "Cezalı olabilirlik (sandviç) kovaryansı pozitif tanımlı değil; SH üretilmedi."
+        variances[idx] = np.diag(S)
+    elif se_method != "posterior":
+        raise ValueError("se_method must be 'posterior' or 'sandwich'.")
     rows = []
     for position, (j, parameter, estimate, on_bound) in enumerate(parsed):
-        se = np.nan if on_bound else float(np.sqrt(covariance[position, position]))
+        se = np.nan if on_bound else float(np.sqrt(variances[position]))
         rows.append({"Madde": names[j], "Parametre": NAMES[parameter], "Kestirim": estimate, "SH": se,
                      "GA %95 alt": estimate - Z95 * se, "GA %95 üst": estimate + Z95 * se,
                      "Not": "Kutu sınırında; SH/Wald GA geçersiz (kütüphane bu parametreyi sabit tutar)"

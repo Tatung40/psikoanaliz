@@ -10,7 +10,7 @@ from core.irt_python_mirt_adapter import fit_python_mirt
 def actual_fits():
     x=pd.read_csv('tests/fixtures/irt_b10/data_irt1pl_ok.csv').iloc[:240,:6].astype(int)
     fits={(model,q):fit_python_mirt(x,model=model,n_quadpts=q)
-          for model,q in [('Rasch',21),('2PL',21),('2PL',31)]}
+          for model,q in [('Rasch',21),('Rasch',61),('2PL',61),('2PL',31)]}  # 2PL default 61 nodes (certification A2); Rasch keeps 21
     assert all(v.fit.converged for v in fits.values())
     return x,fits
 
@@ -73,6 +73,9 @@ def test_spss_outputs_and_rasch_map_preserve_actual_values(actual_fits,monkeypat
 
 def test_comparison_requires_matched_solver_and_bad_settings_fail_closed(actual_fits,monkeypatch):
     at,calls,downloads,_=app_with_real_fits(actual_fits,monkeypatch)
+    # Rasch keeps 21 nodes (phase-2 evidence), 2PL defaults to 61: match them so the comparison is admissible.
+    at.checkbox(key='python_mirt_solver_advanced_Rasch').check().run()
+    at.number_input(key='python_mirt_solver_Rasch_n_quadpts').set_value(61).run()
     at.button(key='python_mirt_start_Rasch').click().run()
     at.button(key='irt_nav_2PL').click().run()
     at.button(key='python_mirt_start_2PL').click().run()
@@ -80,7 +83,7 @@ def test_comparison_requires_matched_solver_and_bad_settings_fail_closed(actual_
     comparison=pd.read_csv(io.BytesIO(downloads['python_mirt_compare_csv_2PL']))
     assert set(comparison.Model)=={'Rasch','2PL'}
     for model in comparison.Model:
-        assert comparison.set_index('Model').loc[model,'LogLik']==pytest.approx(actual_fits[1][model,21].fit.log_likelihood,abs=1e-10)
+        assert comparison.set_index('Model').loc[model,'LogLik']==pytest.approx(actual_fits[1][model,61].fit.log_likelihood,abs=1e-10)
     before=downloads['python_mirt_persons_csv_2PL']
     downloads.clear();at.checkbox(key='python_mirt_output_2PL_comparison').uncheck().run()
     assert 'python_mirt_compare_csv_2PL' not in downloads and downloads['python_mirt_persons_csv_2PL']==before and len(calls)==2

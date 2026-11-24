@@ -25,6 +25,11 @@ class LibraryReport:
 
 def binary_evidence_label(outcome, *, common_discrimination=False, converged=None):
     """Presentation only: never rewrite adapter status codes or infer normality."""
+    if converged is True and outcome.model in ('Rasch','1PL','2PL','3PL','4PL'):
+        from core.irt_binary_usage_policy import certification
+        state,text=certification(outcome.model,outcome.estimation,outcome.n_persons,outcome.n_items,outcome.solver_settings)
+        if state!='outside_scope' or common_discrimination:
+            return text
     if outcome.model=='1PL' and common_discrimination:
         # tests/test_scientific_gap_closure.py: identical to native sigma-free Rasch (one fixture).
         return ('POINT ESTIMATES NUMERICALLY VERIFIED (yerel σ-serbest Rasch eşdeğerliği, tek fikstür); '

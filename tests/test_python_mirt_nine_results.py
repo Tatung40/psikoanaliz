@@ -20,9 +20,11 @@ def test_conditional_evidence_label_never_rewrites_unknown_or_extends_scope(mode
     assert 'Yakınsama doğrulanmadı' in binary_evidence_label(outcome,converged=False)
     outcome.n_persons=500
     assert 'bu tasarıma genellenmez' in binary_evidence_label(outcome,converged=True)
-    outcome.n_persons=1000;outcome.solver_settings['n_quadpts']=61
-    assert 'bu tasarıma genellenmez' in binary_evidence_label(outcome,converged=True)
+    outcome.n_persons=1000;outcome.solver_settings['n_quadpts']=61          # certified rectangle (binary certification)
+    assert binary_evidence_label(outcome,converged=True).startswith('CERTIFIED')
     if model=='1PL':
+        assert binary_evidence_label(outcome,common_discrimination=True,converged=True).startswith('CERTIFIED')
+        outcome.n_persons=500
         assert 'NOT VERIFIED' in binary_evidence_label(outcome,common_discrimination=True,converged=True)
     assert outcome.scientific_status=='Unknown'
 
@@ -126,10 +128,10 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
     # Single click: binary models also get the SE/CI table (not 1PL: no SE), PNG + Excel/ZIP bundle; Rasch the Wright map.
-    tables={'Rasch':7,'1PL':4,'2PL':5,'3PL':5,'4PL':5,'NRM':3}.get(model,4)
+    tables={'Rasch':7,'1PL':5,'2PL':5,'3PL':5,'4PL':5,'NRM':3}.get(model,4)  # 1PL common a: SE now reported
     assert len(at.dataframe)==tables and len(rendered_figures)==4
     from tests.reproducible_ui import scientific_downloads
-    assert len(scientific_downloads(at))=={'Rasch':15,'1PL':10,'2PL':12,'3PL':11,'4PL':11,'NRM':6}.get(model,7)  # incl. 2PL Word
+    assert len(scientific_downloads(at))=={'Rasch':15,'1PL':11,'2PL':12,'3PL':11,'4PL':11,'NRM':6}.get(model,7)  # incl. 2PL Word
     assert {'repro_py','repro_zip'} <= {d.key for d in at.get('download_button')}
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     parameter_index=1 if model=='NRM' else 2
