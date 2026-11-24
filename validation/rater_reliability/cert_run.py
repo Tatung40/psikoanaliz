@@ -56,15 +56,37 @@ def target(m, s2):
     return r1 if m.endswith("_1") else k * r1 / (1 + (k - 1) * r1)
 
 
+KIND = {"icc_1_1": "ICC(1,1)", "icc_1_k": "ICC(1,k)", "icc_2_1": "ICC(A,1)", "icc_2_k": "ICC(A,k)", "icc_3_1": "ICC(C,1)", "icc_3_k": "ICC(C,k)"}
+
+
+def icc_fast(m, x):
+    """Same estimators as production: closed-form ICC/F/p (pingouin definitions) + production _icc_ci."""
+    from scipy.stats import f as F_
+    from core.rater_reliability import _icc_ci
+    n, k = x.shape; g = x.mean(); ssr = k * ((x.mean(1) - g) ** 2).sum(); ssc = n * ((x.mean(0) - g) ** 2).sum()
+    sse = ((x - g) ** 2).sum() - ssr - ssc; msb, msj, mse = ssr / (n - 1), ssc / (k - 1), sse / ((n - 1) * (k - 1))
+    msw = (ssc + sse) / (n * (k - 1))
+    est = {"icc_1_1": (msb - msw) / (msb + (k - 1) * msw), "icc_1_k": (msb - msw) / msb,
+           "icc_2_1": (msb - mse) / (msb + (k - 1) * mse + k * (msj - mse) / n), "icc_2_k": (msb - mse) / (msb + (msj - mse) / n),
+           "icc_3_1": (msb - mse) / (msb + (k - 1) * mse), "icc_3_k": (msb - mse) / msb}[m]
+    Fv, d2 = (msb / msw, n * (k - 1)) if m.startswith("icc_1") else (msb / mse, (n - 1) * (k - 1))
+    return {"estimate": est, "F": Fv, "p": F_.sf(Fv, n - 1, d2), "ci95": _icc_ci(x, KIND[m])}
+
+
 def fam_c(m):
     rng = np.random.default_rng(3); model = int(m[4]); cov = rej = 0; t = target(m, 1.0)
-    big = C(m, icc_data(rng, model, 2000, 4, 1.0))["estimate"]
+    ident = 0.0
+    for _ in range(20):                                                   # identity with the production engine
+        x = icc_data(rng, model, 30, 4, 1.0); a, b = icc_fast(m, x), C(m, x)
+        ident = max(ident, abs(a["estimate"] - b["estimate"]), abs(a["F"] - b["F"]), abs(a["p"] - b["p"]),
+                    *(abs(u - v) for u, v in zip(a["ci95"], b["ci95"])))
+    big = icc_fast(m, icc_data(rng, model, 2000, 4, 1.0))["estimate"]
     for _ in range(R_):
-        lo, hi = ci(C(m, icc_data(rng, model, 30, 4, 1.0))); cov += lo <= t <= hi
-        rej += C(m, icc_data(rng, model, 30, 4, 0.0))["p"] < .05
+        lo, hi = icc_fast(m, icc_data(rng, model, 30, 4, 1.0))["ci95"]; cov += lo <= t <= hi
+        rej += icc_fast(m, icc_data(rng, model, 30, 4, 0.0))["p"] < .05
     c, ty = cov / R_, rej / R_
-    return m, dict(target=t, estimate_n2000=float(big), coverage=c, type1=ty,
-                   passed=bool(abs(big - t) <= .03 and abs(c - .95) <= .02 and .036 <= ty <= .064))
+    return m, dict(target=t, estimate_n2000=float(big), coverage=c, type1=ty, production_identity_max_abs_diff=ident,
+                   passed=bool(ident <= 1e-8 and abs(big - t) <= .03 and abs(c - .95) <= .02 and .036 <= ty <= .064))
 
 
 def fam_d(m):
@@ -103,12 +125,12 @@ def fam_f(m):
 
 
 if __name__ == "__main__":
-    jobs = [(fam_a, None)] + [(fam_b, m) for m in ("cohen_kappa", "cohen_kappa_linear", "cohen_kappa_quadratic")] + \
-           [(fam_c, m) for m in ("icc_1_1", "icc_1_k", "icc_2_1", "icc_2_k", "icc_3_1", "icc_3_k")] + \
+    jobs = [(fam_c, m) for m in ("icc_1_1", "icc_1_k", "icc_2_1", "icc_2_k", "icc_3_1", "icc_3_k")] + [(fam_a, None)] + [(fam_b, m) for m in ("cohen_kappa", "cohen_kappa_linear", "cohen_kappa_quadratic")] + \
            [(fam_d, m) for m in ("pearson", "spearman", "kendall_w")] + [(fam_e, m) for m in ("mcnemar", "stuart_maxwell", "bhapkar")] + [(fam_f, "bland_altman")]
     with ProcessPoolExecutor(2) as ex:
         futs = [ex.submit(f, a) for f, a in jobs]; res = {}
         for f in futs:
             r = f.result(); res.update(r if isinstance(r, dict) else {r[0]: r[1]})
+            print("done", list(r)[0] if isinstance(r, dict) else r[0], flush=True)
     Path(sys.argv[1]).write_text(json.dumps(res, indent=1, default=float) + "\n")
     for m, v in res.items(): print(m, v["passed"], {k: v[k] for k in v if k != "passed"})
