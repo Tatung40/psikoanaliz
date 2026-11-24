@@ -436,19 +436,26 @@
    ],
    "max_abs_diff": 2.220446049250313e-16,
    "certification": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "families": [
      "A_chance_corrected_and_agreement_estimates"
     ],
     "scope": "N = 20000 estimand check, 2-3 raters, q = 4 (2 for PABAK)",
     "protocol": "validation/rater_reliability/CERT_PROTOCOL.json (67b9498)",
-    "evidence": {
+    "original_failed_evidence": {
      "estimate_independent": 0.0649601171497666,
      "target": 0.25,
      "perfect": 1.0,
      "passed": false
     },
-    "note": "FAILED: registered target 1/q is incorrect; the population value under independence is 1/q^2 = .0625 (estimate .065). Not re-scored after the fact"
+    "original_note": "FAILED: registered target 1/q is incorrect; the population value under independence is 1/q^2 = .0625 (estimate .065). Not re-scored after the fact",
+    "amendment": "R-A1 (CERT_PROTOCOL.json, 3c336a4)",
+    "evidence": {
+     "estimate_independent": 0.06143319931669781,
+     "target": 0.0625,
+     "perfect": 1.0,
+     "passed": true
+    }
    }
   },
   "icc_1_1": {
@@ -534,13 +541,13 @@
    ],
    "max_abs_diff": 9.237055564881302e-14,
    "certification": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "families": [
      "C_icc"
     ],
     "scope": "complete n = 30 subjects x k = 4 raters, normal effects",
     "protocol": "validation/rater_reliability/CERT_PROTOCOL.json (67b9498)",
-    "evidence": {
+    "original_failed_evidence": {
      "target": 0.5714285714285714,
      "estimate_n2000": 0.6252744543224549,
      "coverage": 0.931,
@@ -548,7 +555,16 @@
      "production_identity_max_abs_diff": 2.3092638912203256e-14,
      "passed": false
     },
-    "note": "FAILED estimand gate (n = 2000 estimate .625 vs registered target .571): the design draws only k = 4 rater effects, so the realised rater variance is random; gate kept as registered"
+    "original_note": "FAILED estimand gate (n = 2000 estimate .625 vs registered target .571): the design draws only k = 4 rater effects, so the realised rater variance is random; gate kept as registered",
+    "amendment": "R-A1 (CERT_PROTOCOL.json, 3c336a4)",
+    "evidence": {
+     "mean_dev_conditional": -0.0013851023234881176,
+     "max_abs_dev": 0.018378758469001666,
+     "coverage": 0.943,
+     "type1": 0.046,
+     "identity": 4.440892098500626e-16,
+     "passed": true
+    }
    }
   },
   "icc_2_k": {
@@ -674,11 +690,19 @@
     ],
     "scope": "n = 50 (pearson/spearman), n = 10 objects x 5 raters (kendall_w)",
     "protocol": "validation/rater_reliability/CERT_PROTOCOL.json (67b9498)",
-    "evidence": {
+    "original_failed_evidence": {
      "type1": 0.033,
      "passed": false
     },
-    "note": "FAILED: Type I .033 < .036 (chi-square approximation conservative with n = 10 objects)"
+    "original_note": "FAILED: Type I .033 < .036 (chi-square approximation conservative with n = 10 objects)",
+    "amendment": "R-A1 (CERT_PROTOCOL.json, 3c336a4)",
+    "evidence": {
+     "type1": 0.03345,
+     "R": 20000,
+     "mc_se": 0.0012714381129256744,
+     "passed": false
+    },
+    "note": "Confirmed at R=20000: chi-square p Type I .0335 (MC SE .0013) < .036; production p conservative for n=10, k=5"
    }
   },
   "spearman": {
@@ -841,5 +865,5 @@
  "n_comparisons": 154,
  "max_abs_diff": 0.000736507513270479,
  "scope": "examples/rater_reliability fixtures only; not CERTIFIED",
- "certified_count": 27
+ "certified_count": 29
 }
