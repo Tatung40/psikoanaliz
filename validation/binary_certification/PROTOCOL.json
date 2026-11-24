@@ -312,5 +312,36 @@
    "rule": "A 4PL fixture passes G1 if the original G1 criteria hold against R mirt, OR all of: (i) the independent reference meets the original G1 criteria against Python (|diff| a/b <= .002, c/d <= .001, |objective diff| <= .001, Python not worse by > 1e-4); (ii) R's own log-posterior is higher at Python's solution than at R's independently started solution; (iii) R EM started at Python's solution stays within the original G1 parameter criteria. 4PL G1 passes only if all seven fixtures pass. Criteria are the original G1 numbers; nothing else changes (4PL scope, G2 and its CI exclusion unchanged).",
    "rounds": "one confirmatory CI round; if a fixture fails it is reported as the blocker"
   }
+ },
+ "amendment_C": {
+  "registered": "2026-11-24, after PR #180 and before any run below; all earlier gates, thresholds, scopes and failed evidence unchanged",
+  "C1_4PL": {
+   "unresolved": [
+    "4PL__fresh_3000_30_405",
+    "4PL__fresh_10000_12_406",
+    "4PL__fresh_10000_30_407"
+   ],
+   "change": "R per-start time budget 240 s -> 900 s (computational budget only); the two independent R starts run as separate parallel CI jobs; each job evaluates R's own log-posterior at Python's and at its own solution; matched initialization runs in the default-start job",
+   "rule": "unchanged B2 rule; the R independent solution is the better of the finished starts by R's own log-posterior. 4PL G1 passes iff these three fixtures pass and the four already passing B2 fixtures stand. One CI round; any remaining failure is reported as the blocker."
+  },
+  "C2_3PL_output_level": {
+   "certified_outputs_if_passed": [
+    "item parameter point estimates (a, b, c)",
+    "item response functions",
+    "item and test information"
+   ],
+   "not_certified": [
+    "parameter SE and Wald CI (G3 failed: A2 b .976, c .975; amendment B root cause)",
+    "person estimates, fit statistics, DIF"
+   ],
+   "gates": "G1 (R mirt, 3/3, already passed) and G2 recovery incl. IRF RMSE (A2, four corners, already passed) are reused; new G5 output identity: on the three G1 3PL fixtures the application's IRF and item/test information equal an independent closed-form computation from the fitted parameters (max |diff| <= 1e-10)",
+   "status_label": "OUTPUT-LEVEL CERTIFIED (parameters, IRF, information); SE/CI NOT CERTIFIED",
+   "applies_also_to": "4PL G5 is run as an additional check (stricter, never relaxing)"
+  },
+  "C3_Rasch": {
+   "change": "the Python mirt Rasch screen uses the 61-node binary default (it is the certified fixed-a 1PL)",
+   "validation": "Wright map outputs at 61 nodes: item locations equal the fitted b and person values equal the library EAP of the same fit (identity, <= 1e-12, browser and AppTest); historical reproducibility: the same screen with 21 nodes set explicitly reproduces the frozen phase-2 evidence (validation/r_mirt_phase2/evidence) to <= 1e-12",
+   "scope": "Wright person values are EAP person estimates and stay outside the certified outputs"
+  }
  }
 }
