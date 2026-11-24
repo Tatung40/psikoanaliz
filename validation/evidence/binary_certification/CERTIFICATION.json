@@ -207,7 +207,19 @@
       "4PL__sim_N_3000_k_30_seed_402": true,
       "4PL__sim_N_10000_k_12_seed_403": false
      },
-     "expected_cases": 3
+     "expected_cases": 3,
+     "B2": {
+      "pass": false,
+      "cases": {
+       "4PL__fresh_10000_12_406": false,
+       "4PL__fresh_10000_30_407": false,
+       "4PL__fresh_3000_12_404": true,
+       "4PL__fresh_3000_30_405": false,
+       "4PL__sim_N_10000_k_12_seed_403": true,
+       "4PL__sim_N_3000_k_12_seed_401": true,
+       "4PL__sim_N_3000_k_30_seed_402": true
+      }
+     }
     },
     "G2_recovery": {
      "pass": true,

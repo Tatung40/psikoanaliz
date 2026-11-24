@@ -66,5 +66,5 @@ def test_binary_screens_default_to_61_nodes_and_other_families_keep_21():
 
 def test_protocol_registered_before_evidence_and_amendments_are_ordered():
     protocol = json.loads((ROOT / "validation/binary_certification/PROTOCOL.json").read_text())
-    assert [k for k in protocol if k.startswith("amendment_")] == ["amendment_A1", "amendment_A2", "amendment_A3", "amendment_A4", "amendment_A5"]
+    assert [k for k in protocol if k.startswith("amendment_")] == ["amendment_A1", "amendment_A2", "amendment_A3", "amendment_A4", "amendment_A5", "amendment_B"]
     assert protocol["status_rules"]["NOT CERTIFIED"].endswith("the scope is not narrowed after seeing results")
