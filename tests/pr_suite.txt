@@ -107,3 +107,4 @@ tests/test_raschpy_v15_resume.py
 tests/test_irt_single_click.py
 tests/test_binary_certification.py
 tests/test_rasch_61_wright.py
+tests/test_binary_app_path_certification.py
