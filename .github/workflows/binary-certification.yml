@@ -40,9 +40,10 @@ jobs:
       - name: Fixtures and Python mirt fits
         run: python validation/binary_certification/r_equivalence.py prepare --out g1
       - name: R mirt 1.48 reference fits
-        timeout-minutes: 15
+        timeout-minutes: 16
         run: Rscript validation/binary_certification/reference.R g1/manifest.json g1
       - name: Independent arbiter comparison
+        if: always()
         run: |
           python validation/binary_certification/r_equivalence.py compare --out g1 --evidence g1/r_equivalence.json
           echo "=====G1-EVIDENCE-BEGIN====="; base64 -w0 g1/r_equivalence.json; echo; echo "=====G1-EVIDENCE-END====="

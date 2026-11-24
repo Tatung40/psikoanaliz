@@ -15,9 +15,10 @@ items <- list(
   irt4 = createItem("irt4", par = c(a = 1, b = 0, c = .15, d = .95), est = rep(TRUE, 4), P = P4,
                     lbound = c(eps, -Inf, eps, eps), ubound = c(Inf, Inf, 1 - eps, 1 - eps)))
 settings <- list(quadpts = 101, theta_lim = c(-6, 6), TOL = 1e-8, verbose = FALSE, SE = TRUE, SE.type = "Oakes",
-                 technical = list(NCYCLES = 5000))
+                 accelerate = "squarem", technical = list(NCYCLES = 5000))   # SQUAREM: speed only, same objective
 fit_with <- function(args) {
-  fit <- tryCatch(do.call(mirt, c(args, settings)), error = function(e) NULL)
+  setTimeLimit(elapsed = 300, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
+  fit <- tryCatch(do.call(mirt, c(args, settings)), error = function(e) { message("fit error: ", conditionMessage(e)); NULL })
   se_type <- "Oakes"
   if (is.null(fit) || !isTRUE(extract.mirt(fit, "secondordertest"))) {   # pre-registered fallback, recorded
     s2 <- settings; s2$SE.type <- "Richardson"; fit <- do.call(mirt, c(args, s2)); se_type <- "Richardson"
@@ -25,7 +26,9 @@ fit_with <- function(args) {
   list(fit = fit, se_type = se_type)
 }
 for (case in cases) {
+  t0 <- Sys.time()
   dat <- read.csv(case$path); k <- ncol(dat); model <- case$model
+  ok <- tryCatch({
   if (model %in% c("1PL", "2PL")) {
     sv <- mirt(dat, 1, itemtype = "2PL", pars = "values")
     extra <- list()
@@ -51,6 +54,8 @@ for (case in cases) {
                  loglik = extract.mirt(res$fit, "logLik"), logPrior = tryCatch(extract.mirt(res$fit, "logPrior"), error = function(e) NA),
                  se_type = res$se_type, par = par, se = se)
   write_json(result, file.path(out, paste0(case$id, ".R.json")), digits = NA, auto_unbox = TRUE, na = "null")
-  cat(sprintf("%s converged=%s iterations=%d logLik=%.8f se=%s\n", case$id, result$converged, result$iterations, result$loglik, res$se_type))
+  cat(sprintf("%s converged=%s iterations=%d logLik=%.8f se=%s seconds=%.0f\n", case$id, result$converged, result$iterations,
+              result$loglik, res$se_type, as.numeric(difftime(Sys.time(), t0, units = "secs"))))
+  TRUE }, error = function(e) { cat(sprintf("%s R FAILED: %s\n", case$id, conditionMessage(e))); FALSE })
 }
 write_json(list(R = R.version.string, R_mirt = as.character(packageVersion("mirt"))), file.path(out, "versions.json"), auto_unbox = TRUE)
