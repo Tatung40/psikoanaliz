@@ -23,6 +23,12 @@ _OUTPUTS = {"1PL": "madde parametreleri, MTF/bilgi, SH ve %95 Wald GA", "2PL": "
             "3PL": "madde parametreleri, MTF/bilgi, SH ve %95 Wald GA", "4PL": "madde parametreleri ve MTF/bilgi (SH/GA kapsam dışı)"}
 
 
+def _outputs(entry, name):
+    if entry["status"] == "OUTPUT-LEVEL CERTIFIED":          # amendment C2: SE/CI stay NOT CERTIFIED
+        return "madde parametre kestirimleri, MTF ve madde/test bilgisi; SH ve Wald GA: NOT CERTIFIED"
+    return _OUTPUTS[name]
+
+
 def _certification_record():
     import json
     from pathlib import Path
@@ -39,7 +45,7 @@ def certification(model, estimation, n, k, solver_settings=None):
     entry = _certification_record()["models"].get(name)
     if entry is None:
         return "not_certified", f"{name}: sertifika kaydı yok (NOT CERTIFIED)."
-    if entry["status"] != "CERTIFIED":
+    if entry["status"] not in ("CERTIFIED", "OUTPUT-LEVEL CERTIFIED"):
         return "not_certified", (f"{name}: NOT CERTIFIED — başarısız kapı: {', '.join(entry['failed_gates'])} "
                                  f"({CERTIFICATION}).")
     scope = entry["scope"]; (n_lo, n_hi), (k_lo, k_hi) = scope["N"], scope["k"]
@@ -50,7 +56,7 @@ def certification(model, estimation, n, k, solver_settings=None):
         return "outside_scope", (f"{name}: bu analiz (kestirim {estimation}, N = {n}, k = {k}, düğüm "
                                  f"{settings.get('n_quadpts', '?')}) sertifika kapsamı dışında — NOT VERIFIED. "
                                  f"Sertifika kapsamı: {rect}.")
-    return "certified", (f"CERTIFIED — {name} {rect}. Sertifikalı çıktılar: {_OUTPUTS[name]}. Kanıt: R mirt 1.48 eşdeğerliği "
+    return "certified", (f"{entry['status']} — {name} {rect}. Sertifikalı çıktılar: {_outputs(entry, name)}. Kanıt: R mirt 1.48 eşdeğerliği "
                          f"ve önceden kayıtlı Monte Carlo ({CERTIFICATION}). θ normalliği veriden doğrulanmaz; "
                          "birey kestirimleri, uyum istatistikleri ve DIF bu sertifikaya dahil değildir.")
 _MIN_N_SUPPORTED = {("3PL", "ML"): 10000, ("3PL", "MAP"): 3000, ("4PL", "ML"): None, ("4PL", "MAP"): 3000}
@@ -95,9 +101,9 @@ def evidence_note(model, common_discrimination=False):
         return "warning", "Bu model için bağımsız doğrulama kaydı yok (NOT VERIFIED)."
     scope = entry["scope"]; (n_lo, n_hi), (k_lo, k_hi) = scope["N"], scope["k"]
     rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü"
-    if entry["status"] == "CERTIFIED":
+    if entry["status"] in ("CERTIFIED", "OUTPUT-LEVEL CERTIFIED"):
         variant = (" (sabit a = 1 ve ortak serbest a)" if name == "1PL" else "")
-        return "info", (f"{name}{variant}: CERTIFIED — kapsam {rect}; çıktılar: {_OUTPUTS[name]}. R mirt 1.48 ile "
+        return "info", (f"{name}{variant}: {entry['status']} — kapsam {rect}; çıktılar: {_outputs(entry, name)}. R mirt 1.48 ile "
                         f"bağımsız eşdeğerlik ve önceden kayıtlı Monte Carlo ({CERTIFICATION}). Kapsam dışı "
                         "tasarımlar sonuç ekranında ayrıca işaretlenir.")
     return "warning", (f"{name}: NOT CERTIFIED — başarısız kapı: {', '.join(entry['failed_gates'])} "

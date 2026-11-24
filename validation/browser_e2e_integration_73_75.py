@@ -40,14 +40,21 @@ def run(output,app_python=None,browser_path=None):
                     page.get_by_text('Kestirim yakınsadı; bilimsel sertifika anlamına gelmez.',exact=True).wait_for(timeout=180000)
                     wait_idle(page)
                     summary=pd.read_csv(download(page,'Model özeti — CSV',out))
-                    assert summary['n_quadpts'].iloc[0]==21 and summary['max_iter'].iloc[0]==500 and summary['tol'].iloc[0]==1e-4
+                    assert summary['n_quadpts'].iloc[0]==61 and summary['max_iter'].iloc[0]==500 and summary['tol'].iloc[0]==1e-4
                     assert str(summary['Yakınsama'].iloc[0]).lower()=='true'
                     params=pd.read_csv(download(page,'Madde parametreleri — CSV',out))
                     people=pd.read_csv(download(page,'Birey yetenekleri — CSV',out))
                     person_xlsx=pd.read_excel(download(page,'Birey yetenekleri — Excel',out))
                     pd.testing.assert_frame_equal(people,person_xlsx,check_dtype=False,check_exact=False,rtol=1e-12,atol=1e-12)
-                    expected_root=ROOT/'validation/r_mirt_phase2/evidence'
-                    ep=pd.read_csv(expected_root/'rasch_persons.csv');ei=pd.read_csv(expected_root/'rasch_items.csv')
+                    # 61-node default (amendment C3): identity with an independent refit and the library EAP; the frozen
+                    # 21-node phase-2 evidence is reproduced by tests/test_rasch_61_wright.py with 21 nodes set explicitly.
+                    import mirt
+                    from core.irt_python_mirt_adapter import fit_python_mirt
+                    xr=pd.read_csv(ROOT/'tests/fixtures/rasch/data_rasch_main.csv').astype(int)
+                    ref=fit_python_mirt(xr.to_numpy(),model='Rasch',n_quadpts=61).fit
+                    eap=mirt.fscores(ref,xr.to_numpy(),method='EAP',n_quadpts=61)
+                    ep=pd.DataFrame({'θ':np.asarray(eap.theta).reshape(-1),'Posterior SD':np.asarray(eap.standard_error).reshape(-1)})
+                    ei=pd.DataFrame({'Madde':list(xr.columns),'b':ref.coef().difficulty.to_numpy(float)})
                     assert len(people)==1000 and len(params)==10
                     np.testing.assert_allclose(people['Yetenek (θ)'],ep['θ'],rtol=1e-12,atol=1e-12)
                     np.testing.assert_allclose(people['SH (θ)'],ep['Posterior SD'],rtol=1e-12,atol=1e-12)

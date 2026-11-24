@@ -39,7 +39,7 @@ items <- list(
 settings <- list(quadpts = 101, theta_lim = c(-6, 6), TOL = 1e-8, verbose = FALSE, SE = TRUE, SE.type = "Oakes",
                  accelerate = "squarem", technical = list(NCYCLES = 5000))   # SQUAREM: speed only, same objective
 fit_with <- function(args) {
-  setTimeLimit(elapsed = 240, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
+  setTimeLimit(elapsed = as.numeric(Sys.getenv("R_BUDGET", "240")), transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
   use <- settings; use[names(args)[names(args) %in% names(use)]] <- NULL
   fit <- tryCatch(do.call(mirt, c(args, use)), error = function(e) { message("fit error: ", conditionMessage(e)); NULL })
   se_type <- if (isFALSE(args$SE)) "none (MAP: descriptive only, A5 addendum)" else "Oakes"
@@ -77,7 +77,9 @@ for (case in cases) {
     }
     # Start 2 (amendment A5): R's own nested-model fit on the same data; Python estimates are never used.
     sv2 <- sv
-    if (model == "4PL") {
+    if (Sys.getenv("R_START", "both") == "default") {
+      # amendment C1: the default-start job does not compute the nested start
+    } else if (model == "4PL") {
       nested <- tryCatch({
         s3 <- mirt(dat, 1, itemtype = "irt3", customItems = items["irt3"], pars = "values")
         s3$value[s3$name == "b"] <- -qlogis(pmin(pmax(colMeans(dat), .02), .98))
@@ -93,7 +95,10 @@ for (case in cases) {
       sv2$value[sv2$name == "c"] <- .15
     }
     safe <- function(start) tryCatch(run(start), error = function(e) { message("start discarded: ", conditionMessage(e)); NULL })
-    fits <- Filter(function(f) !is.null(f) && !is.null(f$fit), list(default = safe(sv), nested = safe(sv2)))   # A5 addendum 2
+    which_start <- Sys.getenv("R_START", "both")                      # amendment C1: starts may run as separate jobs
+    fits <- Filter(function(f) !is.null(f) && !is.null(f$fit),
+                   list(default = if (which_start %in% c("both", "default")) safe(sv),
+                        nested = if (which_start %in% c("both", "nested")) safe(sv2)))   # A5 addendum 2
     if (!length(fits)) stop("no start finished")
     lps <- sapply(fits, logpost); best <- names(which.max(lps))
     res <- fits[[best]]; res$starts <- as.list(lps); res$chosen <- best

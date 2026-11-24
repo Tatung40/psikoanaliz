@@ -1,0 +1,94 @@
+{
+ "protocol": "PROTOCOL.json amendment_C C2 G5",
+ "tolerance": 1e-10,
+ "cases": [
+  {
+   "id": "3PL__sim_N_3000_k_12_seed_301",
+   "model": "3PL",
+   "max_abs_diff": {
+    "library_irf": 2.220446049250313e-16,
+    "library_item_information": 8.326672684688674e-16,
+    "library_test_information": 1.4432899320127035e-15,
+    "route_parameters": 0.0,
+    "route_irf": 2.220446049250313e-16,
+    "route_item_information": 8.326672684688674e-16,
+    "route_test_information": 1.1379786002407855e-15
+   },
+   "pass": true
+  },
+  {
+   "id": "3PL__sim_N_3000_k_30_seed_302",
+   "model": "3PL",
+   "max_abs_diff": {
+    "library_irf": 2.220446049250313e-16,
+    "library_item_information": 6.106226635438361e-16,
+    "library_test_information": 2.6645352591003757e-15,
+    "route_parameters": 0.0,
+    "route_irf": 2.220446049250313e-16,
+    "route_item_information": 6.106226635438361e-16,
+    "route_test_information": 2.6645352591003757e-15
+   },
+   "pass": true
+  },
+  {
+   "id": "3PL__sim_N_10000_k_12_seed_303",
+   "model": "3PL",
+   "max_abs_diff": {
+    "library_irf": 2.220446049250313e-16,
+    "library_item_information": 1.0130785099704553e-15,
+    "library_test_information": 1.4432899320127035e-15,
+    "route_parameters": 0.0,
+    "route_irf": 2.220446049250313e-16,
+    "route_item_information": 1.0130785099704553e-15,
+    "route_test_information": 1.4432899320127035e-15
+   },
+   "pass": true
+  },
+  {
+   "id": "4PL__sim_N_3000_k_12_seed_401",
+   "model": "4PL",
+   "max_abs_diff": {
+    "library_irf": 2.220446049250313e-16,
+    "library_item_information": 3.3306690738754696e-16,
+    "library_test_information": 8.881784197001252e-16,
+    "route_parameters": 0.0,
+    "route_irf": 2.220446049250313e-16,
+    "route_item_information": 3.3306690738754696e-16,
+    "route_test_information": 4.440892098500626e-16
+   },
+   "pass": true
+  },
+  {
+   "id": "4PL__sim_N_3000_k_30_seed_402",
+   "model": "4PL",
+   "max_abs_diff": {
+    "library_irf": 2.220446049250313e-16,
+    "library_item_information": 4.3021142204224816e-16,
+    "library_test_information": 1.7763568394002505e-15,
+    "route_parameters": 0.0,
+    "route_irf": 2.220446049250313e-16,
+    "route_item_information": 4.163336342344337e-16,
+    "route_test_information": 8.881784197001252e-16
+   },
+   "pass": true
+  },
+  {
+   "id": "4PL__sim_N_10000_k_12_seed_403",
+   "model": "4PL",
+   "max_abs_diff": {
+    "library_irf": 2.220446049250313e-16,
+    "library_item_information": 2.7755575615628914e-16,
+    "library_test_information": 8.881784197001252e-16,
+    "route_parameters": 0.0,
+    "route_irf": 2.220446049250313e-16,
+    "route_item_information": 2.7755575615628914e-16,
+    "route_test_information": 6.661338147750939e-16
+   },
+   "pass": true
+  }
+ ],
+ "pass_by_model": {
+  "3PL": true,
+  "4PL": true
+ }
+}

@@ -119,7 +119,7 @@
    }
   },
   "3PL": {
-   "status": "NOT CERTIFIED",
+   "status": "OUTPUT-LEVEL CERTIFIED",
    "scope": {
     "N": [
      3000,
@@ -175,8 +175,20 @@
        "c_coverage"
       ]
      }
+    },
+    "G5_output_identity": {
+     "pass": true
     }
-   }
+   },
+   "certified_outputs": [
+    "item parameter point estimates (a, b, c)",
+    "item response functions",
+    "item and test information"
+   ],
+   "not_certified_outputs": [
+    "parameter SE and Wald CI (G3 failed: A2 b .976, c .975; amendment B root cause)",
+    "person estimates, fit statistics, DIF"
+   ]
   },
   "4PL": {
    "status": "NOT CERTIFIED",
@@ -219,6 +231,14 @@
        "4PL__sim_N_3000_k_12_seed_401": true,
        "4PL__sim_N_3000_k_30_seed_402": true
       }
+     },
+     "C1": {
+      "pass": false,
+      "fixtures": {
+       "4PL__fresh_10000_12_406": false,
+       "4PL__fresh_10000_30_407": false,
+       "4PL__fresh_3000_30_405": false
+      }
      }
     },
     "G2_recovery": {
@@ -234,10 +254,17 @@
     "G3_inference": {
      "pass": null,
      "note": "parameter SE and Wald CI: pre-registered coverage criterion already failed in p7_binary34_se (over-coverage .971-.994); the library SE equals the inverse log-posterior Hessian, so this is a property of posterior-curvature intervals, not a defect; the screen keeps withholding the CI"
+    },
+    "G5_output_identity": {
+     "pass": true
     }
    }
   }
  },
+ "amendment_C_evidence": [
+  "binary_certification/c1_4pl.json",
+  "binary_certification/g5_identity.json"
+ ],
  "superseded_evidence_reported": [
   "p1_3pl4pl",
   "p6_binary_se",

@@ -60,17 +60,22 @@ jobs:
           retention-days: 30
       - name: Recomputed G1 equals the committed evidence and the certification decision
         run: python validation/binary_certification/certify.py --check-g1 g1/r_equivalence.json
-  b2-4pl:
+  c1-4pl:
+    # Evidence committed (validation/evidence/binary_certification/c1_4pl.json); re-run on demand only.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
-        fixture: ['seed_401 seed_402 seed_403 fresh_3000_12_404', 'fresh_3000_30_405', 'fresh_10000_12_406', 'fresh_10000_30_407']
+        fixture: ['fresh_3000_30_405', 'fresh_10000_12_406', 'fresh_10000_30_407']
+        start: ['default', 'nested']
     env:
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
       PYTHONPATH: .
+      R_START: ${{ matrix.start }}
+      R_BUDGET: '900'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -90,17 +95,15 @@ jobs:
           cache-version: 3
       - name: Install Python scientific dependencies
         run: python -m pip install -r requirements.txt 'mirt==1.2.0'
-      - name: Fixtures, Python mirt fits and independent numpy reference (amendment B2)
-        run: python validation/binary_certification/b2_4pl.py prepare --out b2 --only ${{ matrix.fixture }}
-      - name: R mirt independent starts, R log-posterior evaluation and matched initialization
+      - name: Fixture, Python mirt fit and independent numpy reference
+        run: python validation/binary_certification/b2_4pl.py prepare --out c1 --only ${{ matrix.fixture }}
+      - name: R mirt start (900 s budget, amendment C1), R log-posterior evaluation, matched initialization
         timeout-minutes: 19
         run: |
-          python -c "import json;m=json.load(open('b2/manifest.json'));[json.dump([c],open(f'b2/one_{i:02d}.json','w')) for i,c in enumerate(m)]"
-          ls b2/one_*.json | xargs -P 4 -I{} sh -c 'timeout 1110 sh -c "Rscript validation/binary_certification/reference.R {} b2; Rscript validation/binary_certification/b2_checks.R {} b2" > {}.log 2>&1 || echo "{} ended with status $?" >> {}.log'
-          cat b2/one_*.json.log
-      - name: B2 decision
+          Rscript validation/binary_certification/reference.R c1/manifest.json c1 || true
+          Rscript validation/binary_certification/b2_checks.R c1/manifest.json c1 || true
+      - name: Job evidence
         if: always()
         run: |
-          python validation/binary_certification/b2_4pl.py compare --out b2 --evidence b2/b2_4pl.json
-          echo "=====B2-EVIDENCE-BEGIN====="; base64 -w0 b2/b2_4pl.json; echo; echo "=====B2-EVIDENCE-END====="
-
+          python validation/binary_certification/c1_combine.py --out c1 --start ${{ matrix.start }} --evidence c1/job.json
+          echo "=====C1-EVIDENCE-BEGIN====="; base64 -w0 c1/job.json; echo; echo "=====C1-EVIDENCE-END====="
