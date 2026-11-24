@@ -77,7 +77,9 @@ for (case in cases) {
     }
     # Start 2 (amendment A5): R's own nested-model fit on the same data; Python estimates are never used.
     sv2 <- sv
-    if (model == "4PL") {
+    if (Sys.getenv("R_START", "both") == "default") {
+      # amendment C1: the default-start job does not compute the nested start
+    } else if (model == "4PL") {
       nested <- tryCatch({
         s3 <- mirt(dat, 1, itemtype = "irt3", customItems = items["irt3"], pars = "values")
         s3$value[s3$name == "b"] <- -qlogis(pmin(pmax(colMeans(dat), .02), .98))
