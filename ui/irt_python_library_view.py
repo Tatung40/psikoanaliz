@@ -67,6 +67,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         (st.info if _level=='info' else st.warning)(_note)
     if model in ('3PL','4PL'):
         estimation=st.radio('Kestirim',['MAP','ML'],key=f'python_mirt_estimation_{model}',horizontal=True)
+        from ui.irt_solver_controls import effective_solver
+        solver_options=effective_solver(model,estimation,solver_options)
         st.caption('MAP: kütüphane varsayılan önselleri; mevcut bilimsel kullanım sınırları geçerlidir.')
         multi=st.checkbox('Çoklu başlangıç denetimi (8 deterministik kestirim; en yüksek amaç değeri seçilir)',value=False,
                           key=f'python_mirt_multistart_{model}')
@@ -113,7 +115,11 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                 multistart_result=None
                 if multi:
                     from core.reproducible import public_call
-                    outcome,ms_table,ms_notes=public_call('core.irt_binary_multistart','multistart',x.to_numpy(),model,estimation,**solver_options)
+                    # 4PL: 8 multistart fits at the D4 setting (tol 1e-10) are too slow for an opt-in diagnostic; they run at
+                    # standard precision and the selected fit is labelled outside the certified 4PL solver setting.
+                    ms_solver=dict(solver_options,tol=max(solver_options['tol'],1e-4),max_iter=min(solver_options['max_iter'],500)) if model=='4PL' else solver_options
+                    if ms_solver is not solver_options:st.caption('4PL çoklu başlangıç: standart hassasiyet (tol 1e-4, max_iter 500); seçilen çözüm sertifikalı 4PL çözücü ayarının (tol ≤ 1e-10) dışındadır.')
+                    outcome,ms_table,ms_notes=public_call('core.irt_binary_multistart','multistart',x.to_numpy(),model,estimation,**ms_solver)
                     multistart_result=(ms_table,ms_notes)
                 else:outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
             saved=dict(key=key,outcome=outcome,multistart=multistart_result)

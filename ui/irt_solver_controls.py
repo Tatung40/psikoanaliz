@@ -17,3 +17,14 @@ def solver_controls(prefix,advanced_key=None,n_quadpts=21,tol=1e-4,max_iter=500)
         n_quadpts=st.number_input('Gauss–Hermite düğüm sayısı',min_value=1,value=default_quadpts,step=1,key=prefix+'_n_quadpts')
         st.caption('ML: marjinal logLik; MAP: logposterior değişimi. Gerçek mirt.fit_mirt ayarları; değişiklikten sonra yeniden kestirim gerekir. Düğüm sayısı doğruluğu etkiler; küçük grid önerilmez.')
     return dict(max_iter=int(max_iter),tol=float(tol),n_quadpts=int(n_quadpts))
+
+
+D4_4PL = dict(tol=1e-10, max_iter=50000)
+
+
+def effective_solver(model, estimation, options):
+    """4PL: the D4-validated setting applies to MAP (the certified estimation); ML 4PL (outside the certified scope) keeps
+    standard precision unless the user changed the values."""
+    if model == "4PL" and estimation == "ML" and options.get("tol") == D4_4PL["tol"] and options.get("max_iter") == D4_4PL["max_iter"]:
+        return dict(options, tol=1e-4, max_iter=500)
+    return options

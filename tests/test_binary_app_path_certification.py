@@ -62,3 +62,10 @@ def test_other_models_keep_their_defaults_and_3pl_inference_not_certified():
     assert certification("4PL", "MAP", 3000, 20, ok)[0] == "outside_scope"          # restricted to the D4 setting
     assert certification("4PL", "MAP", 3000, 20, dict(max_iter=50000, tol=1e-10, n_quadpts=61))[0] == "certified"
     assert "tol ≤ 1e-10" in evidence_note("4PL")[1]
+
+
+def test_4pl_ml_keeps_standard_precision():
+    from ui.irt_solver_controls import effective_solver
+    d4 = dict(max_iter=50000, tol=1e-10, n_quadpts=61)
+    assert effective_solver("4PL", "ML", d4) == dict(max_iter=500, tol=1e-4, n_quadpts=61)
+    assert effective_solver("4PL", "MAP", d4) == d4 and effective_solver("3PL", "ML", d4) == d4
