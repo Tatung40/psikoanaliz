@@ -45,7 +45,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         }
         outputs={name:st.checkbox(label,value=not (model=='NRM' and name=='itemfit'),disabled=model=='NRM' and name=='itemfit',key=f'python_mirt_output_{model}_{name}')
                  for name,label in output_names.items()}
-    solver_options=solver_controls(f"python_mirt_solver_{model}",advanced_key=f"python_mirt_solver_advanced_{model}")
+    solver_options=solver_controls(f"python_mirt_solver_{model}",advanced_key=f"python_mirt_solver_advanced_{model}",
+                                   n_quadpts=61 if model in BINARY else 21)
     if model=='NRM':st.caption('Nominal kategoriler için ordinal Infit/Outfit/S-X² sunulmaz.')
     with st.expander('Grafik ve çıktı ayrıntıları',expanded=False):
         st.caption('Varsayılan seçimler mevcut raporun bütün grafiklerini korur. Seçimler hesaplamayı değil yalnızca sunumu etkiler.')
