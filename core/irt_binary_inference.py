@@ -55,11 +55,33 @@ ACCURACY_34 = {
 BIAS_LIMIT = 0.05
 
 
+# Negative second derivative of the Python mirt default log-priors (mirt.estimation.priors.default_priors):
+# a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8), d ~ Beta(8, 2). Used only for the MAP sandwich covariance.
+PRIOR_CURVATURE = {
+    "discrimination": lambda a: ((1 - np.log(a)) / 0.25 - 1) / a ** 2,
+    "difficulty": lambda b: np.full_like(np.asarray(b, float), 1 / 4),
+    "guessing": lambda c: 1 / c ** 2 + 7 / (1 - c) ** 2,
+    "upper": lambda d: 7 / d ** 2 + 1 / (1 - d) ** 2,
+}
+
+
+def map_sandwich(covariance, kinds, estimates):
+    """Penalized-likelihood (frequentist) covariance of a MAP estimate: V J V with J = V^-1 - P, i.e. V - V P V.
+
+    V is the library inverse log-posterior Hessian of the free (interior) parameters; P the diagonal prior curvature.
+    Returns None when the result is not positive definite (no SE is then reported)."""
+    V = np.asarray(covariance, float)
+    P = np.diag([float(PRIOR_CURVATURE[k](np.asarray(e, float))) for k, e in zip(kinds, estimates)])
+    S = V - V @ P @ V
+    S = (S + S.T) / 2
+    return S if np.isfinite(S).all() and np.linalg.eigvalsh(S)[0] > 0 else None
+
+
 def _matrix(value):
     return np.asarray(value() if callable(value) else value, float)
 
 
-def parameter_inference(fit, model, item_names, estimation=None):
+def parameter_inference(fit, model, item_names, estimation=None, se_method="posterior"):
     """Return (table, reason). table is None and reason explains why when SE cannot be reported.
 
     With estimation ("ML"/"MAP") coverage evidence is necessary but not sufficient:
@@ -118,9 +140,18 @@ def parameter_inference(fit, model, item_names, estimation=None):
         return None, "Kovaryans matrisi pozitif tanımlı değil; SH üretilemez."
     if eigen[-1] / eigen[0] > 1e8:
         return None, f"Kovaryans matrisi kötü koşullanmış (koşul sayısı {eigen[-1] / eigen[0]:.3g}); SH üretilmedi."
+    variances = np.diag(covariance).astype(float)
+    if se_method == "sandwich":                       # MAP only: penalized-likelihood covariance (amendment A1b)
+        idx = np.flatnonzero(active)
+        S = map_sandwich(covariance[np.ix_(idx, idx)], [parsed[i][1] for i in idx], [parsed[i][2] for i in idx])
+        if S is None:
+            return None, "Cezalı olabilirlik (sandviç) kovaryansı pozitif tanımlı değil; SH üretilmedi."
+        variances[idx] = np.diag(S)
+    elif se_method != "posterior":
+        raise ValueError("se_method must be 'posterior' or 'sandwich'.")
     rows = []
     for position, (j, parameter, estimate, on_bound) in enumerate(parsed):
-        se = np.nan if on_bound else float(np.sqrt(covariance[position, position]))
+        se = np.nan if on_bound else float(np.sqrt(variances[position]))
         rows.append({"Madde": names[j], "Parametre": NAMES[parameter], "Kestirim": estimate, "SH": se,
                      "GA %95 alt": estimate - Z95 * se, "GA %95 üst": estimate + Z95 * se,
                      "Not": "Kutu sınırında; SH/Wald GA geçersiz (kütüphane bu parametreyi sabit tutar)"
