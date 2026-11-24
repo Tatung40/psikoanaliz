@@ -1,0 +1,46 @@
+{
+ "method": "independent Orlando-Thissen S-X2 (Lord-Wingersky, 61 GH nodes), compared on items without library cell collapsing",
+ "cases": [
+  {
+   "model": "Rasch",
+   "estimation": "ML",
+   "items_compared": 10,
+   "items_collapsed_by_library": 0,
+   "max_relative_diff": 8.658466278781176e-15,
+   "passed": true
+  },
+  {
+   "model": "1PL",
+   "estimation": "ML",
+   "items_compared": 10,
+   "items_collapsed_by_library": 0,
+   "max_relative_diff": 8.658466278781176e-15,
+   "passed": true
+  },
+  {
+   "model": "2PL",
+   "estimation": "ML",
+   "items_compared": 9,
+   "items_collapsed_by_library": 1,
+   "max_relative_diff": 6.767063975015069e-06,
+   "passed": true
+  },
+  {
+   "model": "3PL",
+   "estimation": "MAP",
+   "items_compared": 10,
+   "items_collapsed_by_library": 0,
+   "max_relative_diff": 2.1950652428296502e-07,
+   "passed": true
+  },
+  {
+   "model": "4PL",
+   "estimation": "MAP",
+   "items_compared": 10,
+   "items_collapsed_by_library": 0,
+   "max_relative_diff": 1.8499131053257948e-06,
+   "passed": true
+  }
+ ],
+ "all_pass": true
+}
