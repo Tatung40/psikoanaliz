@@ -858,12 +858,14 @@
      "source": "irr::icc"
     },
     "ci_low": {
-     "value": 0.910753327001899,
-     "source": "irr::icc"
+     "value": 0.91148983451517,
+     "source": "psych::ICC",
+     "note": "irr::icc value 0.910753327001899 not used: irr's twoway-agreement Satterthwaite df handling is documented as incorrect (irrNA::icc_corr, 'corrected version of icc{irr}'); mismatch kept in validation/rater_reliability/comparison.csv"
     },
     "ci_high": {
-     "value": 0.984181993348949,
-     "source": "irr::icc"
+     "value": 0.984126909604538,
+     "source": "psych::ICC",
+     "note": "irr::icc value 0.984181993348949 not used: irr's twoway-agreement Satterthwaite df handling is documented as incorrect (irrNA::icc_corr, 'corrected version of icc{irr}'); mismatch kept in validation/rater_reliability/comparison.csv"
     }
    }
   },
