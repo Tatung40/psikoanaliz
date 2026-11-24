@@ -1,0 +1,137 @@
+{
+ "cases": [
+  {
+   "model": "Rasch",
+   "variant": null,
+   "estimation": "ML",
+   "N": 1000,
+   "k": 12,
+   "loglik": -6978.472828165326,
+   "loglik_independent": -6978.472828165327,
+   "n_parameters": 12,
+   "expected_n_parameters": 12,
+   "aic": 13980.945656330652,
+   "bic": 14039.838719678437,
+   "checks": {
+    "converged": true,
+    "loglik_independent": true,
+    "n_parameters": true,
+    "n_observations": true,
+    "aic": true,
+    "bic": 1.0
+   },
+   "pass": true
+  },
+  {
+   "model": "1PL",
+   "variant": "common_a",
+   "estimation": "ML",
+   "N": 1000,
+   "k": 12,
+   "loglik": -6422.966082363407,
+   "loglik_independent": -6422.966082363408,
+   "n_parameters": 13,
+   "expected_n_parameters": 13,
+   "aic": 12871.932164726813,
+   "bic": 12935.73298335358,
+   "checks": {
+    "converged": true,
+    "loglik_independent": true,
+    "n_parameters": true,
+    "n_observations": true,
+    "aic": true,
+    "bic": 1.0
+   },
+   "pass": true
+  },
+  {
+   "model": "2PL",
+   "variant": null,
+   "estimation": "ML",
+   "N": 1000,
+   "k": 12,
+   "loglik": -6370.8442024024525,
+   "loglik_independent": -6370.844202402454,
+   "n_parameters": 24,
+   "expected_n_parameters": 24,
+   "aic": 12789.688404804905,
+   "bic": 12907.474531500477,
+   "checks": {
+    "converged": true,
+    "loglik_independent": true,
+    "n_parameters": true,
+    "n_observations": true,
+    "aic": true,
+    "bic": 1.0
+   },
+   "pass": true
+  },
+  {
+   "model": "3PL",
+   "variant": null,
+   "estimation": "MAP",
+   "N": 3000,
+   "k": 12,
+   "loglik": -22238.66988140539,
+   "loglik_independent": -22238.66988140539,
+   "n_parameters": 36,
+   "expected_n_parameters": 36,
+   "aic": 44549.33976281078,
+   "bic": 44765.56899524618,
+   "checks": {
+    "converged": true,
+    "loglik_independent": true,
+    "n_parameters": true,
+    "n_observations": true,
+    "aic": true,
+    "bic": 1.0
+   },
+   "pass": true
+  },
+  {
+   "model": "4PL",
+   "variant": null,
+   "estimation": "MAP",
+   "N": 3000,
+   "k": 12,
+   "loglik": -23125.195479555947,
+   "loglik_independent": -23125.195479555947,
+   "n_parameters": 48,
+   "expected_n_parameters": 48,
+   "aic": 46346.39095911189,
+   "bic": 46634.69660235911,
+   "checks": {
+    "converged": true,
+    "loglik_independent": true,
+    "n_parameters": true,
+    "n_observations": true,
+    "aic": true,
+    "bic": 1.0
+   },
+   "pass": true
+  },
+  {
+   "model": "3PL",
+   "variant": null,
+   "estimation": "ML",
+   "N": 3000,
+   "k": 12,
+   "loglik": -22236.65601270476,
+   "loglik_independent": -22236.65601270482,
+   "n_parameters": 36,
+   "expected_n_parameters": 36,
+   "aic": 44545.31202540952,
+   "bic": 44761.541257844925,
+   "checks": {
+    "converged": true,
+    "loglik_independent": true,
+    "n_parameters": true,
+    "n_observations": true,
+    "aic": true,
+    "bic": 1.0
+   },
+   "pass": true
+  }
+ ],
+ "all_pass": true
+}

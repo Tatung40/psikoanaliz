@@ -1,0 +1,40 @@
+{
+ "cases": [
+  {
+   "model": "Rasch",
+   "estimation": "ML",
+   "outfit_max_abs_diff": 0.0,
+   "infit_max_abs_diff": 1.1102230246251565e-16,
+   "passed": true
+  },
+  {
+   "model": "1PL",
+   "estimation": "ML",
+   "outfit_max_abs_diff": 0.0,
+   "infit_max_abs_diff": 1.1102230246251565e-16,
+   "passed": true
+  },
+  {
+   "model": "2PL",
+   "estimation": "ML",
+   "outfit_max_abs_diff": 1.1102230246251565e-16,
+   "infit_max_abs_diff": 0.0,
+   "passed": true
+  },
+  {
+   "model": "3PL",
+   "estimation": "MAP",
+   "outfit_max_abs_diff": 3.3306690738754696e-16,
+   "infit_max_abs_diff": 2.55351295663786e-15,
+   "passed": true
+  },
+  {
+   "model": "4PL",
+   "estimation": "MAP",
+   "outfit_max_abs_diff": 2.220446049250313e-16,
+   "infit_max_abs_diff": 3.3306690738754696e-16,
+   "passed": true
+  }
+ ],
+ "all_pass": true
+}
