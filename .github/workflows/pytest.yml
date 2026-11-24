@@ -58,6 +58,7 @@ jobs:
           # Rater reliability module: three new teaching datasets (rater_117–119) in the shared example library.
           # G Theory (PR gtheory-final): library run on centered, power-of-ten scaled scores, so components are no longer
           # 4-dp rounded and SEM/error-budget tables are added (validation/generalizability/PROTOCOL_FINAL.json).
+          # Binary certification: new metadata field 'Sertifika durumu' (validation/binary_certification; no numerical change).
           # B14 "Bilimsel durum" text now states the R mirt / Monte Carlo evidence (PR #97; no numerical change).
           python tools/golden_master.py compare /tmp/golden-reference.json.gz /tmp/golden-current.json.gz \
             --intended /example_library/mirt_051 --intended /example_library/mirt_052 --intended /example_library/mirt_053 \
@@ -67,6 +68,7 @@ jobs:
             --intended '/python_mirt_models/2PL/metadata/Kullanım durumu:' \
             --intended '/python_mirt_models/1PL/usage_labels' --intended '/python_mirt_models/2PL/usage_labels' \
             --intended '/python_mirt_models/1PL/warnings[1]:' \
+            --intended '/python_mirt_models/Rasch/metadata/Sertifika durumu' --intended '/python_mirt_models/1PL/metadata/Sertifika durumu' --intended '/python_mirt_models/2PL/metadata/Sertifika durumu' --intended '/python_mirt_models/3PL/metadata/Sertifika durumu' --intended '/python_mirt_models/4PL/metadata/Sertifika durumu' \
             --intended '/python_dif/2PL/tables/Raju_area:' \
             --intended /generalizability \
             --intended /example_library/rater_117 --intended /example_library/rater_118 --intended /example_library/rater_119 \
