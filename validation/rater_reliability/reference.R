@@ -67,7 +67,7 @@ for (b in blocks) {
                     c("ci_low", row$`lower bound`), c("ci_high", row$`upper bound`))) put(id, m, "psych::ICC", kv[1], kv[2])
   }
   if (m == "kendall_w") { k <- kendall(x, correct = TRUE)
-    for (kv in list(c("estimate", k$value), c("chi2", k$statistic), c("df", k$subjects - 1), c("p", k$p.value))) put(id, m, "irr::kendall", kv[1], kv[2]) }
+    for (kv in list(c("estimate", k$value), c("chi2", k$statistic), c("df", k$subjects - 1), c("p_chi2", k$p.value))) put(id, m, "irr::kendall", kv[1], kv[2]) }
   if (m == "spearman") { r <- cor.test(x[, 1], x[, 2], method = "spearman", exact = FALSE)
     put(id, m, "stats::cor.test", "estimate", r$estimate); put(id, m, "stats::cor.test", "p", r$p.value) }
   if (m == "pearson") { r <- cor.test(x[, 1], x[, 2], method = "pearson")
