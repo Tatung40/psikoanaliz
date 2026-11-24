@@ -13,6 +13,10 @@ import numpy as np
 
 D1 = json.loads((Path(__file__).with_name("PROTOCOL.json")).read_text())["amendment_D"]["D1_4PL_independent_pathway"]
 SIM = re.compile(r"sim\(N=(\d+), k=(\d+), seed=(\d+)\)")
+import os
+ROUND = os.environ.get("D_ROUND", "D1")
+D4 = ["sim(N=3000, k=12, seed=416)", "sim(N=3000, k=12, seed=417)", "sim(N=3000, k=30, seed=418)", "sim(N=3000, k=30, seed=419)",
+      "sim(N=10000, k=12, seed=420)", "sim(N=10000, k=12, seed=421)", "sim(N=10000, k=30, seed=422)", "sim(N=10000, k=30, seed=423)"]
 PERTURB = [(.6, .05, .85, -.5), (1.8, .3, .99, .5), (.6, .3, .99, .5), (1.8, .05, .85, -.5)]
 
 
@@ -23,7 +27,8 @@ def one(fixture):
     from validation.binary_certification.reference_numpy import BOX, data_start, fit, objective
     n, k, seed = map(int, SIM.fullmatch(fixture).groups())
     x = simulate("4PL", n, k, seed); obj = Objective(x, "4PL", map_priors=True)
-    py = fit_python_mirt(x, model="4PL", estimation="MAP", n_quadpts=61, tol=1e-8, max_iter=5000).fit; co = py.coef()
+    tol, iters = (1e-10, 50000) if ROUND == "D4" else (1e-8, 5000)
+    py = fit_python_mirt(x, model="4PL", estimation="MAP", n_quadpts=61, tol=tol, max_iter=iters).fit; co = py.coef()
     P = {"a": co.discrimination.to_numpy(float), "b": co.difficulty.to_numpy(float), "c": co.guessing.to_numpy(float), "d": co.upper.to_numpy(float)}
     base = data_start(x); starts = [base] + [{"a": np.full(k, a), "b": base["b"] + db, "c": np.full(k, c), "d": np.full(k, d)}
                                              for a, c, d, db in PERTURB]
@@ -52,11 +57,12 @@ def one(fixture):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--workers", type=int, default=2); ap.add_argument("--output", required=True)
     a = ap.parse_args(); t = time.time()
-    order = sorted(D1["fresh_holdout"], key=lambda f: -int(SIM.fullmatch(f).group(1)) * int(SIM.fullmatch(f).group(2)))
+    fixtures = D4 if ROUND == "D4" else D1["fresh_holdout"]
+    order = sorted(fixtures, key=lambda f: -int(SIM.fullmatch(f).group(1)) * int(SIM.fullmatch(f).group(2)))
     with ProcessPoolExecutor(a.workers) as ex:
         done = dict(zip(order, ex.map(one, order)))
-    rows = [done[f] for f in D1["fresh_holdout"]]
-    res = {"protocol": "PROTOCOL.json amendment_D D1", "fixtures": rows, "all_pass": all(r["pass"] for r in rows), "wall_seconds": round(time.time() - t)}
+    rows = [done[f] for f in fixtures]
+    res = {"protocol": f"PROTOCOL.json amendment_D {ROUND}", "fixtures": rows, "all_pass": all(r["pass"] for r in rows), "wall_seconds": round(time.time() - t)}
     Path(a.output).write_text(json.dumps(res, indent=1) + "\n")
     for r in rows:
         print(r["fixture"], r["pass"], "starts@best", r["starts_at_best"], {q: f"{v:.1e}" for q, v in r["max_abs_diff"].items()},

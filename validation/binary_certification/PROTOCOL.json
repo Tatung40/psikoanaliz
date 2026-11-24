@@ -375,6 +375,12 @@
    "sample": "tests/fixtures/rasch/data_rasch_inscope.csv: Rasch (a = 1), N = 2000, k = 20, b = linspace(-2, 2, 20), theta ~ N(0, 1), seed 20261124",
    "validation": "Python mirt Rasch (61 nodes) vs an independent fixed-a reference (same numpy objective, exact gradient): max |diff b| <= .002, |objective diff| <= .001; recovery: every |b-hat - b| <= 3 SE; certification lookup returns 'certified'",
    "historical": "tests/fixtures/rasch/data_rasch_main.csv and its frozen phase-2 tests stay unchanged"
+  },
+  "D4_round2": {
+   "registered": "2026-11-24, after D1 (evidence d1_4pl.json: 7/8; sim(N=10000, k=12, seed=412) fails max |diff a| 2.8e-3 > .002) and before the run below; D1's failure stays reported",
+   "diagnosis": "not quadrature (identical diff with 61/121/201 reference nodes); Python's EM stops at tol 1e-8 after 599 iterations with an objective 1.6e-5 below the optimum on a flat ridge; at tol 1e-10 (1727 iterations) the diff is 3.3e-4",
+   "design": "8 new holdout fixtures sim(N, k, seed) with (3000,12,416), (3000,12,417), (3000,30,418), (3000,30,419), (10000,12,420), (10000,12,421), (10000,30,422), (10000,30,423); Python comparison fit at tol 1e-10, max_iter 50000 (61 nodes); everything else and all criteria exactly as D1",
+   "decision": "4PL G1 is satisfied iff all 8 D4 fixtures pass; the application solver default is unchanged (statistical adequacy of the default fit is the A2 recovery evidence); no further rounds"
   }
  }
 }
