@@ -255,5 +255,19 @@
    "criteria": "unchanged G3 criteria (convergence >= .99, withheld <= .05, |coverage - .95| <= .02) plus se_refused rate <= .01",
    "decision": "a model whose sandwich intervals meet the criteria at all four corners gets the sandwich SE/CI for MAP in the application and passes G3 by A1b; otherwise its MAP SE stays the posterior one with CI withheld, and for 3PL G3 fails (NOT CERTIFIED). 4PL certification does not depend on A1b (CI excluded from its scope); 4PL CI is enabled only if A1b passes."
   }
+ },
+ "amendment_A2": {
+  "registered": "2026-11-24, after A1 (evidence/binary_certification/amendment_a1.json, reported unchanged) and before any run below",
+  "defect": "Quadrature error of the application default (21 Gauss-Hermite nodes) for binary models at large N/k. Diagnostic (6 fresh datasets, 1PL common_a, N = 10000, k = 30): shared a-hat at 21 vs 61 nodes differs by -0.22 SE on average and the 21-node SE is 1.5 % smaller; explains A1a coverage .929. EM tolerance is not the cause (1e-4 vs 1e-8: 0.008 SE).",
+  "fix": "binary screens (Rasch, 1PL, 2PL, 3PL, 4PL) default to 61 nodes (the R mirt default for one dimension); polytomous/DIF screens unchanged (their evidence used 21 nodes)",
+  "retest": {
+   "1PL fixed_a, 2PL": "all four corners N 1000/10000 x k 12/30; replications N1000: 300, N10000: 100",
+   "1PL common_a": "all four corners; 1000 datasets each",
+   "3PL MAP": "all four corners, posterior SE (the application SE); replications N3000: 300, N10000: 150; G2 by the p1 criteria computed from the same fits (RMSE a/b <= .30, c <= .07, IRF RMSE <= .02, bound rate <= .05) plus G3 criteria",
+   "4PL MAP": "all four corners, G2 only (p1 criteria incl. RMSE d <= .07); replications N3000: 100, N10000: 50",
+   "seed": 20261127,
+   "fit": "application path with n_quadpts = 61 (max_iter 500, tol 1e-4)"
+  },
+  "decision": "G2/G3 of all four models are decided by A2 at all four corners under the corrected default; earlier 21-node results (p1, p6, p7, coverage.json, A1) remain reported as evidence for the superseded configuration. G1 already used 61 nodes and is unaffected. The status rules, criteria and scope are unchanged."
  }
 }
