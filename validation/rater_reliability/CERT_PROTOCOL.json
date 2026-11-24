@@ -83,6 +83,18 @@
     "bangdiwala_b": "Derivation: B = sum n_ii^2 / sum n_i+ n_+i. Independent uniform raters: E n_ii = N/q^2, n_i+ ~ n_+i ~ N/q, so B -> q(N/q^2)^2 / (q (N/q)^2) = 1/q^2 (+O(1/N)); registered 1/q was a target error. Amended target 1/q^2 = .0625, tolerance .02 and perfect-agreement check unchanged; fresh N=20000, seed 11.",
     "kendall_w": "Original Type I .033 at R=1000 (MC SE ~.0069 at .05) is 2.5 SE below .05. Re-estimate production chi-square p Type I with R=20000 (MC SE ~.0015), same design (n=10 objects, k=5 raters), fresh seed 41, band [.036,.064] unchanged. Fail => production p declared conservative, NOT CERTIFIED; no fallback."
    }
+  },
+  {
+   "id": "R-A2",
+   "method": "kendall_w",
+   "registered_before_fresh_runs": true,
+   "thresholds_changed": false,
+   "change": "production p = tie-aware Monte Carlo permutation p (independent within-rater permutation of ranks, ties preserved, B=9999, fixed seed), p=(1+#{W*>=W})/(B+1) (Phipson & Smyth 2010); chi-square p kept as p_chi2. R-A1 failed evidence retained.",
+   "gates": {
+    "null_type1": "R=2000, n=10, k=5 continuous, band [.036,.064]",
+    "null_type1_ties": "R=2000, n=10, k=5 integer scores 1..4 (ties), Type I <= .064",
+    "production_identity": "W and p_chi2 unchanged vs previous formula (<=1e-12); p in (0,1]; deterministic"
+   }
   }
  ]
 }
