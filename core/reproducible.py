@@ -288,6 +288,30 @@ def instrument(namespace=None):
                 space[name] = recorded(function)
 
 
+class _LateImportHook:
+    """Instrument core/ui modules first imported while a recorder is active (lazy imports inside a click handler),
+    so the click run itself records every downstream public call; no second rerun is needed."""
+    def find_spec(self, fullname, path=None, target=None):
+        if _ACTIVE.get() is None or not fullname.startswith(('core.', 'ui.')) or fullname == __name__:
+            return None
+        import importlib.machinery
+        spec = importlib.machinery.PathFinder.find_spec(fullname, path)
+        if spec is None or spec.loader is None or not hasattr(spec.loader, 'exec_module'):
+            return spec
+        loader = spec.loader
+        original = loader.exec_module
+        def exec_module(module):
+            original(module)
+            if _ACTIVE.get() is not None:
+                instrument()
+        loader.exec_module = exec_module
+        return spec
+
+
+if not any(isinstance(f, _LateImportHook) for f in sys.meta_path):
+    sys.meta_path.insert(0, _LateImportHook())
+
+
 def capture_view(function):
     @wraps(function)
     def wrapper(*args, **kwargs):

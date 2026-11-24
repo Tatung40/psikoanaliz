@@ -47,7 +47,7 @@ def test_spss_outputs_and_rasch_map_preserve_actual_values(actual_fits,monkeypat
     assert all(at.checkbox(key=f'python_mirt_output_Rasch_{k}').value for k in outputs)
     assert not at.checkbox(key='python_mirt_solver_advanced_Rasch').value
     at.button(key='python_mirt_start_Rasch').click().run()
-    assert not at.exception and len(calls)==1 and len(at.dataframe)==4
+    assert not at.exception and len(calls)==1 and len(at.dataframe)==7  # +Wright items/histogram +SE table (single click)
     params=downloads['python_mirt_parameters_csv_Rasch'];people=downloads['python_mirt_persons_csv_Rasch']
     for group,key in [('summary','summary'),('parameters','parameters'),('persons','persons'),('curves','curves'),('information','information'),('itemfit','itemfit')]:
         downloads.clear();at.checkbox(key=f'python_mirt_output_Rasch_{group}').uncheck().run()
@@ -56,8 +56,7 @@ def test_spss_outputs_and_rasch_map_preserve_actual_values(actual_fits,monkeypat
         assert not at.exception and len(calls)==1
         assert downloads['python_mirt_parameters_csv_Rasch']==params
         assert downloads['python_mirt_persons_csv_Rasch']==people
-    at.checkbox(key='python_mirt_wright_Rasch').check().run()
-    assert not at.exception and len(at.get('plotly_chart'))==1 and len(calls)==1
+    assert not at.exception and len(at.get('plotly_chart'))==1 and len(calls)==1  # Wright map from the single click
     native=pd.read_csv(io.BytesIO(downloads['python_mirt_persons_csv_Rasch']))
     wright=pd.read_csv(io.BytesIO(downloads['rasch_wright_persons']))
     np.testing.assert_array_equal(native.Birey,wright.Birey)

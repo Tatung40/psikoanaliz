@@ -25,7 +25,6 @@ def _fingerprint(frame):
     return h.hexdigest()
 
 
-@st.cache_data(show_spinner=False, max_entries=6)
 def _analyse(frame, identification, points, with_lr):
     f = R.fit(frame, "RSM", identification, points)
     out = {"fit": {k: v for k, v in f.items() if k not in ("spec",)}, "persons": R.persons(f),
@@ -83,10 +82,12 @@ def render(data, item_cols=(), id_col=None, group_col=None):
                 if len(cols) < 2:
                     raise ValueError("En az iki madde seçin.")
                 frame = data.loc[:, cols]
+                st.session_state.pop("rsm_request", None)
                 with st.spinner("RSM kestiriliyor…"):
-                    _analyse(frame, ident, points, with_lr)
+                    result = _analyse(frame, ident, points, with_lr)
+                # One fit per click, kept as the same objects: reruns reuse it and stay linked to the recorded fit.
                 st.session_state.rsm_request = {"cols": list(cols), "ident": ident, "points": points,
-                                                "lr": with_lr, "fp": _fingerprint(frame)}
+                                                "lr": with_lr, "fp": _fingerprint(frame), "result": result}
             except Exception as exc:
                 st.session_state.pop("rsm_request", None)
                 st.error(f"RSM analizi yapılamadı: {exc}")
@@ -99,7 +100,11 @@ def render(data, item_cols=(), id_col=None, group_col=None):
             frame = data.loc[:, cols]
             if _fingerprint(frame) != req["fp"]:
                 raise KeyError
-            res = _analyse(frame, req["ident"], req["points"], req["lr"])
+            res = req.get("result")
+            if res is None:  # request restored without its result: compute once, then keep the same objects
+                res = req["result"] = _analyse(frame, req["ident"], req["points"], req["lr"])
+            from core.reproducible import displayed as record_displayed
+            record_displayed(res["fit"]["steps"], res["fit"]["tables"], res["persons"], res["item_fit"])
         except Exception:
             st.session_state.pop("rsm_request", None)
             with tabs[0]:

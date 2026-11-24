@@ -125,9 +125,11 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.run();assert not at.exception
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
-    assert len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==4
+    # Single click: binary models also get the SE/CI table (not 1PL: no SE), PNG + Excel/ZIP bundle; Rasch the Wright map.
+    tables={'Rasch':7,'1PL':4,'2PL':5,'3PL':5,'4PL':5,'NRM':3}.get(model,4)
+    assert len(at.dataframe)==tables and len(rendered_figures)==4
     from tests.reproducible_ui import scientific_downloads
-    assert len(scientific_downloads(at))==(6 if model=='NRM' else 8 if model=='2PL' else 7)  # existing model exports, including specialized 2PL Word
+    assert len(scientific_downloads(at))=={'Rasch':15,'1PL':10,'2PL':12,'3PL':11,'4PL':11,'NRM':6}.get(model,7)  # incl. 2PL Word
     assert {'repro_py','repro_zip'} <= {d.key for d in at.get('download_button')}
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     parameter_index=1 if model=='NRM' else 2
@@ -140,7 +142,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
         assert outcome.scientific_status=='EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED'
     assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[parameter_index+1].value.columns)
     assert len(at.dataframe[parameter_index+1].value)==len(frame)
-    at.run();assert len(calls)==1 and len(at.dataframe)==(3 if model=='NRM' else 4) and len(rendered_figures)==8
+    at.run();assert len(calls)==1 and len(at.dataframe)==tables and len(rendered_figures)==8
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False

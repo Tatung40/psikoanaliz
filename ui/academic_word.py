@@ -22,7 +22,7 @@ WIDGETS={'selectbox','multiselect','radio','checkbox','toggle','slider','select_
          'number_input','text_input','text_area','date_input','file_uploader','data_editor'}
 DISPLAY={'dataframe','table','metric','pyplot','plotly_chart','json','markdown','caption',
          'header','subheader','title','warning','error','info','success','download_button'} | OUTPUTS
-PRESENTATION=re.compile(r'(?:output_|chart_|show_|plot_|report_|theta_range|theta_min|theta_max|theta_points)')
+PRESENTATION=re.compile(r'(?:output_|chart_|show_|plot_|report_|theta_range|theta_min|theta_max|theta_points|curve_item|crc_item|empirical_item|extra_kind|extra_items|extras_)')  # display-only selectors: never refit
 
 
 def _digest(value):

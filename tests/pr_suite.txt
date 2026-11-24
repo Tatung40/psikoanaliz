@@ -104,3 +104,4 @@ tests/test_result_panels.py
 tests/test_raschpy_mfrm.py
 tests/test_missing_advisor.py
 tests/test_raschpy_v15_resume.py
+tests/test_irt_single_click.py
