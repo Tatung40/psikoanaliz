@@ -10,18 +10,28 @@ P4 <- function(par, Theta, ncat) { p <- clip(par[3] + (par[4] - par[3]) / (1 + e
 P3 <- function(par, Theta, ncat) { p <- clip(par[3] + (1 - par[3]) / (1 + exp(-par[1] * (Theta[, 1] - par[2])))); cbind(1 - p, p) }
 eps <- 1e-6
 # Amendment A3: the registered priors enter the M-step objective of each custom item (parprior is not used by R mirt's
-# M-step for createItem items). Objective per item: sum(expected counts * log P) + log prior, gradient/Hessian by numDeriv.
-lp <- function(par) {
-  out <- dlnorm(par[1], 0, .5, log = TRUE) + dnorm(par[2], 0, 2, log = TRUE) + dbeta(par[3], 2, 8, log = TRUE)
-  if (length(par) == 4) out <- out + dbeta(par[4], 8, 2, log = TRUE)
-  if (is.finite(out)) out else -1e10
+# M-step for createItem items). Objective per item: sum(expected counts * log P) + log prior.
+# Analytic gradient/Hessian of (expected complete-data item log-likelihood + log prior); verified against central
+# differences (relative error <= 2e-7) in validation/binary_certification (Python mirror of these lines).
+derivs <- function(p, x, Theta) {
+  four <- length(p) == 4; a <- p[1]; b <- p[2]; c <- p[3]; d <- if (four) p[4] else 1
+  th <- Theta[, 1]; r0 <- x@dat[, 1]; r1 <- x@dat[, 2]
+  s <- plogis(a * (th - b)); u <- s * (1 - s); w <- u * (1 - 2 * s); t <- th - b; P <- c + (d - c) * s
+  g <- r1 / P - r0 / (1 - P); h <- -r1 / P^2 - r0 / (1 - P)^2
+  D <- list((d - c) * u * t, -(d - c) * u * a, 1 - s); if (four) D[[4]] <- s
+  m <- length(D); zero <- 0 * th; D2 <- rep(list(rep(list(zero), m)), m)
+  D2[[1]][[1]] <- (d - c) * w * t^2; D2[[1]][[2]] <- D2[[2]][[1]] <- (d - c) * (-w * a * t - u); D2[[2]][[2]] <- (d - c) * w * a^2
+  D2[[1]][[3]] <- D2[[3]][[1]] <- -u * t; D2[[2]][[3]] <- D2[[3]][[2]] <- u * a
+  if (four) { D2[[1]][[4]] <- D2[[4]][[1]] <- u * t; D2[[2]][[4]] <- D2[[4]][[2]] <- -u * a }
+  gp <- c(-1 / a - log(a) / (.25 * a), -b / 4, 1 / c - 7 / (1 - c)); if (four) gp <- c(gp, 7 / d - 1 / (1 - d))
+  hp <- c((log(a) - 1) / (.25 * a^2) + 1 / a^2, -1 / 4, -1 / c^2 - 7 / (1 - c)^2); if (four) hp <- c(hp, -7 / d^2 - 1 / (1 - d)^2)
+  G <- sapply(D, function(Di) sum(g * Di)) + gp
+  H <- matrix(0, m, m); for (i in 1:m) for (j in 1:m) H[i, j] <- sum(h * D[[i]] * D[[j]] + g * D2[[i]][[j]])
+  list(G = G, H = H + diag(hp))
 }
-make <- function(name, par, P, lb, ub) {
-  obj <- function(p, x, Theta) sum(x@dat * log(P(p, Theta))) + lp(p)
+make <- function(name, par, P, lb, ub)
   createItem(name, par = par, est = rep(TRUE, length(par)), P = P, lbound = lb, ubound = ub,
-             gr = function(x, Theta) numDeriv::grad(function(p) obj(p, x, Theta), x@par),
-             hss = function(x, Theta) numDeriv::hessian(function(p) obj(p, x, Theta), x@par))
-}
+             gr = function(x, Theta) derivs(x@par, x, Theta)$G, hss = function(x, Theta) derivs(x@par, x, Theta)$H)
 items <- list(
   irt3 = make("irt3", c(a = 1, b = 0, c = .15), P3, c(eps, -Inf, eps), c(Inf, Inf, 1 - eps)),
   irt4 = make("irt4", c(a = 1, b = 0, c = .15, d = .95), P4, c(eps, -Inf, eps, eps), c(Inf, Inf, 1 - eps, 1 - eps)))
