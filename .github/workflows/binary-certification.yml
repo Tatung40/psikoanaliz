@@ -1,0 +1,54 @@
+name: Binary IRT certification — R mirt equivalence (G1)
+on:
+  pull_request:
+    paths:
+      - 'validation/binary_certification/**'
+      - 'validation/evidence/binary_certification/**'
+      - 'core/irt_binary_inference.py'
+      - 'core/irt_python_mirt_adapter.py'
+      - 'core/irt_binary_usage_policy.py'
+      - '.github/workflows/binary-certification.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  r-equivalence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::jsonlite
+          cache-version: 3
+      - name: Install Python scientific dependencies
+        run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Fixtures and Python mirt fits
+        run: python validation/binary_certification/r_equivalence.py prepare --out g1
+      - name: R mirt 1.48 reference fits
+        run: Rscript validation/binary_certification/reference.R g1/manifest.json g1
+      - name: Independent arbiter comparison
+        run: python validation/binary_certification/r_equivalence.py compare --out g1 --evidence g1/r_equivalence.json
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-certification-g1-${{ github.sha }}
+          path: g1/
+          retention-days: 30
+      - name: Recomputed G1 equals the committed evidence and the certification decision
+        run: python validation/binary_certification/certify.py --check-g1 g1/r_equivalence.json
