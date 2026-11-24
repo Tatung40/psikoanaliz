@@ -676,15 +676,17 @@
     "chi2",
     "df",
     "estimate",
-    "p"
+    "p",
+    "p_chi2"
    ],
    "failed_outputs": [],
    "references": [
-    "irr::kendall"
+    "irr::kendall",
+    "p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1)"
    ],
    "max_abs_diff": 4.404571325722362e-20,
    "certification": {
-    "status": "NOT CERTIFIED",
+    "status": "CERTIFIED",
     "families": [
      "D_correlation_and_concordance"
     ],
@@ -695,14 +697,22 @@
      "passed": false
     },
     "original_note": "FAILED: Type I .033 < .036 (chi-square approximation conservative with n = 10 objects)",
-    "amendment": "R-A1 (CERT_PROTOCOL.json, 3c336a4)",
-    "evidence": {
+    "amendment": "R-A2 (permutation p)",
+    "r_a1_failed_evidence": {
      "type1": 0.03345,
      "R": 20000,
      "mc_se": 0.0012714381129256744,
      "passed": false
     },
-    "note": "Confirmed at R=20000: chi-square p Type I .0335 (MC SE .0013) < .036; production p conservative for n=10, k=5"
+    "r_a1_note": "Confirmed at R=20000: chi-square p Type I .0335 (MC SE .0013) < .036; production p conservative for n=10, k=5",
+    "evidence": {
+     "type1": 0.0575,
+     "type1_ties": 0.0565,
+     "deterministic": true,
+     "p": 0.6478,
+     "p_chi2": 0.6069931961138524,
+     "passed": true
+    }
    }
   },
   "spearman": {
@@ -865,5 +875,5 @@
  "n_comparisons": 154,
  "max_abs_diff": 0.000736507513270479,
  "scope": "examples/rater_reliability fixtures only; not CERTIFIED",
- "certified_count": 29
+ "certified_count": 30
 }

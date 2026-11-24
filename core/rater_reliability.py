@@ -346,7 +346,21 @@ def _kendall(data):
     R = ranks.sum(axis=1)
     w = (12 * (R ** 2).sum() - 3 * k ** 2 * n * (n + 1) ** 2) / (k ** 2 * n * (n ** 2 - 1) - k * ties)
     chi2 = k * (n - 1) * w
-    return {"estimate": float(w), "chi2": float(chi2), "df": n - 1, "p": float(stats.chi2.sf(chi2, n - 1))}
+    return {"estimate": float(w), "chi2": float(chi2), "df": n - 1, "p": _kendall_perm_p(ranks),
+            "p_method": "permutation (B=9999, ties preserved)", "p_chi2": float(stats.chi2.sf(chi2, n - 1))}
+
+
+def _kendall_perm_p(ranks, B=9999, seed=20261124):
+    """Monte Carlo permutation p for Kendall's W: ranks permuted independently within raters (tie
+    structure, hence the W denominator, preserved), so W is monotone in sum(R_i^2); p=(1+b)/(B+1)."""
+    n, k = ranks.shape; obs = (ranks.sum(1) ** 2).sum()
+    rng = np.random.default_rng(seed); cnt = 0
+    for s in range(0, B, 2000):
+        m = min(2000, B - s)
+        idx = np.argsort(rng.random((m, n, k)), axis=1)
+        st = (np.take_along_axis(np.broadcast_to(ranks, (m, n, k)), idx, 1).sum(2) ** 2).sum(1)
+        cnt += int((st >= obs - 1e-9).sum())
+    return float((1 + cnt) / (B + 1))
 
 
 def _bland_altman(data):

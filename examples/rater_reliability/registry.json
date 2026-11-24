@@ -1030,11 +1030,16 @@
      "value": 9.0,
      "source": "irr::kendall"
     },
-    "p": {
+    "p_chi2": {
      "value": 1.0001385514218e-05,
      "source": "irr::kendall"
+    },
+    "p": {
+     "value": 5e-06,
+     "source": "permutation-MC independent naive loop (raw-score within-rater permutation, full tie-corrected W), B=199999, seed 777"
     }
-   }
+   },
+   "expected_note": "irr::kendall p is the chi-square approximation; production p is the permutation p (R-A2)"
   },
   {
    "id": "spearman_paired",

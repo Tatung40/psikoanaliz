@@ -72,10 +72,11 @@ NOT CERTIFIED (genel kapsam): 30. Kanıtsız ya da uyuşmayan çıktı ekranda v
 | ICC(3,k) | df2 | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(3,k) | p | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(3,k) | ci95 | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
-| Kendall W | estimate | NUMERICALLY VALIDATED | irr::kendall |
-| Kendall W | chi2 | NUMERICALLY VALIDATED | irr::kendall |
-| Kendall W | df | NUMERICALLY VALIDATED | irr::kendall |
-| Kendall W | p | NUMERICALLY VALIDATED | irr::kendall |
+| Kendall W | estimate | NUMERICALLY VALIDATED | irr::kendall; p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1) |
+| Kendall W | chi2 | NUMERICALLY VALIDATED | irr::kendall; p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1) |
+| Kendall W | df | NUMERICALLY VALIDATED | irr::kendall; p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1) |
+| Kendall W | p | NUMERICALLY VALIDATED | irr::kendall; p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1) |
+| Kendall W | p_chi2 | NUMERICALLY VALIDATED | irr::kendall; p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1) |
 | Spearman sıra korelasyonu | estimate | NUMERICALLY VALIDATED | stats::cor.test |
 | Spearman sıra korelasyonu | p | NUMERICALLY VALIDATED | stats::cor.test |
 | Pearson korelasyonu | estimate | NUMERICALLY VALIDATED | stats::cor.test |
