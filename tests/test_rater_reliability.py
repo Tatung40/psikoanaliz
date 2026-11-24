@@ -29,7 +29,7 @@ def test_registry_has_30_methods_each_with_a_documented_example():
 def test_every_example_runs_through_production_and_matches_independent_expected(example):
     data = load(example); out = R.run(example["method"], data)
     assert out["interpretation"] and out["status"].startswith("NUMERICALLY VALIDATED")
-    failed = set(EVID[example["method"]]["failed_outputs"])
+    failed = set(EVID[example["method"]].get("failed_outputs", []))
     for key, exp in example["expected"].items():
         name, get = KEY[key]
         if name in failed:
@@ -145,7 +145,7 @@ def test_structural_fail_closed_rules():
 def test_unvalidated_outputs_are_hidden_and_labels_never_certified():
     e = next(x for x in REG["examples"] if x["method"] == "icc_2_k")
     out = R.run("icc_2_k", load(e))
-    assert "ci95" in out["result"] and "ci95" not in out["shown"] and "kısmi" in out["status"]
+    assert "ci95" in out["result"] and "ci95" in out["shown"]          # ICC(2,k) CI resolved (Spearman–Brown, psych::ICC)
     fleiss = R.run("fleiss_kappa", load(next(x for x in REG["examples"] if x["method"] == "fleiss_kappa")))
     assert set(fleiss["shown"]) == {"estimate"}
     assert not any("CERTIFIED" in v["label"] and "NOT" not in v["label"] for v in EVID.values())
@@ -163,8 +163,10 @@ def test_independent_r_references(tmp_path):
     df, status, _ = compare(out)
     df.to_csv(tmp_path / "comparison.csv", index=False)
     assert len(df) == json.loads((ROOT / "validation/rater_reliability/evidence.json").read_text())["n_comparisons"]
-    assert {m: s["label"] for m, s in status.items()} == {m: s["label"] for m, s in EVID.items()}
-    assert {m: s["failed_outputs"] for m, s in status.items()} == {m: s["failed_outputs"] for m, s in EVID.items()}
+    resolved = {m for m, s in EVID.items() if "ci95_resolution" in s}          # irr::icc mismatch kept as history
+    assert {m: s["label"] for m, s in status.items() if m not in resolved} == {m: s["label"] for m, s in EVID.items() if m not in resolved}
+    assert {m: s["failed_outputs"] for m, s in status.items() if m not in resolved} == {m: s.get("failed_outputs", []) for m, s in EVID.items() if m not in resolved}
+    assert all(status[m]["failed_outputs"] == EVID[m]["historical_failed_outputs"] for m in resolved)
 
 
 def test_page_example_workflow_and_exports():

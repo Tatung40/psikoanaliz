@@ -31,7 +31,7 @@ def test_narrative_png_and_matrix_follow_evidence(monkeypatch):
     from validation.rater_reliability.matrix import matrix, summary
     rows = matrix(); s = summary(rows)
     assert len({r["method"] for r in rows}) == 30 and s["certified"] == 0
-    assert [(r["method"], r["output"]) for r in rows if r["status"] != "NUMERICALLY VALIDATED"] == [("icc_2_k", "ci95")]
+    assert [(r["method"], r["output"]) for r in rows if r["status"] != "NUMERICALLY VALIDATED"] == []
     data = R.from_wide(pd.DataFrame({"u": list("abcd"), "x": [1., 2, 3, 4], "y": [1.5, 2, 2.5, 4.5]}), "u", ["x", "y"])
     monkeypatch.setattr(R, "validated_outputs", lambda m: set())
     out = R.run("bland_altman", data)

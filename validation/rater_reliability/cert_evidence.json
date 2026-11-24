@@ -1,0 +1,182 @@
+{
+ "icc_1_1": {
+  "target": 0.5714285714285714,
+  "estimate_n2000": 0.5749888807036256,
+  "coverage": 0.953,
+  "type1": 0.053,
+  "production_identity_max_abs_diff": 1.4210854715202004e-14,
+  "passed": true
+ },
+ "icc_1_k": {
+  "target": 0.8421052631578947,
+  "estimate_n2000": 0.8440307074852328,
+  "coverage": 0.953,
+  "type1": 0.053,
+  "production_identity_max_abs_diff": 1.4210854715202004e-14,
+  "passed": true
+ },
+ "icc_2_1": {
+  "target": 0.5714285714285714,
+  "estimate_n2000": 0.6252744543224549,
+  "coverage": 0.931,
+  "type1": 0.052,
+  "production_identity_max_abs_diff": 2.3092638912203256e-14,
+  "passed": false
+ },
+ "icc_2_k": {
+  "target": 0.8421052631578947,
+  "estimate_n2000": 0.8696979965797024,
+  "coverage": 0.931,
+  "type1": 0.052,
+  "production_identity_max_abs_diff": 2.3092638912203256e-14,
+  "passed": true
+ },
+ "icc_3_1": {
+  "target": 0.6666666666666666,
+  "estimate_n2000": 0.6702191021975257,
+  "coverage": 0.949,
+  "type1": 0.054,
+  "production_identity_max_abs_diff": 1.4210854715202004e-14,
+  "passed": true
+ },
+ "icc_3_k": {
+  "target": 0.8888888888888888,
+  "estimate_n2000": 0.8904621601799921,
+  "coverage": 0.949,
+  "type1": 0.054,
+  "production_identity_max_abs_diff": 1.4210854715202004e-14,
+  "passed": true
+ },
+ "cohen_kappa": {
+  "coverage": 0.94,
+  "type1": 0.051,
+  "passed": true
+ },
+ "cohen_kappa_linear": {
+  "coverage": 0.945,
+  "type1": 0.045,
+  "passed": true
+ },
+ "cohen_kappa_quadratic": {
+  "coverage": 0.948,
+  "type1": 0.043,
+  "passed": true
+ },
+ "fleiss_kappa": {
+  "estimate_independent": -0.0013246000660568343,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "conger_kappa": {
+  "estimate_independent": -0.0014701818270048503,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "light_kappa": {
+  "estimate_independent": -0.0030418432135306188,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "scott_pi": {
+  "estimate_independent": 0.0009458262874304364,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "gwet_ac1": {
+  "estimate_independent": -0.001617720136054372,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "gwet_ac2": {
+  "estimate_independent": -0.005262226647906906,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "brennan_prediger": {
+  "estimate_independent": -0.0037999999999999887,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "kripp_nominal": {
+  "estimate_independent": 0.001299429424364118,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "kripp_ordinal": {
+  "estimate_independent": 0.0036066268736906215,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "kripp_interval": {
+  "estimate_independent": -0.0030932961777343504,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "kripp_ratio": {
+  "estimate_independent": -0.008294293189589963,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "percent_agreement": {
+  "estimate_independent": 0.24665,
+  "target": 0.25,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "pabak": {
+  "estimate_independent": 0.0041999999999999815,
+  "target": 0.0,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "bangdiwala_b": {
+  "estimate_independent": 0.0649601171497666,
+  "target": 0.25,
+  "perfect": 1.0,
+  "passed": false
+ },
+ "pearson": {
+  "type1": 0.052,
+  "passed": true,
+  "coverage": 0.943
+ },
+ "spearman": {
+  "type1": 0.053,
+  "passed": true
+ },
+ "kendall_w": {
+  "type1": 0.033,
+  "passed": false
+ },
+ "mcnemar": {
+  "type1": 0.039,
+  "passed": true
+ },
+ "stuart_maxwell": {
+  "type1": 0.051,
+  "passed": true
+ },
+ "bhapkar": {
+  "type1": 0.059,
+  "passed": true
+ },
+ "bland_altman": {
+  "coverage": {
+   "bias": 0.955,
+   "loa_low": 0.949,
+   "loa_high": 0.955
+  },
+  "passed": true
+ }
+}

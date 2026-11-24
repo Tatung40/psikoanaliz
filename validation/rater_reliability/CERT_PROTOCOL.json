@@ -1,0 +1,19 @@
+{
+ "registered": "2026-11-24, before any run below; numerical validation (evidence.json, 30/30) is reused, not repeated",
+ "families": {
+  "A_chance_corrected_and_agreement_estimates": {"methods": ["cohen_kappa", "cohen_kappa_linear", "cohen_kappa_quadratic", "fleiss_kappa", "conger_kappa", "light_kappa", "scott_pi", "gwet_ac1", "gwet_ac2", "brennan_prediger", "kripp_nominal", "kripp_ordinal", "kripp_interval", "kripp_ratio", "percent_agreement", "pabak", "bangdiwala_b"],
+     "gate": "estimand consistency at N = 20000 units, 3 raters (2 for two-rater methods), q = 4 uniform categories (2 for PABAK): independent raters -> target 0 for chance-corrected coefficients, 1/q for percent agreement and Bangdiwala B; |estimate - target| <= .02; identical raters -> exactly 1 (|diff| <= 1e-12)"},
+  "B_kappa_inference": {"methods": ["cohen_kappa", "cohen_kappa_linear", "cohen_kappa_quadratic"], "scope": "2 raters, N >= 200, q = 4",
+     "gate": "R = 1000: 95% CI coverage at true kappa .5 within .95 +/- .02; z test Type I at kappa = 0 within [.036, .064]"},
+  "C_icc": {"methods": ["icc_1_1", "icc_1_k", "icc_2_1", "icc_2_k", "icc_3_1", "icc_3_k"], "scope": "complete n = 30 subjects x k = 4 raters, normal effects",
+     "gate": "R = 1000 per model: estimand consistency (mean estimate within .03 of the population ICC at n = 2000, one run); 95% CI coverage within .95 +/- .02 under the matching model (one-way data for ICC(1,.), two-way random for ICC(2,.), two-way with fixed rater effects for ICC(3,.)); F test Type I at ICC = 0 within [.036, .064]"},
+  "D_correlation_and_concordance": {"methods": ["pearson", "spearman", "kendall_w"], "scope": "n = 50 (pearson/spearman), n = 10 objects x 5 raters (kendall_w)",
+     "gate": "R = 1000: Type I within [.036, .064]; Pearson Fisher-z CI coverage at rho = .5 within .95 +/- .02"},
+  "E_marginal_homogeneity": {"methods": ["mcnemar", "stuart_maxwell", "bhapkar"], "scope": "N = 200 pairs, symmetric joint table",
+     "gate": "R = 1000: Type I <= .064 (discrete tests: upper bound only; continuity-corrected McNemar is conservative by design)"},
+  "F_bland_altman": {"methods": ["bland_altman"], "scope": "n = 50 normal differences",
+     "gate": "R = 1000: 95% CI coverage of the bias within .95 +/- .02; of each limit of agreement (approximate Bland-Altman 1999 SE) within .95 +/- .02"}
+ },
+ "mc_precision": "R = 1000 gives MCSE ~ .007 for .95 and ~ .0069 for .05; the +/- .02 and [.036, .064] bands are ~3 and 2 MCSE",
+ "status_rule": "A method is CERTIFIED for an output only if every gate of its family that applies to that output passes; outputs without an applicable gate stay NUMERICALLY VALIDATED; failures are recorded, never hidden"
+}

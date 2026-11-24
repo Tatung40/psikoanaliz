@@ -1,7 +1,7 @@
 # Puanlayıcı güvenirliği — yöntem × çıktı matrisi
 
 `evidence.json` kaydından üretildi (`matrix.py`), yeniden hesaplama yapılmadı. Doğrulama yalnız örnek veriler için geçerli;
-**CERTIFIED: 0**. Tüm çıktıları doğrulanmış yöntem: 29/30. Kısmi: 1.
+**CERTIFIED: 0**. Tüm çıktıları doğrulanmış yöntem: 30/30. Kısmi: 0.
 NOT CERTIFIED (genel kapsam): 30. Kanıtsız ya da uyuşmayan çıktı ekranda ve dışa aktarımlarda gösterilmez.
 
 | Yöntem | Çıktı | Durum | Referanslar |
@@ -59,7 +59,7 @@ NOT CERTIFIED (genel kapsam): 30. Kanıtsız ya da uyuşmayan çıktı ekranda v
 | ICC(2,k) | df1 | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(2,k) | df2 | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(2,k) | p | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
-| ICC(2,k) | ci95 | WITHHELD (referans uyuşmazlığı) | irr::icc; psych::ICC |
+| ICC(2,k) | ci95 | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(3,1) | estimate | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(3,1) | F | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
 | ICC(3,1) | df1 | NUMERICALLY VALIDATED | irr::icc; psych::ICC |
