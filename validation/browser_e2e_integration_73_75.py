@@ -1,4 +1,4 @@
-"""Real app upload -> SPSS controls -> calibrated Rasch -> downloads -> Wright."""
+"""Real app upload -> SPSS controls -> calibrated Rasch -> downloads -> Wright (in-scope sample, amendment D3)."""
 import argparse,json,traceback
 from pathlib import Path
 import numpy as np
@@ -28,7 +28,7 @@ def run(output,app_python=None,browser_path=None):
                         (expect(control).to_be_checked() if value else expect(control).not_to_be_checked())
                         wait_idle(page)
                     errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-                    upload(page,server.port,ROOT/'tests/fixtures/rasch/data_rasch_main.csv')
+                    upload(page,server.port,ROOT/'tests/fixtures/rasch/data_rasch_inscope.csv')
                     nav(page,'📐 Rasch Modeli')
                     click_text('Çıktılar ve Raporlama Seçenekleri')
                     names=['Model özeti, LogLik, AIC/BIC ve yakınsama','Madde parametreleri',
@@ -50,12 +50,13 @@ def run(output,app_python=None,browser_path=None):
                     # 21-node phase-2 evidence is reproduced by tests/test_rasch_61_wright.py with 21 nodes set explicitly.
                     import mirt
                     from core.irt_python_mirt_adapter import fit_python_mirt
-                    xr=pd.read_csv(ROOT/'tests/fixtures/rasch/data_rasch_main.csv').astype(int)
+                    xr=pd.read_csv(ROOT/'tests/fixtures/rasch/data_rasch_inscope.csv').astype(int)
                     ref=fit_python_mirt(xr.to_numpy(),model='Rasch',n_quadpts=61).fit
                     eap=mirt.fscores(ref,xr.to_numpy(),method='EAP',n_quadpts=61)
                     ep=pd.DataFrame({'θ':np.asarray(eap.theta).reshape(-1),'Posterior SD':np.asarray(eap.standard_error).reshape(-1)})
                     ei=pd.DataFrame({'Madde':list(xr.columns),'b':ref.coef().difficulty.to_numpy(float)})
-                    assert len(people)==1000 and len(params)==10
+                    assert len(people)==2000 and len(params)==20
+                    page.get_by_text('CERTIFIED',exact=False).first.wait_for(state='attached',timeout=30000)   # in-scope: certified label (D3; in the collapsed details)
                     np.testing.assert_allclose(people['Yetenek (θ)'],ep['θ'],rtol=1e-12,atol=1e-12)
                     np.testing.assert_allclose(people['SH (θ)'],ep['Posterior SD'],rtol=1e-12,atol=1e-12)
                     np.testing.assert_allclose(params.set_index('Madde').loc[ei.Madde,'b'],ei.b,rtol=1e-12,atol=1e-12)
@@ -82,7 +83,7 @@ def run(output,app_python=None,browser_path=None):
                     })""")
                     assert chart['axes']==['y','y'] and chart['names']==wi.Madde.tolist()
                     np.testing.assert_allclose(chart['items'],wi.b,rtol=1e-12,atol=1e-12)
-                    assert -sum(chart['counts'])==1000
+                    assert -sum(chart['counts'])==2000
                     page.locator('[data-testid=stPlotlyChart]').evaluate("el => el.scrollIntoView({block:'center'})")
                     page.screenshot(path=str(out/'rasch_wright_app.png'),full_page=True)
                     click_text('Python mirt — sayısal çözücü')
@@ -105,7 +106,7 @@ def run(output,app_python=None,browser_path=None):
                     expect(page.locator('[data-testid=stPlotlyChart]')).to_have_count(0)
                     assert not errors,errors
                     page.screenshot(path=str(out/'invalid_solver_app.png'),full_page=True)
-                    result.update(status='PASS',persons=1000,items=10,controls_verified=names,
+                    result.update(status='PASS',persons=2000,items=20,controls_verified=names,
                         solver_settings=dict(max_iter=700,tol=1e-6,n_quadpts=31),wright=chart,
                         parameter_values_unchanged_by_output_controls=True,invalid_settings_withheld=True)
                 except Exception:

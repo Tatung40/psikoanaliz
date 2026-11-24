@@ -1,0 +1,20 @@
+{
+ "sample": "tests/fixtures/rasch/data_rasch_inscope.csv",
+ "sha256": "89e2e47759a70754276e29c34e776eb8cec23fd666df7044452f05ec45fb15a2",
+ "shape": [
+  2000,
+  20
+ ],
+ "max_abs_diff_b_reference": 0.0004006331937094626,
+ "objective_gap": -0.0001229033077834174,
+ "max_abs_z_vs_truth": 2.4836409097201133,
+ "certification_state": "certified",
+ "checks": {
+  "converged": true,
+  "b_vs_reference": true,
+  "objective": true,
+  "recovery_3se": true,
+  "certified": true
+ },
+ "pass": true
+}

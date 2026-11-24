@@ -1,0 +1,487 @@
+{
+ "protocol": "PROTOCOL.json amendment_D D1",
+ "fixtures": [
+  {
+   "fixture": "sim(N=3000, k=12, seed=408)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -23192.933757453975,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 209,
+     "max_abs_gradient": 3.0144995856851153e-05,
+     "neg_objective": 23273.519219513448
+    },
+    {
+     "objective": -23192.933757453924,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 236,
+     "max_abs_gradient": 2.2017511821736946e-05,
+     "neg_objective": 23273.519219513397
+    },
+    {
+     "objective": -23192.933757453942,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 248,
+     "max_abs_gradient": 0.00011013499140588578,
+     "neg_objective": 23273.519219513415
+    },
+    {
+     "objective": -23192.933757453924,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 269,
+     "max_abs_gradient": 0.00014615034357001733,
+     "neg_objective": 23273.519219513397
+    },
+    {
+     "objective": -23192.933757453928,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 235,
+     "max_abs_gradient": 7.731520771780964e-05,
+     "neg_objective": 23273.5192195134
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.0007691707116133095,
+    "b": 0.0003379871109606414,
+    "c": 0.00011365696686763127,
+    "d": 7.180835041753486e-05
+   },
+   "objective_gap_python_minus_best": -3.0269766284618527e-06,
+   "max_abs_gradient_interior": 0.004376802624373788,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 4.223951844681304,
+   "pass": true
+  },
+  {
+   "fixture": "sim(N=3000, k=12, seed=409)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -23324.238850101054,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 215,
+     "max_abs_gradient": 8.744100971957991e-05,
+     "neg_objective": 23404.824312160526
+    },
+    {
+     "objective": -23324.238850101006,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 256,
+     "max_abs_gradient": 5.185352265901777e-05,
+     "neg_objective": 23404.82431216048
+    },
+    {
+     "objective": -23324.238850101046,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 260,
+     "max_abs_gradient": 0.00012776099878264446,
+     "neg_objective": 23404.82431216052
+    },
+    {
+     "objective": -23324.238850101035,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 237,
+     "max_abs_gradient": 3.0513144896104905e-05,
+     "neg_objective": 23404.82431216051
+    },
+    {
+     "objective": -23324.238850101032,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 236,
+     "max_abs_gradient": 2.893058139119553e-05,
+     "neg_objective": 23404.824312160505
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.0002914266402356258,
+    "b": 0.0003109114237064281,
+    "c": 8.821316015406033e-05,
+    "d": 1.9511846236941466e-05
+   },
+   "objective_gap_python_minus_best": -1.1960073607042432e-06,
+   "max_abs_gradient_interior": 0.004852715573330446,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 3.827833477944983,
+   "pass": true
+  },
+  {
+   "fixture": "sim(N=3000, k=30, seed=410)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -57001.27299755592,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 333,
+     "max_abs_gradient": 6.458967919176217e-05,
+     "neg_objective": 57202.7366527046
+    },
+    {
+     "objective": -57001.27299755583,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 337,
+     "max_abs_gradient": 3.9529348336397874e-05,
+     "neg_objective": 57202.736652704516
+    },
+    {
+     "objective": -57001.27299755584,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 360,
+     "max_abs_gradient": 5.89996089024325e-05,
+     "neg_objective": 57202.73665270453
+    },
+    {
+     "objective": -57001.27299755587,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 368,
+     "max_abs_gradient": 7.907572906251659e-05,
+     "neg_objective": 57202.73665270455
+    },
+    {
+     "objective": -57001.27299755597,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 359,
+     "max_abs_gradient": 9.37281616941732e-05,
+     "neg_objective": 57202.73665270466
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.001216210167959142,
+    "b": 0.0002899142670381716,
+    "c": 7.409014005432812e-05,
+    "d": 0.00016036310012568222
+   },
+   "objective_gap_python_minus_best": -3.411158104427159e-06,
+   "max_abs_gradient_interior": 0.003993301980272479,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 3.0987792805161494,
+   "pass": true
+  },
+  {
+   "fixture": "sim(N=3000, k=30, seed=411)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -57065.22241457933,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 301,
+     "max_abs_gradient": 4.6488571814329305e-05,
+     "neg_objective": 57266.68606972801
+    },
+    {
+     "objective": -57065.222414579504,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 312,
+     "max_abs_gradient": 0.00021078143409880568,
+     "neg_objective": 57266.68606972818
+    },
+    {
+     "objective": -57065.222414579366,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 333,
+     "max_abs_gradient": 4.9870725796097304e-05,
+     "neg_objective": 57266.68606972805
+    },
+    {
+     "objective": -57065.22241457932,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 321,
+     "max_abs_gradient": 6.84854121737466e-05,
+     "neg_objective": 57266.686069728006
+    },
+    {
+     "objective": -57065.22241457943,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 328,
+     "max_abs_gradient": 5.710523096924547e-05,
+     "neg_objective": 57266.686069728115
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.0003544016507823766,
+    "b": 0.0002064426224986926,
+    "c": 7.504234973149115e-05,
+    "d": 4.8469482268109765e-05
+   },
+   "objective_gap_python_minus_best": -1.6751509974710643e-06,
+   "max_abs_gradient_interior": 0.00284431614902525,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 4.209536513389281,
+   "pass": true
+  },
+  {
+   "fixture": "sim(N=10000, k=12, seed=412)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -77468.4498455558,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 350,
+     "max_abs_gradient": 0.0002785090739507723,
+     "neg_objective": 77549.0353076153
+    },
+    {
+     "objective": -77468.44984555579,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 344,
+     "max_abs_gradient": 0.00010044058690650282,
+     "neg_objective": 77549.03530761527
+    },
+    {
+     "objective": -77468.44984555605,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 381,
+     "max_abs_gradient": 9.791903410638625e-05,
+     "neg_objective": 77549.03530761552
+    },
+    {
+     "objective": -77468.44984555633,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 333,
+     "max_abs_gradient": 0.0004852726175723632,
+     "neg_objective": 77549.0353076158
+    },
+    {
+     "objective": -77468.44984555582,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 375,
+     "max_abs_gradient": 0.0003995639833251907,
+     "neg_objective": 77549.03530761528
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": false,
+   "max_abs_diff": {
+    "a": 0.0028383734255590376,
+    "b": 0.0006321280599683732,
+    "c": 0.00019300833454430344,
+    "d": 0.0002987303159281973
+   },
+   "objective_gap_python_minus_best": -1.5806712326593697e-05,
+   "max_abs_gradient_interior": 0.011974693109642054,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 3.3998488361461385,
+   "pass": false
+  },
+  {
+   "fixture": "sim(N=10000, k=12, seed=413)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -77310.93454679094,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 346,
+     "max_abs_gradient": 0.0003542954666111431,
+     "neg_objective": 77391.52000885042
+    },
+    {
+     "objective": -77310.93454679074,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 374,
+     "max_abs_gradient": 0.0001860471908781136,
+     "neg_objective": 77391.52000885022
+    },
+    {
+     "objective": -77310.93454679158,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 356,
+     "max_abs_gradient": 0.00021111628814196592,
+     "neg_objective": 77391.52000885106
+    },
+    {
+     "objective": -77310.93454679094,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 339,
+     "max_abs_gradient": 0.00010463740646571296,
+     "neg_objective": 77391.52000885042
+    },
+    {
+     "objective": -77310.93454679119,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 341,
+     "max_abs_gradient": 0.00044652336709161133,
+     "neg_objective": 77391.52000885067
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.0007015959390064275,
+    "b": 0.0004751859850828932,
+    "c": 0.00013465926873840184,
+    "d": 0.00011136209877216086
+   },
+   "objective_gap_python_minus_best": -6.273970939218998e-06,
+   "max_abs_gradient_interior": 0.006425305956261784,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 4.773245922243037,
+   "pass": true
+  },
+  {
+   "fixture": "sim(N=10000, k=30, seed=414)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -189805.967782685,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 361,
+     "max_abs_gradient": 0.0004446319661779441,
+     "neg_objective": 190007.4314378337
+    },
+    {
+     "objective": -189805.9677826845,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 380,
+     "max_abs_gradient": 0.0002475574246449952,
+     "neg_objective": 190007.43143783318
+    },
+    {
+     "objective": -189805.96778268414,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 447,
+     "max_abs_gradient": 0.0004473523677077651,
+     "neg_objective": 190007.43143783283
+    },
+    {
+     "objective": -189805.96778268536,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 392,
+     "max_abs_gradient": 0.0002485499657850776,
+     "neg_objective": 190007.43143783405
+    },
+    {
+     "objective": -189805.9677826844,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 426,
+     "max_abs_gradient": 0.00018594103713853727,
+     "neg_objective": 190007.4314378331
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.0004932095374918788,
+    "b": 0.0003239859431234393,
+    "c": 0.00012150175663461216,
+    "d": 6.505130864931097e-05
+   },
+   "objective_gap_python_minus_best": -3.1657691579312086e-06,
+   "max_abs_gradient_interior": 0.005491702927948872,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 7.959150827080531,
+   "pass": true
+  },
+  {
+   "fixture": "sim(N=10000, k=30, seed=415)",
+   "python_converged": true,
+   "starts": [
+    {
+     "objective": -189976.09165220245,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 458,
+     "max_abs_gradient": 0.00021052525547593515,
+     "neg_objective": 190177.55530735114
+    },
+    {
+     "objective": -189976.09165220257,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 480,
+     "max_abs_gradient": 0.00014706218256055337,
+     "neg_objective": 190177.55530735126
+    },
+    {
+     "objective": -189976.0916522021,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 513,
+     "max_abs_gradient": 0.0004898258939798339,
+     "neg_objective": 190177.5553073508
+    },
+    {
+     "objective": -189976.09165220283,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 492,
+     "max_abs_gradient": 0.0007681874359807273,
+     "neg_objective": 190177.55530735152
+    },
+    {
+     "objective": -189976.09165220225,
+     "converged": true,
+     "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+     "iterations": 495,
+     "max_abs_gradient": 0.0002935707943292343,
+     "neg_objective": 190177.55530735094
+    }
+   ],
+   "starts_at_best": 5,
+   "agreement": true,
+   "max_abs_diff": {
+    "a": 0.0008585014231763388,
+    "b": 0.0002063743374224325,
+    "c": 4.466545136425082e-05,
+    "d": 0.00011819289125647447
+   },
+   "objective_gap_python_minus_best": -4.716013791039586e-06,
+   "max_abs_gradient_interior": 0.009705973430678583,
+   "bound_active": 0,
+   "kkt": true,
+   "hessian_min_eigenvalue": 3.8436913832145962,
+   "pass": true
+  }
+ ],
+ "all_pass": false,
+ "wall_seconds": 219
+}
