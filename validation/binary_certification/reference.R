@@ -67,15 +67,41 @@ for (case in cases) {
     sv$value[sv$name == "b"] <- -qlogis(pmin(pmax(colMeans(dat), .02), .98))
     # Custom items: Newton-Raphson M-step with the supplied (analytic) Hessian; the default quasi-Newton
     # M-step stopped EM after 8-14 cycles below the posterior maximum (run 4ce2ee1). Objective and TOL unchanged.
-    res <- fit_with(list(data = dat, model = 1, itemtype = type, customItems = items[type], pars = sv,
-                         optimizer = "NR", accelerate = "squarem"))
+    run <- function(start) fit_with(list(data = dat, model = 1, itemtype = type, customItems = items[type], pars = start,
+                                         optimizer = "NR", accelerate = "squarem"))
+    logpost <- function(res) {          # R-computed log-posterior at R's own estimate (amendment A5)
+      cf <- coef(res$fit)[seq_len(k)]
+      extract.mirt(res$fit, "logLik") + sum(sapply(cf, function(m) { p <- m["par", ]
+        dlnorm(p[["a"]], 0, .5, log = TRUE) + dnorm(p[["b"]], 0, 2, log = TRUE) + dbeta(p[["c"]], 2, 8, log = TRUE) +
+          (if ("d" %in% names(p)) dbeta(p[["d"]], 8, 2, log = TRUE) else 0) }))
+    }
+    # Start 2 (amendment A5): R's own nested-model fit on the same data; Python estimates are never used.
+    sv2 <- sv
+    if (model == "4PL") {
+      nested <- tryCatch({
+        s3 <- mirt(dat, 1, itemtype = "irt3", customItems = items["irt3"], pars = "values")
+        s3$value[s3$name == "b"] <- -qlogis(pmin(pmax(colMeans(dat), .02), .98))
+        coef(fit_with(list(data = dat, model = 1, itemtype = "irt3", customItems = items["irt3"], pars = s3,
+                           optimizer = "NR", accelerate = "squarem"))$fit)[seq_len(k)] }, error = function(e) NULL)
+      if (!is.null(nested)) for (q in c("a", "b", "c"))
+        sv2$value[sv2$name == q] <- pmin(pmax(sapply(nested, function(m) m["par", q]), c(a = .1, b = -6, c = 1e-6)[[q]]), c(a = 5, b = 6, c = .5)[[q]])
+      sv2$value[sv2$name == "d"] <- .95
+    } else {
+      nested <- tryCatch(coef(mirt(dat, 1, itemtype = "2PL", verbose = FALSE), IRTpars = TRUE)[seq_len(k)], error = function(e) NULL)
+      if (!is.null(nested)) for (q in c("a", "b"))
+        sv2$value[sv2$name == q] <- pmin(pmax(sapply(nested, function(m) m[1, q]), c(a = .1, b = -6)[[q]]), c(a = 5, b = 6)[[q]])
+      sv2$value[sv2$name == "c"] <- .15
+    }
+    fits <- list(default = run(sv), nested = run(sv2))
+    lps <- sapply(fits, logpost); best <- names(which.max(lps))
+    res <- fits[[best]]; res$starts <- as.list(lps); res$chosen <- best
     cf <- coef(res$fit, printSE = TRUE)[seq_len(k)]
     get <- function(row, p) unname(sapply(cf, function(m) if (row %in% rownames(m)) m[row, p] else NA_real_))
     par <- setNames(lapply(qs, function(p) get("par", p)), qs); se <- setNames(lapply(qs, function(p) get("SE", p)), qs)
   }
   result <- list(id = case$id, converged = extract.mirt(res$fit, "converged"), iterations = extract.mirt(res$fit, "iterations"),
                  loglik = extract.mirt(res$fit, "logLik"), logPrior = tryCatch(extract.mirt(res$fit, "logPrior"), error = function(e) NA),
-                 se_type = res$se_type, par = par, se = se)
+                 se_type = res$se_type, par = par, se = se, starts_logpost = res$starts, chosen_start = res$chosen)
   write_json(result, file.path(out, paste0(case$id, ".R.json")), digits = NA, auto_unbox = TRUE, na = "null")
   cat(sprintf("%s converged=%s iterations=%d logLik=%.8f se=%s seconds=%.0f\n", case$id, result$converged, result$iterations,
               result$loglik, res$se_type, as.numeric(difftime(Sys.time(), t0, units = "secs"))))
