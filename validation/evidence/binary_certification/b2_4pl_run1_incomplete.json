@@ -1,0 +1,198 @@
+{
+ "protocol": "PROTOCOL.json amendment_B B2",
+ "cases": [
+  {
+   "id": "4PL__sim_N_3000_k_12_seed_401",
+   "fixture": "sim(N=3000, k=12, seed=401)",
+   "sha256": "7aa8442cd7f8e92418428aeffa75641dd3c71c22ab1539b1644defbf8c1dc3fd",
+   "R_logpost_at_python": -23340.9750300974,
+   "R_logpost_at_R": -23340.975028338,
+   "matched_max_abs_diff": {
+    "a": 0.0004622690417979136,
+    "b": 0.00021726038221802843,
+    "c": 7.505966160947786e-05,
+    "d": 6.199471168888415e-05
+   },
+   "original_R_pass": true,
+   "R_max_abs_diff": {
+    "a": 0.00046229161041777544,
+    "b": 0.0002172852975380491,
+    "c": 7.506608538448978e-05,
+    "d": 6.199703559683911e-05
+   },
+   "R_objective_gap": -1.7593847587704659e-06,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00046179123484768603,
+    "b": 0.00021715842335303867,
+    "c": 7.489929926260408e-05,
+    "d": 6.185256304225284e-05
+   },
+   "reference_objective_gap": -1.759308361215517e-06,
+   "reference_iterations": 209,
+   "R_prefers_python": false,
+   "R_matched_stationary": true,
+   "pass_": true
+  },
+  {
+   "id": "4PL__sim_N_3000_k_30_seed_402",
+   "fixture": "sim(N=3000, k=30, seed=402)",
+   "sha256": "7d3f8ad35e665106508fa4b67a7f3a94b03ebac2b3b42368141a0f0218ea01f1",
+   "R_logpost_at_python": -56836.3917444591,
+   "R_logpost_at_R": -56836.3917429203,
+   "matched_max_abs_diff": {
+    "a": 0.00022332730472574003,
+    "b": 0.0005205399134469157,
+    "c": 0.00015120896082260193,
+    "d": 1.8345055673330002e-05
+   },
+   "original_R_pass": true,
+   "R_max_abs_diff": {
+    "a": 0.00022332854276563285,
+    "b": 0.0005205313323659033,
+    "c": 0.0001512086347026098,
+    "d": 1.8344994800356673e-05
+   },
+   "R_objective_gap": -1.5390323824249208e-06,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.0002249888325990268,
+    "b": 0.0005189939489729234,
+    "c": 0.00015200352830563313,
+    "d": 1.8566349687221262e-05
+   },
+   "reference_objective_gap": -1.538843207526952e-06,
+   "reference_iterations": 336,
+   "R_prefers_python": false,
+   "R_matched_stationary": true,
+   "pass_": true
+  },
+  {
+   "id": "4PL__sim_N_10000_k_12_seed_403",
+   "fixture": "sim(N=10000, k=12, seed=403)",
+   "sha256": "a60fe7766dd303f1908d49e638b05b08d7055c4d34fce2046ccea46c593d09dd",
+   "R_logpost_at_python": -77447.8244221506,
+   "R_logpost_at_R": -77899.7636313005,
+   "matched_max_abs_diff": {
+    "a": 0.0005405714993564903,
+    "b": 0.0004522164276745677,
+    "c": 0.00015497389038388043,
+    "d": 0.00010438678319024675
+   },
+   "original_R_pass": false,
+   "R_max_abs_diff": {
+    "a": 1.0789823923582895,
+    "b": 6.774441903561396,
+    "c": 0.15149938297320814,
+    "d": 0.4376930671943823
+   },
+   "R_objective_gap": 451.939207812291,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.0005462163671294817,
+    "b": 0.00045823035469777507,
+    "c": 0.00015673436382751538,
+    "d": 0.00010532140665819867
+   },
+   "reference_objective_gap": -4.518587957136333e-06,
+   "reference_iterations": 278,
+   "R_prefers_python": true,
+   "R_matched_stationary": true,
+   "pass_": true
+  },
+  {
+   "id": "4PL__fresh_3000_12_404",
+   "fixture": "sim(N=3000, k=12, seed=404)",
+   "sha256": "9625c0dc1ba7d36d23275a96f08b8900d568c99ce2ef9199c9bd90acb0822e20",
+   "R_logpost_at_python": -23280.9721465092,
+   "R_logpost_at_R": -23280.9721441482,
+   "matched_max_abs_diff": {
+    "a": 0.00046822185535000393,
+    "b": 0.0004655150339155367,
+    "c": 0.00013762274036888122,
+    "d": 2.3333109877343716e-05
+   },
+   "original_R_pass": true,
+   "R_max_abs_diff": {
+    "a": 0.000468225491899954,
+    "b": 0.00046552255374451845,
+    "c": 0.00013762492135688253,
+    "d": 2.333304643542533e-05
+   },
+   "R_objective_gap": -2.3608372430317104e-06,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.0004657015550628696,
+    "b": 0.00046571110290660744,
+    "c": 0.00013763949309053558,
+    "d": 2.3085725178617622e-05
+   },
+   "reference_objective_gap": -2.3607572074979544e-06,
+   "reference_iterations": 228,
+   "R_prefers_python": false,
+   "R_matched_stationary": true,
+   "pass_": true
+  },
+  {
+   "id": "4PL__fresh_3000_30_405",
+   "fixture": "sim(N=3000, k=30, seed=405)",
+   "sha256": "f9ee1b9a9243503d03a5d4c28e58347fe9df2c8305998827d10737eef1d5cf2d",
+   "original_R_pass": false,
+   "R_max_abs_diff": null,
+   "R_objective_gap": null,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00047328228666598804,
+    "b": 0.00022867716503705005,
+    "c": 9.492897309981707e-05,
+    "d": 5.455201173898416e-05
+   },
+   "reference_objective_gap": -2.1462474251165986e-06,
+   "reference_iterations": 338,
+   "R_prefers_python": false,
+   "R_matched_stationary": false,
+   "pass_": false
+  },
+  {
+   "id": "4PL__fresh_10000_12_406",
+   "fixture": "sim(N=10000, k=12, seed=406)",
+   "sha256": "f0faa9c202b7f80ee196a9e73479f17df70c2e3a33704cd9299ebb5afb4ddfaa",
+   "original_R_pass": false,
+   "R_max_abs_diff": null,
+   "R_objective_gap": null,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00149032572661012,
+    "b": 0.0011626357477589888,
+    "c": 0.0004694018620247653,
+    "d": 0.00018427661548348073
+   },
+   "reference_objective_gap": -1.0652060154825449e-05,
+   "reference_iterations": 381,
+   "R_prefers_python": false,
+   "R_matched_stationary": false,
+   "pass_": false
+  },
+  {
+   "id": "4PL__fresh_10000_30_407",
+   "fixture": "sim(N=10000, k=30, seed=407)",
+   "sha256": "5b7228c39a1805ebf5a56d4546e81d955b74d8235e1fe13f99d02c3b6e9e976a",
+   "original_R_pass": false,
+   "R_max_abs_diff": null,
+   "R_objective_gap": null,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00038354002429641376,
+    "b": 0.00017005880518372596,
+    "c": 7.236406284866215e-05,
+    "d": 4.025066537149957e-05
+   },
+   "reference_objective_gap": -2.2041494958102703e-06,
+   "reference_iterations": 373,
+   "R_prefers_python": false,
+   "R_matched_stationary": false,
+   "pass_": false
+  }
+ ],
+ "all_pass": false
+}

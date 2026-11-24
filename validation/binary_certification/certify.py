@@ -29,6 +29,10 @@ def decide():
         want = len(PROTOCOL["gates"]["G1_R_equivalence"]["fixtures"][m]) * (2 if m == "1PL" else 1)
         gates[m]["G1_R_equivalence"] = {"pass": len(cases) == want and all(c["pass_"] for c in cases),
                                         "cases": {c["id"]: c["pass_"] for c in cases}, "expected_cases": want}
+    b2 = _load("binary_certification/b2_4pl.json")          # amendment B2: 4PL G1 alternative rule (all seven fixtures)
+    if b2 is not None:
+        gates["4PL"]["G1_R_equivalence"]["B2"] = {"pass": bool(b2["all_pass"]), "cases": {c["id"]: c["pass_"] for c in b2["cases"]}}
+        gates["4PL"]["G1_R_equivalence"]["pass"] = gates["4PL"]["G1_R_equivalence"]["pass"] or bool(b2["all_pass"])
     labels = {"1PL": ("1PL fixed_a", "1PL common_a"), "2PL": ("2PL",), "3PL": ("3PL MAP",), "4PL": ("4PL MAP",)}
     for m, labs in labels.items():
         cells = {f"{r['cell']} N{r['N']} k{r['k']}": r for r in (a2 or {}).get("results", []) if r["cell"] in labs}

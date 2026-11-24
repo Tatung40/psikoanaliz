@@ -291,5 +291,26 @@
   "decision": "G1 is decided by the next complete run under the unchanged criteria; all earlier runs stay reported.",
   "addendum": "2026-11-24, before any complete A5 run (run 5220842 timed out in the R step): R standard errors are not computed for the 3PL/4PL MAP custom items (they were descriptive only; the MAP SE gate uses the independent numerical inverse Hessian), and each R process has a hard 10-minute limit so that partial results are reported. Criteria unchanged.",
   "addendum_2": "2026-11-24, before any complete A5 run (run d47c60d: one 4PL start returned no fit, one process hit the 10-minute limit): a start that errors or exceeds 240 s is discarded and R keeps the best of the finished starts by its own log-posterior; if no start finishes the fixture fails. Criteria unchanged."
+ },
+ "amendment_B": {
+  "registered": "2026-11-24, after PR #179 (decision 1PL/2PL CERTIFIED, 3PL/4PL NOT CERTIFIED) and before any confirmatory run below; all earlier evidence and gates stay unchanged",
+  "B1_3PL": {
+   "development_only": "pilot seeds 777000/778000 (never reused): posterior SE / empirical SD of MAP = 1.11 (a), 1.35 (b), 1.37 (c); sandwich SE / SD = .94-.95 but not positive definite in 36/150 datasets and the MAP sampling distribution is skewed (.66-.79); library 'crossprod' SE coverage b/c .970-.972, 'sandwich' .90-.92 at N = 3000, k = 12.",
+   "decision": "No Wald-type interval qualifies for a confirmatory run; parametric-bootstrap intervals would need ~2.4e5 refits to validate and are not run. 3PL G3 stays failed (A2: b .976, c .975, MCSE .0025-.0026, i.e. 10 and 9.6 MCSE above .95); 3PL stays NOT CERTIFIED."
+  },
+  "B2_4PL_G1": {
+   "development_only": "fixture 4PL sim(N=10000, k=12, seed=403): Python's MAP is interior (>= .045 from every bound), max |numerical gradient| .006, Hessian of the negative log-posterior positive definite (min eigenvalue 6.9); an independent numpy reference reached it from a data-only start (max |diff| 5.5e-4, objective diff 4.5e-6).",
+   "fixtures": [
+    "the three registered 4PL G1 fixtures",
+    "fresh: sim(N=3000, k=12, seed=404)",
+    "sim(N=3000, k=30, seed=405)",
+    "sim(N=10000, k=12, seed=406)",
+    "sim(N=10000, k=30, seed=407)"
+   ],
+   "independent_reference": "validation/binary_certification/reference_numpy.py: own marginal log-posterior (121 GH nodes), exact gradient by Fisher's identity, L-BFGS-B in the Python mirt box, data-only start; no Python mirt and no R",
+   "R_checks": "R mirt 1.48 with the A3-A5 harness (independent starts); in addition, R-only evaluation of its own log-posterior (logLik with TOL = NaN at fixed parameters + R log-prior) at Python's and at R's solution, and R EM started at Python's solution (matched initialization; a dependent stationarity check)",
+   "rule": "A 4PL fixture passes G1 if the original G1 criteria hold against R mirt, OR all of: (i) the independent reference meets the original G1 criteria against Python (|diff| a/b <= .002, c/d <= .001, |objective diff| <= .001, Python not worse by > 1e-4); (ii) R's own log-posterior is higher at Python's solution than at R's independently started solution; (iii) R EM started at Python's solution stays within the original G1 parameter criteria. 4PL G1 passes only if all seven fixtures pass. Criteria are the original G1 numbers; nothing else changes (4PL scope, G2 and its CI exclusion unchanged).",
+   "rounds": "one confirmatory CI round; if a fixture fails it is reported as the blocker"
+  }
  }
 }
