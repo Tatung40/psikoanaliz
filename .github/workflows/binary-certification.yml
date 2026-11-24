@@ -43,9 +43,9 @@ jobs:
       - name: R mirt 1.48 reference fits
         timeout-minutes: 17
         run: |
-          python -c "import json;m=json.load(open('g1/manifest.json'));[json.dump([c for c in m if c['model']==k],open(f'g1/manifest_{k}.json','w')) for k in ('1PL','2PL','3PL','4PL')]"
-          for k in 1PL 2PL 3PL 4PL; do Rscript validation/binary_certification/reference.R g1/manifest_$k.json g1 > g1/R_$k.log 2>&1 & done
-          wait; cat g1/R_*.log
+          python -c "import json;m=json.load(open('g1/manifest.json'));m.sort(key=lambda c:-c['shape'][0]*c['shape'][1]*(3 if c['model'] in ('3PL','4PL') else 1));[json.dump([c],open(f'g1/one_{i:02d}.json','w')) for i,c in enumerate(m)]"
+          ls g1/one_*.json | xargs -P 4 -I{} sh -c 'Rscript validation/binary_certification/reference.R {} g1 > {}.log 2>&1'
+          cat g1/one_*.json.log
       - name: Independent arbiter comparison
         if: always()
         run: |
