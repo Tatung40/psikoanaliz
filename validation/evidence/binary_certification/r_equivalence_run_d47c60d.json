@@ -1,0 +1,445 @@
+{
+ "protocol": "validation/binary_certification/PROTOCOL.json G1",
+ "cases": [
+  {
+   "id": "1PL_fixed_a__tests_fixtures_irt_b10_data_irt1pl_ok_csv",
+   "model": "1PL",
+   "variant": "fixed_a",
+   "fixture": "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+   "sha256": "ef48589c02aa404b5e7960c164dd95bc15555a77cba3f2243bcf75e77aa2dd18",
+   "shape": [
+    1000,
+    10
+   ],
+   "max_abs_diff": {
+    "a": 0.0,
+    "b": 3.088781001081564e-06
+   },
+   "objective_python": -5753.2016492503735,
+   "objective_R": -5753.2016492473695,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 2.4688285948926136e-07,
+   "R_iterations": 20,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "1PL_fixed_a__sim_N_1000_k_12_seed_101",
+   "model": "1PL",
+   "variant": "fixed_a",
+   "fixture": "sim(N=1000, k=12, seed=101)",
+   "sha256": "e074691fb456921c158ec921e73050b5375472d64fe15ec9a4268d617d390e3f",
+   "shape": [
+    1000,
+    12
+   ],
+   "max_abs_diff": {
+    "a": 0.0,
+    "b": 4.972320643448214e-06
+   },
+   "objective_python": -7008.361314204741,
+   "objective_R": -7008.361314196376,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 2.998121519937058e-07,
+   "R_iterations": 34,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "1PL_fixed_a__sim_N_3000_k_30_seed_102",
+   "model": "1PL",
+   "variant": "fixed_a",
+   "fixture": "sim(N=3000, k=30, seed=102)",
+   "sha256": "21a1380d47651203b271bdeea81e77e752b9ebbc464fd3e58b52b10e6ae70db1",
+   "shape": [
+    3000,
+    30
+   ],
+   "max_abs_diff": {
+    "a": 0.0,
+    "b": 4.400401072246485e-06
+   },
+   "objective_python": -52010.11770220012,
+   "objective_R": -52010.11770217577,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 1.932203053112147e-07,
+   "R_iterations": 13,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "1PL_common_a__tests_fixtures_irt_b10_data_irt1pl_ok_csv",
+   "model": "1PL",
+   "variant": "common_a",
+   "fixture": "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+   "sha256": "ef48589c02aa404b5e7960c164dd95bc15555a77cba3f2243bcf75e77aa2dd18",
+   "shape": [
+    1000,
+    10
+   ],
+   "max_abs_diff": {
+    "a": 1.1063650314113715e-05,
+    "b": 3.4421569299780685e-05
+   },
+   "objective_python": -5752.099208567146,
+   "objective_R": -5752.099208503687,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 1.9775756814777168e-05,
+   "R_iterations": 31,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "1PL_common_a__sim_N_1000_k_12_seed_101",
+   "model": "1PL",
+   "variant": "common_a",
+   "fixture": "sim(N=1000, k=12, seed=101)",
+   "sha256": "a15f56d05672395276afc38a672efd9cf7e66a90c2b55b3e9f1bc16dae1956a7",
+   "shape": [
+    1000,
+    12
+   ],
+   "max_abs_diff": {
+    "a": 2.2691637424632205e-06,
+    "b": 1.3332979270863632e-05
+   },
+   "objective_python": -6447.5876611434205,
+   "objective_R": -6447.587661095218,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 2.9756643895595403e-06,
+   "R_iterations": 36,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "1PL_common_a__sim_N_3000_k_30_seed_102",
+   "model": "1PL",
+   "variant": "common_a",
+   "fixture": "sim(N=3000, k=30, seed=102)",
+   "sha256": "82a8505934c4cf65078fef370721cb0b43b943ed30382fa5a5966d57845fcbac",
+   "shape": [
+    3000,
+    30
+   ],
+   "max_abs_diff": {
+    "a": 5.394827824467541e-06,
+    "b": 1.3619583102864041e-05
+   },
+   "objective_python": -47265.77045378749,
+   "objective_R": -47265.77045369163,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 3.986027463009911e-05,
+   "R_iterations": 147,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "2PL__tests_fixtures_irt_b10_data_irt2pl_ok_csv",
+   "model": "2PL",
+   "variant": null,
+   "fixture": "tests/fixtures/irt_b10/data_irt2pl_ok.csv",
+   "sha256": "27642b7d58b444b36ae502be4162659629df7aae5bc880a37aa5601646725912",
+   "shape": [
+    1200,
+    10
+   ],
+   "max_abs_diff": {
+    "a": 9.083098232665066e-06,
+    "b": 1.0998259229344498e-05
+   },
+   "objective_python": -6325.191798908599,
+   "objective_R": -6325.191798891067,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 1.5129975430516751e-05,
+   "R_iterations": 471,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "2PL__sim_N_1000_k_12_seed_201",
+   "model": "2PL",
+   "variant": null,
+   "fixture": "sim(N=1000, k=12, seed=201)",
+   "sha256": "2069207c281340ee483d7f8aca81bc209c20d9a8c9cc00d8360fe87d310b61c3",
+   "shape": [
+    1000,
+    12
+   ],
+   "max_abs_diff": {
+    "a": 2.9136457198042365e-06,
+    "b": 1.191427561142433e-05
+   },
+   "objective_python": -6403.585321905285,
+   "objective_R": -6403.585321864176,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 7.707662032396811e-06,
+   "R_iterations": 80,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "2PL__sim_N_3000_k_30_seed_202",
+   "model": "2PL",
+   "variant": null,
+   "fixture": "sim(N=3000, k=30, seed=202)",
+   "sha256": "76324e9cfb391bccfffbae5ca9eb589ceff357022f00916a5d244e29725a2dfc",
+   "shape": [
+    3000,
+    30
+   ],
+   "max_abs_diff": {
+    "a": 0.00013256868342548245,
+    "b": 0.00017598432269405606
+   },
+   "objective_python": -46538.08667696624,
+   "objective_R": -46538.08665215374,
+   "se_reference": "R mirt Oakes",
+   "se_max_relative_diff": 0.0003659788692795818,
+   "R_iterations": 83,
+   "R_se_type": "Oakes",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "3PL__sim_N_3000_k_12_seed_301",
+   "model": "3PL",
+   "variant": null,
+   "fixture": "sim(N=3000, k=12, seed=301)",
+   "sha256": "3119f19b73ea76a2a51d723bb1c230d1e9c6b6c4396aa54d10595c181425904f",
+   "shape": [
+    3000,
+    12
+   ],
+   "max_abs_diff": {
+    "a": 0.00036663730877850575,
+    "b": 0.0001067243123400452,
+    "c": 3.9616670067382787e-05
+   },
+   "objective_python": -22315.3709685352,
+   "objective_R": -22315.37096747106,
+   "se_reference": "independent numerical inverse Hessian",
+   "se_max_relative_diff": 1.0332707427340715e-05,
+   "R_iterations": 25,
+   "R_se_type": "none (MAP: descriptive only, A5 addendum)",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "3PL__sim_N_3000_k_30_seed_302",
+   "model": "3PL",
+   "variant": null,
+   "fixture": "sim(N=3000, k=30, seed=302)",
+   "sha256": "e0585146a5c76ce661cd3f4f4c6b936935e445168fce1a5a6b3a2e97b9533262",
+   "shape": [
+    3000,
+    30
+   ],
+   "max_abs_diff": {
+    "a": 4.10949875464528e-05,
+    "b": 4.515785702174924e-05,
+    "c": 1.2920256872689384e-05
+   },
+   "objective_python": -54849.244737989065,
+   "objective_R": -54849.244737828805,
+   "se_reference": "independent numerical inverse Hessian",
+   "se_max_relative_diff": 2.337050877154745e-05,
+   "R_iterations": 52,
+   "R_se_type": "none (MAP: descriptive only, A5 addendum)",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "3PL__sim_N_10000_k_12_seed_303",
+   "model": "3PL",
+   "variant": null,
+   "fixture": "sim(N=10000, k=12, seed=303)",
+   "sha256": "e80ad57e633e648c6d9226bf77e0fc17d99aadba258047ad2c3d4c5887f0647b",
+   "shape": [
+    10000,
+    12
+   ],
+   "max_abs_diff": {
+    "a": 0.00024675629561299317,
+    "b": 0.00015829953139356867,
+    "c": 5.223641847056093e-05
+   },
+   "objective_python": -74585.17373749033,
+   "objective_R": -74585.17373653663,
+   "se_reference": "independent numerical inverse Hessian",
+   "se_max_relative_diff": 5.2702032573126445e-05,
+   "R_iterations": 22,
+   "R_se_type": "none (MAP: descriptive only, A5 addendum)",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "4PL__sim_N_3000_k_12_seed_401",
+   "model": "4PL",
+   "variant": null,
+   "fixture": "sim(N=3000, k=12, seed=401)",
+   "sha256": "7aa8442cd7f8e92418428aeffa75641dd3c71c22ab1539b1644defbf8c1dc3fd",
+   "shape": [
+    3000,
+    12
+   ],
+   "pass_": false,
+   "error": "R result missing"
+  },
+  {
+   "id": "4PL__sim_N_3000_k_30_seed_402",
+   "model": "4PL",
+   "variant": null,
+   "fixture": "sim(N=3000, k=30, seed=402)",
+   "sha256": "7d3f8ad35e665106508fa4b67a7f3a94b03ebac2b3b42368141a0f0218ea01f1",
+   "shape": [
+    3000,
+    30
+   ],
+   "max_abs_diff": {
+    "a": 0.00022332854276563285,
+    "b": 0.0005205313323659033,
+    "c": 0.0001512086347026098,
+    "d": 1.8344994800356673e-05
+   },
+   "objective_python": -56836.391744192144,
+   "objective_R": -56836.39174265311,
+   "se_reference": "independent numerical inverse Hessian",
+   "se_max_relative_diff": 5.051518416099299e-05,
+   "R_iterations": 26,
+   "R_se_type": "none (MAP: descriptive only, A5 addendum)",
+   "R_se_max_relative_diff_descriptive": null,
+   "checks": {
+    "both_converged": true,
+    "a_b": true,
+    "c_d": true,
+    "objective": true,
+    "python_not_worse": true,
+    "se": true
+   },
+   "pass_": true
+  },
+  {
+   "id": "4PL__sim_N_10000_k_12_seed_403",
+   "model": "4PL",
+   "variant": null,
+   "fixture": "sim(N=10000, k=12, seed=403)",
+   "sha256": "a60fe7766dd303f1908d49e638b05b08d7055c4d34fce2046ccea46c593d09dd",
+   "shape": [
+    10000,
+    12
+   ],
+   "pass_": false,
+   "error": "R result missing"
+  }
+ ],
+ "all_pass": false,
+ "versions": {
+  "R": "R version 4.6.2 (2026-10-29)",
+  "R_mirt": "1.48",
+  "python_mirt": "1.2.0"
+ }
+}

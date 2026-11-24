@@ -39,7 +39,7 @@ items <- list(
 settings <- list(quadpts = 101, theta_lim = c(-6, 6), TOL = 1e-8, verbose = FALSE, SE = TRUE, SE.type = "Oakes",
                  accelerate = "squarem", technical = list(NCYCLES = 5000))   # SQUAREM: speed only, same objective
 fit_with <- function(args) {
-  setTimeLimit(elapsed = 840, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
+  setTimeLimit(elapsed = 240, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
   use <- settings; use[names(args)[names(args) %in% names(use)]] <- NULL
   fit <- tryCatch(do.call(mirt, c(args, use)), error = function(e) { message("fit error: ", conditionMessage(e)); NULL })
   se_type <- if (isFALSE(args$SE)) "none (MAP: descriptive only, A5 addendum)" else "Oakes"
@@ -92,7 +92,9 @@ for (case in cases) {
         sv2$value[sv2$name == q] <- pmin(pmax(sapply(nested, function(m) m[1, q]), c(a = .1, b = -6)[[q]]), c(a = 5, b = 6)[[q]])
       sv2$value[sv2$name == "c"] <- .15
     }
-    fits <- list(default = run(sv), nested = run(sv2))
+    safe <- function(start) tryCatch(run(start), error = function(e) { message("start discarded: ", conditionMessage(e)); NULL })
+    fits <- Filter(function(f) !is.null(f) && !is.null(f$fit), list(default = safe(sv), nested = safe(sv2)))   # A5 addendum 2
+    if (!length(fits)) stop("no start finished")
     lps <- sapply(fits, logpost); best <- names(which.max(lps))
     res <- fits[[best]]; res$starts <- as.list(lps); res$chosen <- best
     cf <- coef(res$fit)[seq_len(k)]
