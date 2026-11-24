@@ -101,6 +101,17 @@ def parameter_inference(fit, model, item_names, estimation=None):
     block = covariance[np.ix_(active, active)]
     if not np.isfinite(block).all():
         return None, "Kovaryans matrisi sınır dışı parametrelerde sonlu değil; SH üretilmedi."
+    # Equality constraints (common discrimination, 1PL with shared free a) are expanded by the library into one
+    # identical row/column per item; the covariance of the free parameters is the block of one representative.
+    # Verified against an independent observed-information Hessian (validation/binary_certification).
+    keep, positions = [], np.flatnonzero(active)
+    for i, p_i in enumerate(positions):
+        duplicate = any(parsed[p_i][1] == parsed[positions[j]][1] and parsed[p_i][2] == parsed[positions[j]][2]
+                        and np.allclose(block[i], block[j], rtol=0, atol=1e-12 * max(1.0, np.abs(block).max()))
+                        for j in keep)
+        if not duplicate:
+            keep.append(i)
+    block = block[np.ix_(keep, keep)]
     block = (block + block.T) / 2
     eigen = np.linalg.eigvalsh(block)
     if eigen[0] <= 0:
