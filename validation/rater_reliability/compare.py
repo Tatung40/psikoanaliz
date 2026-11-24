@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]; EX = ROOT / "examples/rater_reliabil
 KEY = {"estimate": ("estimate", lambda r: r["estimate"]), "se": ("se", lambda r: r["se"]), "z0": ("z0", lambda r: r["z0"]),
        "p": ("p", lambda r: r["p"]), "ci_low": ("ci95", lambda r: r["ci95"][0]), "ci_high": ("ci95", lambda r: r["ci95"][1]),
        "F": ("F", lambda r: r["F"]), "df1": ("df1", lambda r: r["df1"]), "df2": ("df2", lambda r: r["df2"]),
-       "chi2": ("chi2", lambda r: r["chi2"]), "df": ("df", lambda r: r["df"]), "all_agree": ("all_agree", lambda r: r["all_agree"]),
+       "chi2": ("chi2", lambda r: r["chi2"]), "p_chi2": ("p_chi2", lambda r: r["p_chi2"]), "df": ("df", lambda r: r["df"]), "all_agree": ("all_agree", lambda r: r["all_agree"]),
        "bias": ("bias", lambda r: r["bias"]), "sd": ("sd", lambda r: r["sd"]), "loa_low": ("loa", lambda r: r["loa"][0]),
        "loa_high": ("loa", lambda r: r["loa"][1]), "bias_ci_low": ("ci95_bias", lambda r: r["ci95_bias"][0]),
        "bias_ci_high": ("ci95_bias", lambda r: r["ci95_bias"][1]), "loa_low_ci_low": ("ci95_loa", lambda r: r["ci95_loa"][0][0]),
@@ -20,7 +20,9 @@ KEY = {"estimate": ("estimate", lambda r: r["estimate"]), "se": ("se", lambda r:
 
 def tolerance(reference, key, value, method):
     if reference.startswith("irrCAC"): return 5e-6 + 1e-9
-    if key == "p": return 1e-9 + 1e-6 * abs(value)
+    if reference.startswith("permutation-MC"):              # independent MC reference: 4 combined MC SE + resolution 1/(B+1)
+        return 4 * (2 * max(value, 1e-4) * (1 - value) / 9999) ** .5 + 1 / 10000
+    if key in ("p", "p_chi2"): return 1e-9 + 1e-6 * abs(value)
     if key.startswith("ci_") and method.startswith("icc_"): return 1e-8
     if reference == "analytic": return 1e-10
     return 1e-9

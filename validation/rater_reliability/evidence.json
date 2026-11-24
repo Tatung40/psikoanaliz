@@ -676,11 +676,13 @@
     "chi2",
     "df",
     "estimate",
+    "p",
     "p_chi2"
    ],
    "failed_outputs": [],
    "references": [
-    "irr::kendall"
+    "irr::kendall",
+    "p: independent naive permutation-MC reference (B=199999), tolerance 4 combined MC SE + 1/(B+1)"
    ],
    "max_abs_diff": 4.404571325722362e-20,
    "certification": {

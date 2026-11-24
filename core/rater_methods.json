@@ -474,7 +474,8 @@
     "estimate",
     "chi2",
     "df",
-    "p"
+    "p",
+    "p_chi2"
    ],
    "example": "kendall_w_rankings",
    "status": "NOT CERTIFIED (ön kayıt; doğrulama sonucu bekleniyor)"
