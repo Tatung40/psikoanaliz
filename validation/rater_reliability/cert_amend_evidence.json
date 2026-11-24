@@ -1,0 +1,22 @@
+{
+ "icc_2_1": {
+  "mean_dev_conditional": -0.0013851023234881176,
+  "max_abs_dev": 0.018378758469001666,
+  "coverage": 0.943,
+  "type1": 0.046,
+  "identity": 4.440892098500626e-16,
+  "passed": true
+ },
+ "bangdiwala_b": {
+  "estimate_independent": 0.06143319931669781,
+  "target": 0.0625,
+  "perfect": 1.0,
+  "passed": true
+ },
+ "kendall_w": {
+  "type1": 0.03345,
+  "R": 20000,
+  "mc_se": 0.0012714381129256744,
+  "passed": false
+ }
+}
