@@ -1,0 +1,158 @@
+{
+ "protocol": "PROTOCOL.json amendment_C C1 (B2 rule, 900 s per start)",
+ "jobs": [
+  {
+   "id": "4PL__fresh_10000_12_406",
+   "sha256": "f0faa9c202b7f80ee196a9e73479f17df70c2e3a33704cd9299ebb5afb4ddfaa",
+   "start": "default",
+   "reference_converged": true,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00149032572661012,
+    "b": 0.0011626357477589888,
+    "c": 0.0004694018620247653,
+    "d": 0.00018427661548348073
+   },
+   "reference_objective_gap": -1.0652060154825449e-05,
+   "R_finished": false,
+   "R_logpost_at_python": -77383.3734548614,
+   "R_logpost_at_R": null,
+   "matched_max_abs_diff": {
+    "a": 0.0014921793514974802,
+    "b": 0.0011634952270530574,
+    "c": 0.0004698420799122416,
+    "d": 0.00018503833099270395
+   },
+   "matched_pass": true
+  },
+  {
+   "id": "4PL__fresh_10000_30_407",
+   "sha256": "5b7228c39a1805ebf5a56d4546e81d955b74d8235e1fe13f99d02c3b6e9e976a",
+   "start": "nested",
+   "reference_converged": true,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00038354002429641376,
+    "b": 0.00017005880518372596,
+    "c": 7.236406284866215e-05,
+    "d": 4.025066537149957e-05
+   },
+   "reference_objective_gap": -2.2041494958102703e-06,
+   "R_finished": false,
+   "R_logpost_at_python": -189674.404097148,
+   "R_logpost_at_R": null
+  },
+  {
+   "id": "4PL__fresh_10000_12_406",
+   "sha256": "f0faa9c202b7f80ee196a9e73479f17df70c2e3a33704cd9299ebb5afb4ddfaa",
+   "start": "nested",
+   "reference_converged": true,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00149032572661012,
+    "b": 0.0011626357477589888,
+    "c": 0.0004694018620247653,
+    "d": 0.00018427661548348073
+   },
+   "reference_objective_gap": -1.0652060154825449e-05,
+   "R_finished": false,
+   "R_logpost_at_python": -77383.3734548614,
+   "R_logpost_at_R": null
+  },
+  {
+   "id": "4PL__fresh_3000_30_405",
+   "sha256": "f9ee1b9a9243503d03a5d4c28e58347fe9df2c8305998827d10737eef1d5cf2d",
+   "start": "default",
+   "reference_converged": true,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00047328228666598804,
+    "b": 0.00022867716503705005,
+    "c": 9.492897309981707e-05,
+    "d": 5.455201173898416e-05
+   },
+   "reference_objective_gap": -2.1462474251165986e-06,
+   "R_finished": false,
+   "R_logpost_at_python": -56996.5715466637,
+   "R_logpost_at_R": null,
+   "matched_max_abs_diff": {
+    "a": 0.00047539335692770024,
+    "b": 0.0002294525055374086,
+    "c": 9.511010298340894e-05,
+    "d": 5.4448170064946844e-05
+   },
+   "matched_pass": true
+  },
+  {
+   "id": "4PL__fresh_10000_30_407",
+   "sha256": "5b7228c39a1805ebf5a56d4546e81d955b74d8235e1fe13f99d02c3b6e9e976a",
+   "start": "default",
+   "reference_converged": true,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.00038354002429641376,
+    "b": 0.00017005880518372596,
+    "c": 7.236406284866215e-05,
+    "d": 4.025066537149957e-05
+   },
+   "reference_objective_gap": -2.2041494958102703e-06,
+   "R_finished": false,
+   "R_logpost_at_python": -189674.404097148,
+   "R_logpost_at_R": null,
+   "matched_max_abs_diff": {
+    "a": 0.00038587574967263727,
+    "b": 0.00016930384841951085,
+    "c": 7.214344712799803e-05,
+    "d": 3.969853300800352e-05
+   },
+   "matched_pass": true
+  },
+  {
+   "id": "4PL__fresh_3000_30_405",
+   "sha256": "f9ee1b9a9243503d03a5d4c28e58347fe9df2c8305998827d10737eef1d5cf2d",
+   "start": "nested",
+   "reference_converged": true,
+   "reference_pass": true,
+   "reference_max_abs_diff": {
+    "a": 0.0009922381062970054,
+    "b": 0.0002900025093682812,
+    "c": 0.00012057014972866043,
+    "d": 6.362892907429973e-05
+   },
+   "reference_objective_gap": -3.155240847263485e-06,
+   "R_finished": false,
+   "R_logpost_at_python": -56996.5715476726,
+   "R_logpost_at_R": null
+  }
+ ],
+ "fixtures": {
+  "4PL__fresh_10000_12_406": {
+   "starts_finished": [],
+   "best_start": null,
+   "original_R_pass": false,
+   "reference_pass": true,
+   "R_prefers_python": false,
+   "R_matched_stationary": true,
+   "pass_": false
+  },
+  "4PL__fresh_10000_30_407": {
+   "starts_finished": [],
+   "best_start": null,
+   "original_R_pass": false,
+   "reference_pass": true,
+   "R_prefers_python": false,
+   "R_matched_stationary": true,
+   "pass_": false
+  },
+  "4PL__fresh_3000_30_405": {
+   "starts_finished": [],
+   "best_start": null,
+   "original_R_pass": false,
+   "reference_pass": true,
+   "R_prefers_python": false,
+   "R_matched_stationary": true,
+   "pass_": false
+  }
+ },
+ "all_pass": false
+}

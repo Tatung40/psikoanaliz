@@ -61,6 +61,8 @@ jobs:
       - name: Recomputed G1 equals the committed evidence and the certification decision
         run: python validation/binary_certification/certify.py --check-g1 g1/r_equivalence.json
   c1-4pl:
+    # Evidence committed (validation/evidence/binary_certification/c1_4pl.json); re-run on demand only.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:

@@ -48,12 +48,27 @@ def decide():
             gates[m]["G3_inference"] = {"pass": len(g3) == want and all(g3.values()), "cells": g3, "source": "amendment_a2.json",
                                         "failures": {key: [c for c, v in cells[key]["checks"].items() if not v]
                                                      for key, ok in g3.items() if not ok}}
+    c1, g5 = _load("binary_certification/c1_4pl.json"), _load("binary_certification/g5_identity.json")
+    if c1 is not None:                                       # amendment C1: B2 rule with a 900 s budget for 405-407
+        b2_ok = {k: v for k, v in gates["4PL"]["G1_R_equivalence"].get("B2", {}).get("cases", {}).items()}
+        rest = [v for k, v in b2_ok.items() if not any(f in k for f in ("405", "406", "407"))]
+        gates["4PL"]["G1_R_equivalence"]["C1"] = {"pass": bool(c1["all_pass"]), "fixtures": {k: v["pass_"] for k, v in c1["fixtures"].items()}}
+        gates["4PL"]["G1_R_equivalence"]["pass"] = gates["4PL"]["G1_R_equivalence"]["pass"] or (bool(c1["all_pass"]) and len(rest) == 4 and all(rest))
+    for m in ("3PL", "4PL"):                                 # amendment C2: output identity G5
+        gates[m]["G5_output_identity"] = {"pass": bool(g5 and g5["pass_by_model"][m])}
     status = {}
     for m, g in gates.items():
         ok = all(v["pass"] for v in g.values() if v["pass"] is not None)
         status[m] = {"status": "CERTIFIED" if ok else "NOT CERTIFIED", "scope": PROTOCOL["scope"][m],
                      "failed_gates": [name for name, v in g.items() if v["pass"] is False], "gates": g}
+    g3 = gates["3PL"]
+    if (status["3PL"]["status"] != "CERTIFIED" and status["3PL"]["failed_gates"] == ["G3_inference"]
+            and g3["G1_R_equivalence"]["pass"] and g3["G2_recovery"]["pass"] and g3["G5_output_identity"]["pass"]):
+        c2 = PROTOCOL["amendment_C"]["C2_3PL_output_level"]                # amendment C2: output-level certification
+        status["3PL"].update(status="OUTPUT-LEVEL CERTIFIED", certified_outputs=c2["certified_outputs_if_passed"],
+                             not_certified_outputs=c2["not_certified"])
     return {"protocol": "validation/binary_certification/PROTOCOL.json (amendments A1-A3)", "models": status,
+            "amendment_C_evidence": ["binary_certification/c1_4pl.json", "binary_certification/g5_identity.json"],
             "superseded_evidence_reported": ["p1_3pl4pl", "p6_binary_se", "p7_binary34_se", "binary_certification/coverage.json",
                                              "binary_certification/amendment_a1.json", "binary_certification/r_equivalence_run1_3bd40ad.json"]}
 

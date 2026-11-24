@@ -80,6 +80,6 @@ def test_evidence_note_is_model_specific_and_matches_stored_coverage():
     for m in ("Rasch", "1PL", "2PL", "3PL", "4PL"):
         name = "1PL" if m == "Rasch" else m
         level, text = evidence_note(m)
-        assert (level == "info") == (decision[name]["status"] == "CERTIFIED")
+        assert (level == "info") == (decision[name]["status"] in ("CERTIFIED", "OUTPUT-LEVEL CERTIFIED"))
         assert decision[name]["status"] in text and "CERTIFICATION.json" in text
     assert evidence_note("1PL", common_discrimination=True) == evidence_note("1PL")
