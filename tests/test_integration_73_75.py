@@ -10,7 +10,7 @@ from core.irt_python_mirt_adapter import fit_python_mirt
 def actual_fits():
     x=pd.read_csv('tests/fixtures/irt_b10/data_irt1pl_ok.csv').iloc[:240,:6].astype(int)
     fits={(model,q):fit_python_mirt(x,model=model,n_quadpts=q)
-          for model,q in [('Rasch',21),('2PL',21),('2PL',31)]}
+          for model,q in [('Rasch',61),('2PL',61),('2PL',31)]}  # binary default: 61 nodes (certification A2)
     assert all(v.fit.converged for v in fits.values())
     return x,fits
 
@@ -80,7 +80,7 @@ def test_comparison_requires_matched_solver_and_bad_settings_fail_closed(actual_
     comparison=pd.read_csv(io.BytesIO(downloads['python_mirt_compare_csv_2PL']))
     assert set(comparison.Model)=={'Rasch','2PL'}
     for model in comparison.Model:
-        assert comparison.set_index('Model').loc[model,'LogLik']==pytest.approx(actual_fits[1][model,21].fit.log_likelihood,abs=1e-10)
+        assert comparison.set_index('Model').loc[model,'LogLik']==pytest.approx(actual_fits[1][model,61].fit.log_likelihood,abs=1e-10)
     before=downloads['python_mirt_persons_csv_2PL']
     downloads.clear();at.checkbox(key='python_mirt_output_2PL_comparison').uncheck().run()
     assert 'python_mirt_compare_csv_2PL' not in downloads and downloads['python_mirt_persons_csv_2PL']==before and len(calls)==2

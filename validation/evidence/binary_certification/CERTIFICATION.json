@@ -1,0 +1,237 @@
+{
+ "protocol": "validation/binary_certification/PROTOCOL.json (amendments A1-A3)",
+ "models": {
+  "1PL": {
+   "status": "CERTIFIED",
+   "scope": {
+    "N": [
+     1000,
+     10000
+    ],
+    "k": [
+     12,
+     30
+    ],
+    "theta": "N(0, 1)",
+    "outputs": [
+     "item parameters",
+     "IRF/information",
+     "parameter SE",
+     "95% Wald CI"
+    ]
+   },
+   "failed_gates": [],
+   "gates": {
+    "G1_R_equivalence": {
+     "pass": true,
+     "cases": {
+      "1PL_fixed_a__tests_fixtures_irt_b10_data_irt1pl_ok_csv": true,
+      "1PL_fixed_a__sim_N_1000_k_12_seed_101": true,
+      "1PL_fixed_a__sim_N_3000_k_30_seed_102": true,
+      "1PL_common_a__tests_fixtures_irt_b10_data_irt1pl_ok_csv": true,
+      "1PL_common_a__sim_N_1000_k_12_seed_101": true,
+      "1PL_common_a__sim_N_3000_k_30_seed_102": true
+     },
+     "expected_cases": 6
+    },
+    "G2_recovery": {
+     "pass": true,
+     "cells": {
+      "1PL fixed_a N1000 k12": true,
+      "1PL fixed_a N1000 k30": true,
+      "1PL fixed_a N10000 k12": true,
+      "1PL fixed_a N10000 k30": true,
+      "1PL common_a N1000 k12": true,
+      "1PL common_a N1000 k30": true,
+      "1PL common_a N10000 k12": true,
+      "1PL common_a N10000 k30": true
+     },
+     "source": "amendment_a2.json"
+    },
+    "G3_inference": {
+     "pass": true,
+     "cells": {
+      "1PL fixed_a N1000 k12": true,
+      "1PL fixed_a N1000 k30": true,
+      "1PL fixed_a N10000 k12": true,
+      "1PL fixed_a N10000 k30": true,
+      "1PL common_a N1000 k12": true,
+      "1PL common_a N1000 k30": true,
+      "1PL common_a N10000 k12": true,
+      "1PL common_a N10000 k30": true
+     },
+     "source": "amendment_a2.json",
+     "failures": {}
+    }
+   }
+  },
+  "2PL": {
+   "status": "CERTIFIED",
+   "scope": {
+    "N": [
+     1000,
+     10000
+    ],
+    "k": [
+     12,
+     30
+    ],
+    "theta": "N(0, 1)",
+    "outputs": [
+     "item parameters",
+     "IRF/information",
+     "parameter SE",
+     "95% Wald CI"
+    ]
+   },
+   "failed_gates": [],
+   "gates": {
+    "G1_R_equivalence": {
+     "pass": true,
+     "cases": {
+      "2PL__tests_fixtures_irt_b10_data_irt2pl_ok_csv": true,
+      "2PL__sim_N_1000_k_12_seed_201": true,
+      "2PL__sim_N_3000_k_30_seed_202": true
+     },
+     "expected_cases": 3
+    },
+    "G2_recovery": {
+     "pass": true,
+     "cells": {
+      "2PL N1000 k12": true,
+      "2PL N1000 k30": true,
+      "2PL N10000 k12": true,
+      "2PL N10000 k30": true
+     },
+     "source": "amendment_a2.json"
+    },
+    "G3_inference": {
+     "pass": true,
+     "cells": {
+      "2PL N1000 k12": true,
+      "2PL N1000 k30": true,
+      "2PL N10000 k12": true,
+      "2PL N10000 k30": true
+     },
+     "source": "amendment_a2.json",
+     "failures": {}
+    }
+   }
+  },
+  "3PL": {
+   "status": "NOT CERTIFIED",
+   "scope": {
+    "N": [
+     3000,
+     10000
+    ],
+    "k": [
+     12,
+     30
+    ],
+    "theta": "N(0, 1)",
+    "outputs": [
+     "item parameters",
+     "IRF/information",
+     "parameter SE",
+     "95% Wald CI"
+    ]
+   },
+   "failed_gates": [
+    "G3_inference"
+   ],
+   "gates": {
+    "G1_R_equivalence": {
+     "pass": true,
+     "cases": {
+      "3PL__sim_N_3000_k_12_seed_301": true,
+      "3PL__sim_N_3000_k_30_seed_302": true,
+      "3PL__sim_N_10000_k_12_seed_303": true
+     },
+     "expected_cases": 3
+    },
+    "G2_recovery": {
+     "pass": true,
+     "cells": {
+      "3PL MAP N3000 k12": true,
+      "3PL MAP N3000 k30": true,
+      "3PL MAP N10000 k12": true,
+      "3PL MAP N10000 k30": true
+     },
+     "source": "amendment_a2.json"
+    },
+    "G3_inference": {
+     "pass": false,
+     "cells": {
+      "3PL MAP N3000 k12": false,
+      "3PL MAP N3000 k30": true,
+      "3PL MAP N10000 k12": true,
+      "3PL MAP N10000 k30": true
+     },
+     "source": "amendment_a2.json",
+     "failures": {
+      "3PL MAP N3000 k12": [
+       "b_coverage",
+       "c_coverage"
+      ]
+     }
+    }
+   }
+  },
+  "4PL": {
+   "status": "NOT CERTIFIED",
+   "scope": {
+    "N": [
+     3000,
+     10000
+    ],
+    "k": [
+     12,
+     30
+    ],
+    "theta": "N(0, 1)",
+    "outputs": [
+     "item parameters",
+     "IRF/information"
+    ],
+    "excluded_outputs": "parameter SE and Wald CI: pre-registered coverage criterion already failed in p7_binary34_se (over-coverage .971-.994); the library SE equals the inverse log-posterior Hessian, so this is a property of posterior-curvature intervals, not a defect; the screen keeps withholding the CI"
+   },
+   "failed_gates": [
+    "G1_R_equivalence"
+   ],
+   "gates": {
+    "G1_R_equivalence": {
+     "pass": false,
+     "cases": {
+      "4PL__sim_N_3000_k_12_seed_401": true,
+      "4PL__sim_N_3000_k_30_seed_402": true,
+      "4PL__sim_N_10000_k_12_seed_403": false
+     },
+     "expected_cases": 3
+    },
+    "G2_recovery": {
+     "pass": true,
+     "cells": {
+      "4PL MAP N3000 k12": true,
+      "4PL MAP N3000 k30": true,
+      "4PL MAP N10000 k12": true,
+      "4PL MAP N10000 k30": true
+     },
+     "source": "amendment_a2.json"
+    },
+    "G3_inference": {
+     "pass": null,
+     "note": "parameter SE and Wald CI: pre-registered coverage criterion already failed in p7_binary34_se (over-coverage .971-.994); the library SE equals the inverse log-posterior Hessian, so this is a property of posterior-curvature intervals, not a defect; the screen keeps withholding the CI"
+    }
+   }
+  }
+ },
+ "superseded_evidence_reported": [
+  "p1_3pl4pl",
+  "p6_binary_se",
+  "p7_binary34_se",
+  "binary_certification/coverage.json",
+  "binary_certification/amendment_a1.json",
+  "binary_certification/r_equivalence_run1_3bd40ad.json"
+ ]
+}

@@ -16,8 +16,17 @@ def test_stored_evidence_matches_design_and_the_screen_decision_table():
     assert evidence["design"] == json.loads(json.dumps(DESIGN)) and evidence["criteria"] == CRITERIA
     checks, supported = judge(evidence["results"])
     assert evidence["checks"] == checks and evidence["wald_ci_supported"] == supported
-    assert {f"{m}_{e}_{q}": v[2] for (m, e, q), v in EVIDENCE_34.items()} == supported
-    for r in evidence["results"]:
+    # ML rows: this study (21 nodes). MAP rows: binary certification amendment A2 (application default 61 nodes).
+    assert {f"{m}_{e}_{q}": v[2] for (m, e, q), v in EVIDENCE_34.items() if e == "ML"} == {k: v for k, v in supported.items() if "_ML_" in k}
+    a2 = json.loads((EVIDENCE.parents[1] / "binary_certification/amendment_a2.json").read_text())
+    for (m, e, q), (coverage, withheld, ok) in EVIDENCE_34.items():
+        if e != "MAP":
+            continue
+        cells = [r for r in a2["results"] if r["cell"] == f"{m} MAP"]
+        assert len(cells) == 4
+        assert ok == (m == "3PL" and all(abs(r[q]["coverage"] - .95) <= .02 and r[q]["withheld_rate"] <= .05 for r in cells))
+        assert abs(coverage - max((r[q]["coverage"] for r in cells), key=lambda c: abs(c - .95))) <= 5e-4
+    for r in (r for r in evidence["results"] if r["estimation"] == "ML"):
         assert r["converged"] == r["replications"] and r["se_refused"] == 0
         for q, (coverage, withheld, _) in ((q, EVIDENCE_34[(r["model"], r["estimation"], q)]) for q in "abcd" if q in r):
             assert abs(coverage - .95) >= abs(r[q]["coverage"] - .95) - 5e-4 and withheld >= r[q]["withheld_rate"] - 5e-4
