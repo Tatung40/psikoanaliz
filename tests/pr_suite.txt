@@ -109,3 +109,4 @@ tests/test_binary_certification.py
 tests/test_rasch_61_wright.py
 tests/test_binary_app_path_certification.py
 tests/test_fit_indices_certification.py
+tests/test_rater_icc2k_ci.py

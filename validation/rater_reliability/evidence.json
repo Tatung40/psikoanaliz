@@ -264,22 +264,25 @@
    "max_abs_diff": 9.237055564881302e-14
   },
   "icc_2_k": {
-   "label": "NUMERICALLY VALIDATED (kısmi; başarısız çıktılar gizli)",
+   "label": "NUMERICALLY VALIDATED",
    "validated_outputs": [
     "F",
+    "ci95",
     "df1",
     "df2",
     "estimate",
     "p"
    ],
-   "failed_outputs": [
-    "ci95"
-   ],
    "references": [
     "irr::icc",
     "psych::ICC"
    ],
-   "max_abs_diff": 0.000736507513270479
+   "max_abs_diff": 0.000736507513270479,
+   "ci95_resolution": "ci95 = Spearman–Brown transform of the validated ICC(2,1) McGraw–Wong interval (|diff| <= 1e-16; ICC(A,k) = SB(ICC(A,1)) and intervals transform monotonically); equals psych::ICC (<= 4.4e-16). The Satterthwaite df is identical to the single-measure df because rho_k/(1-rho_k) = k rho_1/(1-rho_1). R irr::icc differs (lower 7.4e-4): consistent with irr using the average-measure coefficient in the single-measure Satterthwaite terms (not a defect here). Historical irr mismatch kept in comparison.csv.",
+   "historical_failed_outputs": [
+    "ci95"
+   ],
+   "historical_failed_reference": "irr::icc ci95 (max |diff| 7.4e-4); kept"
   },
   "icc_3_1": {
    "label": "NUMERICALLY VALIDATED",
