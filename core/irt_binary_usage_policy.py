@@ -17,6 +17,42 @@ Findings that the rules encode:
 Conditions outside the studied design (N < 1000, k < 12, non-normal theta) are reported as not studied.
 """
 EVIDENCE = "validation/evidence/p1_3pl4pl/irt_3pl4pl_root_cause.json"
+CERTIFICATION = "validation/evidence/binary_certification/CERTIFICATION.json"
+_ESTIMATION = {"1PL": "ML", "2PL": "ML", "3PL": "MAP", "4PL": "MAP"}
+_OUTPUTS = {"1PL": "madde parametreleri, MTF/bilgi, SH ve %95 Wald GA", "2PL": "madde parametreleri, MTF/bilgi, SH ve %95 Wald GA",
+            "3PL": "madde parametreleri, MTF/bilgi, SH ve %95 Wald GA", "4PL": "madde parametreleri ve MTF/bilgi (SH/GA kapsam dışı)"}
+
+
+def _certification_record():
+    import json
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[1] / CERTIFICATION
+    return json.loads(path.read_text()) if path.exists() else {"models": {}}
+
+
+def certification(model, estimation, n, k, solver_settings=None):
+    """Return (status, Turkish text) from the pre-registered decision (validation/binary_certification).
+
+    status: "certified" (inside the certified rectangle with the certified estimation and solver precision),
+    "outside_scope" or "not_certified". Rasch is the fixed-a 1PL; both 1PL variants share the 1PL decision."""
+    name = "1PL" if model in ("Rasch", "1PL") else model
+    entry = _certification_record()["models"].get(name)
+    if entry is None:
+        return "not_certified", f"{name}: sertifika kaydı yok (NOT CERTIFIED)."
+    if entry["status"] != "CERTIFIED":
+        return "not_certified", (f"{name}: NOT CERTIFIED — başarısız kapı: {', '.join(entry['failed_gates'])} "
+                                 f"({CERTIFICATION}).")
+    scope = entry["scope"]; (n_lo, n_hi), (k_lo, k_hi) = scope["N"], scope["k"]
+    settings = solver_settings or {}
+    precise = settings.get("n_quadpts", 0) >= 61 and settings.get("tol", 1) <= 1e-4 and settings.get("max_iter", 0) >= 500
+    rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü"
+    if estimation != _ESTIMATION[name] or not (n_lo <= n <= n_hi and k_lo <= k <= k_hi) or not precise:
+        return "outside_scope", (f"{name}: bu analiz (kestirim {estimation}, N = {n}, k = {k}, düğüm "
+                                 f"{settings.get('n_quadpts', '?')}) sertifika kapsamı dışında — NOT VERIFIED. "
+                                 f"Sertifika kapsamı: {rect}.")
+    return "certified", (f"CERTIFIED — {name} {rect}. Sertifikalı çıktılar: {_OUTPUTS[name]}. Kanıt: R mirt 1.48 eşdeğerliği "
+                         f"ve önceden kayıtlı Monte Carlo ({CERTIFICATION}). θ normalliği veriden doğrulanmaz; "
+                         "birey kestirimleri, uyum istatistikleri ve DIF bu sertifikaya dahil değildir.")
 _MIN_N_SUPPORTED = {("3PL", "ML"): 10000, ("3PL", "MAP"): 3000, ("4PL", "ML"): None, ("4PL", "MAP"): 3000}
 
 
@@ -52,30 +88,17 @@ def usage_status(model, estimation, n, k):
 
 
 def evidence_note(model, common_discrimination=False):
-    """Return (level, Turkish text): the independent evidence that exists for this binary library model.
-
-    Replaces blanket 'research only' labels with what was actually verified (PR #90-96 evidence files);
-    level is "info" when an independent R comparison and Monte Carlo evidence exist, else "warning".
-    """
-    scope = " Kanıt incelenen veri/koşullar içindir; genel sertifika değildir."
-    if model == "1PL" and common_discrimination:
-        return "warning", ("1PL (ortak serbest a): nokta kestirimleri ve logLik yerel σ-serbest Rasch ile sayısal olarak eşdeğer "
-                           "(tek fikstür); bağımsız R karşılaştırması ve Monte Carlo kanıtı yok (NOT VERIFIED); "
-                           "a = 1 modelinin kanıtı bu modele aktarılmaz.")
-    if model in ("Rasch", "1PL"):
-        return "info", ("Doğrulama (a = 1): R mirt 1.48 ile sayısal uyum (parametre farkı ≤ 4.4e-4, "
-                        "validation/r_mirt_phase1); Monte Carlo 300/300 yakınsama, b için %95 GA kapsaması .953 "
-                        "(validation/evidence/p6_binary_se)." + scope)
-    if model == "2PL":
-        return "info", ("Doğrulama: R mirt 1.48 ile sayısal uyum (parametre farkı ≤ 9.2e-4, validation/r_mirt_phase1); "
-                        "Monte Carlo 300/300 yakınsama, a/b için %95 GA kapsaması .945–.951 "
-                        "(validation/evidence/p6_binary_se)." + scope)
-    if model == "3PL":
-        return "info", ("Doğrulama: ML 3PL R mirt 1.48 ile sayısal uyum (parametre ≤ 2.4e-4; SH göreli fark ≤ 1.1e-4, "
-                        "validation/r_mirt_phase1, validation/r_mirt_34). Parametre yorumu ve GA gösterimi kullanım "
-                        "sınırına ve önceden kayıtlı kapsama kanıtına bağlıdır (p1_3pl4pl, p7_binary34_se)." + scope)
-    if model == "4PL":
-        return "warning", ("4PL: bağımsız R doğrulaması yok (NOT VERIFIED — R yakınsamadı; sınır dışı ML çözümü "
-                           "bulunamadı). Parametre yorumu kullanım sınırına ve önceden kayıtlı kapsama kanıtına "
-                           "bağlıdır (p1_3pl4pl, p7_binary34_se).")
-    return "warning", "Bu model için bağımsız doğrulama kaydı yok (NOT VERIFIED)."
+    """Return (level, Turkish text): the certification decision for this binary library model (pre-fit banner)."""
+    name = "1PL" if model in ("Rasch", "1PL") else model
+    entry = _certification_record()["models"].get(name)
+    if entry is None:
+        return "warning", "Bu model için bağımsız doğrulama kaydı yok (NOT VERIFIED)."
+    scope = entry["scope"]; (n_lo, n_hi), (k_lo, k_hi) = scope["N"], scope["k"]
+    rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü"
+    if entry["status"] == "CERTIFIED":
+        variant = (" (sabit a = 1 ve ortak serbest a)" if name == "1PL" else "")
+        return "info", (f"{name}{variant}: CERTIFIED — kapsam {rect}; çıktılar: {_OUTPUTS[name]}. R mirt 1.48 ile "
+                        f"bağımsız eşdeğerlik ve önceden kayıtlı Monte Carlo ({CERTIFICATION}). Kapsam dışı "
+                        "tasarımlar sonuç ekranında ayrıca işaretlenir.")
+    return "warning", (f"{name}: NOT CERTIFIED — başarısız kapı: {', '.join(entry['failed_gates'])} "
+                       f"({CERTIFICATION}). Parametre yorumu kullanım sınırlarına bağlıdır.")

@@ -33,8 +33,9 @@ make <- function(name, par, P, lb, ub)
   createItem(name, par = par, est = rep(TRUE, length(par)), P = P, lbound = lb, ubound = ub,
              gr = function(x, Theta) derivs(x@par, x, Theta)$G, hss = function(x, Theta) derivs(x@par, x, Theta)$H)
 items <- list(
-  irt3 = make("irt3", c(a = 1, b = 0, c = .15), P3, c(eps, -Inf, eps), c(Inf, Inf, 1 - eps)),
-  irt4 = make("irt4", c(a = 1, b = 0, c = .15, d = .95), P4, c(eps, -Inf, eps, eps), c(Inf, Inf, 1 - eps, 1 - eps)))
+  # Amendment A4: the Python mirt library box (mirt.estimation.base._ITEM_PARAMETER_BOUNDS).
+  irt3 = make("irt3", c(a = 1, b = 0, c = .15), P3, c(.1, -6, eps), c(5, 6, .5)),
+  irt4 = make("irt4", c(a = 1, b = 0, c = .15, d = .95), P4, c(.1, -6, eps, .5), c(5, 6, .5, 1 - eps)))
 settings <- list(quadpts = 101, theta_lim = c(-6, 6), TOL = 1e-8, verbose = FALSE, SE = TRUE, SE.type = "Oakes",
                  accelerate = "squarem", technical = list(NCYCLES = 5000))   # SQUAREM: speed only, same objective
 fit_with <- function(args) {

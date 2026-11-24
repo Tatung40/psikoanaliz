@@ -11,21 +11,23 @@ import pandas as pd
 
 Z95 = 1.959963984540054
 NAMES = {"discrimination": "a", "difficulty": "b", "guessing": "c", "upper": "d"}
-STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. Önceden kayıtlı Monte Carlo kapsaması: 1PL/2PL (N = 1000, 12 madde) "
-          ".945–.953; 3PL MAP (N = 3000, 30 madde) .950–.968. Ölçütü (.95 ± .02, sınırda tutulan oran ≤ .05) "
+STATUS = ("Oakes gözlenen bilgi SH ve %95 Wald GA. Önceden kayıtlı Monte Carlo kapsaması (61 düğüm, N 1000–10000, "
+          "k 12–30): 1PL/2PL .944–.961 (CERTIFIED); 3PL MAP a .949–.960, b/c ≤ .976 (aşırı kapsama). Ölçütü (.95 ± .02, sınırda tutulan oran ≤ .05) "
           "sağlamayan 3PL/4PL parametrelerinde SH gösterilir, Wald GA gösterilmez; 4PL ML'de kullanım "
           "politikası gereği kapsama oranından bağımsız tüm Wald GA kapalıdır "
-          "(validation/evidence/p6_binary_se, p7_binary34_se).")
+          "(validation/evidence/binary_certification).")
 # Pre-registered 3PL/4PL decision (validation/binary34_se_coverage_study.py): (model, estimation, parameter) ->
 # (coverage farthest from .95 over the design cells, largest on-bound withheld rate, Wald CI supported).
+# MAP rows: binary certification amendment A2 (application default 61 GH nodes; four corners N 3000/10000 x k 12/30).
+# ML rows: p7_binary34_se (21 nodes); ML 3PL/4PL is outside the certified scope.
 EVIDENCE_34 = {
-    ("3PL", "MAP", "a"): (0.950, 0.000, True),
-    ("3PL", "MAP", "b"): (0.967, 0.000, True),
-    ("3PL", "MAP", "c"): (0.968, 0.000, True),
-    ("4PL", "MAP", "a"): (0.994, 0.000, False),
-    ("4PL", "MAP", "b"): (0.971, 0.000, False),
-    ("4PL", "MAP", "c"): (0.981, 0.000, False),
-    ("4PL", "MAP", "d"): (0.979, 0.000, False),
+    ("3PL", "MAP", "a"): (0.960, 0.000, True),
+    ("3PL", "MAP", "b"): (0.976, 0.000, False),
+    ("3PL", "MAP", "c"): (0.975, 0.000, False),
+    ("4PL", "MAP", "a"): (0.998, 0.000, False),
+    ("4PL", "MAP", "b"): (0.988, 0.000, False),
+    ("4PL", "MAP", "c"): (0.990, 0.000, False),
+    ("4PL", "MAP", "d"): (0.990, 0.000, False),
     ("3PL", "ML", "a"): (0.929, 0.000, False),
     ("3PL", "ML", "b"): (0.827, 0.000, False),
     ("3PL", "ML", "c"): (0.936, 0.128, False),
@@ -37,13 +39,13 @@ EVIDENCE_34 = {
 # Same study: (largest |mean bias|, largest RMSE) over the cells. Coverage is not estimation accuracy: where
 # |bias| exceeds the .05 limit used for 1PL/2PL (p6_binary_se), a kept CI carries an explicit warning.
 ACCURACY_34 = {
-    ("3PL", "MAP", "a"): (-0.022, 0.132),
-    ("3PL", "MAP", "b"): (+0.004, 0.133),
-    ("3PL", "MAP", "c"): (+0.000, 0.047),
-    ("4PL", "MAP", "a"): (+0.036, 0.176),
-    ("4PL", "MAP", "b"): (-0.019, 0.172),
-    ("4PL", "MAP", "c"): (+0.005, 0.045),
-    ("4PL", "MAP", "d"): (-0.018, 0.036),
+    ("3PL", "MAP", "a"): (-0.026, 0.162),
+    ("3PL", "MAP", "b"): (+0.013, 0.141),
+    ("3PL", "MAP", "c"): (+0.003, 0.050),
+    ("4PL", "MAP", "a"): (+0.044, 0.187),
+    ("4PL", "MAP", "b"): (-0.026, 0.187),
+    ("4PL", "MAP", "c"): (+0.008, 0.045),
+    ("4PL", "MAP", "d"): (-0.019, 0.036),
     ("3PL", "ML", "a"): (+0.018, 0.159),
     ("3PL", "ML", "b"): (+0.008, 0.230),
     ("3PL", "ML", "c"): (-0.002, 0.082),

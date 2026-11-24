@@ -276,5 +276,12 @@
   "defect": "Reference-harness implementation defect: with createItem() custom items, R mirt 1.48 did not use parprior in the M-step, so R maximised the likelihood, not the registered posterior.",
   "fix": "The same priors (a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8), d ~ Beta(8, 2)) enter each custom item's M-step objective through createItem gr/hss (numDeriv gradient/Hessian of the expected complete-data item log-likelihood + log-prior); parprior is not used. R mirt's EM, quadrature, TOL and NCYCLES are unchanged.",
   "decision": "3PL and 4PL G1 are decided by the re-run with the fixed harness under the unchanged G1 criteria; the failed run stays reported. 1PL/2PL G1 results stand."
+ },
+ "amendment_A4": {
+  "registered": "2026-11-24, after G1 run 57b4f09 (evidence r_equivalence_run_57b4f09.json, 14/15 pass) and before any re-run",
+  "observed": "4PL sim(N=10000, k=12, seed=403): R's Newton M-step moved to a = 180 (outside the Python library box) with a log-posterior 140 below Python's; all other 3PL/4PL fixtures agree to <= 5.2e-4.",
+  "defect": "Harness deviation from G1's 'same constraints': R custom items were bounded only below (a > 0, 0 < c, d < 1) while Python mirt constrains a to [0.1, 5], b to [-6, 6], c to [0, .5], d to [.5, 1].",
+  "fix": "R custom items use the Python mirt box: a [0.1, 5], b [-6, 6], c [1e-6, .5], d [.5, 1 - 1e-6]; everything else unchanged.",
+  "decision": "G1 is decided by the next complete run under the unchanged criteria; all earlier runs stay reported."
  }
 }
