@@ -3,58 +3,257 @@
  "registered": "2026-11-24, before any new replication or R comparison in this protocol was run",
  "engine": "core.irt_python_mirt_adapter.fit_python_mirt -> mirt.fit_mirt (Python mirt 1.2.0); SE/CI: core.irt_binary_inference.parameter_inference",
  "models": {
-  "1PL": {"variants": {"fixed_a": "a = 1 for all items, theta ~ N(0,1) (screens 'MTK: 1PL', 'Rasch')",
-                       "common_a": "one free discrimination shared by all items, theta ~ N(0,1) (screen 'MTK: Python mirt 1PL')"},
-          "estimation": "ML", "rule": "1PL is CERTIFIED only if both variants pass every gate"},
-  "2PL": {"estimation": "ML"},
-  "3PL": {"estimation": "MAP with the library default item priors a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8); ML is outside the certified scope (p1_3pl4pl: boundary solutions; p7_binary34_se: coverage failures)"},
-  "4PL": {"estimation": "MAP with the library default item priors a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8), d ~ Beta(8, 2); ML is outside the certified scope (p1_3pl4pl: recovery never met)"}
+  "1PL": {
+   "variants": {
+    "fixed_a": "a = 1 for all items, theta ~ N(0,1) (screens 'MTK: 1PL', 'Rasch')",
+    "common_a": "one free discrimination shared by all items, theta ~ N(0,1) (screen 'MTK: Python mirt 1PL')"
+   },
+   "estimation": "ML",
+   "rule": "1PL is CERTIFIED only if both variants pass every gate"
+  },
+  "2PL": {
+   "estimation": "ML"
+  },
+  "3PL": {
+   "estimation": "MAP with the library default item priors a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8); ML is outside the certified scope (p1_3pl4pl: boundary solutions; p7_binary34_se: coverage failures)"
+  },
+  "4PL": {
+   "estimation": "MAP with the library default item priors a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8), d ~ Beta(8, 2); ML is outside the certified scope (p1_3pl4pl: recovery never met)"
+  }
  },
  "scope": {
-  "1PL": {"N": [1000, 10000], "k": [12, 30], "theta": "N(0, 1)", "outputs": ["item parameters", "IRF/information", "parameter SE", "95% Wald CI"]},
-  "2PL": {"N": [1000, 10000], "k": [12, 30], "theta": "N(0, 1)", "outputs": ["item parameters", "IRF/information", "parameter SE", "95% Wald CI"]},
-  "3PL": {"N": [3000, 10000], "k": [12, 30], "theta": "N(0, 1)", "outputs": ["item parameters", "IRF/information", "parameter SE", "95% Wald CI"]},
-  "4PL": {"N": [3000, 10000], "k": [12, 30], "theta": "N(0, 1)", "outputs": ["item parameters", "IRF/information"],
-          "excluded_outputs": "parameter SE and Wald CI: pre-registered coverage criterion already failed in p7_binary34_se (over-coverage .971-.994); the library SE equals the inverse log-posterior Hessian, so this is a property of posterior-curvature intervals, not a defect; the screen keeps withholding the CI"},
+  "1PL": {
+   "N": [
+    1000,
+    10000
+   ],
+   "k": [
+    12,
+    30
+   ],
+   "theta": "N(0, 1)",
+   "outputs": [
+    "item parameters",
+    "IRF/information",
+    "parameter SE",
+    "95% Wald CI"
+   ]
+  },
+  "2PL": {
+   "N": [
+    1000,
+    10000
+   ],
+   "k": [
+    12,
+    30
+   ],
+   "theta": "N(0, 1)",
+   "outputs": [
+    "item parameters",
+    "IRF/information",
+    "parameter SE",
+    "95% Wald CI"
+   ]
+  },
+  "3PL": {
+   "N": [
+    3000,
+    10000
+   ],
+   "k": [
+    12,
+    30
+   ],
+   "theta": "N(0, 1)",
+   "outputs": [
+    "item parameters",
+    "IRF/information",
+    "parameter SE",
+    "95% Wald CI"
+   ]
+  },
+  "4PL": {
+   "N": [
+    3000,
+    10000
+   ],
+   "k": [
+    12,
+    30
+   ],
+   "theta": "N(0, 1)",
+   "outputs": [
+    "item parameters",
+    "IRF/information"
+   ],
+   "excluded_outputs": "parameter SE and Wald CI: pre-registered coverage criterion already failed in p7_binary34_se (over-coverage .971-.994); the library SE equals the inverse log-posterior Hessian, so this is a property of posterior-curvature intervals, not a defect; the screen keeps withholding the CI"
+  },
   "rule": "A scope rectangle is certified only when every gate passes at all four corners; person estimates, fit statistics, DIF and conditions outside the rectangle (other N, k, non-normal theta, missing data) are not certified and keep their existing labels"
  },
  "gates": {
   "G1_R_equivalence": {
    "reference": "R mirt 1.48 (independent implementation), same data, same model, parameterization, constraints, priors and latent N(0,1)",
-   "settings": {"python": "fit_python_mirt(n_quadpts=61, tol=1e-8, max_iter=5000)",
-                "R": "mirt(quadpts=101, theta_lim=c(-6, 6), TOL=1e-8, NCYCLES=5000); 1PL fixed_a: 2PL with a1 fixed at 1; 1PL common_a: 2PL with all a1 constrained equal; 2PL: itemtype 2PL; 3PL/4PL MAP: createItem() in the IRT parameterization P = c + (d - c) / (1 + exp(-a (theta - b))) with parprior lnorm(0, .5) on a, norm(0, 2) on b, beta(2, 8) on c, beta(8, 2) on d",
-                "arbiter": "an independent numpy evaluation of the same objective (marginal log-likelihood, plus log-prior for MAP) with 121-node Gauss-Hermite quadrature at both solutions"},
-   "fixtures": {"1PL": ["tests/fixtures/irt_b10/data_irt1pl_ok.csv", "sim(N=1000, k=12, seed=101)", "sim(N=3000, k=30, seed=102)"],
-                "2PL": ["tests/fixtures/irt_b10/data_irt2pl_ok.csv", "sim(N=1000, k=12, seed=201)", "sim(N=3000, k=30, seed=202)"],
-                "3PL": ["sim(N=3000, k=12, seed=301)", "sim(N=3000, k=30, seed=302)", "sim(N=10000, k=12, seed=303)"],
-                "4PL": ["sim(N=3000, k=12, seed=401)", "sim(N=3000, k=30, seed=402)", "sim(N=10000, k=12, seed=403)"]},
-   "criteria": {"both_converged": true, "max_abs_diff_a_b": 0.002, "max_abs_diff_c_d": 0.001,
-                "abs_objective_diff": 0.001, "python_not_worse_than_R_by_more_than": 0.0001,
-                "se_relative_diff_max": 0.02,
-                "se_reference": "ML models (1PL, 2PL): R mirt Oakes SE. MAP models: independent numerical inverse Hessian of the arbiter objective (R SE reported descriptively, because whether R includes custom-item prior curvature in its SE is not documented)"},
+   "settings": {
+    "python": "fit_python_mirt(n_quadpts=61, tol=1e-8, max_iter=5000)",
+    "R": "mirt(quadpts=101, theta_lim=c(-6, 6), TOL=1e-8, NCYCLES=5000); 1PL fixed_a: 2PL with a1 fixed at 1; 1PL common_a: 2PL with all a1 constrained equal; 2PL: itemtype 2PL; 3PL/4PL MAP: createItem() in the IRT parameterization P = c + (d - c) / (1 + exp(-a (theta - b))) with parprior lnorm(0, .5) on a, norm(0, 2) on b, beta(2, 8) on c, beta(8, 2) on d",
+    "arbiter": "an independent numpy evaluation of the same objective (marginal log-likelihood, plus log-prior for MAP) with 121-node Gauss-Hermite quadrature at both solutions"
+   },
+   "fixtures": {
+    "1PL": [
+     "tests/fixtures/irt_b10/data_irt1pl_ok.csv",
+     "sim(N=1000, k=12, seed=101)",
+     "sim(N=3000, k=30, seed=102)"
+    ],
+    "2PL": [
+     "tests/fixtures/irt_b10/data_irt2pl_ok.csv",
+     "sim(N=1000, k=12, seed=201)",
+     "sim(N=3000, k=30, seed=202)"
+    ],
+    "3PL": [
+     "sim(N=3000, k=12, seed=301)",
+     "sim(N=3000, k=30, seed=302)",
+     "sim(N=10000, k=12, seed=303)"
+    ],
+    "4PL": [
+     "sim(N=3000, k=12, seed=401)",
+     "sim(N=3000, k=30, seed=402)",
+     "sim(N=10000, k=12, seed=403)"
+    ]
+   },
+   "criteria": {
+    "both_converged": true,
+    "max_abs_diff_a_b": 0.002,
+    "max_abs_diff_c_d": 0.001,
+    "abs_objective_diff": 0.001,
+    "python_not_worse_than_R_by_more_than": 0.0001,
+    "se_relative_diff_max": 0.02,
+    "se_reference": "ML models (1PL, 2PL): R mirt Oakes SE. MAP models: independent numerical inverse Hessian of the arbiter objective (R SE reported descriptively, because whether R includes custom-item prior curvature in its SE is not documented)"
+   },
    "rationale": "Differences of 0.002 are < 3% of the smallest sampling SE in scope (about 0.07 at N = 10000), so agreement at this level means the same estimate; the arbiter objective decides which engine reached the optimum."
   },
   "G2_recovery": {
-   "reused": {"3PL/4PL MAP": "validation/evidence/p1_3pl4pl/irt_3pl4pl_root_cause.json corners N 3000/10000 x k 12/30 under its own pre-registered criteria (RMSE a/b <= .30, c/d <= .07, IRF RMSE <= .02, bound rate <= .05)",
-              "1PL fixed_a/2PL (N=1000, k=12)": "validation/evidence/p6_binary_se/coverage.json under its own criteria (|pooled bias| <= .05)"},
-   "new_cells_criteria": {"abs_pooled_bias_a_b_max": 0.05, "rmse_a_b_max": 0.30, "rmse_c_d_max": 0.07}
+   "reused": {
+    "3PL/4PL MAP": "validation/evidence/p1_3pl4pl/irt_3pl4pl_root_cause.json corners N 3000/10000 x k 12/30 under its own pre-registered criteria (RMSE a/b <= .30, c/d <= .07, IRF RMSE <= .02, bound rate <= .05)",
+    "1PL fixed_a/2PL (N=1000, k=12)": "validation/evidence/p6_binary_se/coverage.json under its own criteria (|pooled bias| <= .05)"
+   },
+   "new_cells_criteria": {
+    "abs_pooled_bias_a_b_max": 0.05,
+    "rmse_a_b_max": 0.3,
+    "rmse_c_d_max": 0.07
+   }
   },
   "G3_inference": {
-   "applies_to": ["1PL", "2PL", "3PL"],
-   "criteria": {"convergence_rate_min": 0.99, "se_refused": 0, "withheld_rate_max": 0.05, "coverage_abs_error_max": 0.02},
-   "reused": {"1PL fixed_a/2PL N=1000 k=12": "p6_binary_se", "3PL MAP N=3000 k=30": "p7_binary34_se"},
-   "new_cells": {"1PL fixed_a": [[1000, 30], [10000, 12], [10000, 30]],
-                 "1PL common_a": [[1000, 12], [1000, 30], [10000, 12], [10000, 30]],
-                 "2PL": [[1000, 30], [10000, 12], [10000, 30]],
-                 "3PL MAP": [[3000, 12], [10000, 12], [10000, 30]]},
-   "replications": {"N1000": 300, "N3000": 200, "N10000": 100},
+   "applies_to": [
+    "1PL",
+    "2PL",
+    "3PL"
+   ],
+   "criteria": {
+    "convergence_rate_min": 0.99,
+    "se_refused": 0,
+    "withheld_rate_max": 0.05,
+    "coverage_abs_error_max": 0.02
+   },
+   "reused": {
+    "1PL fixed_a/2PL N=1000 k=12": "p6_binary_se",
+    "3PL MAP N=3000 k=30": "p7_binary34_se"
+   },
+   "new_cells": {
+    "1PL fixed_a": [
+     [
+      1000,
+      30
+     ],
+     [
+      10000,
+      12
+     ],
+     [
+      10000,
+      30
+     ]
+    ],
+    "1PL common_a": [
+     [
+      1000,
+      12
+     ],
+     [
+      1000,
+      30
+     ],
+     [
+      10000,
+      12
+     ],
+     [
+      10000,
+      30
+     ]
+    ],
+    "2PL": [
+     [
+      1000,
+      30
+     ],
+     [
+      10000,
+      12
+     ],
+     [
+      10000,
+      30
+     ]
+    ],
+    "3PL MAP": [
+     [
+      3000,
+      12
+     ],
+     [
+      10000,
+      12
+     ],
+     [
+      10000,
+      30
+     ]
+    ]
+   },
+   "replications": {
+    "N1000": 300,
+    "N3000": 200,
+    "N10000": 100
+   },
    "seed": 20261124,
-   "truth": {"1PL fixed_a": "a = 1, b = linspace(-1.5, 1.5, k)", "1PL common_a": "a = 1.3, b = linspace(-1.5, 1.5, k)",
-             "2PL": "a = linspace(.8, 2.0, k), b = linspace(-1.5, 1.5, k)", "3PL MAP": "validation/irt_3pl4pl_root_cause.truth"},
+   "truth": {
+    "1PL fixed_a": "a = 1, b = linspace(-1.5, 1.5, k)",
+    "1PL common_a": "a = 1.3, b = linspace(-1.5, 1.5, k)",
+    "2PL": "a = linspace(.8, 2.0, k), b = linspace(-1.5, 1.5, k)",
+    "3PL MAP": "validation/irt_3pl4pl_root_cause.truth"
+   },
    "fit": "application path: fit_python_mirt screen defaults (21 GH nodes, tol 1e-4, max_iter 500) -> parameter_inference",
    "precision": "Monte Carlo SE of coverage is computed with datasets as clusters (validation.coverage_precision) and reported; decisions use the fixed criteria above, no replication is added or removed after seeing results"
   },
   "G4_scope_enforcement": "Outside the certified rectangle, other estimation methods and excluded outputs, the application shows the existing non-certified labels; enforced by tests"
  },
- "status_rules": {"CERTIFIED": "every applicable gate passes for every variant at every corner of the scope", "NOT CERTIFIED": "any applicable gate fails; the failing gate is reported and the scope is not narrowed after seeing results"}
+ "status_rules": {
+  "CERTIFIED": "every applicable gate passes for every variant at every corner of the scope",
+  "NOT CERTIFIED": "any applicable gate fails; the failing gate is reported and the scope is not narrowed after seeing results"
+ },
+ "amendment_A1": {
+  "registered": "2026-11-24, after the G3 new-cell results (validation/evidence/binary_certification/coverage.json) and before any run below; those results stay reported unchanged",
+  "A1a_common_a_precision": {
+   "reason": "In '1PL common_a' the shared discrimination yields ONE interval per dataset; with 100-300 datasets the coverage MC SE is .013-.022, not below the +/- .02 criterion, so those cells could neither pass nor fail the parameter a reliably (N = 1000 passes are equally underpowered). Design defect of the original cells, independent of the observed direction.",
+   "design": "all four common_a corners (N 1000/10000 x k 12/30) re-run with 1000 fresh datasets each (coverage MC SE ~ .0069), seed 20261125, same truth, fit and criteria",
+   "decision": "the 1PL common_a G2/G3 cells are decided by A1a for all four corners (passes and failures of the original underpowered cells alike are superseded; both are reported)"
+  },
+  "A1b_map_sandwich_se": {
+   "reason": "For MAP the library covariance V equals the inverse log-posterior Hessian (verified to 1e-5 against an independent numerical Hessian). As a frequentist interval for the penalized-likelihood estimator it is conservative: 3PL MAP k = 12 b/c coverage .968-.974; 4PL MAP .971-.994 (p7). The standard frequentist covariance of a penalized-likelihood estimator is the sandwich V J V with J = V^-1 - P, P = the analytic negative Hessian of the log-prior (diagonal for independent priors), i.e. V - V P V. Point estimates are unchanged.",
+   "design": "3PL MAP and 4PL MAP at all four corners (N 3000/10000 x k 12/30); replications N3000: 300, N10000: 150; fresh seed 20261126; truth validation/irt_3pl4pl_root_cause.truth; application fit defaults; SE refused when V - V P V is not positive definite (counted as se_refused)",
+   "criteria": "unchanged G3 criteria (convergence >= .99, withheld <= .05, |coverage - .95| <= .02) plus se_refused rate <= .01",
+   "decision": "a model whose sandwich intervals meet the criteria at all four corners gets the sandwich SE/CI for MAP in the application and passes G3 by A1b; otherwise its MAP SE stays the posterior one with CI withheld, and for 3PL G3 fails (NOT CERTIFIED). 4PL certification does not depend on A1b (CI excluded from its scope); 4PL CI is enabled only if A1b passes."
+  }
+ }
 }
