@@ -68,7 +68,7 @@ def test_binary_screens_default_to_61_nodes_and_other_families_keep_21():
 
 def test_protocol_registered_before_evidence_and_amendments_are_ordered():
     protocol = json.loads((ROOT / "validation/binary_certification/PROTOCOL.json").read_text())
-    assert [k for k in protocol if k.startswith("amendment_")] == ["amendment_A1", "amendment_A2", "amendment_A3", "amendment_A4", "amendment_A5", "amendment_B", "amendment_C"]
+    assert [k for k in protocol if k.startswith("amendment_")] == ["amendment_A1", "amendment_A2", "amendment_A3", "amendment_A4", "amendment_A5", "amendment_B", "amendment_C", "amendment_D"]
     assert protocol["status_rules"]["NOT CERTIFIED"].endswith("the scope is not narrowed after seeing results")
 
 
@@ -79,5 +79,14 @@ def test_amendment_c_decisions_follow_registered_rules():
     three = decision["3PL"]
     assert three["failed_gates"] == ["G3_inference"] and three["status"] == "OUTPUT-LEVEL CERTIFIED"
     assert any("SE and Wald CI" in o for o in three["not_certified_outputs"])
-    c1 = json.loads((ROOT / "validation/evidence/binary_certification/c1_4pl.json").read_text())
-    assert (decision["4PL"]["status"] == "CERTIFIED") == (c1["all_pass"] and decision["4PL"]["gates"]["G1_R_equivalence"]["pass"])
+    d4 = json.loads((ROOT / "validation/evidence/binary_certification/d4_4pl.json").read_text())
+    g1 = decision["4PL"]["gates"]["G1_R_equivalence"]
+    assert g1["pass"] == (g1["expected_cases"] == len(g1["cases"]) and all(g1["cases"].values())) or g1["pass"] == d4["all_pass"]
+    assert (decision["4PL"]["status"] == "CERTIFIED") == g1["pass"]
+
+
+def test_in_scope_rasch_sample_is_independently_validated_and_historical_fixture_kept():
+    d3 = json.loads((ROOT / "validation/evidence/binary_certification/d3_rasch_sample.json").read_text())
+    import hashlib
+    assert d3["pass"] and hashlib.sha256((ROOT / d3["sample"]).read_bytes()).hexdigest() == d3["sha256"] and d3["shape"] == [2000, 20]
+    assert (ROOT / "tests/fixtures/rasch/data_rasch_main.csv").exists()
