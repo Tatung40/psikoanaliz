@@ -269,5 +269,12 @@
    "fit": "application path with n_quadpts = 61 (max_iter 500, tol 1e-4)"
   },
   "decision": "G2/G3 of all four models are decided by A2 at all four corners under the corrected default; earlier 21-node results (p1, p6, p7, coverage.json, A1) remain reported as evidence for the superseded configuration. G1 already used 61 nodes and is unaffected. The status rules, criteria and scope are unchanged."
+ },
+ "amendment_A3": {
+  "registered": "2026-11-24, after the G1 run of commit 3bd40ad (job 138221256198) and before any re-run",
+  "observed": "1PL (both variants) and 2PL: 9/9 fixtures pass G1 (max |diff| <= 1.8e-4, |objective diff| <= 2.5e-5). 3PL MAP: R's solution has a higher log-likelihood than Python's (+0.4 to +3.5) but a log-posterior 1.0 to 77 units lower; Python's is the higher posterior on all three fixtures. 4PL: R did not finish within the time budget.",
+  "defect": "Reference-harness implementation defect: with createItem() custom items, R mirt 1.48 did not use parprior in the M-step, so R maximised the likelihood, not the registered posterior.",
+  "fix": "The same priors (a ~ LogN(0, .5), b ~ N(0, 2), c ~ Beta(2, 8), d ~ Beta(8, 2)) enter each custom item's M-step objective through createItem gr/hss (numDeriv gradient/Hessian of the expected complete-data item log-likelihood + log-prior); parprior is not used. R mirt's EM, quadrature, TOL and NCYCLES are unchanged.",
+  "decision": "3PL and 4PL G1 are decided by the re-run with the fixed harness under the unchanged G1 criteria; the failed run stays reported. 1PL/2PL G1 results stand."
  }
 }
