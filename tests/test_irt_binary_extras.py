@@ -148,15 +148,11 @@ def test_library_screen_exposes_extras_and_invalidates_bundle_on_data_change():
     at.run()
     at.button(key="python_mirt_start_2PL").click().run()
     assert not at.exception
-    assert not any("SH ve %95 Wald" in m.value for m in at.markdown)  # opt-in, like the Rasch Wright map
-    at.checkbox(key="python_mirt_extras_2PL").check().run()
-    assert not at.exception
-    assert any("SH ve %95 Wald" in m.value for m in at.markdown)
+    assert any("SH ve %95 Wald" in m.value for m in at.markdown)      # single click: no opt-in checkbox
     shown = at.dataframe[-1].value
     assert list(shown.columns)[:4] == ["Madde", "Parametre", "Kestirim", "SH"] and len(shown) == 2 * x.shape[1]
-    at.button(key="python_mirt_bundle_run_2PL").click().run()
-    assert not at.exception
-    assert at.session_state["python_mirt_bundle"]["2PL"]["files"][1][:2] == b"PK"
+    assert at.session_state["python_mirt_bundle"]["2PL"]["files"][1][:2] == b"PK"   # bundle built with the click
+    assert {"python_mirt_bundle_xlsx_2PL", "python_mirt_bundle_zip_2PL"} <= {b.key for b in at.get("download_button")}
     changed = x.copy(); changed.iloc[0, 0] = 1 - changed.iloc[0, 0]
     at.session_state["scored_df"] = changed
     at.run()

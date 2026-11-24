@@ -64,7 +64,6 @@ def run(output,app_python=None,browser_path=None):
                     set_checkbox('Madde/kategori tepki eğrileri',True)
                     set_checkbox('Madde ve test bilgisi, koşullu SEM',True)
                     click_text('Wright Map — Rasch (Python mirt)')
-                    set_checkbox('Kütüphane Wright Map grafiğini göster',True)
                     page.locator('[data-testid=stPlotlyChart] .js-plotly-plot').wait_for(timeout=60000)
                     wp=pd.read_csv(download(page,'Wright persons — CSV',out))
                     wi=pd.read_csv(download(page,'Wright items — CSV',out))

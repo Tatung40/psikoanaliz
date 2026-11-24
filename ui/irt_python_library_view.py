@@ -220,7 +220,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     # other families remain disabled pending model-specific independent validation.
     if model=='Rasch' and report.metadata.get('Yakınsama') is True and not report.errors:
         with st.expander('Wright Map — Rasch (Python mirt)',expanded=False):
-            if st.checkbox('Kütüphane Wright Map grafiğini göster',value=False,key='python_mirt_wright_Rasch'):
+            if True:  # computed with the calculation click; no second opt-in click
                 try:
                     if rasch_tables is None:
                         rasch_tables=rasch_wright_tables(saved['outcome'],x,item_names=cols,
@@ -246,8 +246,13 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
     from core.irt_binary_inference import parameter_inference,STATUS
     from reports.irt_binary_report import kinds,png_bytes,bundle
     with st.expander('Ek bilimsel çıktılar — parametre SH/GA, grafikler (300 dpi PNG) ve rapor paketi',expanded=False):
-        if not st.checkbox('Ek çıktıları göster',value=False,key=f'python_mirt_extras_{model}'):return
+        store=st.session_state.setdefault('python_mirt_bundle',{})
+        entry=store.get(model)
         try:
+          if entry and entry['key']==saved['key']:
+            persons,inference,reason=entry['persons'],entry['inference'],entry['reason']
+            record_displayed(*[v for v in (persons,inference) if v is not None])  # link cached values to their producers
+          else:
             ids=data[id_col].to_numpy(copy=True) if id_col in data.columns else None
             if model=='Rasch':
                 tables=rasch_tables or rasch_wright_tables(saved['outcome'],x,item_names=cols,identifiers=ids)
@@ -255,6 +260,13 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                     'Yetenek (θ)':tables['persons']['θ'],'SH (θ)':tables['persons']['Posterior SD']})
             else:persons=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
             inference,reason=parameter_inference(saved['outcome'].fit,model,cols,getattr(saved['outcome'],'estimation',None))
+            itemfit=None
+            try:
+                itemfit=safe_frame(library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model))
+            except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
+                itemfit=None
+            entry=store[model]={'key':saved['key'],'persons':persons,'inference':inference,'reason':reason,
+                                'files':bundle(report,persons,inference,reason,itemfit)}
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
             st.warning(f'Ek çıktılar üretilemedi: {exc}');return
         st.markdown('#### Madde parametresi SH ve %95 Wald güven aralığı')
@@ -274,15 +286,6 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                            key=f'python_mirt_extra_png_{model}',on_click='ignore')
         if kind=='Wright haritası' and model not in ('Rasch','1PL','2PL'):
             st.caption('3PL/4PL: b ortak θ ölçeğindedir ancak P = .5 noktası değildir; harita betimseldir.')
-        store=st.session_state.setdefault('python_mirt_bundle',{})
-        if st.button('Rapor paketini hazırla (Excel + ZIP)',key=f'python_mirt_bundle_run_{model}'):
-            itemfit=None
-            try:
-                itemfit=safe_frame(library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model))
-            except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
-                itemfit=None
-            store[model]={'key':saved['key'],'files':bundle(report,persons,inference,reason,itemfit)}
-        entry=store.get(model)
         if entry and entry['key']==saved['key']:
             xlsx,archive=entry['files']
             st.download_button('Excel — tüm tablolar',xlsx,f'{model}_rapor.xlsx',
@@ -343,7 +346,7 @@ def _academic_word(saved,model,cols):
         except Exception as exc:
             store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,docx=None,error=f'{type(exc).__name__}: {exc}')
     if store['docx'] is None:
-        st.error(f"Akademik 2PL Word raporu hazırlanamadı: {store['error']}");return
+        st.error('Akademik 2PL Word raporu hazırlanamadı.');st.caption(f"Teknik ayrıntı: {store['error']}");return
     st.download_button('📄 Akademik 2PL Raporu — Word İndir',store['docx'],'python_mirt_2pl_akademik_rapor.docx',
                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                        key='python_mirt_2pl_academic_word',on_click='ignore')

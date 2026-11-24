@@ -106,8 +106,7 @@ def test_rasch_ui_settings_invalidation_and_downloads(calibrated,monkeypatch):
     at.number_input(key=prefix+'_n_quadpts').set_value(31)
     at.number_input(key=prefix+'_tol').set_value(1e-6)
     at.number_input(key=prefix+'_max_iter').set_value(700).run()
-    at.button(key='python_mirt_start_Rasch').click().run()
-    at.checkbox(key='python_mirt_wright_Rasch').check().run()
+    at.button(key='python_mirt_start_Rasch').click().run()  # single click: Wright map and exports included
     assert not at.exception and len(at.get('plotly_chart'))==1 and len(exports)==4
     assert calls[-1]['max_iter']==700 and calls[-1]['tol']==1e-6 and calls[-1]['n_quadpts']==31
     saved=at.session_state['python_mirt_fit_Rasch']['outcome']

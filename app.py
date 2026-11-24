@@ -311,6 +311,8 @@ begin_academic_screen(selected_page, st.session_state.get('raw_df'), st.session_
 from ui.missing_advisor_view import banner as missing_banner, global_panel as missing_global_panel
 missing_banner()                    # applied missing-data method (original data kept, revertible)
 _missing_rule_ok = missing_global_panel(selected_page)  # advice; False while a scoring/sample-changing engine rule awaits approval
+from ui.validation_details import begin as begin_validation_details, end as end_validation_details
+begin_validation_details(selected_page)  # routine IRT notices -> one collapsed section; risks/failures stay visible
 
 
 def end_page_code_capture():
@@ -321,6 +323,7 @@ def end_page_code_capture():
     st.session_state.setdefault("_repro_pages", {})[selected_page] = recorder
     finish_academic_screen(recorder)
     render_reproducible_code(recorder)
+    end_validation_details()
 
 
 def stop_page():

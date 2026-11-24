@@ -59,6 +59,9 @@ jobs:
       - name: Real app SPSS solver and Rasch integration (73 + 75)
         timeout-minutes: 6
         run: python validation/browser_e2e_integration_73_75.py --output /tmp/integration-73-75-browser
+      - name: Real app IRT single click on a mobile viewport (results, bundle, Word, code; collapsed details)
+        timeout-minutes: 5
+        run: python validation/browser_e2e_irt_single_click_mobile.py --output /tmp/irt-single-click-mobile
       - uses: actions/upload-artifact@v4
         if: always()
         with:
