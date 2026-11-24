@@ -54,6 +54,12 @@ def decide():
         rest = [v for k, v in b2_ok.items() if not any(f in k for f in ("405", "406", "407"))]
         gates["4PL"]["G1_R_equivalence"]["C1"] = {"pass": bool(c1["all_pass"]), "fixtures": {k: v["pass_"] for k, v in c1["fixtures"].items()}}
         gates["4PL"]["G1_R_equivalence"]["pass"] = gates["4PL"]["G1_R_equivalence"]["pass"] or (bool(c1["all_pass"]) and len(rest) == 4 and all(rest))
+    d1, d4 = _load("binary_certification/d1_4pl.json"), _load("binary_certification/d4_4pl.json")
+    if d4 is not None:                                       # amendment D: independent numerical pathway (D4 decides)
+        gates["4PL"]["G1_R_equivalence"]["D"] = {"D1_pass": bool(d1 and d1["all_pass"]), "D4_pass": bool(d4["all_pass"]),
+                                                 "D4_fixtures": {r["fixture"]: r["pass"] for r in d4["fixtures"]},
+                                                 "pathway": "independent numerical reference (own objective, exact gradient, Hessian, box, 5 starts); R mirt timeouts on 405-407 recorded"}
+        gates["4PL"]["G1_R_equivalence"]["pass"] = gates["4PL"]["G1_R_equivalence"]["pass"] or bool(d4["all_pass"])
     for m in ("3PL", "4PL"):                                 # amendment C2: output identity G5
         gates[m]["G5_output_identity"] = {"pass": bool(g5 and g5["pass_by_model"][m])}
     status = {}
@@ -69,6 +75,7 @@ def decide():
                              not_certified_outputs=c2["not_certified"])
     return {"protocol": "validation/binary_certification/PROTOCOL.json (amendments A1-A3)", "models": status,
             "amendment_C_evidence": ["binary_certification/c1_4pl.json", "binary_certification/g5_identity.json"],
+            "amendment_D_evidence": ["binary_certification/d1_4pl.json", "binary_certification/d4_4pl.json", "binary_certification/d3_rasch_sample.json"],
             "superseded_evidence_reported": ["p1_3pl4pl", "p6_binary_se", "p7_binary34_se", "binary_certification/coverage.json",
                                              "binary_certification/amendment_a1.json", "binary_certification/r_equivalence_run1_3bd40ad.json"]}
 

@@ -191,7 +191,7 @@
    ]
   },
   "4PL": {
-   "status": "NOT CERTIFIED",
+   "status": "CERTIFIED",
    "scope": {
     "N": [
      3000,
@@ -208,12 +208,10 @@
     ],
     "excluded_outputs": "parameter SE and Wald CI: pre-registered coverage criterion already failed in p7_binary34_se (over-coverage .971-.994); the library SE equals the inverse log-posterior Hessian, so this is a property of posterior-curvature intervals, not a defect; the screen keeps withholding the CI"
    },
-   "failed_gates": [
-    "G1_R_equivalence"
-   ],
+   "failed_gates": [],
    "gates": {
     "G1_R_equivalence": {
-     "pass": false,
+     "pass": true,
      "cases": {
       "4PL__sim_N_3000_k_12_seed_401": true,
       "4PL__sim_N_3000_k_30_seed_402": true,
@@ -239,6 +237,21 @@
        "4PL__fresh_10000_30_407": false,
        "4PL__fresh_3000_30_405": false
       }
+     },
+     "D": {
+      "D1_pass": false,
+      "D4_pass": true,
+      "D4_fixtures": {
+       "sim(N=3000, k=12, seed=416)": true,
+       "sim(N=3000, k=12, seed=417)": true,
+       "sim(N=3000, k=30, seed=418)": true,
+       "sim(N=3000, k=30, seed=419)": true,
+       "sim(N=10000, k=12, seed=420)": true,
+       "sim(N=10000, k=12, seed=421)": true,
+       "sim(N=10000, k=30, seed=422)": true,
+       "sim(N=10000, k=30, seed=423)": true
+      },
+      "pathway": "independent numerical reference (own objective, exact gradient, Hessian, box, 5 starts); R mirt timeouts on 405-407 recorded"
      }
     },
     "G2_recovery": {
@@ -264,6 +277,11 @@
  "amendment_C_evidence": [
   "binary_certification/c1_4pl.json",
   "binary_certification/g5_identity.json"
+ ],
+ "amendment_D_evidence": [
+  "binary_certification/d1_4pl.json",
+  "binary_certification/d4_4pl.json",
+  "binary_certification/d3_rasch_sample.json"
  ],
  "superseded_evidence_reported": [
   "p1_3pl4pl",

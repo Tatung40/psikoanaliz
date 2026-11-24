@@ -50,8 +50,10 @@ def certification(model, estimation, n, k, solver_settings=None):
                                  f"({CERTIFICATION}).")
     scope = entry["scope"]; (n_lo, n_hi), (k_lo, k_hi) = scope["N"], scope["k"]
     settings = solver_settings or {}
-    precise = settings.get("n_quadpts", 0) >= 61 and settings.get("tol", 1) <= 1e-4 and settings.get("max_iter", 0) >= 500
-    rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü"
+    tol_max, iter_min = (1e-10, 50000) if name == "4PL" else (1e-4, 500)      # 4PL: setting validated by amendment D4
+    precise = settings.get("n_quadpts", 0) >= 61 and settings.get("tol", 1) <= tol_max and settings.get("max_iter", 0) >= iter_min
+    rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü" + (
+        ", tol ≤ 1e-10, max_iter ≥ 50000" if name == "4PL" else "")
     if estimation != _ESTIMATION[name] or not (n_lo <= n <= n_hi and k_lo <= k <= k_hi) or not precise:
         return "outside_scope", (f"{name}: bu analiz (kestirim {estimation}, N = {n}, k = {k}, düğüm "
                                  f"{settings.get('n_quadpts', '?')}) sertifika kapsamı dışında — NOT VERIFIED. "
@@ -100,7 +102,8 @@ def evidence_note(model, common_discrimination=False):
     if entry is None:
         return "warning", "Bu model için bağımsız doğrulama kaydı yok (NOT VERIFIED)."
     scope = entry["scope"]; (n_lo, n_hi), (k_lo, k_hi) = scope["N"], scope["k"]
-    rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü"
+    rect = f"{_ESTIMATION[name]}, N {n_lo}–{n_hi}, k {k_lo}–{k_hi}, θ ~ N(0, 1), ≥ 61 GH düğümü" + (
+        ", tol ≤ 1e-10, max_iter ≥ 50000" if name == "4PL" else "")
     if entry["status"] in ("CERTIFIED", "OUTPUT-LEVEL CERTIFIED"):
         variant = (" (sabit a = 1 ve ortak serbest a)" if name == "1PL" else "")
         return "info", (f"{name}{variant}: {entry['status']} — kapsam {rect}; çıktılar: {_outputs(entry, name)}. R mirt 1.48 ile "

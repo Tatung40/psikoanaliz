@@ -1806,7 +1806,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
         from ui.irt_solver_controls import solver_controls
         instrument_code_capture(globals())
         with st.sidebar:
-            solver_options=solver_controls(f"py_mirt_solver_{model}", n_quadpts=61)
+            solver_options=solver_controls(f"py_mirt_solver_{model}", n_quadpts=61,
+                                           **(dict(tol=1e-10, max_iter=50000) if model == "4PL" else {}))
         from core.irt_binary_usage_policy import evidence_note
         _level, _note = evidence_note(model)
         (st.info if _level == "info" else st.warning)("Etkin iki kategorili MTK motoru: Python mirt. " + _note)
@@ -1821,6 +1822,8 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                            + (", d~Beta(8,2)" if model == "4PL" else "")
                            + ". Kütüphane varsayılanıdır; sonuçlara göre ayarlanmadı. MAP altında logLik/AIC/BIC "
                              "önselsiz ML ölçütleri değildir.")
+            from ui.irt_solver_controls import effective_solver
+            solver_options = effective_solver(model, estimation, solver_options)   # 4PL: D4 setting for MAP only
             from core.irt_binary_usage_policy import usage_status
             policy_status, policy_message = usage_status(model, estimation, len(target), len(irt_columns))
             {"supported": st.success, "caution": st.warning}.get(policy_status, st.error)(

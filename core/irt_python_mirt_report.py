@@ -106,6 +106,9 @@ def build_report(outcome, *, model, items, labels=(), theta=None):
             outcome, common_discrimination=model=='1PL' and not fixed_a,
             converged=report.metadata['Yakınsama'])
     if message:report.warnings.append(message)
+    if model in BINARY:                                 # certification decision for this fit (validation/binary_certification)
+        report.metadata['Sertifika durumu']=binary_evidence_label(outcome,common_discrimination=model=='1PL' and not fixed_a if model=='1PL' else False,
+                                                                  converged=report.metadata.get('Yakınsama'))
     if outcome.estimation=='MAP':report.warnings.append('Motorun logLik/AIC/BIC değerleri MAP noktasındadır; standart ML maksimumuna dayalı model seçimi olarak yorumlanmamalıdır.')
     try:
         report.parameters=parameter_table(fit,model,items,labels)

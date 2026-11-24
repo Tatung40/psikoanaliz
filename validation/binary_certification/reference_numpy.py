@@ -12,26 +12,39 @@ PRIOR = {"a": (lambda a: -np.log(a) - np.log(a) ** 2 / 0.5, lambda a: -1 / a - n
 BOX = {"a": (0.1, 5.0), "b": (-6.0, 6.0), "c": (1e-6, 0.5), "d": (0.5, 1 - 1e-6)}
 
 
-def fit(x, model, points=121):
-    x = np.asarray(x, float); n, k = x.shape; qs = "abc" + ("d" if model == "4PL" else "")
+def objective(x, model, points=121):
+    """(f_g, qs, k): f_g(v) -> (negative log-posterior [log-likelihood for fixed-a 1PL], exact gradient)."""
+    x = np.asarray(x, float); n, k = x.shape
+    qs = {"1PL": "b", "3PL": "abc", "4PL": "abcd"}[model]; prior = model != "1PL"
     z, w = roots_hermite(points); th = np.sqrt(2) * z; lw = np.log(w / np.sqrt(np.pi))
-    def unpack(v): return {q: v[i::len(qs)] for i, q in enumerate(qs)}
     def f_g(v):
-        p = unpack(v); d = p.get("d", np.ones(k)); s = expit(p["a"] * (th[:, None] - p["b"]))      # Q x k
-        P = np.clip(p["c"] + (d - p["c"]) * s, 1e-300, 1 - 1e-16)
-        L = x @ np.log(P).T + (1 - x) @ np.log1p(-P).T + lw                                        # n x Q
+        p = {q: v[i::len(qs)] for i, q in enumerate(qs)}
+        a = p.get("a", np.ones(k)); c = p.get("c", np.zeros(k)); d = p.get("d", np.ones(k))
+        s = expit(a * (th[:, None] - p["b"])); P = np.clip(c + (d - c) * s, 1e-300, 1 - 1e-16)
+        L = x @ np.log(P).T + (1 - x) @ np.log1p(-P).T + lw
         m = L.max(1, keepdims=True); post = np.exp(L - m); tot = post.sum(1, keepdims=True); post /= tot
         val = float(np.sum(m[:, 0] + np.log(tot[:, 0])))
-        r1 = post.T @ x; r0 = post.T @ (1 - x)                                                     # Q x k expected counts
+        r1 = post.T @ x; r0 = post.T @ (1 - x)
         g = r1 / P - r0 / (1 - P); u = s * (1 - s); t = th[:, None] - p["b"]
-        D = {"a": (d - p["c"]) * u * t, "b": -(d - p["c"]) * u * p["a"], "c": 1 - s, "d": s}
-        grad = {q: (g * D[q]).sum(0) + PRIOR[q][1](p[q]) for q in qs}
-        val += sum(float(np.sum(PRIOR[q][0](p[q]))) for q in qs)
+        D = {"a": (d - c) * u * t, "b": -(d - c) * u * a, "c": 1 - s, "d": s}
+        grad = {q: (g * D[q]).sum(0) + (PRIOR[q][1](p[q]) if prior else 0) for q in qs}
+        if prior:
+            val += sum(float(np.sum(PRIOR[q][0](p[q]))) for q in qs)
         return -val, -np.ravel(np.column_stack([grad[q] for q in qs]))
-    pbar = np.clip(x.mean(0), .02, .98)
-    start = {"a": np.ones(k), "b": -np.log(pbar / (1 - pbar)), "c": np.full(k, .15), "d": np.full(k, .95)}
-    v0 = np.ravel(np.column_stack([start[q] for q in qs]))
+    return f_g, qs, k
+
+
+def data_start(x):
+    pbar = np.clip(np.asarray(x, float).mean(0), .02, .98); k = len(pbar)
+    return {"a": np.ones(k), "b": -np.log(pbar / (1 - pbar)), "c": np.full(k, .15), "d": np.full(k, .95)}
+
+
+def fit(x, model, points=121, start=None):
+    f_g, qs, k = objective(x, model, points)
+    start = start or data_start(x)
+    v0 = np.ravel(np.column_stack([np.asarray(start[q], float) for q in qs]))
     r = minimize(f_g, v0, jac=True, method="L-BFGS-B", bounds=[BOX[q] for _ in range(k) for q in qs],
                  options=dict(maxiter=20000, maxfun=40000, ftol=1e-16, gtol=1e-7, maxcor=50))
-    return unpack(r.x), {"converged": bool(r.success), "message": str(r.message), "iterations": int(r.nit),
-                         "max_abs_gradient": float(np.abs(r.jac).max())}
+    return {q: r.x[i::len(qs)] for i, q in enumerate(qs)}, {"converged": bool(r.success), "message": str(r.message),
+                                                           "iterations": int(r.nit), "max_abs_gradient": float(np.abs(r.jac).max()),
+                                                           "neg_objective": float(r.fun)}

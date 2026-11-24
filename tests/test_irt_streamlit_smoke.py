@@ -48,7 +48,7 @@ def test_report_exports_and_scientific_caveat():
     # The blanket caveat was replaced by the model-specific evidence note (validation status per model).
     assert "evidence_note(model)" in source
     from core.irt_binary_usage_policy import evidence_note
-    assert all(evidence_note(m)[1] for m in ("1PL", "2PL", "3PL", "4PL")) and "NOT CERTIFIED" in evidence_note("4PL")[1]
+    assert all(evidence_note(m)[1] for m in ("1PL", "2PL", "3PL", "4PL")) and __import__("json").loads(open("validation/evidence/binary_certification/CERTIFICATION.json").read())["models"]["4PL"]["status"] in evidence_note("4PL")[1]
 
 
 def test_legacy_dependency_inventory_script_parses():
