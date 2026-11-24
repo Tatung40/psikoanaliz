@@ -29,10 +29,12 @@ def b2_cases():
     return registered + fresh
 
 
-def prepare(out):
+def prepare(out, only=None):
     from validation.binary_certification.reference_numpy import fit
     out.mkdir(parents=True, exist_ok=True); manifest = []
     for case in b2_cases():
+        if only and not any(o in case["id"] for o in only):
+            continue
         x = load(case); path = out / f"{case['id']}.csv"
         pd.DataFrame(x, columns=[f"V{j + 1}" for j in range(x.shape[1])]).to_csv(path, index=False)
         case.update(path=str(path), sha256=hashlib.sha256(path.read_bytes()).hexdigest(), shape=list(x.shape))
@@ -79,12 +81,13 @@ def compare(out, evidence):
                    reference_iterations=ref["iterations"], R_prefers_python=bool(ii_ok), R_matched_stationary=bool(iii_ok),
                    pass_=bool(original or (i_ok and ii_ok and iii_ok)))
         rows.append(row); print(case["id"], "PASS" if row["pass_"] else "FAIL", "orig", original, "ref", i_ok, "R-prefers", ii_ok, "matched", iii_ok)
-    res = {"protocol": "PROTOCOL.json amendment_B B2", "cases": rows, "all_pass": all(r["pass_"] for r in rows) and len(rows) == 7}
+    res = {"protocol": "PROTOCOL.json amendment_B B2", "cases": rows, "all_pass": all(r["pass_"] for r in rows) and len(rows) == 7,
+           "note": "per-fixture CI jobs; evidence files are combined by case id"}
     Path(evidence).write_text(json.dumps(res, indent=1, allow_nan=True) + "\n")
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("step", choices=("prepare", "compare"))
-    ap.add_argument("--out", type=Path, required=True); ap.add_argument("--evidence")
+    ap.add_argument("--out", type=Path, required=True); ap.add_argument("--evidence"); ap.add_argument("--only", nargs="*")
     a = ap.parse_args()
-    prepare(a.out) if a.step == "prepare" else compare(a.out, a.evidence)
+    prepare(a.out, a.only) if a.step == "prepare" else compare(a.out, a.evidence)
