@@ -44,7 +44,7 @@ jobs:
         timeout-minutes: 18
         run: |
           python -c "import json;m=json.load(open('g1/manifest.json'));m.sort(key=lambda c:-c['shape'][0]*c['shape'][1]*(3 if c['model'] in ('3PL','4PL') else 1));[json.dump([c],open(f'g1/one_{i:02d}.json','w')) for i,c in enumerate(m)]"
-          ls g1/one_*.json | xargs -P 4 -I{} sh -c 'Rscript validation/binary_certification/reference.R {} g1 > {}.log 2>&1'
+          ls g1/one_*.json | xargs -P 4 -I{} sh -c 'timeout 600 Rscript validation/binary_certification/reference.R {} g1 > {}.log 2>&1 || echo "{} R process ended with status $?" >> {}.log'
           cat g1/one_*.json.log
       - name: Independent arbiter comparison
         if: always()

@@ -288,6 +288,7 @@
   "registered": "2026-11-24, after G1 run 4897635 (evidence r_equivalence_run_4897635.json, 14/15 pass) and before any re-run",
   "observed": "4PL sim(N=10000, k=12, seed=403): from R's default start, R mirt stops (reporting convergence) at a point whose log-posterior is 450 below Python's; all other fixtures agree to <= 5.4e-4 with objective differences <= 2e-6.",
   "fix": "R reference uses two deterministic starts, both computed by R only: (1) the current default start; (2) R's own fit of the nested model on the same data (3PL MAP for 4PL with d = .95; R mirt 2PL ML for 3PL with c = .15). R keeps the solution with the larger R-computed log-posterior (R logLik + R log-prior). Python estimates are never used by R.",
-  "decision": "G1 is decided by the next complete run under the unchanged criteria; all earlier runs stay reported."
+  "decision": "G1 is decided by the next complete run under the unchanged criteria; all earlier runs stay reported.",
+  "addendum": "2026-11-24, before any complete A5 run (run 5220842 timed out in the R step): R standard errors are not computed for the 3PL/4PL MAP custom items (they were descriptive only; the MAP SE gate uses the independent numerical inverse Hessian), and each R process has a hard 10-minute limit so that partial results are reported. Criteria unchanged."
  }
 }

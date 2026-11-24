@@ -108,7 +108,8 @@ def compare(out, evidence):
                    se_max_relative_diff=se_rel, R_iterations=r.get("iterations"), R_se_type=r.get("se_type"),
                    R_se_max_relative_diff_descriptive=(float(np.nanmax(np.abs(py_se / np.array(
                        [r["se"][q][0 if j is None else j] if r["se"][q][0 if j is None else j] is not None else np.nan
-                        for q, j in free], float) - 1))) if case["estimation"] == "MAP" else None),
+                        for q, j in free], float) - 1))) if case["estimation"] == "MAP"
+                       and any(v is not None for q in r["se"] for v in r["se"][q]) else None),
                    checks={k_: bool(v) for k_, v in checks.items()}, pass_=bool(all(checks.values())))
         rows.append(row); print(case["id"], "PASS" if row["pass_"] else "FAIL", {k_: v for k_, v in checks.items() if not v})
     versions = json.loads((out / "versions.json").read_text()) if (out / "versions.json").exists() else {}

@@ -42,8 +42,8 @@ fit_with <- function(args) {
   setTimeLimit(elapsed = 840, transient = TRUE); on.exit(setTimeLimit(elapsed = Inf), add = TRUE)   # per-fit budget
   use <- settings; use[names(args)[names(args) %in% names(use)]] <- NULL
   fit <- tryCatch(do.call(mirt, c(args, use)), error = function(e) { message("fit error: ", conditionMessage(e)); NULL })
-  se_type <- "Oakes"
-  if (is.null(fit) || !isTRUE(extract.mirt(fit, "secondordertest"))) {   # pre-registered fallback, recorded
+  se_type <- if (isFALSE(args$SE)) "none (MAP: descriptive only, A5 addendum)" else "Oakes"
+  if (!isFALSE(args$SE) && (is.null(fit) || !isTRUE(extract.mirt(fit, "secondordertest")))) {   # pre-registered fallback, recorded
     s2 <- use; s2$SE.type <- "Richardson"; fit <- do.call(mirt, c(args, s2)); se_type <- "Richardson"
   }
   list(fit = fit, se_type = se_type)
@@ -68,7 +68,7 @@ for (case in cases) {
     # Custom items: Newton-Raphson M-step with the supplied (analytic) Hessian; the default quasi-Newton
     # M-step stopped EM after 8-14 cycles below the posterior maximum (run 4ce2ee1). Objective and TOL unchanged.
     run <- function(start) fit_with(list(data = dat, model = 1, itemtype = type, customItems = items[type], pars = start,
-                                         optimizer = "NR", accelerate = "squarem"))
+                                         optimizer = "NR", accelerate = "squarem", SE = FALSE))   # A5 addendum
     logpost <- function(res) {          # R-computed log-posterior at R's own estimate (amendment A5)
       cf <- coef(res$fit)[seq_len(k)]
       extract.mirt(res$fit, "logLik") + sum(sapply(cf, function(m) { p <- m["par", ]
@@ -82,7 +82,7 @@ for (case in cases) {
         s3 <- mirt(dat, 1, itemtype = "irt3", customItems = items["irt3"], pars = "values")
         s3$value[s3$name == "b"] <- -qlogis(pmin(pmax(colMeans(dat), .02), .98))
         coef(fit_with(list(data = dat, model = 1, itemtype = "irt3", customItems = items["irt3"], pars = s3,
-                           optimizer = "NR", accelerate = "squarem"))$fit)[seq_len(k)] }, error = function(e) NULL)
+                           optimizer = "NR", accelerate = "squarem", SE = FALSE))$fit)[seq_len(k)] }, error = function(e) NULL)
       if (!is.null(nested)) for (q in c("a", "b", "c"))
         sv2$value[sv2$name == q] <- pmin(pmax(sapply(nested, function(m) m["par", q]), c(a = .1, b = -6, c = 1e-6)[[q]]), c(a = 5, b = 6, c = .5)[[q]])
       sv2$value[sv2$name == "d"] <- .95
@@ -95,7 +95,7 @@ for (case in cases) {
     fits <- list(default = run(sv), nested = run(sv2))
     lps <- sapply(fits, logpost); best <- names(which.max(lps))
     res <- fits[[best]]; res$starts <- as.list(lps); res$chosen <- best
-    cf <- coef(res$fit, printSE = TRUE)[seq_len(k)]
+    cf <- coef(res$fit)[seq_len(k)]
     get <- function(row, p) unname(sapply(cf, function(m) if (row %in% rownames(m)) m[row, p] else NA_real_))
     par <- setNames(lapply(qs, function(p) get("par", p)), qs); se <- setNames(lapply(qs, function(p) get("SE", p)), qs)
   }
