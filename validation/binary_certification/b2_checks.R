@@ -16,12 +16,17 @@ for (case in cases) {
                                              quadpts = 101, theta_lim = c(-6, 6), TOL = NaN, verbose = FALSE), "logLik") + lprior(lapply(p, unlist))
     py <- fromJSON(file.path(out, paste0(case$id, ".python.json")), simplifyVector = FALSE)$par
     rr <- tryCatch(fromJSON(file.path(out, paste0(case$id, ".R.json")), simplifyVector = FALSE)$par, error = function(e) NULL)
-    matched <- mirt(dat, 1, itemtype = "irt4", customItems = items["irt4"], pars = with_par(py), quadpts = 101, theta_lim = c(-6, 6),
-                    TOL = 1e-8, optimizer = "NR", verbose = FALSE, SE = FALSE, technical = list(NCYCLES = 5000))
-    cf <- coef(matched)[seq_len(k)]
-    mp <- setNames(lapply(c("a", "b", "c", "d"), function(q) unname(sapply(cf, function(m) m["par", q]))), c("a", "b", "c", "d"))
+    mp <- NULL; matched <- NULL
+    if (Sys.getenv("R_START", "both") != "nested") {                   # matched initialization once per fixture (C1)
+      matched <- mirt(dat, 1, itemtype = "irt4", customItems = items["irt4"], pars = with_par(py), quadpts = 101, theta_lim = c(-6, 6),
+                      TOL = 1e-8, optimizer = "NR", verbose = FALSE, SE = FALSE, technical = list(NCYCLES = 5000))
+      cf <- coef(matched)[seq_len(k)]
+      mp <- setNames(lapply(c("a", "b", "c", "d"), function(q) unname(sapply(cf, function(m) m["par", q]))), c("a", "b", "c", "d"))
+    }
     list(id = case$id, R_logpost_at_python = eval_at(py), R_logpost_at_R = if (is.null(rr)) NA else eval_at(rr),
-         matched_converged = extract.mirt(matched, "converged"), matched_iterations = extract.mirt(matched, "iterations"), matched_par = mp)
+         matched_converged = if (is.null(matched)) NA else extract.mirt(matched, "converged"),
+         matched_iterations = if (is.null(matched)) NA else extract.mirt(matched, "iterations"), matched_par = mp,
+         start = Sys.getenv("R_START", "both"))
   }, error = function(e) list(id = case$id, error = conditionMessage(e)))
   write_json(res, file.path(out, paste0(case$id, ".Rb2.json")), digits = NA, auto_unbox = TRUE, na = "null")
   cat(case$id, if (is.null(res$error)) sprintf("R logpost python=%.4f R=%.4f matched_iter=%s", res$R_logpost_at_python, res$R_logpost_at_R, res$matched_iterations) else res$error, "\n")
