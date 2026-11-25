@@ -10,6 +10,7 @@ from core.irt_python_mirt_report import MODELS,BINARY,build_report
 from core.irt_b14 import prepare_polytomous
 from reports.irt_b14_report import safe_frame
 from core.irt_person_abilities import person_abilities
+from core.irt_binary_persons import binary_person_abilities,SCORING_VERSION
 from ui.irt_solver_controls import solver_controls
 from core.irt_rasch_wright import rasch_wright_tables,wright_figure,wright_exports
 from core.irt_library_diagnostics import library_itemfit
@@ -198,7 +199,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.download_button('Madde parametreleri — CSV',_csv(report.parameters),f'{model}_parameters.csv','text/csv',key=f'python_mirt_parameters_csv_{model}',on_click='ignore')
         st.caption('a: ayırt edicilik; b: güçlük/eşik/adım. c/d: alt/üst asimptot. NRM A/D: kategori eğimi/kesişimi; kategori0 referans. SH/GA bu ortak tabloda üretilmez.')
     if outputs['persons']:st.markdown('### Birey Yetenek Kestirimleri (θ)')
-    if outputs['persons']:st.caption('N(0,1) EAP; SH(θ) posterior SS’dir, bilgi SEM’i değildir. '+('Rasch: desteklenen mirt.fscores GH61 API.' if model=='Rasch' else '161 noktalı [-4,4] ızgara.'))
+    if outputs['persons']:st.caption('N(0,1) EAP; SH(θ) posterior SS’dir, bilgi SEM’i değildir. '+('Rasch: desteklenen mirt.fscores GH61 API.' if model=='Rasch' else '3PL/4PL: GH121/GH241 denetimli koşullu posterior; kişi kapsaması NOT CERTIFIED.' if model in ('3PL','4PL') else '161 noktalı [-4,4] ızgara.'))
     if outputs['persons'] and (report.metadata.get('Yakınsama') is not True or report.errors):
         st.warning('Yakınsama veya rapor hatası nedeniyle kişi kestirimleri kesin sonuç olarak sunulmaz.')
     elif outputs['persons'] and not report.curves.empty:
@@ -209,6 +210,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                 raw_people=rasch_tables['persons']
                 people=pd.DataFrame({'Birey':raw_people.Birey,'Ham puan':x.to_numpy().sum(1),
                     'Yetenek (θ)':raw_people['θ'],'SH (θ)':raw_people['Posterior SD'],'Yöntem':'EAP','Model':model})
+            elif model in ('3PL','4PL'):people=binary_person_abilities(saved['outcome'],x.to_numpy(),identifiers=ids)
             else:people=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
             st.dataframe(safe_frame(people).round(4),hide_index=True,use_container_width=True)
             st.download_button('Birey yetenekleri — CSV',_csv(people),
@@ -256,8 +258,9 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
     with st.expander('Ek bilimsel çıktılar — parametre SH/GA, grafikler (300 dpi PNG) ve rapor paketi',expanded=False):
         store=st.session_state.setdefault('python_mirt_bundle',{})
         entry=store.get(model)
+        bundle_key=(saved['key'],SCORING_VERSION) if model in ('3PL','4PL') else saved['key']
         try:
-          if entry and entry['key']==saved['key']:
+          if entry and entry['key']==bundle_key:
             persons,inference,reason=entry['persons'],entry['inference'],entry['reason']
             record_displayed(*[v for v in (persons,inference) if v is not None])  # link cached values to their producers
           else:
@@ -266,6 +269,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 tables=rasch_tables or rasch_wright_tables(saved['outcome'],x,item_names=cols,identifiers=ids)
                 persons=pd.DataFrame({'Birey':tables['persons'].Birey,'Ham puan':x.to_numpy().sum(1),
                     'Yetenek (θ)':tables['persons']['θ'],'SH (θ)':tables['persons']['Posterior SD']})
+            elif model in ('3PL','4PL'):persons=binary_person_abilities(saved['outcome'],x.to_numpy(),identifiers=ids)
             else:persons=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
             inference,reason=parameter_inference(saved['outcome'].fit,model,cols,getattr(saved['outcome'],'estimation',None))
             itemfit=None
@@ -273,7 +277,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 itemfit=safe_frame(library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model))
             except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
                 itemfit=None
-            entry=store[model]={'key':saved['key'],'persons':persons,'inference':inference,'reason':reason,
+            entry=store[model]={'key':bundle_key,'persons':persons,'inference':inference,'reason':reason,
                                 'files':bundle(report,persons,inference,reason,itemfit)}
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
             st.warning(f'Ek çıktılar üretilemedi: {exc}');return

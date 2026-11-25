@@ -194,6 +194,8 @@
       "core.irt_b14.prepare_polytomous",
       "core.irt_binary_inference.STATUS",
       "core.irt_binary_inference.parameter_inference",
+      "core.irt_binary_persons.SCORING_VERSION",
+      "core.irt_binary_persons.binary_person_abilities",
       "core.irt_binary_usage_policy.evidence_note",
       "core.irt_library_diagnostics.library_fit_diagnostics",
       "core.irt_library_diagnostics.library_itemfit",

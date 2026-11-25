@@ -1922,6 +1922,9 @@ elif selected_page in ("MTK: 1PL", "MTK: 2PL", "MTK: 3PL", "MTK: 4PL", "MTK: Kar
                     "Serbest parametre": diag["n_parameters"],
                     "Gözlem": diag["n_observations"],
                 }
+                if model in ("3PL", "4PL") and estimation == "MAP":
+                    diagnostics["Uyum ölçütü yorumu"] = "MAP noktasında; klasik ML maksimumu/model seçimi değildir"
+                    diagnostics["Klasik ML model seçimi"] = "KAPALI (MAP)"
                 if report_diagnostics:
                     st.markdown("#### Python mirt — kestirim tanıları")
                     diagnostic_table = pd.DataFrame([diagnostics])
