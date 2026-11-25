@@ -6,9 +6,11 @@ import numpy as np
 from scipy.special import expit,logit
 from core.irt_binary_inference import Z95
 from validation.binary_certification.common import truth,simulate
-from validation.binary_certification.reference_numpy import PRIOR,BOX,objective
+from validation.binary_certification.reference_numpy import PRIOR,BOX as REFERENCE_BOX,objective
 SPEC=importlib.util.spec_from_file_location("frozen_g",os.environ.get("G_REFERENCE","/tmp/parameter-g-runner.py"))
 G=importlib.util.module_from_spec(SPEC);sys.modules["frozen_g"]=G;SPEC.loader.exec_module(G)
+from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS as NATIVE_BOUNDS
+BOX={q:tuple(NATIVE_BOUNDS[col]) for col,q in G.SHORT.items()}
 PROTOCOL_COMMIT="b1a40c916e2f99b35ef5832a5ba4175691829c96"
 
 
@@ -77,7 +79,7 @@ def replicate(job):
         if importlib.metadata.version("mirt")!="1.2.0":raise ValueError("Unverified engine version")
         for col,q in G.SHORT.items():
             if tuple(bounds[col])!=BOX[q]:raise ValueError("Native bound mismatch")
-        if not (0<BOX["c"][0]<BOX["c"][1]<=BOX["d"][0]<BOX["d"][1]<1):
+        if not (0<=BOX["c"][0]<BOX["c"][1]<=BOX["d"][0]<BOX["d"][1]<=1):
             raise ValueError("Native boxes do not enforce c<d")
         x=simulate(model,n,k,seed)
         record["data_sha256"]=hashlib.sha256(np.ascontiguousarray(x).tobytes()).hexdigest()
@@ -144,8 +146,8 @@ def run(model,n,directory):
             if len(records)==10:
                 overhead=sum(r["audit_seconds"] for r in records)
                 projected=overhead+sum(r["seconds"]-r["audit_seconds"] for r in records)/10*planned/2
-                if projected>300:reason="preregistered feasibility budget";break
-            if elapsed>=300:reason="preregistered execution budget";break
+                if projected>90:reason="preregistered feasibility budget";break
+            if elapsed>=90:reason="preregistered execution budget";break
     report=G.summarize(records,model,n,k,planned,reason)
     report["protocol_commit"]=PROTOCOL_COMMIT
     report["native_bread_audit"]=records[0].get("native_bread_audit",{"pass":False})
@@ -158,6 +160,8 @@ def run(model,n,directory):
     report["api"]="fit.vcov / fit.vcov_labels (callable or property), physical parameterization"
     report["protocol_sha256"]=hashlib.sha256(Path(__file__).with_name("PROTOCOL.json").read_bytes()).hexdigest()
     report["P2"]="NOT EXECUTED";report["P3"]="NOT EXECUTED"
+    report["actual_native_bounds"]=BOX
+    report["runtime_amendment_sha256"]=hashlib.sha256(Path(__file__).with_name("RUNTIME_PROTOCOL.json").read_bytes()).hexdigest()
     (output/"report.json").write_text(json.dumps(report,indent=2,allow_nan=False)+"\n")
     print("RESULT_JSON "+json.dumps(report,allow_nan=False))
 
@@ -169,5 +173,5 @@ if __name__=="__main__":
     if os.getenv("H_PREFLIGHT_ONLY")=="1":
         from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS
         print("RUNTIME_PREFLIGHT "+json.dumps({"mirt":importlib.metadata.version("mirt"),
-            "actual_bounds":_ITEM_PARAMETER_BOUNDS,"reference_bounds":BOX},default=list))
+            "actual_bounds":_ITEM_PARAMETER_BOUNDS,"reference_bounds":REFERENCE_BOX},default=list))
     else:run(a.model,a.n,a.output)

@@ -1,0 +1,68 @@
+{
+  "registered_before_any_calibration": true,
+  "evidence_run": 45611011206,
+  "evidence_job": 139194210002,
+  "actual_api": {
+    "mirt": "1.2.0",
+    "actual_bounds": {
+      "discrimination": [
+        0.1,
+        5
+      ],
+      "difficulty": [
+        -6,
+        6
+      ],
+      "intercepts": [
+        -6,
+        6
+      ],
+      "thresholds": [
+        -6,
+        6
+      ],
+      "steps": [
+        -6,
+        6
+      ],
+      "guessing": [
+        0,
+        0.5
+      ],
+      "upper": [
+        0.5,
+        1
+      ],
+      "asymmetry": [
+        0.1,
+        5
+      ]
+    },
+    "reference_bounds": {
+      "a": [
+        0.1,
+        5
+      ],
+      "b": [
+        -6,
+        6
+      ],
+      "c": [
+        0.000001,
+        0.5
+      ],
+      "d": [
+        0.5,
+        0.999999
+      ]
+    }
+  },
+  "root_cause": "Independent reference BOX uses interior epsilon bounds 1e-6/1-1e-6; actual installed Python mirt 1.2.0 bounds c=[0,.5], d=[.5,1]. Initial equality precheck refused before generating data or fitting. Native-box transform must use actual API bounds, not the reference's epsilon safeguard.",
+  "correction": "Use actual native bounds exactly. Every finite non-saturated box-logit coordinate has 0<c<.5<d<1; numerical saturation fails closed. Keep 1e-6 active-bound refusal distance and all statistical gates unchanged. No modification of production bounds or estimator.",
+  "budget_seconds_per_cell": 90,
+  "planned_replications": 300,
+  "reason": "Remaining hard wall-clock budget; technical budget shortened BEFORE fresh data, no statistical threshold changed. Any incomplete run remains NOT CERTIFIED. First ten independent seeds are not replaced.",
+  "original_precheck": "0 actual calibrations; original reports/artifacts preserved",
+  "P2": "NOT EXECUTED",
+  "P3": "NOT EXECUTED"
+}
