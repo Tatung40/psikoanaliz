@@ -74,3 +74,28 @@ jobs:
         with:
           name: closure-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}
           path: /tmp/irt-closure/
+
+  aggregate:
+    needs: scientific-work
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: closure-*
+          path: /tmp/closure-results
+      - name: Independent calibration-cluster aggregation; no fits
+        run: |
+          mkdir -p /tmp/closure-aggregate
+          python -u validation/irt_closure/aggregate.py --input /tmp/closure-results --output /tmp/closure-aggregate/REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: closure-aggregate
+          path: /tmp/closure-aggregate/

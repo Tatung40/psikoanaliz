@@ -56,3 +56,31 @@ def test_gaussian_inverse_does_not_relabel_map_sampling_se():
     J=alpha
     assert sd_MAP/J==pytest.approx(1.)
     assert sd_MAP!=sd_MAP/J
+
+
+@pytest.mark.parametrize("model",["3PL","4PL"])
+def test_equal_tailed_quantiles_against_independent_adaptive_integral(model):
+    from scipy.integrate import quad
+    from scipy.special import log_expit
+    from validation.irt_closure.patterns import probability
+    reference=oracle(model);p=reference[0];bounds=reference[5]
+    for code in (0,4095,1365):
+        x=PATTERNS[code]
+        def lp(theta):
+            z=p["a"]*(theta-p["b"])
+            with np.errstate(divide="ignore"):
+                logp=np.logaddexp(np.log(p["c"]),np.log(p["d"]-p["c"])+log_expit(z))
+                logq=np.logaddexp(np.log1p(-p["d"]),np.log(p["d"]-p["c"])+log_expit(-z))
+            return float((x*logp+(1-x)*logq).sum()-.5*theta*theta)
+        offset=max(lp(t) for t in np.linspace(-8,8,161))
+        f=lambda t:np.exp(lp(t)-offset)
+        total=quad(f,-np.inf,np.inf,epsabs=1e-10,epsrel=1e-10)[0]
+        for value,target in zip(bounds[code],(.025,.975)):
+            found=quad(f,-np.inf,float(value),epsabs=1e-10,epsrel=1e-10)[0]/total
+            assert found==pytest.approx(target,abs=3e-5)
+
+
+def test_bootstrap_rank_boundary_uses_declared_alpha():
+    # B99 plus-one probabilities have exactly five rejection ranks at alpha=.05.
+    ranks=np.arange(1,101)/100
+    assert np.count_nonzero(ranks<=.05)==5
