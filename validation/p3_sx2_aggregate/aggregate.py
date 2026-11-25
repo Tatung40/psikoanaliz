@@ -94,8 +94,9 @@ def p3_boot(null, alt):
         A = [r for r in alt if r["model"] == m]; ra = np.array([(r.get("p_boot") or [np.nan])[0] for r in A], float)
         k = int(np.sum((ra <= .05) | ~np.isfinite(ra))); low = cp_lower(int(np.sum(ra <= .05)), len(A), .025)
         gates = {"per_item_upper<=.07": max(upper) <= .07, "pooled_MCSE<=.004": mcse <= .004, "pooled_lower>=.03": bool(rej.mean() - Z * mcse >= .03),
-                 "non_evaluable<=.01": float(noneval.mean()) <= .01, "power_lower>.10": low > .10}
-        out[m] = dict(executed=True, R=n, pooled_typeI=float(rej.mean()), pooled_MCSE=mcse, per_item=rej.mean(0).tolist(), per_item_simultaneous_upper=upper,
+                 "non_evaluable<=.01": float(noneval.mean()) <= .01, "power_lower>.10": low > .10,
+                 "complete_R1500_and_misfit150": n == 1500 and len(A) == 150}
+        out[m] = dict(executed=True, status=("COMPLETE" if gates["complete_R1500_and_misfit150"] else "INCONCLUSIVE — run cancelled at wall-clock feasibility limit; never certified"), R=n, pooled_typeI=float(rej.mean()), pooled_MCSE=mcse, per_item=rej.mean(0).tolist(), per_item_simultaneous_upper=upper,
                       non_evaluable=float(noneval.mean()), inner_failures=int(sum(r.get("inner_failures", 0) for r in R)),
                       misfit_R=len(A), power=float(np.mean(ra <= .05)), power_lower=low, gates=gates, passed=all(gates.values()))
     return out
