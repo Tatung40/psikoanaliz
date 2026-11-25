@@ -34,3 +34,19 @@ def test_joint_empirical_meat_differs_from_failed_a1_and_includes_cross_covarian
 
 def test_singular_sampling_covariance_rejected():
     with pytest.raises(ValueError):empirical_sandwich(np.eye(2),np.ones((5,2)))
+
+
+def test_bias_correction_requires_its_own_covariance_jacobian():
+    # Exact Gaussian penalized-estimation identity, not an IRT simulation.
+    information,penalty=1.,4.
+    V=1/(information+penalty)
+    sampling=V*information*V
+    assert V!=sampling  # posterior curvature is not sampling variance
+    # m_adjusted=m_MAP-V*prior_score(m_MAP)=(1+V*penalty)*m_MAP.
+    jacobian=1+V*penalty
+    adjusted_sampling=jacobian*sampling*jacobian
+    assert adjusted_sampling==pytest.approx(.1296)
+    assert adjusted_sampling!=sampling
+    # Even the adjustment leaves residual bias: alpha*(2-alpha) != 1.
+    alpha=information*V
+    assert alpha*(2-alpha)==pytest.approx(.36)

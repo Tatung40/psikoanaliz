@@ -35,7 +35,16 @@ jobs:
         run: |
           mkdir -p /tmp/parameter-se
           set -o pipefail
-          python -u validation/parameter_uncertainty_g/runner.py --model '${{ matrix.model }}' --n '${{ matrix.n }}' --j '${{ matrix.j }}' --output /tmp/parameter-se 2>&1 | tee /tmp/parameter-se/execution.log
+          if [ -f 'validation/evidence/parameter_uncertainty_g/${{ matrix.model }}_${{ matrix.n }}_${{ matrix.j }}.json' ]; then
+            python -m pytest -q 'tests/test_parameter_uncertainty_g_evidence.py::test_archived_confirmation[${{ matrix.model }}-${{ matrix.n }}-${{ matrix.j }}]'
+            git fetch --no-tags --depth=1 origin 2211429dc7c8226f11f95a9305bb93ac57b0abd8
+            for source in validation/parameter_uncertainty_g/runner.py validation/parameter_uncertainty_g/PROTOCOL.json core/irt_binary_inference.py core/irt_python_mirt_adapter.py validation/binary_certification/common.py validation/irt_3pl4pl_root_cause.py validation/coverage_precision.py; do
+              git show '2211429dc7c8226f11f95a9305bb93ac57b0abd8':"$source" | cmp - "$source"
+            done
+            echo 'REUSED canonical confirmation 45606844841; exact scientific sources; no new fit; NOT CERTIFIED.'
+          else
+            python -u validation/parameter_uncertainty_g/runner.py --model '${{ matrix.model }}' --n '${{ matrix.n }}' --j '${{ matrix.j }}' --output /tmp/parameter-se 2>&1 | tee /tmp/parameter-se/execution.log
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
