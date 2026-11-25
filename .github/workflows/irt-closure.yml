@@ -76,6 +76,8 @@ jobs:
           path: /tmp/irt-closure/
 
   aggregate:
+    env:
+      PYTHONPATH: .
     needs: scientific-work
     if: always()
     runs-on: ubuntu-latest
