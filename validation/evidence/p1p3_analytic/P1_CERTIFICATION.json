@@ -1,0 +1,144 @@
+{
+ "id": "P1 closure J \u2014 one-step prior-bias-corrected Wald CI",
+ "protocol": "validation/p3_sx2_analytic/PROTOCOL.json (f8b92e5, before confirmation)",
+ "confirmation_run": 45665227625,
+ "confirmation_head": "e53ad8a",
+ "aggregation_run": 45669467736,
+ "seeds": {
+  "null": 202611252101
+ },
+ "scope": "3PL/4PL native MAP (mirt 1.2.0, GH61, tol1e-4, max_iter500, default priors), N=3000, J=12, validation.binary_certification.common.truth items, theta~N(0,1), complete binary data. No generalisation.",
+ "estimand": "True physical item parameter. MAP point estimate unchanged; interval centered on separate one-step estimator.",
+ "certified": [
+  "3PL a: 95% CI (one-step Wald)",
+  "3PL a: SE of one-step estimator",
+  "3PL b: 95% CI (one-step Wald)",
+  "3PL b: SE of one-step estimator",
+  "3PL c: 95% CI (one-step Wald)",
+  "3PL c: SE of one-step estimator",
+  "4PL a: 95% CI (one-step Wald)",
+  "4PL a: SE of one-step estimator",
+  "4PL b: 95% CI (one-step Wald)",
+  "4PL b: SE of one-step estimator",
+  "4PL c: 95% CI (one-step Wald)",
+  "4PL c: SE of one-step estimator",
+  "4PL d: 95% CI (one-step Wald)",
+  "4PL d: SE of one-step estimator"
+ ],
+ "not_certified": [
+  "MAP sampling SE (unchanged NOT CERTIFIED)",
+  "one-step estimator as a point estimate (bias reported, not gated)"
+ ],
+ "results": {
+  "3PL a": {
+   "coverage": 0.9504444444444443,
+   "MCSE": 0.0011213617045813242,
+   "median_width": 0.8623768619043943,
+   "SE_over_SD": 0.9605043533343055,
+   "SE_over_SD_CI": [
+    0.9531783511540791,
+    0.9678303555145319
+   ],
+   "bias_onestep": 0.013115123894141748,
+   "CI_passed": true,
+   "SE_certified": true,
+   "min_item_coverage": 0.935,
+   "max_item_coverage": 0.963
+  },
+  "3PL b": {
+   "coverage": 0.949111111111111,
+   "MCSE": 0.0011330518683339951,
+   "median_width": 1.0692975139460845,
+   "SE_over_SD": 1.033786478413515,
+   "SE_over_SD_CI": [
+    1.0254470558914754,
+    1.0421259009355544
+   ],
+   "bias_onestep": -0.04028614337241777,
+   "CI_passed": true,
+   "SE_certified": true,
+   "min_item_coverage": 0.932,
+   "max_item_coverage": 0.974
+  },
+  "3PL c": {
+   "coverage": 0.9468333333333333,
+   "MCSE": 0.0011664866986212663,
+   "median_width": 0.29335517279689105,
+   "SE_over_SD": 1.0364198804269662,
+   "SE_over_SD_CI": [
+    1.028006818432913,
+    1.0448329424210194
+   ],
+   "bias_onestep": -0.018233761951201903,
+   "CI_passed": true,
+   "SE_certified": true,
+   "full_box_fraction": 0.22555555555555556,
+   "min_item_coverage": 0.9323333333333333,
+   "max_item_coverage": 0.9726666666666667
+  },
+  "3PL refusal": 0.0,
+  "4PL a": {
+   "coverage": 0.949611111111111,
+   "MCSE": 0.0011731727462316846,
+   "median_width": 3.233834567197526,
+   "SE_over_SD": 0.9839644552480783,
+   "SE_over_SD_CI": [
+    0.9763882464442228,
+    0.9915406640519338
+   ],
+   "bias_onestep": 0.04558118580546367,
+   "CI_passed": true,
+   "SE_certified": true,
+   "min_item_coverage": 0.9443333333333334,
+   "max_item_coverage": 0.955
+  },
+  "4PL b": {
+   "coverage": 0.9489166666666666,
+   "MCSE": 0.0011621195864613095,
+   "median_width": 2.626380196217389,
+   "SE_over_SD": 1.0010768026397237,
+   "SE_over_SD_CI": [
+    0.9925461441239569,
+    1.0096074611554904
+   ],
+   "bias_onestep": -0.0026541449765223467,
+   "CI_passed": true,
+   "SE_certified": true,
+   "min_item_coverage": 0.9306666666666666,
+   "max_item_coverage": 0.968
+  },
+  "4PL c": {
+   "coverage": 0.9462777777777777,
+   "MCSE": 0.0012043649011591723,
+   "median_width": 0.4632294278136639,
+   "SE_over_SD": 0.9688220026772542,
+   "SE_over_SD_CI": [
+    0.9602552366696594,
+    0.9773887686848489
+   ],
+   "bias_onestep": -0.023201835619480693,
+   "CI_passed": true,
+   "SE_certified": true,
+   "full_box_fraction": 0.45991666666666664,
+   "min_item_coverage": 0.941,
+   "max_item_coverage": 0.955
+  },
+  "4PL d": {
+   "coverage": 0.9476944444444444,
+   "MCSE": 0.0011855973723602978,
+   "median_width": 0.450468919667215,
+   "SE_over_SD": 0.9898987064650816,
+   "SE_over_SD_CI": [
+    0.9818158159268942,
+    0.997981597003269
+   ],
+   "bias_onestep": 0.018740945384329723,
+   "CI_passed": true,
+   "SE_certified": true,
+   "full_box_fraction": 0.39113888888888887,
+   "min_item_coverage": 0.938,
+   "max_item_coverage": 0.9536666666666667
+  },
+  "4PL refusal": 0.0
+ }
+}
