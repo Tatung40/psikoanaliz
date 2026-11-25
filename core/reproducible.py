@@ -30,6 +30,7 @@ PREFLIGHT_ONLY = frozenset({
     'fingerprint', 'data_type', 'prepare', 'prepare_polytomous', 'prepare_data',
     'validate', 'validate_inputs', 'validate_analysis_inputs', 'screen_items',
     'structure', 'specification', 'support_matrix', 'group_candidates', 'category_mapping',
+    'independent_person_scope',  # eligibility only; never a new fitted/scored result
 })
 
 
