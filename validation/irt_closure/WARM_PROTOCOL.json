@@ -1,0 +1,13 @@
+{
+  "purpose": "Development-only full-native warm-refit equivalence/speed benchmark on cached pilot bootstrap cases, not independent confirmation.",
+  "cases": "Models3PL/4PL, original pilot r0/r4, b0..4; no cold refit is repeated. Compare original cached cold estimates/S-X2 and independent GH61 log-posterior.",
+  "candidates": [
+    "native warm-start full EM",
+    "native warm-start SQUAREM"
+  ],
+  "P1_gates": "All10 paired cases converged, |objective difference|<=.001, a/b maxdiff<=.002, c/d<=.001, unchanged existing numerical reference gates.",
+  "P3_gates": "All10 paired cases converged, |objective difference|<=.001, |S-X2 difference|<=.0022 (existing LSAT7 independent-reference bound). No df rescaling, fixed groups or frozen-fit statistic.",
+  "stop": "Reject a candidate as soon as both P1/P3 equivalence gates fail; do not repeat it unchanged. Never certify a pilot. Use only a fully eligible method in a separately registered independent confirmation.",
+  "source_run": 45617556122,
+  "remaining_budget": "Any subsequent confirmation requires forecast+integration reserve before the original15:22:02UTC hard stop."
+}

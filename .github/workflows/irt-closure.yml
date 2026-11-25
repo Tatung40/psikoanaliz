@@ -8,6 +8,38 @@ on:
 permissions:
   contents: read
 jobs:
+  warm-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ['3PL','4PL']
+    env:
+      PYTHONPATH: .
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: /tmp/irt-closure/
+          key: closure-I-${{ matrix.model }}-pilot-0-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-benchmark-${{ github.run_id }}
+          restore-keys: |
+            closure-I-${{ matrix.model }}-pilot-0-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-
+      - name: Compare two native refit strategies against cached full cold fits
+        run: python -u validation/irt_closure/warm_benchmark.py --model '${{ matrix.model }}' --work /tmp/irt-closure/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: warm-benchmark-${{ matrix.model }}
+          path: /tmp/irt-closure/warm_benchmark.json
   plan:
     runs-on: ubuntu-latest
     outputs:
