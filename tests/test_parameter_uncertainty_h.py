@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 from scipy.special import expit
-from validation.parameter_uncertainty_h.runner import coordinates,transformed_covariance,G
+from validation.parameter_uncertainty_h.runner import coordinates,physical,transformed_covariance,G
 from validation.binary_certification.reference_numpy import objective,BOX
 
 
@@ -15,7 +15,7 @@ def test_actual_transformed_objective_two_step_gradient_hessian(model):
     v=np.array([p[q][j] for j in range(k) for q in qs])
     limits=np.array([BOX[q] for j in range(k) for q in qs])
     eta,D,h=coordinates(v,limits)
-    decode=lambda e:limits[:,0]+(limits[:,1]-limits[:,0])*expit(e)
+    decode=lambda e:physical(e,limits)
     F=lambda e:f(decode(e))[0]  # NO density Jacobian: same physical MAP objective
     gp=f(v)[1]  # gradient of negative objective
     H=np.column_stack([(f(v+np.eye(len(v))[i]*1e-5)[1]-f(v-np.eye(len(v))[i]*1e-5)[1])/2e-5 for i in range(len(v))])
@@ -44,11 +44,9 @@ def test_compressed_uncentered_meat_is_exact_and_prior_is_not_meat():
 
 
 def test_native_box_transform_always_preserves_four_pl_order():
-    for ec in (-100.,0.,100.):
-        for ed in (-100.,0.,100.):
-            c=BOX["c"][0]+(BOX["c"][1]-BOX["c"][0])*expit(ec)
-            d=BOX["d"][0]+(BOX["d"][1]-BOX["d"][0])*expit(ed)
-            assert 0<c<=.5<=d<1
-    # All finite moderate transformed coordinates are strictly ordered.
-    assert BOX["c"][0]+(BOX["c"][1]-BOX["c"][0])*expit(10)<.5
-    assert .5<BOX["d"][0]+(BOX["d"][1]-BOX["d"][0])*expit(-10)
+    limits=np.array([BOX["c"],BOX["d"]])
+    for ec in (-10.,0.,10.):
+        for ed in (-10.,0.,10.):
+            c,d=physical(np.array([ec,ed]),limits)
+            assert 0<c<d<1
+    with pytest.raises(ValueError):physical(np.array([100.,-100.]),limits)

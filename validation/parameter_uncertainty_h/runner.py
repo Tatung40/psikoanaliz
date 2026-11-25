@@ -20,6 +20,14 @@ def coordinates(v,bounds):
     return eta,D,h
 
 
+def physical(eta,bounds):
+    bounds=np.asarray(bounds,float)
+    values=bounds[:,0]+(bounds[:,1]-bounds[:,0])*expit(eta)
+    if np.any(values<=bounds[:,0]) or np.any(values>=bounds[:,1]):
+        raise ValueError("Numerical saturation at native bound")
+    return values
+
+
 def transformed_covariance(V,U,counts,D,h,g):
     A=np.linalg.inv(V)
     Aeta=D[:,None]*A*D[None,:]-np.diag(g*h)
@@ -103,8 +111,8 @@ def replicate(job):
             record["audit_seconds"]=time.monotonic()-audit_start
             if not record["native_bread_audit"]["pass"]:raise ValueError("Native bread numerical audit")
         limits=np.asarray(limits);width=limits[:,1]-limits[:,0]
-        low=limits[:,0]+width*expit(eta-Z95*np.sqrt(np.diag(C)))
-        high=limits[:,0]+width*expit(eta+Z95*np.sqrt(np.diag(C)))
+        low=physical(eta-Z95*np.sqrt(np.diag(C)),limits)
+        high=physical(eta+Z95*np.sqrt(np.diag(C)),limits)
         se=np.sqrt(np.diag(D[:,None]*C*D[None,:]))
         if np.any(low<=limits[:,0]) or np.any(high>=limits[:,1]):raise ValueError("Degenerate transformed endpoint")
         true=truth(model,k);record["by_parameter"]={}
