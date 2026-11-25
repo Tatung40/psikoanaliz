@@ -1,0 +1,36 @@
+{
+ "id": "P1/P3 analytic closure (J): exact-pattern nuisance-adjusted S-X2 reference (Method A) and one-step prior-bias-corrected Wald CI",
+ "base_main": "833e24ab5b47ede463fbe7e7a18f067f3cb3dde6",
+ "registered_before_confirmation": true,
+ "engine": "Python mirt 1.2.0 native MAP (default priors a~LogN(0,.5), b~N(0,2), c~Beta(2,8), d~Beta(8,2)), GH61, tol 1e-4, max_iter 500; production S-X2 = mirt.itemfit (41 nodes, min_expected 1, adjacent-row pooling)",
+ "scope": "3PL/4PL, N=3000 calibration, J=12, truth validation.binary_certification.common.truth, theta~N(0,1), complete independent binary data, no DIF. No extrapolation to other N, J, item designs or latent distributions.",
+ "seeds": {"development": [202611252001, 202611252002], "null_confirmation": 202611252101, "misfit_confirmation": 202611252102,
+           "construction": "simulate(model,3000,12,[root,3|4,r,0]); misfit item-1 generator rng [root,3|4,r,0,1]. No A-I seed reused."},
+ "development_evidence": "Seeds 202611252001 (R150/model null) and 202611252002 (R<=60 misfit) used only for kernel debugging and feasibility. Never confirmation.",
+ "P3": {
+  "statistic": "UNCHANGED production S-X2 value, grouping and df are preserved and displayed; only the reference distribution changes (Method A). No new standardized statistic is introduced.",
+  "derivation": "u_jg = sum_x p_hat_x 1[s(x) in g](x_j - P_j(1|s;eta)) is linear in the empirical pattern distribution; S-X2_j = N sum_g w_jg u_jg^2 with w_jg = n_g/(e1 e0) (algebraic identity, checked <=1e-10). IF(x) = h(x) + G A^-1 score(x), A = I_exp(eta_hat) - H_logprior/N, G = -sum_{k in g} pi_k dP_j(1|k)/deta. Sigma = Cov_{p_eta_hat}(IF) over all 4096 patterns. Prior-induced residual mean delta = sqrt(N) G A^-1 grad_logprior/N. Reference: P(sum lambda_i (z_i+nu_i)^2 > S-X2), lambda = eig(W^1/2 Sigma W^1/2), Imhof inversion.",
+  "grouping": "Production realised pooling per dataset is used as given; its data dependence is NOT assumed harmless: the confirmation draws fresh data and applies the full production pipeline, so the evaluated size includes grouping selection. Pooling frequency is reported.",
+  "rank_rule": "Eigenvalues clipped at 0; weights <=1e-12*max dropped (contribute nothing). Fewer than 3 positive weights, production p NaN (sparse/df<=0) or numerical failure -> non-evaluable, counted as rejection in worst-case bounds.",
+  "tail_accuracy": "Imhof vs chi-square/noncentral chi-square <=1e-8 (df>=3) and vs 4e5-draw Monte Carlo on a generic spectrum within 4 MC SE (tests/test_p3_sx2_analytic.py).",
+  "independent_checks": "Influence function vs finite differences of the full residual functional with independent Fisher-scoring MAP re-solve (rtol 2e-4); known-parameter unpooled eigenvalues = 1 (atol 2e-3); recomputed S-X2 == native S-X2 (<=1e-8) in every confirmation dataset.",
+  "null_R_per_model": 3000,
+  "gates": {"per_item_simultaneous_upper_max": 0.07, "simultaneous": "one-sided Clopper-Pearson upper bound, alpha .05/24, 24 model-items", "pooled_lower_min": 0.03,
+            "pooled": "pooled Type I with dataset-cluster MCSE; MCSE <= .004; pooled 95% CI lower bound >= .03 (non-trivial: no suppression of rejections)",
+            "non_evaluable_max": 0.01, "identity_max": 1e-8,
+            "misfit_power": "R=300/model; item 1 generated with slope 2a_1 (other items true). Method A rejection rate for item 1 must have one-sided 97.5% CP lower bound > .10 (2 alpha). Chi-square power reported for comparison, not a gate."},
+  "unchanged_original": "Original chi-square p remains NOT CERTIFIED (archived failure .063444/.085500)."
+ },
+ "P1": {
+  "diagnosis": "Exact-pattern expected information at the true items has N*lambda_min = .54 (3PL) and .06 (4PL) at N=3000: weak identification. Prior Hessian dominates weak directions; population MAP functional differs from truth by up to .15 (a), .11 (b), .036 (c), .053 (d) = O(1) sampling SD. Centered-at-MAP intervals cannot be calibrated by any variance correction.",
+  "method": "Separate interval estimator, MAP point unchanged: one-step Newton from MAP to the likelihood equations, eta_os = eta_MAP - I(eta_MAP)^-1 grad_logprior(eta_MAP)/N (removes first-order prior bias). Wald interval eta_os +/- 1.959964 sqrt(diag I^-1/N), intersected with the native box (a>0; c in [0,.5]; d in [.5,1]). Its SE (sqrt diag I^-1/N) is the SE of eta_os, never attached to the MAP estimate.",
+  "refusal": "Refuse if I is not positive definite or cond(I) > 1e12; refusals count as non-coverage.",
+  "gates": {"coverage_target": 0.95, "coverage_abs_error_max": 0.02, "per": "per model x parameter type pooled over 12 items, dataset-cluster MCSE <= .004; per-item coverage reported",
+            "refusal_max": 0.01,
+            "informativeness": "Median box-truncated width must be < admissible box length (c: .5, d: .5) and the fraction of intervals covering the whole box must be <= .5; a/b median width reported. Coverage obtained by full-box intervals is not certified.",
+            "SE": "One-step SE certified only if per-type mean SE/empirical SD of eta_os has dataset-cluster 95% delta interval inside [.9245, 1.107]; else SE NOT CERTIFIED while CI may pass."},
+  "R_per_model": 3000,
+  "shared_fits": "Same null confirmation fits as P3."
+ },
+ "production": "Promote only outputs whose confirmation passes every listed gate within this exact scope. All failures archived. MAP estimates, P2 certificates and earlier certificates unchanged."
+}

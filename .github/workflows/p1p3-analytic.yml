@@ -1,0 +1,32 @@
+name: P1/P3 analytic closure confirmation
+on:
+  pull_request:
+    paths:
+      - 'validation/p3_sx2_analytic/**'
+      - '.github/workflows/p1p3-analytic.yml'
+permissions:
+  contents: read
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        model: ['3PL','4PL']
+        shard: [0,1,2,3,4,5,6,7,8,9]
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests/test_p3_sx2_analytic.py
+      - name: Null confirmation (fresh seed 202611252101)
+        run: python -u validation/p3_sx2_analytic/run.py --model ${{ matrix.model }} --root 202611252101 --R 3000 --start ${{ matrix.shard }} --step 10 --out out/null_${{ matrix.model }}_${{ matrix.shard }}.jsonl
+      - name: Misfit confirmation (fresh seed 202611252102)
+        run: python -u validation/p3_sx2_analytic/run.py --model ${{ matrix.model }} --root 202611252102 --R 300 --start ${{ matrix.shard }} --step 10 --alt --out out/alt_${{ matrix.model }}_${{ matrix.shard }}.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'j-${{ matrix.model }}-${{ matrix.shard }}', path: out/}
