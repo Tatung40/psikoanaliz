@@ -1,0 +1,54 @@
+{
+  "amendment": "G: centered empirical-score sandwich for native MAP",
+  "base": "da0ae7c08cc542beab5b0a59036d8777f44fcdfa",
+  "registered_before_execution": true,
+  "estimand": "True physical a,b,c,d of existing DGP; estimator remains native library MAP, not a Bayesian credible interval or new point estimator.",
+  "candidate": "V B V, where V is the native full joint inverse penalized observed Hessian and B=N/(N-1) sum_i (s_i-mean(s))(s_i-mean(s))'. s_i is the exact marginal (theta integrated) LIKELIHOOD score, not a complete-data score and not the penalized score. Unlike failed A1, B is an empirical score covariance, never V^-1-P.",
+  "parameterization": "Native physical a,b,c,d and vcov_labels ordering; full cross-item/cross-parameter covariance retained. No delta transformation or SE scaling. No boundary Wald interval.",
+  "bias": "The estimator is biased; this covariance correction alone need not repair coverage. Assess original true-parameter coverage and bias independently. No plug-in bias shift with an unaccounted-for derivative is introduced.",
+  "DGP": "Reuse common.truth/common.simulate; N(0,1), independent Bernoulli; four corners N=3000/10000, J=12/30.",
+  "seeds": {
+    "threePL": 202611250701,
+    "fourPL": 202611250702,
+    "construction": "SeedSequence([model_seed,N,J,replication]); disjoint from old A-D/F runs; no development simulations reused."
+  },
+  "fit": {
+    "estimation": "MAP",
+    "n_quadpts": 61,
+    "tol": 0.0001,
+    "max_iter": 500,
+    "priors": "unchanged default_priors"
+  },
+  "replications": {
+    "N3000": 300,
+    "N10000": 150
+  },
+  "precision": "Replicate-cluster MCSE of pooled parameter-family coverage <=.005 required, not interval-binomial MCSE. Per-item coverage/MCSE also reported, not automatically individually certified. Planned R is not a precision guarantee; insufficient precision is INCONCLUSIVE, no result-driven extension.",
+  "gates": {
+    "convergence_min": 0.99,
+    "se_refused_rate_max": 0.01,
+    "withheld_max": 0.05,
+    "coverage_abs_error_max": 0.02,
+    "target": 0.95,
+    "coverage_cluster_MCSE_max": 0.005,
+    "mean_abs_bias_ab_max": 0.05,
+    "rmse_ab_max": 0.3,
+    "rmse_cd_max": 0.07,
+    "covariance_condition_max": 100000000,
+    "positive_definite": true,
+    "boundary_distance_min": 0.000001
+  },
+  "failure": "Retain every seed/hash/fit failure. No replacement or retry. Rejected covariance gives no intervals. Failed fits counted in rates and denominator sensitivity, never silently omitted.",
+  "execution": {
+    "parallel": "8 independent model/corner jobs; at most 2 processes/job",
+    "seconds_per_cell": 240,
+    "feasibility": "First 10 planned replications are retained. If projected total exceeds budget, stop INCONCLUSIVE before the remaining campaign; no look at coverage for stopping. Otherwise continue the same fixed planned seeds without rerunning the first ten.",
+    "hard_stop": "15 minutes overall development; no new experiment after cutoff."
+  },
+  "decision": "Certification only if every gate passes at all four corners for a model. If partial/failed, production and registry stay unchanged. Passing covariance identity or unit tests is not coverage certification.",
+  "preserve": "All failed A1/A2 evidence, native estimators/defaults, item/IRF/information certifications, PR187 UI/export contracts, all unsupported inference gates.",
+  "references": [
+    "Penalized estimating-equation sandwich: bread inverse penalized derivative, meat sampling covariance of unpenalized likelihood score (White 1982 estimating-equation principle).",
+    "Bayesian inverse posterior Hessian is curvature, not sampling covariance; biased MAP need not have nominal centered Wald coverage."
+  ]
+}

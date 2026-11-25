@@ -1,0 +1,74 @@
+{
+  "protocol_commit": "7c6dba3ccfa9475260053938e997f0c5d57e6078",
+  "execution_head": "2211429dc7c8226f11f95a9305bb93ac57b0abd8",
+  "run_id": 45606844841,
+  "total_attempted": 1370,
+  "total_valid": 1370,
+  "models_certified": 0,
+  "artifacts": [
+    {
+      "id": 15018401306,
+      "name": "parameter-se-3PL-3000-30",
+      "size_in_bytes": 39412803,
+      "digest": "sha256:eddc8edcd1dc9f5090b51debe46a50b3134107a3b017772d7b00468a1107c3b6",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15018401306",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15018041660,
+      "name": "parameter-se-4PL-3000-30",
+      "size_in_bytes": 2722478,
+      "digest": "sha256:c42d3bca88e1c21a1819a8226e2bb48b7909f2e5d355a852d68fa6dfa55bd4d4",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15018041660",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15017892439,
+      "name": "parameter-se-4PL-3000-12",
+      "size_in_bytes": 9790712,
+      "digest": "sha256:792dcc536848f4483549d69daef357c556fe1c7f67ab5f4e3a9899af83b546d7",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15017892439",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15017728987,
+      "name": "parameter-se-3PL-10000-30",
+      "size_in_bytes": 19722367,
+      "digest": "sha256:fd16abc1bee22dd559c37ef674bc0b3f04dedb1601fc37aff01972eb5950d6be",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15017728987",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15017528825,
+      "name": "parameter-se-4PL-10000-12",
+      "size_in_bytes": 4899180,
+      "digest": "sha256:edb4230410933e26d32381b95c7c4027bf08480a226c030f75fe2327ea2a42b2",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15017528825",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15017453121,
+      "name": "parameter-se-3PL-3000-12",
+      "size_in_bytes": 5889022,
+      "digest": "sha256:8f55c9256e0084a52456fd097719181e0a1f16a042d836387c6619d6d347b404",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15017453121",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15017419601,
+      "name": "parameter-se-4PL-10000-30",
+      "size_in_bytes": 2714523,
+      "digest": "sha256:f204a6c680b9b88bd15c3bbc8951f85c5ce5b81d19ec62c6e243eee3d2a9b794",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15017419601",
+      "expires_at": "2027-02-23T11:41:56Z"
+    },
+    {
+      "id": 15017154982,
+      "name": "parameter-se-3PL-10000-12",
+      "size_in_bytes": 2948826,
+      "digest": "sha256:15bdec8c1d6bc5bf04e0c3a1bd5fe7ac04127b131ab6d3d8702bb9baf2b573c8",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15017154982",
+      "expires_at": "2027-02-23T11:41:56Z"
+    }
+  ]
+}
