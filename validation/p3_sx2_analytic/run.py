@@ -40,7 +40,7 @@ def one(job):
             Ii, Ai = np.linalg.inv(I), np.linalg.inv(A)
             tr = truth(model, 12); tv = np.stack([tr[q] for q in "abcd"[:k]], 1).ravel()
             one_step = eta - Ii @ gp / 3000
-            rec.update(eta=eta.tolist(), truth=tv.tolist(), one_step=one_step.tolist(),
+            rec.update(eta=eta.tolist(), truth=tv.tolist(), one_step=one_step.tolist(), cond_I=float(np.linalg.cond(I)), pd_I=bool(np.linalg.eigvalsh(I).min() > 0),
                        se_ml=np.sqrt(np.diag(Ii) / 3000).tolist(), se_map=np.sqrt(np.diag(Ai @ I @ Ai) / 3000).tolist())
     except Exception as e:
         rec["error"] = repr(e)

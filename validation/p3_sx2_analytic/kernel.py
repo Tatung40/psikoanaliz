@@ -126,6 +126,11 @@ def imhof_sf(q, lam, nc=None):
     return float(min(max(.5 + v / np.pi, 0.0), 1.0))
 
 
+def _safe(q, lam, nc=None):
+    try: return imhof_sf(q, lam, nc) if np.isfinite(q) else float('nan')
+    except Exception: return float('nan')
+
+
 def analyse(x, eta, model, include_bias=True, eps=1e-6):
     """Production S-X2 (recomputed), Method A corrected p-values, per item. x: N x J responses."""
     x = np.asarray(x, int); N = len(x)
@@ -166,6 +171,6 @@ def analyse(x, eta, model, include_bias=True, eps=1e-6):
         nc[pos] = (V.T @ (Wh * delta))[pos] / np.sqrt(lam[pos])
         df = max(G - 1 * 0 - npar, 0)  # production df: G contrasts - npar
         out.append(dict(sx=float(sx), sx_from_u=float(N * (w * u**2).sum()), groups=groups, sparse=sparse, df=df,
-                        lam=lam.tolist(), p_A=imhof_sf(sx, lam[pos], nc[pos]), p_A_nobias=imhof_sf(sx, lam[pos]),
+                        lam=lam.tolist(), p_A=_safe(sx, lam[pos], nc[pos]), p_A_nobias=_safe(sx, lam[pos]),
                         mean_E=float(lam.sum() + (nc**2 * lam).sum())))
     return out
