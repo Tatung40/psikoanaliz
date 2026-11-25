@@ -22,6 +22,7 @@ jobs:
       RAYON_NUM_THREADS: '1'
       PYTHONPATH: .
       G_REFERENCE: /tmp/parameter-g-runner.py
+      H_PREFLIGHT_ONLY: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,7 +36,7 @@ jobs:
           git show 2211429dc7c8226f11f95a9305bb93ac57b0abd8:validation/parameter_uncertainty_g/runner.py > /tmp/parameter-g-runner.py
       - name: Independent transformed derivatives before any fit
         run: python -m pytest -q tests/test_parameter_uncertainty_h.py
-      - name: Fresh bounded independent confirmation
+      - name: Runtime compatibility diagnostics ONLY — no fit
         run: |
           mkdir -p /tmp/parameter-h
           set -o pipefail

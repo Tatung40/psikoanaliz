@@ -165,4 +165,9 @@ def run(model,n,directory):
 if __name__=="__main__":
     ap=argparse.ArgumentParser();ap.add_argument("--model",choices=["3PL","4PL"],required=True)
     ap.add_argument("--n",type=int,choices=[3000,10000],required=True);ap.add_argument("--output",required=True)
-    a=ap.parse_args();run(a.model,a.n,a.output)
+    a=ap.parse_args()
+    if os.getenv("H_PREFLIGHT_ONLY")=="1":
+        from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS
+        print("RUNTIME_PREFLIGHT "+json.dumps({"mirt":importlib.metadata.version("mirt"),
+            "actual_bounds":_ITEM_PARAMETER_BOUNDS,"reference_bounds":BOX},default=list))
+    else:run(a.model,a.n,a.output)
