@@ -1,0 +1,66 @@
+{
+  "amendment": "E: bounded uncertainty audit and conditional-person quadrature",
+  "registered_before_confirmatory_execution": true,
+  "base": "34ca6ecb2a88cf3f0b66dcdf3cf721f74c703ca1",
+  "deadline_utc": "2026-11-25T09:34:05Z",
+  "scope": "3PL/4PL only; retain original certification registry, item estimators, parameter SE/CI gates and every failed A-D record",
+  "existing_failures": {
+    "threePL_MAP": "b/c Wald coverage .976/.975, MCSE .0025-.0026; posterior curvature is not sampling covariance of penalized estimator. Existing sandwich/crossprod failures not repeated",
+    "fourPL": "posterior SE/CI not calibrated; point/IRF/information certification already obtained via D4; no new R timeouts",
+    "itemfit": "S-X2/df identity supports numerical calculation, not p-value null calibration; production 3PL/4PL p gates remain closed"
+  },
+  "development_diagnostic": {
+    "model": "3PL",
+    "parameters": {
+      "a": 1.4,
+      "b": 2.5,
+      "c": 0.15,
+      "d": 1,
+      "k": 12
+    },
+    "old": {
+      "eap": 3.257053743602077,
+      "sd": 0.4200868281935277
+    },
+    "reference": {
+      "eap": 3.3563453600100868,
+      "sd": 0.5087901519260069
+    },
+    "verification": {
+      "eap": 3.3563453600100868,
+      "sd": 0.5087901519259999
+    }
+  },
+  "proposed_correction": {
+    "method": "Existing Python mirt fscores EAP public API, N(0,1) latent scale, fixed calibrated items. GH121 and GH241, no item re-estimation. Publish GH241 only if both EAP and posterior SD agree within absolute 1e-6; otherwise fail closed with numerical-precision reason.",
+    "uncertainty": "Conditional posterior SD, not frequentist person SE/CI and not calibration uncertainty. No inference certification from quadrature identity.",
+    "production": "Only 3PL/4PL person calls in UI/shared export paths; preserve all other models and parameter inference gates.",
+    "fit_outputs": "Keep existing numbers; explicitly label 3PL/4PL MAP logLik/AIC/BIC as evaluated at MAP, not classical ML model-selection evidence."
+  },
+  "confirmatory_checks": {
+    "native": "One small deterministic fitting fixture per model, reused fitted parameters for scoring all-zero/all-one/mixed patterns, plus fixed parameter tail diagnostic; no repeated calibration to seek PASS.",
+    "reference": "Independent scipy.integrate.quad over the real line using fitted coefficients, Gaussian prior and Bernoulli log likelihood. First/second moments centered at mode for stability. abs EAP/SD difference <=1e-6, repeat integration settings to verify reference accuracy. Node-stability is necessary but independent check also required.",
+    "gates": [
+      "valid finite binary responses and IDs preserved",
+      "converged unidimensional N(0,1) fit",
+      "public API IDs/order, finite positive posterior SD",
+      "numerical quadrature agreement",
+      "no inference CERTIFIED promotion without independent recovery/coverage evidence"
+    ],
+    "negative": [
+      "nonconvergence",
+      "nonnormal latent scale",
+      "unstable quadrature",
+      "invalid IDs",
+      "nonfinite score or nonpositive SD"
+    ],
+    "regression": "Only affected person/report/policy tests; existing certification records byte-identical. CI asynchronous, no full-suite local run."
+  },
+  "new_certification": "NONE pre-authorized by these numerical checks. VERIFIED conditional integration does not imply empirical recovery, coverage or calibrated item-fit inference.",
+  "not_run": "No fresh parameter coverage campaign without sufficient independent replication and before-deadline feasibility. No ad hoc rescaling, transformed-endpoint relabeling, naive profile-chi-square at MAP/boundary, or new R fit.",
+  "references": [
+    "Wilks (1938): regular ML likelihood-ratio theory, not a generic MAP/boundary pivot",
+    "White (1982): sandwich covariance and distinction between curvature and sampling variance",
+    "Direct Bayes rule: posterior moments conditional on fixed item parameters; these do not integrate item-calibration uncertainty"
+  ]
+}
