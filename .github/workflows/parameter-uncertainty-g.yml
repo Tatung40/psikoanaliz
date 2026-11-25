@@ -1,0 +1,43 @@
+name: MAP parameter centered-score covariance confirmation
+on:
+  pull_request:
+    paths:
+      - 'validation/parameter_uncertainty_g/**'
+      - 'tests/test_parameter_uncertainty_g.py'
+      - '.github/workflows/parameter-uncertainty-g.yml'
+permissions:
+  contents: read
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ['3PL','4PL']
+        n: [3000,10000]
+        j: [12,30]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Exact score and joint-covariance tests before execution
+        run: python -m pytest -q tests/test_parameter_uncertainty_g.py
+      - name: One preregistered confirmation cell; preserve failures
+        run: |
+          mkdir -p /tmp/parameter-se
+          set -o pipefail
+          python -u validation/parameter_uncertainty_g/runner.py --model '${{ matrix.model }}' --n '${{ matrix.n }}' --j '${{ matrix.j }}' --output /tmp/parameter-se 2>&1 | tee /tmp/parameter-se/execution.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parameter-se-${{ matrix.model }}-${{ matrix.n }}-${{ matrix.j }}
+          path: /tmp/parameter-se/
