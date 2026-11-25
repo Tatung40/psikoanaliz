@@ -8,6 +8,8 @@ permissions:
   contents: read
 jobs:
   confirm:
+    # Archived: the preregistered confirmation ran once on its exact head (run 45665227625); never re-run.
+    if: github.event.pull_request.head.sha == 'e53ad8a247a75b9eb00a7810790158898c5a0098'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
