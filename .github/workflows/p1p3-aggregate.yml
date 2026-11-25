@@ -18,9 +18,13 @@ jobs:
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
       - id: run
-        run: echo "id=$(python -c 'import json;print(json.load(open("validation/p3_sx2_aggregate/RUN.json"))["confirmation_run_id"])')" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "id=$(python -c 'import json;print(json.load(open("validation/p3_sx2_aggregate/RUN.json"))["confirmation_run_id"])')" >> "$GITHUB_OUTPUT"
+          echo "boot=$(python -c 'import json;print(json.load(open("validation/p3_sx2_aggregate/RUN.json"))["bootstrap_run_id"])')" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         with: {pattern: 'j-*', path: /tmp/j, merge-multiple: true, run-id: '${{ steps.run.outputs.id }}', github-token: '${{ github.token }}'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'b-*', path: /tmp/j, merge-multiple: true, run-id: '${{ steps.run.outputs.boot }}', github-token: '${{ github.token }}'}
       - run: |
           ls /tmp/j | wc -l; wc -l /tmp/j/*.jsonl | tail -1; sha256sum /tmp/j/*.jsonl > /tmp/j/SHA256SUMS
           python validation/p3_sx2_aggregate/aggregate.py /tmp/j /tmp/j/REPORT.json
