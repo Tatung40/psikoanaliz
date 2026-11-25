@@ -1,0 +1,31 @@
+name: P1/P3 analytic closure aggregation (read-only)
+on:
+  pull_request:
+    paths:
+      - 'validation/p3_sx2_aggregate/**'
+      - '.github/workflows/p1p3-aggregate.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env: {PYTHONPATH: .}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - id: run
+        run: echo "id=$(python -c 'import json;print(json.load(open("validation/p3_sx2_aggregate/RUN.json"))["confirmation_run_id"])')" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'j-*', path: /tmp/j, merge-multiple: true, run-id: '${{ steps.run.outputs.id }}', github-token: '${{ github.token }}'}
+      - run: |
+          ls /tmp/j | wc -l; wc -l /tmp/j/*.jsonl | tail -1; sha256sum /tmp/j/*.jsonl > /tmp/j/SHA256SUMS
+          python validation/p3_sx2_aggregate/aggregate.py /tmp/j /tmp/j/REPORT.json
+          echo "REPORT_JSON $(python -c 'import json;print(json.dumps(json.load(open("/tmp/j/REPORT.json"))))')"
+          echo "SHA256SUMS_BEGIN"; cat /tmp/j/SHA256SUMS; echo "SHA256SUMS_END"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: j-aggregate, path: /tmp/j/}
