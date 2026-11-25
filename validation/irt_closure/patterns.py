@@ -2,7 +2,7 @@
 from functools import lru_cache
 import numpy as np
 from scipy.stats import norm
-from core.irt_binary_patterns import PATTERNS,SCORES,THETA
+from core.irt_binary_patterns import K,PATTERNS,SCORES,THETA
 from core.irt_binary_patterns import _probability as probability, _log_probability as log_probability, _moments as moments, _cdf_grid as cdf_grid, _at as at, _score_mass as score_mass, _exact_score_intervals as exact_score_intervals
 @lru_cache(2)
 def oracle(model):
