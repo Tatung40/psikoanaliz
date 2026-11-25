@@ -265,7 +265,8 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         try:
           if entry and entry['key']==bundle_key:
             persons,inference,reason=entry['persons'],entry['inference'],entry['reason']
-            record_displayed(*[v for v in (persons,inference) if v is not None])  # link cached values to their producers
+            onestep,onestep_reason=entry.get('onestep'),entry.get('onestep_reason')
+            record_displayed(*[v for v in (persons,inference,onestep) if v is not None])  # link cached values to their producers
           else:
             ids=data[id_col].to_numpy(copy=True) if id_col in data.columns else None
             if model=='Rasch':
@@ -275,13 +276,18 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
             elif model in ('3PL','4PL'):persons=binary_person_abilities(saved['outcome'],x.to_numpy(),identifiers=ids)
             else:persons=person_abilities(x.to_numpy(),report.curves,model=model,identifiers=ids)
             inference,reason=parameter_inference(saved['outcome'].fit,model,cols,getattr(saved['outcome'],'estimation',None))
+            onestep,onestep_reason=None,None
+            if model in ('3PL','4PL'):
+                from core.irt_binary_onestep import onestep_intervals
+                onestep,onestep_reason=onestep_intervals(saved['outcome'],cols)
             itemfit=None
             try:
                 itemfit=safe_frame(library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model))
             except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
                 itemfit=None
             entry=store[model]={'key':bundle_key,'persons':persons,'inference':inference,'reason':reason,
-                                'files':bundle(report,persons,inference,reason,itemfit)}
+                                'onestep':onestep,'onestep_reason':onestep_reason,
+                                'files':bundle(report,persons,inference,reason,itemfit,onestep=onestep)}
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
             st.warning(f'Ek çıktılar üretilemedi: {exc}');return
         st.markdown('#### Madde parametresi SH ve %95 Wald güven aralığı')
@@ -291,6 +297,16 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
             st.download_button('Parametre SH/GA — CSV',_csv(inference),f'{model}_parameter_se_ci.csv','text/csv',
                                key=f'python_mirt_se_csv_{model}',on_click='ignore')
         st.caption(STATUS)
+        if model in ('3PL','4PL'):
+            from core.irt_binary_onestep import METHOD,SCOPE
+            st.markdown('#### Frekansçı %95 GA — tek adımlı önsel-yanlılık düzeltmesi (MAP kestirimi değişmez)')
+            if onestep is None:st.info(onestep_reason or 'Tek adımlı GA üretilmedi.')
+            else:
+                st.dataframe(safe_frame(onestep.drop(columns=['Yöntem','Kapsam','Bilimsel durum'])).round(4),hide_index=True,use_container_width=True)
+                st.download_button('Tek adımlı GA — CSV',_csv(onestep),f'{model}_parameter_onestep_ci.csv','text/csv',
+                                   key=f'python_mirt_onestep_csv_{model}',on_click='ignore')
+            st.caption(f'{METHOD}. {SCOPE} Aralık gerçek parametreyi hedefler; merkezi MAP değildir. Gösterilen SH tek-adım '
+                       'kestiricisinindir, MAP örnekleme SH’si değildir. 4PL a/b aralıkları geçerli fakat çok geniştir.')
         kind=st.selectbox('Grafik',kinds(model),key=f'python_mirt_extra_kind_{model}')
         chosen=None
         if kind in ('ICC','IIC'):

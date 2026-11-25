@@ -1,0 +1,38 @@
+name: P3 fallback A bootstrap confirmation
+on:
+  pull_request:
+    paths:
+      - 'validation/p3_sx2_bootstrap/**'
+      - '.github/workflows/p3-bootstrap.yml'
+permissions:
+  contents: read
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {phase: '${{ steps.p.outputs.phase }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: echo "phase=$(python3 -c 'import json;print(json.load(open("validation/p3_sx2_bootstrap/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
+  boot:
+    needs: plan
+    if: needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    strategy:
+      fail-fast: false
+      max-parallel: 18
+      matrix:
+        model: ['3PL','4PL']
+        shard: [0,1,2,3,4,5,6,7,8]
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - run: python -u validation/p3_sx2_bootstrap/run.py --model ${{ matrix.model }} --root 202611252201 --R 1500 --start ${{ matrix.shard }} --step 9 --out out/bnull_${{ matrix.model }}_${{ matrix.shard }}.jsonl
+      - run: python -u validation/p3_sx2_bootstrap/run.py --model ${{ matrix.model }} --root 202611252202 --R 150 --start ${{ matrix.shard }} --step 9 --alt --out out/balt_${{ matrix.model }}_${{ matrix.shard }}.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'b-${{ matrix.model }}-${{ matrix.shard }}', path: out/}

@@ -101,7 +101,7 @@ def method_text(report, inference_reason, persons=None):
             ) + uncertainty + fit_note + person_note + (f"SH durumu: {inference_reason}\n" if inference_reason else "") + (
             "Wright haritası (2PL–4PL): b her modelde aynı θ ölçeğindedir; yalnız 1PL/2PL'de P = .5 noktasıdır.\n")
 
-def bundle(report, persons, inference, inference_reason, itemfit=None):
+def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=None):
     """(xlsx bytes, zip bytes) with every table, the method text and all applicable 300 dpi PNGs."""
     from reports.irt_b14_report import safe_frame
     tables = {"Model_Ozeti": pd.DataFrame([report.metadata]), "Madde_Parametreleri": report.parameters,
@@ -110,6 +110,8 @@ def bundle(report, persons, inference, inference_reason, itemfit=None):
         tables["Parametre_SH_GA"] = inference
     if itemfit is not None and not itemfit.empty:
         tables["Madde_Uyumu"] = itemfit
+    if onestep is not None:
+        tables["Parametre_GA_TekAdim"] = onestep
     xlsx = io.BytesIO()
     with pd.ExcelWriter(xlsx, engine="openpyxl") as writer:
         for name, frame in tables.items():
