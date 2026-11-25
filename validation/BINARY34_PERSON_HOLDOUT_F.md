@@ -1,6 +1,6 @@
 # 3PL/4PL independent person holdout: amendment F
 
-Preregistered commit: 72d1d651aa2433fc416cbd960dc7671da9c31e2f; execution commit: 8059811660688008ce483908c67baefad48dd5e1.
+Preregistered commit: 72d1d651aa2433fc416cbd960dc7671da9c31e2f; PR execution head: 8059811660688008ce483908c67baefad48dd5e1; actual GITHUB_SHA (synthetic PR merge): 44639756faffe1c3baa799a69acc7a29ee6454c9.
 Base main 7fc9161 includes PR #187. Actual run: https://github.com/Tatung40/psikoanaliz/actions/runs/45593803451.
 
 ## Actual execution
@@ -37,3 +37,7 @@ All previously certified item estimates/IRF/information, posterior scoring, conv
 No certification registry cell is promoted; parameter CI and S-X² p-value gates remain closed as before.
 No R execution or full local regression occurred. Cloud execution is unavailable; actual Python execution is evidenced by the linked Actions job.
 Zero remaining scientific blockers is NOT established.
+
+## Operational replay and provenance correction
+GitHub PR path filters use the whole PR diff. The archive-only commit therefore automatically replayed the identical seeded calibrations in run 45594344360; those are not new independent calibration repetitions and are not pooled with the canonical run. Its separate artifacts remain preserved. The workflow now verifies exact scientific-source bytes against the original head and validates the canonical JSON before reusing it, preventing further fits on documentation/archive pushes.
+The initial archive test incorrectly equated PR head SHA with pull_request GITHUB_SHA. The actual runtime uses synthetic merge 44639756faffe1c3baa799a69acc7a29ee6454c9; the original workflow head is 8059811660688008ce483908c67baefad48dd5e1. The test now checks the exact recorded runtime SHA. No numerical result, protocol, bound or acceptance criterion was modified.

@@ -1,0 +1,25 @@
+{
+  "canonical_run": 45593803451,
+  "head_sha": "8059811660688008ce483908c67baefad48dd5e1",
+  "runtime_merge_sha": "44639756faffe1c3baa799a69acc7a29ee6454c9",
+  "protocol_commit": "72d1d651aa2433fc416cbd960dc7671da9c31e2f",
+  "artifacts": [
+    {
+      "id": 15012476108,
+      "name": "person-holdout-4PL",
+      "digest": "sha256:a6e767dd1730e533c8af4ff2fbd2762ae7a3367b22c9b6da2bfafe58a97c3eb7",
+      "size_in_bytes": 671030,
+      "expires_at": "2027-02-23T10:19:02Z",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15012476108"
+    },
+    {
+      "id": 15011289962,
+      "name": "person-holdout-3PL",
+      "digest": "sha256:279c137d6d6ad7db1767ebd49f0e1f7a5e7f2c75a92a1f4917b2e9c5d20a8442",
+      "size_in_bytes": 651894,
+      "expires_at": "2027-02-23T10:19:02Z",
+      "url": "https://api.github.com/repos/Tatung40/psikoanaliz/actions/artifacts/15011289962"
+    }
+  ],
+  "replay_run_not_independent": 45594344360
+}

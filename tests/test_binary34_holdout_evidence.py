@@ -17,7 +17,7 @@ def test_archived_holdout_evidence_and_conditional_precision(model):
     protocol=ROOT/"validation/uncertainty_f/PROTOCOL.json"
     assert hashlib.sha256(protocol.read_bytes()).hexdigest()==report["protocol_sha256"]
     assert report["protocol_commit"]=="72d1d651aa2433fc416cbd960dc7671da9c31e2f"
-    assert report["code_commit"]=="8059811660688008ce483908c67baefad48dd5e1"
+    assert report["code_commit"]=="44639756faffe1c3baa799a69acc7a29ee6454c9"  # actual pull_request GITHUB_SHA (synthetic merge), not branch head
     assert report["run_id"]=="45593803451"
     assert report["model"]==model and report["fit_converged"] is True
     assert report["calibration_replicates"]==1
