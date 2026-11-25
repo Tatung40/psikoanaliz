@@ -141,5 +141,21 @@ def aggregate(root):
 
 if __name__=="__main__":
     ap=argparse.ArgumentParser();ap.add_argument("--input",required=True);ap.add_argument("--output",required=True);a=ap.parse_args()
-    report=aggregate(a.input);write_json(a.output,report)
+    report=aggregate(a.input)
+    phase=json.loads(Path(__file__).with_name("RUN.json").read_text()).get("phase")
+    if phase=="archive":
+        canonical_path=Path(__file__).resolve().parents[1]/"evidence/irt_closure/REPORT.json"
+        canonical=json.loads(canonical_path.read_text())
+        def equivalent(x,y):
+            if isinstance(x,dict):return isinstance(y,dict) and x.keys()==y.keys() and all(equivalent(x[k],y[k]) for k in x)
+            if isinstance(x,list):return isinstance(y,list) and len(x)==len(y) and all(equivalent(a,b) for a,b in zip(x,y))
+            if isinstance(x,(int,float)) and not isinstance(x,bool):return isinstance(y,(int,float)) and abs(x-y)<=1e-12
+            return x==y
+        for model in ("3PL","4PL"):
+            for name in ("baseline_P3","confirmation_P2"):
+                if not equivalent(report["models"][model][name],canonical["models"][model][name]):
+                    raise ValueError("Canonical cohort verification failed: "+model+" "+name)
+        canonical["read_only_verified_calibrations"]=report["calibration_clusters"]
+        report=canonical
+    write_json(a.output,report)
     print("AGGREGATE_JSON "+json.dumps(report))

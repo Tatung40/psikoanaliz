@@ -1,7 +1,6 @@
 {
-  "phase": "pilot",
-  "bootstrap_P1": false,
-  "bootstrap_P3": false,
+  "phase": "archive",
   "protocol_commit": "c7327ac8cfbd1fa7c3956a8861b202be0bc5a34a",
-  "scientific_execution": "Development R20/model plus independent P3 baseline R3000/model and P2 first300/model; no certification before complete acceptance."
+  "scientific_execution": "All6000 baseline fits and40 pilot datasets complete; reuse cached fitted quantities only. No fresh calibration or bootstrap campaign is authorized on archival/production commits.",
+  "certification": "Only complete independently confirmed P2 output scopes promoted. P1/P3 remain NOT CERTIFIED."
 }

@@ -79,7 +79,7 @@ def png_bytes(report, persons, kind, selected=None):
     return stream.getvalue()
 
 
-def method_text(report, inference_reason):
+def method_text(report, inference_reason, persons=None):
     meta = report.metadata
     map_fit = report.model in ("3PL", "4PL") and meta.get("Kestirim") == "MAP"
     uncertainty = ("Parametre SH: Oakes ters log-posterior eğriliği; MAP örnekleme SH/GA sertifikası değildir.\n" if map_fit else
@@ -87,6 +87,12 @@ def method_text(report, inference_reason):
     fit_note = "LogLik/AIC/BIC MAP noktasındadır; klasik ML model seçimi değildir.\n" if map_fit else ""
     person_note = ("Kişi posterior SS: sabit madde kestirimlerine koşulludur; kalibrasyon belirsizliğini içermez; kişi GA kapsaması NOT CERTIFIED.\n"
                    if report.model in ("3PL", "4PL") else "")
+    if (persons is not None and "Posterior %95 alt" in persons.columns and "Bağımsızlık koşulu" in persons.columns
+            and persons["Bilimsel durum"].astype(str).str.contains("SCOPED CERTIFIED").all()):
+        person_note=("Bağımsız kişi aralıkları: referans N3000/J12 MAP/GH61 N(0,1) tasarımında bağımsız 300 kalibrasyonla SCOPED CERTIFIED.\n"
+                     "Posterior %95 aralık eşit kuyruklu Bayesçidir; sabit θ ve uç bölgelerde %95 sıklıkçı kapsama sağlamaz.\n"
+                     "Skor GA: madde kestirimlerine koşullu tam Poisson-binomial test terslemesi; doğrulama θ=-4..4 (21 nokta) ve N(0,1) kuyruk ortalamalarıyla sınırlıdır.\n"
+                     "±inf sonuçlar tanımlanabilirlik sınırlılığıdır; boş güven kümesinde sınırlar verilmez. J30 ve farklı DGP doğrulanmadı.\n")
     return ("PsikoAnaliz — İkili MTK rapor paketi\n"
             f"Model: {report.model}\nMotor: Python mirt 1.2.0 (tek kestirim altyapısı)\n"
             f"N: {meta.get('N')} | Madde: {meta.get('Madde')} | Yakınsama: {meta.get('Yakınsama')}\n"
@@ -111,7 +117,7 @@ def bundle(report, persons, inference, inference_reason, itemfit=None):
     archive = io.BytesIO()
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr(f"{report.model}_rapor.xlsx", xlsx.getvalue())
-        z.writestr(f"{report.model}_yontem.txt", method_text(report, inference_reason))
+        z.writestr(f"{report.model}_yontem.txt", method_text(report, inference_reason, persons))
         for name, frame in tables.items():
             z.writestr(f"tablolar/{name}.csv", safe_frame(frame).to_csv(index=False))
         for kind in kinds(report.model):

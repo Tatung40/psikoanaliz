@@ -9,6 +9,8 @@ permissions:
   contents: read
 jobs:
   warm-benchmark:
+    needs: plan
+    if: needs.plan.outputs.phase != 'archive'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     strategy:
@@ -44,6 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
+      phase: ${{ steps.plan.outputs.phase }}
     steps:
       - uses: actions/checkout@v4
       - id: plan
@@ -59,7 +62,9 @@ jobs:
             total=1500 if phase.get("bootstrap_P3") else 400
             B=399 if phase.get("bootstrap_P1") else 99
             rows += [dict(model=m,stage="confirm",shard=s,shards=40,total=total,B=B,bootstrap=True) for s in range(40) for m in ("3PL","4PL")]
-          with open(os.environ["GITHUB_OUTPUT"],"a") as f:f.write("matrix="+json.dumps({"include":rows})+"\n")
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+            f.write("matrix="+json.dumps({"include":rows})+"\n")
+            f.write("phase="+phase["phase"]+"\n")
   scientific-work:
     needs: plan
     runs-on: ubuntu-latest
@@ -133,3 +138,21 @@ jobs:
         with:
           name: closure-aggregate
           path: /tmp/closure-aggregate/
+
+  p2-production-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Real native engine, independent-only scope, UI stale downloads and shared exports
+        run: python -m pytest -q tests/test_irt_person_pattern_inference.py tests/test_binary34_uncertainty_contract.py tests/test_python_mirt_nine_results.py -k 'independent or preserved or scope or exports or ui_cache'

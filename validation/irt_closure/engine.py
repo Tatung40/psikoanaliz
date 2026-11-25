@@ -70,6 +70,8 @@ def base_fit(model,r,stage,work,persons=False):
     path=Path(work)/f"base_{r:05d}.npz";meta=path.with_suffix(".json")
     if path.exists() and meta.exists():
         return dict(np.load(path,allow_pickle=False)),json.loads(meta.read_text())
+    phase=json.loads(Path(__file__).with_name("RUN.json").read_text()).get("phase")
+    if phase=="archive":raise RuntimeError("Canonical cached fit absent; archival runs never repeat a calibration")
     deadline();seed=[ROOTS[stage],int(model[0]),r,0]
     x=simulate(model,3000,12,seed).astype(np.uint8)
     data={"x":x};info={"r":r,"seed":seed,"converged":False,"fit_called":False,
