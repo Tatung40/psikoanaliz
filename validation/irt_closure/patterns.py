@@ -39,7 +39,7 @@ def cdf_grid(p,step=.01,keep=False):
     t=np.arange(-10,10+step/2,step);lp,lq=log_probability(t,p)
     bounds=[];curves=[] if keep else None
     for x in np.array_split(PATTERNS,32):
-        ll=x@np.log(prob).T+(1-x)@np.log1p(-prob).T+norm.logpdf(t)
+        ll=x@lp.T+(1-x)@lq.T+norm.logpdf(t)
         pdf=np.exp(ll-ll.max(1,keepdims=True))
         cdf=cumulative_trapezoid(pdf,t,axis=1,initial=0)
         cdf/=cdf[:,-1,None]
