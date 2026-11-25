@@ -298,7 +298,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                            key=f'python_mirt_extra_png_{model}',on_click='ignore')
         if kind=='Wright haritası' and model not in ('Rasch','1PL','2PL'):
             st.caption('3PL/4PL: b ortak θ ölçeğindedir ancak P = .5 noktası değildir; harita betimseldir.')
-        if entry and entry['key']==saved['key']:
+        if entry and entry['key']==bundle_key:
             xlsx,archive=entry['files']
             st.download_button('Excel — tüm tablolar',xlsx,f'{model}_rapor.xlsx',
                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

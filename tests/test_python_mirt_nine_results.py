@@ -131,7 +131,25 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     tables={'Rasch':7,'1PL':5,'2PL':5,'3PL':5,'4PL':5,'NRM':3}.get(model,4)  # 1PL common a: SE now reported
     assert len(at.dataframe)==tables and len(rendered_figures)==4
     from tests.reproducible_ui import scientific_downloads
-    assert len(scientific_downloads(at))=={'Rasch':15,'1PL':11,'2PL':12,'3PL':11,'4PL':11,'NRM':6}.get(model,7)  # incl. 2PL Word
+    download_keys={d.key for d in scientific_downloads(at)}
+    required={f'python_mirt_{suffix}_{model}' for suffix in (
+        'summary_csv','parameters_csv','persons_csv','persons_xlsx',
+        'curves_csv','information_csv')}
+    if model in BINARY:
+        required.update(f'python_mirt_{suffix}_{model}' for suffix in (
+            'itemfit_csv','se_csv','extra_png','bundle_xlsx','bundle_zip'))
+    elif model!='NRM':
+        required.add(f'python_mirt_itemfit_csv_{model}')
+    if model=='2PL':
+        required.add('python_mirt_2pl_academic_word')
+    assert required <= download_keys, (required-download_keys, download_keys)
+    if model in ('3PL','4PL'):
+        # A versioned scoring cache must retain both complete report exports.
+        assert download_keys == required
+        from core.irt_binary_persons import SCORING_VERSION
+        cached=at.session_state['python_mirt_bundle'][model]
+        assert cached['key']==(at.session_state[f'python_mirt_fit_{model}']['key'],SCORING_VERSION)
+
     assert {'repro_py','repro_zip'} <= {d.key for d in at.get('download_button')}
     assert sum('Kestirim yakınsadı' in e.value for e in at.success)==int(bool(outcome.fit.converged))
     parameter_index=1 if model=='NRM' else 2
@@ -145,6 +163,7 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     assert {'Birey','Ham puan','Yetenek (θ)','SH (θ)','Yöntem','Model'} <= set(at.dataframe[parameter_index+1].value.columns)
     assert len(at.dataframe[parameter_index+1].value)==len(frame)
     at.run();assert len(calls)==1 and len(at.dataframe)==tables and len(rendered_figures)==8
+    assert {d.key for d in scientific_downloads(at)} == download_keys
     # Nonconvergence is explicit in UI and exported parameters.
     from copy import copy
     failed=copy(outcome.fit);failed.converged=False

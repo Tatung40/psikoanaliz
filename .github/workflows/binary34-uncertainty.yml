@@ -7,6 +7,7 @@ on:
       - 'ui/irt_python_library_view.py'
       - 'reports/irt_binary_report.py'
       - 'tests/test_binary34_uncertainty_contract.py'
+      - 'tests/test_python_mirt_nine_results.py'
       - 'validation/binary_certification/AMENDMENT_E.json'
       - '.github/workflows/binary34-uncertainty.yml'
 jobs:
@@ -28,7 +29,7 @@ jobs:
       - name: Targeted numerical and export checks only
         run: |
           python -m compileall -q core/irt_binary_persons.py core/irt_python_mirt_report.py ui/irt_python_library_view.py reports/irt_binary_report.py app.py
-          python -m pytest -q -s tests/test_binary34_uncertainty_contract.py tests/test_irt_person_abilities.py tests/test_irt_binary_usage_policy.py --basetemp=/tmp/binary34-uncertainty
+          python -m pytest -q -s 'tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[3PL]' 'tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[4PL]' --basetemp=/tmp/binary34-uncertainty
       - uses: actions/upload-artifact@v4
         if: always()
         with:
