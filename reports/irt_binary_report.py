@@ -81,15 +81,19 @@ def png_bytes(report, persons, kind, selected=None):
 
 def method_text(report, inference_reason):
     meta = report.metadata
+    map_fit = report.model in ("3PL", "4PL") and meta.get("Kestirim") == "MAP"
+    uncertainty = ("Parametre SH: Oakes ters log-posterior eğriliği; MAP örnekleme SH/GA sertifikası değildir.\n" if map_fit else
+                   "Parametre SH: kütüphane Oakes gözlenen bilgisi; sınırdaki parametrelerde Wald GA yok.\n")
+    fit_note = "LogLik/AIC/BIC MAP noktasındadır; klasik ML model seçimi değildir.\n" if map_fit else ""
+    person_note = ("Kişi posterior SS: sabit madde kestirimlerine koşulludur; kalibrasyon belirsizliğini içermez; kişi GA kapsaması NOT CERTIFIED.\n"
+                   if report.model in ("3PL", "4PL") else "")
     return ("PsikoAnaliz — İkili MTK rapor paketi\n"
             f"Model: {report.model}\nMotor: Python mirt 1.2.0 (tek kestirim altyapısı)\n"
             f"N: {meta.get('N')} | Madde: {meta.get('Madde')} | Yakınsama: {meta.get('Yakınsama')}\n"
             "Ölçek: θ ~ N(0,1); P = c + (d − c)·logistic(a(θ − b))\n"
             "Kişi puanları: EAP ve posterior SS; SEM(θ) = 1/√I_test(θ).\n"
-            "Parametre SH: kütüphane Oakes gözlenen bilgisi; sınırdaki parametrelerde Wald GA yok.\n"
-            + (f"SH durumu: {inference_reason}\n" if inference_reason else "")
-            + "Wright haritası (2PL–4PL): b her modelde aynı θ ölçeğindedir; yalnız 1PL/2PL'de P = .5 noktasıdır.\n")
-
+            ) + uncertainty + fit_note + person_note + (f"SH durumu: {inference_reason}\n" if inference_reason else "") + (
+            "Wright haritası (2PL–4PL): b her modelde aynı θ ölçeğindedir; yalnız 1PL/2PL'de P = .5 noktasıdır.\n")
 
 def bundle(report, persons, inference, inference_reason, itemfit=None):
     """(xlsx bytes, zip bytes) with every table, the method text and all applicable 300 dpi PNGs."""

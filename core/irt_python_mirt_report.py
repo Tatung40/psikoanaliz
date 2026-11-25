@@ -109,6 +109,10 @@ def build_report(outcome, *, model, items, labels=(), theta=None):
     if model in BINARY:                                 # certification decision for this fit (validation/binary_certification)
         report.metadata['Sertifika durumu']=binary_evidence_label(outcome,common_discrimination=model=='1PL' and not fixed_a if model=='1PL' else False,
                                                                   converged=report.metadata.get('Yakınsama'))
+    if model in ('3PL','4PL') and outcome.estimation=='MAP':
+        report.metadata['Uyum ölçütü yorumu']='MAP noktasında sayısal değerlendirme; klasik ML maksimumu/model seçimi değildir'
+        report.metadata['Klasik ML model seçimi']='KAPALI (MAP)'
+        report.warnings.append('Parametre SH ters log-posterior eğriliğidir; MAP örnekleme SH ve Wald GA sertifikası değildir. Kişi posterior SS madde kalibrasyonu belirsizliğini içermez.')
     if outcome.estimation=='MAP':report.warnings.append('Motorun logLik/AIC/BIC değerleri MAP noktasındadır; standart ML maksimumuna dayalı model seçimi olarak yorumlanmamalıdır.')
     try:
         report.parameters=parameter_table(fit,model,items,labels)
