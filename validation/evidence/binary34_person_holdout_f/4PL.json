@@ -1,0 +1,211 @@
+{
+  "model": "4PL",
+  "protocol_commit": "72d1d651aa2433fc416cbd960dc7671da9c31e2f",
+  "code_commit": "44639756faffe1c3baa799a69acc7a29ee6454c9",
+  "run_id": "45593803451",
+  "versions": {
+    "mirt": "1.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.1"
+  },
+  "python": "3.11.18",
+  "status": "MEASURED / NOT CERTIFIED",
+  "certification": "NOT CERTIFIED",
+  "calibration_replicates": 1,
+  "scope": "Conditional on one independently generated calibration; not unconditional calibration-sampling coverage.",
+  "settings": {
+    "N_calibration": 3000,
+    "J": 12,
+    "N_holdout": 10000,
+    "seed_calibration": 2026112541,
+    "seed_holdout": 2026112542,
+    "estimation": "MAP",
+    "n_quadpts": 61,
+    "tol": 1e-10,
+    "max_iter": 50000
+  },
+  "protocol_sha256": "05ad9857408ec6cacdd7ea60d565c27116b07efcd28e36bd9765826f46767b34",
+  "registry_git_blob": "49b5aa914c8ea99ec319ded58bf09ac6b85a4de2",
+  "calibration_sha256": "83551bbd4bb848739d50b075c33e90051abfa2d297dbc86368c9384e1026f702",
+  "fit_seconds": 5.701316763999998,
+  "fit_converged": true,
+  "n_iterations": 459,
+  "log_likelihood": -23198.793842077343,
+  "true_items": {
+    "a": [
+      0.8,
+      0.8727272727272728,
+      0.9454545454545455,
+      1.0181818181818183,
+      1.090909090909091,
+      1.1636363636363638,
+      1.2363636363636363,
+      1.309090909090909,
+      1.3818181818181818,
+      1.4545454545454546,
+      1.5272727272727273,
+      1.6
+    ],
+    "b": [
+      -1.25,
+      -1.0227272727272727,
+      -0.7954545454545454,
+      -0.5681818181818182,
+      -0.34090909090909094,
+      -0.11363636363636376,
+      0.11363636363636354,
+      0.34090909090909083,
+      0.5681818181818181,
+      0.7954545454545454,
+      1.0227272727272725,
+      1.25
+    ],
+    "c": [
+      0.1,
+      0.10727272727272728,
+      0.11454545454545455,
+      0.12181818181818183,
+      0.1290909090909091,
+      0.13636363636363635,
+      0.14363636363636365,
+      0.1509090909090909,
+      0.15818181818181817,
+      0.16545454545454547,
+      0.17272727272727273,
+      0.18
+    ],
+    "d": [
+      0.9,
+      0.9063636363636364,
+      0.9127272727272727,
+      0.9190909090909091,
+      0.9254545454545454,
+      0.9318181818181819,
+      0.9381818181818182,
+      0.9445454545454546,
+      0.9509090909090909,
+      0.9572727272727273,
+      0.9636363636363636,
+      0.97
+    ]
+  },
+  "theta_sha256": "35a0fe03ca472ac3ab0ea56529eedf637d116fb08b5ee57af1e46ae7f0253be8",
+  "holdout_sha256": "896a50b328f4f1e5cd895fbef8ba0d0ec2014d3bbe66f1310ef8d677f6ea263f",
+  "statistics": {
+    "n": 10000,
+    "covered": 9499,
+    "coverage": 0.9499,
+    "mcse_conditional_on_calibration": 0.002181513007066427,
+    "cp_97_5": [
+      0.9447915444603486,
+      0.9546725782141784
+    ],
+    "bias": 0.005836063125730817,
+    "rmse": 0.6278171997845113,
+    "coverage_screen_only": true
+  },
+  "correlation": 0.776908506967357,
+  "quadrature_max_difference": 2.708944180085382e-14,
+  "theta_bands": [
+    {
+      "lower": "-inf",
+      "upper": "-2",
+      "n": 226,
+      "covered": 131,
+      "coverage": 0.5796460176991151,
+      "mcse_conditional_on_calibration": 0.03283483148568361,
+      "cp_97_5": [
+        0.5030158216199064,
+        0.6535984001197414
+      ],
+      "bias": 1.2559094133272521,
+      "rmse": 1.3459819464489953,
+      "coverage_screen_only": false
+    },
+    {
+      "lower": "-2",
+      "upper": "-1",
+      "n": 1388,
+      "covered": 1273,
+      "coverage": 0.9171469740634006,
+      "mcse_conditional_on_calibration": 0.007399100441358896,
+      "cp_97_5": [
+        0.8990626170648621,
+        0.9329565463932399
+      ],
+      "bias": 0.5564835774609627,
+      "rmse": 0.7354606412987159,
+      "coverage_screen_only": false
+    },
+    {
+      "lower": "-1",
+      "upper": "0",
+      "n": 3443,
+      "covered": 3367,
+      "coverage": 0.9779262271275051,
+      "mcse_conditional_on_calibration": 0.0025039336710708606,
+      "cp_97_5": [
+        0.9716293780706801,
+        0.9831661248310084
+      ],
+      "bias": 0.11282341426827777,
+      "rmse": 0.525882653451246,
+      "coverage_screen_only": false
+    },
+    {
+      "lower": "0",
+      "upper": "1",
+      "n": 3408,
+      "covered": 3347,
+      "coverage": 0.9821009389671361,
+      "mcse_conditional_on_calibration": 0.0022711373238621427,
+      "cp_97_5": [
+        0.9763101875721448,
+        0.9868106291943776
+      ],
+      "bias": -0.16694511222263012,
+      "rmse": 0.5406272804947996,
+      "coverage_screen_only": false
+    },
+    {
+      "lower": "1",
+      "upper": "2",
+      "n": 1315,
+      "covered": 1228,
+      "coverage": 0.9338403041825095,
+      "mcse_conditional_on_calibration": 0.006854411610773527,
+      "cp_97_5": [
+        0.9168342699709425,
+        0.9483398419483811
+      ],
+      "bias": -0.45017701143532957,
+      "rmse": 0.6550826685211589,
+      "coverage_screen_only": true
+    },
+    {
+      "lower": "2",
+      "upper": "inf",
+      "n": 220,
+      "covered": 153,
+      "coverage": 0.6954545454545454,
+      "mcse_conditional_on_calibration": 0.031027665123325977,
+      "cp_97_5": [
+        0.6207182760607902,
+        0.7634200534112194
+      ],
+      "bias": -1.024515475018025,
+      "rmse": 1.105299944584924,
+      "coverage_screen_only": false
+    }
+  ],
+  "software_checks": "PASS",
+  "limitations": [
+    "One calibration only; 10000 people are not 10000 independent calibration repetitions.",
+    "EAP plus/minus 1.96 posterior SD is a diagnostic normal approximation, not an equal-tailed posterior interval.",
+    "CP/MCSE cover holdout sampling conditional on this calibration only.",
+    "Theta-band coverage can differ; no uniform-in-theta claim.",
+    "Only J12; no J30 or rectangle certification; no parameter-SE or S-X2 p certification."
+  ],
+  "wall_seconds": 6.106885845000001
+}

@@ -1,0 +1,48 @@
+{
+  "amendment": "F: independent holdout person-recovery/normal-interval pilot",
+  "base_main": "7fc9161b63f17ecca71ced7c7a09ebc9d43accd7",
+  "registered_before_new_execution": true,
+  "time_budget_seconds": 900,
+  "scope": "One independent calibration and one independent holdout per model, 3PL/4PL, J=12. Diagnostic pilot, never full certification.",
+  "calibration": {
+    "N": 3000,
+    "J": 12,
+    "seed": {
+      "threePL": 2026112531,
+      "fourPL": 2026112541
+    },
+    "truth": "Existing validation.irt_3pl4pl_root_cause.truth; theta N(0,1); independent NumPy uniforms",
+    "estimator": "Production fit_python_mirt MAP, default priors, GH61, tol 1e-10, max_iter 50000. Exactly one fit/model, no retry; no setting changed after results."
+  },
+  "holdout": {
+    "N": 10000,
+    "seed": {
+      "threePL": 2026112532,
+      "fourPL": 2026112542
+    },
+    "truth": "Same true item coefficients, independent latent traits and uniforms; original true theta retained. Not generated from estimated coefficients.",
+    "score": "Existing production binary_person_abilities GH121/GH241, same ordering and complete binary data",
+    "interval": "Diagnostic EAP +/- existing Z95 times conditional posterior SD. Not a production CI and not an automatically calibrated frequentist interval."
+  },
+  "record": [
+    "actual fit convergence and iterations",
+    "calibration and holdout hashes",
+    "true/estimated coefficients",
+    "per-person true theta, EAP, posterior SD, interval coverage",
+    "bias/RMSE/correlation",
+    "marginal coverage, binomial MCSE, 97.5% exact CP CI per model (Bonferroni for two fixed-calibration coverage statements)",
+    "theta-band conditional coverage and quadrature stability",
+    "versions, protocol commit, execution time"
+  ],
+  "failure": "Nonconvergence, unstable quadrature, exception or timeout is retained as FAIL; no retry or replacement. No silent subject exclusion. No scientific criterion is relaxed.",
+  "decisions": {
+    "software": "PASS only for complete finite output, unique IDs, valid scale, convergence, quadrature stability and 10000 preserved holdout rows; inferential disagreement remains evidence, not a software PASS claim.",
+    "coverage_diagnostic": "Existing .95 +/- .02 is reported as a diagnostic screen only. No person bias/RMSE criterion was preregistered in prior certification; report those without invented acceptance limits.",
+    "certification": "MEASURED / NOT CERTIFIED regardless of a favorable point estimate: one calibration cannot establish sampling coverage across calibration datasets or across the four rectangle corners. CP/MCSE condition on that calibration; no effective sample size claim of 10000 independent item calibrations."
+  },
+  "other_blockers": {
+    "parameter_SE_CI": "Existing posterior-curvature, sandwich and crossprod failures remain. No unchanged campaign repeated, no data-driven SE scaling or naive penalized profile pivot. Broad covariance/CI certification requires a fresh preregistered multi-calibration campaign outside this bounded pilot.",
+    "SX2": "Native numerical S-X2 identity is insufficient. Conditional simulation with frozen fitted items omits parameter-estimation effects; a refit bootstrap or justified null law requires separate preregistration. No p gate opens."
+  },
+  "production": "No output gates, calibration algorithms, estimator defaults, registry bytes or PR187 export/UI contracts changed by this pilot."
+}

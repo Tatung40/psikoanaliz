@@ -1,0 +1,27 @@
+name: 3PL 4PL archived holdout evidence integrity
+on:
+  pull_request:
+    paths:
+      - 'validation/evidence/binary34_person_holdout_f/**'
+      - 'validation/BINARY34_PERSON_HOLDOUT_F.md'
+      - 'tests/test_binary34_holdout_evidence.py'
+      - '.github/workflows/binary34-person-evidence.yml'
+permissions:
+  contents: read
+jobs:
+  holdout-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Reuse project dependencies
+        run: pip install -r requirements.txt
+      - name: Independently recompute archived coverage and precision only
+        run: python -m pytest -q tests/test_binary34_holdout_evidence.py
