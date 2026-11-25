@@ -1,0 +1,7 @@
+{
+  "phase": "pilot",
+  "bootstrap_P1": false,
+  "bootstrap_P3": false,
+  "protocol_commit": "c7327ac8cfbd1fa7c3956a8861b202be0bc5a34a",
+  "scientific_execution": "Development R20/model plus independent P3 baseline R3000/model and P2 first300/model; no certification before complete acceptance."
+}

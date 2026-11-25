@@ -1,0 +1,76 @@
+name: Shared independent IRT closure
+on:
+  pull_request:
+    paths:
+      - 'validation/irt_closure/**'
+      - 'tests/test_irt_closure.py'
+      - '.github/workflows/irt-closure.yml'
+permissions:
+  contents: read
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        shell: python
+        run: |
+          import json,os
+          phase=json.load(open("validation/irt_closure/RUN.json"))
+          rows=[]
+          if phase["phase"]=="pilot":
+            rows += [dict(model=m,stage="pilot",shard=s,shards=4,total=20,B=399,bootstrap=True) for s in range(4) for m in ("3PL","4PL")]
+          rows += [dict(model=m,stage="baseline",shard=s,shards=6,total=3000,B=0,bootstrap=False) for s in range(6) for m in ("3PL","4PL")]
+          if phase["phase"]=="confirm":
+            total=1500 if phase.get("bootstrap_P3") else 400
+            B=399 if phase.get("bootstrap_P1") else 99
+            rows += [dict(model=m,stage="confirm",shard=s,shards=40,total=total,B=B,bootstrap=True) for s in range(40) for m in ("3PL","4PL")]
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:f.write("matrix="+json.dumps({"include":rows})+"\n")
+  scientific-work:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: closure-${{ github.head_ref }}-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}
+      cancel-in-progress: false
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: No-fit numerical contracts
+        run: python -m pytest -q tests/test_irt_closure.py
+      - uses: actions/cache/restore@v4
+        with:
+          path: /tmp/irt-closure/
+          key: closure-I-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-${{ github.run_id }}
+          restore-keys: |
+            closure-I-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-
+      - name: Shared native calibration and checkpointed independent workload
+        run: |
+          mkdir -p /tmp/irt-closure
+          set -o pipefail
+          python -u validation/irt_closure/runner.py --model '${{ matrix.model }}' --stage '${{ matrix.stage }}' --shard '${{ matrix.shard }}' --shards '${{ matrix.shards }}' --total '${{ matrix.total }}' --B '${{ matrix.B }}' --work /tmp/irt-closure ${{ matrix.bootstrap && '--bootstrap' || '' }} 2>&1 | tee /tmp/irt-closure/execution.log
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: /tmp/irt-closure/
+          key: closure-I-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: closure-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}
+          path: /tmp/irt-closure/
