@@ -1,0 +1,48 @@
+name: Transformed empirical MAP uncertainty H
+on:
+  pull_request:
+    paths:
+      - 'validation/parameter_uncertainty_h/**'
+      - 'tests/test_parameter_uncertainty_h.py'
+      - '.github/workflows/parameter-uncertainty-h.yml'
+permissions:
+  contents: read
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ['3PL','4PL']
+        n: [3000,10000]
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+      G_REFERENCE: /tmp/parameter-g-runner.py
+      H_PREFLIGHT_ONLY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Reuse pinned score and precision helpers without running G
+        run: |
+          git fetch --no-tags --depth=1 origin 2211429dc7c8226f11f95a9305bb93ac57b0abd8
+          git show 2211429dc7c8226f11f95a9305bb93ac57b0abd8:validation/parameter_uncertainty_g/runner.py > /tmp/parameter-g-runner.py
+      - name: Independent transformed derivatives before any fit
+        run: python -m pytest -q tests/test_parameter_uncertainty_h.py
+      - name: Fresh bounded independent confirmation
+        run: |
+          mkdir -p /tmp/parameter-h
+          set -o pipefail
+          python -u validation/parameter_uncertainty_h/runner.py --model '${{ matrix.model }}' --n '${{ matrix.n }}' --output /tmp/parameter-h 2>&1 | tee /tmp/parameter-h/execution.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parameter-h-${{ matrix.model }}-${{ matrix.n }}
+          path: /tmp/parameter-h/

@@ -1,0 +1,61 @@
+{
+  "amendment": "H: uncentered pattern-compressed empirical MAP sandwich with native-box-logit confidence intervals",
+  "base": "da0ae7c08cc542beab5b0a59036d8777f44fcdfa",
+  "registered_before_execution": true,
+  "source_reuse": {
+    "G_head": "2211429dc7c8226f11f95a9305bb93ac57b0abd8",
+    "purpose": "Reuse only analytic marginal score and summary helpers. Failed G data/seeds are not confirmation data."
+  },
+  "estimand": "Existing PHYSICAL native MAP point estimates, unchanged. Transformed objective is ell(x(eta))+logprior(x(eta)), WITHOUT log Jacobian density.",
+  "coordinates": "eta_i=logit((x_i-lo_i)/(hi_i-lo_i)) at actual native physical box bounds. Python mirt 1.2.0 c upper=.5 and d lower=.5 imply exact 0<c<d<1 for all finite 4PL eta. 3PL d remains fixed 1. No extra coupled transformation is needed for these disjoint native boxes; reject any API/bound mismatch.",
+  "method": "A_x=inverse(native full joint covariance). g_x=exact marginal likelihood gradient + physical default-prior gradient. D=diag(dx/deta), h=d2x/deta2. A_eta=D A_x D-diag(g_x*h), including nonstationary chain correction. Individual transformed likelihood scores=s_x D; B_eta=sum_pattern f_pattern s_eta s_eta' UNcentered, no prior curvature in meat. C_eta=A_eta^-1 B_eta A_eta^-T. Do not require likelihood Hessian alone PD. No pseudoinverse or rescaling.",
+  "intervals": "Native-box-logit eta +/- Z95 sqrt(diag(C_eta)), exact inverse mapping to physical bounds. Physical sampling SE from full D C_eta D. These are new transformed-scale frequentist candidate intervals, not Bayesian credible intervals; coverage must independently pass.",
+  "derivatives": "Independent actual physical/transformed log posterior central gradients/Hessians at two steps; compressed/uncompressed score equivalence; full chain nonstationary term checked. First calibration/cell numerical Hessian vs native bread, rel Frobenius <=1e-3 and numerical Hessian step agreement <=1e-3; failures retained, never bypassed.",
+  "scope": {
+    "N": [
+      3000,
+      10000
+    ],
+    "J": 12,
+    "models": [
+      "3PL",
+      "4PL"
+    ],
+    "replications_per_cell": 300,
+    "exclusions": "J30 not attempted: prior G feasibility records already show 4PL J30 exceeds bounded cost. No broad J12-J30 model certification."
+  },
+  "fit": {
+    "n_quadpts": 61,
+    "max_iter": 500,
+    "tol": 0.0001,
+    "estimation": "MAP",
+    "priors": "unchanged default_priors"
+  },
+  "seeds": {
+    "threePL": 202611250801,
+    "fourPL": 202611250802,
+    "construction": "[seed,N,12,replication] fresh independent confirmation only"
+  },
+  "gates": {
+    "convergence_min": 0.99,
+    "se_refused_rate_max": 0.01,
+    "withheld_max": 0.05,
+    "coverage_target": 0.95,
+    "coverage_abs_error_max": 0.02,
+    "cluster_mcse_max": 0.005,
+    "abs_pooled_bias_ab_max": 0.05,
+    "rmse_ab_max": 0.3,
+    "rmse_cd_max": 0.07,
+    "condition_max": 100000000,
+    "boundary_distance_min": 0.000001
+  },
+  "precision": "R300 is planned, not an automatic precision guarantee. Cluster MCSE <=.005 must actually hold; per-item coverage separately descriptive. Missing precision or incomplete campaign is INCONCLUSIVE, not certification.",
+  "budget": {
+    "seconds_per_cell": 300,
+    "workers_per_cell": 2,
+    "benchmark": "Reuse identical native-fit G timings for N3000/J12 and N10000/J12; new deterministic compressed-score/unit derivative benchmark before fitting. First 10 planned replications retained for technical feasibility only; stop if estimated full cost exceeds 300 seconds. No result-based stopping or extension."
+  },
+  "failure": "Every seed/response hash, nonconvergence, Hessian mismatch, boundary/covariance refusal preserved; no retry/replacement. Failed fits included in denominator sensitivity. No unvalidated prior-score bias correction.",
+  "production": "No integration/registry promotion unless all gates pass both N endpoints for a model in explicitly limited J12 scope. Original certified estimator, outputs and PR187 exports preserved. If fails, diagnose covariance calibration vs bias/asymmetry; no threshold change.",
+  "P2_P3": "Only if budget remains after P1. Otherwise NOT EXECUTED; no claimed person or S-X2 certification."
+}
