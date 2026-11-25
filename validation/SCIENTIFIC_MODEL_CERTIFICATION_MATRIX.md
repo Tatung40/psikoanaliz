@@ -113,3 +113,19 @@ Uygulamada yeni çıkarım yalnız açık bağımsızlık beyanı ve ayrık kali
 Aynı kalibrasyon kişilerine yeni kapsama etiketi verilmez. J30/farklı DGP genellenmez.
 P1 bootstrap bağlama tersleme yalnız pilot (3PL b/c .925/.904; 4PL %40 ret); bağımsız doğrulama yok, NOT CERTIFIED.
 P3 yerel ki-kare p-değerleri 3000'er null uyumda kapıları geçmedi; üretimde kapalı kalır.
+
+## P1/P3 kapanış J — 2026-11-25
+
+Önkayıt `validation/p3_sx2_analytic/PROTOCOL.json` (f8b92e5, doğrulamadan önce); doğrulama 45665227625 (baş e53ad8a, model başına 3000 yeni kalibrasyon, kök 202611252101), salt okunur toplama 45683610723. Kanıt: `evidence/p1p3_analytic/` (REPORT_J_FINAL.json, P1_CERTIFICATION.json, SHA256SUMS).
+Tanı: N=3000/J12'de beklenen Fisher bilgisinin en küçük özdeğeri × N = .54 (3PL), .06 (4PL) — zayıf tanımlanma; MAP popülasyon fonksiyoneli gerçekten bir örnekleme SD'si kadar sapar (a .15, b .11, c .036, d .053). MAP merkezli aralıklar hiçbir varyans düzeltmesiyle kalibre edilemez.
+
+| Model | Çıktı | Yöntem | Kapsama / I. tip | MCSE | Karar |
+|---|---|---|---|---|---|
+| 3PL | a, b, c %95 GA | Tek adımlı önsel-yanlılık düzeltmeli Wald (MAP değişmez) | .9504 / .9491 / .9468 | ≤.0012 | SCOPED CERTIFIED (N3000/J12); c medyan genişlik .29 |
+| 4PL | a, b, c, d %95 GA | aynı | .9496 / .9489 / .9463 / .9477 | ≤.0012 | SCOPED CERTIFIED; geçerli fakat geniş (a 3.2, b 2.6, c .46, d .45 medyan) |
+| 3PL/4PL | Tek-adım kestiricisinin SH'si | √diag(I⁻¹/N) | SH/SD .96–1.04, delta GA [.9245,1.107] içinde | — | SCOPED CERTIFIED; MAP SH'si değildir |
+| 3PL/4PL | MAP örnekleme SH'si | — | — | — | NOT CERTIFIED (değişmedi) |
+| 3PL | S-X² Yöntem A (çıkarım-düzeltmeli genelleştirilmiş ki-kare referansı) | Tam 4096 örüntü etki fonksiyonu + Imhof | havuz .0491; madde 11 eşzamanlı üst .0720 > .07 | .0011 | NOT CERTIFIED |
+| 4PL | S-X² Yöntem A | aynı | havuz .0484, üst ≤.0643; güç .060 (alt .036 ≤ .10) | .0012 | NOT CERTIFIED (güç kapısı) |
+| 3PL/4PL | S-X² tam yeniden kestirimli parametrik bootstrap (B=99) | Yedek A | 1438/1500 ve 1165/1500 tamamlandı; üst .076/.0748; 4PL güç .06 | .0017 | INCONCLUSIVE — süre sınırında iptal; NOT CERTIFIED |
+| 3PL/4PL | Orijinal ki-kare S-X² p | — | .0622 / .0862 (yeni null) | — | NOT CERTIFIED (kapalı kalır) |

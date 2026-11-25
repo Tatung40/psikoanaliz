@@ -3,7 +3,7 @@
  "protocol": "validation/p3_sx2_analytic/PROTOCOL.json (f8b92e5, before confirmation)",
  "confirmation_run": 45665227625,
  "confirmation_head": "e53ad8a",
- "aggregation_run": 45669467736,
+ "aggregation_run": 45683610723,
  "seeds": {
   "null": 202611252101
  },
