@@ -1,0 +1,42 @@
+name: 3PL 4PL independent person holdout pilot
+on:
+  pull_request:
+    paths:
+      - 'validation/uncertainty_f/**'
+      - 'tests/test_binary34_person_holdout.py'
+      - '.github/workflows/binary34-person-holdout.yml'
+permissions:
+  contents: read
+jobs:
+  person-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ['3PL', '4PL']
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Reuse existing project dependencies
+        run: pip install -r requirements.txt
+      - name: Lightweight affected tests only
+        run: python -m pytest -q tests/test_binary34_person_holdout.py
+      - name: Exactly one preregistered fit and independent holdout
+        run: |
+          mkdir -p /tmp/person-holdout
+          set -o pipefail
+          python -u validation/uncertainty_f/runner.py --model '${{ matrix.model }}' --output /tmp/person-holdout 2>&1 | tee /tmp/person-holdout/execution.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: person-holdout-${{ matrix.model }}
+          path: /tmp/person-holdout/
