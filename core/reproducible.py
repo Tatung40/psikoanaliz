@@ -30,6 +30,7 @@ PREFLIGHT_ONLY = frozenset({
     'fingerprint', 'data_type', 'prepare', 'prepare_polytomous', 'prepare_data',
     'validate', 'validate_inputs', 'validate_analysis_inputs', 'screen_items',
     'structure', 'specification', 'support_matrix', 'group_candidates', 'category_mapping',
+    'independent_person_scope',  # eligibility only; never a new fitted/scored result
 })
 
 
@@ -394,7 +395,11 @@ def runtime_hashes(calls=()):
 def _runtime_assets(calls):
     path = ROOT / 'scripts' / 'gtheory_reml.R'
     needed = any(c.get('module')=='core.generalizability_advanced' and c.get('function')=='analyze' for c in calls)
-    return [path] if needed and path.is_file() else []
+    assets=[path] if needed and path.is_file() else []
+    person_needed=any(c.get('module') in ('core.irt_binary_persons','core.irt_binary_patterns') for c in calls)
+    person_proof=ROOT/'validation'/'evidence'/'irt_closure'/'P2_CERTIFICATION.json'
+    if person_needed and person_proof.is_file():assets.append(person_proof)
+    return assets
 
 
 def python_code(manifest):

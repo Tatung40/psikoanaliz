@@ -95,3 +95,21 @@ MFRM (ön kayıt `b3b9e42`, `mfrm/RESULT.md`):
 - R TAM MML; mfrmr MML ile yüzey, eşik, logLik ve σ farkı ≤ 4.2e-6.
 - 5 çıktı CERTIFIED (fikstür kapsamı), 11 PARTIAL, 4 NOT CERTIFIED; 4+ yüzeyli model desteklenmiyor.
 - FACETS eşdeğerliği iddia edilmez.
+
+
+## P2 bağımsız kişi çıkarımı — 2026-11-25 kapsamlı ek kayıt
+
+Önkayıt c7327ac; orijinal çalışma 45617556122, salt okunur kanıt toplama 45637837615.
+Her modelde 300 bağımsız kalibrasyon, N=3000/J=12, MAP/GH61, N(0,1), common.truth madde düzeni; 4096 yanıt örüntüsü tam sayıldı.
+Ek sicil: evidence/irt_closure/P2_CERTIFICATION.json. Önceki nokta/IRF/bilgi ve parametre çıkarım sicilleri değişmedi.
+
+| Model | Çıktı | Karar | Sınır |
+|---|---|---|---|
+| 3PL/4PL | Bağımsız popülasyonda EAP geri kazanımı | SCOPED CERTIFIED | N3000/J12; oracle-risk ölçütü ve yan kapıları geçti; bireysel sabit-θ yansızlık iddiası yok |
+| 3PL/4PL | Eşit kuyruklu posterior %95 aralık | SCOPED CERTIFIED — marjinal | Bayesçi aralık; sabit θ ve uç bölge sıklıkçı kapsaması sertifikalı değildir |
+| 3PL/4PL | Skora dayalı Poisson-binomial tersleme aralığı | SCOPED CERTIFIED | K: bilinen maddelerde matematiksel tam test; F: bağımsız kalibrasyonlar, θ=-4..4 21 nokta ve N(0,1) kuyruk ortalamaları; sonsuz/boş kümeler mümkün |
+
+Uygulamada yeni çıkarım yalnız açık bağımsızlık beyanı ve ayrık kalibrasyon/puanlama kimlikleriyle sunulur.
+Aynı kalibrasyon kişilerine yeni kapsama etiketi verilmez. J30/farklı DGP genellenmez.
+P1 bootstrap bağlama tersleme yalnız pilot (3PL b/c .925/.904; 4PL %40 ret); bağımsız doğrulama yok, NOT CERTIFIED.
+P3 yerel ki-kare p-değerleri 3000'er null uyumda kapıları geçmedi; üretimde kapalı kalır.

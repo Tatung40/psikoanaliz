@@ -251,6 +251,9 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     _academic_word(saved,model,cols)
 
 
+    if outputs['persons']:
+        _independent_person_view(saved,report,data,cols,id_col,model)
+
 def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
     """B13 output types on the library route: parameter SE/CI, eight charts as 300 dpi PNG, report bundle."""
     from core.irt_binary_inference import parameter_inference,STATUS
@@ -362,3 +365,46 @@ def _academic_word(saved,model,cols):
     st.download_button('📄 Akademik 2PL Raporu — Word İndir',store['docx'],'python_mirt_2pl_akademik_rapor.docx',
                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                        key='python_mirt_2pl_academic_word',on_click='ignore')
+
+
+def _independent_person_view(saved,report,data,cols,id_col,model):
+    """Held-out workflow; in-sample estimates never acquire the new certificate."""
+    from core.irt_binary_patterns import independent_person_scope,score_independent_persons,METHOD_VERSION
+    if not independent_person_scope(saved['outcome']) or id_col not in data.columns:return
+    st.subheader('Bağımsız örneklem: kişi puanları ve aralıkları')
+    st.caption('Yalnız referans N3000/J12 MAP/GH61 koşulları. Kalibrasyon verisindeki kişilere bu aralık sertifikası uygulanmaz.')
+    uploaded=st.file_uploader('Kalibrasyondan bağımsız kişi verisi (aynı madde ve kimlik sütunları)',
+                              type=['csv','xlsx'],key=f'python_mirt_holdout_file_{model}')
+    declared=st.checkbox('Bu dosya kalibrasyondan bağımsız farklı bireyler içerir.',
+                         key=f'python_mirt_holdout_declared_{model}')
+    cache_name=f'python_mirt_holdout_result_{model}'
+    if uploaded is None or not declared:
+        st.session_state.pop(cache_name,None);return
+    payload=uploaded.getvalue()
+    key=(saved['key'],hashlib.sha256(payload).hexdigest(),uploaded.name.lower(),_data_fingerprint(data[[id_col]]),str(id_col),tuple(cols),METHOD_VERSION,declared)
+    if st.session_state.get(cache_name,{}).get('key')!=key:st.session_state.pop(cache_name,None)
+    if st.button('Bağımsız bireyleri puanla',key=f'python_mirt_holdout_run_{model}'):
+        try:
+            import io
+            import pandas as pd
+            held=(pd.read_excel(io.BytesIO(payload),dtype={id_col:str}) if uploaded.name.lower().endswith('.xlsx')
+                  else pd.read_csv(io.BytesIO(payload),dtype={id_col:str}))
+            if id_col not in held or any(c not in held for c in cols):raise ValueError('Kimlik veya madde sütunları eksik.')
+            x=held[list(cols)].apply(pd.to_numeric,errors='raise').to_numpy()
+            people=score_independent_persons(saved['outcome'],x,held[id_col].tolist(),
+                         data[id_col].tolist(),independence_declared=declared)
+            from reports.irt_binary_report import bundle
+            excel,archive=bundle(report,people,None,'Bu paket bağımsız kişi çıkarımını raporlar; parametre SE/GA doğrulaması değildir.')
+            st.session_state[cache_name]={'key':key,'people':people,'excel':excel,'zip':archive}
+        except (ValueError,TypeError,KeyError,ImportError) as exc:
+            st.session_state.pop(cache_name,None);st.error(f'Bağımsız kişi analizi yapılamadı: {exc}')
+    result=st.session_state.get(cache_name)
+    if not result or result['key']!=key:return
+    st.warning('Posterior aralık Bayesçidir: sabit θ ve uçlarda %95 sıklıkçı kapsama garantisi vermez. Skor aralığı farklı, madde kestirimlerine koşullu bir güven kümesidir; ±∞ veya boş küme mümkün. Doğrulama yalnız kayıtlı madde düzeni, θ=-4..4 (21 nokta) ve N(0,1) kuyruk ortalamaları içindir; J30 doğrulanmadı.')
+    st.dataframe(safe_frame(result['people']),hide_index=True,use_container_width=True)
+    st.download_button(f'{model} bağımsız kişi puanları — CSV',_csv(result['people']),
+                       f'{model}_independent_persons.csv','text/csv',key=f'python_mirt_holdout_csv_{model}',on_click='ignore')
+    st.download_button(f'{model} bağımsız kişi raporu — XLSX',result['excel'],
+                       f'{model}_independent_persons.xlsx',key=f'python_mirt_holdout_xlsx_{model}',on_click='ignore')
+    st.download_button(f'{model} bağımsız kişi paketi — ZIP',result['zip'],
+                       f'{model}_independent_persons.zip','application/zip',key=f'python_mirt_holdout_zip_{model}',on_click='ignore')

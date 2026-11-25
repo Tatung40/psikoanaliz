@@ -1,0 +1,109 @@
+{
+  "id": "I: shared-fit independent 3PL/4PL closure",
+  "base_main": "95081fedd610289d3bb433095835e29f2187e5a8",
+  "registered_before_execution": true,
+  "start_utc": "2026-11-25T12:22:02Z",
+  "hard_stop_utc": "2026-11-25T15:22:02Z",
+  "engine": "Python mirt 1.2.0; native MAP, GH61, tol1e-4, max_iter500, unchanged default priors and original estimator; no R.",
+  "scope": {
+    "model": [
+      "3PL",
+      "4PL"
+    ],
+    "calibration_N": 3000,
+    "J": 12,
+    "truth": "validation.binary_certification.common.truth",
+    "latent": "N(0,1)",
+    "data": "Complete independent binary; local independence, no DIF",
+    "exclude": "No J30, N outside exactly3000, nonnormal latent, multidimensional or missing-data generalization."
+  },
+  "seeds": {
+    "development": 202611251001,
+    "baseline_confirmation": 202611251101,
+    "bootstrap_confirmation": 202611251201,
+    "power_optional": 202611251301,
+    "construction": "SeedSequence([root,model3or4,replicate,inner]); model and stages disjoint. No prior A-H seeds reused."
+  },
+  "reuse": "Shared native calibration per seed cached as synthetic responses, physical coefficients/full covariance, labels, native raw S-X2 and public GH241 pattern EAP/SD when needed. Preserve failures; never refit unchanged seed. Bootstrap full native refits shared by P1 and P3. Exact response-pattern probabilities/scores cached. Confirmations remain independent of development.",
+  "stages": {
+    "development": {
+      "R_per_model": 20,
+      "shards_per_model": 4,
+      "bootstrap_B": 399,
+      "maximum_seconds": 1800,
+      "purpose": "Method feasibility and benchmarks only; NEVER certification"
+    },
+    "baseline_confirmation": {
+      "R_per_model": 3000,
+      "shards_per_model": 6,
+      "P2_first": 300,
+      "purpose": "P3 original chi-square calibration and independent P2 exact-pattern calibration; P1 may reuse eligible frozen base fits without duplicate calibration"
+    },
+    "bootstrap_confirmation": {
+      "R_per_model": 400,
+      "shards_per_model": 40,
+      "bootstrap_B": 399,
+      "launch_rule": "Only if development establishes technically valid binding inversion and within remaining wall-clock projection; preregister fixed selected method before launch. No scientific results from confirmation inspected for method selection.",
+      "P3_only_R": 1500,
+      "P3_B": 99
+    }
+  },
+  "P1": {
+    "method": "Parametric-bootstrap binding-function inversion with full joint score-sensitivity Jacobian, not A1/G/H covariance or a prior-score shift.",
+    "coordinates": "Exact native box-logit, MAP point remains physical native fit; no density-Jacobian prior.",
+    "bootstrap": "Generate under fitted marginal null; use multinomial pattern counts only when GH241/GH481 mass L1 <=1e-8 and independent integration check passes, otherwise latent-normal + Bernoulli generation. Every bootstrap dataset gets native full MAP refit. No unvalidated approximate refit.",
+    "score_identity": "D_eta E_eta[T(X)]=Cov_eta(T(X), likelihood_score_eta(X)), with T=transformed native MAP. Estimate full joint binding Jacobian from B full refits and likelihood scores at generating fit.",
+    "control_variate": "J=Veta Ieta + Cov_boot(Tstar-Tlinear, scorestar), where Tlinear=eta_hat+Veta(scorestar+prior_score_eta) and Ieta exact marginal expected Fisher from response enumeration. Control variate reduces Monte Carlo noise; no arbitrary shrinkage or pseudoinverse.",
+    "interval": "Binding inversion draws eta_hat + solve(J,eta_hat-eta_star). Take fixed .025/.975 quantiles, map exactly to physical boxes. Native MAP point unchanged; MAP sampling SE is SD of full bootstrap PHYSICAL estimates, not CI width or posterior SD. Report binding-inverted center separately.",
+    "failures": "Refuse nonsingular/condition-number gate violations (kappa>1e8), saturated/boundary coordinates, native nonconvergence or >1% failed bootstrap refits. Do not replace failed draws. Gaussian analytical identity test required before actual calibration.",
+    "gates": {
+      "outer_convergence_min": 0.99,
+      "outer_refusal_max": 0.01,
+      "inner_failure_max": 0.01,
+      "withheld_max": 0.05,
+      "abs_bias_ab_max": 0.05,
+      "rmse_ab_max": 0.3,
+      "rmse_cd_max": 0.07,
+      "coverage_target": 0.95,
+      "coverage_abs_error_max": 0.02,
+      "cluster_MCSE_max": 0.004,
+      "SE_accuracy": "Bootstrap sampling-SD / empirical sampling-SD must have simultaneous95% calibration-cluster delta CI inside [Phi^-1(.965)/Z95, Phi^-1(.985)/Z95], the Gaussian SE ratio range implied by unchanged .95±.02 coverage tolerance. This is separate from confidence-inversion coverage; report per-item values."
+    },
+    "development_decision": "Assess native API, covariance/score identities, numerical conditioning, binding nonlinearity and runtime. Grossly invalid/unstable inversion is rejected, not silently rescaled. If infeasible or scientifically failed, preserve records and prioritize P2/P3 rather than repeating unchanged."
+  },
+  "P2": {
+    "patterns": 4096,
+    "posterior": "Preserve public native GH241 EAP/SD. Independently compute marginal probabilities, moments, CDF and .025/.975 equal-tailed posterior bounds under K=true items and F=independently calibrated MAP items.",
+    "integration": "Normal-prior theta grid[-10,10], dyadic .02/.01/.005 convergence until weighted coverage change<=1e-4 and interval-bound change<=1e-3; independently check moments GH241/GH481 and native F<=1e-6. No guessed quantiles or normal-Wald substitute.",
+    "metrics": "Exact pattern-weighted bias/RMSE, marginal and theta-grid/tail coverage; calibration dataset is MC cluster, never persons or parameter draws.",
+    "exact_frequentist": "Invert exact Poisson-binomial raw-score tails at .025 via monotonic root finding, using enumerated equivalent raw-score probabilities. Allow +/-infinity where 3PL/4PL asymptotes prevent rejection. Known-item exact coverage is distinct from fitted-item coverage. Never invoke Wilks.",
+    "theta_grid": "21 prespecified theta values linspace(-4,4,21); tail subsets theta<=-2 or >=2 and separate unconditional theta regions.",
+    "gates": {
+      "abs_marginal_bias_max": 0.05,
+      "marginal_coverage_target": 0.95,
+      "marginal_coverage_abs_error_max": 0.02,
+      "cluster_MCSE_max": 0.004,
+      "numerical_identity_max": 0.000001,
+      "non_evaluable_max": 0.01,
+      "oracle_efficiency": "Upper simultaneous95% CI of excess F MSE relative to K must be <=5% of K Bayes risk (retain at least95% oracle measurement precision); new criterion fixed before data, not inferred from observed errors."
+    },
+    "uncertainty": "Bonferroni t intervals over calibration clusters for P2 declared family (models x marginal credible coverage/bias/efficiency and exact-CI conditional grid/tails); report approximate MC intervals. Raw-score F frequentist claim only where lower simultaneous bound >=.95; K exact result is mathematical, not a fitted-item guarantee. Credible intervals retain Bayesian label."
+  },
+  "P3": {
+    "primary": "Evaluate ORIGINAL native mirt.itemfit S_X2 statistic, df, raw p on independently refitted null datasets; preserve library raw-score grouping and sparse-cell collapsing.",
+    "baseline_R": 3000,
+    "alpha": 0.05,
+    "multiple_claims": "24 model-item primary null rejection rates; simultaneous one-sided exact CP with alpha=.05/24, plus dataset-cluster pooled MCSE.",
+    "gates": {
+      "per_item_simultaneous_upper_max": 0.07,
+      "interpretation": "Scoped approximate alpha=.05 size calibration allowing the project's fixed 2-percentage-point absolute error budget; NOT exact global size or all-alpha superuniformity. Report conservative behavior rather than falsely claiming uniform p.",
+      "cluster_MCSE_max": 0.004,
+      "non_evaluable_max": 0.01,
+      "failure_sensitivity": "Treat non-evaluable tests as rejections in worst-case Type-I bounds; never silently drop."
+    },
+    "replacement": "Only if baseline fails: use fitted-null parametric bootstrap with native full MAP refit, rebuild raw-score groups/collapsing and recompute S_X2 for each bootstrap. p=(1+exceedances)/(B+1), B399 fixed. Bootstrap fits already generated for P1 can be shared. No frozen-fit-only certification or df correction. Full-refit baseline retained. For P3 alone B99 may be used as preregistered fixed .01-resolution test at alpha=.05; use first99 refits when sharing a B399 P1 sample. Independent bootstrap confirmation R1500/model if baseline fails; its first400 may share P1 confirmation data/fit stream.",
+    "power": "Optional fresh local-dependence alternative only after size gates and if affordable; no power claim from null."
+  },
+  "production": "Promote only output+method+exact declared scope supported by independent complete confirmation. Preserve old certifications and unsupported gates. No pilot certification. All errors, original failures, refusal/completion counts and source/data hashes retained.",
+  "execution": "Bounded multiprocessing2/job; matrix max_parallel16. Global hard stop in numerical loops. Checkpoint fitted results and raw decisions; artifact/cache reuse on archive commits. CI execution PASS is never scientific PASS; no full local suite."
+}

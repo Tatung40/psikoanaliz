@@ -1,0 +1,149 @@
+{
+  "method_version": "pattern-person-v1",
+  "status": "SCOPED CERTIFIED",
+  "protocol_commit": "c7327ac8cfbd1fa7c3956a8861b202be0bc5a34a",
+  "confirmation_run": 45637837615,
+  "native_original_run": 45617556122,
+  "scope": {
+    "N": 3000,
+    "J": 12,
+    "estimation": "MAP",
+    "quadrature": 61,
+    "latent": "N(0,1)",
+    "true_item_fixture": "validation.binary_certification.common.truth",
+    "conditional_theta_grid": "21 points -4..4",
+    "tails": "N(0,1), theta<=-2 / >=2",
+    "excluded": "J30, alternative true item designs, nonnormal latent or missing data; no all-theta guarantee for fitted items",
+    "scoring": "Independent held-out persons; declared design and disjoint IDs. In-sample coverage not certified."
+  },
+  "models": {
+    "3PL": {
+      "recovery": true,
+      "credible_marginal": true,
+      "score_interval": true,
+      "independent_calibrations": 300,
+      "valid": 300,
+      "coverage": {
+        "mean": 0.9494500319680579,
+        "MCSE": 0.00015799998962504657,
+        "CI": [
+          0.9489214319322934,
+          0.9499786320038224
+        ]
+      },
+      "exact_marginal": {
+        "mean": 0.9781047414520411,
+        "MCSE": 0.000023944476919979566,
+        "CI": [
+          0.9780246335268045,
+          0.9781848493772777
+        ]
+      },
+      "bias": {
+        "mean": -0.00035516592755385686,
+        "MCSE": 0.0007843059801678061,
+        "CI": [
+          -0.0029791165376196215,
+          0.002268784682511908
+        ]
+      },
+      "rmse": 0.5876398102969704,
+      "oracle_efficiency": {
+        "mean": 0.0066479506685374525,
+        "MCSE": 0.00012021822946223144,
+        "CI": [
+          0.006245752158625598,
+          0.007050149178449307
+        ]
+      },
+      "credible_tail_coverage": [
+        0.6500425667531206,
+        0.7852050685262911
+      ],
+      "minimum_exact_grid_lower_CI": 0.965239405638583,
+      "exact_tail": [
+        {
+          "mean": 0.9866514024619142,
+          "MCSE": 0.00016561025642320988,
+          "CI": [
+            0.9860973417453532,
+            0.9872054631784751
+          ]
+        },
+        {
+          "mean": 0.9903072280925528,
+          "MCSE": 0.00009962008573042979,
+          "CI": [
+            0.9899739421157313,
+            0.9906405140693743
+          ]
+        }
+      ],
+      "warning": "Posterior credible marginal coverage does not imply frequentist fixed-theta/tail coverage; posterior SD excludes calibration uncertainty."
+    },
+    "4PL": {
+      "recovery": true,
+      "credible_marginal": true,
+      "score_interval": true,
+      "independent_calibrations": 300,
+      "valid": 300,
+      "coverage": {
+        "mean": 0.9493249485277535,
+        "MCSE": 0.00015107090351530432,
+        "CI": [
+          0.9488195302350645,
+          0.9498303668204425
+        ]
+      },
+      "exact_marginal": {
+        "mean": 0.9773687001281443,
+        "MCSE": 0.000018990257443149345,
+        "CI": [
+          0.9773051668912912,
+          0.9774322333649973
+        ]
+      },
+      "bias": {
+        "mean": -0.000849917734310229,
+        "MCSE": 0.0008009208250477056,
+        "CI": [
+          -0.003529454472062324,
+          0.0018296190034418664
+        ]
+      },
+      "rmse": 0.6271604780601824,
+      "oracle_efficiency": {
+        "mean": 0.008157592846506294,
+        "MCSE": 0.00014118814686314577,
+        "CI": [
+          0.007685238008645256,
+          0.00862994768436733
+        ]
+      },
+      "credible_tail_coverage": [
+        0.6175550683387253,
+        0.7495577086802876
+      ],
+      "minimum_exact_grid_lower_CI": 0.9598919221675679,
+      "exact_tail": [
+        {
+          "mean": 0.985487456869889,
+          "MCSE": 0.0002619525766811963,
+          "CI": [
+            0.9846110761705555,
+            0.9863638375692225
+          ]
+        },
+        {
+          "mean": 0.991032790896247,
+          "MCSE": 0.00015411447123851198,
+          "CI": [
+            0.9905171901344885,
+            0.9915483916580055
+          ]
+        }
+      ],
+      "warning": "Posterior credible marginal coverage does not imply frequentist fixed-theta/tail coverage; posterior SD excludes calibration uncertainty."
+    }
+  }
+}

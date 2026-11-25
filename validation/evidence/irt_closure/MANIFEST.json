@@ -1,0 +1,12 @@
+{
+  "protocol_commit": "c7327ac8cfbd1fa7c3956a8861b202be0bc5a34a",
+  "native_run": 45617556122,
+  "read_only_aggregate_run": 45637837615,
+  "calibration_clusters": 6040,
+  "independent_P2_calibrations": 600,
+  "independent_P3_calibrations": 6000,
+  "P1_development_only": 40,
+  "certified_new_outputs": 6,
+  "P1_independent_confirmation": 0,
+  "P3_bootstrap_independent_confirmation": 0
+}

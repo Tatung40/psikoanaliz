@@ -1,0 +1,160 @@
+name: Shared independent IRT closure
+on:
+  pull_request:
+    paths:
+      - 'validation/irt_closure/**'
+      - 'tests/test_irt_closure.py'
+      - '.github/workflows/irt-closure.yml'
+permissions:
+  contents: read
+jobs:
+  warm-benchmark:
+    needs: plan
+    if: needs.plan.outputs.phase != 'archive'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ['3PL','4PL']
+    env:
+      PYTHONPATH: .
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: /tmp/irt-closure/
+          key: closure-I-${{ matrix.model }}-pilot-0-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-benchmark-${{ github.run_id }}
+          restore-keys: |
+            closure-I-${{ matrix.model }}-pilot-0-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-
+      - name: Compare two native refit strategies against cached full cold fits
+        run: python -u validation/irt_closure/warm_benchmark.py --model '${{ matrix.model }}' --work /tmp/irt-closure/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: warm-benchmark-${{ matrix.model }}
+          path: /tmp/irt-closure/warm_benchmark.json
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      phase: ${{ steps.plan.outputs.phase }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: plan
+        shell: python
+        run: |
+          import json,os
+          phase=json.load(open("validation/irt_closure/RUN.json"))
+          rows=[]
+          if phase["phase"]=="pilot":
+            rows += [dict(model=m,stage="pilot",shard=s,shards=4,total=20,B=399,bootstrap=True) for s in range(4) for m in ("3PL","4PL")]
+          rows += [dict(model=m,stage="baseline",shard=s,shards=6,total=3000,B=0,bootstrap=False) for s in range(6) for m in ("3PL","4PL")]
+          if phase["phase"]=="confirm":
+            total=1500 if phase.get("bootstrap_P3") else 400
+            B=399 if phase.get("bootstrap_P1") else 99
+            rows += [dict(model=m,stage="confirm",shard=s,shards=40,total=total,B=B,bootstrap=True) for s in range(40) for m in ("3PL","4PL")]
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+            f.write("matrix="+json.dumps({"include":rows})+"\n")
+            f.write("phase="+phase["phase"]+"\n")
+  scientific-work:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: closure-${{ github.head_ref }}-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}
+      cancel-in-progress: false
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: No-fit numerical contracts
+        run: python -m pytest -q tests/test_irt_closure.py
+      - uses: actions/cache/restore@v4
+        with:
+          path: /tmp/irt-closure/
+          key: closure-I-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-${{ github.run_id }}
+          restore-keys: |
+            closure-I-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-
+      - name: Shared native calibration and checkpointed independent workload
+        run: |
+          mkdir -p /tmp/irt-closure
+          set -o pipefail
+          python -u validation/irt_closure/runner.py --model '${{ matrix.model }}' --stage '${{ matrix.stage }}' --shard '${{ matrix.shard }}' --shards '${{ matrix.shards }}' --total '${{ matrix.total }}' --B '${{ matrix.B }}' --work /tmp/irt-closure ${{ matrix.bootstrap && '--bootstrap' || '' }} 2>&1 | tee /tmp/irt-closure/execution.log
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: /tmp/irt-closure/
+          key: closure-I-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}-${{ hashFiles('validation/irt_closure/PROTOCOL.json','core/irt_python_mirt_adapter.py','validation/binary_certification/common.py') }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: closure-${{ matrix.model }}-${{ matrix.stage }}-${{ matrix.shard }}
+          path: /tmp/irt-closure/
+
+  aggregate:
+    env:
+      PYTHONPATH: .
+    needs: scientific-work
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: closure-*
+          path: /tmp/closure-results
+      - name: Independent calibration-cluster aggregation; no fits
+        run: |
+          mkdir -p /tmp/closure-aggregate
+          python -u validation/irt_closure/aggregate.py --input /tmp/closure-results --output /tmp/closure-aggregate/REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: closure-aggregate
+          path: /tmp/closure-aggregate/
+
+  p2-production-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Targeted DOCX cache and eligibility regression; no scientific simulations
+        run: python -m pytest -q tests/test_universal_academic_capture.py::test_graphic_selection_updates_word_without_refitting tests/test_universal_academic_capture.py::test_holdout_scope_check_is_not_a_new_calibration
+      - name: Real native engine, independent-only scope, UI stale downloads and shared exports
+        run: python -m pytest -q tests/test_irt_person_pattern_inference.py tests/test_binary34_uncertainty_contract.py tests/test_python_mirt_nine_results.py -k 'independent or preserved or scope or exports or ui_cache'

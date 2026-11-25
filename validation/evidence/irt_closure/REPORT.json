@@ -1,0 +1,1504 @@
+{
+  "calibration_clusters": 6040,
+  "scope": "N3000/J12, common.truth, independent normal latent; no J30",
+  "models": {
+    "3PL": {
+      "development_P1": {
+        "R": 20,
+        "expected": 20,
+        "eligible": 20,
+        "parameters": {
+          "a": {
+            "coverage": 0.9583333333333334,
+            "coverage_mc_se": 0.012824729401064426,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 20,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                12,
+                11,
+                11,
+                12,
+                10,
+                11,
+                12,
+                12,
+                11,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                10,
+                12,
+                11,
+                11
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12
+              ]
+            },
+            "bias": -0.008939381956769549,
+            "RMSE": 0.14312149166687507,
+            "sampling_SE_ratio": 1.0967397817265339,
+            "sampling_SE_ratio_CI": [
+              0.9212962974337356,
+              1.272183266019332
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              0.95,
+              1,
+              0.9,
+              0.9,
+              0.9,
+              1,
+              0.95,
+              1,
+              0.95,
+              0.95,
+              1,
+              1
+            ],
+            "refusal_rate": 0,
+            "mean_inner_refusal": 0.0002506265664160456
+          },
+          "b": {
+            "coverage": 0.925,
+            "coverage_mc_se": 0.015880585079150588,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 20,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                12,
+                10,
+                11,
+                11,
+                10,
+                10,
+                12,
+                12,
+                11,
+                12,
+                11,
+                12,
+                12,
+                11,
+                11,
+                9,
+                11,
+                11,
+                11
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12
+              ]
+            },
+            "bias": 0.006578403060647061,
+            "RMSE": 0.13902337582252788,
+            "sampling_SE_ratio": 1.0625759093354232,
+            "sampling_SE_ratio_CI": [
+              0.8847024857809063,
+              1.2404493328899402
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              0.95,
+              1,
+              0.95,
+              0.9,
+              0.85,
+              0.85,
+              0.85,
+              1,
+              0.8,
+              0.95,
+              1,
+              1
+            ],
+            "refusal_rate": 0,
+            "mean_inner_refusal": 0.0002506265664160456
+          },
+          "c": {
+            "coverage": 0.9041666666666667,
+            "coverage_mc_se": 0.01739105604640951,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 20,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                11,
+                9,
+                11,
+                10,
+                11,
+                10,
+                12,
+                11,
+                10,
+                12,
+                11,
+                11,
+                12,
+                12,
+                11,
+                9,
+                10,
+                11,
+                11
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12
+              ]
+            },
+            "bias": 0.0015683996971746323,
+            "RMSE": 0.04797920672178069,
+            "sampling_SE_ratio": 1.0471554216014805,
+            "sampling_SE_ratio_CI": [
+              0.8917538700560161,
+              1.2025569731469448
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              0.95,
+              1,
+              0.95,
+              0.9,
+              0.85,
+              0.8,
+              0.9,
+              1,
+              0.8,
+              0.8,
+              1,
+              0.9
+            ],
+            "refusal_rate": 0,
+            "mean_inner_refusal": 0.0002506265664160456
+          }
+        },
+        "certified": false,
+        "gates": {
+          "complete": true,
+          "convergence": true,
+          "refusal": true,
+          "a_coverage": true,
+          "a_precision": false,
+          "a_SE": false,
+          "a_RMSE": true,
+          "a_bias": true,
+          "b_coverage": false,
+          "b_precision": false,
+          "b_SE": false,
+          "b_RMSE": true,
+          "b_bias": true,
+          "c_coverage": false,
+          "c_precision": false,
+          "c_SE": false,
+          "c_RMSE": true
+        }
+      },
+      "baseline_P3": {
+        "method": "native chi-square",
+        "R": 3000,
+        "expected": 3000,
+        "items": [
+          {
+            "item": 1,
+            "rejections_failures_as_events": 228,
+            "R": 3000,
+            "TypeI_worst_case": 0.076,
+            "upper_CP_simultaneous": 0.09086523056804059,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 2,
+            "rejections_failures_as_events": 221,
+            "R": 3000,
+            "TypeI_worst_case": 0.07366666666666667,
+            "upper_CP_simultaneous": 0.08833992732404167,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 3,
+            "rejections_failures_as_events": 217,
+            "R": 3000,
+            "TypeI_worst_case": 0.07233333333333333,
+            "upper_CP_simultaneous": 0.08689512753192585,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 4,
+            "rejections_failures_as_events": 177,
+            "R": 3000,
+            "TypeI_worst_case": 0.059,
+            "upper_CP_simultaneous": 0.07236782866319297,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 5,
+            "rejections_failures_as_events": 187,
+            "R": 3000,
+            "TypeI_worst_case": 0.06233333333333333,
+            "upper_CP_simultaneous": 0.07601426565295581,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 6,
+            "rejections_failures_as_events": 188,
+            "R": 3000,
+            "TypeI_worst_case": 0.06266666666666666,
+            "upper_CP_simultaneous": 0.076378335687189,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 7,
+            "rejections_failures_as_events": 185,
+            "R": 3000,
+            "TypeI_worst_case": 0.06166666666666667,
+            "upper_CP_simultaneous": 0.07528581897698793,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 8,
+            "rejections_failures_as_events": 176,
+            "R": 3000,
+            "TypeI_worst_case": 0.058666666666666666,
+            "upper_CP_simultaneous": 0.07200259343508171,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 9,
+            "rejections_failures_as_events": 173,
+            "R": 3000,
+            "TypeI_worst_case": 0.057666666666666665,
+            "upper_CP_simultaneous": 0.07090621851465606,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 10,
+            "rejections_failures_as_events": 176,
+            "R": 3000,
+            "TypeI_worst_case": 0.058666666666666666,
+            "upper_CP_simultaneous": 0.07200259343508171,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 11,
+            "rejections_failures_as_events": 177,
+            "R": 3000,
+            "TypeI_worst_case": 0.059,
+            "upper_CP_simultaneous": 0.07236782866319297,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 12,
+            "rejections_failures_as_events": 179,
+            "R": 3000,
+            "TypeI_worst_case": 0.059666666666666666,
+            "upper_CP_simultaneous": 0.07309796977089611,
+            "non_evaluable_rate": 0
+          }
+        ],
+        "pooled": {
+          "mean": 0.06344444444444444,
+          "MCSE": 0.0012807403079621157,
+          "CI": [
+            0.059498767957076676,
+            0.06739012093181221
+          ]
+        },
+        "gates": {
+          "complete": true,
+          "pooled_MCSE": true,
+          "all_item_CP": false,
+          "evaluable": true
+        },
+        "certified": false,
+        "scope": "Approximate alpha=.05 calibration in preregistered N3000/J12 null DGP; tolerance+.02, not all-alpha p uniformity"
+      },
+      "confirmation_P2": {
+        "R": 300,
+        "expected": 300,
+        "valid": 300,
+        "failure_rate": 0,
+        "bias": {
+          "mean": -0.00035516592755385686,
+          "MCSE": 0.0007843059801678061,
+          "CI": [
+            -0.0029791165376196215,
+            0.002268784682511908
+          ]
+        },
+        "excess_MSE_fraction": {
+          "mean": 0.0066479506685374525,
+          "MCSE": 0.00012021822946223144,
+          "CI": [
+            0.006245752158625598,
+            0.007050149178449307
+          ]
+        },
+        "credible_marginal": {
+          "mean": 0.9494500319680579,
+          "MCSE": 0.00015799998962504657,
+          "CI": [
+            0.9489214319322934,
+            0.9499786320038224
+          ]
+        },
+        "credible_failure_sensitivity": [
+          0.9489214319322934,
+          0.9499786320038224
+        ],
+        "credible_conditional_mean": [
+          0,
+          0,
+          0.05500851279627149,
+          0.3984833298653968,
+          0.6648442537948279,
+          0.824636290286283,
+          0.9114308771418984,
+          0.9511086348080369,
+          0.969621084681964,
+          0.9818367248834133,
+          0.9848489375159574,
+          0.9705587420478772,
+          0.9622869484133065,
+          0.9343676414777764,
+          0.923833042511773,
+          0.8927764979838095,
+          0.838741308832563,
+          0.645392160816002,
+          0,
+          0,
+          0
+        ],
+        "credible_tail_mean": [
+          0.6500425667531206,
+          0.7852050685262911
+        ],
+        "exact_score_marginal": {
+          "mean": 0.9781047414520411,
+          "MCSE": 0.000023944476919979566,
+          "CI": [
+            0.9780246335268045,
+            0.9781848493772777
+          ]
+        },
+        "exact_score_grid": [
+          {
+            "mean": 0.9856431031377458,
+            "MCSE": 0.0006697559860583032,
+            "CI": [
+              0.9834023875590672,
+              0.9878838187164245
+            ]
+          },
+          {
+            "mean": 0.988950473125025,
+            "MCSE": 0.0004753966596831734,
+            "CI": [
+              0.9873600002907723,
+              0.9905409459592778
+            ]
+          },
+          {
+            "mean": 0.9878778506010834,
+            "MCSE": 0.0001279491703556431,
+            "CI": [
+              0.9874497876867342,
+              0.9883059135154325
+            ]
+          },
+          {
+            "mean": 0.9826535573182968,
+            "MCSE": 0.00017701560990299707,
+            "CI": [
+              0.9820613391925384,
+              0.9832457754440553
+            ]
+          },
+          {
+            "mean": 0.9851317721381694,
+            "MCSE": 0.0006402147735543559,
+            "CI": [
+              0.982989888755766,
+              0.9872736555205728
+            ]
+          },
+          {
+            "mean": 0.9844907994312424,
+            "MCSE": 0.0004936426177426517,
+            "CI": [
+              0.982839283465875,
+              0.9861423153966098
+            ]
+          },
+          {
+            "mean": 0.971185387112614,
+            "MCSE": 0.0006071501452427454,
+            "CI": [
+              0.9691541237609431,
+              0.973216650464285
+            ]
+          },
+          {
+            "mean": 0.9779845379815512,
+            "MCSE": 6.420585529534508e-18,
+            "CI": [
+              0.9779845379815512,
+              0.9779845379815512
+            ]
+          },
+          {
+            "mean": 0.9729521718147438,
+            "MCSE": 6.420585529534508e-18,
+            "CI": [
+              0.9729521718147438,
+              0.9729521718147438
+            ]
+          },
+          {
+            "mean": 0.9804299074051002,
+            "MCSE": 0.0006087877653905641,
+            "CI": [
+              0.9783931652804827,
+              0.9824666495297176
+            ]
+          },
+          {
+            "mean": 0.98803693302862,
+            "MCSE": 0.0002939748256227917,
+            "CI": [
+              0.987053419651772,
+              0.9890204464054679
+            ]
+          },
+          {
+            "mean": 0.9785477069737036,
+            "MCSE": 0.0006295600669813569,
+            "CI": [
+              0.976441469658676,
+              0.9806539442887313
+            ]
+          },
+          {
+            "mean": 0.966730348397612,
+            "MCSE": 0.00044564684926177853,
+            "CI": [
+              0.965239405638583,
+              0.9682212911566409
+            ]
+          },
+          {
+            "mean": 0.981635916930516,
+            "MCSE": 0.00008692030645640801,
+            "CI": [
+              0.9813451189550823,
+              0.9819267149059497
+            ]
+          },
+          {
+            "mean": 0.9839222618801261,
+            "MCSE": 0.00009007587233761029,
+            "CI": [
+              0.983620906737938,
+              0.9842236170223142
+            ]
+          },
+          {
+            "mean": 0.9850003886973218,
+            "MCSE": 0.00035082653119329133,
+            "CI": [
+              0.9838266739560992,
+              0.9861741034385443
+            ]
+          },
+          {
+            "mean": 0.9939930450982748,
+            "MCSE": 0.0004203779193925765,
+            "CI": [
+              0.9925866413146235,
+              0.9953994488819261
+            ]
+          },
+          {
+            "mean": 0.9920409851575827,
+            "MCSE": 0,
+            "CI": [
+              0.9920409851575827,
+              0.9920409851575827
+            ]
+          },
+          {
+            "mean": 0.9964157030950102,
+            "MCSE": 0.00035147571282784706,
+            "CI": [
+              0.9952398164711436,
+              0.9975915897188767
+            ]
+          },
+          {
+            "mean": 0.9886174460087079,
+            "MCSE": 0.00008962596648272052,
+            "CI": [
+              0.9883175960580806,
+              0.9889172959593353
+            ]
+          },
+          {
+            "mean": 0.9953023915419301,
+            "MCSE": 6.420585529534508e-18,
+            "CI": [
+              0.9953023915419301,
+              0.9953023915419301
+            ]
+          }
+        ],
+        "exact_score_tails": [
+          {
+            "mean": 0.9866514024619142,
+            "MCSE": 0.00016561025642320988,
+            "CI": [
+              0.9860973417453532,
+              0.9872054631784751
+            ]
+          },
+          {
+            "mean": 0.9903072280925528,
+            "MCSE": 0.00009962008573042979,
+            "CI": [
+              0.9899739421157313,
+              0.9906405140693743
+            ]
+          }
+        ],
+        "mean_rmse": 0.5876398102969704,
+        "known_credible_marginal": 0.9500000000000006,
+        "known_exact_score_conditional": [
+          0.9933452969774162,
+          0.9913745299694465,
+          0.988005799771439,
+          0.9819763398354343,
+          0.9936156004905483,
+          0.9872294889801242,
+          0.9793465137304936,
+          0.977984537981551,
+          0.9729521718147437,
+          0.9884396959721182,
+          0.9891616072397945,
+          0.9695653112009401,
+          0.9625981051811965,
+          0.9814848604903761,
+          0.9837411995058338,
+          0.9820305399102166,
+          0.9963709246051387,
+          0.9920409851575827,
+          0.997905277349652,
+          0.9883960491747374,
+          0.9953023915419302
+        ],
+        "recovery_gates": {
+          "complete": true,
+          "evaluable": true,
+          "bias": true,
+          "efficiency": true
+        },
+        "credible_gates": {
+          "complete": true,
+          "evaluable": true,
+          "bias": true,
+          "efficiency": true,
+          "coverage": true,
+          "MCSE": true
+        },
+        "exact_score_gates": {
+          "complete": true,
+          "evaluable": true,
+          "bias": true,
+          "efficiency": true,
+          "marginal": true,
+          "all_grid": true,
+          "tails": true
+        },
+        "recovery_certified": true,
+        "credible_certified": true,
+        "exact_score_certified": true
+      },
+      "confirmation_P1": {
+        "R": 0,
+        "expected": 400,
+        "eligible": 0,
+        "parameters": {},
+        "certified": false
+      },
+      "bootstrap_P3": {
+        "status": "NOT EXECUTED",
+        "certified": false
+      }
+    },
+    "4PL": {
+      "development_P1": {
+        "R": 20,
+        "expected": 20,
+        "eligible": 12,
+        "parameters": {
+          "a": {
+            "coverage": 0.9930555555555556,
+            "coverage_mc_se": 0.0068215242101215484,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 12,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                11,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "bias": 0.003112613217302154,
+            "RMSE": 0.153174157088886,
+            "sampling_SE_ratio": 1.2136791455036458,
+            "sampling_SE_ratio_CI": [
+              1.0241467754108384,
+              1.403211515596453
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0.9166666666666666,
+              1,
+              1,
+              1,
+              1
+            ],
+            "refusal_rate": 0.4,
+            "mean_inner_refusal": 0
+          },
+          "b": {
+            "coverage": 0.9930555555555556,
+            "coverage_mc_se": 0.0068215242101215484,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 12,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                11,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "bias": -0.038350553991351385,
+            "RMSE": 0.20142509284571472,
+            "sampling_SE_ratio": 0.9965613195056116,
+            "sampling_SE_ratio_CI": [
+              0.8564037510312241,
+              1.136718887979999
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              0.9166666666666666,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "refusal_rate": 0.4,
+            "mean_inner_refusal": 0
+          },
+          "c": {
+            "coverage": 1,
+            "coverage_mc_se": 0,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 12,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "bias": -0.0013028533809256557,
+            "RMSE": 0.04410455848786485,
+            "sampling_SE_ratio": 1.0434514781254591,
+            "sampling_SE_ratio_CI": [
+              0.8789304064386031,
+              1.207972549812315
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "refusal_rate": 0.4,
+            "mean_inner_refusal": 0
+          },
+          "d": {
+            "coverage": 1,
+            "coverage_mc_se": 0,
+            "coverage_mc_se_method": "replication-cluster delta method (pooled ratio)",
+            "independent_replications": 20,
+            "eligible_replications": 12,
+            "coverage_cluster_counts": {
+              "covered": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "eligible": [
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                12,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "bias": -0.021768268097965456,
+            "RMSE": 0.03715760332631904,
+            "sampling_SE_ratio": 1.0993966414765517,
+            "sampling_SE_ratio_CI": [
+              0.88188740148879,
+              1.3169058814643133
+            ],
+            "SE_limits": [
+              0.9244612080858208,
+              1.107209313386346
+            ],
+            "per_item_coverage": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "refusal_rate": 0.4,
+            "mean_inner_refusal": 0
+          }
+        },
+        "certified": false,
+        "gates": {
+          "complete": true,
+          "convergence": true,
+          "refusal": false,
+          "a_coverage": false,
+          "a_precision": false,
+          "a_SE": false,
+          "a_RMSE": true,
+          "a_bias": true,
+          "b_coverage": false,
+          "b_precision": false,
+          "b_SE": false,
+          "b_RMSE": true,
+          "b_bias": true,
+          "c_coverage": false,
+          "c_precision": true,
+          "c_SE": false,
+          "c_RMSE": true,
+          "d_coverage": false,
+          "d_precision": true,
+          "d_SE": false,
+          "d_RMSE": true
+        }
+      },
+      "baseline_P3": {
+        "method": "native chi-square",
+        "R": 3000,
+        "expected": 3000,
+        "items": [
+          {
+            "item": 1,
+            "rejections_failures_as_events": 279,
+            "R": 3000,
+            "TypeI_worst_case": 0.093,
+            "upper_CP_simultaneous": 0.10915808229069353,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 2,
+            "rejections_failures_as_events": 285,
+            "R": 3000,
+            "TypeI_worst_case": 0.095,
+            "upper_CP_simultaneous": 0.11129927838009687,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 3,
+            "rejections_failures_as_events": 248,
+            "R": 3000,
+            "TypeI_worst_case": 0.08266666666666667,
+            "upper_CP_simultaneous": 0.09805996328854148,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 4,
+            "rejections_failures_as_events": 271,
+            "R": 3000,
+            "TypeI_worst_case": 0.09033333333333333,
+            "upper_CP_simultaneous": 0.10629984123130035,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 5,
+            "rejections_failures_as_events": 264,
+            "R": 3000,
+            "TypeI_worst_case": 0.088,
+            "upper_CP_simultaneous": 0.10379566621025389,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 6,
+            "rejections_failures_as_events": 236,
+            "R": 3000,
+            "TypeI_worst_case": 0.07866666666666666,
+            "upper_CP_simultaneous": 0.09374664790858715,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 7,
+            "rejections_failures_as_events": 247,
+            "R": 3000,
+            "TypeI_worst_case": 0.08233333333333333,
+            "upper_CP_simultaneous": 0.0977009098093356,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 8,
+            "rejections_failures_as_events": 227,
+            "R": 3000,
+            "TypeI_worst_case": 0.07566666666666666,
+            "upper_CP_simultaneous": 0.09050470933144032,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 9,
+            "rejections_failures_as_events": 260,
+            "R": 3000,
+            "TypeI_worst_case": 0.08666666666666667,
+            "upper_CP_simultaneous": 0.1023633187811884,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 10,
+            "rejections_failures_as_events": 256,
+            "R": 3000,
+            "TypeI_worst_case": 0.08533333333333333,
+            "upper_CP_simultaneous": 0.10092993395705141,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 11,
+            "rejections_failures_as_events": 247,
+            "R": 3000,
+            "TypeI_worst_case": 0.08233333333333333,
+            "upper_CP_simultaneous": 0.0977009098093356,
+            "non_evaluable_rate": 0
+          },
+          {
+            "item": 12,
+            "rejections_failures_as_events": 258,
+            "R": 3000,
+            "TypeI_worst_case": 0.086,
+            "upper_CP_simultaneous": 0.10164675739838332,
+            "non_evaluable_rate": 0
+          }
+        ],
+        "pooled": {
+          "mean": 0.0855,
+          "MCSE": 0.0014600896736797699,
+          "CI": [
+            0.0810017879432142,
+            0.0899982120567858
+          ]
+        },
+        "gates": {
+          "complete": true,
+          "pooled_MCSE": true,
+          "all_item_CP": false,
+          "evaluable": true
+        },
+        "certified": false,
+        "scope": "Approximate alpha=.05 calibration in preregistered N3000/J12 null DGP; tolerance+.02, not all-alpha p uniformity"
+      },
+      "confirmation_P2": {
+        "R": 300,
+        "expected": 300,
+        "valid": 300,
+        "failure_rate": 0,
+        "bias": {
+          "mean": -0.000849917734310229,
+          "MCSE": 0.0008009208250477056,
+          "CI": [
+            -0.003529454472062324,
+            0.0018296190034418664
+          ]
+        },
+        "excess_MSE_fraction": {
+          "mean": 0.008157592846506294,
+          "MCSE": 0.00014118814686314577,
+          "CI": [
+            0.007685238008645256,
+            0.00862994768436733
+          ]
+        },
+        "credible_marginal": {
+          "mean": 0.9493249485277535,
+          "MCSE": 0.00015107090351530432,
+          "CI": [
+            0.9488195302350645,
+            0.9498303668204425
+          ]
+        },
+        "credible_failure_sensitivity": [
+          0.9488195302350645,
+          0.9498303668204425
+        ],
+        "credible_conditional_mean": [
+          0,
+          0,
+          0.0003168007777044745,
+          0.33214075199189086,
+          0.6350052285605089,
+          0.8080647111021229,
+          0.9015439679268491,
+          0.9504609199115945,
+          0.970982761481477,
+          0.9820776337462273,
+          0.9830699331601342,
+          0.9780521197286767,
+          0.9595559030117147,
+          0.9419034639925143,
+          0.9176865791620054,
+          0.8796078441352064,
+          0.7913385490995336,
+          0.5454876034407523,
+          0,
+          0,
+          0
+        ],
+        "credible_tail_mean": [
+          0.6175550683387253,
+          0.7495577086802876
+        ],
+        "exact_score_marginal": {
+          "mean": 0.9773687001281443,
+          "MCSE": 0.000018990257443149345,
+          "CI": [
+            0.9773051668912912,
+            0.9774322333649973
+          ]
+        },
+        "exact_score_grid": [
+          {
+            "mean": 0.9854820258493601,
+            "MCSE": 0.000658431892130712,
+            "CI": [
+              0.9832791958203534,
+              0.9876848558783667
+            ]
+          },
+          {
+            "mean": 0.987532510148183,
+            "MCSE": 0.000603468923716306,
+            "CI": [
+              0.9855135625810583,
+              0.9895514577153077
+            ]
+          },
+          {
+            "mean": 0.9885299864350736,
+            "MCSE": 0.0002874045758088264,
+            "CI": [
+              0.9875684542893314,
+              0.9894915185808159
+            ]
+          },
+          {
+            "mean": 0.9841971177322206,
+            "MCSE": 0.0001721209199483776,
+            "CI": [
+              0.9836212751346581,
+              0.9847729603297831
+            ]
+          },
+          {
+            "mean": 0.9801857908336873,
+            "MCSE": 0.0005031508559808768,
+            "CI": [
+              0.9785024643910868,
+              0.9818691172762878
+            ]
+          },
+          {
+            "mean": 0.9895769526195405,
+            "MCSE": 0.00015285174360264944,
+            "CI": [
+              0.9890655764015625,
+              0.9900883288375185
+            ]
+          },
+          {
+            "mean": 0.960923776337915,
+            "MCSE": 0.0003084240203911672,
+            "CI": [
+              0.9598919221675679,
+              0.9619556305082622
+            ]
+          },
+          {
+            "mean": 0.9797643113082506,
+            "MCSE": 6.420585529534508e-18,
+            "CI": [
+              0.9797643113082506,
+              0.9797643113082506
+            ]
+          },
+          {
+            "mean": 0.9809163427531186,
+            "MCSE": 0.000648323093922172,
+            "CI": [
+              0.9787473324168047,
+              0.9830853530894325
+            ]
+          },
+          {
+            "mean": 0.9765040105414539,
+            "MCSE": 0.0005567677881441098,
+            "CI": [
+              0.9746413048955616,
+              0.9783667161873462
+            ]
+          },
+          {
+            "mean": 0.9689053323159499,
+            "MCSE": 0.0000738301590443972,
+            "CI": [
+              0.9686583283458612,
+              0.9691523362860386
+            ]
+          },
+          {
+            "mean": 0.9716685897238746,
+            "MCSE": 0,
+            "CI": [
+              0.9716685897238746,
+              0.9716685897238746
+            ]
+          },
+          {
+            "mean": 0.9780252222851609,
+            "MCSE": 6.420585529534508e-18,
+            "CI": [
+              0.9780252222851609,
+              0.9780252222851609
+            ]
+          },
+          {
+            "mean": 0.9726227529665243,
+            "MCSE": 0.0007484452524744047,
+            "CI": [
+              0.9701187769335852,
+              0.9751267289994635
+            ]
+          },
+          {
+            "mean": 0.9835003459252205,
+            "MCSE": 0.00016275167998088308,
+            "CI": [
+              0.9829558487764372,
+              0.9840448430740039
+            ]
+          },
+          {
+            "mean": 0.9928752948022967,
+            "MCSE": 0.0003741871868351811,
+            "CI": [
+              0.9916234253508297,
+              0.9941271642537638
+            ]
+          },
+          {
+            "mean": 0.9908766436311386,
+            "MCSE": 0.000025915817791060112,
+            "CI": [
+              0.9907899404468933,
+              0.9909633468153839
+            ]
+          },
+          {
+            "mean": 0.995652040415474,
+            "MCSE": 0.0001500629742113214,
+            "CI": [
+              0.9951499942208933,
+              0.9961540866100546
+            ]
+          },
+          {
+            "mean": 0.9938869749612245,
+            "MCSE": 0.00034441484859796005,
+            "CI": [
+              0.9927347109533675,
+              0.9950392389690814
+            ]
+          },
+          {
+            "mean": 0.9920947895645956,
+            "MCSE": 0.00024438233182447785,
+            "CI": [
+              0.9912771913505122,
+              0.9929123877786791
+            ]
+          },
+          {
+            "mean": 0.9925199648464977,
+            "MCSE": 0.0001429205646687124,
+            "CI": [
+              0.9920418140834841,
+              0.9929981156095113
+            ]
+          }
+        ],
+        "exact_score_tails": [
+          {
+            "mean": 0.985487456869889,
+            "MCSE": 0.0002619525766811963,
+            "CI": [
+              0.9846110761705555,
+              0.9863638375692225
+            ]
+          },
+          {
+            "mean": 0.991032790896247,
+            "MCSE": 0.00015411447123851198,
+            "CI": [
+              0.9905171901344885,
+              0.9915483916580055
+            ]
+          }
+        ],
+        "mean_rmse": 0.6271604780601824,
+        "known_credible_marginal": 0.9500000000000006,
+        "known_exact_score_conditional": [
+          0.993775473096499,
+          0.9920866970825795,
+          0.989239942105845,
+          0.9842244082125455,
+          0.9947375802480466,
+          0.9897934800175805,
+          0.9591828196274739,
+          0.9797643113082507,
+          0.9901326920974457,
+          0.9680277950191206,
+          0.9688007456631713,
+          0.9716685897238746,
+          0.978025222285161,
+          0.9847287247853542,
+          0.9829013942248781,
+          0.975885686998117,
+          0.9908507278133475,
+          0.9757207622733578,
+          0.9850018987082033,
+          0.9893722211352454,
+          0.9915787874896949
+        ],
+        "recovery_gates": {
+          "complete": true,
+          "evaluable": true,
+          "bias": true,
+          "efficiency": true
+        },
+        "credible_gates": {
+          "complete": true,
+          "evaluable": true,
+          "bias": true,
+          "efficiency": true,
+          "coverage": true,
+          "MCSE": true
+        },
+        "exact_score_gates": {
+          "complete": true,
+          "evaluable": true,
+          "bias": true,
+          "efficiency": true,
+          "marginal": true,
+          "all_grid": true,
+          "tails": true
+        },
+        "recovery_certified": true,
+        "credible_certified": true,
+        "exact_score_certified": true
+      },
+      "confirmation_P1": {
+        "R": 0,
+        "expected": 400,
+        "eligible": 0,
+        "parameters": {},
+        "certified": false
+      },
+      "bootstrap_P3": {
+        "status": "NOT EXECUTED",
+        "certified": false
+      }
+    }
+  }
+}

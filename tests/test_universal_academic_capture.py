@@ -61,7 +61,7 @@ def test_chart_zip_is_portable_and_preserves_actual_observations(tmp_path):
     assert json.loads((tmp_path/'observed.json').read_text())==scores.tolist()
 
 
-def test_graphic_selection_updates_word_without_refitting():
+def test_graphic_selection_updates_word_without_refitting(monkeypatch):
     import io,zipfile
     from tests.test_reproducible_page_reruns import _state
     page='MTK: Python mirt 1PL';at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=180)
@@ -79,4 +79,33 @@ def test_graphic_selection_updates_word_without_refitting():
     assert media(before)!=media(after)
     assert at.session_state['python_mirt_fit_1PL']['outcome'] is fitted
     assert at.session_state['_repro_history'].manifest()['status']=='GENERATED / UNVERIFIED'
-    at.run();assert at.session_state['_academic_history'][page]['docx'] is after
+    # An unchanged rerun must not invoke the producer, even when DOCX ZIP
+    # timestamps happen to fall in the same two-second slot.
+    import reports.academic_docx as docx
+    def unexpected_regeneration(*args,**kwargs):
+        raise AssertionError('Unchanged graphic selection regenerated the Word report')
+    monkeypatch.setattr(docx,'build_academic_docx',unexpected_regeneration)
+    at.run()
+    assert not at.exception
+    assert at.session_state['_academic_history'][page]['docx'] is after
+    assert at.session_state['python_mirt_fit_1PL']['outcome'] is fitted
+
+
+def test_holdout_scope_check_is_not_a_new_calibration():
+    from types import SimpleNamespace
+    from core.reproducible import Recorder
+    from core.academic_screen_results import primary
+    from core.irt_binary_patterns import independent_person_scope,score_independent_persons
+    # The real screen invokes this gate with the cached fitted outcome on every
+    # rerun. It is recorded through that producer reference, even for 1PL.
+    outcome=SimpleNamespace(engine='python_mirt',model='1PL')
+    recorder=Recorder('MTK: Python mirt 1PL')
+    recorder.references[id(outcome)]=[0]
+    recorder.keep.append(outcome)
+    assert recorder.invoke(independent_person_scope,(outcome,),{}) is False
+    call=recorder.calls[-1]
+    assert call['function']=='independent_person_scope'
+    assert not primary(call)
+    assert primary({'module':score_independent_persons.__module__,
+                    'function':score_independent_persons.__name__})
+
