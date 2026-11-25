@@ -1,0 +1,35 @@
+name: Streamlit startup smoke
+# Production-like startup: apt packages from packages.txt, a fresh `pip install -r requirements.txt` (latest allowed
+# versions, as Community Cloud resolves them after a requirements change), `streamlit run app.py`, and a real headless
+# browser that must see the home page render. Records timings, server RSS and resolved versions.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  startup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: System packages (packages.txt)
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends $(grep -vE '^\s*(#|$)' packages.txt | tr '\n' ' ')
+      - name: Fresh requirements install
+        run: pip install --no-cache-dir -r requirements.txt playwright && python -m playwright install --with-deps chromium
+      - name: Startup smoke
+        run: python validation/startup_smoke.py --budget 120 --out startup_smoke.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: startup-smoke-${{ matrix.python }}
+          path: |
+            startup_smoke.json
+            startup_smoke.log
