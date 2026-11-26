@@ -1,0 +1,7 @@
+{"registered_before_comparison": true, "frozen_reference": "validation/p1_4pl_score_perf/frozen_k.py (byte-exact core/irt_4pl_score_sets.py at 262f1d9)",
+ "change": "terms() score tensor einsum replaced by two exact GEMMs (algebraic identity); nothing else in the statistic, path, grid, critical value or set construction changes.",
+ "cases": {"archived": "closure-K confirmation datasets simulate('4PL',3000,12,[202611262101,4,r,0]) r=0..7, all 24 c/d parameters, all 26 grid points + truth",
+           "adversarial": "r=0..3 with MAP c set to 1e-6 (lower bound) or .4999, d set to .5+1e-6 or 1-1e-6 for every item (boundary clipping); plus every whole-box/empty/split set occurring in archived cases"},
+ "tolerances": {"T": "|T_new - T_frozen| <= 1e-8 * max(1, T_frozen) at every grid point and at truth", "decision_margin": "any grid point with |T_frozen - 3.8415| <= 1e-6 reported as a near-tie",
+                "decisions": "identical accept/reject at every grid point and truth; identical intervals (exact float equality), whole, empty, covered_set, covered_exact, refusal behaviour"},
+ "on_failure": "reject optimisation (or full revalidation under closure-K gates); no tolerance change"}
