@@ -1,0 +1,78 @@
+{
+  "id": "P3-M1 prospective empirical-IF / standardized residual validation",
+  "base": "262f1d9ab95911f29b2014d3236f0f03ac22a090",
+  "created_utc": "2026-11-26",
+  "hard_stop_utc": "2026-11-26T13:47:29Z",
+  "protected": [
+    "P1 14 scoped certificates",
+    "P2 6 scoped certificates",
+    "4PL c/d score sets",
+    "MAP estimators",
+    "old c/d Wald NOT CERTIFIED",
+    "PR195"
+  ],
+  "scope": {
+    "N": 3000,
+    "J": 12,
+    "models": [
+      "3PL",
+      "4PL"
+    ],
+    "truth": "validation.binary_certification.common.truth",
+    "latent": "N(0,1)",
+    "estimator": "native mirt1.2.0 MAP GH61 max500 tol1e-4 default priors"
+  },
+  "methods": {
+    "3PL": "A-emp: unchanged native S-X2 with full observed penalized marginal-equation Jacobian, empirical frequency-weighted centered residual IF covariance, noncentral generalized chi-square tail including deterministic null-space shift",
+    "4PL": "MAP IF-standardized residual Q: N(u-null_mean)'Sigma^-1(u-null_mean), rank chi-square; separately named, inspired by Han et al., NOT ordinary S-X2 and NOT an asserted direct transfer of ML theory"
+  },
+  "derivative": "G=-sum empirical score frequencies*d conditional_j(score)/d eta; A=-sum phat*d2log p_pattern - Hprior/N. IF=h+score A^-T G^T. All coordinates physical joint (a,b,c[,d]); no parameterwise covariance; prior curvature only in A. Sigma=sum phat psi psi'-mean_psi mean_psi'. Full conditional-probability derivative from GH41 pattern likelihoods; native estimation likelihood GH61. Null mean=model E[h]+G A^-1 gradprior/N. Data-realized native pooling retained, selection assessed in independent MC.",
+  "numerics": {
+    "bread": "symmetric positive definite, condition <=1e10; no pseudoinverse; observed vs expected bread compared",
+    "bounds": "native runtime bounds inspected; within1e-6 active-bound distance -> refusal",
+    "rank": "whitened residual covariance eigenvalues >1e-10*max retained; materially negative eigenvalues below -1e-10*max -> refuse; rank<3 -> refuse; deterministic projected mean in discarded space retained in generalized chi-square reference",
+    "derivative_tests": "analytic score and observed Hessian vs centered differences at steps1e-5/5e-6; full residual-functional IF via independent re-solve; original S-X2 <=1e-8 native. Gaussian tail against independent characteristic-function inversion and scipy chi2/ncx2",
+    "standardized": "Q is covariance-standardized, not S-X2; null-space observed residual must agree with deterministic mean to numerical error, otherwise refuse"
+  },
+  "seeds": {
+    "pilot_null": 202611261001,
+    "pilot_power": 202611261002,
+    "confirmation_null": 202611262001,
+    "confirmation_power": 202611262002,
+    "construction": "[root,model3or4,replicate,0]; no historical confirmation seed202611252101 reused"
+  },
+  "DGP": {
+    "generator": "reuse validation.p3_sx2_bootstrap.run.data exactly",
+    "registered_alternative_warning": "Historical code draws item1 latent ability independently from other items using seed+[1]; this is not simply doubled slope on a shared latent trait. Preserve actual historical alternative unchanged, report discrepancy; no easier substitute."
+  },
+  "replications": {
+    "pilot_null": 100,
+    "pilot_power": 150,
+    "confirmation_null": 6000,
+    "confirmation_power": 600
+  },
+  "gates": {
+    "per_item_CP_upper": 0.07,
+    "CP_alpha": 0.0020833333333333333,
+    "MCSE_pooled_max": 0.004,
+    "pooled_normal95_lower_min": 0.03,
+    "non_evaluable_max": 0.01,
+    "non_evaluable_null_policy": "count as rejection for every failed item; power failures count as non-detection",
+    "unchanged_statistic_identity": 1e-8,
+    "power_CP_alpha": 0.025,
+    "power_CP_lower_min": 0.1,
+    "completion": "all planned records, duplicate/missing seeds forbidden"
+  },
+  "stopping": {
+    "confirmation": "no interim acceptance; no rejection just because interim bound exceeds final gate; only technical failure/deadline or logically impossible final acceptance even with all remaining successes",
+    "pilot": "development only, never certified; mathematical/technical failure stops before confirmation; only prospective primary methods eligible"
+  },
+  "reference": {
+    "DOI": "10.1177/01466216221108077",
+    "authors": "Han, Sinharay, Johnson, Liu",
+    "title": "The Standardized S-X2 Statistic for Assessing Item Fit",
+    "journal": "Applied Psychological Measurement 47(1),3-18 (2023); online2022-09-17",
+    "warning": "Published unpenalized ML covariance standardization motivates but does not validate native MAP adaptation."
+  },
+  "execution": "No P1/P2 simulations, no bootstrap retries, cache native fit per dataset shared across candidates. One BLAS thread, bounded workers, checkpoint every record. Archive raw decisions, seeds/hashes, full diagnostics and failures. Production promotion only after every model-specific confirmation gate passes."
+}
