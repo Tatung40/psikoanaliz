@@ -1,7 +1,21 @@
-{"registered_before_comparison": true, "frozen_reference": "validation/p1_4pl_score_perf/frozen_k.py (byte-exact core/irt_4pl_score_sets.py at 262f1d9)",
+{
+ "registered_before_comparison": true,
+ "frozen_reference": "validation/p1_4pl_score_perf/frozen_k.py (byte-exact core/irt_4pl_score_sets.py at 262f1d9)",
  "change": "terms() score tensor einsum replaced by two exact GEMMs (algebraic identity); nothing else in the statistic, path, grid, critical value or set construction changes.",
- "cases": {"archived": "closure-K confirmation datasets simulate('4PL',3000,12,[202611262101,4,r,0]) r=0..7, all 24 c/d parameters, all 26 grid points + truth",
-           "adversarial": "r=0..3 with MAP c set to 1e-6 (lower bound) or .4999, d set to .5+1e-6 or 1-1e-6 for every item (boundary clipping); plus every whole-box/empty/split set occurring in archived cases"},
- "tolerances": {"T": "|T_new - T_frozen| <= 1e-8 * max(1, T_frozen) at every grid point and at truth", "decision_margin": "any grid point with |T_frozen - 3.8415| <= 1e-6 reported as a near-tie",
-                "decisions": "identical accept/reject at every grid point and truth; identical intervals (exact float equality), whole, empty, covered_set, covered_exact, refusal behaviour"},
- "on_failure": "reject optimisation (or full revalidation under closure-K gates); no tolerance change"}
+ "cases": {
+  "archived": "closure-K confirmation datasets simulate('4PL',3000,12,[202611262101,4,r,0]) r=0..7, all 24 c/d parameters, all 26 grid points + truth",
+  "adversarial": "r=0..3 with MAP c set to 1e-6 (lower bound) or .4999, d set to .5+1e-6 or 1-1e-6 for every item (boundary clipping); plus every whole-box/empty/split set occurring in archived cases"
+ },
+ "tolerances": {
+  "T": "|T_new - T_frozen| <= 1e-8 * max(1, T_frozen) at every grid point and at truth",
+  "decision_margin": "any grid point with |T_frozen - 3.8415| <= 1e-6 reported as a near-tie",
+  "decisions": "identical accept/reject at every grid point and truth; identical intervals (exact float equality), whole, empty, covered_set, covered_exact, refusal behaviour"
+ },
+ "on_failure": "reject optimisation (or full revalidation under closure-K gates); no tolerance change",
+ "amendment_P1": {
+  "registered_after": "Attempt 1 (EQUIVALENCE_attempt1_FAILED.json) and attempt 2 (EQUIVALENCE.json): identical decisions and sets in all 24 cases, but max relative T difference 1e-5 (fits) to .39 (adversarial) > 1e-8.",
+  "mechanism": "FROZEN_SELF_SENSITIVITY.json: the frozen statistic changes by up to 7.8e-6 relative under 1-ulp score perturbations (cond(I) up to 4.8e21 along the nuisance path). The 1e-8 T tolerance is unattainable for any reimplementation; reported as a registered-tolerance defect, NOT relaxed.",
+  "consequence": "Per protocol the optimisation is not accepted by numerical equivalence. Full revalidation under the original closure-K gates instead: optimised code on all 1000 confirmation datasets (same seeds, method fixed before the run), gates by the unchanged aggregate.py, plus set-by-set comparison with archived run 45777107775 (24000 sets: intervals, whole, empty, covered_set, covered_exact).",
+  "acceptance": "all closure-K gates pass AND gate decisions unchanged; set-level differences reported exactly."
+ }
+}

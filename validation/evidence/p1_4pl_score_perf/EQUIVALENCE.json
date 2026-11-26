@@ -1,0 +1,389 @@
+{
+ "cases": [
+  {
+   "r": 0,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 2.649743309268704e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 4,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 1,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 7.207678543474212e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 1,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 2,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 3.38059712434724e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 3,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 3,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 5.9926589799495525e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 2,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 4,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 3.1900451615274328e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 1,
+    "empty": 2,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 5,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 1.7579047431326433e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 2,
+    "empty": 2,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 6,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 1.0087174655127356e-05,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 2,
+    "empty": 1,
+    "split": 1
+   },
+   "equal": false
+  },
+  {
+   "r": 7,
+   "mode": "fit",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 3.0689788803606177e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 1,
+    "empty": 0,
+    "split": 2
+   },
+   "equal": false
+  },
+  {
+   "r": 0,
+   "mode": "c_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 3.2680416662673973e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 4,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 0,
+   "mode": "c_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.00035301109321395167,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 19,
+    "split": 2
+   },
+   "equal": false
+  },
+  {
+   "r": 0,
+   "mode": "d_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.0024444243095279533,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 21,
+    "split": 3
+   },
+   "equal": false
+  },
+  {
+   "r": 0,
+   "mode": "d_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 5.061286485197431e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 4,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 1,
+   "mode": "c_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 2.0886547683794384e-09,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 6,
+    "empty": 1,
+    "split": 1
+   },
+   "equal": true
+  },
+  {
+   "r": 1,
+   "mode": "c_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.03151813598784302,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 19,
+    "split": 3
+   },
+   "equal": false
+  },
+  {
+   "r": 1,
+   "mode": "d_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.0011419940824035635,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 21,
+    "split": 1
+   },
+   "equal": false
+  },
+  {
+   "r": 1,
+   "mode": "d_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 6.306664120349329e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 1,
+    "empty": 1,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 2,
+   "mode": "c_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 8.013388841376923e-10,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 6,
+    "empty": 2,
+    "split": 1
+   },
+   "equal": true
+  },
+  {
+   "r": 2,
+   "mode": "c_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.028338883970008586,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 20,
+    "split": 3
+   },
+   "equal": false
+  },
+  {
+   "r": 2,
+   "mode": "d_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.2530322032371679,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 21,
+    "split": 1
+   },
+   "equal": false
+  },
+  {
+   "r": 2,
+   "mode": "d_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 4.371008708292188e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 1,
+    "empty": 0,
+    "split": 1
+   },
+   "equal": false
+  },
+  {
+   "r": 3,
+   "mode": "c_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 1.7084585008424836e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 6,
+    "empty": 1,
+    "split": 0
+   },
+   "equal": false
+  },
+  {
+   "r": 3,
+   "mode": "c_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.393452299894963,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 19,
+    "split": 2
+   },
+   "equal": false
+  },
+  {
+   "r": 3,
+   "mode": "d_low",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 0.0009923142554170718,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 0,
+    "empty": 21,
+    "split": 1
+   },
+   "equal": false
+  },
+  {
+   "r": 3,
+   "mode": "d_high",
+   "frozen_refused": false,
+   "new_refused": false,
+   "max_rel_T": 4.235842787446253e-06,
+   "near_ties": 0,
+   "decisions_equal": true,
+   "sets_equal": true,
+   "topology": {
+    "whole": 3,
+    "empty": 0,
+    "split": 0
+   },
+   "equal": false
+  }
+ ],
+ "all_equal": false
+}
