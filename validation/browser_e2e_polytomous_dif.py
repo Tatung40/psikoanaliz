@@ -192,7 +192,6 @@ def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
                 if model == "NRM":
                     box = page.get_by_label("Nominal seçenekler (virgülle)")
                     box.fill("A,B,C,D"); box.press("Enter"); wait_idle(page)
-                page.get_by_text("Veri uygunluğu:").wait_for(timeout=60_000)
                 click_ready(page, "Python mirt ile B14 pilot analizi")
                 page.get_by_role("button", name="Madde parametrelerini CSV indir").wait_for(timeout=180_000)
                 wait_idle(page)
