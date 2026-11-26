@@ -1,0 +1,35 @@
+{
+  "id": "M2 independent confirmation selection",
+  "registered_before_confirmation": true,
+  "protocol_commit": "5be1faad9b40d27373b34ff7c887030bf64c89ca",
+  "amendment_commit": "4b89f7d152e1f95f08c86cee59be6e5324239d6d",
+  "selected": {
+    "3PL": "p_constrained (UNCHANGED native S-X2, constrained-Gaussian reference)"
+  },
+  "4PL": "NO CONFIRMATION: M2 standardized development power4/150=.02667; 97.5% CP upper .06687 < required lower>.10. Efficient-score development power10/150, predicted NCP .0020; no credible power mechanism demonstrated.",
+  "pilot_evidence": {
+    "root_null": 202611261001,
+    "null_R": 100,
+    "root_power": 202611261002,
+    "power_R": 150,
+    "3PL_M2": {
+      "TypeI": 0.045,
+      "power": 0.3,
+      "power_lower": 0.22797001580233436,
+      "refusal": 0,
+      "runtime_P95": 0.2844748758999856
+    }
+  },
+  "confirmation": {
+    "null_root": 202611262001,
+    "null_R": 6000,
+    "power_root": 202611262002,
+    "power_R": 600,
+    "noise_root": 202611262003,
+    "shards": 20,
+    "workers_per_shard": 2,
+    "model": "3PL"
+  },
+  "criteria": "All original gates unchanged incl24-model-item Bonferroni CP alpha.05/24, upper<=.07; cluster MCSE<=.004; pooled95 lower>=.03; refusal<=.01; identity<=1e-8; powerCP97.5 lower>.10. Fixed final analysis; no interim acceptance. Secondary methods never promoted on this dataset.",
+  "precision": "R6000 yields max363 false-positive events/item for CP upper<=.07; union-bound probability of all24 size gates passing if each true p=.05 is >=.996906, no item-independence assumption."
+}

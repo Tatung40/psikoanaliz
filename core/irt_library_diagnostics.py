@@ -5,7 +5,7 @@ No native engine inference or invented convergence metrics.
 import math
 
 
-def library_itemfit(fit, responses, *, model):
+def library_itemfit(fit, responses, *, model, inference_context=None, reference_seed=None):
     """Public itemfit API with the same scientific restrictions in UI and exports.
 
     Ordinal mean squares are descriptive; nominal item fit is unsupported here.
@@ -36,6 +36,17 @@ def library_itemfit(fit, responses, *, model):
     else:
         label = "EXPLORATORY / NOT CERTIFIED — kütüphane S-X² bağımsız referansla eşlenmedi"
     frame["Bilimsel durum"] = label
+    if model=="3PL" and inference_context is not None and reference_seed is not None:
+        from core.irt_sx2_scoped import reference_table,STATUS_COLUMN
+        if getattr(inference_context,"fit",None) is not fit:
+            frame[STATUS_COLUMN]="Kalibrasyon nesnesi eşleşmiyor; yeni referans p kapalı."
+            return frame
+        reference,reason=reference_table(inference_context,responses,reference_seed)
+        if reference is not None:
+            if len(reference)!=len(frame):raise ValueError("Kısıtlı referans madde eşleşmesi başarısız.")
+            for column in reference:frame[column]=reference[column].to_numpy()
+            frame.attrs.update(reference.attrs)
+        else:frame[STATUS_COLUMN]=reason
     return frame
 
 

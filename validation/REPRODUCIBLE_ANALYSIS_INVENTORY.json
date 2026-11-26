@@ -213,7 +213,8 @@
       "core.irt_python_mirt_report.build_report",
       "core.irt_rasch_wright.rasch_wright_tables",
       "core.irt_rasch_wright.wright_exports",
-      "core.irt_rasch_wright.wright_figure"
+      "core.irt_rasch_wright.wright_figure",
+      "core.irt_sx2_scoped.cache_fingerprint"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
