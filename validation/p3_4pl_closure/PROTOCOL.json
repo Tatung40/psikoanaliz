@@ -1,0 +1,66 @@
+{
+  "id": "P3 4PL genuinely out-of-model closure N",
+  "created_utc": "2026-11-26T13:42:00Z",
+  "deadline_utc": "2026-11-26T15:07:21Z",
+  "base": "f80541256d8e470b00c37154151cb0aa62eb9062",
+  "preserve": "All21 prior scoped P1/P2/P3 groups and old evidence; no 3PL calibrations or prior certificate edits.",
+  "estimand": "Itemwise misfit of the unidimensional locally independent bounded 4PL marginal response distribution under fixed N(0,1), native MAP mirt1.2.0. Rejection is not item-local causal attribution, FWER or DIF certification.",
+  "method": "Existing frozen joint constrained-Gaussian MAP score/residual reference. Compare raw unchanged S-X2 and separately named standardized Q in development; select one prospectively before fresh confirmation. All native bounds, priors, GH61 estimation and native GH41 S-X2 grouping unchanged.",
+  "design": {
+    "N": 3000,
+    "J": 12,
+    "model": "4PL",
+    "truth": "validation.binary_certification.common.truth('4PL',12)",
+    "estimation": "MAP, default cold max500 tol1e-4 GH61",
+    "theta": "N(0,1)",
+    "target_item": 0,
+    "alternatives": {
+      "nonmonotone": {
+        "definition": "Only item1: p=.1+.8 expit(a1*(theta-b1)-.25*(theta-b1)^2). Quadratic logit represents high-trait response reversal. Other item curves unchanged.",
+        "effect": "gamma=.25; fixed before pilot, not chosen against observed power."
+      },
+      "local_dependence": {
+        "definition": "Generate item2 first; only item1: p=.1+.8 expit(a1*(theta-b1)+1.0*(X2-p2(theta))). Conditional log-odds dependence 1.0; all uniforms independent.",
+        "effect": "lambda=1.0; no post-pilot strengthening."
+      },
+      "two_stage": {
+        "definition": "Only item1: p=.1+.8*(.6 expit(2*(theta+1))+.4 expit(3*(theta-1))). Two-stage monotone item requiring heterogeneous processes; true probabilities remain in(.1,.9).",
+        "effect": "Fixed .6/.4 mixture, component slopes2/3, locations-1/+1."
+      }
+    }
+  },
+  "pilot": {
+    "null_R": 100,
+    "power_R_each": 100,
+    "null_root": 202611264101,
+    "power_root": 202611264102,
+    "reference_root": 202611264103,
+    "policy": "Development only. Select method by null refusal/size and minimum power across alternatives; no scientific acceptance from pilot. If both candidates infeasible stop, do not repeat unchanged. Full fits checkpoint once and shared."
+  },
+  "confirmation": {
+    "null_R": 6000,
+    "power_R_each": 600,
+    "null_root": 202611264201,
+    "power_root": 202611264202,
+    "reference_root": 202611264203,
+    "seed_vectors": "[root,4,replicate,condition_index]; conditions0=null,1=nonmonotone,2=local_dependence,3=two_stage. Distinct from all prior streams.",
+    "fixed_final_analysis": true,
+    "shards": 20,
+    "workers": 2
+  },
+  "gates": {
+    "size": "Every item one-sided CP upper(alpha=.05/24)<=.07, counting any dataset/item failure as rejection. Retain historical24 model-item multiplicity despite only12 newitems.",
+    "precision": "Pooled calibration-cluster MCSE<=.004; pooled normal95% lower>=.03; no treating12 items as independent Monte Carlo units.",
+    "refusal": "Null and each alternative non-evaluable proportions<=.01; failed alternative fits count non-detections. No replacement/retry/newseed.",
+    "power": "Each predeclared alternative claim separately requires item1 CP lower(alpha=.025/3)>.10; report all3. A passing claim never implies validity/power for another class. No after-the-fact scope substitution.",
+    "identity": "Raw S-X2/native identity<=1e-8. Standardized Q additionally independently verifies covariance whitening, nullspace deterministic means and active-set KKT<=1e-7.",
+    "runtime": "Measure actual post-fit median/P95; target P95<1second, numerical validity overrides speed.",
+    "completeness": "All6000 null and600 per alternative attempted; fixed final acceptance only. No interim acceptance."
+  },
+  "precision_plan": "R6000 chosen from existing exactbinomial calculation: simultaneous24 size-gate pass probability union lower .996906 if all true item rates .05. Dataset is MC cluster. PowerR600 chosen to distinguish meaningful >.10 detection; exact CP and independent arithmetic audit.",
+  "futility": "Pilot may prevent confirmation for technical failure or absence of a demonstrably distinguishable alternative; no certification from pilot. During confirmation only technical budget/deadline stops, or final impossibility: observed rejections already exceed maximum allowed even if all remaining nulls pass; for power maximum possible successes cannot meet final gate. No criterion based merely on interim upper bound.",
+  "distinguishability": "Exact4096-pattern GH121/241 probability vectors. Fit population pseudo-true physical4PL null by likelihood KL minimization with multiple deterministic starts; report feasible-null KL, stationarity and GH sensitivity. Local minimum is an upper bound on closest-null KL, never a proved positive global lower bound. Analytic violated monotonicity/local-independence implications or explicit observable witnesses where available distinguish genuine departure from numerical optimization.",
+  "prior_power_bound": "Independently verify old coupling via normal-MGF proof and adaptive integration. Preserve .050060264 result only for original historical independent-item generator; do not carry it to new alternatives.",
+  "archive": "Raw attempts, datahashes,seeds, coefs/pattern counts, source/environment/version, convergence, active bounds, pvalues, native statistics, timing; atomic checkpoints; compact committedrecords+fullartifacts.",
+  "confirmation_registration": "This protocol precedes every new dataset. Separate method-selection commit precedes confirmation. Failed evidence and protocol immutable."
+}
