@@ -1,0 +1,43 @@
+name: P4-C1 polytomous confirmation
+on:
+  pull_request:
+    paths: ['validation/p4_confirm/RUN.json']
+permissions: {contents: read}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {phase: '${{ steps.p.outputs.phase }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: echo "phase=$(python3 -c 'import json;print(json.load(open("validation/p4_confirm/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
+  confirm:
+    needs: plan
+    if: needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy: {fail-fast: false, matrix: {shard: [0,1,2,3,4,5,6,7,8,9]}}
+    env: {PYTHONPATH: ., OMP_NUM_THREADS: '1', OPENBLAS_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - run: mkdir -p out && python validation/p4_confirm/confirm.py ${{ matrix.shard }} 10 400 out/p4_${{ matrix.shard }}.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'p4-${{ matrix.shard }}', path: out/}
+  aggregate:
+    needs: [plan, confirm]
+    if: always() && needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'p4-*', path: /tmp/p, merge-multiple: true}
+      - run: |
+          sha256sum /tmp/p/*.jsonl
+          python validation/p4_confirm/aggregate.py /tmp/p /tmp/p/REPORT.json
