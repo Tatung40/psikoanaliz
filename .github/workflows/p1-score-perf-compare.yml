@@ -5,6 +5,8 @@ on:
 permissions: {contents: read, actions: read}
 jobs:
   compare:
+    # Archived read-only listing; ran once on 5a0… head. Never re-run.
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

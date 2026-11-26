@@ -1,4 +1,4 @@
-name: Closure K optimised revalidation
+name: Closure K optimised revalidation / fresh confirmation
 on:
   pull_request:
     paths: ['validation/p1_4pl_score_perf/RUN.json']
@@ -6,24 +6,28 @@ permissions: {contents: read, actions: read}
 jobs:
   plan:
     runs-on: ubuntu-latest
-    outputs: {phase: '${{ steps.p.outputs.phase }}'}
+    outputs: {phase: '${{ steps.p.outputs.phase }}', root: '${{ steps.p.outputs.root }}', compare: '${{ steps.p.outputs.compare }}'}
     steps:
       - uses: actions/checkout@v4
       - id: p
-        run: echo "phase=$(python3 -c 'import json;print(json.load(open("validation/p1_4pl_score_perf/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
+        run: |
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json; d = json.load(open("validation/p1_4pl_score_perf/RUN.json"))
+          print("phase=" + d["phase"]); print("root=" + str(d.get("root", 202611262101))); print("compare=" + str(d.get("compare_to_certified", True)).lower())
+          PY
   confirm:
     needs: plan
     if: needs.plan.outputs.phase == 'run'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy: {fail-fast: false, matrix: {shard: [0,1,2,3,4,5,6,7]}}
-    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1', ROOT: '${{ needs.plan.outputs.root }}'}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - run: python -u validation/p1_4pl_score/confirm.py --root 202611262101 --R 1000 --start ${{ matrix.shard }} --step 8 --out out/k_${{ matrix.shard }}.jsonl
+      - run: python -u validation/p1_4pl_score/confirm.py --root ${{ env.ROOT }} --R 1000 --start ${{ matrix.shard }} --step 8 --out out/k_${{ matrix.shard }}.jsonl
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: 'kopt-${{ matrix.shard }}', path: out/}
@@ -41,6 +45,6 @@ jobs:
         with: {pattern: 'k-[0-9]*', path: /tmp/old, merge-multiple: true, run-id: '45777107775', github-token: '${{ github.token }}'}
       - run: |
           python validation/p1_4pl_score/aggregate.py /tmp/new /tmp/new/REPORT_K_OPT.json
-          python validation/p1_4pl_score_perf/compare_sets.py /tmp/old /tmp/new /tmp/new/COMPARE.json
+          if [ "${{ needs.plan.outputs.compare }}" = "true" ]; then python validation/p1_4pl_score_perf/compare_sets.py /tmp/old /tmp/new /tmp/new/COMPARE.json; fi
       - uses: actions/upload-artifact@v4
         with: {name: kopt-report, path: '/tmp/new/*.json'}
