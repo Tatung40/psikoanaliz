@@ -90,12 +90,14 @@ Independent Mahalanobis solves and constrained scipy optimizations verify the al
 The ML asymptotics motivating Han et al.'s standardized S-X² (doi:10.1177/01466216221108077)
 are **not** asserted to transfer to MAP; independent finite-sample confirmation supplies the scoped evidence.
 
-Only native MAP/N3000/J12/default-cold/GH61 solutions can show new Q/p/decision columns.
+Only native MAP/N3000/J12/default-cold/GH61/max500/tol1e-4 solutions can show new Q/p/decision columns.
+The existing4PL UI D4 defaults max50000/tol1e-10 remain unchanged and OUTSIDE this Q certificate;
+the explicitly selected standard-native solver profile is required. No solver/point certificate is silently generalized.
 Ordinary S-X² remains visible descriptively; its old p-values remain NA.
 No generic user item design/latent distribution is certified.
 The same separate labels, seed, scope and refusals flow to UI/CSV/XLSX/ZIP/DOCX and portable Python.
 Actual response values, fitted coefficients, method, source/proof fingerprint and persistent independent seed
-bind caches. Proof withdrawal invalidates all downloads without recalibration.
+bind caches, including each actual analysis seed in report bundles. Proof withdrawal invalidates all downloads without recalibration.
 Post-fit public API timing is additionally measured by targeted regression; kernel latency above is not mislabeled as whole-page latency.
 
 ## Permanent evidence and verification

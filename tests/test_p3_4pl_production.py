@@ -22,11 +22,18 @@ def calibrated():
     for k,v in dict(raw_df=data,scored_df=data.copy(),item_cols=list(data),id_col=None,group_col=None,
                     is_dichotomous=True,nav_page=page).items():at.session_state[k]=v
     at.run();assert not at.exception
+    at.checkbox(key="python_mirt_solver_advanced_4PL").check().run()
+    assert at.number_input(key="python_mirt_solver_4PL_max_iter").value==50000
+    assert at.number_input(key="python_mirt_solver_4PL_tol").value==1e-10
+    at.number_input(key="python_mirt_solver_4PL_max_iter").set_value(500)
+    at.number_input(key="python_mirt_solver_4PL_tol").set_value(1e-4)
+    at.run()
     at.checkbox(key="python_mirt_output_4PL_persons").uncheck().run()
     at.button(key="python_mirt_start_4PL").click().run()
     assert not at.exception
     saved=at.session_state["python_mirt_fit_4PL"]
     assert saved["outcome"].fit.converged
+    assert saved["outcome"].solver_settings==dict(max_iter=500,tol=1e-4,n_quadpts=61)
     frame=saved["p3_itemfit"]["frame"]
     return SimpleNamespace(at=at,data=data,saved=saved,outcome=saved["outcome"],frame=frame,page=page)
 
@@ -45,7 +52,7 @@ def test_real_native_reference_keeps_ordinary_chi_square_closed(calibrated):
 
 
 @pytest.mark.parametrize("change",[dict(model="3PL"),dict(estimation="ML"),dict(n_persons=2999),
-    dict(n_items=11),dict(solver_settings=dict(max_iter=500,tol=1e-4,n_quadpts=21))])
+    dict(n_items=11),dict(solver_settings=dict(max_iter=50000,tol=1e-10,n_quadpts=61)),dict(solver_settings=dict(max_iter=500,tol=1e-4,n_quadpts=21))])
 def test_out_of_scope_outputs_remain_suppressed(calibrated,change):
     result,reason=reference_table(replace(calibrated.outcome,**change),calibrated.data.to_numpy(),[1,2,3])
     assert result is None and reason
@@ -149,3 +156,26 @@ def test_actual_public_postfit_latency(calibrated):
         assert reason is None and result[P_COLUMN].notna().all()
     print("P3N_PUBLIC_LATENCY_JSON",json.dumps({"median":float(np.median(seconds)),
         "P95":float(np.percentile(seconds,95)),"calls":len(seconds),"N":3000,"J":12,"new_fits":0}))
+
+
+def test_new_reference_seed_updates_screen_and_downloads_without_refitting(calibrated):
+    c=calibrated;at=c.at
+    saved=at.session_state["python_mirt_fit_4PL"];fit=saved["outcome"]
+    seed=[202611264991,4,0];saved["p3_reference_seed"]=seed;saved.pop("p3_itemfit",None)
+    at.session_state["python_mirt_fit_4PL"]=saved
+    at.run();assert not at.exception
+    current=at.session_state["python_mirt_fit_4PL"]
+    assert current["outcome"] is fit
+    frame=current["p3_itemfit"]["frame"]
+    assert frame["Referans seed"].eq(str(seed)).all()
+    xlsx,raw=at.session_state["python_mirt_bundle"]["4PL"]["files"]
+    excel=pd.read_excel(io.BytesIO(xlsx),sheet_name="Madde_Uyumu")
+    assert excel["Referans seed"].eq(str(seed)).all()
+    assert np.array_equal(excel[P_COLUMN],frame[P_COLUMN])
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        csv=pd.read_csv(io.BytesIO(z.read("tablolar/Madde_Uyumu.csv")))
+        assert csv["Referans seed"].eq(str(seed)).all()
+        assert np.allclose(csv[P_COLUMN],frame[P_COLUMN],rtol=0,atol=1e-15)
+    doc=Document(io.BytesIO(at.session_state["_academic_history"][c.page]["docx"]))
+    text="\n".join(cell.text for table in doc.tables for row in table.rows for cell in row.cells)
+    assert str(seed) in text
