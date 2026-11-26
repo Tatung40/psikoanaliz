@@ -41,3 +41,19 @@ def test_worst_case_failures_never_disappear():
     r=summarize(rows,"p_constrained","pilot")
     assert r["TypeI"]==1 and r["refusal"]==1 and r["certified_claims"]==[]
     assert all(v["power"]==0 and v["refusal"]==1 for v in r["power"].values())
+
+def test_monotone_kl_projection_matches_independent_constrained_optimizer():
+    from scipy import optimize
+    from scipy.special import xlogy
+    from validation.p3_4pl_closure.witness import pav,bound
+    v=np.array([.1,.4,.3,.8,.6]);w=np.array([.1,.2,.3,.1,.3])
+    q=pav(v,w)
+    obj=lambda p:float(-w@(xlogy(v,p)+xlogy(1-v,1-p)))
+    r=optimize.minimize(obj,np.linspace(.2,.7,5),method="SLSQP",bounds=[(.001,.999)]*5,
+        constraints=[{"type":"ineq","fun":lambda p:np.diff(p)}],options={"ftol":1e-13,"maxiter":500})
+    assert r.success and np.max(abs(r.x-q))<1e-6
+    for points in (61,121):
+        assert bound(distribution("null",points))["KL_global_lower"]<1e-12
+    # A nonzero bound is evidence, never assumed merely because a curve is nonlogistic.
+    b=bound(distribution("nonmonotone",121))
+    assert b["KL_global_lower"]>=0

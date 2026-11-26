@@ -54,7 +54,7 @@ jobs:
         with: {name: 'p3n-records-${{ matrix.shard }}', path: /tmp/p3n/}
   diagnostic:
     needs: [plan,mathematics]
-    if: needs.plan.outputs.phase == 'pilot'
+    if: needs.plan.outputs.phase == 'confirm'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - run: python -m validation.p3_4pl_closure.diagnostics --out /tmp/p3n-diag/DIAGNOSTICS.json
+      - run: python -m validation.p3_4pl_closure.witness --out /tmp/p3n-diag/WITNESS.json
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: p3n-diagnostic, path: /tmp/p3n-diag/}
