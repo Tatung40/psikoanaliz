@@ -7,7 +7,8 @@ from scipy.special import expit,logit
 from core.irt_binary_inference import Z95
 from validation.binary_certification.common import truth,simulate
 from validation.binary_certification.reference_numpy import PRIOR,BOX as REFERENCE_BOX,objective
-SPEC=importlib.util.spec_from_file_location("frozen_g",os.environ.get("G_REFERENCE","/tmp/parameter-g-runner.py"))
+# Default: byte-exact copy of validation/parameter_uncertainty_g/runner.py at 2211429 (main push CI has no /tmp copy).
+SPEC=importlib.util.spec_from_file_location("frozen_g",os.environ.get("G_REFERENCE",os.path.join(os.path.dirname(__file__),"frozen_g_runner.py")))
 G=importlib.util.module_from_spec(SPEC);sys.modules["frozen_g"]=G;SPEC.loader.exec_module(G)
 from mirt.estimation.base import _ITEM_PARAMETER_BOUNDS as NATIVE_BOUNDS
 BOX={q:tuple(NATIVE_BOUNDS[col]) for col,q in G.SHORT.items()}

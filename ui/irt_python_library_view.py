@@ -305,9 +305,25 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 st.dataframe(safe_frame(onestep.drop(columns=['Yöntem','Kapsam','Bilimsel durum'])).round(4),hide_index=True,use_container_width=True)
                 st.download_button('Tek adımlı GA — CSV',_csv(onestep),f'{model}_parameter_onestep_ci.csv','text/csv',
                                    key=f'python_mirt_onestep_csv_{model}',on_click='ignore')
+            if model=='4PL' and onestep is not None:
+                skey=('score_sets',bundle_key)
+                cache=st.session_state.setdefault('python_mirt_4pl_score_sets',{})
+                if skey not in cache and st.button('4PL c/d güven kümeleri — C(α) skor ters çevirme (gelişmiş, ~25 sn)',key='python_mirt_4pl_score_sets_btn'):
+                    from core.irt_4pl_score_sets import score_set_table
+                    with st.spinner('C(α) güven kümeleri hesaplanıyor...'):
+                        cache[skey]=score_set_table(saved['outcome'],x.to_numpy(dtype=int),cols)
+                if skey in cache:
+                    sets_table,sets_reason=cache[skey]
+                    if sets_table is None:st.info(sets_reason)
+                    else:
+                        record_displayed(sets_table)
+                        st.dataframe(safe_frame(sets_table.drop(columns=['Yöntem','Kapsam'])),hide_index=True,use_container_width=True)
+                        st.download_button('4PL c/d güven kümeleri — CSV',_csv(sets_table),'4PL_cd_score_sets.csv','text/csv',
+                                           key='python_mirt_4pl_score_sets_csv',on_click='ignore')
+                        st.caption('Küme boş, parçalı veya tüm kutu olabilir; tüm-kutu kümeler bilgi vermez. MAP kestirimi değişmez.')
             st.caption(f'{METHOD}. {SCOPE} Aralık gerçek parametreyi hedefler; merkezi MAP değildir. Gösterilen SH tek-adım '
-                       'kestiricisinindir, MAP örnekleme SH’si değildir. 4PL a/b aralıkları geçerli fakat çok geniştir; 4PL c/d GA '
-                       'bilgi vermediği için NOT CERTIFIED ve üretilmez.')
+                       'kestiricisinindir, MAP örnekleme SH’si değildir. 4PL a/b aralıkları geçerli fakat çok geniştir; 4PL c/d için tek-adım Wald GA '
+                       'NOT CERTIFIED; doğrulanmış C(α) güven kümeleri ayrı düğmeyle üretilir.')
         kind=st.selectbox('Grafik',kinds(model),key=f'python_mirt_extra_kind_{model}')
         chosen=None
         if kind in ('ICC','IIC'):

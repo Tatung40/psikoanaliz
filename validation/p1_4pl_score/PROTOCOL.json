@@ -1,0 +1,14 @@
+{"id": "Closure K: 4PL c/d 95% confidence sets by Neyman C(alpha) efficient-score inversion",
+ "registered_before_confirmation": true, "base_main": "b91844f6b7a4fc85af8d07b7418edad70ce8a324",
+ "estimand": "True physical 4PL c_j and d_j (unchanged). MAP estimates unchanged; sets are a separate inferential output.",
+ "method": "core/irt_4pl_score_sets.py: nuisance path from the MAP along the expected-information projection (clipped to the native box), unpenalised efficient score at the empirical 4096-pattern distribution, chi2_1 .95 critical value, union of accepted cells on a 26-point box grid. Sets may be empty, disconnected or the whole box.",
+ "scope": "N=3000, J=12, registered item design (validation.binary_certification.common.truth), theta~N(0,1), native MAP mirt 1.2.0 GH61 tol1e-4 max_iter500. No generalisation.",
+ "development": "Pilot seed 202611262001, R=80, items 1/6/12 (validation/evidence/p1_4pl_score/PILOT_dev.json); never confirmation.",
+ "confirmation": {"seed_root": 202611262101, "R": 1000, "seeds": "simulate('4PL',3000,12,[202611262101,4,r,0])"},
+ "gates_per_parameter_type_c_and_d": {
+   "unconditional_coverage_displayed_set": "[.93,.97], dataset-clustered MCSE <= .004; refusals, non-converged fits, errors and empty sets count as non-coverage",
+   "conditional_coverage_informative": "[.93,.97] over sets that are neither whole-box nor empty (whole-box never counted as informative)",
+   "whole_box_fraction": "<= .5", "median_informative_width": "< box length .5",
+   "numerical_failure": "<= .01 (non-converged MAP, non-PD/ill-conditioned information, exceptions)",
+   "reported_not_gated": "exact T(psi0) coverage, empty-set rate, per-item coverage/whole-box, runtime"},
+ "certification_unit": "Per parameter type (all 12 c; all 12 d). No post hoc item restriction; per-item results reported."}

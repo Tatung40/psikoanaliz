@@ -1,0 +1,46 @@
+name: Closure K 4PL c/d score-set confirmation
+on:
+  pull_request:
+    paths: ['validation/p1_4pl_score/RUN.json']
+permissions: {contents: read}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {phase: '${{ steps.p.outputs.phase }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: echo "phase=$(python3 -c 'import json;print(json.load(open("validation/p1_4pl_score/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
+  confirm:
+    needs: plan
+    if: needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy: {fail-fast: false, matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}}
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - run: python -u validation/p1_4pl_score/confirm.py --root 202611262101 --R 1000 --start ${{ matrix.shard }} --step 16 --out out/k_${{ matrix.shard }}.jsonl
+      - run: python validation/p1_4pl_score/summarize.py out "out/k_${{ matrix.shard }}.jsonl"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'k-${{ matrix.shard }}', path: out/}
+  aggregate:
+    needs: confirm
+    if: always() && needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'k-*', path: /tmp/k, merge-multiple: true}
+      - run: |
+          sha256sum /tmp/k/*.jsonl
+          python validation/p1_4pl_score/aggregate.py /tmp/k /tmp/k/REPORT_K.json
+      - uses: actions/upload-artifact@v4
+        with: {name: k-report, path: /tmp/k/REPORT_K.json}
