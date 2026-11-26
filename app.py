@@ -717,6 +717,11 @@ elif selected_page == "4. Test İstatistikleri":
         # Toplam puan hesaplama
         total_scores = calculate_total_scores(target_df, item_cols)
         k_items = len(item_cols)
+        _partial = int((target_df[item_cols].apply(pd.to_numeric, errors="coerce").isna().any(axis=1) & total_scores.notna()).sum())
+        if _partial:
+            st.warning(f"{_partial} katılımcının toplamı yalnız yanıtladığı maddelerin gözlenen toplamıdır (en az %80 yanıt; "
+                       "%80'in altı hesaplanmadı). Bu kısmi toplamlar tam test puanlarıyla doğrudan karşılaştırılabilir değildir; "
+                       "kayıp yanıtlar yanlış (0) sayılmaz.")
         summary = compute_test_summary(total_scores, k_items)
         st.session_state.test_summary = summary
 
@@ -780,7 +785,13 @@ elif selected_page == "5. Madde Analizi":
     if target_df is None or not item_cols:
         st.warning("Lütfen önce veri yükleyin ve puanlama işlemini tamamlayın.")
     else:
-        total_scores = calculate_total_scores(target_df, item_cols)
+        # Toplam puana dayalı madde istatistikleri yalnız tam yanıtlı katılımcılarda (kısmi toplamlar tam test puanı değildir)
+        total_scores = calculate_total_scores(target_df, item_cols, missing_rule="strict")
+        n_partial = int(total_scores.isna().sum())
+        if n_partial:
+            st.warning(f"{n_partial} katılımcıda kayıp yanıt var: r_it, r_ir, %27 grupları ve 'silindiğinde' istatistikleri yalnız "
+                       f"{int(total_scores.notna().sum())} tam yanıtlı katılımcıda hesaplandı; madde ortalaması/güçlüğü her maddenin "
+                       "gözlenen yanıtlarından (N sütunu) hesaplanır. Kayıp yanıtlar yanlış (0) sayılmaz.")
         summary_df, meta = compute_item_statistics(
             target_df,
             item_columns=item_cols,
@@ -993,7 +1004,9 @@ elif selected_page == "9. Bilimsel Grafikler":
     else:
         total_scores = calculate_total_scores(target_df, item_cols)
         if st.session_state.item_summary is None:
-            st.session_state.item_summary, _ = compute_item_statistics(target_df, item_cols, total_scores)
+            st.session_state.item_summary, _ = compute_item_statistics(
+                target_df, item_cols, calculate_total_scores(target_df, item_cols, missing_rule="strict"),
+                is_dichotomous=st.session_state.is_dichotomous)
 
         tab_g1, tab_g2, tab_g3, tab_g4 = st.tabs([
             "📊 Test Puan Dağılımı", 
@@ -1049,9 +1062,12 @@ elif selected_page == "10. Raporlama":
         if not st.session_state.test_summary:
             st.session_state.test_summary = compute_test_summary(total_scores, len(item_cols))
         if st.session_state.item_summary is None:
-            st.session_state.item_summary, _ = compute_item_statistics(target_df, item_cols, total_scores)
+            st.session_state.item_summary, _ = compute_item_statistics(
+                target_df, item_cols, calculate_total_scores(target_df, item_cols, missing_rule="strict"),
+                is_dichotomous=st.session_state.is_dichotomous)
         if not st.session_state.reliability_data:
-            st.session_state.reliability_data = compute_reliability_indices(target_df, item_cols)
+            st.session_state.reliability_data = compute_reliability_indices(
+                target_df, item_cols, is_dichotomous=st.session_state.is_dichotomous)
 
         freq_df = compute_frequency_distribution(total_scores)
 
