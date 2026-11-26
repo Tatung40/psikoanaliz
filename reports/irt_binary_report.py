@@ -79,7 +79,7 @@ def png_bytes(report, persons, kind, selected=None):
     return stream.getvalue()
 
 
-def method_text(report, inference_reason, persons=None):
+def method_text(report, inference_reason, persons=None, itemfit=None):
     meta = report.metadata
     map_fit = report.model in ("3PL", "4PL") and meta.get("Kestirim") == "MAP"
     uncertainty = ("Parametre SH: Oakes ters log-posterior eğriliği; MAP örnekleme SH/GA sertifikası değildir.\n" if map_fit else
@@ -93,12 +93,18 @@ def method_text(report, inference_reason, persons=None):
                      "Posterior %95 aralık eşit kuyruklu Bayesçidir; sabit θ ve uç bölgelerde %95 sıklıkçı kapsama sağlamaz.\n"
                      "Skor GA: madde kestirimlerine koşullu tam Poisson-binomial test terslemesi; doğrulama θ=-4..4 (21 nokta) ve N(0,1) kuyruk ortalamalarıyla sınırlıdır.\n"
                      "±inf sonuçlar tanımlanabilirlik sınırlılığıdır; boş güven kümesinde sınırlar verilmez. J30 ve farklı DGP doğrulanmadı.\n")
+    p3_note=""
+    if itemfit is not None and "S-X² kısıtlı referans p" in itemfit:
+        p3_note=("S-X²: istatistik değişmez; yeni p sütunu kısıtlı Gauss MAP referansıdır (B4095, ayrı 1024 eğitim çekilişi). "
+                 "Klasik χ² p değeri NOT CERTIFIED olarak kapalıdır. Karar madde düzeyindedir; FWER/FDR sertifikası değildir.\n"
+                 "Doğrulama yalnız kayıtlı N3000/J12/3PL MAP/GH61/default-prior/N(0,1) tasarımıdır; kullanıcı tasarımı doğrulanmadı. "
+                 "Kabul toleransı 24 model-madde eşzamanlı Tip-I üst sınırı ≤.07; tam nominal .05 kontrolü iddia edilmez. Seed tablolardadır.\n")
     return ("PsikoAnaliz — İkili MTK rapor paketi\n"
             f"Model: {report.model}\nMotor: Python mirt 1.2.0 (tek kestirim altyapısı)\n"
             f"N: {meta.get('N')} | Madde: {meta.get('Madde')} | Yakınsama: {meta.get('Yakınsama')}\n"
             "Ölçek: θ ~ N(0,1); P = c + (d − c)·logistic(a(θ − b))\n"
             "Kişi puanları: EAP ve posterior SS; SEM(θ) = 1/√I_test(θ).\n"
-            ) + uncertainty + fit_note + person_note + (f"SH durumu: {inference_reason}\n" if inference_reason else "") + (
+            ) + uncertainty + fit_note + person_note + p3_note + (f"SH durumu: {inference_reason}\n" if inference_reason else "") + (
             "Wright haritası (2PL–4PL): b her modelde aynı θ ölçeğindedir; yalnız 1PL/2PL'de P = .5 noktasıdır.\n")
 
 def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=None):
@@ -119,7 +125,7 @@ def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=N
     archive = io.BytesIO()
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr(f"{report.model}_rapor.xlsx", xlsx.getvalue())
-        z.writestr(f"{report.model}_yontem.txt", method_text(report, inference_reason, persons))
+        z.writestr(f"{report.model}_yontem.txt", method_text(report, inference_reason, persons, itemfit))
         for name, frame in tables.items():
             z.writestr(f"tablolar/{name}.csv", safe_frame(frame).to_csv(index=False))
         for kind in kinds(report.model):

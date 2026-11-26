@@ -1,0 +1,38 @@
+{
+  "3PL": {
+    "feasible_item1": {
+      "a": 0.1,
+      "b": -6,
+      "c": 0.4996769495250795,
+      "d": 1
+    },
+    "alternative_marginal": 0.822547678522911,
+    "alternative_GH121_GH241_L1": 4.626264200216046e-15,
+    "feasible_null_GH121_GH241_L1": 4.5803677199690715e-15,
+    "KL_GH241": 0.00028896855028809646,
+    "KL_GH121": 0.00028896855028817843,
+    "N_KL": 0.8669056508642894,
+    "uniform_level_.05_power_upper_Pinsker": 0.7083713431127944,
+    "analytic_coupling_power_bound": null,
+    "analytic_derivation": null,
+    "interpretation": "Bound applies to any test controlling .05 at this feasible null, not merely at the one registered reference truth. It does not prove structural parameter nonidentifiability or a global optimum. Native MAP prior is unchanged; this is an explicit feasible member of the model family."
+  },
+  "4PL": {
+    "feasible_item1": {
+      "a": 5,
+      "b": -6,
+      "c": 0.1,
+      "d": 0.7422646031314765
+    },
+    "alternative_marginal": 0.7422646031314765,
+    "alternative_GH121_GH241_L1": 4.183704943626961e-15,
+    "feasible_null_GH121_GH241_L1": 3.9823558099988995e-14,
+    "KL_GH241": 5.088992260882598e-15,
+    "KL_GH121": 5.049907050497182e-15,
+    "N_KL": 1.5266976782647795e-11,
+    "uniform_level_.05_power_upper_Pinsker": 0.05000276287683246,
+    "analytic_coupling_power_bound": 0.05006026397973786,
+    "analytic_derivation": "Take a1=5,b1=-6,c1=.1,d1=m, where m=E[.1+.8 logistic(1.6(theta+1.25))] lies in(.5,.9). Couple same theta, other items and uniform first-item responses. The per-person disagreement is E[(m-.1) logistic(-5(theta+6))] <=.8 E[exp(-5theta-30)]=.8 exp(-17.5). For N independent persons TV<=N times this bound; any test of size<=.05 at this feasible null has alternative power<=.05+N*.8 exp(-17.5). This is a uniform composite-null statement, not a claim that the single registered reference cell proves uniform level.",
+    "interpretation": "Bound applies to any test controlling .05 at this feasible null, not merely at the one registered reference truth. It does not prove structural parameter nonidentifiability or a global optimum. Native MAP prior is unchanged; this is an explicit feasible member of the model family."
+  }
+}

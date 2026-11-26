@@ -174,12 +174,12 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     for error in report.errors:st.error(error)
     if outputs['itemfit'] and model!='NRM':
         st.markdown('### Madde uyumu — Python mirt itemfit')
-        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için p/karar kapalı. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
+        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için klasik χ² p/karar kapalı. 3PL MAP/N3000/J12 için ayrı etiketli kısıtlı Gauss referansı yalnız doğrulanmış çözücü kapsamında sunulur; kullanıcı DGP'si sertifikalanmaz. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
         if report.metadata.get('Yakınsama') is not True or report.errors:
             st.warning('Yakınsama veya rapor hatası nedeniyle madde uyumu hesaplanmadı.')
         else:
             try:
-                fit_table=library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model)
+                fit_table=_itemfit(saved,x,model)
                 fit_frame=safe_frame(fit_table)
                 if fit_frame.empty:
                     st.info('Kütüphane bu model için madde uyum tablosu döndürmedi.')
@@ -262,6 +262,9 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         store=st.session_state.setdefault('python_mirt_bundle',{})
         entry=store.get(model)
         bundle_key=(saved['key'],SCORING_VERSION) if model in ('3PL','4PL') else saved['key']
+        if model=='3PL':
+            from core.irt_sx2_scoped import cache_fingerprint
+            bundle_key=(bundle_key,'p3-constrained-gaussian-v1',cache_fingerprint())
         try:
           if entry and entry['key']==bundle_key:
             persons,inference,reason=entry['persons'],entry['inference'],entry['reason']
@@ -282,7 +285,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 onestep,onestep_reason=onestep_intervals(saved['outcome'],cols)
             itemfit=None
             try:
-                itemfit=safe_frame(library_itemfit(saved['outcome'].fit,x.to_numpy(dtype=int),model=model))
+                itemfit=safe_frame(_itemfit(saved,x,model))
             except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
                 itemfit=None
             entry=store[model]={'key':bundle_key,'persons':persons,'inference':inference,'reason':reason,
@@ -441,3 +444,28 @@ def _independent_person_view(saved,report,data,cols,id_col,model):
                        f'{model}_independent_persons.xlsx',key=f'python_mirt_holdout_xlsx_{model}',on_click='ignore')
     st.download_button(f'{model} bağımsız kişi paketi — ZIP',result['zip'],
                        f'{model}_independent_persons.zip','application/zip',key=f'python_mirt_holdout_zip_{model}',on_click='ignore')
+
+
+def _itemfit(saved,x,model):
+    """Session-local cache follows actual responses, fitted coefficients and method."""
+    outcome=saved['outcome']
+    scoped=(model=='3PL' and saved.get('multistart') is None and getattr(outcome,'estimation',None)=='MAP'
+            and (getattr(outcome,'n_persons',None),getattr(outcome,'n_items',None))==(3000,12)
+            and getattr(outcome,'solver_settings',{})==dict(max_iter=500,tol=1e-4,n_quadpts=61))
+    if not scoped:return library_itemfit(outcome.fit,x.to_numpy(dtype=int),model=model)
+    if _data_fingerprint(x)!=saved['key'][2]:
+        raise ValueError('Kalibrasyon verisi değişti; eski madde uyumu kullanılmaz. Yeniden kestirin.')
+    from core.irt_sx2_scoped import cache_fingerprint
+    key=(_data_fingerprint(x),_data_fingerprint(outcome.fit.coef()),saved['key'],'p3-constrained-gaussian-v1',cache_fingerprint())
+    cached=saved.get('p3_itemfit')
+    if cached and cached['key']==key:
+        record_displayed(cached['frame'])
+        return cached['frame']
+    if 'p3_reference_seed' not in saved:
+        # Independent analysis randomization, recorded in the API recipe and every
+        # export; held constant through reruns. No user-data-derived random seed.
+        saved['p3_reference_seed']=np.random.SeedSequence().generate_state(4).tolist()
+    table=library_itemfit(outcome.fit,x.to_numpy(dtype=int),model=model,
+        inference_context=outcome,reference_seed=saved['p3_reference_seed'])
+    saved['p3_itemfit']={'key':key,'frame':table}
+    return table

@@ -132,3 +132,15 @@ Tanı: N=3000/J12'de beklenen Fisher bilgisinin en küçük özdeğeri × N = .5
 | 3PL/4PL | Orijinal ki-kare S-X² p | — | .0622 / .0862 (yeni null) | — | NOT CERTIFIED (kapalı kalır) |
 
 | 4PL | c, d %95 güven kümesi (kapanış K) | C(α) etkin-skor ters çevirme, 26 noktalı ızgara | koşulsuz .9447/.9467; bilgi veren .9434/.9602; tüm-kutu %16.6/%0.9 | .0021–.0023 | SCOPED CERTIFIED (N3000/J12, kayıtlı tasarım; R=1000 yeni tohum 202611262101) |
+
+
+## P3 closure M — scoped 3PL reference (2026-11-26)
+
+| Model | Output | Method | Independent evidence | Status |
+|---|---|---|---|---|
+| 3PL | S-X² inferential p, separate reference column | Unchanged native statistic; constrained-Gaussian joint MAP score/residual law, B4095 | R6000 null + R600 power; Type-I .049806, cluster MCSE .0008244; worst CP upper .068946≤.07; power .3367, CP lower .2989>.10; refusal0 | SCOPED CERTIFIED, N3000/J12/default cold MAP/GH61/reference item design/N(0,1) only |
+| 3PL/4PL | Ordinary chi-square S-X² p | Original approximation | Previous failures retained | NOT CERTIFIED; remains suppressed |
+| 4PL | Standardized residual Q / orthogonal score alternatives | Development pilots only | Standardized power4/150, CP upper .06687<.10; registered independent-item alternative is nearly indistinguishable from a feasible valid 4PL null | NOT CERTIFIED; no new confirmation |
+| 3PL | Standardized-Q secondary | Same confirmation, not selected prospectively | Numerical gates passed but procedure was not selected | NOT CERTIFIED; not exposed |
+
+This new certificate does not certify exact .05 control, FWER/FDR, arbitrary user item designs, other N/J, or ML. All 14 P1 and six P2 certificates and withdrawn 4PL c/d Wald gates remain unchanged. Full protocol, raw compact records, independent audit and the analytic 4PL power obstruction: [P3_CLOSURE_M.md](P3_CLOSURE_M.md).

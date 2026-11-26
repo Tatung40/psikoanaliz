@@ -1,0 +1,33 @@
+{
+  "independent_arithmetic": "PASS",
+  "null_R": 6000,
+  "power_R": 600,
+  "rejections_per_item": [
+    273,
+    325,
+    281,
+    289,
+    281,
+    267,
+    289,
+    309,
+    296,
+    318,
+    358,
+    300
+  ],
+  "power_rejections": 202,
+  "typeI": 0.049805555555555554,
+  "MCSE": 0.0008244146070209565,
+  "worst_upper": 0.06894565960161474,
+  "power": 0.33666666666666667,
+  "power_lower": 0.2989045849456573,
+  "native_converged": 6600,
+  "identity_max": 8.988365607365267e-13,
+  "refusal": 0,
+  "all_seeds_and_sources_verified": true,
+  "decision": true,
+  "raw_archive_sha256": "fc60a71366c0323ad62a2569496806de876f753c5ee3552b13effc941ff4abd2",
+  "raw_archive_rows": 6600,
+  "raw_archive_git_blob": "3c88c17eaddc7adad0e9ccc9a085cb07d0ad8943"
+}
