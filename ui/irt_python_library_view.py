@@ -174,7 +174,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     for error in report.errors:st.error(error)
     if outputs['itemfit'] and model!='NRM':
         st.markdown('### Madde uyumu — Python mirt itemfit')
-        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için klasik χ² p/karar kapalı. 3PL MAP/N3000/J12 için ayrı etiketli kısıtlı Gauss referansı yalnız doğrulanmış çözücü kapsamında sunulur; kullanıcı DGP'si sertifikalanmaz. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
+        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için klasik χ² p/karar kapalı. 3PL MAP/N3000/J12 için ayrı etiketli kısıtlı Gauss referansı yalnız doğrulanmış çözücü kapsamında sunulur; kullanıcı DGP’si sertifikalanmaz. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
         if report.metadata.get('Yakınsama') is not True or report.errors:
             st.warning('Yakınsama veya rapor hatası nedeniyle madde uyumu hesaplanmadı.')
         else:
