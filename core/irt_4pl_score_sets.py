@@ -30,8 +30,22 @@ def terms(eta, t, w):
     return px, sc
 
 
+def terms_fast(eta, t, w):
+    """Algebraically identical to terms() without cancellation: (x-P)/(P(1-P)) = 1/P if x=1 and -1/(1-P) if x=0, so
+    score_jk(x) = x_j (post @ dP/P)_jk - (1-x_j) (post @ dP/(1-P))_jk: two (patterns x nodes)@(nodes x 4J) GEMMs."""
+    e = np.asarray(eta, float).reshape(J, 4); a, b, c, d = e.T
+    z = expit(a * (t[:, None] - b)); P = np.clip(c + (d - c) * z, 1e-300, 1 - 1e-16); dz = z * (1 - z)
+    dP = np.stack([(d - c) * dz * (t[:, None] - b), -(d - c) * dz * a, 1 - z, z], 2)          # Q x J x 4
+    lp, lq = np.log(P), np.log1p(-P)
+    ll = _X @ lp.T + (1 - _X) @ lq.T; m = ll.max(1, keepdims=True); L = np.exp(ll - m) * w
+    px = L.sum(1); post = L / px[:, None]; px = px * np.exp(m[:, 0])
+    B1 = (dP / P[:, :, None]).reshape(len(t), -1); B0 = (dP / (1 - P)[:, :, None]).reshape(len(t), -1)
+    X4 = np.repeat(_X, 4, axis=1); sc = X4 * (post @ B1) - (1 - X4) * (post @ B0)
+    return px, sc
+
+
 def statistic(eta, phat, i, N, t, w):
-    px, sc = terms(eta, t, w); s = phat @ sc; I = (px[:, None] * sc).T @ sc
+    px, sc = terms_fast(eta, t, w); s = phat @ sc; I = (px[:, None] * sc).T @ sc
     lam = np.r_[0:i, i + 1:len(eta)]; b = np.linalg.solve(I[np.ix_(lam, lam)], I[lam, i])
     g = s[i] - b @ s[lam]; v = I[i, i] - b @ I[lam, i]
     return float(N * g * g / v)
@@ -41,7 +55,7 @@ def confidence_sets(eta_map, responses, items=range(J), params=(2, 3), truth=Non
     """Per (item, param): accepted grid, union-of-cells intervals, whole/empty flags; truth coverage if given."""
     x = np.asarray(responses, int); N = len(x); t, w = _quad()
     phat = np.bincount(x @ _BITS, minlength=2 ** J) / N
-    eta = np.asarray(eta_map, float).ravel(); px, sc = terms(eta, t, w); I = (px[:, None] * sc).T @ sc
+    eta = np.asarray(eta_map, float).ravel(); px, sc = terms_fast(eta, t, w); I = (px[:, None] * sc).T @ sc
     ev = np.linalg.eigvalsh(I)
     if not np.all(np.isfinite(I)) or ev[0] <= 0 or ev[-1] / ev[0] > 1e12:
         raise np.linalg.LinAlgError("expected information not positive definite / cond > 1e12")

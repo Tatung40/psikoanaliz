@@ -1,0 +1,9 @@
+{"id": "Closure K optimised implementation (frozen at c1ad2a2) — fresh independent confirmation",
+ "registered_before_run": true,
+ "implementation": "core/irt_4pl_score_sets.py at c1ad2a2 (frozen; no further optimisation)",
+ "seed_root": 202611261301, "seeds": "simulate('4PL',3000,12,[202611261301,4,r,0]), r=0..999; disjoint from development 202611262001, certified confirmation 202611262101 and regression rerun",
+ "R": 1000, "mc_precision": "dataset-clustered; certified run gave MCSE .0021 (unconditional) and <=.0023 (conditional) at R=1000, inside the .004 gate",
+ "gates": "UNCHANGED closure-K gates (validation/p1_4pl_score/PROTOCOL.json, evaluated by the unchanged validation/p1_4pl_score/aggregate.py): per c and d, unconditional coverage [.93,.97] with MCSE<=.004 (refusals, non-converged fits, errors and empty sets = non-coverage); informative (neither whole-box nor empty) coverage [.93,.97] with MCSE<=.004; whole-box <=.5; median informative width <.5; numerical failure <=.01.",
+ "scope": "Unchanged: N=3000, J=12, registered item design, theta~N(0,1), native MAP mirt 1.2.0 GH61 tol1e-4 max_iter500.",
+ "decision": "Pass -> optimised implementation replaces the frozen one in production. Fail -> production keeps frozen_k.py (certified implementation); 14 certificates unaffected.",
+ "regression_note": "Run 45798062200 (same seeds as the certified confirmation) is regression evidence only, not confirmation."}

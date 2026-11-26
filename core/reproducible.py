@@ -392,10 +392,26 @@ def runtime_hashes(calls=()):
     return hashes
 
 
+# Non-.py files read at runtime by called calculation modules (registry, evidence gates, R scripts). Without them a
+# replay silently differs from the app (import failure, or evidence-gated outputs failing closed).
+_MODULE_ASSETS = (
+    ('core.rater_reliability', ('core/rater_methods.json', 'validation/rater_reliability/evidence.json')),
+    ('core.mfrm', ('scripts/mfrm_tam.R', 'validation/mfrm/evidence.json')),
+    ('core.raschpy_mfrm', ('validation/raschpy_mfrm/evidence.json', 'validation/raschpy_mfrm/simulation.json',
+                           'validation/raschpy_mfrm/simulation_v12.json', 'validation/raschpy_mfrm/simulation_v14.json')),
+    ('core.dif', ('validation/lord_rasch_free_scale/results/report.json', 'tests/fixtures/irt_b10/data_dif1pl_uniform.csv')),
+    ('core.irt', ('validation/evidence/binary_certification/CERTIFICATION.json',)),
+)
+
+
 def _runtime_assets(calls):
     path = ROOT / 'scripts' / 'gtheory_reml.R'
     needed = any(c.get('module')=='core.generalizability_advanced' and c.get('function')=='analyze' for c in calls)
     assets=[path] if needed and path.is_file() else []
+    modules={str(c.get('module','')) for c in calls}
+    for prefix, files in _MODULE_ASSETS:
+        if any(m == prefix or m.startswith(prefix + '.') or (prefix in ('core.dif', 'core.irt') and m.startswith(prefix)) for m in modules):
+            assets += [ROOT / f for f in files if (ROOT / f).is_file() and ROOT / f not in assets]
     person_needed=any(c.get('module') in ('core.irt_binary_persons','core.irt_binary_patterns') for c in calls)
     person_proof=ROOT/'validation'/'evidence'/'irt_closure'/'P2_CERTIFICATION.json'
     if person_needed and person_proof.is_file():assets.append(person_proof)
@@ -404,7 +420,7 @@ def _runtime_assets(calls):
         for relative in ('validation/p3_empirical/constrained.py','validation/p3_empirical/kernel.py',
                          'validation/p3_sx2_analytic/kernel.py','validation/evidence/p3_empirical/CERTIFICATION.json'):
             asset=ROOT/relative
-            if asset.is_file():assets.append(asset)
+            if asset.is_file() and asset not in assets:assets.append(asset)
     return assets
 
 
@@ -449,7 +465,7 @@ if not (RUNTIME / "core").is_dir():
             parts = Path(item.filename).parts[1:]
             if not parts or ".." in parts:
                 continue
-            if "/".join(parts) not in MANIFEST["runtime_sha256"]:
+            if not ((parts[0] in ("core", "reports") and item.filename.endswith(".py")) or "/".join(parts) in MANIFEST["runtime_sha256"]):
                 continue
             target = RUNTIME.joinpath(*parts)
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -493,5 +509,6 @@ def bundle(manifest, python):
                          'Install requirements-repro.txt in a virtual environment. No packages are installed automatically.\n'
                          'Python reuses the bundled PsikoAnaliz engine; this is not an independent reference.\n'
                          'Only REML G-theory calls additionally require R, lme4 2.1-0 and jsonlite; no auto-install.\n'
+                         'TAM-based MFRM calls additionally require R and TAM; Python reproduction of R-backed steps is UNVERIFIED here.\n'
                          'Code generation is not scientific validation.\n')
     return output.getvalue()

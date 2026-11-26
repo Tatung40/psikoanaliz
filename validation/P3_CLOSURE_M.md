@@ -15,7 +15,7 @@ The registered acceptance tolerance is simultaneous per-item Type-I upper ≤.07
 
 ## Reproducibility and independence
 
-- Base main: 262f1d9ab95911f29b2014d3236f0f03ac22a090; PR195 is separate and untouched.
+- Base main: 262f1d9ab95911f29b2014d3236f0f03ac22a090; PR195 was subsequently merged into main (0ea3990, with #197/#198); its revalidated optimized kernel and certification metadata are retained unchanged.
 - Protocol committed first: 5be1faad9b40d27373b34ff7c887030bf64c89ca.
 - Boundary/orthogonal fallback amendment: 4b89f7d152e1f95f08c86cee59be6e5324239d6d.
 - Method selected before fresh confirmation: 88afec3341859b71ca970fb064b2d2159f382fe8.
