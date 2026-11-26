@@ -58,8 +58,8 @@ def main():
         if key in seen:raise ValueError("duplicate independent dataset "+str(key))
         seen.add(key);rows.append(r);hashes[str(f.relative_to(a.input))]=hashlib.sha256(raw).hexdigest()
     report={"phase":a.phase,"source_run":"actual JSON records; dataset is MC cluster","models":{m:summarize(rows,m,a.phase) for m in ("3PL","4PL")},"precision_design":design(),"record_hashes":hashes}
-    Path(a.out).parent.mkdir(parents=True,exist_ok=True);Path(a.out).write_text(json.dumps(report,indent=1))
-    print("P3_REPORT_JSON "+json.dumps({k:v for k,v in report.items() if k!="record_hashes"}),flush=True)
+    Path(a.out).parent.mkdir(parents=True,exist_ok=True);Path(a.out).write_text(json.dumps(report,indent=1,default=lambda v:v.item()))
+    print("P3_REPORT_JSON "+json.dumps({k:v for k,v in report.items() if k!="record_hashes"},default=lambda v:v.item()),flush=True)
 
 
 if __name__=="__main__":main()

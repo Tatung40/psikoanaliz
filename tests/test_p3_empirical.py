@@ -94,3 +94,17 @@ def test_primary_registry_and_original_gates_unchanged():
     for path,sha in lock.items():
         raw=(root/path).read_bytes()
         assert hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()==sha
+
+
+def test_aggregate_cli_serializes_numpy_gate_booleans(tmp_path,monkeypatch):
+    import json,sys
+    from validation.p3_empirical import aggregate
+    for model in ("3PL","4PL"):
+        for r,p in enumerate((.01,.5,.7)):
+            record={"model":model,"root":1,"r":r,"alt":False,"result":{"items":[{"p_emp":p,"p_standardized":p}]*12,"seconds":.1},
+                    "p_chi":[p]*12,"identity":0.,"seconds":.1}
+            (tmp_path/f"{model}_1_{r}.json").write_text(json.dumps(record))
+    out=tmp_path/"summary.json"
+    monkeypatch.setattr(sys,"argv",["aggregate","--input",str(tmp_path),"--phase","pilot","--out",str(out)])
+    aggregate.main()
+    assert json.loads(out.read_text())["models"]["3PL"]["p_emp"]["null_R"]==3
