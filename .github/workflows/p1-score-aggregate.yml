@@ -1,0 +1,20 @@
+name: Closure K read-only re-aggregation
+on:
+  pull_request:
+    paths: ['validation/p1_4pl_score/aggregate.py', '.github/workflows/p1-score-aggregate.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'k-*', path: /tmp/k, merge-multiple: true, run-id: '45777107775', github-token: '${{ github.token }}'}
+      - run: |
+          sha256sum /tmp/k/*.jsonl
+          python validation/p1_4pl_score/aggregate.py /tmp/k /tmp/k/REPORT_K.json
+      - uses: actions/upload-artifact@v4
+        with: {name: k-report-final, path: /tmp/k/REPORT_K.json}

@@ -16,8 +16,8 @@ for q in "cd":
     ok = np.array(["sets" in r for r in rows]); info = ok[:, None] & ~whole & ~empty
     u, ue = mcse_ratio(cov.sum(1).astype(float), np.full(R, 12.0)); c, ce = mcse_ratio((cov & info).sum(1).astype(float), info.sum(1).astype(float))
     fail = 1 - ok.mean(); wf = whole.sum() / (12 * R); mw = float(np.nanmedian(width[info]))
-    gates = {"unconditional[.93,.97]": .93 <= u <= .97, "MCSE<=.004": ue <= .004, "conditional[.93,.97]": .93 <= c <= .97,
-             "conditional_MCSE<=.004": ce <= .004, "whole_box<=.5": wf <= .5, "median_informative_width<.5": mw < .5, "numerical_failure<=.01": fail <= .01}
+    gates = {k: bool(v) for k, v in {"unconditional[.93,.97]": .93 <= u <= .97, "MCSE<=.004": ue <= .004, "conditional[.93,.97]": .93 <= c <= .97,
+             "conditional_MCSE<=.004": ce <= .004, "whole_box<=.5": wf <= .5, "median_informative_width<.5": mw < .5, "numerical_failure<=.01": fail <= .01}.items()}
     rep[q] = dict(item_sets=12 * R, covered=int(cov.sum()), informative=int(info.sum()), covered_informative=int((cov & info).sum()),
                   whole_box=int(whole.sum()), empty=int(empty.sum()), unconditional=u, unconditional_MCSE=ue, conditional=c, conditional_MCSE=ce,
                   exact_T_coverage=float(exact.mean()), whole_box_fraction=float(wf), median_informative_width=mw,
