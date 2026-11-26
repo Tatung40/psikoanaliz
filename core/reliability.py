@@ -179,32 +179,22 @@ def compute_reliability_indices(
         results["split_half_first_second_r"] = np.nan
         results["spearman_brown_first_second"] = np.nan
 
-    # 7. McDonald Omega (Omega Total - Tek Faktörlü Model Kestirimi)
-    # Temel bileşenler / tek faktör faktör analizi yükleri üzerinden
+    # 7. McDonald Omega (omega_t): one-factor MAXIMUM-LIKELIHOOD factor analysis of the standardized complete-case
+    # items (sklearn FactorAnalysis), omega = (sum lambda)^2 / ((sum lambda)^2 + sum psi). The former principal-
+    # component approximation inflated loadings and is not a factor-model omega. Heywood cases (psi <= 1e-6) or a
+    # non-converged/negative-sum solution return None (never a clipped value). Numerical, NOT CERTIFIED.
+    omega_total = np.nan
     try:
-        eigenvals, eigenvecs = np.linalg.eigh(corr_matrix.values)
-        # En büyük özdeğer ve özvektör
-        max_idx = np.argmax(eigenvals)
-        max_eigenval = eigenvals[max_idx]
-        if max_eigenval > 0:
-            loadings = eigenvecs[:, max_idx] * np.sqrt(max_eigenval)
-            # Yüklerin yönünü pozitif yap
-            if np.mean(loadings) < 0:
-                loadings = -loadings
-            sum_loadings = np.sum(loadings)
-            sum_sq_loadings = (sum_loadings) ** 2
-            # Hata varyansları (uniquenesses)
-            uniqueness = np.maximum(0.0, 1.0 - loadings ** 2)
-            sum_uniqueness = np.sum(uniqueness)
-
-            denom = sum_sq_loadings + sum_uniqueness
-            if denom > 1e-12:
-                omega_total = float(sum_sq_loadings / denom)
-            else:
-                omega_total = np.nan
-        else:
-            omega_total = np.nan
-    except Exception:
+        from sklearn.decomposition import FactorAnalysis
+        z = item_df.to_numpy(float); sd = z.std(axis=0, ddof=1)
+        if k_items >= 3 and n_examinees > k_items and np.all(sd > 1e-12):
+            z = (z - z.mean(axis=0)) / sd
+            fa = FactorAnalysis(n_components=1, tol=1e-10, max_iter=5000, svd_method="lapack").fit(z)
+            lam = fa.components_[0]; psi = fa.noise_variance_
+            if lam.sum() < 0: lam = -lam
+            if np.all(psi > 1e-6) and lam.sum() > 0 and fa.n_iter_ < 5000:
+                omega_total = float(lam.sum() ** 2 / (lam.sum() ** 2 + psi.sum()))
+    except (ImportError, ValueError, np.linalg.LinAlgError):
         omega_total = np.nan
     results["mcdonald_omega"] = round(omega_total, 4) if not np.isnan(omega_total) else None
 
