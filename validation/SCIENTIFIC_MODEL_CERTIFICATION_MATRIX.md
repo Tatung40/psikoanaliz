@@ -175,4 +175,4 @@ See [P3_4PL_CLOSURE_N.md](P3_4PL_CLOSURE_N.md); raw ledger, all failures, old ev
 | NRM kesişimler (Oakes) | .9509 | .0027 | SCOPED CERTIFIED |
 
 Kapsam: kayıtlı üreteç, N=2000. N500, RSM, UI/dışa aktarma etiketleri henüz güncellenmedi.
-UI/CSV/XLSX/DOCX/ZIP entegrasyonu henüz yapılmadı: core/polytomous_certification.ci_status kapsamı uygular; ekranlar bağlanana dek uygulamada etiket NOT CERTIFIED kalır.
+Üretim: core/polytomous_inference.parameter_table (tek paylaşılan tablo) ekran, CSV, XLSX ve ZIP için kullanılır; satır etiketi ci_status ile (N=2000, 10 madde, 4 kategori, ML, 21 düğüm, max_iter 500, tol 1e-4, NRM kaydedilmiş Oakes SH). DOCX bağlantısı doğrulanmadı.
