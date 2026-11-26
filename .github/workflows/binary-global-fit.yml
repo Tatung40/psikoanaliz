@@ -1,0 +1,35 @@
+name: Binary global fit validation
+on:
+  pull_request:
+    paths: ['validation/binary_global_fit/**','validation/evidence/binary_global_fit/**','tests/test_binary_global_fit.py','core/irt_global_fit.py','.github/workflows/binary-global-fit.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  python-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: Installed API/source only, ZERO fits
+        run: python -m validation.binary_global_fit.preflight
+  r-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with: {r-version: release,use-public-rspm: true}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::nloptr
+          cache-version: 1
+      - name: Actual R parameterization/M2 conventions, ZERO calibration
+        run: Rscript validation/binary_global_fit/preflight.R
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: binary-global-R-preflight,path: /tmp/global-preflight/}
