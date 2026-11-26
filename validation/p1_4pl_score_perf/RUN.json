@@ -1,1 +1,1 @@
-{"phase": "run", "root": 202611261301, "compare_to_certified": false, "note": "fresh confirmation (FRESH_PROTOCOL.json); previous: regression run 45798062200"}
+{"phase": "archive", "fresh_run_id": 45802055748, "regression_run_id": 45798062200, "cancelled_before_results": 45802023036}
