@@ -415,10 +415,11 @@ def _runtime_assets(calls):
     person_needed=any(c.get('module') in ('core.irt_binary_persons','core.irt_binary_patterns') for c in calls)
     person_proof=ROOT/'validation'/'evidence'/'irt_closure'/'P2_CERTIFICATION.json'
     if person_needed and person_proof.is_file():assets.append(person_proof)
-    p3_needed=any(c.get('module') in ('core.irt_sx2_scoped','core.irt_library_diagnostics') for c in calls)
+    p3_needed=any(c.get('module') in ('core.irt_sx2_scoped','core.irt_4pl_itemfit','core.irt_library_diagnostics') for c in calls)
     if p3_needed:
         for relative in ('validation/p3_empirical/constrained.py','validation/p3_empirical/kernel.py',
-                         'validation/p3_sx2_analytic/kernel.py','validation/evidence/p3_empirical/CERTIFICATION.json'):
+                         'validation/p3_sx2_analytic/kernel.py','validation/evidence/p3_empirical/CERTIFICATION.json',
+                         'validation/evidence/p3_4pl_closure/CERTIFICATION.json'):
             asset=ROOT/relative
             if asset.is_file() and asset not in assets:assets.append(asset)
     return assets

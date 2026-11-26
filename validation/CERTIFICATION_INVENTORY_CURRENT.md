@@ -9,6 +9,7 @@ Categories: **NUMERICAL AGREEMENT** (matches an independent reference on fixture
 | P1 parameter inference (14) | 3PL a/b/c and 4PL a/b one-step Wald 95% CI (5); one-step SE 3PL a/b/c, 4PL a/b/c/d (7); 4PL c/d C(α) score-inversion 95% sets (2) | N=3000, J=12, registered items, θ~N(0,1), MAP GH61 | `evidence/p1p3_analytic/P1_CERTIFICATION.json`, `evidence/p1_4pl_score*/` |
 | P2 independent persons (6) | 3PL/4PL EAP recovery, equal-tailed posterior 95% (marginal, Bayesian), score Poisson-binomial inversion interval | N3000/J12; declared independent, disjoint IDs | `evidence/irt_closure/P2_CERTIFICATION.json` |
 | P3 item-fit reference (1) | 3PL unchanged native S-X² with constrained-Gaussian MAP reference; original χ² p stays closed | N3000/J12/default cold MAP/GH61/registered truth/N(0,1); R6000 null+R600 power; worst CP upper .068946, power lower .298905 | `evidence/p3_empirical/CERTIFICATION.json`, `P3_CLOSURE_M.md` |
+| P3 separate standardized Q (1) | 4PL covariance-standardized residual Q with constrained-Gaussian MAP reference; ordinary S-X² χ² p stays closed | N3000/J12/default cold MAP/GH61/reference truth/N(0,1); R6000 null, R600 each of3 alternatives; Type-I .033819, worst CP upper .044526; nonmonotone power .195, dependence .610; two-stage .0333 NOT CERTIFIED | `evidence/p3_4pl_closure/CERTIFICATION.json`, `P3_4PL_CLOSURE_N.md` |
 | Rater reliability (30) | All 30 methods SCOPED CERTIFIED (simulation protocol) and NUMERICALLY VALIDATED (R references) | CERT_PROTOCOL designs, amendments R-A1, R-A2 | `rater_reliability/evidence.json` |
 | RaschPy MFRM recovery (8) | global, items, thresholds, bivector, matrix, centrality, pseudo_halo, bistretch parameter recovery | examples/mfrm fixtures; not TAM/FACETS-equivalent | `raschpy_mfrm/evidence.json` |
 | mfrmr MFRM (numerical) | facet measures, thresholds, model fit, latent, rater ranking CERTIFIED vs mfrmr MML; SE/CI/person/fit PARTIAL; interaction/ZSTD/4-facet NOT CERTIFIED | fixtures | `mfrm/evidence.json` |
@@ -20,7 +21,7 @@ Categories: **NUMERICAL AGREEMENT** (matches an independent reference on fixture
 - Optimised C(α) kernel numerical equivalence (1e-8 T tolerance failed; inference re-certified by fresh confirmation 202611261301).
 
 ## Prioritised remaining scientific blockers
-1. P3 4PL item-fit inference: registered independent-item power alternative is practically indistinguishable from a feasible 4PL null; a uniformly valid level-.05 test has power ≤.050061 there. 3PL constrained-Gaussian reference is scoped-certified by PR #196; no general design or FWER/FDR claim.
+1. Ordinary4PL S-X² χ² inference and two-stage-shape sensitivity remain NOT CERTIFIED. The old independent-item alternative remains practically indistinguishable from a feasible4PL null (power bound≤.050061). PR #204 separately certifies standardized4PL Q only for the reference null design and predeclared nonmonotone/dependence detection classes; no general-design, FWER/FDR or weak-shape certificate. The PR #1963PL certificate remains unchanged.
 2. 4PL item-1 c: informative sets infeasible below N≈52–62k (bound); other N/J/designs uncertified.
 3. Scope transfer: every scoped certificate is tied to one registered design; no design-eligibility check is possible on user data.
 4. C(α) sets are CSV-only (not in the XLSX/ZIP bundle); UI file is touched by open polytomous PRs, left unchanged.

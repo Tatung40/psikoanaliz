@@ -174,7 +174,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     for error in report.errors:st.error(error)
     if outputs['itemfit'] and model!='NRM':
         st.markdown('### Madde uyumu — Python mirt itemfit')
-        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için klasik χ² p/karar kapalı. 3PL MAP/N3000/J12 için ayrı etiketli kısıtlı Gauss referansı yalnız doğrulanmış çözücü kapsamında sunulur; kullanıcı DGP’si sertifikalanmaz. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
+        st.caption('Python mirt itemfit: Infit/Outfit betimseldir. S-X² yalnız ikili modellerde; 3PL/4PL ve ortak-serbest-a 1PL için klasik χ² p/karar kapalı. 3PL MAP/N3000/J12 için ayrı etiketli kısıtlı Gauss referansı yalnız doğrulanmış çözücü kapsamında sunulur; kullanıcı DGP’si sertifikalanmaz. 4PL için ayrı standartlaştırılmış artık Q ve kısıtlı referans p yalnız doğrulanmış tasarımda sunulur; olağan S-X² yerine geçirilmez. Sabit-a 1PL/2PL referans kontrolü genel sertifika değildir. Çok kategorili S-X² kapalıdır.')
         if report.metadata.get('Yakınsama') is not True or report.errors:
             st.warning('Yakınsama veya rapor hatası nedeniyle madde uyumu hesaplanmadı.')
         else:
@@ -266,6 +266,9 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         if model=='3PL':
             from core.irt_sx2_scoped import cache_fingerprint
             itemfit_proof=('p3-constrained-gaussian-v1',cache_fingerprint())
+        elif model=='4PL':
+            from core.irt_4pl_itemfit import cache_fingerprint as fingerprint4
+            itemfit_proof=('4pl-standardized-gaussian-v1',fingerprint4())
         try:
           if entry and entry['key']==bundle_key and entry.get('itemfit_proof')==itemfit_proof:
             persons,inference,reason=entry['persons'],entry['inference'],entry['reason']
@@ -450,14 +453,18 @@ def _independent_person_view(saved,report,data,cols,id_col,model):
 def _itemfit(saved,x,model):
     """Session-local cache follows actual responses, fitted coefficients and method."""
     outcome=saved['outcome']
-    scoped=(model=='3PL' and saved.get('multistart') is None and getattr(outcome,'estimation',None)=='MAP'
+    scoped=(model in ('3PL','4PL') and saved.get('multistart') is None and getattr(outcome,'estimation',None)=='MAP'
             and (getattr(outcome,'n_persons',None),getattr(outcome,'n_items',None))==(3000,12)
             and getattr(outcome,'solver_settings',{})==dict(max_iter=500,tol=1e-4,n_quadpts=61))
     if not scoped:return library_itemfit(outcome.fit,x.to_numpy(dtype=int),model=model)
     if _data_fingerprint(x)!=saved['key'][2]:
         raise ValueError('Kalibrasyon verisi değişti; eski madde uyumu kullanılmaz. Yeniden kestirin.')
     from core.irt_sx2_scoped import cache_fingerprint
-    key=(_data_fingerprint(x),_data_fingerprint(outcome.fit.coef()),saved['key'],'p3-constrained-gaussian-v1',cache_fingerprint())
+    version,proof='p3-constrained-gaussian-v1',cache_fingerprint()
+    if model=='4PL':
+        from core.irt_4pl_itemfit import cache_fingerprint as fingerprint4
+        version,proof='4pl-standardized-gaussian-v1',fingerprint4()
+    key=(_data_fingerprint(x),_data_fingerprint(outcome.fit.coef()),saved['key'],version,proof)
     cached=saved.get('p3_itemfit')
     if cached and cached['key']==key:
         record_displayed(cached['frame'])

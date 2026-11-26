@@ -1,0 +1,248 @@
+{
+  "method_version": "4pl-standardized-gaussian-v1",
+  "status": "SCOPED CERTIFIED",
+  "model": "4PL",
+  "statistic": "Separately named covariance-standardized residual Q; UNCHANGED native S-X2 remains descriptive",
+  "reference": "Joint constrained-Gaussian score/residual MAP reference; full native box; independent1024 training+4095 reference draws; no ordinary chi-square substitution.",
+  "protocol_commit": "e7f8b3b13501723cd638a07d8055d2cf0167b874",
+  "method_selection_commit": "e4448a2991b89aa2fd9146fd601ce176b1e874a3",
+  "confirmation_head": "dc4fa11ce917839cbc3d2727c92ea4cb08895045",
+  "confirmation_run": 45833050428,
+  "checkout_commit": "50127d6ce26352d92e445eea6747c9bc02e27aa2",
+  "independent_audit_run": 45835088987,
+  "independent_audit_passed": true,
+  "certified_claims": [
+    "nonmonotone",
+    "local_dependence"
+  ],
+  "scope": {
+    "N": 3000,
+    "J": 12,
+    "models": [
+      "4PL"
+    ],
+    "truth": "validation.binary_certification.common.truth('4PL',12)",
+    "latent": "N(0,1)",
+    "estimator": "native mirt1.2.0 cold default MAP/GH61/max500/tol1e-4/default priors",
+    "alternatives": "Fixed quadratic nonmonotone component-logit gamma.25 and local dependence component-logit lambda1.0; exact equations in committed protocol and DGP.",
+    "unit": "Independent calibration dataset; NOT persons or12 items treated as independent MC units."
+  },
+  "gates": {
+    "size": true,
+    "MCSE": true,
+    "pooled_lower": true,
+    "refusal": true,
+    "identity": true,
+    "complete": true,
+    "selected_before_confirmation": true
+  },
+  "metrics": {
+    "method": "p_constrained_standardized",
+    "phase": "confirm",
+    "null_R": 6000,
+    "TypeI": 0.03381944444444444,
+    "MCSE": 0.0006968313658249146,
+    "item_counts": [
+      221,
+      217,
+      213,
+      212,
+      179,
+      184,
+      194,
+      179,
+      205,
+      208,
+      222,
+      201
+    ],
+    "upper": [
+      0.04434448171334634,
+      0.04361769928195455,
+      0.04289028989659135,
+      0.04270833761467325,
+      0.03667936083159275,
+      0.03759612978156335,
+      0.03942598717102465,
+      0.03667936083159275,
+      0.04143352148405192,
+      0.04198012054695055,
+      0.044526081278207896,
+      0.040704125992010634
+    ],
+    "worst_upper": 0.044526081278207896,
+    "refusal": 0,
+    "dataset_refusal": 0,
+    "converged": 7800,
+    "runtime_median": 0.16393607999998494,
+    "runtime_P95": 0.25738884680000856,
+    "identity_max": 7.105427357601002e-13,
+    "power": {
+      "nonmonotone": {
+        "R": 600,
+        "detected": 117,
+        "power": 0.195,
+        "MCSE": 0.016174826119621812,
+        "lower": 0.15769145062660242,
+        "upper": 0.2366397318275898,
+        "refusal": 0,
+        "power_gate": true,
+        "complete": true
+      },
+      "local_dependence": {
+        "R": 600,
+        "detected": 366,
+        "power": 0.61,
+        "MCSE": 0.019912307751739876,
+        "lower": 0.5608556708230339,
+        "upper": 0.6575902691241875,
+        "refusal": 0,
+        "power_gate": true,
+        "complete": true
+      },
+      "two_stage": {
+        "R": 600,
+        "detected": 20,
+        "power": 0.03333333333333333,
+        "MCSE": 0.0073282810879294,
+        "lower": 0.01825949550683045,
+        "upper": 0.05524137628073312,
+        "refusal": 0,
+        "power_gate": false,
+        "complete": true
+      }
+    },
+    "gates": {
+      "size": true,
+      "MCSE": true,
+      "pooled_lower": true,
+      "refusal": true,
+      "identity": true,
+      "complete": true
+    },
+    "certified_claims": [
+      "nonmonotone",
+      "local_dependence"
+    ],
+    "errors": {}
+  },
+  "independent_audit": {
+    "independent_arithmetic": "PASS",
+    "null_R": 6000,
+    "power_R_each": 600,
+    "TypeI": 0.033819444444444444,
+    "MCSE": 0.0006968313658249146,
+    "item_counts": [
+      221,
+      217,
+      213,
+      212,
+      179,
+      184,
+      194,
+      179,
+      205,
+      208,
+      222,
+      201
+    ],
+    "upper": [
+      0.04434448171334634,
+      0.043617699281954546,
+      0.04289028989659135,
+      0.04270833761467325,
+      0.03667936083159275,
+      0.03759612978156335,
+      0.03942598717102464,
+      0.03667936083159275,
+      0.04143352148405192,
+      0.04198012054695054,
+      0.044526081278207896,
+      0.04070412599201063
+    ],
+    "worst_upper": 0.044526081278207896,
+    "power": {
+      "nonmonotone": {
+        "R": 600,
+        "rejections": 117,
+        "power": 0.195,
+        "lower": 0.15769145062660242,
+        "upper": 0.23663973182758977,
+        "refusal": 0
+      },
+      "local_dependence": {
+        "R": 600,
+        "rejections": 366,
+        "power": 0.61,
+        "lower": 0.5608556708230339,
+        "upper": 0.6575902691241874,
+        "refusal": 0
+      },
+      "two_stage": {
+        "R": 600,
+        "rejections": 20,
+        "power": 0.03333333333333333,
+        "lower": 0.01825949550683045,
+        "upper": 0.05524137628073311,
+        "refusal": 0
+      }
+    },
+    "refusal": 0,
+    "identity_max": 7.105427357601002e-13,
+    "all_native_converged": 7800,
+    "records": 7800,
+    "source": "50127d6ce26352d92e445eea6747c9bc02e27aa2",
+    "run": "45833050428",
+    "gates": {
+      "size": true,
+      "MCSE": true,
+      "pooled_lower": true,
+      "refusal": true,
+      "identity": true,
+      "complete": true,
+      "selected_before_confirmation": true
+    },
+    "certified_claims": [
+      "nonmonotone",
+      "local_dependence"
+    ],
+    "no_new_fits": true,
+    "full_original_archive_sha256": "c93d1f7494b3313766b21d81bf672a3f8eff9751950d8ecdafdefb79c99e8115",
+    "full_original_archive_git_blob": "dd068341d26e2f33f6dcaab638a06d3faaf02383",
+    "archive_sha256": "1462180d605ac9a9129bbc6e81a54c4bbbe79562b67bef8914fd3353354e6a3d",
+    "archive_git_blob": "2e40fa8fdc4647655aceb99b6977ed7a92063290",
+    "ledger_schema": "selected-Q-v1: p_grid/4096 is the EXACT p; Q/native/analysis S-X2 floats unchanged; all seeds, hashes, failures retained. Unselected statistics and full diagnostics remain original canonical artifacts."
+  },
+  "scientific_source_blobs": {
+    "validation/p3_empirical/constrained.py": "da977cb8bd9fd59518533e330e4360d3cbc229c8",
+    "validation/p3_empirical/kernel.py": "b391c538ee3c214b6cf7451612776eb7983805a1",
+    "validation/p3_sx2_analytic/kernel.py": "ffd10f74310545ee505467484e1f8e393c0215f7",
+    "core/irt_python_mirt_adapter.py": "c71a422a7768ddf91544669aad87af30f686baf8",
+    "core/irt_binary_patterns.py": "024903abe089c4f2f94f3e0c4a1be4bb885f16c3"
+  },
+  "ordinary_S_X2_chi_square": "NOT CERTIFIED — withheld",
+  "not_certified": [
+    "Two-stage monotone shape detection:20/600; power lower .01826, upper .05524.",
+    "Uniform validity over all4PL parameters, latent distributions, N/J, optimizers, priors or arbitrary user DGP.",
+    "FWER/FDR or causal localization of local dependence.",
+    "Ordinary S-X2 chi-square p."
+  ],
+  "randomization": "Independent recorded seed; persistent through reruns; confirmation root202611264203, calibration roots264201/264202 as full vectors in protocol. Finite reference randomization is part of dataset-cluster MC uncertainty.",
+  "preserved": {
+    "P1": 14,
+    "P2": 6,
+    "prior_3PL_P3": 1,
+    "MAP": "UNCHANGED",
+    "old_4PL_c_d_Wald": "NOT CERTIFIED",
+    "PR195_score_sets": "UNCHANGED"
+  },
+  "archive": {
+    "selected_ledger_sha256": "1462180d605ac9a9129bbc6e81a54c4bbbe79562b67bef8914fd3353354e6a3d",
+    "selected_ledger_git_blob": "2e40fa8fdc4647655aceb99b6977ed7a92063290",
+    "full_original_sha256": "c93d1f7494b3313766b21d81bf672a3f8eff9751950d8ecdafdefb79c99e8115",
+    "full_original_run": 45835088987,
+    "native_coefficients_counts_run": 45833050428
+  },
+  "pilot_head": "32e58ebfff9d7a57290392c875b428f0f0357ae1",
+  "pilot_run": 45831797694
+}

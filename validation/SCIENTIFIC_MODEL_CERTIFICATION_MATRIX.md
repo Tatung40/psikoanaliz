@@ -144,3 +144,18 @@ Tanı: N=3000/J12'de beklenen Fisher bilgisinin en küçük özdeğeri × N = .5
 | 3PL | Standardized-Q secondary | Same confirmation, not selected prospectively | Numerical gates passed but procedure was not selected | NOT CERTIFIED; not exposed |
 
 This new certificate does not certify exact .05 control, FWER/FDR, arbitrary user item designs, other N/J, or ML. All 14 P1 and six P2 certificates and withdrawn 4PL c/d Wald gates remain unchanged. Full protocol, raw compact records, independent audit and the analytic 4PL power obstruction: [P3_CLOSURE_M.md](P3_CLOSURE_M.md).
+
+## P3 closure N — separately named 4PL standardized Q (2026-11-26)
+
+| Model | Output | Independent evidence | Status / scope |
+|---|---|---|---|
+| 4PL | Covariance-standardized residual Q, constrained-Gaussian MAP p | R6000 null; Type-I .0338194, cluster MCSE .0006968, worst simultaneous CP upper .0445261; refusal0 | SCOPED CERTIFIED; N3000/J12/reference items/N(0,1)/default cold native MAP/GH61 only |
+| 4PL Q | Nonmonotone sensitivity |117/600=.195; multiplicity-adjusted CP lower .157691>.10 | SCOPED CERTIFIED detection claim |
+| 4PL Q | Local-dependence sensitivity |366/600=.610; adjusted CP lower .560856>.10 | SCOPED CERTIFIED detection claim; no causal item attribution |
+| 4PL Q | Two-stage monotone-shape sensitivity |20/600=.03333; adjusted CP upper .05524<.10 | NOT CERTIFIED; unchanged failed alternative retained |
+| 4PL | Ordinary S-X² χ² p | Previous failures unchanged | NOT CERTIFIED; remains NA |
+
+Q is not relabeled S-X². Its full shared/power gates and independent audit pass only the first two
+prospective classes; no arbitrary user DGP or uniform parameter-space validity, exact5%, FWER/FDR,
+other N/J/prior/optimizer claim. Existing14 P1 +6 P2 +1 3PL P3 groups remain unchanged (21→22).
+See [P3_4PL_CLOSURE_N.md](P3_4PL_CLOSURE_N.md); raw ledger, all failures, old evidence and native MAP are retained.
