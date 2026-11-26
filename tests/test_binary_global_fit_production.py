@@ -86,13 +86,15 @@ def test_bundle_contains_global_residuals_and_separately_named_score_sets(actual
     import reports.irt_binary_report as B
     value=global_fit(out,x,seed=[4,5])
     report=build_report(out,model=model,items=x.columns,global_diagnostics=value)
+    report.global_fit={**value,"comparisons":pd.DataFrame([nested_lrt(ctx("3PL",36),ctx("4PL",48,-90))])}
     # Export fixture is explicitly synthetic, not new scientific evidence.
     sets=pd.DataFrame({"Madde":[x.columns[0]],"Parametre":["c"],"Küme":["[0, .5]"],"Yöntem":["C(alpha), not Wald"],"Kapsam":["unit export fixture"]})
     persons=pd.DataFrame({"Yetenek (θ)":[0.],"SH (θ)":[1.]})
     monkeypatch.setattr(B,"png_bytes",lambda *a,**k:b"PNG export unit fixture")
     excel,archive=B.bundle(report,persons,None,"MAP Wald withheld",score_sets=sets)
     sheets=pd.read_excel(io.BytesIO(excel),sheet_name=None)
-    assert {"Global_Uyum","Global_Korelasyon_Artiklari","4PL_CD_Skor_Guven_Kumeleri"}<=set(sheets)
+    assert {"Global_Uyum","Global_Korelasyon_Artiklari","ML_LRT_Karsilastirmalari","4PL_CD_Skor_Guven_Kumeleri"}<=set(sheets)
+    assert sheets["ML_LRT_Karsilastirmalari"]["p"].isna().all()
     assert sheets["Global_Uyum"]["M2 asimptotik p"].isna().all()
     with zipfile.ZipFile(io.BytesIO(archive)) as z:
         assert "tablolar/4PL_CD_Skor_Guven_Kumeleri.csv" in z.namelist()
@@ -159,11 +161,15 @@ def test_confirmed_global_production_profile_and_withdrawal(model,monkeypatch):
     cell=G._proof()["models"][model];row=last["table"].iloc[0]
     assert cell["status"]=="SCOPED CERTIFIED" and np.isfinite(row["Küresel referans p"])
     assert np.isnan(row["M2 asimptotik p"]) and "SCOPED CERTIFIED" in row["Bilimsel durum"]
-    assert all("MAP" in str(last["table"].iloc[0]["Küresel yöntem"]) for _ in [0])
+    assert "MAP" in str(last["table"].iloc[0]["Küresel yöntem"])
     mutated=G.global_fit(out,x,seed=[7,8],calibration_profile={**profile,"selection":"multiple starts"})
     assert np.isnan(mutated["table"].iloc[0]["Küresel referans p"])
     proof=G._proof();proof["models"][model]["gates"]["complete"]=False
     monkeypatch.setattr(G,"_proof",lambda:proof)
     refused=G.global_fit(out,x,seed=[7,8],calibration_profile=profile)
     assert np.isnan(refused["table"].iloc[0]["Küresel referans p"])
-    print("PRODUCTION_LATENCY_JSON "+json.dumps(dict(model=model,software_calls=5,median=float(np.median(elapsed)),P95=float(np.percentile(elapsed,95)),note="Software API benchmark; confirmation reference latency separately measured at6000 datasets/model")))
+    benchmark=dict(model=model,software_calls=5,median=float(np.median(elapsed)),P95=float(np.percentile(elapsed,95)),note="Software API benchmark; confirmation reference latency separately measured at6000 datasets/model")
+    from pathlib import Path
+    output=Path("/tmp/global-production");output.mkdir(parents=True,exist_ok=True)
+    (output/(model+".json")).write_text(json.dumps(benchmark))
+    print("PRODUCTION_LATENCY_JSON "+json.dumps(benchmark))

@@ -11,6 +11,7 @@ COLD_PROFILE={"start":"native default","acceleration":"none","selection":"single
 
 def cache_fingerprint():
     h=hashlib.sha256()
+    h.update(Path(__file__).read_bytes())  # source-bound cache; never refits calibration
     try:
         raw=PROOF.read_bytes();h.update(raw);proof=json.loads(raw)
         for p in sorted(proof.get("scientific_source_blobs",{})):

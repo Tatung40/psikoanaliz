@@ -21,6 +21,18 @@ def main():
     assert {r["source"] for r in records}=={proof["canonical_source"]}
     for p,sha in proof["scientific_source_blobs"].items():
         b=(ROOT/p).read_bytes();assert hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()==sha,p
+    eta_lookup={}
+    for model,meta in proof["coefficient_archives"].items():
+        content=(ROOT/meta["path"]).read_bytes()
+        assert hashlib.sha256(content).hexdigest()==meta["sha256"]
+        with np.load(ROOT/meta["path"],allow_pickle=False) as a:
+            assert a["eta"].shape==(meta["rows"],meta["columns"])
+            for kind,r,e in zip(a["kind"],a["r"],a["eta"]):
+                key=(model,("null","nonmonotone","local_dependence","second_factor")[int(kind)],int(r))
+                assert key not in eta_lookup
+                eta_lookup[key]=hashlib.sha256(np.asarray(e,dtype="<f8").tobytes()).hexdigest()
+    assert len(eta_lookup)==15600
+    for r in records:assert eta_lookup[(r["model"],r["kind"],r["r"])]==r["eta_sha256"]
     audit={}
     for model in ("3PL","4PL"):
         cell=proof["models"][model];method=cell["method"];rr=[r for r in records if r["model"]==model]

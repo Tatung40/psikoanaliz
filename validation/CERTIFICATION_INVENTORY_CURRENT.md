@@ -1,4 +1,4 @@
-# Current scientific certification inventory (main d2977dd, 2026-11-26)
+# Scientific certification inventory (baseline main69be9aa; binary-global-fit update, 2026-11-26)
 
 Categories: **NUMERICAL AGREEMENT** (matches an independent reference on fixtures), **DESCRIPTIVE IDENTITY** (algebraic/library identity), **SCOPED CERTIFIED** (preregistered Monte Carlo inference gates passed within a stated design), **NOT CERTIFIED / UNSUPPORTED** (inference shown closed or not shown), **UNIMPLEMENTED**. A scoped certificate is never evidence for user data outside its design.
 
@@ -10,11 +10,11 @@ Categories: **NUMERICAL AGREEMENT** (matches an independent reference on fixture
 | P2 independent persons (6) | 3PL/4PL EAP recovery, equal-tailed posterior 95% (marginal, Bayesian), score Poisson-binomial inversion interval | N3000/J12; declared independent, disjoint IDs | `evidence/irt_closure/P2_CERTIFICATION.json` |
 | P3 item-fit reference (1) | 3PL unchanged native S-X² with constrained-Gaussian MAP reference; original χ² p stays closed | N3000/J12/default cold MAP/GH61/registered truth/N(0,1); R6000 null+R600 power; worst CP upper .068946, power lower .298905 | `evidence/p3_empirical/CERTIFICATION.json`, `P3_CLOSURE_M.md` |
 | P3 separate standardized Q (1) | 4PL covariance-standardized residual Q with constrained-Gaussian MAP reference; ordinary S-X² χ² p stays closed | N3000/J12/default cold MAP/GH61/reference truth/N(0,1); R6000 null, R600 each of3 alternatives; Type-I .033819, worst CP upper .044526; nonmonotone power .195, dependence .610; two-stage .0333 NOT CERTIFIED | `evidence/p3_4pl_closure/CERTIFICATION.json`, `P3_4PL_CLOSURE_N.md` |
+| Binary global M2 references (2 new groups;24 relevant P1/P2/P3/global groups) | Unchanged native M2 with constrained-Gaussian MAP reference:3PL linear,4PL nonlinear. M2/RMSEA2/SRMSR/CFI/TLI numerical/descriptive outputs separately labelled; classical MAP χ² and RMSEA CI stay closed. | N3000/J12/reference truth/N(0,1), single cold MAP/GH61/max500/tol1e-4. R6000null+600/class/model; TypeI.045/.043333; upperCP.050554/.048795. Sensitivity:3PL dependence+secondfactor;4PL dependence only. No nonmonotone or4PL secondfactor certificate. | `evidence/binary_global_fit/CERTIFICATION.json`, `BINARY_GLOBAL_FIT_CLOSURE_O.md` |
 | Rater reliability (30) | All 30 methods SCOPED CERTIFIED (simulation protocol) and NUMERICALLY VALIDATED (R references) | CERT_PROTOCOL designs, amendments R-A1, R-A2 | `rater_reliability/evidence.json` |
 | RaschPy MFRM recovery (8) | global, items, thresholds, bivector, matrix, centrality, pseudo_halo, bistretch parameter recovery | examples/mfrm fixtures; not TAM/FACETS-equivalent | `raschpy_mfrm/evidence.json` |
 | mfrmr MFRM (numerical) | facet measures, thresholds, model fit, latent, rater ranking CERTIFIED vs mfrmr MML; SE/CI/person/fit PARTIAL; interaction/ZSTD/4-facet NOT CERTIFIED | fixtures | `mfrm/evidence.json` |
 
-| Binary global M2 references (2 new groups;24 relevant P1/P2/P3/global groups) | Unchanged native M2 with constrained-Gaussian MAP reference:3PL linear,4PL nonlinear. M2/RMSEA2/SRMSR/CFI/TLI numerical/descriptive outputs separately labelled; classical MAP χ² and RMSEA CI stay closed. | N3000/J12/reference truth/N(0,1), single cold MAP/GH61/max500/tol1e-4. R6000null+600/class/model; TypeI.045/.043333; upperCP.050554/.048795. Sensitivity:3PL dependence+secondfactor;4PL dependence only. No nonmonotone or4PL secondfactor certificate. | `evidence/binary_global_fit/CERTIFICATION.json`, `BINARY_GLOBAL_FIT_CLOSURE_O.md` |
 
 ## Explicitly NOT CERTIFIED (closed or labelled)
 - 4PL c/d one-step Wald CIs (withdrawn #193: whole-box 46%/39%, informative coverage .9005/.9141).

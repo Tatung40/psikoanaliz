@@ -133,7 +133,10 @@
     "validation/binary_global_fit/SELECTION.json": "0c5d302bff319aa64a25082fa5bebfefa83519eb",
     "validation/p3_empirical/kernel.py": "b391c538ee3c214b6cf7451612776eb7983805a1",
     "validation/p3_empirical/constrained.py": "da977cb8bd9fd59518533e330e4360d3cbc229c8",
-    "validation/p3_sx2_analytic/kernel.py": "ffd10f74310545ee505467484e1f8e393c0215f7"
+    "validation/p3_sx2_analytic/kernel.py": "ffd10f74310545ee505467484e1f8e393c0215f7",
+    "core/irt_binary_patterns.py": "024903abe089c4f2f94f3e0c4a1be4bb885f16c3",
+    "core/irt_python_mirt_adapter.py": "c71a422a7768ddf91544669aad87af30f686baf8",
+    "validation/irt_3pl4pl_root_cause.py": "9e24e668494abe5230ea8d408ee95e3a8db33e3f"
   },
   "ledger_sha256": "add1c880cfcded1507de6c8cda8cd669d38fcb4311c96d98d13b20b9861f758e",
   "software": {
@@ -154,6 +157,24 @@
   "canonical_environment_provenance": "Original shard5 job140037432792 install log, same Python3.11/setup/cache and requirements across24 shards",
   "Python": "3.11.18 (main, Oct 26 2026, 02:48:29) [GCC 15.2.0]",
   "platform": "Linux-7.0.0-1020-azure-x86_64-with-glibc2.43",
-  "archive": "All raw fitted coefficients/counts/complete candidate diagnostics preserved in the24 canonical global-confirm-shard artifacts; ledger retains every attempted decision/error/hash and coefficient hash. No archived commit may refit missing evidence.",
-  "scope": "Reference true parameters only; N3000/J12 fixed N(0,1), native cold MAP default priors/GH61/max500/tol1e-4. Not a user-DGP guarantee, no FWER/FDR, no RMSEA/CFI/TLI interval certificate."
+  "archive": "All raw fitted coefficients/counts/complete candidate diagnostics preserved in the24 canonical global-confirm-shard artifacts; ledger retains every attempted decision/error/hash and coefficient hash. No archived commit may refit missing evidence. Exact fitted estimates also permanently frozen in model-specific COEFFICIENTS_*.npz, with per-record numeric hashes verified independently; data are deterministically regenerated from frozen DGP/seeds without refitting.",
+  "scope": "Reference true parameters only; N3000/J12 fixed N(0,1), native cold MAP default priors/GH61/max500/tol1e-4. Not a user-DGP guarantee, no FWER/FDR, no RMSEA/CFI/TLI interval certificate.",
+  "coefficient_archives": {
+    "3PL": {
+      "path": "validation/evidence/binary_global_fit/COEFFICIENTS_3PL.npz",
+      "sha256": "ee82936d293ab8a3207489eae513f69a0abac0e058b315f866c3f23979ec8e92",
+      "git_blob": "81d495199dd2372f0b175d442a498e11121a8619",
+      "rows": 7800,
+      "columns": 36,
+      "archival_head": "18cf80f5f0d40c8085ccb26b6ed2912d919e1fc7"
+    },
+    "4PL": {
+      "path": "validation/evidence/binary_global_fit/COEFFICIENTS_4PL.npz",
+      "sha256": "f9e79662143e0ebcee287a1fc6fe12af9590bdda34baa03606099fb9eea176a0",
+      "git_blob": "439dd2fce30e2fb70ca028dd24ca600838040006",
+      "rows": 7800,
+      "columns": 48,
+      "archival_head": "18cf80f5f0d40c8085ccb26b6ed2912d919e1fc7"
+    }
+  }
 }

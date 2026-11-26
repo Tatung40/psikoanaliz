@@ -32,6 +32,7 @@ def export_2pl_docx(outcome, items, *, global_diagnostics=None):
     result = irt_report_to_result(report)
     if global_diagnostics:
         result["tables"]["global_fit"]=_clean(global_diagnostics["table"])
+        if "comparisons" in global_diagnostics:result["tables"]["nested_ml_lrt"]=_clean(global_diagnostics["comparisons"])
         result["tables"]["global_correlation_residuals"]=_clean(global_diagnostics["residuals"].rename_axis("Madde").reset_index())
         result["warnings"].append(str(global_diagnostics["table"].iloc[0]["Sınırlılık"]))
     # The generic manifest cannot distinguish item/category series: suppress its

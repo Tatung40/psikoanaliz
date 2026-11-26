@@ -160,6 +160,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             lrt_pool[(pool_key,model)]=comparison_context(saved['outcome'],x.to_numpy())
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,np.linalg.LinAlgError):
             lrt_pool.pop((pool_key,model),None)
+    lrt_rows=[]
     if outputs['comparison']:
         st.markdown('### Python model karşılaştırması')
         st.caption('Yalnızca bu oturumda aynı madde verisi, kategori kodlaması ve ML yöntemiyle yakınsamış modeller karşılaştırılır. MAP için klasik AIC/BIC karşılaştırması sunulmaz. Düşük AIC/BIC göreli uyumu gösterir, bilimsel geçerlik kanıtı değildir.')
@@ -176,11 +177,12 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
             from core.irt_global_fit import nested_lrt
             contexts=sorted([v for (k,_),v in lrt_pool.items() if k==pool_key],key=lambda z:z['q'])
             pairs=[nested_lrt(a,b) for i,a in enumerate(contexts) for b in contexts[i+1:]]
+            lrt_rows=pairs
             for row in pairs:
                 mask=comparison['Model']==row['Üst']
                 for name in ('LR','sd','p','Durum','Gerekçe'):
                     comparison.loc[mask,f"LRT {row['Alt']} → {row['Üst']} · {name}"]=row[name]
-            st.caption('LRT yalnız aynı veri/ölçek/ızgarada içte, tanımlı, düzenli ML sabit/ortak-a 1PL→2PL için asimptotiktir. MAP veya c=0/d=1 sınırlarında Wilks p kapalıdır.')
+            if pairs:st.caption('LRT yalnız aynı veri/ölçek/ızgarada içte, tanımlı, düzenli ML sabit/ortak-a 1PL→2PL için asimptotiktir. MAP veya c=0/d=1 sınırlarında Wilks p kapalıdır.')
             st.dataframe(comparison,hide_index=True)
             st.download_button('Model karşılaştırması — CSV',_csv(comparison),'model_comparison.csv',
                                'text/csv',key=f'python_mirt_compare_csv_{model}',on_click='ignore')
@@ -194,6 +196,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     if report.metadata['Yakınsama'] is True:st.success('Kestirim yakınsadı; bilimsel sertifika anlamına gelmez.')
     elif report.metadata['Yakınsama'] is False:st.error('Kestirim yakınsamadı. Gösterilen değerler geçicidir; başarılı analiz sayılmaz.')
     else:st.error('Yakınsama durumu doğrulanamadı; sonuç kesinleştirilemez.')
+    if lrt_rows and report.global_fit:
+        report.global_fit={**report.global_fit,'comparisons':pd.DataFrame(lrt_rows)}
     for warning in report.warnings:st.warning(warning)
     for error in report.errors:st.error(error)
     if outputs['itemfit'] and model!='NRM':
@@ -303,7 +307,8 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         store=st.session_state.setdefault('python_mirt_bundle',{})
         entry=store.get(model)
         bundle_key=(saved['key'],SCORING_VERSION) if model in ('3PL','4PL') else saved['key']
-        global_proof=st.session_state.get('python_mirt_global_fit',{}).get(model,{}).get('key')
+        global_proof=(st.session_state.get('python_mirt_global_fit',{}).get(model,{}).get('key'),
+                      _data_fingerprint(report.global_fit['comparisons']) if 'comparisons' in report.global_fit else None)
         itemfit_proof=None
         if model=='3PL':
             from core.irt_sx2_scoped import cache_fingerprint
@@ -444,7 +449,7 @@ def _academic_word(saved,model,cols,global_diagnostics=None):
     st.markdown('### 📄 Akademik 2PL Raporu')
     store=st.session_state.setdefault('python_mirt_2pl_word',{})
     from reports.academic_docx import REPORT_STANDARD_VERSION
-    global_key=_data_fingerprint(global_diagnostics["table"]) if global_diagnostics else None
+    global_key=(_data_fingerprint(global_diagnostics["table"]),_data_fingerprint(global_diagnostics["comparisons"]) if "comparisons" in global_diagnostics else None) if global_diagnostics else None
     if store.get('key')!=saved['key'] or store.get('standard')!=REPORT_STANDARD_VERSION or store.get('global_key')!=global_key:
         try:
             from reports.irt_2pl_academic_docx import export_2pl_docx
