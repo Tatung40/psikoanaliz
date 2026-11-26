@@ -159,3 +159,19 @@ Q is not relabeled S-X². Its full shared/power gates and independent audit pass
 prospective classes; no arbitrary user DGP or uniform parameter-space validity, exact5%, FWER/FDR,
 other N/J/prior/optimizer claim. Existing14 P1 +6 P2 +1 3PL P3 groups remain unchanged (21→22).
 See [P3_4PL_CLOSURE_N.md](P3_4PL_CLOSURE_N.md); raw ledger, all failures, old evidence and native MAP are retained.
+
+## Politomöz IRT parametre GA kapsaması — P4-C1 (2026-11-26)
+
+Önkayıt validation/p4_confirm/PROTOCOL.json; çalışma 45853181770, yeni tohumlar, N=2000, R=400, uygulama yolu (NRM Oakes önceden belirlendi). Tüm kapılar geçti (kapsama, Bonferroni eşzamanlı, küme MCSE ≤ .004, ret 0):
+
+| Blok | Kapsama | Küme MCSE | Karar |
+|---|---|---|---|
+| GRM a | .9490 | .0035 | SCOPED CERTIFIED |
+| GRM eşikler | .9497 | .0026 | SCOPED CERTIFIED |
+| PCM adımlar | .9552 | .0022 | SCOPED CERTIFIED |
+| GPCM a | .9495 | .0036 | SCOPED CERTIFIED |
+| GPCM adımlar | .9478 | .0022 | SCOPED CERTIFIED |
+| NRM eğimler (Oakes) | .9493 | .0024 | SCOPED CERTIFIED |
+| NRM kesişimler (Oakes) | .9509 | .0027 | SCOPED CERTIFIED |
+
+Kapsam: kayıtlı üreteç, N=2000. N500, RSM, UI/dışa aktarma etiketleri henüz güncellenmedi.
