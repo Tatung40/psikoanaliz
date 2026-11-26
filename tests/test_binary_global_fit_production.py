@@ -191,3 +191,9 @@ def test_residual_png_never_clips_valid_correlation_differences(actual,monkeypat
     monkeypatch.setattr(Figure,"savefig",capture)
     raw=B.png_bytes(report,pd.DataFrame(),"Korelasyon artıkları")
     assert raw[:4]==bytes([137,80,78,71]) and seen==[(-1.5,1.5)]
+
+def test_global_diagnostics_are_derived_not_new_calibration_producers():
+    from core.academic_screen_results import primary
+    for name in ("cache_fingerprint","comparison_context","nested_lrt","global_fit"):
+        assert not primary({"module":"core.irt_global_fit","function":name})
+    assert primary({"module":"core.irt_python_mirt_adapter","function":"fit_python_mirt"})
