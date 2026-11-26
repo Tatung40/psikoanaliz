@@ -11,4 +11,4 @@ for k in keys:
         n += 1
         if s != t: diff.append({"r": k, "item": s["item"], "param": s["param"], "frozen": s, "optimised": t})
 rep = {"datasets_compared": len(keys), "missing": sorted(set(old) ^ set(new)), "sets_compared": n, "sets_different": len(diff), "differences": diff[:50]}
-json.dump(rep, open(sys.argv[3], "w"), indent=1); print("COMPARE " + json.dumps({k: v for k, v in rep.items() if k != "differences"}))
+json.dump(rep, open(sys.argv[3], "w"), indent=1); print("COMPARE " + json.dumps(rep))
