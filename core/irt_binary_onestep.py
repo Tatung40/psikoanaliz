@@ -21,7 +21,7 @@ SCOPE = ("Yalnız N=3000, 12 madde, Python mirt 1.2.0 MAP (61 düğüm, tol 1e-4
 CI_VALIDATED = {"3PL": {"discrimination", "difficulty", "guessing"}, "4PL": {"discrimination", "difficulty"}}
 SE_VALIDATED = {"3PL": {"discrimination", "difficulty", "guessing"}, "4PL": {"discrimination", "difficulty", "guessing", "upper"}}
 WITHDRAWN = ("NOT CERTIFIED — 4PL c/d GA: aralıkların %46/%39'u tüm parametre kutusu, bilgi veren aralıklarda kapsama "
-             ".9005/.9141 (<.93); GA üretilmez. Tek-adım SH referans kapsamında doğrulandı.")
+             ".9005/.9141 (<.93); Wald GA üretilmez. Tek-adım SH doğrulandı; doğrulanmış C(α) güven kümesi ayrıca sunulur.")
 NAMES = ("discrimination", "difficulty", "guessing", "upper")
 BOX = {"discrimination": (0.0, np.inf), "difficulty": (-np.inf, np.inf), "guessing": (0.0, .5), "upper": (.5, 1.0)}
 

@@ -191,6 +191,7 @@
   {
     "screen": "ui/irt_python_library_view.py",
     "core_imports": [
+      "core.irt_4pl_score_sets.score_set_table",
       "core.irt_b14.prepare_polytomous",
       "core.irt_binary_inference.STATUS",
       "core.irt_binary_inference.parameter_inference",

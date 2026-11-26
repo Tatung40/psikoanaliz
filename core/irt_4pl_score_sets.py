@@ -63,3 +63,30 @@ def confidence_sets(eta_map, responses, items=range(J), params=(2, 3), truth=Non
                 rec["covered_exact"] = bool(T(tv) <= CRIT)
             out.append(rec)
     return out
+
+
+METHOD = "C(α) etkin-skor testi ters çevirme güven kümesi (4096 örüntü, 26 noktalı kutu ızgarası)"
+STATUS = {"guessing": "CERTIFIED", "upper": "CERTIFIED"}   # validation/evidence/p1_4pl_score/REPORT_K.json (run 45777107775)
+
+
+def score_set_table(outcome, responses, item_names):
+    """(table, reason); fail closed outside the registered reference scope."""
+    import pandas as pd
+    from core.irt_binary_onestep import onestep_scope, SCOPE
+    if getattr(outcome, "model", None) != "4PL" or not onestep_scope(outcome):
+        return None, "4PL c/d güven kümeleri yalnız doğrulanmış N=3000/12 madde 4PL MAP referans kapsamında üretilir."
+    eta = outcome.fit.coef()[["discrimination", "difficulty", "guessing", "upper"]].to_numpy(float).ravel()
+    try:
+        sets = confidence_sets(eta, responses)
+    except np.linalg.LinAlgError as exc:
+        return None, f"Bilgi matrisi reddedildi: {exc}"
+    rows = []
+    for s in sets:
+        name = "guessing" if s["param"] == "c" else "upper"; ok = STATUS[name] == "CERTIFIED"
+        label = ("boş küme" if s["empty"] else "tüm kutu (bilgi vermez)" if s["whole"] else
+                 " ∪ ".join(f"[{a:.2f}, {b:.2f}]" for a, b in s["intervals"]))
+        rows.append({"Madde": str(item_names[s["item"]]), "Parametre": name, "MAP kestirimi": eta[4 * s["item"] + (2 if name == "guessing" else 3)],
+                     "%95 güven kümesi": label if ok else np.nan, "Bilgi verici": (not s["whole"] and not s["empty"]) if ok else np.nan,
+                     "Yöntem": METHOD, "Bilimsel durum": ("REFERANS KAPSAMINDA DOĞRULANDI — frekansçı güven kümesi; tüm-kutu kümeler bilgi vermez"
+                                                          if ok else f"NOT CERTIFIED ({STATUS[name]})"), "Kapsam": SCOPE})
+    return pd.DataFrame(rows), None

@@ -21,7 +21,9 @@
   "4PL b: 95% CI (one-step Wald)",
   "4PL b: SE of one-step estimator",
   "4PL c: SE of one-step estimator",
-  "4PL d: SE of one-step estimator"
+  "4PL d: SE of one-step estimator",
+  "4PL c: 95% confidence set (C(alpha) score inversion, closure K)",
+  "4PL d: 95% confidence set (C(alpha) score inversion, closure K)"
  ],
  "not_certified": [
   "MAP sampling SE (unchanged NOT CERTIFIED)",
@@ -238,5 +240,42 @@
   "4PL d": 0.9141
  },
  "audit_note": "3PL c conditional coverage .9313 (MCSE .0015) remains inside the registered band; whole-box 8120/36000. Retained with this disclosure.",
- "certificate_count": 12
+ "certificate_count": 14,
+ "closure_K": {
+  "protocol": "validation/p1_4pl_score/PROTOCOL.json (preregistered, commit before run 45777107775)",
+  "report": "validation/evidence/p1_4pl_score/REPORT_K.json",
+  "summary": {
+   "c": {
+    "item_sets": 12000,
+    "covered": 11337,
+    "informative": 9905,
+    "covered_informative": 9344,
+    "whole_box": 1993,
+    "empty": 102,
+    "unconditional": 0.94475,
+    "unconditional_MCSE": 0.002061625307862981,
+    "conditional": 0.943361938414942,
+    "conditional_MCSE": 0.0022697336784598143,
+    "whole_box_fraction": 0.16608333333333333,
+    "median_informative_width": 0.30000000000000004,
+    "CERTIFIED": true
+   },
+   "d": {
+    "item_sets": 12000,
+    "covered": 11361,
+    "informative": 11721,
+    "covered_informative": 11255,
+    "whole_box": 106,
+    "empty": 173,
+    "unconditional": 0.94675,
+    "unconditional_MCSE": 0.0021202173734311985,
+    "conditional": 0.9602423001450389,
+    "conditional_MCSE": 0.0018230689800140323,
+    "whole_box_fraction": 0.008833333333333334,
+    "median_informative_width": 0.27,
+    "CERTIFIED": true
+   }
+  },
+  "note": "Item-1/2/3 c sets are whole-box in 77/61/42% of datasets (information bound); whole-box sets are labelled uninformative. The withdrawn one-step Wald c/d CIs stay NOT CERTIFIED."
+ }
 }
