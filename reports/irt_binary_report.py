@@ -127,6 +127,8 @@ def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=N
     if getattr(report,"global_fit",None):
         tables["Global_Uyum"]=report.global_fit["table"]
         tables["Global_Korelasyon_Artiklari"]=report.global_fit["residuals"].rename_axis("Madde").reset_index()
+        if "comparisons" in report.global_fit:
+            tables["ML_LRT_Karsilastirmalari"]=report.global_fit["comparisons"]
     if score_sets is not None:
         tables["4PL_CD_Skor_Guven_Kumeleri"]=score_sets
     if inference is not None:

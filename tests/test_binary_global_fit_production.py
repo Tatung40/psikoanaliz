@@ -122,11 +122,13 @@ def test_actual_2pl_docx_carries_global_indices_without_refit(actual,monkeypatch
     from docx import Document
     from reports.irt_2pl_academic_docx import export_2pl_docx
     value=global_fit(out,x)
+    value["comparisons"]=pd.DataFrame([nested_lrt(ctx("2PL",24),ctx("3PL",36,-90))])  # export-only boundary refusal fixture
     # The report receives the SAME already-computed diagnostics, never a new fit.
     raw=export_2pl_docx(out,list(x.columns),global_diagnostics=value)
     doc=Document(io.BytesIO(raw))
     text=" ".join(p.text for p in doc.paragraphs)+" "+" ".join(c.text for t in doc.tables for r in t.rows for c in r.cells)
     assert "M2" in text and "SRMSR" in text and "RMSEA" in text
+    assert "NOT AVAILABLE" in text and "Unsupported nesting" in text
     assert len(doc.inline_shapes)==len(x.columns)+1
 
 def test_no_hidden_global_helper_override():

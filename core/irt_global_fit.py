@@ -97,6 +97,9 @@ def global_fit(outcome,responses,*,seed=None,calibration_profile=None):
     row["Başlangıç profili"]=str(calibration_profile) if calibration_profile else "UNVERIFIED; scoped inference withheld"
     eligible=(calibration_profile==COLD_PROFILE and model in ("3PL","4PL") and outcome.estimation=="MAP" and (N,J)==(3000,12)
               and outcome.solver_settings==dict(max_iter=500,tol=1e-4,n_quadpts=61))
+    if model in ("3PL","4PL"):
+        row["Küresel referans kapsamı"]="Yalnız referans doğrusu/N(0,1), N3000/J12, tek cold MAP/GH61/max500/tol1e-4; kullanıcı DGP’si doğrulanmadı"
+        if not eligible:row["Sınırlılık"]+=" Current fit/profile is outside the registered global-reference eligibility; p withheld."
     if eligible:
         try:
             proof=_proof();cell=proof["models"][model]
