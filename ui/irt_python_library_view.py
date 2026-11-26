@@ -247,7 +247,7 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.caption('Wright Map: bu model için bağımsız bilimsel doğrulama kapısı henüz açılmadı.')
     if model in BINARY and report.metadata.get('Yakınsama') is True and not report.errors:
         _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables)
-    elif model in ('GRM','PCM','GPCM','NRM'):
+    elif model in ('GRM','PCM','GPCM','NRM') and report.metadata.get('Yakınsama') is True and not report.errors:
         _polytomous_inference(saved,report,cols,model)
     _charts(report,outputs,charts,cols,model)
     _academic_word(saved,model,cols)
@@ -261,10 +261,11 @@ def _polytomous_inference(saved,report,cols,model):
     from core.polytomous_inference import parameter_table,export_bundle
     store=st.session_state.setdefault('python_mirt_poly_inference',{})
     entry=store.get(model)
-    if not entry or entry['key']!=saved.get('key'):
+    key=(saved.get('key'),id(saved['outcome'].fit),bool(getattr(saved['outcome'].fit,'converged',False)))
+    if not entry or entry['key']!=key:
         table,reason=parameter_table(saved['outcome'],cols)
         files=export_bundle(table,report) if table is not None else None
-        entry=store[model]={'key':saved.get('key'),'table':table,'reason':reason,'files':files}
+        entry=store[model]={'key':key,'table':table,'reason':reason,'files':files}
     with st.expander('Madde parametresi SH ve %95 Wald GA (politomöz)',expanded=False):
         if entry['table'] is None:st.info(entry['reason']);return
         record_displayed(entry['table'])

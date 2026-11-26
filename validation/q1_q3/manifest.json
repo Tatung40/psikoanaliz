@@ -25,7 +25,6 @@
   "validation/evidence/p8_bifactor/recovery.json": "9296d0506c95fa763849ef0044578ec291e40efda05b5d0d177bb0fcfb301ae7"
  },
  "source_sha256": {
-  "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
   "core/irt_binary_inference.py": "25d5858eaeb1ba427b00924af5226bb89ee9d20754c7b48880c35ec7db93f4ce",
   "core/irt_rsm.py": "2db444ccb231eb4c885b2aa7e0ab8fef29ec0d234deec7ee6c5d0edde762f44b",
   "core/generalizability.py": "0968d481086e427231146f7e7287e66184cf5a7cab5c22ad36d3a00b6b3ed2ae",
@@ -54,6 +53,19 @@
    "protocol_commit": "a42d42d",
    "pr": "binary certification (1PL-4PL)",
    "evidence_effect": "Q1-Q3 evidence is unchanged history; current binary evidence is validation/evidence/binary_certification/CERTIFICATION.json."
+  }
+ },
+ "source_changes": {
+  "core/irt_python_mirt_adapter.py": {
+   "historical_sha256": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
+   "current_sha256": "1af963c7898ec45deac481c74207219c02afef5239c339276be79900c7cbca98",
+   "change": "metadata only (PR #206, P4-C1): PythonMirtResult.se_method field and its value in the return statement; fit arguments and estimation unchanged",
+   "reversal": {
+    "remove": "    se_method: str | None = None   # SE method actually requested from the library (None = not recorded)\n",
+    "replace_new": "    return PythonMirtResult(\"python_mirt\",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings,\n                            se_method=kwargs.get(\"se_method\",\"library_default\"))",
+    "with_old": "    return PythonMirtResult(\"python_mirt\",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings)"
+   },
+   "moved_from_family": "source_sha256"
   }
  }
 }
