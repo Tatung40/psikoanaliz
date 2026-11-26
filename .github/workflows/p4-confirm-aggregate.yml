@@ -1,0 +1,16 @@
+name: P4-C1 read-only re-aggregation
+on:
+  pull_request:
+    paths: ['validation/p4_confirm/aggregate.py']
+permissions: {contents: read, actions: read}
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'p4-*', path: /tmp/p, merge-multiple: true, run-id: '45853181770', github-token: '${{ github.token }}'}
+      - run: |
+          sha256sum /tmp/p/*.jsonl
+          python3 validation/p4_confirm/aggregate.py /tmp/p /tmp/p/REPORT.json
