@@ -175,3 +175,19 @@ def test_confirmed_global_production_profile_and_withdrawal(model,monkeypatch):
     output=Path("/tmp/global-production");output.mkdir(parents=True,exist_ok=True)
     (output/(model+".json")).write_text(json.dumps(benchmark))
     print("PRODUCTION_LATENCY_JSON "+json.dumps(benchmark))
+
+def test_residual_png_never_clips_valid_correlation_differences(actual,monkeypatch):
+    model,x,out=actual
+    if model!="4PL":return
+    from matplotlib.figure import Figure
+    import reports.irt_binary_report as B
+    report=build_report(out,model=model,items=x.columns)
+    residual=pd.DataFrame([[0.,-1.5],[-1.5,0.]],columns=["A","B"],index=["A","B"])
+    report.global_fit={"residuals":residual}
+    seen=[];original=Figure.savefig
+    def capture(fig,*args,**kwargs):
+        seen.append(fig.axes[0].images[0].get_clim())
+        return original(fig,*args,**kwargs)
+    monkeypatch.setattr(Figure,"savefig",capture)
+    raw=B.png_bytes(report,pd.DataFrame(),"Korelasyon artıkları")
+    assert raw[:4]==bytes([137,80,78,71]) and seen==[(-1.5,1.5)]

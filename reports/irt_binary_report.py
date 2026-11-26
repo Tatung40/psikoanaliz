@@ -41,7 +41,9 @@ def png_bytes(report, persons, kind, selected=None):
     ax = fig.add_subplot(111)
     if kind=="Korelasyon artıkları":
         residual=report.global_fit["residuals"]
-        image=ax.imshow(residual.to_numpy(float),cmap="RdBu_r",vmin=-1,vmax=1)
+        values=residual.to_numpy(float)
+        limit=max(float(np.max(np.abs(values))),1e-12)  # correlations may differ by up to2; never clip at1
+        image=ax.imshow(values,cmap="RdBu_r",vmin=-limit,vmax=limit)
         fig.colorbar(image,ax=ax,label="Gözlenen − model korelasyonu (betimsel)")
         ax.set_xticks(range(len(residual)),labels=residual.columns,rotation=90)
         ax.set_yticks(range(len(residual)),labels=residual.index)
