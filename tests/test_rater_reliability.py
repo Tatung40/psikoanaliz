@@ -215,3 +215,24 @@ def test_scoped_certification_label_matches_evidence_and_ui_caption():
     assert sum(R.certification(m) == "CERTIFIED" for m in ev) == 30
     ui = Path("ui/rater_reliability_view.py").read_text(encoding="utf-8")
     assert "Hiçbir yöntem CERTIFIED değildir" not in ui and "Bilimsel sertifika (kapsamlı)" in ui
+
+
+def test_exports_built_once_per_result_and_invalidated_on_new_data(monkeypatch):
+    from streamlit.testing.v1 import AppTest
+    import ui.rater_reliability_view as V
+    calls = {"exports": 0, "png": 0}
+    real_e, real_p = V._exports, V._ba_png
+    monkeypatch.setattr(V, "_exports", lambda *a: (calls.__setitem__("exports", calls["exports"] + 1), real_e(*a))[1])
+    monkeypatch.setattr(V, "_ba_png", lambda *a: (calls.__setitem__("png", calls["png"] + 1), real_p(*a))[1])
+    at = AppTest.from_string("from ui.rater_reliability_view import render\nrender()", default_timeout=120)
+    at.run(); at.selectbox(key="rr_example_choice").set_value("bland_altman_paired").run()
+    at.button(key="rr_load_example").click().run(); at.button(key="rr_run").click().run(); assert not at.exception
+    first = dict(at.session_state["rr_results"]["exports"]); n_e, n_p = calls["exports"], calls["png"]
+    at.run(); at.run(); assert not at.exception                      # display reruns reuse bytes
+    assert calls["exports"] == n_e == 1 and at.session_state["rr_results"]["exports"]["bulgular.csv"] == first["bulgular.csv"]
+    assert calls["png"] == n_p
+    at.button(key="rr_run").click().run()                             # explicit rerun -> fresh result and exports
+    assert calls["exports"] == 2
+    at.selectbox(key="rr_example_choice").set_value("cohen_kappa_nominal").run()
+    at.button(key="rr_load_example").click().run()
+    assert "rr_results" not in at.session_state

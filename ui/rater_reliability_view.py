@@ -274,10 +274,13 @@ def render():
                 st.caption(f"Amaç/model: {meta['formula']}. Düzey: {meta['level']}; puanlayıcı: {meta['raters']}; düzen: {meta['layout']}; "
                            f"eksik veri: {meta['missing']}. Motor: {meta['engine']}. Kanıt: {out['status']}.")
                 if m == "bland_altman" and {"bias", "loa"} <= set(out["shown"]):
-                    st.image(_ba_png(out), caption="Bland–Altman grafiği")
+                    if "ba_png" not in saved: saved["ba_png"] = _ba_png(out)   # same fp-keyed result -> same figure
+                    st.image(saved["ba_png"], caption="Bland–Altman grafiği")
     with st.expander("9. Raporlar ve Dışa Aktarma", expanded=False):
         if saved:
-            files = _exports(saved["out"], data, cfg)
+            if "exports" not in saved:          # built once per fp-keyed result; reruns/tabs/downloads reuse the bytes
+                saved["exports"] = _exports(saved["out"], data, cfg)
+            files = saved["exports"]
             cols = st.columns(3)
             for i, (name, b) in enumerate(files.items()):
                 cols[i % 3].download_button(name, b, file_name=name, key=f"rr_dl_{name}", use_container_width=True)
