@@ -47,6 +47,8 @@ def global_fit(outcome,responses,*,seed=None):
     if (outcome.n_persons,outcome.n_items)!=(N,J) or int(outcome.fit.n_observations)!=N:raise ValueError("Calibration cohort dimensions differ.")
     if not bool(outcome.fit.converged):raise ValueError("No global inference for nonconvergence.")
     if importlib.metadata.version("mirt")!="1.2.0":raise ValueError("Global diagnostic API validated for mirt1.2.0.")
+    cov=getattr(outcome.fit,"latent_covariance",None)
+    if cov is not None and not np.allclose(np.asarray(cov,float),np.eye(1),rtol=0,atol=1e-12):raise ValueError("Unsupported estimated latent scale; fixed N(0,1) required.")
     mode,eta=_coordinates(outcome)
     model=outcome.model
     cons=[{"parameter":"discrimination","items":list(range(J))}] if mode=="common1PL" else None
@@ -55,12 +57,19 @@ def global_fit(outcome,responses,*,seed=None):
     points=int(outcome.solver_settings.get("n_quadpts",61))
     native=compute_fit_indices(outcome.fit,x,n_quadpts=points,prior_mean=[0.],prior_cov=[[1.]],constraints=cons)
     obs=K.observed(x);mu,Xi,D=K.moments(eta,mode,J,points=points)
-    m2,rank,_,_=K.m2_from_moments(obs,mu,Xi,D,N,rank_threshold=1e-6)
+    try:
+        m2,rank,_,_=K.m2_from_moments(obs,mu,Xi,D,N,rank_threshold=1e-6)
+    except ValueError as exc:
+        if str(exc)!="No residual degrees of freedom." or int(native["M2_df"])>0:raise
+        # Saturated limited moments do not invalidate descriptive correlations.
+        m2=np.nan
+        rank=dict(df=int(native["M2_df"]),rank=len(Xi)-int(native["M2_df"]),rank_stable=False,
+                  q_nominal=D.shape[1],rank_audit=[],Xi_condition=float(np.linalg.cond(Xi)))
     if rank["df"]!=native["M2_df"] or abs(m2-native["M2"])>1e-7+1e-6*abs(native["M2"]):raise ValueError("Native/independent M2 rank or statistic mismatch.")
     sr,res=K.srmsr(obs,mu,J);baseline,base_rank=K.baseline(obs,J,N)
     if abs(sr-float(native["SRMSR"]))>1e-7:raise ValueError("Native SRMSR identity mismatch.")
     status="NUMERICAL AGREEMENT / DESCRIPTIVE"
-    reason="MAP M2 χ² and RMSEA intervals are not certified; descriptive indices do not imply fit."
+    reason="3PL/4PL ordinary M2 χ² and RMSEA intervals are not certified; MAP indices are descriptive. Descriptive indices do not imply fit."
     p_asym=np.nan
     co=outcome.fit.coef();bound=False
     for name,lo,hi in (("discrimination",.1,5.),("difficulty",-6.,6.)):
@@ -76,6 +85,9 @@ def global_fit(outcome,responses,*,seed=None):
          "Jacobian rank":rank["rank"],"Nominal parametre":rank["q_nominal"],"Rank kararlı":rank["rank_stable"],
          "QLI (ayrı istatistik)":np.nan,"Küresel referans p":np.nan,"Küresel yöntem":"Native M2; moment-GLS, numeric1e-6 tangent rank",
          "Bilimsel durum":status,"Sınırlılık":reason,"RMSEA2 GA":"R ve Python N/N−1/fallback kuralları farklı; doğrulanmadı, gösterilmez"}
+    if rank["df"]<=0:
+        for name in ("M2","M2 asimptotik p","RMSEA2 (N−1)","CFI","TLI"):row[name]=np.nan
+        row["Sınırlılık"]+=" No residual degrees of freedom: M2/RMSEA2/CFI/TLI unavailable; SRMSR remains descriptive."
     if baseline<=base_rank["df"]:
         row["CFI"]=row["TLI"]=np.nan
         row["Sınırlılık"]+=" Independence baseline has no positive noncentrality; perfect-fit fallback not imputed."
@@ -107,6 +119,8 @@ def comparison_context(outcome,responses):
     mode,eta=_coordinates(outcome);N,J=x.shape
     if getattr(outcome,"engine",None)!="python_mirt" or outcome.n_persons!=N:raise ValueError("Native cohort identity mismatch.")
     fit=outcome.fit;ll=float(fit.log_likelihood);q=int(fit.n_parameters)
+    cov=getattr(fit,"latent_covariance",None)
+    if cov is not None and not np.allclose(np.asarray(cov,float),np.eye(1),rtol=0,atol=1e-12):raise ValueError("Unsupported latent scale for ML nesting.")
     if not np.isfinite(ll):raise ValueError("Finite likelihood required.")
     from validation.binary_global_fit import kernel as K
     mu,Xi,D=K.moments(eta,mode,J,points=int(outcome.solver_settings["n_quadpts"]))

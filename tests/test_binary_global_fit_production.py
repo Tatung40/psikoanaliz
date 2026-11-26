@@ -22,8 +22,12 @@ def test_actual_native_global_indices_and_map_refusal(actual):
     model,x,out=actual
     value=global_fit(out,x.to_numpy(),seed=[9101,1])
     row=value["table"].iloc[0]
-    assert np.isfinite(row["M2"]) and row["M2 etkin sd"]>0
-    assert np.isfinite(row["RMSEA2 (N−1)"]) and np.isfinite(row["SRMSR"])
+    if row["M2 etkin sd"]<=0:
+        assert model=="4PL" and all(np.isnan(row[k]) for k in ("M2","RMSEA2 (N−1)","CFI","TLI","M2 asimptotik p"))
+        assert "No residual degrees of freedom" in row["Sınırlılık"]
+    else:
+        assert np.isfinite(row["M2"]) and np.isfinite(row["RMSEA2 (N−1)"])
+    assert np.isfinite(row["SRMSR"])
     assert value["residuals"].shape==(6,6)
     np.testing.assert_allclose(value["residuals"],value["residuals"].T,rtol=0,atol=1e-14)
     assert np.isnan(row["Küresel referans p"])    # N300/J6 is outside ALL confirmation cells
@@ -31,7 +35,7 @@ def test_actual_native_global_indices_and_map_refusal(actual):
         assert np.isnan(row["M2 asimptotik p"])
         assert "DESCRIPTIVE" in row["Bilimsel durum"]
     report=build_report(out,model=model,items=x.columns,global_diagnostics=value)
-    assert report.metadata["Global · M2"]==row["M2"]
+    np.testing.assert_equal(report.metadata["Global · M2"],row["M2"])
     assert report.global_fit is value
     assert report.metadata["Kestirim"]==out.estimation
     with pytest.raises(ValueError,match="nonconvergence"):
@@ -100,3 +104,11 @@ def test_reproducibility_ships_global_math_sources():
     paths={str(p).replace("\\\\","/") for p in _runtime_assets([dict(module="core.irt_global_fit",function="global_fit")])}
     assert any(p.endswith("validation/binary_global_fit/kernel.py") for p in paths)
     assert any(p.endswith("validation/binary_global_fit/analysis.py") for p in paths)
+
+def test_actual_4pl_overidentified_global_moments():
+    x=pd.read_csv("tests/fixtures/irt_b11/data_irt4pl_ok.csv").iloc[:300].astype(int)
+    out=fit_python_mirt(x.to_numpy(),model="4PL",estimation="MAP",n_quadpts=61)
+    assert out.fit.converged
+    value=global_fit(out,x,seed=[9721,4]);r=value["table"].iloc[0]
+    assert r["M2 etkin sd"]>0 and np.isfinite(r["M2"])
+    assert np.isnan(r["M2 asimptotik p"]) and np.isnan(r["Küresel referans p"])
