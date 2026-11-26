@@ -66,6 +66,36 @@ def wait_idle(page, timeout=180_000):
     page.wait_for_function("() => !document.querySelector('[data-testid=stStatusWidget]')", timeout=timeout)
 
 
+def click_ready(page, name, timeout=60_000):
+    """Wait for full actionability, then dispatch exactly one real click."""
+    from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+    btn = page.get_by_role("button", name=name)
+    deadline = time.monotonic() + timeout / 1000
+    last = None
+
+    def remaining():
+        ms = int((deadline - time.monotonic()) * 1000)
+        if ms <= 0:
+            raise TimeoutError(f"{name!r} readiness deadline exhausted")
+        return ms
+
+    while time.monotonic() < deadline:
+        try:
+            wait_idle(page, timeout=min(30_000, remaining()))
+            btn.click(trial=True, timeout=min(5_000, remaining()))
+        except PlaywrightTimeoutError as exc:
+            last = exc
+            ms = int((deadline - time.monotonic()) * 1000)
+            if ms <= 0:
+                break
+            page.wait_for_timeout(min(400, ms))
+            continue
+        # Never retry an ambiguous real click.
+        btn.click(timeout=min(10_000, remaining()))
+        return
+    raise TimeoutError(f"{name!r} not actionable: {last}")
+
+
 def download(page, label, outdir):
     wait_idle(page)
     with page.expect_download(timeout=60_000) as d:
@@ -152,6 +182,7 @@ def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
         if model not in models:
             continue
         rec = {"flow": "B14 polytomous", "model": model, "status": "FAILED"}
+        page = None
         try:
             with Server(log) as srv:
                 page = browser.new_page(accept_downloads=True)
@@ -161,7 +192,7 @@ def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
                 if model == "NRM":
                     box = page.get_by_label("Nominal seçenekler (virgülle)")
                     box.fill("A,B,C,D"); box.press("Enter"); wait_idle(page)
-                page.get_by_role("button", name="Python mirt ile B14 pilot analizi").click()
+                click_ready(page, "Python mirt ile B14 pilot analizi")
                 page.get_by_role("button", name="Madde parametrelerini CSV indir").wait_for(timeout=180_000)
                 wait_idle(page)
                 rec['panels']=verify_result_panels(page,outdir/f'{model}_panel_dom.html')
@@ -185,9 +216,12 @@ def flow_polytomous(browser, outdir, log, models=("GRM", "PCM", "GPCM", "NRM")):
                            max_abs_diff_vs_direct_fit=diff, max_abs_diff_theta=dtheta, xlsx_sheets=list(sheets),
                            status="PASS" if diff < 1e-6 and dtheta < 1e-6 and len(got) == 8 and charts > 0
                            and plotly > 0 and {"Kişi Yetenekleri", "Bilgi Fonksiyonları"} <= set(sheets) else "FAIL")
-                page.screenshot(path=str(outdir / f"{model}.png"), full_page=True); page.close()
+                page.screenshot(path=str(outdir / f"{model}.png"), full_page=True)
         except Exception as exc:
             rec["error"] = f"{type(exc).__name__}: {str(exc)[:300]}"
+        finally:
+            if page is not None:
+                page.close()
         records.append(rec)
     return records
 

@@ -215,7 +215,9 @@
       "core.irt_rasch_wright.rasch_wright_tables",
       "core.irt_rasch_wright.wright_exports",
       "core.irt_rasch_wright.wright_figure",
-      "core.irt_sx2_scoped.cache_fingerprint"
+      "core.irt_sx2_scoped.cache_fingerprint",
+      "core.polytomous_inference.export_bundle",
+      "core.polytomous_inference.parameter_table"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },

@@ -1,0 +1,10 @@
+{"id": "P4-C1 polytomous parameter CI coverage confirmation", "registered_before_confirmation": true,
+ "engine": "application fit path: P4_ENGINE=adapter (core.irt_python_mirt_adapter.fit_python_mirt; NRM SE = Oakes, prespecified here)",
+ "design": "validation/polytomous_mc_study.py generator/truth unchanged; models GRM, PCM, GPCM, NRM; N=2000 only",
+ "seeds": "seed = 920000000 + 100000*model_index + r (model_index GRM0 PCM1 GPCM2 NRM3), r=0..R-1; disjoint from archived p4 seeds",
+ "R": {"value": 400, "derivation": "archived N2000 dataset-cluster SD of per-dataset coverage <= .070 (MCSE .0099 at R=50); R=400 gives MCSE <= .0035 < .004"},
+ "gates_per_model_block": {"coverage": "point coverage in [.925,.975] (unchanged target)",
+   "simultaneous": "Bonferroni over the 7 model-blocks: coverage +/- 2.690*cluster MCSE inside [.925,.975]",
+   "mcse": "dataset-cluster MCSE <= .004",
+   "refusal": "non-converged, failed or missing-SE parameters count as non-coverage (denominator = all registered parameters of all R datasets); refusal rate <= .01"},
+ "certify": "a model-block is SCOPED CERTIFIED only if every gate passes; scope = registered generator, N=2000, C categories of the study, adapter fit path"}

@@ -247,12 +247,35 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.caption('Wright Map: bu model için bağımsız bilimsel doğrulama kapısı henüz açılmadı.')
     if model in BINARY and report.metadata.get('Yakınsama') is True and not report.errors:
         _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables)
+    elif model in ('GRM','PCM','GPCM','NRM') and report.metadata.get('Yakınsama') is True and not report.errors:
+        _polytomous_inference(saved,report,cols,model)
     _charts(report,outputs,charts,cols,model)
     _academic_word(saved,model,cols)
 
 
     if outputs['persons']:
         _independent_person_view(saved,report,data,cols,id_col,model)
+
+def _polytomous_inference(saved,report,cols,model):
+    """Shared polytomous SE/CI result: one table feeds screen, CSV and XLSX/ZIP (cached per fit key)."""
+    from core.polytomous_inference import parameter_table,export_bundle
+    store=st.session_state.setdefault('python_mirt_poly_inference',{})
+    entry=store.get(model)
+    key=(saved.get('key'),id(saved['outcome'].fit),bool(getattr(saved['outcome'].fit,'converged',False)))
+    if not entry or entry['key']!=key:
+        table,reason=parameter_table(saved['outcome'],cols)
+        files=export_bundle(table,report) if table is not None else None
+        entry=store[model]={'key':key,'table':table,'reason':reason,'files':files}
+    with st.expander('Madde parametresi SH ve %95 Wald GA (politomöz)',expanded=False):
+        if entry['table'] is None:st.info(entry['reason']);return
+        record_displayed(entry['table'])
+        st.dataframe(safe_frame(entry['table']),hide_index=True,use_container_width=True)
+        st.caption('SCOPED CERTIFIED yalnız P4-C1 kapsamında: N=2000, 10 madde, 4 kategori, ML, 21 düğüm, max_iter 500, tol 1e-4; NRM yalnız Oakes SH. Diğer tüm durumlar NOT CERTIFIED.')
+        st.download_button('Parametre SH/GA — CSV',_csv(entry['table']),f'{model}_parameter_se_ci.csv','text/csv',key=f'python_mirt_poly_ci_csv_{model}',on_click='ignore')
+        excel,archive=entry['files']
+        st.download_button('Parametre SH/GA — Excel',excel,f'{model}_parameter_se_ci.xlsx',key=f'python_mirt_poly_ci_xlsx_{model}',on_click='ignore')
+        st.download_button('Parametre SH/GA — ZIP',archive,f'{model}_parameter_se_ci.zip',key=f'python_mirt_poly_ci_zip_{model}',on_click='ignore')
+
 
 def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
     """B13 output types on the library route: parameter SE/CI, eight charts as 300 dpi PNG, report bundle."""
