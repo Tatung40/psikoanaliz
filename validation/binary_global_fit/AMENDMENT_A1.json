@@ -1,0 +1,12 @@
+{
+  "id": "O-A1 actual-library rank and conventions",
+  "before_new_data": true,
+  "preflight_head": "7ebd2253fc398f7a7cb4951ab777b685ddeefe07",
+  "Python": "mirt1.2.0 actual publiccompute_m2/compute_fit_indices available; full model covariance + FD Jacobian/equalityties, effective rank with relative1e-6 tangent cutoff and covariance1e-10 when needed.",
+  "R": "Actual mirt1.48 preflight succeeded. Internal g/u logits; mod2values physical; fixed theta N0,1. R M2 omits estimated group covariance derivative: reference fixtures fix latentvariance and useR2PL tiedslopes forcommon-a. R nominal df andPython numerical rank can differ; do not force agreement.",
+  "rank": "Independent mathematical rank1e-10 retained as audit. Reconstruct ACTUAL native M2 statistic at native1e-6 tangent rule for reference simulation; compare same rankC in independent algebra. Do not overwrite package outputs or silently change df. Rank instability at factor10 is reported; ordinarychi inference withheld. Q uses its own covariance rank1e-10 and stability audit.",
+  "RMSEA": "R1.48 point uses N-1; R noncentralCI uses N denominator whilePython usesN-1 and mayheuristicfallback. New MAP/nonvalidatedRMSEA intervals are withheld, not mixed.",
+  "baseline": "Independence Bernoulli baseline. PythonCFI/TLI return1 in some undefined-baseline cases; wrapper must exposeNA/reason there rather than silently imputeperfectfit. CFI conventional0..1 truncation explicit; TLI unbounded.",
+  "reference": "Robject fixed-point no-fit calls actual ProbTrace/M2. Same GH61 nodes/weights injected into R model/Internals slots underverified use_dentype_estimateTRUE; separate defaultR-linear61 audit. Independent mathematical rank-awareR projection checks rank-dependent differences. Fixed-point p not claimed scientificcalibration.",
+  "gates": "All preregistered size/power/MCSE/refusal thresholds and effects unchanged. No dataset generated yet."
+}

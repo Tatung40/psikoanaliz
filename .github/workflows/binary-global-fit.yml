@@ -4,22 +4,31 @@ on:
     paths: ['validation/binary_global_fit/**','validation/evidence/binary_global_fit/**','tests/test_binary_global_fit.py','core/irt_global_fit.py','.github/workflows/binary-global-fit.yml']
 permissions: {contents: read, actions: read}
 jobs:
-  python-preflight:
+  mathematics:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - name: Installed API/source only, ZERO fits
-        run: python -m validation.binary_global_fit.preflight
-  r-preflight:
+      - run: python -m pytest -q tests/test_binary_global_fit.py
+      - name: Actual native fixed-point API vs independent moment mathematics; ZERO fits
+        run: python -m validation.binary_global_fit.python_reference
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: global-python-reference,path: /tmp/global-reference/}
+  r-reference:
+    needs: mathematics
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install numpy
       - uses: r-lib/actions/setup-r@v2
         with: {r-version: release,use-public-rspm: true}
       - uses: r-lib/actions/setup-r-dependencies@v2
@@ -28,8 +37,46 @@ jobs:
             any::mirt@1.48
             any::nloptr
           cache-version: 1
-      - name: Actual R parameterization/M2 conventions, ZERO calibration
-        run: Rscript validation/binary_global_fit/preflight.R
+      - uses: actions/download-artifact@v4
+        with: {name: global-python-reference,path: /tmp/global-reference}
+      - name: Actual R fixed-point M2 and independent physical Jacobian/covariance; no calibrations
+        run: Rscript validation/binary_global_fit/reference.R
+      - run: python -m validation.binary_global_fit.compare
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: binary-global-R-preflight,path: /tmp/global-preflight/}
+        with: {name: global-R-reference,path: /tmp/global-reference/}
+  pilot:
+    needs: [mathematics,r-reference]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2,3,4,5,6,7]
+    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1',MKL_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: One native calibration shared by all prospective diagnostic candidates
+        run: python -m validation.binary_global_fit.runner --phase pilot --shard ${{ matrix.shard }} --shards 8 --work /tmp/global-pilot
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'global-pilot-${{ matrix.shard }}',path: /tmp/global-pilot/}
+  aggregate:
+    needs: [pilot]
+    if: always()
+    runs-on: ubuntu-latest
+    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'global-pilot-*',path: /tmp/global-pilot}
+      - run: python -m validation.binary_global_fit.statistics --input /tmp/global-pilot --phase pilot --out /tmp/global-report/REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: global-pilot-report,path: /tmp/global-report/}
