@@ -306,7 +306,8 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 st.download_button('Tek adımlı GA — CSV',_csv(onestep),f'{model}_parameter_onestep_ci.csv','text/csv',
                                    key=f'python_mirt_onestep_csv_{model}',on_click='ignore')
             st.caption(f'{METHOD}. {SCOPE} Aralık gerçek parametreyi hedefler; merkezi MAP değildir. Gösterilen SH tek-adım '
-                       'kestiricisinindir, MAP örnekleme SH’si değildir. 4PL a/b aralıkları geçerli fakat çok geniştir.')
+                       'kestiricisinindir, MAP örnekleme SH’si değildir. 4PL a/b aralıkları geçerli fakat çok geniştir; 4PL c/d GA '
+                       'bilgi vermediği için NOT CERTIFIED ve üretilmez.')
         kind=st.selectbox('Grafik',kinds(model),key=f'python_mirt_extra_kind_{model}')
         chosen=None
         if kind in ('ICC','IIC'):

@@ -27,3 +27,17 @@ def test_real_fit_table_scope_and_fail_closed():
     assert O.onestep_intervals(small, list(range(12)))[0] is None
     ml = types.SimpleNamespace(**{**out.__dict__, "estimation": "ML"})
     assert O.onestep_intervals(ml, list(range(12)))[0] is None
+
+
+def test_4pl_c_d_intervals_fail_closed_and_status_consistent():
+    from core.irt_python_mirt_adapter import fit_python_mirt
+    x = simulate("4PL", 3000, 12, [202611260, 4, 0, 0])
+    out = fit_python_mirt(x, model="4PL", estimation="MAP", n_quadpts=61, max_iter=500, tol=1e-4)
+    table, reason = O.onestep_intervals(out, [f"I{j}" for j in range(12)])
+    assert reason is None and len(table) == 48
+    cd = table[table["Parametre"].isin(["guessing", "upper"])]; ab = table[~table.index.isin(cd.index)]
+    assert cd[["%95 GA alt", "%95 GA üst"]].isna().all().all() and cd["SH (tek adım)"].notna().all()
+    assert cd["Bilimsel durum"].str.startswith("NOT CERTIFIED").all()
+    assert ab[["%95 GA alt", "%95 GA üst"]].notna().all().all() and not ab["Bilimsel durum"].str.contains("NOT CERTIFIED").any()
+    assert not table["Bilimsel durum"].str.contains("CERTIFIED \\(", regex=True).any()
+    assert "doğrulayamaz" in table["Kapsam"].iloc[0]

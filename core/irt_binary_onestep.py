@@ -13,8 +13,15 @@ from scipy.special import expit
 
 J = 12
 METHOD = "Tek adımlı önsel-yanlılık düzeltmeli Wald GA (beklenen Fisher bilgisi, 4096 örüntü)"
-SCOPE = ("Yalnız N=3000, 12 madde, Python mirt 1.2.0 MAP (61 düğüm, tol 1e-4, max_iter 500) referans tasarımında "
-         "bağımsız olarak doğrulandı; farklı N, madde sayısı, madde tasarımı veya örtük dağılıma genellenmez.")
+SCOPE = ("Yalnız N=3000, 12 madde, Python mirt 1.2.0 MAP (61 düğüm, tol 1e-4, max_iter 500), kayıtlı madde tasarımı "
+         "(validation.binary_certification.common.truth) ve θ~N(0,1) referans tasarımında bağımsız olarak doğrulandı. Uygulama "
+         "kullanıcı verisinin madde tasarımını ve örtük dağılımını doğrulayamaz; bu satırlar o veri için sertifika kanıtı değildir.")
+# Audit (validation/evidence/p1p3_analytic/AUDIT_closureJ.json): 4PL c/d intervals are whole-box in 46%/39% of
+# replications and cover only .9005/.9141 when informative -> CI certificates withdrawn; their SE certificates remain.
+CI_VALIDATED = {"3PL": {"discrimination", "difficulty", "guessing"}, "4PL": {"discrimination", "difficulty"}}
+SE_VALIDATED = {"3PL": {"discrimination", "difficulty", "guessing"}, "4PL": {"discrimination", "difficulty", "guessing", "upper"}}
+WITHDRAWN = ("NOT CERTIFIED — 4PL c/d GA: aralıkların %46/%39'u tüm parametre kutusu, bilgi veren aralıklarda kapsama "
+             ".9005/.9141 (<.93); GA üretilmez. Tek-adım SH referans kapsamında doğrulandı.")
 NAMES = ("discrimination", "difficulty", "guessing", "upper")
 BOX = {"discrimination": (0.0, np.inf), "difficulty": (-np.inf, np.inf), "guessing": (0.0, .5), "upper": (.5, 1.0)}
 
@@ -79,9 +86,11 @@ def onestep_intervals(outcome, item_names):
     rows = []
     for j, item in enumerate(item_names):
         for q, name in enumerate(names):
-            i = j * k + q; lo, hi = BOX[name]
+            i = j * k + q; lo, hi = BOX[name]; ci_ok = name in CI_VALIDATED[model]
             rows.append({"Madde": str(item), "Parametre": name, "MAP kestirimi": eta[i], "Tek adım merkezi": center[i],
-                         "SH (tek adım)": se[i], "%95 GA alt": max(center[i] - 1.959964 * se[i], lo),
-                         "%95 GA üst": min(center[i] + 1.959964 * se[i], hi), "Yöntem": METHOD,
-                         "Bilimsel durum": "CERTIFIED (referans kapsamı) — frekansçı GA; MAP SH'si değildir", "Kapsam": SCOPE})
+                         "SH (tek adım)": se[i] if name in SE_VALIDATED[model] else np.nan,
+                         "%95 GA alt": max(center[i] - 1.959964 * se[i], lo) if ci_ok else np.nan,
+                         "%95 GA üst": min(center[i] + 1.959964 * se[i], hi) if ci_ok else np.nan, "Yöntem": METHOD,
+                         "Bilimsel durum": ("REFERANS KAPSAMINDA DOĞRULANDI — frekansçı GA ve tek-adım SH; MAP SH'si değildir"
+                                            if ci_ok else WITHDRAWN), "Kapsam": SCOPE})
     return pd.DataFrame(rows), None
