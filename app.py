@@ -843,7 +843,9 @@ elif selected_page == "6. Çeldirici Analizi":
     else:
         raw_df = st.session_state.raw_df
         item_cols = st.session_state.item_cols
-        total_scores = calculate_total_scores(st.session_state.scored_df if st.session_state.scored_df is not None else raw_df, item_cols)
+        total_scores = calculate_total_scores(st.session_state.scored_df if st.session_state.scored_df is not None else raw_df, item_cols, missing_rule="strict")
+        if total_scores.isna().any():
+            st.warning(f"{int(total_scores.isna().sum())} katılımcıda kayıp yanıt var; üst/alt gruplar yalnız tam yanıtlı katılımcılardan oluşturuldu (kısmi toplamlar karşılaştırılabilir değildir).")
 
         # Eşik belirleme
         col_th, col_sel = st.columns([1, 2])
@@ -935,7 +937,7 @@ elif selected_page == "7. Güvenirlik & Ölçme Hatası":
             {"Metrik": "KR-21 Katsayısı", "Değer": rel.get("kr21") if rel.get("kr21") is not None else "-", "Açıklama": "Maddelerin eşit güçlükte olduğu varsayımı altında alt sınır"},
             {"Metrik": "İki-Yarı (Tek-Çift) Spearman-Brown", "Değer": rel.get("spearman_brown_odd_even"), "Açıklama": "Test yarısı eşdeğerlik kestirimi"},
             {"Metrik": "Guttman Split-Half (λ4)", "Değer": rel.get("guttman_lambda4"), "Açıklama": "Yarı-test varyans temelli güvenirlik"},
-            {"Metrik": "McDonald Omega (ω_t)", "Değer": rel.get("mcdonald_omega") if rel.get("mcdonald_omega") else "-", "Açıklama": "Tek faktörlü model faktör yüklerine dayalı genel güvenirlik"},
+            {"Metrik": "McDonald Omega (ω_t)", "Değer": rel.get("mcdonald_omega") if rel.get("mcdonald_omega") else "-", "Açıklama": "Standardize maddelerde tek faktörlü ML faktör analizi; Heywood/yakınsamama durumunda raporlanmaz. Sayısal; sertifikalı değildir"},
             {"Metrik": "Maddeler Arası Ort. Korelasyon", "Değer": rel.get("mean_inter_item_r"), "Açıklama": "Tüm madde ikililerinin Pearson korelasyon ortalaması"},
             {"Metrik": "Ölçmenin Standart Hatası (SEM)", "Değer": rel.get("sem"), "Açıklama": "Bireysel ölçüm hatası standart sapması"},
             {"Metrik": "Feldt (1969) %95 Alfa Güven Aralığı", "Değer": f"[{rel.get('alpha_ci_lower')}, {rel.get('alpha_ci_upper')}]", "Açıklama": "F-dağılımı temelli kuramsal güven aralığı"}
@@ -960,7 +962,10 @@ elif selected_page == "8. Grup Bazlı Analizler":
     elif not grp_col or grp_col not in target_df.columns:
         st.info("Grup analizi için sol menüden 'Veri Yükleme' sekmesine gidip bir Grup Değişkeni (Cinsiyet, Şube vb.) seçiniz.")
     else:
-        total_scores = calculate_total_scores(target_df, item_cols)
+        total_scores = calculate_total_scores(target_df, item_cols, missing_rule="strict")
+        if total_scores.isna().any():
+            st.warning(f"{int(total_scores.isna().sum())} katılımcıda kayıp yanıt var; grup karşılaştırmaları yalnız tam yanıtlı katılımcılarla yapıldı. "
+                       "Tam-durum analizi, kayıp yanıtlar tamamen rastgele değilse yanlı olabilir.")
         grp_res = compare_test_scores_by_group(target_df, grp_col, total_scores)
 
         st.markdown(f"#### 📊 Grup Puan Karşılaştırması ({grp_col})")
