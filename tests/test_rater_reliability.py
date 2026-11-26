@@ -205,3 +205,13 @@ def test_platform_example_dataset_can_be_analysed_on_the_page():
     at.button(key="rr_run").click().run(); assert not at.exception
     out = at.session_state["rr_results"]["out"]["cohen_kappa_quadratic"]
     assert np.isfinite(out["result"]["estimate"]) and out["n_raters"] == 2 and out["n_units"] == d.n
+
+
+def test_scoped_certification_label_matches_evidence_and_ui_caption():
+    import json
+    from pathlib import Path
+    ev = json.loads(Path("validation/rater_reliability/evidence.json").read_text(encoding="utf-8"))["status"]
+    assert all(R.certification(m) == ev[m]["certification"]["status"] for m in ev)
+    assert sum(R.certification(m) == "CERTIFIED" for m in ev) == 30
+    ui = Path("ui/rater_reliability_view.py").read_text(encoding="utf-8")
+    assert "Hiçbir yöntem CERTIFIED değildir" not in ui and "Bilimsel sertifika (kapsamlı)" in ui

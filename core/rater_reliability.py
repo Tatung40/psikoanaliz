@@ -464,6 +464,12 @@ def status(method):
     return evidence().get(method, {}).get("label", "NOT CERTIFIED")
 
 
+def certification(method):
+    """Scoped simulation-certification status (CERT_PROTOCOL.json with amendments R-A1/R-A2), separate from the
+    numerical-agreement label returned by status(). Scope: the protocol's simulation designs only."""
+    return evidence().get(method, {}).get("certification", {}).get("status", "NOT CERTIFIED")
+
+
 def validated_outputs(method):
     return set(evidence().get(method, {}).get("validated_outputs", []))
 

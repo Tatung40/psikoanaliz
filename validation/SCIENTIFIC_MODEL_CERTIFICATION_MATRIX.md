@@ -131,4 +131,4 @@ Tanı: N=3000/J12'de beklenen Fisher bilgisinin en küçük özdeğeri × N = .5
 | 3PL/4PL | S-X² tam yeniden kestirimli parametrik bootstrap (B=99) | Yedek A | 1438/1500 ve 1165/1500 tamamlandı; üst .076/.0748; 4PL güç .06 | .0017 | INCONCLUSIVE — süre sınırında iptal; NOT CERTIFIED |
 | 3PL/4PL | Orijinal ki-kare S-X² p | — | .0622 / .0862 (yeni null) | — | NOT CERTIFIED (kapalı kalır) |
 
-| 4PL | c, d %95 güven kümesi (kapanış K) | C(α) etkin-skor ters çevirme, 26 noktalı ızgara | koşulsuz .9447/.9467; bilgi veren .9434/.9602; tüm-kutu %16.6/%0.9 | .0021–.0023 | SCOPED CERTIFIED (N3000/J12, kayıtlı tasarım; R=1000 yeni tohum 202611262101) |
+| 4PL | c, d %95 güven kümesi (kapanış K) | C(α) etkin-skor ters çevirme, 26 noktalı ızgara | koşulsuz .9447/.9467; bilgi veren .9434/.9602; tüm-kutu %16.6/%0.9 | .0021–.0023 | SCOPED CERTIFIED (N3000/J12, kayıtlı tasarım; R=1000 yeni tohum 202611262101). Hızlandırılmış uygulama (#195): sayısal eşdeğerlik KURULAMADI (1e-8 T toleransı); bağımsız yeni doğrulama 202611261301, R=1000: c .9481/.9476, d .9538/.9650 — tüm kapılar geçti |

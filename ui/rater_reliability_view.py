@@ -214,7 +214,9 @@ def _exports(results, data, cfg):
 
 def render():
     st.header("Puanlayıcı Güvenirliği ve Uyum")
-    st.caption("30 yöntem; Python motorları, bağımsız R referanslarıyla örnek verilerde doğrulandı. Hiçbir yöntem CERTIFIED değildir.")
+    st.caption("30 yöntem. Sayısal doğrulama: Python motorları bağımsız R referanslarıyla örnek verilerde uyumlu (Kanıt durumu). "
+               "Bilimsel sertifika: 30/30 yöntem önkayıtlı simülasyon protokolünde (CERT_PROTOCOL.json, R-A1/R-A2) CERTIFIED; "
+               "yalnız protokolün simülasyon tasarımları kapsamındadır, kullanıcı verisi için kanıt değildir.")
     with st.expander("1. Veri Setimi Nasıl Düzenlemeliyim?", expanded=st.session_state.get("rr_source") is None):
         _guide()
     with st.expander("2. Veri Yükle / Örnek Veri Seç", expanded=True):
@@ -240,7 +242,8 @@ def render():
     status = {m: R.applicable(m, data) for m in R.METHODS}
     with st.expander("4. Uygun Analizleri Öner", expanded=False):
         st.dataframe(pd.DataFrame([{"Yöntem": f"{R.METHODS[m]['name']} ({R.METHODS[m]['abbr']})", "Uygun": "Evet" if ok else "Hayır",
-                                    "Gerekçe": why or R.METHODS[m]["level"], "Kanıt durumu": R.status(m)}
+                                    "Gerekçe": why or R.METHODS[m]["level"], "Kanıt durumu": R.status(m),
+                                    "Bilimsel sertifika (kapsamlı)": R.certification(m)}
                                    for m, (ok, why) in status.items()]), hide_index=True, use_container_width=True)
     chosen = []
     for key, title in PANELS:
