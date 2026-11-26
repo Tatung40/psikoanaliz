@@ -30,7 +30,8 @@ def summarize(rows,model,phase,methods=("p_emp","p_standardized")):
         gates={"CP_upper<=.07":max(upper)<=.07,"cluster_MCSE<=.004":mcse<=.004,
             "pooled95_lower>=.03":float(cl.mean())-stats.norm.ppf(.975)*mcse>=.03 if n else False,
             "nonevaluable<=.01":float(invalid.mean())<=.01 if n else False,"identity<=1e-8":identity<=1e-8,
-            "power_CP_lower>.10":low>.10,"complete_independent_confirmation":phase=="confirm" and complete}
+            "power_CP_lower>.10":low>.10,"complete_independent_confirmation":phase=="confirm" and complete,
+            "preregistered_selected_method":phase=="confirm" and model=="3PL" and method=="p_constrained"}
         report[method]={"null_R":n,"power_R":len(alt),"typeI":float(cl.mean()) if n else None,"MCSE":mcse,
             "per_item":reject.mean(0).tolist() if n else [],"upper":upper,"power":detected/max(1,len(alt)),"power_lower":low,
             "power_upper":cp_upper(detected,len(alt),.025) if len(alt) else 1.,"refusal":float(invalid.mean()) if n else 1.,
@@ -58,7 +59,7 @@ def main():
         raw=f.read_bytes();r=json.loads(raw);key=(r["model"],r["root"],r["r"])
         if key in seen:raise ValueError("duplicate independent dataset "+str(key))
         seen.add(key);rows.append(r);hashes[str(f.relative_to(a.input))]=hashlib.sha256(raw).hexdigest()
-    report={"phase":a.phase,"source_run":"actual JSON records; dataset is MC cluster","models":{m:summarize(rows,m,a.phase,a.methods.split(",")) for m in ("3PL","4PL")},"precision_design":design(),"record_hashes":hashes}
+    report={"phase":a.phase,"source_run":"actual JSON records; dataset is MC cluster","models":{m:summarize(rows,m,a.phase,a.methods.split(",")) for m in ("3PL","4PL") if any(r["model"]==m for r in rows)},"precision_design":design(),"record_hashes":hashes}
     Path(a.out).parent.mkdir(parents=True,exist_ok=True);Path(a.out).write_text(json.dumps(report,indent=1,default=lambda v:v.item()))
     print("P3_REPORT_JSON "+json.dumps({k:v for k,v in report.items() if k!="record_hashes"},default=lambda v:v.item()),flush=True)
 

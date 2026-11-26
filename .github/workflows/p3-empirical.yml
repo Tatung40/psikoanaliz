@@ -77,8 +77,8 @@ jobs:
         if: always()
         with: {name: 'p3-m2-${{ matrix.model }}-${{ matrix.shard }}', path: /tmp/p3-data/}
   aggregate:
-    needs: [mathematics,pilot]
-    if: always() && needs.mathematics.result == 'success' && needs.mathematics.outputs.phase == 'replay' && needs.pilot.result == 'success'
+    needs: [mathematics,confirm]
+    if: always() && needs.mathematics.result == 'success' && needs.mathematics.outputs.phase == 'confirm' && needs.confirm.result == 'success'
     runs-on: ubuntu-latest
     env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
     steps:
@@ -87,11 +87,11 @@ jobs:
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
       - uses: actions/download-artifact@v4
-        with: {pattern: p3-m2-*, path: /tmp/p3-input, merge-multiple: true}
-      - run: python -m validation.p3_empirical.aggregate --input /tmp/p3-input --phase pilot --methods p_constrained,p_constrained_standardized,p_efficient --out /tmp/p3-output/REPORT.json
+        with: {pattern: p3-confirm-*, path: /tmp/p3-input, merge-multiple: true}
+      - run: python -m validation.p3_empirical.aggregate --input /tmp/p3-input --phase confirm --methods p_constrained,p_constrained_standardized --out /tmp/p3-output/REPORT.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: p3-m2-summary, path: /tmp/p3-output/}
+        with: {name: p3-confirm-summary, path: /tmp/p3-output/}
 
   population:
     needs: mathematics
@@ -111,3 +111,37 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: p3-population, path: /tmp/p3-population/}
+
+  confirm:
+    needs: mathematics
+    if: needs.mathematics.outputs.phase == 'confirm'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: /tmp/p3-confirm/
+          key: p3-m2-confirm-3PL-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/SELECTION.json') }}-${{ github.run_id }}
+          restore-keys: p3-m2-confirm-3PL-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/SELECTION.json') }}-
+      - name: Independent fixed-size null confirmation; one native fit per dataset
+        run: python -m validation.p3_empirical.confirm --root 202611262001 --R 6000 --shard '${{ matrix.shard }}' --work /tmp/p3-confirm
+      - name: Independent registered alternative; no change to historical generator
+        run: python -m validation.p3_empirical.confirm --root 202611262002 --R 600 --shard '${{ matrix.shard }}' --work /tmp/p3-confirm --alt
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: /tmp/p3-confirm/
+          key: p3-m2-confirm-3PL-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/SELECTION.json') }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'p3-confirm-${{ matrix.shard }}', path: /tmp/p3-confirm/}

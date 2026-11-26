@@ -1,1 +1,1 @@
-{"phase":"replay","source_run":45806031473,"protocol_commit":"5be1faad9b40d27373b34ff7c887030bf64c89ca","production":"NO GATES OPENED","no_new_fits":true}
+{"phase":"confirm","selected_model":"3PL","no_other_fits":true,"protocol_commit":"5be1faad9b40d27373b34ff7c887030bf64c89ca"}
