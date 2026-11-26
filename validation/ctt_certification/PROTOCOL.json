@@ -1,0 +1,21 @@
+{"id": "CTT-C1 reliability-coefficient recovery", "registered_before_confirmation": true, "supersedes_draft": "PROTOCOL_DRAFT.json (scope reduced below; missing-data and categorical-omega cells deferred, not certified)",
+ "distinction": "Formula correctness = validation/evidence/ctt_reference/COMPARISON.json (numerical agreement). This study = recovery of each method's own population estimand under explicit measurement models.",
+ "estimands": {
+   "alpha": "alpha(Sigma) = k/(k-1) (1 - tr Sigma / 1'Sigma1) of the generating covariance",
+   "kr20": "alpha(Sigma_binary) of the exact population covariance of the binary items (sample-variance KR-20 == sample alpha)",
+   "omega_std": "(sum lambda*)^2 / ((sum lambda*)^2 + sum(1 - lambda*^2)), lambda* = standardized generating loadings",
+   "omega_raw": "(sum lambda)^2 / ((sum lambda)^2 + sum psi) of the generating raw loadings/uniquenesses",
+   "feldt_brennan": "Feldt-Brennan functional of Sigma", "feldt_gilmer": "Feldt-Gilmer functional of Sigma",
+   "reported_not_gated": "true reliability var(T)/var(X) of the raw total (continuous) for context"},
+ "production_estimators": "core.reliability.compute_reliability_indices (alpha, kr20, mcdonald_omega, mcdonald_omega_raw) and core.reliability_extended.reliability_family(np.cov(ddof=1)) (feldt_brennan, feldt_gilmer)",
+ "designs": {
+   "continuous": "multivariate normal one-factor; models tau-equivalent (lambda=.6, psi=.64) and congeneric (lambda linspace .4-.8, psi=1-lambda^2, item SDs linspace .5-2 applied to raw scale); N {200,1000}; k {6,20}; 8 cells",
+   "binary": "probit threshold model X=1[lambda F + e > tau], lambda linspace .5-.8, tau linspace -1..1; exact population covariance by bivariate-normal orthant probabilities; N {200,1000}; k {6,20}; 4 cells; methods alpha/kr20, feldt_brennan, feldt_gilmer only (Pearson omega on binary has no registered estimand here)",
+   "missingness": "none (complete data). Missing-data and categorical-omega scopes NOT in this study."},
+ "replications": {"R_per_cell": 1000, "cluster": "dataset", "seeds": "numpy.random.default_rng([20261126015, cell, r]); development smoke only with root 20261126014"},
+ "gates_per_method_and_cell": {
+   "bias": "|mean(est) - estimand| + 2.576 * MCSE(bias) <= .01 (N=1000) / .02 (N=200)  [conservative 99% bound]",
+   "mcse": "MCSE(bias) = SD(est)/sqrt(n_valid) <= .002",
+   "refusal": "None/NaN results are refusals; counted, never dropped silently; refusal rate <= .01 (closed-form methods) and <= .05 (omega); bias over non-refused",
+   "simultaneity": "a method is CERTIFIED only if it passes in every applicable cell; otherwise PARTIAL (some cells) or NOT CERTIFIED (none); failed cells archived"},
+ "certification_scope": "complete continuous normal one-factor data (and binary probit for alpha/KR-20/Feldt), N 200-1000, k 6-20; estimand = method's own population functional, NOT true reliability unless the model makes them equal (tau-equivalent alpha)"}

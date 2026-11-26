@@ -183,7 +183,7 @@ def compute_reliability_indices(
     # items (sklearn FactorAnalysis), omega = (sum lambda)^2 / ((sum lambda)^2 + sum psi). The former principal-
     # component approximation inflated loadings and is not a factor-model omega. Heywood cases (psi <= 1e-6) or a
     # non-converged/negative-sum solution return None (never a clipped value). Numerical, NOT CERTIFIED.
-    omega_total = np.nan
+    omega_total = np.nan; omega_raw = np.nan
     try:
         from sklearn.decomposition import FactorAnalysis
         z = item_df.to_numpy(float); sd = z.std(axis=0, ddof=1)
@@ -194,9 +194,16 @@ def compute_reliability_indices(
             if lam.sum() < 0: lam = -lam
             if np.all(psi > 1e-6) and lam.sum() > 0 and fa.n_iter_ < 5000:
                 omega_total = float(lam.sum() ** 2 / (lam.sum() ** 2 + psi.sum()))
+                # Raw-score (unstandardized observed total) omega from the same ML fit: ML FA is scale-equivariant,
+                # lambda_raw = lambda * sd, psi_raw = psi * sd^2. Separate estimand; NOT the standardized omega.
+                lr, pr = lam * sd, psi * sd ** 2
+                omega_raw = float(lr.sum() ** 2 / (lr.sum() ** 2 + pr.sum()))
     except (ImportError, ValueError, np.linalg.LinAlgError):
         omega_total = np.nan
     results["mcdonald_omega"] = round(omega_total, 4) if not np.isnan(omega_total) else None
+    results["mcdonald_omega_raw"] = round(omega_raw, 4) if not np.isnan(omega_raw) else None
+    results["omega_estimands"] = ("mcdonald_omega: standardized item scores; mcdonald_omega_raw: raw observed total score; both one-factor "
+                                  "ML on Pearson covariances of complete cases (observed-score, not categorical/latent-response omega)")
 
     # 8. Ölçmenin Standart Hatası (SEM)
     # Referans güvenirlik katsayısı: Alfa (veya ikili ise KR-20)

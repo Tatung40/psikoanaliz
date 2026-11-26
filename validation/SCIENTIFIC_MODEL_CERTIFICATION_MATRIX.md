@@ -144,3 +144,18 @@ Tanı: N=3000/J12'de beklenen Fisher bilgisinin en küçük özdeğeri × N = .5
 | 3PL | Standardized-Q secondary | Same confirmation, not selected prospectively | Numerical gates passed but procedure was not selected | NOT CERTIFIED; not exposed |
 
 This new certificate does not certify exact .05 control, FWER/FDR, arbitrary user item designs, other N/J, or ML. All 14 P1 and six P2 certificates and withdrawn 4PL c/d Wald gates remain unchanged. Full protocol, raw compact records, independent audit and the analytic 4PL power obstruction: [P3_CLOSURE_M.md](P3_CLOSURE_M.md).
+
+## KTT güvenirlik katsayıları — CTT-C1 (2026-11-26)
+
+Önkayıt validation/ctt_certification/PROTOCOL.json; çalışma 45826745448 (tohum 20261126015), hücre başına R=1000, 12 hücre. Kanıt: evidence/ctt_certification/. Sayısal R uyumu ayrı: evidence/ctt_reference/COMPARISON.json.
+
+| Yöntem | Kestirilen nicelik | Hücre | maks |yanlılık| | maks RMSE | maks MCSE | Karar |
+|---|---|---|---|---|---|---|
+| Cronbach α | α(Σ) | 12 | .0035 | .038 | .0012 | SCOPED CERTIFIED (nokta kestirimi) |
+| KR-20 | α(Σ ikili) | 4 | .0035 | .038 | .0012 | SCOPED CERTIFIED |
+| ω standart (ML) | standardize tek faktör ω | 8 | .0017 | .026 | .0008 | SCOPED CERTIFIED |
+| ω ham (ML) | ham toplam ω | 8 | .0012 | .026 | .0008 | SCOPED CERTIFIED |
+| Feldt–Brennan | FB(Σ) | 12 | .0025 | .038 | .0012 | SCOPED CERTIFIED |
+| Feldt–Gilmer | FG(Σ) | 12 | .0010 | .037 | .0012 | SCOPED CERTIFIED |
+
+Kapsam dışı: eksik veri, kategorik ω, SH/GA, KR-21, Guttman λ, yarıya bölme (yalnız sayısal uyum).

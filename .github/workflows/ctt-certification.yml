@@ -1,0 +1,46 @@
+name: CTT-C1 certification confirmation
+on:
+  pull_request:
+    paths: ['validation/ctt_certification/RUN.json']
+permissions: {contents: read}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs: {phase: '${{ steps.p.outputs.phase }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - id: p
+        run: echo "phase=$(python3 -c 'import json;print(json.load(open("validation/ctt_certification/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
+  confirm:
+    needs: plan
+    if: needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy: {fail-fast: false, matrix: {cell: [0,1,2,3,4,5,6,7,8,9,10,11]}}
+    env: {PYTHONPATH: ., OMP_NUM_THREADS: '1', OPENBLAS_NUM_THREADS: '1', CTT_CELLS: '${{ matrix.cell }}'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - run: python validation/ctt_certification/run.py out/c_${{ matrix.cell }}.jsonl 1000
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'ctt-${{ matrix.cell }}', path: out/}
+  aggregate:
+    needs: [plan, confirm]
+    if: always() && needs.plan.outputs.phase == 'run'
+    runs-on: ubuntu-latest
+    env: {PYTHONPATH: .}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'ctt-*', path: /tmp/c, merge-multiple: true}
+      - run: |
+          sha256sum /tmp/c/*.jsonl
+          python validation/ctt_certification/aggregate.py /tmp/c /tmp/c/REPORT.json
+      - uses: actions/upload-artifact@v4
+        with: {name: ctt-report, path: /tmp/c/REPORT.json}

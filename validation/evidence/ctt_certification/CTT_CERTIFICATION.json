@@ -1,0 +1,59 @@
+{
+ "protocol": "validation/ctt_certification/PROTOCOL.json",
+ "run": 45826745448,
+ "seed_root": 20261126015,
+ "status": {
+  "alpha": "CERTIFIED",
+  "feldt_brennan": "CERTIFIED",
+  "feldt_gilmer": "CERTIFIED",
+  "omega_std": "CERTIFIED",
+  "omega_raw": "CERTIFIED",
+  "kr20": "CERTIFIED"
+ },
+ "summary": {
+  "alpha": {
+   "cells": 12,
+   "max_abs_bias": 0.0034713842203170087,
+   "max_rmse": 0.03771325650624207,
+   "max_mcse": 0.001188129142290224,
+   "max_refusal": 0
+  },
+  "feldt_brennan": {
+   "cells": 12,
+   "max_abs_bias": 0.002520460183656925,
+   "max_rmse": 0.03752924565359909,
+   "max_mcse": 0.001184691966228197,
+   "max_refusal": 0
+  },
+  "feldt_gilmer": {
+   "cells": 12,
+   "max_abs_bias": 0.0010384120202419078,
+   "max_rmse": 0.03703726655523365,
+   "max_mcse": 0.0011717820298490212,
+   "max_refusal": 0
+  },
+  "omega_std": {
+   "cells": 8,
+   "max_abs_bias": 0.0016809443911790511,
+   "max_rmse": 0.025641044814587285,
+   "max_mcse": 0.0008110075938715477,
+   "max_refusal": 0
+  },
+  "omega_raw": {
+   "cells": 8,
+   "max_abs_bias": 0.0012075625829169878,
+   "max_rmse": 0.02564136372093707,
+   "max_mcse": 0.0008111666394008552,
+   "max_refusal": 0
+  },
+  "kr20": {
+   "cells": 4,
+   "max_abs_bias": 0.0034713842203170087,
+   "max_rmse": 0.03771325650624207,
+   "max_mcse": 0.001188129142290224,
+   "max_refusal": 0
+  }
+ },
+ "scope": "complete data; continuous normal one-factor (tau-equivalent, congeneric) and binary probit (alpha/KR-20/Feldt only); N 200-1000; k 6-20",
+ "meaning": "SCOPED CERTIFIED = recovery of each method's own population estimand within the registered design; not proof for user data; no SE/CI certified; no missing-data or categorical-omega scope"
+}
