@@ -35,7 +35,8 @@
   "validation/q1_q3/profile.py": "938d72f5f3e1e670608366a0f7def5bb1aeb0e6591a2bbb1b37e13059f20c85f",
   "validation/q1_q3/polish.py": "b925abbb9244281249472c70b0af268053d04bdcec1c104498721a6eea3fbdff",
   "validation/q1_q3/ci_mode.py": "a9226ecd1dfbaaac5ddbea345ca825bea52eae0e467bff9774f62b8198c048e6",
-  "tests/test_certification_q123.py": "8facc82a6451a2a16fc1362145ff81d7d780c0589d2dce223741333386cd85dd"
+  "tests/test_certification_q123.py": "8facc82a6451a2a16fc1362145ff81d7d780c0589d2dce223741333386cd85dd",
+  "core/irt_python_mirt_adapter.py": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60"
  },
  "source_amendments": {
   "core/generalizability.py": {
@@ -53,19 +54,6 @@
    "protocol_commit": "a42d42d",
    "pr": "binary certification (1PL-4PL)",
    "evidence_effect": "Q1-Q3 evidence is unchanged history; current binary evidence is validation/evidence/binary_certification/CERTIFICATION.json."
-  }
- },
- "source_changes": {
-  "core/irt_python_mirt_adapter.py": {
-   "historical_sha256": "ba87709ebb628d28880cf4f8c74436fc17546189ac78f8531e3706cd44855e60",
-   "current_sha256": "1af963c7898ec45deac481c74207219c02afef5239c339276be79900c7cbca98",
-   "change": "metadata only (PR #206, P4-C1): PythonMirtResult.se_method field and its value in the return statement; fit arguments and estimation unchanged",
-   "reversal": {
-    "remove": "    se_method: str | None = None   # SE method actually requested from the library (None = not recorded)\n",
-    "replace_new": "    return PythonMirtResult(\"python_mirt\",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings,\n                            se_method=kwargs.get(\"se_method\",\"library_default\"))",
-    "with_old": "    return PythonMirtResult(\"python_mirt\",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings)"
-   },
-   "moved_from_family": "source_sha256"
   }
  }
 }
