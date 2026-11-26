@@ -1,0 +1,128 @@
+{
+  "phase": "confirm",
+  "source_run": "actual JSON records; dataset is MC cluster",
+  "models": {
+    "3PL": {
+      "p_constrained": {
+        "null_R": 6000,
+        "power_R": 600,
+        "typeI": 0.049805555555555554,
+        "MCSE": 0.0008244146070209567,
+        "per_item": [
+          0.0455,
+          0.05416666666666667,
+          0.04683333333333333,
+          0.04816666666666667,
+          0.04683333333333333,
+          0.0445,
+          0.04816666666666667,
+          0.0515,
+          0.04933333333333333,
+          0.053,
+          0.059666666666666666,
+          0.05
+        ],
+        "upper": [
+          0.053742131797954173,
+          0.06306266141557144,
+          0.05518056258026698,
+          0.05661725984331923,
+          0.05518056258026698,
+          0.052662127555253964,
+          0.05661725984331923,
+          0.060201852579827325,
+          0.05787300129984139,
+          0.06181177575006788,
+          0.06894565960161474,
+          0.058590011751628354
+        ],
+        "power": 0.33666666666666667,
+        "power_lower": 0.2989045849456573,
+        "power_upper": 0.37604613537946946,
+        "refusal": 0,
+        "power_refusal": 0,
+        "runtime_median": 0.12356005850000429,
+        "runtime_P95": 0.18971473845004,
+        "total_seconds": 3648.6598148909875,
+        "errors": {},
+        "identity_max": 8.348877145181177e-13,
+        "gates": {
+          "CP_upper<=.07": true,
+          "cluster_MCSE<=.004": true,
+          "pooled95_lower>=.03": true,
+          "nonevaluable<=.01": true,
+          "identity<=1e-8": true,
+          "power_CP_lower>.10": true,
+          "complete_independent_confirmation": true,
+          "preregistered_selected_method": true
+        },
+        "certified": true
+      },
+      "p_constrained_standardized": {
+        "null_R": 6000,
+        "power_R": 600,
+        "typeI": 0.03884722222222222,
+        "MCSE": 0.0007697557249869208,
+        "per_item": [
+          0.031,
+          0.04016666666666667,
+          0.03883333333333333,
+          0.04516666666666667,
+          0.03966666666666667,
+          0.03166666666666667,
+          0.032,
+          0.037,
+          0.037,
+          0.042,
+          0.04883333333333333,
+          0.042833333333333334
+        ],
+        "upper": [
+          0.03796248672935323,
+          0.04796953380906167,
+          0.04652122612886035,
+          0.05338224483615021,
+          0.047426676879249174,
+          0.03869461653893309,
+          0.03906039531996317,
+          0.044526081278207896,
+          0.044526081278207896,
+          0.04995745346920994,
+          0.0573349797594784,
+          0.05085977340608464
+        ],
+        "power": 0.4266666666666667,
+        "power_lower": 0.38670382120964725,
+        "power_upper": 0.46735479200774044,
+        "refusal": 0,
+        "power_refusal": 0,
+        "runtime_median": 0.12356005850000429,
+        "runtime_P95": 0.18971473845004,
+        "total_seconds": 3648.6598148909875,
+        "errors": {},
+        "identity_max": 8.348877145181177e-13,
+        "gates": {
+          "CP_upper<=.07": true,
+          "cluster_MCSE<=.004": true,
+          "pooled95_lower>=.03": true,
+          "nonevaluable<=.01": true,
+          "identity<=1e-8": true,
+          "power_CP_lower>.10": true,
+          "complete_independent_confirmation": true,
+          "preregistered_selected_method": false
+        },
+        "certified": false
+      }
+    }
+  },
+  "precision_design": {
+    "3000": {
+      "max_rejections": 170,
+      "P_all24_size_gates_if_each_true_rate_.05_lower": 0
+    },
+    "6000": {
+      "max_rejections": 363,
+      "P_all24_size_gates_if_each_true_rate_.05_lower": 0.9969060069276006
+    }
+  }
+}

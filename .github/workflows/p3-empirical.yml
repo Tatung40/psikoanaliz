@@ -1,7 +1,7 @@
 name: P3 empirical covariance and standardized residual validation
 on:
   pull_request:
-    paths: ['validation/p3_empirical/**','tests/test_p3_empirical.py','.github/workflows/p3-empirical.yml']
+    paths: ['validation/p3_empirical/**','validation/evidence/p3_empirical/**','tests/test_p3_empirical.py','tests/test_p3_constrained.py','tests/test_p3_absorption.py','tests/test_p3_production.py','core/irt_sx2_scoped.py','.github/workflows/p3-empirical.yml']
 permissions:
   contents: read
   actions: read
@@ -10,138 +10,42 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
-    outputs:
-      phase: ${{ steps.plan.outputs.phase }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - name: Targeted read-only aggregation regression
-        run: python -m pytest -q tests/test_p3_constrained.py tests/test_p3_empirical.py::test_aggregate_cli_serializes_numpy_gate_booleans
-      - id: plan
-        run: echo "phase=$(python -c 'import json;print(json.load(open("validation/p3_empirical/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
-      - name: Exact native package and runtime source provenance
+      - name: New analytic absorption proof; no calibration
+        run: python -m pytest -q tests/test_p3_absorption.py
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: p3-confirm-*, path: /tmp/p3-input, merge-multiple: true, run-id: 45808993982, github-token: '${{ github.token }}'}
+      - name: Independent arithmetic and seed/provenance audit; NO fits or simulated data
         run: |
-          mkdir -p /tmp/p3-runtime
-          pip freeze > /tmp/p3-runtime/packages.txt
-          python - <<'PY'
-          import inspect,json,mirt
-          import mirt.models.dichotomous as d
-          from pathlib import Path
-          source=inspect.getsource(d)
-          Path("/tmp/p3-runtime/native_dichotomous.py").write_text(source)
-          print("MIRT_VERSION",mirt.__version__)
-          hits={}
-          for p in Path(mirt.__file__).parent.rglob("*.py"):
-              ss=p.read_text()
-              if "bounds" not in ss:continue
-              lines=ss.splitlines(); excerpts=[]
-              for i,line in enumerate(lines):
-                  if "bounds" in line.lower() and any(k in ss for k in ("guessing","difficulty","discrimination")):
-                      excerpts.append("\n".join(lines[max(0,i-1):i+8]))
-              if excerpts:hits[str(p.relative_to(Path(mirt.__file__).parent))]=excerpts[:10]
-          Path("/tmp/p3-runtime/bounds.json").write_text(json.dumps(hits))
-          print("RUNTIME_BOUND_SOURCES",json.dumps(hits))
-          PY
+          mkdir -p /tmp/p3-audit
+          python -m validation.p3_empirical.audit --input /tmp/p3-input --report /tmp/p3-input/REPORT.json --out /tmp/p3-audit/AUDIT.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: p3-runtime, path: /tmp/p3-runtime/}
-  pilot:
-    needs: mathematics
-    if: needs.mathematics.outputs.phase == 'replay'
+        with: {name: p3-independent-audit, path: /tmp/p3-audit/}
+  absorption:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        model: ['3PL','4PL']
-        shard: [0,1]
+    timeout-minutes: 8
     env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: 'p3-m1-${{ matrix.model }}-*'
-          path: /tmp/p3-input
-          merge-multiple: true
-          run-id: 45806031473
-          github-token: '${{ github.token }}'
-      - name: New constrained and efficient diagnostics on frozen native calibrations; zero refits
-        run: python -m validation.p3_empirical.replay --model '${{ matrix.model }}' --input /tmp/p3-input --out /tmp/p3-data --shard '${{ matrix.shard }}' --shards 2
+      - name: Stable log-probability quadrature and explicit feasible 4PL null; no refits
+        run: python -m validation.p3_empirical.absorption --out /tmp/p3-proof/REPORT.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: 'p3-m2-${{ matrix.model }}-${{ matrix.shard }}', path: /tmp/p3-data/}
-  aggregate:
-    needs: [mathematics,confirm]
-    if: always() && needs.mathematics.result == 'success' && needs.mathematics.outputs.phase == 'confirm' && needs.confirm.result == 'success'
-    runs-on: ubuntu-latest
-    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
-        with: {pattern: p3-confirm-*, path: /tmp/p3-input, merge-multiple: true}
-      - run: python -m validation.p3_empirical.aggregate --input /tmp/p3-input --phase confirm --methods p_constrained,p_constrained_standardized --out /tmp/p3-output/REPORT.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: p3-confirm-summary, path: /tmp/p3-output/}
-
-  population:
-    needs: mathematics
-    if: needs.mathematics.outputs.phase == 'replay'
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
-        with: {pattern: p3-m1-*, path: /tmp/p3-input, merge-multiple: true, run-id: 45806031473, github-token: '${{ github.token }}'}
-      - name: Deterministic population MAP and alternative-absorption diagnosis; no generated data
-        run: python -m validation.p3_empirical.population --input /tmp/p3-input --out /tmp/p3-population/REPORT.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: p3-population, path: /tmp/p3-population/}
-
-  confirm:
-    needs: mathematics
-    if: needs.mathematics.outputs.phase == 'confirm'
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    strategy:
-      fail-fast: false
-      max-parallel: 20
-      matrix:
-        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
-    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - uses: actions/cache/restore@v4
-        with:
-          path: /tmp/p3-confirm/
-          key: p3-m2-confirm-3PL-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/SELECTION.json') }}-${{ github.run_id }}
-          restore-keys: p3-m2-confirm-3PL-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/SELECTION.json') }}-
-      - name: Independent fixed-size null confirmation; one native fit per dataset
-        run: python -m validation.p3_empirical.confirm --root 202611262001 --R 6000 --shard '${{ matrix.shard }}' --work /tmp/p3-confirm
-      - name: Independent registered alternative; no change to historical generator
-        run: python -m validation.p3_empirical.confirm --root 202611262002 --R 600 --shard '${{ matrix.shard }}' --work /tmp/p3-confirm --alt
-      - uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: /tmp/p3-confirm/
-          key: p3-m2-confirm-3PL-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/SELECTION.json') }}-${{ github.run_id }}
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: 'p3-confirm-${{ matrix.shard }}', path: /tmp/p3-confirm/}
+        with: {name: p3-absorption-proof, path: /tmp/p3-proof/}

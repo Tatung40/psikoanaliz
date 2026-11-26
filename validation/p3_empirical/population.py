@@ -3,7 +3,7 @@ import argparse,json,time
 from pathlib import Path
 import numpy as np
 from scipy import optimize
-from scipy.special import expit,logsumexp
+from scipy.special import expit,logsumexp,log_expit
 from validation.binary_certification.common import truth,PRIORS
 from validation.p3_empirical import kernel as E
 from validation.p3_empirical.efficient import efficient_basis
@@ -13,8 +13,12 @@ def alternative(model,points=121):
     p=truth(model,12);t,w=E.K.quad(points)
     probs=p["c"]+(p["d"]-p["c"])*expit(p["a"]*(t[:,None]-p["b"]))
     mean=float(w@(p["c"][0]+(p["d"][0]-p["c"][0])*expit(2*p["a"][0]*(t-p["b"][0]))))
-    probs[:,0]=mean
-    logp=logsumexp(E.X@np.log(probs).T+(1-E.X)@np.log1p(-probs).T+np.log(w),axis=1)
+    logits=p["a"]*(t[:,None]-p["b"])
+    with np.errstate(divide="ignore"):
+        lp=np.logaddexp(np.log(p["c"]),np.log(p["d"]-p["c"])+log_expit(logits))
+        lq=np.logaddexp(np.log1p(-p["d"]),np.log(p["d"]-p["c"])+log_expit(-logits))
+    lp[:,0]=np.log(mean);lq[:,0]=np.log1p(-mean)
+    logp=logsumexp(E.X@lp.T+(1-E.X)@lq.T+np.log(w),axis=1)
     return np.exp(logp),mean
 
 
