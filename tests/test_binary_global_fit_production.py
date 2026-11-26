@@ -63,6 +63,7 @@ def test_cache_data_coeff_seed_and_proof_invalidation_without_refit(monkeypatch)
     co.iloc[0,1]=.1;view._globalfit(saved,x,"4PL");assert len(calls)==3
     saved["global_reference_seed"]=[7,8];view._globalfit(saved,x,"4PL");assert len(calls)==4
     proof[0]="withdrawn";view._globalfit(saved,x,"4PL");assert len(calls)==5
+    saved["global_calibration_profile"]={"selection":"multiple starts"};view._globalfit(saved,x,"4PL");assert len(calls)==6
 
 def ctx(family="Rasch",q=12,ll=-100.,objective="ML",**kwargs):
     return dict(model=family,family=family,N=3000,J=12,objective=objective,ll=ll,q=q,converged=True,
@@ -91,7 +92,7 @@ def test_bundle_contains_global_residuals_and_separately_named_score_sets(actual
     monkeypatch.setattr(B,"png_bytes",lambda *a,**k:b"PNG export unit fixture")
     excel,archive=B.bundle(report,persons,None,"MAP Wald withheld",score_sets=sets)
     sheets=pd.read_excel(io.BytesIO(excel),sheet_name=None)
-    assert {"Global_Uyum","Global_Artiklar","4PL_CD_Skor_Guven_Kumeleri"}<=set(sheets)
+    assert {"Global_Uyum","Global_Korelasyon_Artiklari","4PL_CD_Skor_Guven_Kumeleri"}<=set(sheets)
     assert sheets["Global_Uyum"]["M2 asimptotik p"].isna().all()
     with zipfile.ZipFile(io.BytesIO(archive)) as z:
         assert "tablolar/4PL_CD_Skor_Guven_Kumeleri.csv" in z.namelist()
@@ -112,3 +113,57 @@ def test_actual_4pl_overidentified_global_moments():
     value=global_fit(out,x,seed=[9721,4]);r=value["table"].iloc[0]
     assert r["M2 etkin sd"]>0 and np.isfinite(r["M2"])
     assert np.isnan(r["M2 asimptotik p"]) and np.isnan(r["Küresel referans p"])
+
+def test_actual_2pl_docx_carries_global_indices_without_refit(actual,monkeypatch):
+    model,x,out=actual
+    if model!="2PL":return
+    from docx import Document
+    from reports.irt_2pl_academic_docx import export_2pl_docx
+    value=global_fit(out,x)
+    # The report receives the SAME already-computed diagnostics, never a new fit.
+    raw=export_2pl_docx(out,list(x.columns),global_diagnostics=value)
+    doc=Document(io.BytesIO(raw))
+    text=" ".join(p.text for p in doc.paragraphs)+" "+" ".join(c.text for t in doc.tables for r in t.rows for c in r.cells)
+    assert "M2" in text and "SRMSR" in text and "RMSEA" in text
+    assert len(doc.inline_shapes)==len(x.columns)+1
+
+def test_no_hidden_global_helper_override():
+    import ast
+    from pathlib import Path
+    tree=ast.parse(Path("ui/irt_python_library_view.py").read_text())
+    assert sum(isinstance(n,ast.FunctionDef) and n.name=="_globalfit" for n in tree.body)==1
+
+def test_previous_scientific_certificates_and_engines_unchanged():
+    import hashlib
+    from pathlib import Path
+    lock=json.loads(Path("validation/binary_global_fit/PROTECTED_SOURCES.json").read_text())
+    for path,sha in lock.items():
+        b=Path(path).read_bytes()
+        assert hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()==sha,path
+
+@pytest.mark.parametrize("model",["3PL","4PL"])
+def test_confirmed_global_production_profile_and_withdrawal(model,monkeypatch):
+    import time
+    import core.irt_global_fit as G
+    x=pd.read_csv("tests/fixtures/irt_b11/data_irt"+model.lower()+"_ok.csv").astype(int)
+    assert x.shape==(3000,12)
+    out=fit_python_mirt(x.to_numpy(),model=model,estimation="MAP",n_quadpts=61,max_iter=500,tol=1e-4)
+    assert out.fit.converged
+    profile={"start":"native default","acceleration":"none","selection":"single fit"}
+    missing=G.global_fit(out,x,seed=[9881,int(model[0])])
+    assert np.isnan(missing["table"].iloc[0]["Küresel referans p"]) # no implicit cold-start claim
+    elapsed=[];last=None
+    for r in range(5):
+        start=time.perf_counter();last=G.global_fit(out,x,seed=[9882,int(model[0]),r],calibration_profile=profile)
+        elapsed.append(time.perf_counter()-start)
+    cell=G._proof()["models"][model];row=last["table"].iloc[0]
+    assert cell["status"]=="SCOPED CERTIFIED" and np.isfinite(row["Küresel referans p"])
+    assert np.isnan(row["M2 asimptotik p"]) and "SCOPED CERTIFIED" in row["Bilimsel durum"]
+    assert all("MAP" in str(last["table"].iloc[0]["Küresel yöntem"]) for _ in [0])
+    mutated=G.global_fit(out,x,seed=[7,8],calibration_profile={**profile,"selection":"multiple starts"})
+    assert np.isnan(mutated["table"].iloc[0]["Küresel referans p"])
+    proof=G._proof();proof["models"][model]["gates"]["complete"]=False
+    monkeypatch.setattr(G,"_proof",lambda:proof)
+    refused=G.global_fit(out,x,seed=[7,8],calibration_profile=profile)
+    assert np.isnan(refused["table"].iloc[0]["Küresel referans p"])
+    print("PRODUCTION_LATENCY_JSON "+json.dumps(dict(model=model,software_calls=5,median=float(np.median(elapsed)),P95=float(np.percentile(elapsed,95)),note="Software API benchmark; confirmation reference latency separately measured at6000 datasets/model")))

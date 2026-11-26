@@ -1,0 +1,159 @@
+{
+  "version": "binary-global-fit-O1",
+  "canonical_source": "f3d8d24d76c45e48b5836ba057a2c1d4aab4e441",
+  "canonical_pr_head": "1d166c5310c34136df51f8e58fb09630206512e9",
+  "canonical_main": "69be9aa4f11590662a49f122198db75dbeced7dc",
+  "canonical_run": 45856527113,
+  "protocol_commit": "521be0af635198e7bc0ab326b47e0ab7a066ca86",
+  "models": {
+    "3PL": {
+      "model": "3PL",
+      "method": "p_linear",
+      "null_R": 6000,
+      "TypeI": 0.045,
+      "upper": 0.050554404278755447,
+      "lower": 0.039893628277066294,
+      "MCSE": 0.002676284738214527,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 600,
+          "k": 29,
+          "power": 0.04833333333333333,
+          "lower": 0.028218975315814944,
+          "upper": 0.07625692386187234,
+          "MCSE": 0.008755685983236096,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 600,
+          "k": 561,
+          "power": 0.935,
+          "lower": 0.9038321170933298,
+          "upper": 0.9586872720921427,
+          "MCSE": 0.010064376119097825,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 600,
+          "k": 155,
+          "power": 0.25833333333333336,
+          "lower": 0.2125375119775061,
+          "upper": 0.30821611989113457,
+          "MCSE": 0.017869770667350595,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": true,
+        "nontrivial": true,
+        "MCSE": true,
+        "refusal": true,
+        "convergence": true,
+        "complete": true
+      },
+      "certified_claims": [
+        "local_dependence",
+        "second_factor"
+      ],
+      "runtime_median": 0.1659703330000184,
+      "runtime_P95": 0.22002028759997358,
+      "native_identity_max": 2.4995912895064976e-8,
+      "errors": {},
+      "status": "SCOPED CERTIFIED",
+      "method_label": "Native M2 / joint constrained linear Gaussian MAP reference"
+    },
+    "4PL": {
+      "model": "4PL",
+      "method": "p_nonlinear",
+      "null_R": 6000,
+      "TypeI": 0.043333333333333335,
+      "upper": 0.04879516543913344,
+      "lower": 0.03832134032521275,
+      "MCSE": 0.002628546986313781,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 600,
+          "k": 26,
+          "power": 0.043333333333333335,
+          "lower": 0.02442394011500495,
+          "upper": 0.07015551023768933,
+          "MCSE": 0.008312195413522988,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 600,
+          "k": 159,
+          "power": 0.265,
+          "lower": 0.21876084526889353,
+          "upper": 0.3152126442393138,
+          "MCSE": 0.01801735274672725,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 600,
+          "k": 25,
+          "power": 0.041666666666666664,
+          "lower": 0.023175883985233826,
+          "upper": 0.06810547262196463,
+          "MCSE": 0.008157875086438006,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": true,
+        "nontrivial": true,
+        "MCSE": true,
+        "refusal": true,
+        "convergence": true,
+        "complete": true
+      },
+      "certified_claims": [
+        "local_dependence"
+      ],
+      "runtime_median": 0.1913753845000059,
+      "runtime_P95": 0.28531890505001484,
+      "native_identity_max": 4.182177946177035e-7,
+      "errors": {},
+      "status": "SCOPED CERTIFIED",
+      "method_label": "Native M2 / joint constrained nonlinear Gaussian MAP reference"
+    }
+  },
+  "scientific_source_blobs": {
+    "validation/binary_global_fit/kernel.py": "cad7572790f0d5507b0d6e2dbe7b24c782940c28",
+    "validation/binary_global_fit/analysis.py": "bd269c677422d97a212ad61b3b5660b6bae6dab0",
+    "validation/binary_global_fit/dgp.py": "3f6397dc97bfad21a7fd9ea6e2cfddca127bb29a",
+    "validation/binary_global_fit/runner.py": "7078a9518ed2b007d27bafb7322d76195a8397ac",
+    "validation/binary_global_fit/statistics.py": "952dd7f707bd9891b1ee3cf44b0e7be67cf72f60",
+    "validation/binary_certification/common.py": "8d2fcd482a34a9fb3bbb498ceba4ed9a240bfa0d",
+    "validation/binary_global_fit/PROTOCOL.json": "369b33df5dc4b225af1566e2781a0f2bbc6068ae",
+    "validation/binary_global_fit/AMENDMENT_A1.json": "bcdabc946d01bb1e0a4c8721b012096956a35cdb",
+    "validation/binary_global_fit/AMENDMENT_A2.json": "659fa91d0990cdfe16aea9a8013715d787bc49ef",
+    "validation/binary_global_fit/SELECTION.json": "0c5d302bff319aa64a25082fa5bebfefa83519eb",
+    "validation/p3_empirical/kernel.py": "b391c538ee3c214b6cf7451612776eb7983805a1",
+    "validation/p3_empirical/constrained.py": "da977cb8bd9fd59518533e330e4360d3cbc229c8",
+    "validation/p3_sx2_analytic/kernel.py": "ffd10f74310545ee505467484e1f8e393c0215f7"
+  },
+  "ledger_sha256": "add1c880cfcded1507de6c8cda8cd669d38fcb4311c96d98d13b20b9861f758e",
+  "software": {
+    "mirt": "1.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.1",
+    "statsmodels": "0.15.0"
+  },
+  "canonical_software": {
+    "Python": "3.11.18",
+    "mirt": "1.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.1.1",
+    "statsmodels": "0.15.0"
+  },
+  "canonical_environment_provenance": "Original shard5 job140037432792 install log, same Python3.11/setup/cache and requirements across24 shards",
+  "Python": "3.11.18 (main, Oct 26 2026, 02:48:29) [GCC 15.2.0]",
+  "platform": "Linux-7.0.0-1020-azure-x86_64-with-glibc2.43",
+  "archive": "All raw fitted coefficients/counts/complete candidate diagnostics preserved in the24 canonical global-confirm-shard artifacts; ledger retains every attempted decision/error/hash and coefficient hash. No archived commit may refit missing evidence.",
+  "scope": "Reference true parameters only; N3000/J12 fixed N(0,1), native cold MAP default priors/GH61/max500/tol1e-4. Not a user-DGP guarantee, no FWER/FDR, no RMSEA/CFI/TLI interval certificate."
+}

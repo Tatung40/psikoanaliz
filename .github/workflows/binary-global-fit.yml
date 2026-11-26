@@ -38,44 +38,40 @@ jobs:
           else
             echo "Confirmation still running on frozen source head; all new production inference gates fail closed"
           fi
-  archive-confirmation:
+  parameter-archive:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 10
     env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - name: Observe canonical run completion; no reruns or new numerical work
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python - <<'PY'
-          import urllib.request,json,time,os
-          req=urllib.request.Request("https://api.github.com/repos/Tatung40/psikoanaliz/actions/runs/45856527113",headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],"Accept":"application/vnd.github+json"})
-          for attempt in range(40):
-              with urllib.request.urlopen(req) as response:z=json.load(response)
-              assert z["head_sha"]=="1d166c5310c34136df51f8e58fb09630206512e9"
-              if z["status"]=="completed":
-                  assert z["conclusion"]=="success",z
-                  print("Canonical fixed-final confirmation completed successfully");break
-              time.sleep(30)
-          else:raise RuntimeError("Canonical confirmation pending; no replacement fitting permitted")
-          PY
+      - run: pip install numpy
       - uses: actions/download-artifact@v4
         with:
           pattern: 'global-confirm-*'
           run-id: 45856527113
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: /tmp/global-frozen
-      - name: Verify saved coefficients/counts and archive all repeat decisions; ZERO refits
-        run: python -m validation.binary_global_fit.archive --input /tmp/global-frozen --out /tmp/global-archive
-      - name: Independent SciPy count/CP/MCSE audit of same frozen ledger
-        run: |
-          mkdir -p /tmp/global-evidence-backup
-          cp /tmp/global-archive/* validation/evidence/binary_global_fit/
-          python -m validation.binary_global_fit.audit
+      - name: Materialize existing exact coefficient arrays only; NO fits
+        run: python -m validation.binary_global_fit.archive_parameters --input /tmp/global-frozen --out /tmp/global-parameters
       - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: global-frozen-archive,path: /tmp/global-archive/}
+        with: {name: global-parameter-arrays,path: /tmp/global-parameters/}
+  transport-parameters:
+    needs: parameter-archive
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: {model: [3PL,4PL]}
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: global-parameter-arrays,path: /tmp/global-parameters}
+      - name: Preserve exact binary archive for repository transport; no numerical computation
+        env: {MODEL: '${{ matrix.model }}'}
+        run: |
+          python - <<'PY'
+          import base64,hashlib,json,os,pathlib
+          model=os.environ["MODEL"];b=pathlib.Path("/tmp/global-parameters/COEFFICIENTS_"+model+".npz").read_bytes()
+          print("PARAMETER_INFO "+json.dumps(dict(model=model,size=len(b),git_blob=hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest(),sha256=hashlib.sha256(b).hexdigest())))
+          print("PARAMETER_BASE64 "+base64.b64encode(b).decode())
+          PY

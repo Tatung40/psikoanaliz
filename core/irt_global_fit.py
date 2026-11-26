@@ -7,6 +7,7 @@ from scipy.stats import chi2
 ROOT=Path(__file__).resolve().parents[1]
 PROOF=ROOT/"validation/evidence/binary_global_fit/CERTIFICATION.json"
 VERSION="binary-global-fit-O1"
+COLD_PROFILE={"start":"native default","acceleration":"none","selection":"single fit"}
 
 def cache_fingerprint():
     h=hashlib.sha256()
@@ -38,10 +39,11 @@ def _proof():
     if not p.get("scientific_source_blobs"):raise ValueError("Missing reference source identity.")
     return p
 
-def global_fit(outcome,responses,*,seed=None):
+def global_fit(outcome,responses,*,seed=None,calibration_profile=None):
     """Same complete calibration sample; no estimator, person-score conditioning or hidden deletion."""
     if getattr(outcome,"engine",None)!="python_mirt" or outcome.model not in ("Rasch","1PL","2PL","3PL","4PL"):
         raise ValueError("Native unidimensional binary mirt outcome required.")
+    labels=list(responses.columns) if isinstance(responses,pd.DataFrame) else list(outcome.fit.coef().index)
     x=np.asarray(responses,float);N,J=x.shape
     if not 3<=J<=30 or N<30 or not np.isfinite(x).all() or not np.isin(x,[0,1]).all():raise ValueError("Complete binary N>=30/J3..30 required.")
     if (outcome.n_persons,outcome.n_items)!=(N,J) or int(outcome.fit.n_observations)!=N:raise ValueError("Calibration cohort dimensions differ.")
@@ -91,7 +93,8 @@ def global_fit(outcome,responses,*,seed=None):
     if baseline<=base_rank["df"]:
         row["CFI"]=row["TLI"]=np.nan
         row["Sınırlılık"]+=" Independence baseline has no positive noncentrality; perfect-fit fallback not imputed."
-    eligible=(model in ("3PL","4PL") and outcome.estimation=="MAP" and (N,J)==(3000,12)
+    row["Başlangıç profili"]=str(calibration_profile) if calibration_profile else "UNVERIFIED; scoped inference withheld"
+    eligible=(calibration_profile==COLD_PROFILE and model in ("3PL","4PL") and outcome.estimation=="MAP" and (N,J)==(3000,12)
               and outcome.solver_settings==dict(max_iter=500,tol=1e-4,n_quadpts=61))
     if eligible:
         try:
@@ -105,11 +108,11 @@ def global_fit(outcome,responses,*,seed=None):
             row["Küresel referans p"]=p;row["Küresel yöntem"]=cell["method_label"]
             if cell["method"]=="p_QLI":row["QLI (ayrı istatistik)"]=r["QLI"]
             row["Bilimsel durum"]="SCOPED CERTIFIED — kayıtlı N3000/J12/default cold MAP/GH61/max500/tol1e-4"
-            row["Sınırlılık"]="Kullanıcı DGP’si doğrulanmaz; sertifikalı duyarlılık: "+", ".join(cell["certified_claims"])+". FWER/FDR, diğer N/J ve D4 profili kapsam dışı."
+            row["Sınırlılık"]="Kullanıcı DGP’si doğrulanmaz; sertifikalı duyarlılık: "+", ".join(cell["certified_claims"])+". Eşzamanlı Tip-I üst sınırı ≤.07; tam nominal .05 kontrolü iddia edilmez. FWER/FDR, diğer N/J, çoklu başlangıç ve D4 profili kapsam dışı."
             row["Küresel seed"]=str(seed)
         except (OSError,ValueError,KeyError,np.linalg.LinAlgError) as e:
             row["Sınırlılık"]+=" Scoped global inference withheld: "+str(e)
-    return dict(table=pd.DataFrame([row]),residuals=pd.DataFrame(res,index=outcome.fit.coef().index,columns=outcome.fit.coef().index),rank=rank,scope_profile="MML moments, fixed latent N(0,1), complete binary",
+    return dict(table=pd.DataFrame([row]),residuals=pd.DataFrame(res,index=labels,columns=labels),rank=rank,scope_profile="MML moments, fixed latent N(0,1), complete binary",
                 ordinary_MAP_p="WITHHELD",data_sha256=hashlib.sha256(x.astype(np.uint8).tobytes()).hexdigest())
 
 def comparison_context(outcome,responses):

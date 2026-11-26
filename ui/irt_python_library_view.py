@@ -124,7 +124,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
                     outcome,ms_table,ms_notes=public_call('core.irt_binary_multistart','multistart',x.to_numpy(),model,estimation,**ms_solver)
                     multistart_result=(ms_table,ms_notes)
                 else:outcome=fit_python_mirt(x.to_numpy(),**fit_kwargs)
-            saved=dict(key=key,outcome=outcome,multistart=multistart_result)
+            saved=dict(key=key,outcome=outcome,multistart=multistart_result,
+                       global_calibration_profile={"start":"native default","acceleration":"none","selection":"single fit"} if not multi else None)
             st.session_state[f'python_mirt_fit_{model}']=saved
         except Exception as e:
             saved=None;st.error(f'Kestirim yapılamadı: {e}')
@@ -142,7 +143,8 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     # item data and identical category coding. MAP is not compared by ordinary AIC/BIC.
     pool=st.session_state.setdefault('python_mirt_comparison_pool',{})
     lrt_pool=st.session_state.setdefault('python_mirt_lrt_pool',{})
-    if estimation=='ML':
+    if model=='4PL':pool.pop((pool_key,model),None)  # unresolved ML maxima are not model-selection evidence
+    if estimation=='ML' and model!='4PL':
         try:
             from core.irt_library_diagnostics import library_fit_diagnostics
             diag=library_fit_diagnostics(saved['outcome'].fit)
@@ -162,14 +164,11 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
         st.markdown('### Python model karşılaştırması')
         st.caption('Yalnızca bu oturumda aynı madde verisi, kategori kodlaması ve ML yöntemiyle yakınsamış modeller karşılaştırılır. MAP için klasik AIC/BIC karşılaştırması sunulmaz. Düşük AIC/BIC göreli uyumu gösterir, bilimsel geçerlik kanıtı değildir.')
         compatible=[v for (k,_),v in pool.items() if k==pool_key]
-        if estimation!='ML':
-            st.info('MAP analizi klasik ML AIC/BIC karşılaştırmasına dahil edilmez.')
+        if estimation!='ML' or model=='4PL':
+            st.info('MAP ve doğrulanmamış 4PL ML analizi klasik ML AIC/BIC karşılaştırmasına dahil edilmez.')
         elif len(compatible)<2:
             st.info('Karşılaştırma için aynı veriyle en az iki ML modeli çalıştırın.')
         else:
-            from core.irt_global_fit import nested_lrt
-            contexts=[v for (k,_),v in lrt_pool.items() if k==pool_key]
-            pairs=[nested_lrt(a,b) for a in contexts for b in contexts if a['q']<b['q']]
             comparison=pd.DataFrame(compatible).sort_values(['AIC','Model']).reset_index(drop=True)
             comparison['ΔAIC']=comparison['AIC']-comparison['AIC'].min()
             comparison['ΔBIC']=comparison['BIC']-comparison['BIC'].min()
@@ -273,25 +272,11 @@ def render(data,items=(),id_col=None,group_col=None,model='1PL'):
     if model in BINARY and report.metadata.get('Yakınsama') is True and not report.errors:
         _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables)
     _charts(report,outputs,charts,cols,model)
-    _academic_word(saved,model,cols)
+    _academic_word(saved,model,cols,report.global_fit)
 
 
     if outputs['persons']:
         _independent_person_view(saved,report,data,cols,id_col,model)
-
-def _globalfit(saved,x,model):
-    """Real data/parameters/settings/source identity; reruns never refit or redraw the reference."""
-    from core.irt_global_fit import global_fit,cache_fingerprint
-    saved.setdefault('global_reference_seed',np.random.SeedSequence().generate_state(4).tolist())
-    key=(saved['key'],_data_fingerprint(x),_data_fingerprint(saved['outcome'].fit.coef()),
-         repr(saved['outcome'].solver_settings),cache_fingerprint(),tuple(saved['global_reference_seed']))
-    old=saved.get('global_diagnostics')
-    if old is None or old['key']!=key:
-        result=global_fit(saved['outcome'],x.to_numpy(dtype=int),seed=saved['global_reference_seed'])
-        saved['global_diagnostics']={'key':key,'result':result}
-    record_displayed(saved['global_diagnostics']['result']['table'])
-    return saved['global_diagnostics']['result']
-
 
 def _globalfit(saved,x,model):
     """Data/coefficients/settings/proof-bound diagnostic cache, never refits calibration."""
@@ -301,13 +286,12 @@ def _globalfit(saved,x,model):
     import secrets
     seed=saved.setdefault('global_reference_seed',[secrets.randbits(32) for _ in range(4)])
     key=(saved['key'],_data_fingerprint(x),_data_fingerprint(out.fit.coef()),
-         repr(sorted(out.solver_settings.items())),out.estimation,cache_fingerprint(),tuple(seed))
+         repr(sorted(out.solver_settings.items())),out.estimation,cache_fingerprint(),tuple(seed),repr(saved.get('global_calibration_profile')))
     entry=cache.get(model)
     if not entry or entry['key']!=key:
-        value=global_fit(out,x.to_numpy(),seed=seed)
-        value['residuals'].index=list(x.columns)
-        value['residuals'].columns=list(x.columns)
+        value=global_fit(out,x,seed=seed,calibration_profile=saved.get('global_calibration_profile'))
         entry=cache[model]={'key':key,'value':value}
+    record_displayed(entry['value']['table'],entry['value']['residuals'])
     return entry['value']
 
 
@@ -319,7 +303,6 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         store=st.session_state.setdefault('python_mirt_bundle',{})
         entry=store.get(model)
         bundle_key=(saved['key'],SCORING_VERSION) if model in ('3PL','4PL') else saved['key']
-        global_proof=saved.get('global_diagnostics',{}).get('key')
         global_proof=st.session_state.get('python_mirt_global_fit',{}).get(model,{}).get('key')
         itemfit_proof=None
         if model=='3PL':
@@ -356,7 +339,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
             if itemfit_proof is not None:
                 itemfit_proof=(*itemfit_proof[:-1],tuple(saved.get('p3_reference_seed',[])))
             entry=store[model]={'key':bundle_key,'itemfit_proof':itemfit_proof,'global_proof':global_proof,'itemfit':itemfit,'persons':persons,'inference':inference,'reason':reason,
-                                'onestep':onestep,'onestep_reason':onestep_reason,'itemfit':itemfit,
+                                'onestep':onestep,'onestep_reason':onestep_reason,
                                 'files':bundle(report,persons,inference,reason,itemfit,onestep=onestep)}
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
             st.warning(f'Ek çıktılar üretilemedi: {exc}');return
@@ -386,10 +369,6 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                     sets_table,sets_reason=cache[skey]
                     if sets_table is None:st.info(sets_reason)
                     else:
-                        sets_key=_data_fingerprint(sets_table)
-                        if entry.get('score_sets_proof')!=sets_key:
-                            entry['files']=bundle(report,persons,inference,reason,entry.get('itemfit'),onestep=onestep,score_sets=sets_table)
-                            entry['score_sets_proof']=sets_key
                         sets_key=_data_fingerprint(sets_table)
                         if entry.get('score_sets_fingerprint')!=sets_key:
                             entry['files']=bundle(report,persons,inference,reason,entry.get('itemfit'),onestep=onestep,score_sets=sets_table)
@@ -458,19 +437,20 @@ def _charts(report,outputs,charts,cols,model):
     st.download_button('Madde/test bilgisi ve SEM — CSV',_csv(info),f'{model}_information.csv','text/csv',key=f'python_mirt_information_csv_{model}',on_click='ignore')
 
 
-def _academic_word(saved,model,cols):
+def _academic_word(saved,model,cols,global_diagnostics=None):
     """2PL academic Word report after all results; built once per fit (reports.irt_2pl_academic_docx)."""
     if model!='2PL':return
     st.divider()
     st.markdown('### 📄 Akademik 2PL Raporu')
     store=st.session_state.setdefault('python_mirt_2pl_word',{})
     from reports.academic_docx import REPORT_STANDARD_VERSION
-    if store.get('key')!=saved['key'] or store.get('standard')!=REPORT_STANDARD_VERSION:
+    global_key=_data_fingerprint(global_diagnostics["table"]) if global_diagnostics else None
+    if store.get('key')!=saved['key'] or store.get('standard')!=REPORT_STANDARD_VERSION or store.get('global_key')!=global_key:
         try:
             from reports.irt_2pl_academic_docx import export_2pl_docx
-            store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,docx=export_2pl_docx(saved['outcome'],list(cols)),error=None)
+            store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,global_key=global_key,docx=export_2pl_docx(saved['outcome'],list(cols),**({'global_diagnostics':global_diagnostics} if global_diagnostics else {})),error=None)
         except Exception as exc:
-            store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,docx=None,error=f'{type(exc).__name__}: {exc}')
+            store.clear();store.update(key=saved['key'],standard=REPORT_STANDARD_VERSION,global_key=global_key,docx=None,error=f'{type(exc).__name__}: {exc}')
     if store['docx'] is None:
         st.error('Akademik 2PL Word raporu hazırlanamadı.');st.caption(f"Teknik ayrıntı: {store['error']}");return
     st.download_button('📄 Akademik 2PL Raporu — Word İndir',store['docx'],'python_mirt_2pl_akademik_rapor.docx',
