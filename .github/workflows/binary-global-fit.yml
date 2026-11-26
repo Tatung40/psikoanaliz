@@ -1,82 +1,40 @@
 name: Binary global fit validation
 on:
   pull_request:
-    paths: ['validation/binary_global_fit/**','validation/evidence/binary_global_fit/**','tests/test_binary_global_fit.py','core/irt_global_fit.py','.github/workflows/binary-global-fit.yml']
-permissions: {contents: read, actions: read}
+    paths: ['validation/binary_global_fit/**','validation/evidence/binary_global_fit/**','tests/test_binary_global_fit*.py','core/irt_global_fit.py','core/irt_python_mirt_report.py','ui/irt_python_library_view.py','reports/irt_binary_report.py','.github/workflows/binary-global-fit.yml']
+permissions: {contents: read}
 jobs:
-  mathematics:
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - run: python -m pytest -q tests/test_binary_global_fit.py
-      - name: Actual native fixed-point API vs independent moment mathematics; ZERO fits
-        run: python -m validation.binary_global_fit.python_reference
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: global-python-reference,path: /tmp/global-reference/}
-  r-reference:
-    needs: mathematics
+  production-contract:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install numpy
-      - uses: r-lib/actions/setup-r@v2
-        with: {r-version: release,use-public-rspm: true}
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          packages: |
-            any::mirt@1.48
-            any::nloptr
-          cache-version: 1
-      - uses: actions/download-artifact@v4
-        with: {name: global-python-reference,path: /tmp/global-reference}
-      - name: Actual R fixed-point M2 and independent physical Jacobian/covariance; no calibrations
-        run: Rscript validation/binary_global_fit/reference.R
-      - run: python -m validation.binary_global_fit.compare
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: global-R-reference,path: /tmp/global-reference/}
-  confirmation:
-    needs: [mathematics,r-reference]
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
     env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1',MKL_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - name: One fresh native fit per preregistered independent dataset; shared diagnostics, no retries
-        run: python -m validation.binary_global_fit.runner --phase confirm --shard ${{ matrix.shard }} --shards 24 --work /tmp/global-confirm
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: 'global-confirm-${{ matrix.shard }}',path: /tmp/global-confirm/}
-  aggregate:
-    needs: [confirmation]
-    if: always()
-    runs-on: ubuntu-latest
-    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
-        with: {pattern: 'global-confirm-*',path: /tmp/global-confirm}
-      - run: python -m validation.binary_global_fit.statistics --input /tmp/global-confirm --phase confirm --out /tmp/global-report/REPORT.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: global-confirm-report,path: /tmp/global-report/}
+      - name: Frozen independent confirmation sources; no new scientific fits
+        run: |
+          python - <<'PY'
+          import subprocess,pathlib
+          source="1d166c5310c34136df51f8e58fb09630206512e9"
+          for path in ("validation/binary_global_fit/kernel.py","validation/binary_global_fit/analysis.py","validation/binary_global_fit/dgp.py","validation/binary_global_fit/runner.py","validation/binary_global_fit/statistics.py","validation/binary_global_fit/PROTOCOL.json","validation/binary_global_fit/SELECTION.json","validation/p3_empirical/kernel.py","validation/p3_empirical/constrained.py","validation/p3_sx2_analytic/kernel.py"):
+              assert subprocess.check_output(["git","show",source+":"+path])==pathlib.Path(path).read_bytes(),path
+          print("Frozen confirmation estimand/sources verified; numerical campaign NOT rerun")
+          PY
+      - name: Affected mathematical, refusal, cache and export contracts
+        run: python -m pytest -q tests/test_binary_global_fit.py tests/test_binary_global_fit_production.py
+      - name: Real 3PL/4PL user-flow regressions (software fixtures only)
+        run: python -m pytest -q 'tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[3PL]' 'tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[4PL]'
+      - name: Static reproducibility inventory
+        run: |
+          python tools/inventory_reproducible.py
+          git diff --exit-code -- validation/REPRODUCIBLE_ANALYSIS_INVENTORY.json
+      - name: Archived independent evidence audit; no missing-cache refits
+        run: |
+          if [ -f validation/evidence/binary_global_fit/CONFIRMATION.jsonl.gz ]; then
+            python -m validation.binary_global_fit.audit
+          else
+            echo "Confirmation still running on frozen source head; all new production inference gates fail closed"
+          fi

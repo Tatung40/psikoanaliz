@@ -15,8 +15,9 @@ KINDS = ("ICC", "IIC", "TIF", "SEM", "Theta dağılımı", "Wright haritası", "
 FREE = {"Rasch": "b", "1PL": "b", "2PL": "ab", "3PL": "abc", "4PL": "abcd"}
 
 
-def kinds(model):
-    return KINDS if model in ("3PL", "4PL") else KINDS[:-1]
+def kinds(model,global_fit=False):
+    base=KINDS if model in ("3PL", "4PL") else KINDS[:-1]
+    return base+(("Korelasyon artıkları",) if global_fit else ())
 
 
 def _theta(persons):
@@ -31,14 +32,20 @@ def png_bytes(report, persons, kind, selected=None):
     matplotlib.use("Agg")
     from matplotlib.figure import Figure
     model = report.model
-    if kind not in kinds(model):
+    if kind not in kinds(model,global_fit=bool(getattr(report,'global_fit',None))):
         raise ValueError(f"{kind} bu model için tanımlı değil.")
     items = report.parameters
     names = items["Madde"].astype(str).tolist()
     info = report.information
     fig = Figure(figsize=(9, 5.5), layout="constrained")
     ax = fig.add_subplot(111)
-    if kind in ("ICC", "IIC"):
+    if kind=="Korelasyon artıkları":
+        residual=report.global_fit["residuals"]
+        image=ax.imshow(residual.to_numpy(float),cmap="RdBu_r",vmin=-1,vmax=1)
+        fig.colorbar(image,ax=ax,label="Gözlenen − model korelasyonu (betimsel)")
+        ax.set_xticks(range(len(residual)),labels=residual.columns,rotation=90)
+        ax.set_yticks(range(len(residual)),labels=residual.index)
+    elif kind in ("ICC", "IIC"):
         chosen = list(selected or names[:8])
         if set(chosen) - set(names):
             raise ValueError("Bilinmeyen madde.")
@@ -112,11 +119,16 @@ def method_text(report, inference_reason, persons=None, itemfit=None):
             ) + uncertainty + fit_note + person_note + p3_note + (f"SH durumu: {inference_reason}\n" if inference_reason else "") + (
             "Wright haritası (2PL–4PL): b her modelde aynı θ ölçeğindedir; yalnız 1PL/2PL'de P = .5 noktasıdır.\n")
 
-def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=None):
+def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=None, score_sets=None):
     """(xlsx bytes, zip bytes) with every table, the method text and all applicable 300 dpi PNGs."""
     from reports.irt_b14_report import safe_frame
     tables = {"Model_Ozeti": pd.DataFrame([report.metadata]), "Madde_Parametreleri": report.parameters,
               "Kisi_Yetenekleri": persons, "Bilgi_SEM": report.information}
+    if getattr(report,"global_fit",None):
+        tables["Global_Uyum"]=report.global_fit["table"]
+        tables["Global_Korelasyon_Artiklari"]=report.global_fit["residuals"].rename_axis("Madde").reset_index()
+    if score_sets is not None:
+        tables["4PL_CD_Skor_Guven_Kumeleri"]=score_sets
     if inference is not None:
         tables["Parametre_SH_GA"] = inference
     if itemfit is not None and not itemfit.empty:
@@ -130,9 +142,12 @@ def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=N
     archive = io.BytesIO()
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr(f"{report.model}_rapor.xlsx", xlsx.getvalue())
-        z.writestr(f"{report.model}_yontem.txt", method_text(report, inference_reason, persons, itemfit))
+        z.writestr(f"{report.model}_yontem.txt", method_text(report, inference_reason, persons, itemfit)+
+                   "\nKüresel uyum: tam ilk/ikinci moment kovaryansı, serbest/bağlı Jacobian, etkin rank. "+
+                   "MAP RMSEA2/CFI/TLI betimseldir; M2 χ² ve RMSEA GA sertifikası değildir. "+
+                   "Ayrı QLI varsa M2 yerine konulmaz. C(α) kümeleri ayrı frekansçı skor ters çevirmedir; Wald GA değildir.\n")
         for name, frame in tables.items():
             z.writestr(f"tablolar/{name}.csv", safe_frame(frame).to_csv(index=False))
-        for kind in kinds(report.model):
+        for kind in kinds(report.model,global_fit=bool(getattr(report,"global_fit",None))):
             z.writestr(f"grafikler/{kind}.png", png_bytes(report, persons, kind))
     return xlsx.getvalue(), archive.getvalue()
