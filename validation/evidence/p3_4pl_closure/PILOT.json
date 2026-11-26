@@ -1,0 +1,180 @@
+{
+  "phase": "pilot",
+  "records": 400,
+  "methods": {
+    "p_constrained": {
+      "method": "p_constrained",
+      "phase": "pilot",
+      "null_R": 100,
+      "TypeI": 0.05333333333333333,
+      "MCSE": 0.0066498103396496104,
+      "item_counts": [
+        5,
+        7,
+        5,
+        6,
+        6,
+        5,
+        5,
+        3,
+        4,
+        5,
+        8,
+        5
+      ],
+      "upper": [
+        0.1463503218668072,
+        0.17467695268372885,
+        0.1463503218668072,
+        0.16072728231433595,
+        0.16072728231433595,
+        0.1463503218668072,
+        0.1463503218668072,
+        0.11583075841228972,
+        0.13143967738892068,
+        0.1463503218668072,
+        0.18827291178229671,
+        0.1463503218668072
+      ],
+      "worst_upper": 0.18827291178229671,
+      "refusal": 0,
+      "dataset_refusal": 0,
+      "converged": 400,
+      "runtime_median": 0.17148887199999407,
+      "runtime_P95": 0.26557030045000574,
+      "identity_max": 4.760636329592671e-13,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "detected": 41,
+          "power": 0.41,
+          "MCSE": 0.04918333050943175,
+          "lower": 0.29325037331649645,
+          "upper": 0.5344866443944548,
+          "refusal": 0,
+          "power_gate": true,
+          "complete": false
+        },
+        "local_dependence": {
+          "R": 100,
+          "detected": 3,
+          "power": 0.03,
+          "MCSE": 0.01705872210923198,
+          "lower": 0.004107630274704333,
+          "upper": 0.0992400855936115,
+          "refusal": 0,
+          "power_gate": false,
+          "complete": false
+        },
+        "two_stage": {
+          "R": 100,
+          "detected": 4,
+          "power": 0.04,
+          "MCSE": 0.019595917942265423,
+          "lower": 0.007887926511447634,
+          "upper": 0.11408893175308445,
+          "refusal": 0,
+          "power_gate": false,
+          "complete": false
+        }
+      },
+      "gates": {
+        "size": false,
+        "MCSE": false,
+        "pooled_lower": true,
+        "refusal": true,
+        "identity": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "errors": {}
+    },
+    "p_constrained_standardized": {
+      "method": "p_constrained_standardized",
+      "phase": "pilot",
+      "null_R": 100,
+      "TypeI": 0.035,
+      "MCSE": 0.0051872891354382035,
+      "item_counts": [
+        5,
+        4,
+        3,
+        5,
+        3,
+        4,
+        1,
+        2,
+        0,
+        6,
+        7,
+        2
+      ],
+      "upper": [
+        0.1463503218668072,
+        0.13143967738892068,
+        0.11583075841228972,
+        0.1463503218668072,
+        0.11583075841228972,
+        0.13143967738892068,
+        0.08111030211894289,
+        0.09924242144565981,
+        0.05987070098981372,
+        0.16072728231433595,
+        0.17467695268372885,
+        0.09924242144565981
+      ],
+      "worst_upper": 0.17467695268372885,
+      "refusal": 0,
+      "dataset_refusal": 0,
+      "converged": 400,
+      "runtime_median": 0.17148887199999407,
+      "runtime_P95": 0.26557030045000574,
+      "identity_max": 4.760636329592671e-13,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "detected": 20,
+          "power": 0.2,
+          "MCSE": 0.04,
+          "lower": 0.11361675058609902,
+          "upper": 0.31245182531573273,
+          "refusal": 0,
+          "power_gate": true,
+          "complete": false
+        },
+        "local_dependence": {
+          "R": 100,
+          "detected": 68,
+          "power": 0.68,
+          "MCSE": 0.0466476151587624,
+          "lower": 0.5574878564524599,
+          "upper": 0.786997898410416,
+          "refusal": 0,
+          "power_gate": true,
+          "complete": false
+        },
+        "two_stage": {
+          "R": 100,
+          "detected": 4,
+          "power": 0.04,
+          "MCSE": 0.019595917942265423,
+          "lower": 0.007887926511447634,
+          "upper": 0.11408893175308445,
+          "refusal": 0,
+          "power_gate": false,
+          "complete": false
+        }
+      },
+      "gates": {
+        "size": false,
+        "MCSE": false,
+        "pooled_lower": false,
+        "refusal": true,
+        "identity": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "errors": {}
+    }
+  }
+}

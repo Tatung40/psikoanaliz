@@ -1,0 +1,87 @@
+{
+  "independent_arithmetic": "PASS",
+  "null_R": 6000,
+  "power_R_each": 600,
+  "TypeI": 0.033819444444444444,
+  "MCSE": 0.0006968313658249146,
+  "item_counts": [
+    221,
+    217,
+    213,
+    212,
+    179,
+    184,
+    194,
+    179,
+    205,
+    208,
+    222,
+    201
+  ],
+  "upper": [
+    0.04434448171334634,
+    0.043617699281954546,
+    0.04289028989659135,
+    0.04270833761467325,
+    0.03667936083159275,
+    0.03759612978156335,
+    0.03942598717102464,
+    0.03667936083159275,
+    0.04143352148405192,
+    0.04198012054695054,
+    0.044526081278207896,
+    0.04070412599201063
+  ],
+  "worst_upper": 0.044526081278207896,
+  "power": {
+    "nonmonotone": {
+      "R": 600,
+      "rejections": 117,
+      "power": 0.195,
+      "lower": 0.15769145062660242,
+      "upper": 0.23663973182758977,
+      "refusal": 0
+    },
+    "local_dependence": {
+      "R": 600,
+      "rejections": 366,
+      "power": 0.61,
+      "lower": 0.5608556708230339,
+      "upper": 0.6575902691241874,
+      "refusal": 0
+    },
+    "two_stage": {
+      "R": 600,
+      "rejections": 20,
+      "power": 0.03333333333333333,
+      "lower": 0.01825949550683045,
+      "upper": 0.05524137628073311,
+      "refusal": 0
+    }
+  },
+  "refusal": 0,
+  "identity_max": 7.105427357601002e-13,
+  "all_native_converged": 7800,
+  "records": 7800,
+  "source": "50127d6ce26352d92e445eea6747c9bc02e27aa2",
+  "run": "45833050428",
+  "gates": {
+    "size": true,
+    "MCSE": true,
+    "pooled_lower": true,
+    "refusal": true,
+    "identity": true,
+    "complete": true,
+    "selected_before_confirmation": true
+  },
+  "certified_claims": [
+    "nonmonotone",
+    "local_dependence"
+  ],
+  "no_new_fits": true,
+  "full_original_archive_sha256": "c93d1f7494b3313766b21d81bf672a3f8eff9751950d8ecdafdefb79c99e8115",
+  "full_original_archive_git_blob": "dd068341d26e2f33f6dcaab638a06d3faaf02383",
+  "archive_sha256": "1462180d605ac9a9129bbc6e81a54c4bbbe79562b67bef8914fd3353354e6a3d",
+  "archive_git_blob": "2e40fa8fdc4647655aceb99b6977ed7a92063290",
+  "ledger_schema": "selected-Q-v1: p_grid/4096 is the EXACT p; Q/native/analysis S-X2 floats unchanged; all seeds, hashes, failures retained. Unselected statistics and full diagnostics remain original canonical artifacts."
+}

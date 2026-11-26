@@ -1,0 +1,44 @@
+name: 4PL P3 distinguishable-alternative validation
+on:
+  pull_request:
+    paths: ['validation/p3_4pl_closure/**','validation/evidence/p3_4pl_closure/**','tests/test_p3_4pl_closure.py','tests/test_p3_4pl_production.py','core/irt_4pl_itemfit.py','.github/workflows/p3-4pl-closure.yml']
+permissions:
+  contents: read
+jobs:
+  mathematics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: Independent algebra, derivative/projection, bound and failure-policy checks
+        run: python -m pytest -q tests/test_p3_4pl_closure.py tests/test_p3_absorption.py tests/test_p3_constrained.py
+  frozen-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: Committed raw ledger, exact gates and21 protected groups; ZERO fits or simulated data
+        run: python -m validation.p3_4pl_closure.frozen
+  production-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: One fixed native regression calibration; UI/export/refusal/cache/portable-code contract and actual latency
+        run: >-
+          python -m pytest -q -s tests/test_p3_4pl_production.py
+          tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[4PL]
+          tests/test_python_mirt_nine_results.py::test_missing_api_and_nonconvergence_are_not_success[4PL]
+          tests/test_reproducible.py::test_inventory_is_current_and_includes_missing_data_page

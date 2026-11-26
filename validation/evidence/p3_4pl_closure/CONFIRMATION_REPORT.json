@@ -1,0 +1,96 @@
+{
+  "phase": "confirm",
+  "records": 7800,
+  "methods": {
+    "p_constrained_standardized": {
+      "method": "p_constrained_standardized",
+      "phase": "confirm",
+      "null_R": 6000,
+      "TypeI": 0.03381944444444444,
+      "MCSE": 0.0006968313658249146,
+      "item_counts": [
+        221,
+        217,
+        213,
+        212,
+        179,
+        184,
+        194,
+        179,
+        205,
+        208,
+        222,
+        201
+      ],
+      "upper": [
+        0.04434448171334634,
+        0.04361769928195455,
+        0.04289028989659135,
+        0.04270833761467325,
+        0.03667936083159275,
+        0.03759612978156335,
+        0.03942598717102465,
+        0.03667936083159275,
+        0.04143352148405192,
+        0.04198012054695055,
+        0.044526081278207896,
+        0.040704125992010634
+      ],
+      "worst_upper": 0.044526081278207896,
+      "refusal": 0,
+      "dataset_refusal": 0,
+      "converged": 7800,
+      "runtime_median": 0.16393607999998494,
+      "runtime_P95": 0.25738884680000856,
+      "identity_max": 7.105427357601002e-13,
+      "power": {
+        "nonmonotone": {
+          "R": 600,
+          "detected": 117,
+          "power": 0.195,
+          "MCSE": 0.016174826119621812,
+          "lower": 0.15769145062660242,
+          "upper": 0.2366397318275898,
+          "refusal": 0,
+          "power_gate": true,
+          "complete": true
+        },
+        "local_dependence": {
+          "R": 600,
+          "detected": 366,
+          "power": 0.61,
+          "MCSE": 0.019912307751739876,
+          "lower": 0.5608556708230339,
+          "upper": 0.6575902691241875,
+          "refusal": 0,
+          "power_gate": true,
+          "complete": true
+        },
+        "two_stage": {
+          "R": 600,
+          "detected": 20,
+          "power": 0.03333333333333333,
+          "MCSE": 0.0073282810879294,
+          "lower": 0.01825949550683045,
+          "upper": 0.05524137628073312,
+          "refusal": 0,
+          "power_gate": false,
+          "complete": true
+        }
+      },
+      "gates": {
+        "size": true,
+        "MCSE": true,
+        "pooled_lower": true,
+        "refusal": true,
+        "identity": true,
+        "complete": true
+      },
+      "certified_claims": [
+        "nonmonotone",
+        "local_dependence"
+      ],
+      "errors": {}
+    }
+  }
+}

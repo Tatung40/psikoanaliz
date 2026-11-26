@@ -99,6 +99,11 @@ def method_text(report, inference_reason, persons=None, itemfit=None):
                  "Klasik χ² p değeri NOT CERTIFIED olarak kapalıdır. Karar madde düzeyindedir; FWER/FDR sertifikası değildir.\n"
                  "Doğrulama yalnız kayıtlı N3000/J12/3PL MAP/GH61/default-prior/N(0,1) tasarımıdır; kullanıcı tasarımı doğrulanmadı. "
                  "Kabul toleransı 24 model-madde eşzamanlı Tip-I üst sınırı ≤.07; tam nominal .05 kontrolü iddia edilmez. Seed tablolardadır.\n")
+    if itemfit is not None and "4PL Q kısıtlı referans p" in itemfit:
+        p3_note+=("4PL Q: ayrı kovaryans-standartlaştırılmış artık istatistiği; S-X² veya olağan χ² p değeri değildir. "
+                  "Kısıtlı Gauss MAP referansı B4095, bağımsız1024 eğitim çekilişi; yalnız kayıtlı N3000/J12/default MAP/GH61 tasarımı. "
+                  "Nonmonotonluk ve yerel bağımlılık duyarlılığı kapsamda; iki aşamalı şekil gücü doğrulanmadı. "
+                  "Kullanıcı DGP’si, FWER/FDR ve tam nominal .05 kontrolü sertifikalanmaz.\n")
     return ("PsikoAnaliz — İkili MTK rapor paketi\n"
             f"Model: {report.model}\nMotor: Python mirt 1.2.0 (tek kestirim altyapısı)\n"
             f"N: {meta.get('N')} | Madde: {meta.get('Madde')} | Yakınsama: {meta.get('Yakınsama')}\n"
