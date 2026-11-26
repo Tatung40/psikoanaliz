@@ -1,0 +1,87 @@
+name: P3 empirical covariance and standardized residual validation
+on:
+  pull_request:
+    paths: ['validation/p3_empirical/**','tests/test_p3_empirical.py','.github/workflows/p3-empirical.yml']
+permissions:
+  contents: read
+jobs:
+  mathematics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    outputs:
+      phase: ${{ steps.plan.outputs.phase }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q tests/test_p3_empirical.py
+      - id: plan
+        run: echo "phase=$(python -c 'import json;print(json.load(open("validation/p3_empirical/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
+      - name: Exact native package and runtime source provenance
+        run: |
+          mkdir -p /tmp/p3-runtime
+          pip freeze > /tmp/p3-runtime/packages.txt
+          python - <<'PY'
+          import inspect,json,mirt
+          import mirt.models.dichotomous as d
+          from pathlib import Path
+          source=inspect.getsource(d)
+          Path("/tmp/p3-runtime/native_dichotomous.py").write_text(source)
+          print("MIRT_VERSION",mirt.__version__)
+          print("NATIVE_BOUND_LINES",[s for s in source.splitlines() if any(k in s.lower() for k in ("bounds","0.1,","5.0","-6.0","0.5"))])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: p3-runtime, path: /tmp/p3-runtime/}
+  pilot:
+    needs: mathematics
+    if: needs.mathematics.outputs.phase == 'pilot'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        model: ['3PL','4PL']
+        shard: [0,1]
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: /tmp/p3-data/
+          key: p3-m1-pilot-${{ matrix.model }}-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/PROTOCOL.json') }}-${{ github.run_id }}
+          restore-keys: p3-m1-pilot-${{ matrix.model }}-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/PROTOCOL.json') }}-
+      - name: New development-only paired candidates; one native fit per dataset
+        run: |
+          python -u validation/p3_empirical/runner.py --model '${{ matrix.model }}' --root 202611261001 --R 100 --shard '${{ matrix.shard }}' --shards 2 --work /tmp/p3-data --expected
+          python -u validation/p3_empirical/runner.py --model '${{ matrix.model }}' --root 202611261002 --R 150 --shard '${{ matrix.shard }}' --shards 2 --work /tmp/p3-data --alt
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: /tmp/p3-data/
+          key: p3-m1-pilot-${{ matrix.model }}-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/PROTOCOL.json') }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'p3-m1-${{ matrix.model }}-${{ matrix.shard }}', path: /tmp/p3-data/}
+  aggregate:
+    needs: [mathematics,pilot]
+    if: always() && needs.pilot.result == 'success'
+    runs-on: ubuntu-latest
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: p3-m1-*, path: /tmp/p3-input, merge-multiple: true}
+      - run: python -m validation.p3_empirical.aggregate --input /tmp/p3-input --phase pilot --out /tmp/p3-output/REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: p3-m1-summary, path: /tmp/p3-output/}
