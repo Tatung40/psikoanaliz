@@ -45,27 +45,27 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: global-R-reference,path: /tmp/global-reference/}
-  pilot:
+  confirmation:
     needs: [mathematics,r-reference]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
-        shard: [0,1,2,3,4,5,6,7]
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
     env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1',MKL_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - name: One native calibration shared by all prospective diagnostic candidates
-        run: python -m validation.binary_global_fit.runner --phase pilot --shard ${{ matrix.shard }} --shards 8 --work /tmp/global-pilot
+      - name: One fresh native fit per preregistered independent dataset; shared diagnostics, no retries
+        run: python -m validation.binary_global_fit.runner --phase confirm --shard ${{ matrix.shard }} --shards 24 --work /tmp/global-confirm
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: 'global-pilot-${{ matrix.shard }}',path: /tmp/global-pilot/}
+        with: {name: 'global-confirm-${{ matrix.shard }}',path: /tmp/global-confirm/}
   aggregate:
-    needs: [pilot]
+    needs: [confirmation]
     if: always()
     runs-on: ubuntu-latest
     env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1'}
@@ -75,8 +75,8 @@ jobs:
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
       - uses: actions/download-artifact@v4
-        with: {pattern: 'global-pilot-*',path: /tmp/global-pilot}
-      - run: python -m validation.binary_global_fit.statistics --input /tmp/global-pilot --phase pilot --out /tmp/global-report/REPORT.json
+        with: {pattern: 'global-confirm-*',path: /tmp/global-confirm}
+      - run: python -m validation.binary_global_fit.statistics --input /tmp/global-confirm --phase confirm --out /tmp/global-report/REPORT.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: global-pilot-report,path: /tmp/global-report/}
+        with: {name: global-confirm-report,path: /tmp/global-report/}

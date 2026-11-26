@@ -49,3 +49,11 @@ def main():
     print("NATIVE_REFERENCE_JSON "+json.dumps([{k:v for k,v in r.items() if k not in ("mu","Xi","D","observed")} for r in records],default=lambda x:x.item()),flush=True)
     assert all(r["numerical_identity_pass"] for r in records)
 if __name__=="__main__":main()
+
+# Prospective exact operating characteristics of the registered final gates.
+from scipy.stats import binom
+from statsmodels.stats.proportion import proportion_confint
+n=6000
+eligible=[k for k in range(n+1) if proportion_confint(k,n,alpha=.05,method="beta")[1]<=.07 and proportion_confint(k,n,alpha=.05,method="beta")[0]>=.03 and np.sqrt((k/n)*(1-k/n)/n)<=.004]
+assert eligible
+print("DESIGN_PRECISION_JSON "+json.dumps({"R":n,"accepted_count_range":[min(eligible),max(eligible)],"pass_probability_at_05":float(binom.cdf(max(eligible),n,.05)-binom.cdf(min(eligible)-1,n,.05))}))
