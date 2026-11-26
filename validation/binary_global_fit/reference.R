@@ -64,7 +64,7 @@ for(model in unique(par$model)){
    active<-which(sv$item==colnames(dat)[j] & sv$est)
    for(rr in active){
      nm<-sv$name[rr];ii<-match(nm,it@parnames)
-     v1<-colSums(dp[,ii,drop=FALSE]*quad$weight)
+     v1<-numeric(J);v1[j]<-sum(dp[,ii]*quad$weight)
      v2<-vapply(seq_len(nrow(pairs)),function(k){
        s<-pairs[k,];if(!j %in% s)return(0)
        sum(dp[,ii]*P[,setdiff(s,j)]*quad$weight)
@@ -90,10 +90,12 @@ for(model in unique(par$model)){
  sn$est[sn$name %in% c("MEAN_1","COV_11")]<-FALSE
  no<-mirt(dat,1,itemtype="2PL",pars=sn,TOL=NaN,SE=FALSE,verbose=FALSE)
  null_exact<-M2(no,calcNull=FALSE,quadpts=2)
+ independent_index<-list(CFI=getFromNamespace("cfi","mirt")(independent,null_exact$M2,length(sets)-rank,null_exact$df),
+                          TLI=getFromNamespace("tli","mirt")(independent,null_exact$M2,length(sets)-rank,null_exact$df))
  exact_index<-list(CFI=getFromNamespace("cfi","mirt")(ref$M2,null_exact$M2,ref$df,null_exact$df),
                    TLI=getFromNamespace("tli","mirt")(ref$M2,null_exact$M2,ref$df,null_exact$df))
  result[[model]]<-list(native_R_QR_rank=qnative$rank,native_R_columns=ncol(DN),native_R_reconstructed=native_reconstructed,
-  native_dP_audit=dp_audit,exact_independence=as.list(null_exact[1,]),matched_baseline_indices=exact_index,mirt=as.list(ref[1,]),independent_R_M2=independent,independent_R_df=length(sets)-rank,
+  native_dP_audit=dp_audit,exact_independence=as.list(null_exact[1,]),matched_baseline_indices=exact_index,independent_indices=independent_index,mirt=as.list(ref[1,]),independent_R_M2=independent,independent_R_df=length(sets)-rank,
   means=mu,Xi=Xi,Jacob=D,Jacobian_step_error=max(abs(D-D2)),rank_singular=ss$d,source_R=R.version.string,version_mirt=as.character(packageVersion("mirt")))
 }
 jsonlite::write_json(result,file.path(dir,"R.json"),auto_unbox=TRUE,pretty=TRUE,digits=17)
