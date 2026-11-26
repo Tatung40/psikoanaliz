@@ -262,11 +262,12 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
         store=st.session_state.setdefault('python_mirt_bundle',{})
         entry=store.get(model)
         bundle_key=(saved['key'],SCORING_VERSION) if model in ('3PL','4PL') else saved['key']
+        itemfit_proof=None
         if model=='3PL':
             from core.irt_sx2_scoped import cache_fingerprint
-            bundle_key=(bundle_key,'p3-constrained-gaussian-v1',cache_fingerprint())
+            itemfit_proof=('p3-constrained-gaussian-v1',cache_fingerprint())
         try:
-          if entry and entry['key']==bundle_key:
+          if entry and entry['key']==bundle_key and entry.get('itemfit_proof')==itemfit_proof:
             persons,inference,reason=entry['persons'],entry['inference'],entry['reason']
             onestep,onestep_reason=entry.get('onestep'),entry.get('onestep_reason')
             record_displayed(*[v for v in (persons,inference,onestep) if v is not None])  # link cached values to their producers
@@ -288,7 +289,7 @@ def _binary_extras(saved,report,data,x,cols,id_col,model,rasch_tables):
                 itemfit=safe_frame(_itemfit(saved,x,model))
             except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError):
                 itemfit=None
-            entry=store[model]={'key':bundle_key,'persons':persons,'inference':inference,'reason':reason,
+            entry=store[model]={'key':bundle_key,'itemfit_proof':itemfit_proof,'persons':persons,'inference':inference,'reason':reason,
                                 'onestep':onestep,'onestep_reason':onestep_reason,
                                 'files':bundle(report,persons,inference,reason,itemfit,onestep=onestep)}
         except (AttributeError,ValueError,TypeError,KeyError,ImportError,RuntimeError) as exc:
