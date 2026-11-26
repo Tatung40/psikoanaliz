@@ -25,7 +25,7 @@ def pav(values,weights):
     return out
 
 def bound(q,j=0):
-    t=E.S-E.X[:,j]
+    t=(E.S-E.X[:,j]).astype(np.int64)
     mass=np.bincount(t,weights=q,minlength=12)
     rate=np.bincount(t,weights=q*E.X[:,j],minlength=12)/mass
     null=pav(rate,mass)
