@@ -32,7 +32,7 @@ jobs:
         if: always()
         with: {name: 'kopt-${{ matrix.shard }}', path: out/}
   aggregate:
-    needs: confirm
+    needs: [plan, confirm]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
