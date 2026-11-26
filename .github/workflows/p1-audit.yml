@@ -1,0 +1,21 @@
+name: P1 closure-J read-only audit
+on:
+  pull_request:
+    paths: ['validation/p1_audit/**', '.github/workflows/p1-audit.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'j-*', path: /tmp/j, merge-multiple: true, run-id: '45665227625', github-token: '${{ github.token }}'}
+      - run: |
+          sha256sum /tmp/j/null_*.jsonl | sha256sum
+          python validation/p1_audit/audit.py /tmp/j /tmp/j/AUDIT.json
+      - uses: actions/upload-artifact@v4
+        with: {name: p1-audit, path: /tmp/j/AUDIT.json}
