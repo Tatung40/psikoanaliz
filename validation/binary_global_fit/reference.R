@@ -56,8 +56,45 @@ for(model in unique(par$model)){
  obj@Model$Theta<-matrix(quad$theta,ncol=1)
  obj@Internals$Prior<-list(quad$weight)
  ref<-M2(obj,calcNull=TRUE,quadpts=61,use_dentype_estimate=TRUE)
- result[[model]]<-list(mirt=as.list(ref[1,]),independent_R_M2=independent,independent_R_df=length(sets)-rank,
+ # Reconstruct the ACTUAL native-R derivative/QR path to diagnose rank/parameterization effects.
+ columns<-list();labels<-character()
+ dp_audit<-list()
+ for(j in seq_len(J)){
+   it<-items[[j]];dp<-getFromNamespace("dP","mirt")(it,matrix(quad$theta,ncol=1))
+   active<-which(sv$item==colnames(dat)[j] & sv$est)
+   for(rr in active){
+     nm<-sv$name[rr];ii<-match(nm,it@parnames)
+     v1<-colSums(dp[,ii,drop=FALSE]*quad$weight)
+     v2<-vapply(seq_len(nrow(pairs)),function(k){
+       s<-pairs[k,];if(!j %in% s)return(0)
+       sum(dp[,ii]*P[,setdiff(s,j)]*quad$weight)
+     },numeric(1))
+     columns[[length(columns)+1]]<-c(v1,v2);labels<-c(labels,paste(j,nm))
+     plus<-it;minus<-it;plus@par[ii]<-it@par[ii]+1e-5;minus@par[ii]<-it@par[ii]-1e-5
+     fd<-(getFromNamespace("ProbTrace","mirt")(plus,matrix(quad$theta,ncol=1))[,2]-getFromNamespace("ProbTrace","mirt")(minus,matrix(quad$theta,ncol=1))[,2])/2e-5
+     scale<-sum(dp[,ii]*fd)/sum(fd^2)
+     dp_audit[[length(dp_audit)+1]]<-list(item=j,parameter=nm,scale=scale,shape_error=sqrt(sum((dp[,ii]-scale*fd)^2))/sqrt(sum(dp[,ii]^2)))
+   }
+ }
+ DN<-do.call(cbind,columns)
+ if(model=="common1PL"){
+   ai<-grep("a1",labels);DN[,ai[1]]<-rowSums(DN[,ai,drop=FALSE]);DN<-DN[,-ai[-1],drop=FALSE]
+ }
+ qnative<-qr(DN);comp<-qr.Q(qnative,complete=TRUE)[,(ncol(DN)+1):nrow(DN),drop=FALSE]
+ vv<-crossprod(comp,obs-mu)
+ native_reconstructed<-as.numeric(nrow(X)*crossprod(vv,solve(crossprod(comp,Xi%*%comp),vv)))
+ # Exact independence margins, not the internally approximate R null EM.
+ sn<-mirt(dat,1,itemtype="2PL",pars="values",verbose=FALSE)
+ sn$value[sn$name=="a1"]<-0;sn$est[sn$name=="a1"]<-FALSE
+ for(j in seq_len(J))sn$value[sn$item==colnames(dat)[j]&sn$name=="d"]<-qlogis(mean(X[,j]))
+ sn$est[sn$name %in% c("MEAN_1","COV_11")]<-FALSE
+ no<-mirt(dat,1,itemtype="2PL",pars=sn,TOL=NaN,SE=FALSE,verbose=FALSE)
+ null_exact<-M2(no,calcNull=FALSE,quadpts=2)
+ exact_index<-list(CFI=getFromNamespace("cfi","mirt")(ref$M2,null_exact$M2,ref$df,null_exact$df),
+                   TLI=getFromNamespace("tli","mirt")(ref$M2,null_exact$M2,ref$df,null_exact$df))
+ result[[model]]<-list(native_R_QR_rank=qnative$rank,native_R_columns=ncol(DN),native_R_reconstructed=native_reconstructed,
+  native_dP_audit=dp_audit,exact_independence=as.list(null_exact[1,]),matched_baseline_indices=exact_index,mirt=as.list(ref[1,]),independent_R_M2=independent,independent_R_df=length(sets)-rank,
   means=mu,Xi=Xi,Jacob=D,Jacobian_step_error=max(abs(D-D2)),rank_singular=ss$d,source_R=R.version.string,version_mirt=as.character(packageVersion("mirt")))
 }
 jsonlite::write_json(result,file.path(dir,"R.json"),auto_unbox=TRUE,pretty=TRUE,digits=17)
-cat("R_REFERENCE_SUMMARY",jsonlite::toJSON(lapply(result,function(z)list(mirt=z$mirt,independent=z$independent_R_M2,df=z$independent_R_df,Jacobian_step_error=z$Jacobian_step_error)),auto_unbox=TRUE,digits=17),"\n")
+cat("R_REFERENCE_SUMMARY",jsonlite::toJSON(lapply(result,function(z)list(mirt=z$mirt,independent=z$independent_R_M2,df=z$independent_R_df,Jacobian_step_error=z$Jacobian_step_error,QR_rank=z$native_R_QR_rank,QR_columns=z$native_R_columns,reconstructed=z$native_R_reconstructed,matched_baseline=z$matched_baseline_indices,null_exact=z$exact_independence,DPmax=max(vapply(z$native_dP_audit,function(x)x$shape_error,numeric(1))))),auto_unbox=TRUE,digits=17),"\n")
