@@ -1,0 +1,7 @@
+{"date": "2026-11-26",
+ "information": "Exact 4096-pattern expected information at the registered 4PL items: N*lambda_min = .06 at N=3000 (3PL .54); population MAP functional off truth by up to .036 (c) and .053 (d).",
+ "minimax_length_bound": "BOUND.json: for ANY 95% CI valid at every parameter value, E[length] >= int max(0,.95-TV) dt, TV bounded by Pinsker/Bhattacharyya at a KL-reducing nuisance (L-BFGS-B not fully converged -> bounds conservative). N=3000 lower bounds: 4PL c items 1,4,7,10,12 = .396/.307/.218/.132/.088 (box .5); 4PL d = .164/.153/.159/.197/.260; 3PL c = .333/.245/.167/.101/.071.",
+ "interpretation": "Mathematical impossibility of informative intervals is shown only for easy-item c (item 1: lower bound .396 = 79% of box; its bound reaches half-box only at N~64k; item 4 ~10k). For other items the bound does not exclude informative valid intervals, so the remaining 4PL c/d failure is method-specific (one-step Wald: informative-interval coverage .9005/.9141), not proven impossible.",
+ "futility_pilot": "Logit-scale one-step Wald (development data seed 202611252001, R=150): one-step centre outside box 36%/39% (refusal), coverage .624/.582 -> stopped, not registered.",
+ "not_attempted_within_budget": "Bootstrap-calibrated constrained-LR inversion: needs exact constrained refits x grid x bootstrap per parameter (production latency minutes-hours; confirmation >1e7 refits). Unpenalized/penalized profiles already failed (Grok, unrecoverable branch).",
+ "status": "4PL c and d 95% CI: NOT CERTIFIED."}

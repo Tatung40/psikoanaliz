@@ -1,0 +1,18 @@
+{
+ "3PL": {
+  "fit_median_s": 0.553282170999978,
+  "fit_p95_s": 0.6462665833999722,
+  "onestep_median_s": 0.04385866000001215,
+  "onestep_p95_s": 0.07000522959997396,
+  "onestep_peak_MiB": 52.810407638549805,
+  "note": "N=3000, J=12, 5 reps, 2-core container shared with a background diagnostic (upper bounds)"
+ },
+ "4PL": {
+  "fit_median_s": 1.0117792969999755,
+  "fit_p95_s": 1.1639164276000087,
+  "onestep_median_s": 0.051117882999960784,
+  "onestep_p95_s": 0.05743817699998317,
+  "onestep_peak_MiB": 52.043335914611816,
+  "note": "N=3000, J=12, 5 reps, 2-core container shared with a background diagnostic (upper bounds)"
+ }
+}
