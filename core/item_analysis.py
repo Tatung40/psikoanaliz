@@ -38,15 +38,18 @@ def compute_item_statistics(
     n_examinees, k_items = item_df.shape
 
     if total_scores is None:
-        total_scores = item_df.sum(axis=1, skipna=True)
+        total_scores = item_df.sum(axis=1, skipna=False)   # partial sums are not full-test totals
     else:
         total_scores = total_scores.copy()
 
     # Üst ve Alt %27 Gruplarının Belirlenmesi (Kelley, 1939 Kuralı)
     # Bağ (tie) politikası: Yüzdelik kesme değerlerine göre eşit puanları dahil etme
     clean_total = total_scores.dropna()
-    p27_cutoff = float(np.percentile(clean_total, 27))
-    p73_cutoff = float(np.percentile(clean_total, 73))
+    if clean_total.empty:      # no complete responders: total-based statistics are undefined (never zero-filled)
+        p27_cutoff = p73_cutoff = np.nan
+    else:
+        p27_cutoff = float(np.percentile(clean_total, 27))
+        p73_cutoff = float(np.percentile(clean_total, 73))
 
     lower_group_mask = total_scores <= p27_cutoff
     upper_group_mask = total_scores >= p73_cutoff
