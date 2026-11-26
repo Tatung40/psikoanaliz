@@ -276,6 +276,19 @@
     "CERTIFIED": true
    }
   },
-  "note": "Item-1/2/3 c sets are whole-box in 77/61/42% of datasets (information bound); whole-box sets are labelled uninformative. The withdrawn one-step Wald c/d CIs stay NOT CERTIFIED."
+  "note": "Item-1/2/3 c sets are whole-box in 77/61/42% of datasets (information bound); whole-box sets are labelled uninformative. The withdrawn one-step Wald c/d CIs stay NOT CERTIFIED.",
+  "optimised_implementation": {
+   "commit": "c1ad2a2 (frozen)",
+   "numerical_equivalence": "NOT established: registered 1e-8 T tolerance failed",
+   "regression_evidence": "run 45798062200, same seeds as certified run: gates identical, 23999/24000 sets identical",
+   "fresh_confirmation": {
+    "run": 45802055748,
+    "seed_root": 202611261301,
+    "protocol": "validation/p1_4pl_score_perf/FRESH_PROTOCOL.json",
+    "report": "validation/evidence/p1_4pl_score_perf/REPORT_K_FRESH.json",
+    "all_gates_passed": true
+   },
+   "high_precision": "validation/evidence/p1_4pl_score_perf/HIGH_PRECISION.json"
+  }
  }
 }

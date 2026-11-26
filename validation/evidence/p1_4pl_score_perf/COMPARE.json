@@ -1,0 +1,44 @@
+{
+ "datasets_compared": 1000,
+ "missing": [],
+ "sets_compared": 24000,
+ "sets_different": 1,
+ "differences": [
+  {
+   "r": 794,
+   "item": 11,
+   "param": "c",
+   "frozen": {
+    "item": 11,
+    "param": "c",
+    "intervals": [
+     [
+      0.0,
+      0.23
+     ]
+    ],
+    "whole": false,
+    "empty": false,
+    "width": 0.23,
+    "covered_set": true,
+    "covered_exact": true
+   },
+   "optimised": {
+    "item": 11,
+    "param": "c",
+    "intervals": [
+     [
+      0.0,
+      0.25
+     ]
+    ],
+    "whole": false,
+    "empty": false,
+    "width": 0.25,
+    "covered_set": true,
+    "covered_exact": true
+   }
+  }
+ ],
+ "near_tie_check": "item12 c T at psi=.24: frozen 3.841160287 optimised 3.841160287 crit 3.841458821 (local py3.13: frozen and optimised both accept -> both [0,.25]; archived CI frozen gave [0,.23]: platform-level near-tie, not the optimisation)"
+}

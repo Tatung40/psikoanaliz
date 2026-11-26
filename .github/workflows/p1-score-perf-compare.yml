@@ -1,0 +1,17 @@
+name: Closure K optimised set comparison (read-only)
+on:
+  pull_request:
+    paths: ['validation/p1_4pl_score_perf/compare_sets.py', '.github/workflows/p1-score-perf-compare.yml']
+permissions: {contents: read, actions: read}
+jobs:
+  compare:
+    # Archived read-only listing; ran once on 5a0… head. Never re-run.
+    if: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'kopt-[0-9]*', path: /tmp/new, merge-multiple: true, run-id: '45798062200', github-token: '${{ github.token }}'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'k-[0-9]*', path: /tmp/old, merge-multiple: true, run-id: '45777107775', github-token: '${{ github.token }}'}
+      - run: python3 validation/p1_4pl_score_perf/compare_sets.py /tmp/old /tmp/new /tmp/COMPARE.json
