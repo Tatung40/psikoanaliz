@@ -57,3 +57,37 @@ def test_monotone_kl_projection_matches_independent_constrained_optimizer():
     # A nonzero bound is evidence, never assumed merely because a curve is nonlogistic.
     b=bound(distribution("nonmonotone",121))
     assert b["KL_global_lower"]>=0
+
+def test_standardized_q_matches_independent_unweighted_mahalanobis(monkeypatch):
+    from validation.p3_empirical import constrained
+    captured={}
+    def fake(eta,model,N,H,G,px,score,seed,train=1024,B=4095):
+        ref=np.random.default_rng(671).normal(size=(train+B,H.shape[1]))
+        captured.update(ref=ref,H=H,N=N)
+        return ref,{"max_KKT":0.}
+    monkeypatch.setattr(constrained,"gaussian_reference",fake)
+    x,_=data(202611264090,0,"null")
+    r=constrained.analyse(x,truth_eta(),"4PL",[1,2,3])
+    observed=np.sqrt(len(x))*(E.K.pattern_counts(x)/len(x)@captured["H"])
+    offset=0
+    for item in r["items"]:
+        stop=offset+len(item["groups"]);ref=captured["ref"][:,offset:stop]
+        mean=ref[:1024].mean(0);cov=np.cov(ref[:1024],rowvar=False)
+        delta=observed[offset:stop]-mean
+        q=float(delta@np.linalg.solve(cov,delta))
+        z=ref[1024:]-mean
+        stats=np.sum(z*np.linalg.solve(cov,z.T).T,axis=1)
+        assert abs(q-item["Q_constrained"])<1e-9
+        assert item["p_constrained_standardized"]==(1+int((stats>=q).sum()))/4096
+        offset=stop
+
+def test_standardized_reference_refuses_deterministic_nullspace_disagreement(monkeypatch):
+    from validation.p3_empirical import constrained
+    def fake(eta,model,N,H,G,px,score,seed,train=1024,B=4095):
+        ref=np.random.default_rng(671).normal(size=(train+B,H.shape[1]));ref[:,-1]=0.
+        return ref,{"max_KKT":0.}
+    monkeypatch.setattr(constrained,"gaussian_reference",fake)
+    x,_=data(202611264090,0,"null")
+    r=constrained.analyse(x,truth_eta(),"4PL",[1,2,3])
+    assert np.isnan(r["items"][-1]["p_constrained_standardized"])
+    assert r["items"][-1]["nullspace_residual"]>1e-6
