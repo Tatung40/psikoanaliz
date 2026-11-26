@@ -18,7 +18,7 @@ jobs:
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
       - name: Targeted read-only aggregation regression
-        run: python -m pytest -q tests/test_p3_empirical.py::test_aggregate_cli_serializes_numpy_gate_booleans
+        run: python -m pytest -q tests/test_p3_constrained.py tests/test_p3_empirical.py::test_aggregate_cli_serializes_numpy_gate_booleans
       - id: plan
         run: echo "phase=$(python -c 'import json;print(json.load(open("validation/p3_empirical/RUN.json"))["phase"])')" >> "$GITHUB_OUTPUT"
       - name: Exact native package and runtime source provenance
@@ -49,7 +49,7 @@ jobs:
         with: {name: p3-runtime, path: /tmp/p3-runtime/}
   pilot:
     needs: mathematics
-    if: needs.mathematics.outputs.phase == 'pilot'
+    if: needs.mathematics.outputs.phase == 'replay'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -64,26 +64,21 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
-      - uses: actions/cache/restore@v4
+      - uses: actions/download-artifact@v4
         with:
-          path: /tmp/p3-data/
-          key: p3-m1-pilot-${{ matrix.model }}-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/PROTOCOL.json') }}-${{ github.run_id }}
-          restore-keys: p3-m1-pilot-${{ matrix.model }}-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/PROTOCOL.json') }}-
-      - name: New development-only paired candidates; one native fit per dataset
-        run: |
-          python -u validation/p3_empirical/runner.py --model '${{ matrix.model }}' --root 202611261001 --R 100 --shard '${{ matrix.shard }}' --shards 2 --work /tmp/p3-data --expected
-          python -u validation/p3_empirical/runner.py --model '${{ matrix.model }}' --root 202611261002 --R 150 --shard '${{ matrix.shard }}' --shards 2 --work /tmp/p3-data --alt
-      - uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: /tmp/p3-data/
-          key: p3-m1-pilot-${{ matrix.model }}-${{ matrix.shard }}-${{ hashFiles('validation/p3_empirical/PROTOCOL.json') }}-${{ github.run_id }}
+          pattern: 'p3-m1-${{ matrix.model }}-*'
+          path: /tmp/p3-input
+          merge-multiple: true
+          run-id: 45806031473
+          github-token: '${{ github.token }}'
+      - name: New constrained and efficient diagnostics on frozen native calibrations; zero refits
+        run: python -m validation.p3_empirical.replay --model '${{ matrix.model }}' --input /tmp/p3-input --out /tmp/p3-data --shard '${{ matrix.shard }}' --shards 2
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: 'p3-m1-${{ matrix.model }}-${{ matrix.shard }}', path: /tmp/p3-data/}
+        with: {name: 'p3-m2-${{ matrix.model }}-${{ matrix.shard }}', path: /tmp/p3-data/}
   aggregate:
     needs: [mathematics,pilot]
-    if: always() && needs.mathematics.result == 'success' && needs.mathematics.outputs.phase == 'review'
+    if: always() && needs.mathematics.result == 'success' && needs.mathematics.outputs.phase == 'replay' && needs.pilot.result == 'success'
     runs-on: ubuntu-latest
     env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
     steps:
@@ -92,8 +87,27 @@ jobs:
         with: {python-version: '3.11', cache: pip}
       - run: pip install -r requirements.txt
       - uses: actions/download-artifact@v4
-        with: {pattern: p3-m1-*, path: /tmp/p3-input, merge-multiple: true, run-id: 45806031473, github-token: '${{ github.token }}'}
-      - run: python -m validation.p3_empirical.aggregate --input /tmp/p3-input --phase pilot --out /tmp/p3-output/REPORT.json
+        with: {pattern: p3-m2-*, path: /tmp/p3-input, merge-multiple: true}
+      - run: python -m validation.p3_empirical.aggregate --input /tmp/p3-input --phase pilot --methods p_constrained,p_constrained_standardized,p_efficient --out /tmp/p3-output/REPORT.json
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: p3-m1-summary, path: /tmp/p3-output/}
+        with: {name: p3-m2-summary, path: /tmp/p3-output/}
+
+  population:
+    needs: mathematics
+    if: needs.mathematics.outputs.phase == 'replay'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with: {pattern: p3-m1-*, path: /tmp/p3-input, merge-multiple: true, run-id: 45806031473, github-token: '${{ github.token }}'}
+      - name: Deterministic population MAP and alternative-absorption diagnosis; no generated data
+        run: python -m validation.p3_empirical.population --input /tmp/p3-input --out /tmp/p3-population/REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: p3-population, path: /tmp/p3-population/}

@@ -6,16 +6,16 @@ from scipy import stats
 from validation.p3_sx2_aggregate.aggregate import cp_upper,cp_lower
 
 
-def summarize(rows,model,phase):
+def summarize(rows,model,phase,methods=("p_emp","p_standardized")):
     null=sorted([r for r in rows if r["model"]==model and not r["alt"]],key=lambda r:r["r"])
     alt=sorted([r for r in rows if r["model"]==model and r["alt"]],key=lambda r:r["r"])
     report={}
-    for method in ("p_emp","p_standardized"):
+    for method in methods:
         n=len(null);p=np.full((n,12),np.nan)
         lat=[];identity=0
         for i,r in enumerate(null):
             if "result" in r and not r.get("error"):
-                items=r["result"]["items"];p[i]=[x[method] for x in items]
+                items=r["result"]["items"];p[i]=[x.get(method,np.nan) for x in items]
                 native=np.asarray(r["p_chi"]);p[i,~np.isfinite(native)]=np.nan
                 lat.append(r["result"]["seconds"]);identity=max(identity,r["identity"])
         invalid=~np.isfinite(p);reject=(p<.05)|invalid
@@ -51,13 +51,14 @@ def design():
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument("--input",required=True);ap.add_argument("--phase",required=True);ap.add_argument("--out",required=True)
+    ap.add_argument("--methods",default="p_emp,p_standardized")
     a=ap.parse_args();rows=[];seen=set();hashes={}
     for f in sorted(Path(a.input).rglob("*.json")):
         if not f.name.startswith(("3PL_","4PL_")):continue
         raw=f.read_bytes();r=json.loads(raw);key=(r["model"],r["root"],r["r"])
         if key in seen:raise ValueError("duplicate independent dataset "+str(key))
         seen.add(key);rows.append(r);hashes[str(f.relative_to(a.input))]=hashlib.sha256(raw).hexdigest()
-    report={"phase":a.phase,"source_run":"actual JSON records; dataset is MC cluster","models":{m:summarize(rows,m,a.phase) for m in ("3PL","4PL")},"precision_design":design(),"record_hashes":hashes}
+    report={"phase":a.phase,"source_run":"actual JSON records; dataset is MC cluster","models":{m:summarize(rows,m,a.phase,a.methods.split(",")) for m in ("3PL","4PL")},"precision_design":design(),"record_hashes":hashes}
     Path(a.out).parent.mkdir(parents=True,exist_ok=True);Path(a.out).write_text(json.dumps(report,indent=1,default=lambda v:v.item()))
     print("P3_REPORT_JSON "+json.dumps({k:v for k,v in report.items() if k!="record_hashes"},default=lambda v:v.item()),flush=True)
 

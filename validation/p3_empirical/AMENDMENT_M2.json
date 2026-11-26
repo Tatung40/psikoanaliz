@@ -1,0 +1,27 @@
+{
+  "id": "M2/M3 prospective development and confirmation amendment",
+  "prior_protocol": "5be1faad9b40d27373b34ff7c887030bf64c89ca",
+  "reason": "M1 actual pilot: 3PL 148/150 power datasets hit a native bound, so ordinary differentiable IF refusal yields zero power; 4PL empirical standardization null .0875, power .0533. These failed candidates remain NOT CERTIFIED; do not rerun unchanged.",
+  "native_bounds_verified": "mirt1.2.0 estimation/base.py _ITEM_PARAMETER_BOUNDS; a[.1,5], b[-6,6], c[0,.5], d[.5,1]; run of review head a2dba11e source artifact",
+  "M2": {
+    "name": "Constrained-Gaussian marginal-equation residual test",
+    "derivation": "Joint Gaussian likelihood-score and raw-score residual fluctuations with exact model pattern covariance. Delta = argmin .5 Delta' A Delta - (Z_score+gradprior/sqrtN)'Delta over sqrtN*(native bounds-eta_MAP), A=I_model-Hprior/N. Reference residual sqrtN*E_model[h]+Z_h+G_model*Delta. All joint covariances retained, deterministic means retained. Boundary projection solved with full A; no pseudoinverse. Evaluate original S-X2 via squared weighted residual and separately named covariance-standardized Q.",
+    "draws": {
+      "independent_training": 1024,
+      "reference": 4095,
+      "p": "(1+exceedances)/(4095+1)",
+      "development_noise_root": 202611261003,
+      "confirmation_noise_root": 202611262003
+    },
+    "numerical_gates": "QP KKT<=1e-7, 100 active-set iterations maximum; bread SPD kappa<=1e10; rank/eigen rules unchanged; test against independent scipy constrained optimizations. This is a Gaussian asymptotic reference, not an assertion of equivalent full bootstrap refits; fresh finite-sample confirmation is mandatory."
+  },
+  "M3": {
+    "name": "Orthogonal marginal item-residual score (MAP plug-in)",
+    "derivation": "Exponential-tilt local alternative p_eta,delta(x) proportional p_eta(x)*exp(delta'h(x)). At delta=0 full nuisance score s, residual score h-E[h], C=E[s(h-Eh)']; efficient T=h-Eh-s I^-1 C. Efficient covariance E[T T']; Q=N*(phat'T)'Cov(T)^-1*(phat'T). E[T]=0, E[s T']=0 and E[dT/deta]=0; MAP prior/bound effects are eliminated only at first order, NOT assumed harmless for finite weak identification; evaluate size/power anew.",
+    "gates": "Likelihood I SPD kappa<=1e12, orthogonality residual<=1e-8; no pseudoinverse. Rank and deterministic null-mode rules unchanged. Never relabel Q as ordinary S-X2."
+  },
+  "pilot": "Reuse exactly all500 native M1 calibration checkpoints, original data hash/seed and estimator unchanged. Recompute new diagnostics only; zero repeated native calibrations. Score-vs-IF comparisons are development, never confirmation.",
+  "selection": "Per model, original M1 primary must meet pilot validity/power plausibility before confirmation; otherwise try M2 (3PL unchanged S-X2 reference,4PL standardized), then M3. Before independent confirmation record one selected method/model. No selection using confirmation outcomes. No pilot certification.",
+  "confirmation": "Original fresh null root202611262001 R6000/model; power root202611262002 R600/model. All original scientific size/power/refusal/MCSE gates remain, alpha .05/24 unchanged; no interim acceptance.",
+  "population": "Deterministic expected-loglikelihood plus actual prior/N at the exact historical independent-item alternative. Record feasible pseudo-true solution, convergence, gradients, KL, residual mean/covariance and efficient score NCP. Compare GH61/GH121. A feasible-null KL can bound distinguishability via Pinsker; no global/structural claim without sufficient evidence."
+}

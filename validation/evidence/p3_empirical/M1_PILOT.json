@@ -1,0 +1,240 @@
+{
+  "phase": "pilot",
+  "source_run": "actual JSON records; dataset is MC cluster",
+  "models": {
+    "3PL": {
+      "p_emp": {
+        "null_R": 100,
+        "power_R": 150,
+        "typeI": 0.04166666666666666,
+        "MCSE": 0.005362818328685682,
+        "per_item": [
+          0.04,
+          0.04,
+          0.05,
+          0.02,
+          0.03,
+          0.04,
+          0.02,
+          0.07,
+          0.07,
+          0.03,
+          0.01,
+          0.08
+        ],
+        "upper": [
+          0.13143967738892068,
+          0.13143967738892068,
+          0.1463503218668072,
+          0.09924242144565981,
+          0.11583075841228972,
+          0.13143967738892068,
+          0.09924242144565981,
+          0.17467695268372885,
+          0.17467695268372885,
+          0.11583075841228972,
+          0.08111030211894289,
+          0.18827291178229671
+        ],
+        "power": 0,
+        "power_lower": 0,
+        "power_upper": 0.02429259716610854,
+        "refusal": 0,
+        "power_refusal": 0.9866666666666667,
+        "runtime_median": 1.2722913629999937,
+        "runtime_P95": 1.4347559037500097,
+        "total_seconds": 240.1086844440002,
+        "errors": {
+          "ValueError('active native parameter bound')": 148
+        },
+        "identity_max": 9.059419880941277e-13,
+        "gates": {
+          "CP_upper<=.07": false,
+          "cluster_MCSE<=.004": false,
+          "pooled95_lower>=.03": true,
+          "nonevaluable<=.01": true,
+          "identity<=1e-8": true,
+          "power_CP_lower>.10": false,
+          "complete_independent_confirmation": false
+        },
+        "certified": false
+      },
+      "p_standardized": {
+        "null_R": 100,
+        "power_R": 150,
+        "typeI": 0.11583333333333332,
+        "MCSE": 0.008614368885222214,
+        "per_item": [
+          0.04,
+          0.06,
+          0.08,
+          0.03,
+          0.11,
+          0.1,
+          0.1,
+          0.12,
+          0.21,
+          0.15,
+          0.17,
+          0.22
+        ],
+        "upper": [
+          0.13143967738892068,
+          0.16072728231433595,
+          0.18827291178229671,
+          0.11583075841228972,
+          0.22741139682837602,
+          0.21460433585920963,
+          0.21460433585920963,
+          0.24001467422676667,
+          0.34672459647528153,
+          0.2767866715899146,
+          0.3005720071450729,
+          0.3580050636068433
+        ],
+        "power": 0,
+        "power_lower": 0,
+        "power_upper": 0.02429259716610854,
+        "refusal": 0,
+        "power_refusal": 0.9866666666666667,
+        "runtime_median": 1.2722913629999937,
+        "runtime_P95": 1.4347559037500097,
+        "total_seconds": 240.1086844440002,
+        "errors": {
+          "ValueError('active native parameter bound')": 148
+        },
+        "identity_max": 9.059419880941277e-13,
+        "gates": {
+          "CP_upper<=.07": false,
+          "cluster_MCSE<=.004": false,
+          "pooled95_lower>=.03": true,
+          "nonevaluable<=.01": true,
+          "identity<=1e-8": true,
+          "power_CP_lower>.10": false,
+          "complete_independent_confirmation": false
+        },
+        "certified": false
+      }
+    },
+    "4PL": {
+      "p_emp": {
+        "null_R": 100,
+        "power_R": 150,
+        "typeI": 0.04416666666666667,
+        "MCSE": 0.0062062158841317255,
+        "per_item": [
+          0.05,
+          0.04,
+          0.02,
+          0.06,
+          0.04,
+          0.07,
+          0.05,
+          0.02,
+          0.04,
+          0.03,
+          0.04,
+          0.07
+        ],
+        "upper": [
+          0.1463503218668072,
+          0.13143967738892068,
+          0.09924242144565981,
+          0.16072728231433595,
+          0.13143967738892068,
+          0.17467695268372885,
+          0.1463503218668072,
+          0.09924242144565981,
+          0.13143967738892068,
+          0.11583075841228972,
+          0.13143967738892068,
+          0.17467695268372885
+        ],
+        "power": 0.02666666666666667,
+        "power_lower": 0.007312546398008252,
+        "power_upper": 0.06686787667748939,
+        "refusal": 0,
+        "power_refusal": 0,
+        "runtime_median": 1.5628027819999915,
+        "runtime_P95": 1.984629365799992,
+        "total_seconds": 616.323814504,
+        "errors": {},
+        "identity_max": 6.892264536872972e-13,
+        "gates": {
+          "CP_upper<=.07": false,
+          "cluster_MCSE<=.004": false,
+          "pooled95_lower>=.03": true,
+          "nonevaluable<=.01": true,
+          "identity<=1e-8": true,
+          "power_CP_lower>.10": false,
+          "complete_independent_confirmation": false
+        },
+        "certified": false
+      },
+      "p_standardized": {
+        "null_R": 100,
+        "power_R": 150,
+        "typeI": 0.0875,
+        "MCSE": 0.007241136847949327,
+        "per_item": [
+          0.06,
+          0.07,
+          0.02,
+          0.06,
+          0.04,
+          0.06,
+          0.05,
+          0.13,
+          0.17,
+          0.12,
+          0.18,
+          0.09
+        ],
+        "upper": [
+          0.16072728231433595,
+          0.17467695268372885,
+          0.09924242144565981,
+          0.16072728231433595,
+          0.13143967738892068,
+          0.16072728231433595,
+          0.1463503218668072,
+          0.2524343467533053,
+          0.3005720071450729,
+          0.24001467422676667,
+          0.3122764176730569,
+          0.20156860591105305
+        ],
+        "power": 0.05333333333333334,
+        "power_lower": 0.02330381019647,
+        "power_upper": 0.10238189602332377,
+        "refusal": 0,
+        "power_refusal": 0,
+        "runtime_median": 1.5628027819999915,
+        "runtime_P95": 1.984629365799992,
+        "total_seconds": 616.323814504,
+        "errors": {},
+        "identity_max": 6.892264536872972e-13,
+        "gates": {
+          "CP_upper<=.07": false,
+          "cluster_MCSE<=.004": false,
+          "pooled95_lower>=.03": true,
+          "nonevaluable<=.01": true,
+          "identity<=1e-8": true,
+          "power_CP_lower>.10": false,
+          "complete_independent_confirmation": false
+        },
+        "certified": false
+      }
+    }
+  },
+  "precision_design": {
+    "3000": {
+      "max_rejections": 170,
+      "P_all24_size_gates_if_each_true_rate_.05_lower": 0
+    },
+    "6000": {
+      "max_rejections": 363,
+      "P_all24_size_gates_if_each_true_rate_.05_lower": 0.9969060069276006
+    }
+  }
+}
