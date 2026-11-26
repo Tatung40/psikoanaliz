@@ -121,8 +121,9 @@ Tanı: N=3000/J12'de beklenen Fisher bilgisinin en küçük özdeğeri × N = .5
 
 | Model | Çıktı | Yöntem | Kapsama / I. tip | MCSE | Karar |
 |---|---|---|---|---|---|
-| 3PL | a, b, c %95 GA | Tek adımlı önsel-yanlılık düzeltmeli Wald (MAP değişmez) | .9504 / .9491 / .9468 | ≤.0012 | SCOPED CERTIFIED (N3000/J12); c medyan genişlik .29 |
-| 4PL | a, b, c, d %95 GA | aynı | .9496 / .9489 / .9463 / .9477 | ≤.0012 | SCOPED CERTIFIED; geçerli fakat geniş (a 3.2, b 2.6, c .46, d .45 medyan) |
+| 3PL | a, b, c %95 GA | Tek adımlı önsel-yanlılık düzeltmeli Wald (MAP değişmez) | .9504 / .9491 / .9468 (c bilgi veren .9313) | ≤.0015 | SCOPED CERTIFIED (N3000/J12, kayıtlı tasarım); c tüm-kutu %22.6 |
+| 4PL | a, b %95 GA | aynı | .9496 / .9489 | ≤.0012 | SCOPED CERTIFIED; geçerli fakat geniş (a 3.2, b 2.6 medyan) |
+| 4PL | c, d %95 GA | aynı | koşulsuz .9463/.9477; bilgi veren aralıkta .9005/.9141; tüm-kutu %46/%39 | .0021/.0019 | WITHDRAWN → NOT CERTIFIED (denetim 2026-11-26) |
 | 3PL/4PL | Tek-adım kestiricisinin SH'si | √diag(I⁻¹/N) | SH/SD .96–1.04, delta GA [.9245,1.107] içinde | — | SCOPED CERTIFIED; MAP SH'si değildir |
 | 3PL/4PL | MAP örnekleme SH'si | — | — | — | NOT CERTIFIED (değişmedi) |
 | 3PL | S-X² Yöntem A (çıkarım-düzeltmeli genelleştirilmiş ki-kare referansı) | Tam 4096 örüntü etki fonksiyonu + Imhof | havuz .0491; madde 11 eşzamanlı üst .0720 > .07 | .0011 | NOT CERTIFIED |
