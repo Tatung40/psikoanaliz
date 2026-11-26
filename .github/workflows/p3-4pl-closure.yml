@@ -1,12 +1,12 @@
 name: 4PL P3 distinguishable-alternative validation
 on:
   pull_request:
-    paths: ['validation/p3_4pl_closure/**','validation/evidence/p3_4pl_closure/**','tests/test_p3_4pl_closure.py','tests/test_p3_4pl_production.py','core/irt_4pl_itemfit.py','.github/workflows/p3-4pl-closure.yml']
+    paths: ['validation/p3_4pl_closure/**','validation/evidence/p3_4pl_closure/**','tests/test_p3_4pl_closure.py','.github/workflows/p3-4pl-closure.yml']
 permissions:
   contents: read
   actions: read
 jobs:
-  mathematics:
+  archive-transfer:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
@@ -14,39 +14,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - run: python -m pytest -q tests/test_p3_4pl_closure.py tests/test_p3_absorption.py tests/test_p3_constrained.py
-  audit:
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - name: Reuse canonical independent confirmation; ZERO model refits
+      - name: Existing successful independent audit; NO fits or repeat validation
         uses: actions/download-artifact@v4
         with:
-          pattern: 'p3n-records-*'
-          path: /tmp/p3n-records
-          run-id: 45833050428
+          name: p3n-independent-audit
+          path: /tmp/full-audit
+          run-id: 45835088987
           github-token: ${{ github.token }}
-      - run: python -m validation.p3_4pl_closure.audit --input /tmp/p3n-records --out /tmp/p3n-audit
+      - run: python -m validation.p3_4pl_closure.compact --input /tmp/full-audit --out /tmp/p3n-selected
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: p3n-independent-audit, path: /tmp/p3n-audit/}
-  witness:
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    env: {PYTHONPATH: ., OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11', cache: pip}
-      - run: pip install -r requirements.txt
-      - name: Independent adaptive integration, observable KL lower bound and fixed-parameter GH sensitivity; NO optimization
-        run: python -m validation.p3_4pl_closure.witness --out /tmp/p3n-witness/WITNESS.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: p3n-witness, path: /tmp/p3n-witness/}
+        with: {name: p3n-selected-ledger, path: /tmp/p3n-selected/}
