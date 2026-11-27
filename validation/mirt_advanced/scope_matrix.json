@@ -1,0 +1,20 @@
+{
+  "policy": "Policy D (validation/SCIENTIFIC_CERTIFICATION_POLICY.md)",
+  "owner": "Claude (advanced MIRT); shared production code is Codex-owned and unchanged",
+  "production_status_label": "EXPERIMENTAL / NOT CERTIFIED (core/irt_multidim.STATUS, unchanged)",
+  "scopes": {
+    "exploratory_M2PL": {"decision": "PARTIAL", "level": "EXPERIMENTAL", "evidence": "2PL_EFA_2D numerically agreed with R mirt 1.48 (stage-1 continuation, triangular identification, 2D only)", "limits": "2D only; numerical agreement is not inferential certification; no SE"},
+    "exploratory_MGRM": {"decision": "PARTIAL", "level": "EXPERIMENTAL", "evidence": "GRM_EFA_2D archived probability gap 3.5e-4 > 1e-4; iteration-1 precision loop in mirt-advanced-reference", "limits": "accepted only if the predeclared unchanged criteria pass"},
+    "exploratory_MGPCM": {"decision": "NO", "level": "EXPERIMENTAL", "evidence": "no R comparison exists", "limits": "production permits the fit but has no reference evidence; integration item for Codex-owned UI/status"},
+    "binary_bifactor": {"decision": "PARTIAL", "level": "EXPERIMENTAL", "evidence": "Bifactor_4D: both engines hit 1000 iterations, all comparisons pass at |dLL|=3e-9; P8 recovery NOT MET (N500 convergence 91/100; N1000 specific RMSE .42 > .30)", "limits": "historical NOT MET preserved; no new campaign"},
+    "GRM_bifactor": {"decision": "NO", "level": "WITHHELD", "evidence": "UNSUPPORTED API: mirt 1.2.0 bfactor raises MirtDataError for non-binary data", "limits": "binary bifactor evidence not transferred"},
+    "GPCM_bifactor": {"decision": "NO", "level": "WITHHELD", "evidence": "UNSUPPORTED API (as above)", "limits": "binary bifactor evidence not transferred"},
+    "PCM_bifactor": {"decision": "NO", "level": "WITHHELD", "evidence": "UNSUPPORTED API (as above)", "limits": "binary bifactor evidence not transferred"},
+    "R_backend": {"implemented": "NO", "tested": "NO", "deployment_ready": "NO", "available_to_users": "NO", "blocker": "Deployment image (Dockerfile/packages.txt, shared) installs r-base and TAM only, not R mirt; no automatic package installation permitted; R mirt is a reference oracle in CI only"},
+    "M3PL_fixed_asymptote": {"decision": "PARTIAL", "level": "EXPERIMENTAL", "evidence": "phase3 fixed-3PL and B_fixed numerically validated (SciPy prototype vs R)", "limits": "not in production (core rejects 3PL family); no SE/CI exposed"},
+    "M3PL_free_asymptote": {"decision": "NO", "level": "WITHHELD", "evidence": "phase3 B_free_c FAIL / BLOCKED", "limits": "free-c not enabled because R returns estimates"},
+    "M4PL_fixed_asymptotes": {"decision": "PARTIAL", "level": "EXPERIMENTAL", "evidence": "phase3 C_fixed 4 cases numerically validated", "limits": "not in production; no asymptote CI"},
+    "M4PL_mixed_asymptotes": {"decision": "NO", "level": "WITHHELD", "evidence": "no predeclared mixed-asymptote comparison", "limits": "not tested"},
+    "M4PL_free_asymptotes": {"decision": "NO", "level": "WITHHELD", "evidence": "phase3 C_free BLOCKED; free4 precision agreement in a subset is numerical only", "limits": "no inferential claim"}
+  }
+}

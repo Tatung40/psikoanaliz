@@ -1,0 +1,33 @@
+name: mirt-advanced-reference
+on:
+  workflow_dispatch:
+  push:
+    branches: [development/mirt-advanced-production]
+    paths: ['validation/mirt_advanced/**', '.github/workflows/mirt-advanced-reference.yml']
+permissions:
+  contents: read
+jobs:
+  precision-loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1', PYTHONPATH: .}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - uses: r-lib/actions/setup-r@v2
+        with: {r-version: '4.6.1', use-public-rspm: true}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::nloptr
+            any::jsonlite
+          cache-version: 2
+      - run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - run: python -m pytest -q tests/test_mirt_advanced_scope.py
+      - run: python validation/mirt_advanced/precision_loop.py --output out/mirt-advanced
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: mirt-advanced-precision-loop, path: out/mirt-advanced, retention-days: 90}
