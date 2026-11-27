@@ -15,7 +15,7 @@ def test_notice_content():
 
 def test_ui_exports_carry_label_and_notice():
     src = Path("ui/dif_classical_view.py").read_text(encoding="utf-8")
-    assert '"Bilimsel durum (p)": SCREENING_STATUS' in src and '("Bilimsel uyarı", OBSERVED_SCORE_NOTICE)' in src
+    assert '"Bilimsel durum (p)": _DC.SCREENING_STATUS' in src and '("Bilimsel uyarı", _DC.OBSERVED_SCORE_NOTICE)' in src
     assert src.index('"Bilimsel durum (p)"') < src.index('to_excel(w, sheet_name="DIF"')
 
 

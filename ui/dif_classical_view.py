@@ -1,5 +1,7 @@
 """Observed-score DIF page: Mantel–Haenszel / Mantel and (ordinal) logistic regression."""
 import io
+import importlib
+_DC = importlib.import_module("core.dif_classical")   # shared Policy D notices
 from ui.p_display import apa_p_frame
 import hashlib
 
@@ -41,8 +43,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     st.caption("İkili maddeler: MH (Holland–Thayer; ETS A/B/C) ve lojistik regresyon (tek biçimli / tek biçimli "
                "olmayan; Jodoin–Gierl ΔR²). Sıralı maddeler: Mantel testi + SMD ve sıralı lojistik regresyon. "
                "Eşleştirme: toplam puan (incelenen madde dahil); isteğe bağlı saflaştırma.")
-    from core.dif_classical import OBSERVED_SCORE_NOTICE
-    st.warning("Bu yöntemler MTK olabilirlik DIF'i değildir. " + OBSERVED_SCORE_NOTICE + " MH tek biçimli olmayan DIF'e "
+    st.warning("Bu yöntemler MTK olabilirlik DIF'i değildir. " + _DC.OBSERVED_SCORE_NOTICE + " MH tek biçimli olmayan DIF'e "
                "duyarsızdır (önceden tanımlı simülasyonda güç %18–41). Ayrıntı: validation/DIF_CERTIFICATION_MATRIX.md.")
     available = [c for c in data.columns if c not in (id_col,)]
     if not available:
@@ -96,8 +97,7 @@ def render(data, item_cols=(), id_col=None, group_col=None):
         st.warning(note)
     show = frame.drop(columns=[c for c in ("reason",) if c in frame.columns and frame[c].eq("").all()])
     st.dataframe(apa_p_frame(show).round(4), hide_index=True, use_container_width=True)
-    from core.dif_classical import SCREENING_STATUS as _SS
-    st.caption("p değerleri: " + _SS)
+    st.caption("p değerleri: " + _DC.SCREENING_STATUS)
     st.metric("DIF işaretlenen madde", "Raporlanmadı" if meta.get("purification_status") == "failed"
               else int(frame["DIF (düzeltilmiş p < alpha)"].sum()))
     if method == "MH" and not meta["ordinal"]:
@@ -115,9 +115,8 @@ def render(data, item_cols=(), id_col=None, group_col=None):
         fig.update_layout(title="Lojistik regresyon DIF etki büyüklüğü (Jodoin–Gierl sınırları .035 / .070)",
                           xaxis_title="Madde", yaxis_title="ΔR²", template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
-    from core.dif_classical import OBSERVED_SCORE_NOTICE, SCREENING_STATUS
-    frame = frame.assign(**{"Bilimsel durum (p)": SCREENING_STATUS})        # same label on screen-captured DOCX, CSV, XLSX
-    meta_frame = pd.DataFrame([(k, str(v)) for k, v in meta.items()] + [("Bilimsel uyarı", OBSERVED_SCORE_NOTICE)],
+    frame = frame.assign(**{"Bilimsel durum (p)": _DC.SCREENING_STATUS})        # same label on screen-captured DOCX, CSV, XLSX
+    meta_frame = pd.DataFrame([(k, str(v)) for k, v in meta.items()] + [("Bilimsel uyarı", _DC.OBSERVED_SCORE_NOTICE)],
                               columns=["Alan", "Değer"])
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine="openpyxl") as w:
