@@ -87,7 +87,9 @@
       "core.dif_center.theta_sensitivity",
       "core.dif_lord_policy.DESCRIPTIVE_NOTE",
       "core.dif_lord_policy.WARNING",
-      "core.dif_lord_policy.protect_result"
+      "core.dif_lord_policy.protect_result",
+      "core.dif_policy.OBSERVED_SCORE_NOTICE",
+      "core.dif_policy.SIBTEST_NOTE"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },
@@ -95,7 +97,9 @@
     "screen": "ui/dif_classical_view.py",
     "core_imports": [
       "core.dif_classical.ADJUST_METHODS",
-      "core.dif_classical.dif_screen"
+      "core.dif_classical.dif_screen",
+      "core.dif_policy.OBSERVED_SCORE_NOTICE",
+      "core.dif_policy.SCREENING_STATUS"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
   },

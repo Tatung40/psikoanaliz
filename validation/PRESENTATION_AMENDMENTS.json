@@ -1,0 +1,33 @@
+{
+ "purpose": "Owner-authorized presentation-only amendments (Policy D, 2026-11-27) to files locked by NON_DIF_IRT_PROTECTED_SOURCES.json. The lock file is unchanged; each amended file must reverse exactly (replacements undone) to its locked git blob.",
+ "authorization": "project owner, 2026-11-27 05:39 +03: presentation-only; no algorithm, evidence, hash, threshold or inferential change",
+ "scope": "warnings and screening-only labels only; core/dif_classical.py and core/dif_center.py untouched",
+ "amendments": [
+  {
+   "path": "ui/dif_classical_view.py",
+   "from_git_blob": "75c05bbf6bf41d8f53f2b74a2fa085d9d3f32446",
+   "to_git_blob": "3e65ac4e0e53b99e785ba7f4d9b21fe257b11bcf",
+   "replacements": [
+    {
+     "old": "    st.warning(\"Bu yöntemler MTK olabilirlik DIF'i değildir. Gruplar arasında yetenek farkı (impact) varken \"",
+     "new": "    from core.dif_policy import OBSERVED_SCORE_NOTICE, SCREENING_STATUS  # Policy D presentation amendment\n    st.warning(OBSERVED_SCORE_NOTICE)\n    st.warning(\"Bu yöntemler MTK olabilirlik DIF'i değildir. Gruplar arasında yetenek farkı (impact) varken \""
+    },
+    {
+     "old": "    meta_frame = pd.DataFrame([(k, str(v)) for k, v in meta.items()], columns=[\"Alan\", \"Değer\"])",
+     "new": "    frame = frame.assign(**{\"Bilimsel durum (p)\": SCREENING_STATUS})   # Policy D: label on CSV/XLSX rows\n    meta_frame = pd.DataFrame([(k, str(v)) for k, v in meta.items()] + [(\"Bilimsel uyarı\", OBSERVED_SCORE_NOTICE)],\n                              columns=[\"Alan\", \"Değer\"])"
+    }
+   ]
+  },
+  {
+   "path": "ui/dif_center_view.py",
+   "from_git_blob": "f592fbedc5eeaf567c21fb8d32fccfdfcc5d2363",
+   "to_git_blob": "42425f18f21cdcc4d667badaeff38c5f8725de3e",
+   "replacements": [
+    {
+     "old": "    st.warning(LIMITATIONS)\n",
+     "new": "    st.warning(LIMITATIONS)\n    from core.dif_policy import OBSERVED_SCORE_NOTICE, SIBTEST_NOTE  # Policy D presentation amendment\n    st.warning(OBSERVED_SCORE_NOTICE); st.caption(SIBTEST_NOTE)\n"
+    }
+   ]
+  }
+ ]
+}

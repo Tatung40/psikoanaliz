@@ -20,9 +20,17 @@ def test_non_dif_complete_matrix_counts_and_sources():
     assert not m["full_certification"] and m["no_new_numerical_campaign"]
 def test_original_certificates_adapter_q1_manifest_and_dif_unchanged():
     lock=json.loads((ROOT/"validation/NON_DIF_IRT_PROTECTED_SOURCES.json").read_text())
+    amended={a["path"]:a for a in json.loads((ROOT/"validation/PRESENTATION_AMENDMENTS.json").read_text())["amendments"]}
+    blob=lambda raw:hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
+    assert set(amended)<={"ui/dif_classical_view.py","ui/dif_center_view.py"}   # presentation files only
     for item in lock["sources"]:
         raw=(ROOT/item["path"]).read_bytes()
-        assert hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()==item["git_blob"],item["path"]
+        if item["path"] in amended:   # declared presentation-only amendment: must reverse exactly to the locked blob
+            a=amended[item["path"]];assert a["from_git_blob"]==item["git_blob"] and blob(raw)==a["to_git_blob"],item["path"]
+            text=raw.decode()
+            for r in reversed(a["replacements"]):assert text.count(r["new"])==1;text=text.replace(r["new"],r["old"],1)
+            raw=text.encode()
+        assert blob(raw)==item["git_blob"],item["path"]
 def test_original_seven_p4_gates_and_two_archived_global_references():
     from core.polytomous_certification import BLOCKS,_confirmed
     assert sum(map(len,BLOCKS.values()))==7

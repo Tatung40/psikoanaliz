@@ -1,0 +1,11 @@
+{"status": "DRAFT — not registered, not executed",
+ "question": "Null DIF Type I of observed-score MH and LR (binary) under latent impact, by generating model",
+ "validity_domains": {"rasch": "equal discrimination: total score sufficient for theta -> MH/LR expected valid under impact",
+                      "2pl": "unequal discrimination: total score not sufficient -> impact-induced inflation expected; domain reported separately, never pooled"},
+ "cells": "generator {rasch, 2pl(a .6-1.8)} x impact muF {0, -.5, -1.0} x N per group {250, 500, 1000} x purify {off, on}; k=12, b linspace -1.5..1.5; 36 cells x 2 methods",
+ "R": "500 datasets per cell (exploratory cluster SD <= .08 -> MCSE <= .0036)",
+ "seeds": "default_rng([20261127050, cell, r]); disjoint from exploratory root 20261127041",
+ "gates": {"type1": "dataset-mean itemwise null rejection in [.035,.065] with 99% bound (+/-2.576 MCSE) inside [.025,.075]", "mcse": "<= .004",
+           "fwer_bh": "dataset-level P(any BH rejection) <= .065 (upper 99% bound <= .075)", "refusal": "counted as non-rejection AND reported; <= .01"},
+ "certify": "per method x domain: CERTIFIED only if every cell of that domain passes; 2PL failures documented as methodological limitation, not hidden",
+ "cost": "exploratory: 400 datasets x 8 analyses = 30 s on 2 cores -> 36 cells x 500 ~ 20 CPU-min"}
