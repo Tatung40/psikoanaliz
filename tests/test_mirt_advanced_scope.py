@@ -10,8 +10,9 @@ def test_polytomous_bifactor_withheld_and_api_unsupported():
     x = np.random.default_rng(0).integers(0, 3, (200, 9))
     with pytest.raises(Exception, match='dichotomous'):
         mirt.bfactor(x, [0, 0, 0, 1, 1, 1, 2, 2, 2], n_quadpts=5, max_iter=5, compute_standard_errors=False)
-    for k in ('GRM_bifactor', 'GPCM_bifactor', 'PCM_bifactor'):
-        assert MATRIX[k]['level'] == 'WITHHELD' and MATRIX[k]['decision'] == 'NO'
+    assert MATRIX['PCM_bifactor']['level'] == 'WITHHELD' and MATRIX['PCM_bifactor']['decision'] == 'NO'
+    for k in ('GRM_bifactor', 'GPCM_bifactor'):  # through the confirmatory orthogonal adapter, numerical scope only
+        assert MATRIX[k]['level'] == 'EXPERIMENTAL' and MATRIX[k]['decision'] == 'PARTIAL'
 
 def test_production_rejects_asymptote_families_and_unvalidated_exploratory():
     M = pytest.importorskip('core.irt_multidim')

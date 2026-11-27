@@ -8,6 +8,7 @@ permissions:
   contents: read
 jobs:
   phase2:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1', PYTHONPATH: .}
