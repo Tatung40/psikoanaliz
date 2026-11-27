@@ -42,8 +42,11 @@ def bifactor_pattern(groups) -> np.ndarray:
     return np.column_stack((np.ones(len(g), int), (g[:, None] == uniq).astype(int)))
 
 
-def fit_polytomous_bifactor(data, groups, model="GRM", *, n_quadpts=7, max_iter=1000, tol=1e-7, start_values=None):
-    """Graded/GPCM bifactor as a confirmatory orthogonal MGRM/MGPCM on a full Gauss-Hermite grid."""
+def fit_polytomous_bifactor(data, groups, model="GRM", *, n_quadpts=7, max_iter=1000, tol=1e-7, start_values=None, high_precision=False):
+    """Graded/GPCM bifactor as a confirmatory orthogonal MGRM/MGPCM on a full Gauss-Hermite grid.
+
+    ``high_precision=True`` adds the explicit EM continuation (``HIGH_PRECISION``) from the default solution.
+    """
     if model not in POLY_BIFACTOR_MODELS:
         raise ValueError(WITHHELD["PCM_bifactor"] if model == "PCM" else f"Unsupported polytomous bifactor model {model!r}")
     import mirt
@@ -63,8 +66,19 @@ def fit_polytomous_bifactor(data, groups, model="GRM", *, n_quadpts=7, max_iter=
     engine = (GradedResponseModel if model == "GRM" else GeneralizedPartialCredit)(k, n_categories=len(labels), n_factors=q, item_names=list(x.columns))
     engine.set_free_parameter_masks({"discrimination": pattern.astype(bool), key: np.ones((k, len(labels) - 1), bool)})
     start = start_values if start_values is not None else {"discrimination": pattern * 1.2, key: np.tile(np.linspace(-1, 1, len(labels) - 1), (k, 1))}
+    t0 = time.perf_counter()
     result = mirt.EMEstimator(**settings, compute_standard_errors=False, accelerate="none").fit(engine, x.to_numpy(), start=start)
-    out = dict(fit=result, covariance=np.eye(q), labels=labels, model=model, settings=settings)
+    out = dict(fit=result, covariance=np.eye(q), labels=labels, model=model, settings=settings, default_seconds=time.perf_counter() - t0)
+    if high_precision:
+        t1 = time.perf_counter()
+        hp = mirt.EMEstimator(n_quadpts=n_quadpts, max_iter=HIGH_PRECISION["max_iter"], tol=HIGH_PRECISION["tol"],
+                              item_optim_ftol=HIGH_PRECISION["item_optim_ftol"], item_optim_maxiter=HIGH_PRECISION["item_optim_maxiter"],
+                              compute_standard_errors=False, accelerate="none")
+        engine2 = (GradedResponseModel if model == "GRM" else GeneralizedPartialCredit)(k, n_categories=len(labels), n_factors=q, item_names=list(x.columns))
+        engine2.set_free_parameter_masks({"discrimination": pattern.astype(bool), key: np.ones((k, len(labels) - 1), bool)})
+        cont = hp.fit(engine2, x.to_numpy(), start=dict(result.model.parameters))
+        out.update(fit=cont, default_fit=result, profile=dict(HIGH_PRECISION), continuation_seconds=time.perf_counter() - t1,
+                   logLik_improvement=float(cont.log_likelihood - result.log_likelihood))
     a = np.asarray(out["fit"].model.parameters["discrimination"])
     if np.any(a[pattern == 0] != 0) or np.any(a[pattern == 1] <= 0):
         raise ValueError("Bifactor loading structure violated")

@@ -91,24 +91,27 @@ def bifactor_profile(name):
                 criteria_sha256=hashlib.sha256((ROOT / 'validation/mirt_stage1/criteria.json').read_bytes()).hexdigest())
 
 
+HP = {'flag': False}
+
+
 def adapter_fit(data, model, pattern, *, correlated=False, exploratory=False, labels=None, start_values=None, n_quadpts=7, max_iter=1000, tol=1e-7):
     assert not correlated and not exploratory
     groups = np.argmax(np.asarray(pattern)[:, 1:], 1)
-    return ADV.fit_polytomous_bifactor(data, groups, model, n_quadpts=n_quadpts, max_iter=max_iter, tol=tol, start_values=start_values)
+    return ADV.fit_polytomous_bifactor(data, groups, model, n_quadpts=n_quadpts, max_iter=max_iter, tol=tol, start_values=start_values, high_precision=HP['flag'])
 
 
-def part_b(out):
+def part_b(out, names=tuple(SEEDS)):
     original_profile, original_fit = S1.profile, S1.fit
     res = {}
     try:
         S1.profile = lambda n: bifactor_profile(n) if n in SEEDS else original_profile(n)
         S1.fit = adapter_fit
-        for name in SEEDS:
+        for name in names:
             t = time.perf_counter(); r = S1.run(name, out / name)
             res[name] = dict(status=r['status'], blocker=r.get('blocker'), seconds=time.perf_counter() - t,
                              Python=r.get('Python'), R={k: r.get('R', {}).get(k) for k in ('converged', 'iterations', 'logLik')},
                              failed=[k for k, v in r.get('comparison', {}).items() if v['status'] != 'PASS'],
-                             max_abs={k: v.get('max_absolute') for k, v in r.get('comparison', {}).items()})
+                             max_abs={k: v.get('max_absolute') for k, v in r.get('comparison', {}).items()}, high_precision=HP['flag'])
     finally:
         S1.profile, S1.fit = original_profile, original_fit
     return res
@@ -165,12 +168,23 @@ def part_e(out):
     return res
 
 
-def main(out):
+def part_f(out):
+    """Iteration 2 (GRM bifactor only): same fixture, same criteria, explicit high-precision continuation."""
+    HP['flag'] = True
+    try:
+        return part_b(out, ('GRM_Bifactor_4D',))
+    finally:
+        HP['flag'] = False
+
+
+def main(out, only=None):
     out.mkdir(parents=True, exist_ok=True); summary = dict(criteria_sha256=hashlib.sha256((ROOT / 'validation/mirt_stage1/criteria.json').read_bytes()).hexdigest(),
                                                            engine=RB.engine_available())
     for key, fn in (('A_fixed_asymptote', part_a), ('B_poly_bifactor', lambda: part_b(out / 'B')),
                     ('C_grm_high_precision', lambda: part_c(out / 'C')), ('D_binary_bifactor_DR', lambda: part_d(out / 'D')),
-                    ('E_R_poly_bfactor_DR', lambda: part_e(out))):
+                    ('E_R_poly_bfactor_DR', lambda: part_e(out)), ('F_grm_bifactor_high_precision', lambda: part_f(out / 'F'))):
+        if only and key not in only:
+            continue
         t = time.perf_counter()
         try:
             summary[key] = fn()
@@ -182,4 +196,5 @@ def main(out):
 
 
 if __name__ == '__main__':
-    p = argparse.ArgumentParser(); p.add_argument('--output', type=Path, required=True); main(p.parse_args().output)
+    p = argparse.ArgumentParser(); p.add_argument('--output', type=Path, required=True); p.add_argument('--only', nargs='*')
+    a = p.parse_args(); main(a.output, a.only)

@@ -11,7 +11,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN python -m pip install --no-cache-dir -r requirements.txt
 # Exact validated TAM version; fail the image build if unavailable.
-RUN Rscript -e 'options(repos=c(CRAN="https://cloud.r-project.org")); install.packages("remotes"); remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA); stopifnot(as.character(packageVersion("TAM"))=="4.3-25")'
+RUN Rscript -e 'options(repos=c(CRAN="https://cloud.r-project.org")); install.packages("remotes"); remotes::install_version("TAM",version="4.3-25",upgrade="never",dependencies=NA); stopifnot(as.character(packageVersion("TAM"))=="4.3.25")'
 # Optional native R mirt backend (advanced MIRT): exact pinned version at build time only; never installed during analysis.
 RUN Rscript -e 'options(repos=c(CRAN="https://cloud.r-project.org")); install.packages(c("jsonlite","nloptr")); remotes::install_version("mirt",version="1.48",upgrade="never",dependencies=NA); stopifnot(as.character(packageVersion("mirt"))=="1.48"); library(nloptr); library(jsonlite)'
 COPY . .
