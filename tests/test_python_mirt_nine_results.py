@@ -128,8 +128,13 @@ def test_actual_streamlit_tables_plots_downloads_and_invalidation(calibrated,mon
     at.button(key=f'python_mirt_start_{model}').click().run()
     assert not at.exception
     # Single click: binary models also get the SE/CI table (not 1PL: no SE), PNG + Excel/ZIP bundle; Rasch the Wright map.
-    tables={'Rasch':7,'1PL':5,'2PL':5,'3PL':5,'4PL':5,'NRM':3}.get(model,4)  # 1PL common a: SE now reported
+    tables={'Rasch':7,'1PL':5,'2PL':5,'3PL':5,'4PL':5,'NRM':4}.get(model,5)  # +1 polytomous P4-C1 SE/CI table (GRM/PCM/GPCM/NRM)
     assert len(at.dataframe)==tables and len(rendered_figures)==4
+    if model in ('GRM','PCM','GPCM','NRM'):
+        poly=[d.value for d in at.dataframe if 'Bilimsel durum (GA)' in getattr(d.value,'columns',[])]
+        assert len(poly)==1 and {'SH','%95 GA alt','%95 GA üst','SH yöntemi'}<=set(poly[0].columns)
+        assert poly[0]['Bilimsel durum (GA)'].isin(['NOT CERTIFIED']).all() or poly[0]['Bilimsel durum (GA)'].str.startswith('SCOPED CERTIFIED').all()
+        assert {f'python_mirt_poly_ci_{k}_{model}' for k in ('csv','xlsx','zip')}<={b.key for b in at.get('download_button')}
     from tests.reproducible_ui import scientific_downloads
     download_keys={d.key for d in scientific_downloads(at)}
     required={f'python_mirt_{suffix}_{model}' for suffix in (

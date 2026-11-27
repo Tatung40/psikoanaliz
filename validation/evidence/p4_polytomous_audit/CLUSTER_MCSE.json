@@ -1,0 +1,114 @@
+{
+ "source": "validation/evidence/p4_polytomous/*.json (read-only re-analysis; no new fits)",
+ "gate_note": "original p4 gates: point coverage in [.925,.975] with item-pooled binomial CIs; no dataset-cluster MCSE gate registered. MCSE<=.004 (house standard) is reported, not applied retrospectively.",
+ "rows": {
+  "original: GRM N500 discrimination": {
+   "datasets": 50,
+   "coverage": 0.97,
+   "cluster_mcse": 0.008206518066482898,
+   "meets_mcse_004": false
+  },
+  "original: GRM N500 thresholds": {
+   "datasets": 50,
+   "coverage": 0.9586666666666667,
+   "cluster_mcse": 0.005758558650602276,
+   "meets_mcse_004": false
+  },
+  "original: GRM N2000 discrimination": {
+   "datasets": 50,
+   "coverage": 0.958,
+   "cluster_mcse": 0.009934479228979262,
+   "meets_mcse_004": false
+  },
+  "original: GRM N2000 thresholds": {
+   "datasets": 50,
+   "coverage": 0.952,
+   "cluster_mcse": 0.006609276789675227,
+   "meets_mcse_004": false
+  },
+  "original: PCM N500 steps": {
+   "datasets": 50,
+   "coverage": 0.94,
+   "cluster_mcse": 0.006801360408136048,
+   "meets_mcse_004": false
+  },
+  "original: PCM N2000 steps": {
+   "datasets": 50,
+   "coverage": 0.94,
+   "cluster_mcse": 0.006388765649999399,
+   "meets_mcse_004": false
+  },
+  "original: GPCM N500 discrimination": {
+   "datasets": 50,
+   "coverage": 0.97,
+   "cluster_mcse": 0.00769309258162072,
+   "meets_mcse_004": false
+  },
+  "original: GPCM N500 steps": {
+   "datasets": 50,
+   "coverage": 0.9653333333333334,
+   "cluster_mcse": 0.004852472077278855,
+   "meets_mcse_004": false
+  },
+  "original: GPCM N2000 discrimination": {
+   "datasets": 50,
+   "coverage": 0.952,
+   "cluster_mcse": 0.009142857142857144,
+   "meets_mcse_004": false
+  },
+  "original: GPCM N2000 steps": {
+   "datasets": 50,
+   "coverage": 0.966,
+   "cluster_mcse": 0.0049934197062546015,
+   "meets_mcse_004": false
+  },
+  "original: NRM N500 slopes": {
+   "datasets": 50,
+   "coverage": 0.6473333333333333,
+   "cluster_mcse": 0.0159673703564417,
+   "meets_mcse_004": false
+  },
+  "original: NRM N500 intercepts": {
+   "datasets": 50,
+   "coverage": 0.67,
+   "cluster_mcse": 0.016748100376256167,
+   "meets_mcse_004": false
+  },
+  "original: NRM N2000 slopes": {
+   "datasets": 50,
+   "coverage": 0.6013333333333334,
+   "cluster_mcse": 0.015906757787514637,
+   "meets_mcse_004": false
+  },
+  "original: NRM N2000 intercepts": {
+   "datasets": 50,
+   "coverage": 0.6293333333333333,
+   "cluster_mcse": 0.015493104310600194,
+   "meets_mcse_004": false
+  },
+  "adapter(NRM oakes, post-hoc method fix): NRM N500 slopes": {
+   "datasets": 50,
+   "coverage": 0.9673333333333334,
+   "cluster_mcse": 0.005511480493802014,
+   "meets_mcse_004": false
+  },
+  "adapter(NRM oakes, post-hoc method fix): NRM N500 intercepts": {
+   "datasets": 50,
+   "coverage": 0.9513333333333334,
+   "cluster_mcse": 0.00701213719398094,
+   "meets_mcse_004": false
+  },
+  "adapter(NRM oakes, post-hoc method fix): NRM N2000 slopes": {
+   "datasets": 50,
+   "coverage": 0.9473333333333334,
+   "cluster_mcse": 0.006604471789556498,
+   "meets_mcse_004": false
+  },
+  "adapter(NRM oakes, post-hoc method fix): NRM N2000 intercepts": {
+   "datasets": 50,
+   "coverage": 0.932,
+   "cluster_mcse": 0.009231711097944864,
+   "meets_mcse_004": false
+  }
+ }
+}

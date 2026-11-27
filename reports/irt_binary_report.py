@@ -139,6 +139,7 @@ def bundle(report, persons, inference, inference_reason, itemfit=None, onestep=N
         tables["Madde_Uyumu"] = itemfit
     if onestep is not None:
         tables["Parametre_GA_TekAdim"] = onestep
+    tables = {k: v for k, v in tables.items() if v is not None}  # retain P4-C1 bundles without person rows
     xlsx = io.BytesIO()
     with pd.ExcelWriter(xlsx, engine="openpyxl") as writer:
         for name, frame in tables.items():
