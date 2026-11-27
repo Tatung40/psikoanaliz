@@ -48,7 +48,7 @@
     "R_backend": {
       "implemented": "YES",
       "executed_in_CI": "YES (R 4.6.1, mirt 1.48)",
-      "executable_in_docker": "see LEDGER.md (Docker job)",
+      "executable_in_docker": "YES. Run 45946079172: the image builds in about 13 min with TAM 4.3.25 and R mirt 1.48. An actual M4PL fit with --network none gives logLik -2536.18391098392, against -2536.18391098393 archived for direct R",
       "available_in_live_deployment": "NO",
       "available_to_users": "NO",
       "blocker": "Live hosting is Streamlit Community Cloud, which does not build the Dockerfile; packages.txt (apt) cannot pin R mirt 1.48. The backend therefore refuses explicitly there and Python-only operation is preserved",

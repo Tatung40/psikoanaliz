@@ -28,4 +28,4 @@ Iteration-1 results are added below once CI completes; they are not edited after
 | 1 | Binary bifactor 4D | full-grid iteration cap | R and Python bfactor DR, quadpts 21, 1000 iterations | still at the cap in both; loadings differ by up to 1.30 → **BLOCKED** (no correctable defect) |
 | 0 | Dockerfile | builds | docker job | the existing TAM check compared "4.3-25" with `as.character(packageVersion())` = "4.3.25" and could never pass; fixed to "4.3.25" |
 | 1 | Docker mirt install | install_version works on bookworm | docker job (run 45945188758) | FAIL: RcppParallel needs cmake; fs needs libuv; Deriv 4.3.0 needs R >= 4.5 (bookworm ships R 4.2.2) |
-| 2 | Docker mirt install | system libraries + Deriv 4.2.0 pre-pin | docker job | see the next run |
+| 2 | Docker mirt install | system libraries + Deriv 4.2.0 pre-pin | docker job (run 45946079172) | **PASS**: image builds; backend ready at build time; offline fit logLik matches archived direct R to about 1e-11 |
