@@ -12,8 +12,8 @@
     "exploratory_MGRM": {
       "decision": "PARTIAL",
       "level": "EXPERIMENTAL",
-      "evidence": "GRM_EFA_2D: baseline probability check failed again (run 45938013141); after the unchanged stage-1 precision continuation (tol 1e-11, item_optim_ftol 1e-14) every unchanged stage-1 check PASSES. Status NUMERICALLY VALIDATED / NOT CERTIFIED",
-      "limits": "2D only. Agreement holds at precision settings, not at production defaults (tol 1e-7). Not inferential; no SE"
+      "evidence": "Default tol 1e-7 fails the probability gate again (fresh R fit, phase2_run_45943641718_summary.json). The explicit high-precision profile core.mirt_advanced.fit_grm_high_precision passes every unchanged stage-1 check: max |dP| 6.7e-7, |dLL| 5.4e-11. Runtime: default 8.4 s, plus 4.0 s for the continuation.",
+      "limits": "2D recorded fixture only; explicit profile, no validated automatic trigger; numerical only"
     },
     "exploratory_MGPCM": {
       "decision": "NO",
@@ -24,39 +24,41 @@
     "binary_bifactor": {
       "decision": "PARTIAL",
       "level": "EXPERIMENTAL",
-      "evidence": "Bifactor_4D: both engines hit 1000 iterations, all comparisons pass at |dLL|=3e-9; P8 recovery NOT MET (N500 convergence 91/100; N1000 specific RMSE .42 > .30); iteration 1 (run 45938013141): baseline NOT CONVERGED again (iteration cap), so the precision continuation was BLOCKED",
+      "evidence": "Bifactor_4D: both engines hit 1000 iterations, all comparisons pass at |dLL|=3e-9; P8 recovery NOT MET (N500 convergence 91/100; N1000 specific RMSE .42 > .30); iteration 1 (run 45938013141): baseline NOT CONVERGED again (iteration cap), so the precision continuation was BLOCKED; Phase II DR diagnostic (quadpts 21, same 1000-iteration budget): R and Python both stop at 1000 iterations; sign-aligned loadings differ by up to 1.30, consistent with a weakly identified, flat ridge. No correctable defect found.",
       "limits": "historical NOT MET preserved; no new campaign"
     },
     "GRM_bifactor": {
-      "decision": "NO",
-      "level": "WITHHELD",
-      "evidence": "UNSUPPORTED API: mirt 1.2.0 bfactor raises MirtDataError for non-binary data",
-      "limits": "binary bifactor evidence not transferred"
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "Python adapter core.mirt_advanced.fit_polytomous_bifactor (confirmatory orthogonal MGRM, full GH7 grid, 4D). Default settings: probability gate FAIL (4.0e-4 > 1e-4); every other check PASS. Iteration 2 (high-precision continuation) is recorded in LEDGER.md",
+      "limits": "One 4D fixture (3 specific factors x 3 items); binary bifactor evidence not transferred"
     },
     "GPCM_bifactor": {
-      "decision": "NO",
-      "level": "WITHHELD",
-      "evidence": "UNSUPPORTED API (as above)",
-      "limits": "binary bifactor evidence not transferred"
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "Python adapter vs native R mirt on a common GH7 grid: all unchanged stage-1 checks PASS (max |dP| 9.8e-5, |dLL| 1.3e-6) (phase2_run_45943641718_summary.json)",
+      "limits": "One 4D fixture; numerical only; no SE"
     },
     "PCM_bifactor": {
       "decision": "NO",
       "level": "WITHHELD",
-      "evidence": "UNSUPPORTED API (as above)",
+      "evidence": "WITHHELD: slope=1 with unit variances is not the Rasch-testlet PCM, which needs free specific variances; no validated specification",
       "limits": "binary bifactor evidence not transferred"
     },
     "R_backend": {
-      "implemented": "NO",
-      "tested": "NO",
-      "deployment_ready": "NO",
+      "implemented": "YES",
+      "executed_in_CI": "YES (R 4.6.1, mirt 1.48)",
+      "executable_in_docker": "see LEDGER.md (Docker job)",
+      "available_in_live_deployment": "NO",
       "available_to_users": "NO",
-      "blocker": "Deployment image (Dockerfile/packages.txt, shared) installs r-base and TAM only, not R mirt; no automatic package installation permitted; R mirt is a reference oracle in CI only"
+      "blocker": "Live hosting is Streamlit Community Cloud, which does not build the Dockerfile; packages.txt (apt) cannot pin R mirt 1.48. The backend therefore refuses explicitly there and Python-only operation is preserved",
+      "licensing": "R mirt is GPL (>= 3); Python mirt 1.2.0 is MIT. Distributing a Docker image that bundles GPL R packages may carry source-availability obligations. Unresolved; not assessed legally"
     },
     "M3PL_fixed_asymptote": {
-      "decision": "PARTIAL",
+      "decision": "YES (numerical scope)",
       "level": "EXPERIMENTAL",
-      "evidence": "phase3 fixed-3PL and B_fixed numerically validated (SciPy prototype vs R)",
-      "limits": "not in production (core rejects 3PL family); no SE/CI exposed"
+      "evidence": "Production SciPy route (core.irt_multidim_general_report) already offers it. The native R backend reproduces the archived direct R fits (|dLL| <= 1e-11), and the two independent engines (R backend vs SciPy) agree on every stage-1 check for 2D within and 3D between cases (phase2_run_45943641718_summary.json)",
+      "limits": "2D/3D, positive CFA, >=3 pure anchors per dimension, c known; no item SE/CI/p"
     },
     "M3PL_free_asymptote": {
       "decision": "NO",
@@ -65,10 +67,10 @@
       "limits": "free-c not enabled because R returns estimates"
     },
     "M4PL_fixed_asymptotes": {
-      "decision": "PARTIAL",
+      "decision": "YES (numerical scope)",
       "level": "EXPERIMENTAL",
-      "evidence": "phase3 C_fixed 4 cases numerically validated",
-      "limits": "not in production; no asymptote CI"
+      "evidence": "4 cases (2D/3D, within/between): adapter fidelity |dLL| <= 2e-11 vs archived direct R; independent R vs SciPy all PASS, max |dP| 9.7e-6 (phase2_run_45943641718_summary.json)",
+      "limits": "as M3PL fixed; no asymptote CI"
     },
     "M4PL_mixed_asymptotes": {
       "decision": "NO",
@@ -83,5 +85,7 @@
       "limits": "no inferential claim"
     }
   },
-  "iteration_1_run": 45938013141
+  "iteration_1_run": 45938013141,
+  "phase2_run": 45943641718,
+  "correction_phase1": "Phase I wrongly stated M3PL/M4PL fixed were absent from production; the SciPy route core.irt_multidim_general_report exists (Codex-owned)."
 }

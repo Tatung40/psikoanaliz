@@ -16,3 +16,14 @@ Iteration-1 results are added below once CI completes; they are not edited after
 - GRM_EFA_2D: baseline NUMERICAL DISAGREEMENT (probabilities). Precision continuation: all checks PASS. Decision: **PASS** (numerical, 2D, precision settings only). The hypothesis is supported.
 - Bifactor_4D: baseline NOT CONVERGED, because both engines hit the iteration cap. The continuation precondition (converged fits) was not met. Decision: **BLOCKED**. No iteration 2 was run, because raising iteration budgets requires changing the shared stage-1 settings (Codex-owned).
 - The workflow is now manual-only (workflow_dispatch), so the experiment is not repeated.
+
+## Phase II — run 45943641718 (criteria SHA 5b666c89…, unchanged; archived as `phase2_run_45943641718_summary.json`)
+| # | Mechanism | Hypothesis | Diagnostic | Decision |
+|---|-----------|------------|------------|----------|
+| 0 | Python graded bifactor API | `bfactor(model="graded")` / `GradedBifactorModel` exist | installed source + PyPI 1.2.0 wheel inspected | **API ABSENT**: `bfactor` has no `model` argument and rejects any response > 1 in `BifactorEMEstimator.fit` (`MirtDataError: requires dichotomous 0/1 responses`); no such class exists |
+| 1 | GRM/GPCM bifactor | expressible as confirmatory orthogonal MGRM/MGPCM | `core.mirt_advanced` vs native R mirt, common GH7 grid, predeclared seeds | GPCM **PASS**; GRM FAIL (probabilities only, 4.0e-4) |
+| 2 | GRM bifactor probabilities | same GRM M-step precision mechanism as GRM EFA | explicit high-precision continuation, same fixture and criteria | see the run recorded below |
+| 1 | M3PL/M4PL fixed through the R backend | backend = verified phase3 R specification | 6 archived cases | **PASS** (fidelity and independence) |
+| 1 | GRM EFA 2D profile | explicit continuation passes | `fit_grm_high_precision` vs fresh R | **PASS**; ΔLL 3.3e-6 vs max ΔP 3.5e-4, so a log-likelihood trigger is unreliable → no adaptive trigger |
+| 1 | Binary bifactor 4D | full-grid iteration cap | R and Python bfactor DR, quadpts 21, 1000 iterations | still at the cap in both; loadings differ by up to 1.30 → **BLOCKED** (no correctable defect) |
+| 0 | Dockerfile | builds | docker job | the existing TAM check compared "4.3-25" with `as.character(packageVersion())` = "4.3.25" and could never pass; fixed to "4.3.25" |
