@@ -7,7 +7,8 @@ for (f in names(py)) {
   lg <- difLogistic(Data = x, group = g, focal.name = "F", type = "both", criterion = "LRT", purify = FALSE)
   lu <- difLogistic(Data = x, group = g, focal.name = "F", type = "udif", criterion = "LRT", purify = FALSE)
   gm <- ifelse(g == "F", "focal", "reference"); A <- match(P$anchors, P$items)
-  sib <- t(sapply(match(P$sib_items, P$items), function(j) { s <- SIBTEST(as.matrix(x), gm, suspect_set = j, match_set = A, focal_name = "focal")
+  J <- match(P$sib_items, P$items)
+  sib <- if (length(J) == 0) matrix(numeric(0), 0, 3, dimnames = list(NULL, c("beta", "X2", "p"))) else t(sapply(J, function(j) { s <- SIBTEST(as.matrix(x), gm, suspect_set = j, match_set = A, focal_name = "focal")
                  c(beta = s$beta[1], X2 = s$X2[1], p = s$p[1]) }))
   res[[f]] <- list(mh_chi2 = unname(mh$MH), mh_alpha = unname(mh$alphaMH), mh_delta = -2.35 * log(unname(mh$alphaMH)), mh_p = unname(mh$p.value),
                    mh_p_bh = unname(mh$adjusted.p), mh_purified_chi2 = unname(mhp$MH), lr_omnibus = unname(lg$Logistik), lr_uniform = unname(lu$Logistik),
