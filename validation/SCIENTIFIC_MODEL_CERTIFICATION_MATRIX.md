@@ -189,3 +189,9 @@ Discrimination and transformed category intercepts, latent covariance, probabili
 MNRM historical corrected native gpcm_mats/BOBYQA warm-reference acceptance is retained separately; it does not certify automatic cold calibration. Optional prospectively registered C1 cold comparison must independently pass unchanged criteria before any new cold release. EFA/bifactor/3PL/4PL and optional R-backend work remain separate and unchanged.
 
 Details, exact errors, ownership, missing-raw-artifact limitation, current software verification and handover: [core MIRT report](mirt_core_production/REPORT.md), [protocol](mirt_core_production/PROTOCOL.md). Runtime status derives from the existing original evidence files, not a competing registry.
+
+### Prospective C1 cold NRM — implementation-only numerical scope
+
+Actual run45960533214/job140377033939, protocolaf024e73e4be99d0db1a2a0df400039f98ab6095: one cold Python/R pair, both converged, unchanged original numerical gates allPASS. **NRM_2D_COLD_C1**: N400/J10/C4, exact 4pure/factor+2crossloading pattern, full correlation, zero means/unit variances/category0 reference, GH15/max3000/tol1e-9, nominal_start/zero intercepts/covarianceI. R full category-by-factor gpcm_mats/BOBYQA, not rank-one nominal. ΔP9.01815e-6; ΔI1.46868e-5; ΔLL8.63292e-9.
+
+This supersedes the pending cold-comparison state only for this prospectively defined profile. Original warm-only acceptance, initial derivative failure and unrelated later software-fixture failure remain recorded. Status **NUMERICALLY CERTIFIED / SCOPED**, never inferential certification. All item SE/CI/p/global-fit/Wilks outputs remain WITHHELD. Unknown/warm initialization, changed settings, missing/withdrawn proof or other dimensions are EXPERIMENTAL. Existing seven core profiles and all unidimensional/DIF inference certificates remain unchanged.

@@ -38,7 +38,17 @@ def audit():
                                     "differences":{k:r["comparison"][k]["max_absolute"] for k in expected}}
     assert set(records)==names
     from core.irt_mirt_policy import profiles
-    assert set(profiles())==names
+    assert set(profiles())==names|{"NRM_2D_COLD_C1"}
+    cold=json.loads((ROOT/"validation/mirt_core_production/NRM_COLD_REFERENCE.json").read_text())
+    c=cold["report"]
+    assert cold["provenance"]["run_id"]==45960533214 and c["calibration_attempts"]=={"Python":1,"R":1}
+    assert c["Python"]["converged"] is True and c["R"]["converged"] is True
+    assert c["Python"]["admissibility"]["valid"] is True and c["R_admissibility"]["valid"] is True
+    assert c["protocol"]["commit"]=="af024e73e4be99d0db1a2a0df400039f98ab6095"
+    for key,criterion in expected.items():
+        check=c["comparison"][key]
+        assert check["status"]=="PASS" and check["tolerance"]==criteria[criterion]
+        assert 0<=check["max_absolute"]<=criteria[criterion],key
     return dict(status="PASS",new_calibrations=0,new_R_calibrations=0,Python=platform.python_version(),
                 mirt=version("mirt"),baseline=owner["baseline_main"],profiles=records,
                 canonical_source_equivalence="Verified exact source after removing warning-only constant",

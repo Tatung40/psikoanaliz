@@ -11,9 +11,9 @@ Baseline: `b5b5ab095d00f1ff19d316a2381efcd551ac03d8`. Prospective ownership/prot
 | MGPCM | 3D full-correlation between-item | same | run40394398251 | WITHHELD | scoped numerical production |
 | MPCM | 2D orthogonal fixed unit loading vectors | native GPCM fixed discrimination | run40394398251 | WITHHELD | scoped numerical production |
 | Multidimensional Rasch | 2D orthogonal fixed unit vectors | native constrained 2PL | run40394398251 | WITHHELD | scoped numerical production |
-| MNRM | 2D full category-by-factor slopes, category0 zero reference | native Python NRM | corrected native R gpcm_mats/BOBYQA warm run40399106868 | WITHHELD | experimental cold; optional C1 pending |
+| MNRM | 2D full category-by-factor slopes, category0 zero reference | native Python NRM | corrected native R gpcm_mats/BOBYQA cold run45960533214 | WITHHELD | scoped numerical production ONLY C1 cold profile |
 
-Cold accepted scopes are N400, J10(2D)/14(3D), C2 binary or C4 categorical, GH15/axis, max1000/tol1e-7, ML/no priors, zero means/unit variances. Exact masks/correlation/free coordinates are read from existing evidence JSON, not inferred from model name. Input labels/IDs remain user data, not performance score assumptions. Program checks observable scope, packageversion, native masks/bounds/covariance/convergence; latent normality/local independence are assumptions not verified directly from user data. Unknown/evidence-withdrawn/out-of-scope cases remain experimental.
+Original seven cold accepted scopes are N400, J10(2D)/14(3D), C2 binary or C4 categorical, GH15/axis, max1000/tol1e-7, ML/no priors, zero means/unit variances. Exact masks/correlation/free coordinates are read from existing evidence JSON, not inferred from model name. Input labels/IDs remain user data, not performance score assumptions. Program checks observable scope, packageversion, native masks/bounds/covariance/convergence; latent normality/local independence are assumptions not verified directly from user data. Unknown/evidence-withdrawn/out-of-scope cases remain experimental.
 
 | Profile | N/J/q | slope Δ | transformed d Δ | probability Δ | IIF matrix Δ | EAP Δ | posterior SD Δ | common LL Δ |
 |---|---|---|---|---|---|---|---|---|
@@ -57,16 +57,28 @@ Threshold/step comparisons are via d=-sum(a)*b/step; those errors are not direct
 
 ## Evidence and source integrity
 
-Native core fit/report functions, compare.py/reference.R/criteria.json are byte-identical to canonical452db8fc6dde0028964c998064020f6713d20c24 apart from a warning constant. OWNERSHIP.json locks the actual baseline scientific/DIF/unidimensional sources and historical evidence; no old hash is rewritten. Existing NON_DIF_IRT_CLOSURE.json is a historical snapshot, not silently promoted. Current numerical scope is a view of existing reports in the existing runtime status system; no competing certification registry.
+Native core fit/report functions, compare.py/reference.R/criteria.json are byte-identical to canonical452db8fc6dde0028964c998064020f6713d20c24 apart from a warning constant. OWNERSHIP.json locks the actual baseline scientific/DIF/unidimensional sources and historical evidence; no old hash is rewritten. Existing NON_DIF_IRT_CLOSURE.json is a historical snapshot, not silently promoted. Current numerical scope is a view of immutable original reports plus prospective C1 cold evidence in the existing runtime status system; no competing certification registry.
 
 Existing advanced functionality is retained with its restrictions. No EFA/bifactor/3PL/4PL estimator or optional R backend is implemented. Automatic PR validation audits frozen evidence and mathematical contracts; advanced independent calibration remains explicit manual dispatch only, so old campaigns are not repeated for shared UI edits.
 
 ## Software checks and artifacts
 
-Focused API/mathematical/scope/refusal tests, actual native software fixtures, actual CSV/XLSX/ZIP/PNG/DOCX files, real Streamlit no-refit/staleness flow and offline runtime-assets checks are required. Software fixtures are not independent calibration campaigns and do not establish new scientific inference. Actual runtime measurements distinguish calibration and reporting and are single-fixture observations, not unsupported P95/speed claims. Test/CI status remains PENDING until actual Actions completion; raw logs/artifacts are uploaded even on failure.
+Focused API/mathematical/scope/refusal tests, actual native software fixtures, actual CSV/XLSX/ZIP/PNG/DOCX files, real Streamlit no-refit/staleness flow and offline runtime-assets checks are required. Software fixtures are not independent calibration campaigns and do not establish new scientific inference. Actual runtime measurements distinguish calibration and reporting and are single-fixture observations, not unsupported P95/speed claims. Final software verification remains PENDING until actual current-head Actions completion; raw logs/artifacts are uploaded even on failure.
 
 ## Claude integration handover
 
 Shared contract remains result={metadata:dict,tables:dict[str,DataFrame]}. Metadata Status/Numerical_status/Inferential_status and Limitations/Applicable_conditions/Unverifiable_assumptions are authoritative. Reports preserve unknown advanced tables and all original numbers; extra metadata does not grant an advanced certificate. New core helpers apply only owned native CFA; EFA/bifactor/3PL/4PL paths remain as before.
 
 Public interfaces: irt_mirt_policy.profiles/numerical_scope/evidence_fingerprint; irt_mirt_diagnostics.enrich; irt_mirt_production.decorate_native/refresh_policy; shared report.export_fingerprint/downloads/figure. Advanced integrations should provide actual convergence/model/engine/identification/settings/status and reuse the result contract, not copy core numerical status. Add advanced-specific evidence only on Claude's branch after rebase onto merged core main. Keep unsupported item SE/CI/p and generic difficulty closed. Final main/PR/test identifiers are in the PR closure record.
+
+## C1 actual cold NRM result (subsequent registered comparison)
+
+Protocol committed at af024e73e4be99d0db1a2a0df400039f98ab6095 BEFORE execution. Canonical run45960533214/job140377033939 checked out8f1848afc92febd5f2140bae743dcaf081f33877 from PRhead1ae9d832. Actual Python mirt1.2.0 and native R mirt1.48 each calibrated ONCE, from cold nominal_start/zero intercepts/identity latent covariance, N400/J10/C4/GH15/max3000/tol1e-9, ML/no priors. All unchanged mapping/calibration gates passed. No active bounds; latent/reference constraints valid.
+
+Python107 iterations /2.26985s; R138 iterations /269.71717s. Maximum differences: slope3.83975e-5, native category intercept1.77649e-5, covariance5.81476e-6, probability9.01815e-6, IIF1.46868e-5, EAP1.36235e-5, posteriorSD2.13090e-6, commonLL8.63292e-9. Parameter count67; AIC/BIC have the same ML definitions. The R prior is exactly0; this is not MAP. No new inferential certificate.
+
+The raw original report retains NUMERICALLY VALIDATED / NOT CERTIFIED (its original inference qualification); Policy D attaches a separate implementation-only NUMERICALLY CERTIFIED / SCOPED label. C1 is a separate exact profile, not an expansion of defaultNRM1000/1e-7. A cold-provenance marker is required from the actual native call; unknown/warm starts fail closed. This is not a claim about arbitrary nominal category structures, sample sizes, true latent DGP, global optimum or coverage.
+
+Whole canonical job later failed an unrelated nominal-label SOFTWARE FIXTURE after the scientific pair passed; that failure is preserved, not presented as whole-workflow PASS. The fixture's numeric codes were incompatible with its default A..E labels. Fix the fixture's explicit label declaration, never the observed data or statistical gates. Initial cold step in earlier run45940610844 was SKIPPED after a no-fit test failure: ZERO calibrations there. Do not repeat the successful pair.
+
+NRM_COLD_REFERENCE.json freezes actual report/provenance. Original complete raw artifacts15180697845 and original warm/negative evidence are retained; archival CI downloads the canonical raw files, verifies source/data hashes, and exports native coefficients without a new fit. Parameterization notices are now model-specific: binary directd, GRM/GPCM transformed thresholds/steps, NRM nominal coefficient vectors only.

@@ -24,6 +24,12 @@ def _outcome(name):
         engine = MultidimensionalModel(k, q, model_type="confirmatory", loading_pattern=pattern)
         engine.set_parameters(slopes=a, intercepts=np.zeros(k))
         loading_key = "slopes"
+    elif model == "NRM":
+        from mirt.models.polytomous import NominalResponseModel
+        from core.irt_multidim import nominal_start
+        engine = NominalResponseModel(k, categories, n_factors=q)
+        engine.set_parameters(slopes=nominal_start(pattern, categories), intercepts=np.zeros((k, categories)))
+        loading_key = "slopes"
     else:
         from mirt.models.polytomous import GradedResponseModel, GeneralizedPartialCredit
         constructor = GradedResponseModel if model == "GRM" else GeneralizedPartialCredit
@@ -33,7 +39,12 @@ def _outcome(name):
                                     np.tile([-1., 0., 1.], (k, 1))})
         loading_key = "discrimination"
     masks = {key: np.ones_like(value, dtype=bool) for key, value in engine.parameters.items()}
-    masks[loading_key] = np.zeros_like(pattern) if unit else pattern.copy()
+    if model == "NRM":
+        masks["slopes"] = np.broadcast_to(pattern[:, None, :], (k, categories, q)).copy()
+        masks["slopes"][:, 0, :] = False
+        masks["intercepts"][:, 0] = False
+    else:
+        masks[loading_key] = np.zeros_like(pattern) if unit else pattern.copy()
     engine.set_free_parameter_masks(masks)
     data = pd.DataFrame((np.arange(cfg["N"])[:, None] + np.arange(k)) % categories,
                         columns=[f"M{j+1}" for j in range(k)])
@@ -41,6 +52,7 @@ def _outcome(name):
                                                  latent_mean=np.zeros(q)),
                 coded=data, labels=tuple(map(str, range(categories))), pattern=pattern,
                 covariance=np.eye(q), correlated=cfg["correlated"], exploratory=False,
+                initialization=P.COLD_INITIALIZATION if model == "NRM" else None,
                 settings={key: cfg[key] for key in ("max_iter", "tol", "n_quadpts")})
 
 
@@ -48,7 +60,8 @@ def test_exact_original_profiles_and_criteria_are_reused():
     profiles = P.profiles()
     assert set(profiles) == set(P.OWNED)
     assert set(P.profiles("GPCM")) == {"GPCM_3D"}
-    assert P.profiles("NRM") == {} and P.profiles("Bifactor") == {} and P.profiles("3PL") == {}
+    assert set(P.profiles("NRM")) == {"NRM_2D_COLD_C1"}
+    assert P.profiles("Bifactor") == {} and P.profiles("3PL") == {}
     assert profiles["GPCM_3D"]["correlated"] == "full"
     profiles["GPCM_3D"]["N"] = 999
     assert P.profiles()["GPCM_3D"]["N"] == 400
@@ -174,3 +187,61 @@ def test_fixed_unit_loadings_and_structural_zeros_are_not_active_bounds(name):
     key = "slopes" if name.startswith("Rasch") else "discrimination"
     assert not np.asarray(out["fit"].model.free_parameter_masks[key]).any()
     assert P.numerical_scope(out)["Status"] == P.NUMERICAL
+
+
+@pytest.mark.parametrize("initialization", [None, "warm", "saved item solution"])
+def test_nrm_cold_claim_requires_explicit_actual_initialization_marker(initialization):
+    out = _outcome("NRM_2D_COLD_C1")
+    out["initialization"] = initialization
+    assert P.numerical_scope(out)["Status"] == P.EXPERIMENTAL
+
+
+@pytest.mark.parametrize("bound", [-5., 5.])
+def test_nrm_signed_category_slopes_and_true_native_bounds(bound):
+    from mirt.estimation.base import _parameter_bounds
+    out = _outcome("NRM_2D_COLD_C1")
+    assert _parameter_bounds(out["fit"].model, "slopes") == (-5., 5.)
+    assert (out["fit"].model.parameters["slopes"] < 0).any()
+    assert P.numerical_scope(out)["Status"] == P.NUMERICAL
+    a = out["fit"].model.parameters["slopes"].copy()
+    a[0, 2, 0] = bound
+    out["fit"].model.set_parameters(slopes=a)
+    assert P.numerical_scope(out)["Status"] == P.EXPERIMENTAL
+
+
+@pytest.mark.parametrize("bad", ["reference_slope", "reference_intercept", "structural_zero", "anchor_sign"])
+def test_nrm_reference_structure_and_canonical_orientation_are_required(bad):
+    out = _outcome("NRM_2D_COLD_C1")
+    native = out["fit"].model
+    a, d = native.parameters["slopes"].copy(), native.parameters["intercepts"].copy()
+    if bad == "reference_slope": a[0, 0, 0] = .1
+    elif bad == "reference_intercept": d[0, 0] = .1
+    elif bad == "structural_zero": a[0, 1, 1] = .1
+    else: a[0, 1, 0] = -.1
+    # Native setters may normalize reference/structural zeros; simulate a damaged
+    # returned snapshot explicitly, without pretending this was a calibrated fit.
+    out["fit"].model = SimpleNamespace(parameters=dict(native.parameters, slopes=a, intercepts=d),
+        free_parameter_masks=native.free_parameter_masks, model_name=native.model_name)
+    assert P.numerical_scope(out)["Status"] == P.EXPERIMENTAL
+
+
+def test_warm_archive_cannot_replace_missing_or_withdrawn_cold_proof(tmp_path, monkeypatch):
+    out = _outcome("NRM_2D_COLD_C1")
+    original = P.ROOT
+    for path in P.PINNED:
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((original / path).read_bytes())
+    monkeypatch.setattr(P, "ROOT", tmp_path)
+    assert len(P.profiles()) == 8
+    target = tmp_path / P.COLD_PATH
+    before = P.evidence_fingerprint()
+    target.unlink()
+    assert P.evidence_fingerprint() != before
+    assert set(P.profiles()) == set(P.OWNED) - {"NRM_2D_COLD_C1"}
+    assert P.profiles("NRM") == {} and P.numerical_scope(out)["Status"] == P.EXPERIMENTAL
+    doc = json.loads((original / P.COLD_PATH).read_text())
+    doc["report"]["calibration_attempts"]["R"] = 2
+    target.write_text(json.dumps(doc))
+    assert P.profiles("NRM") == {}  # even a PASS label cannot replace frozen actual one-shot evidence
+    assert len(P.profiles()) == 7

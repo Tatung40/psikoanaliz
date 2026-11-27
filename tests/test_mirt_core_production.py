@@ -25,7 +25,8 @@ def actual(tmp_path_factory):
         t=time.perf_counter()
         outcome=fit(data,cfg["model"],cfg["pattern"],correlated=cfg["correlated"],
                     n_quadpts=15 if name=="2PL_2D" else 5,max_iter=1000,
-                    tol=1e-7 if name=="2PL_2D" else 1e-5)
+                    tol=1e-7 if name=="2PL_2D" else 1e-5,
+                    labels=["0","1","2","3"] if cfg["model"]=="NRM" else None)
         fitted=time.perf_counter();base=report(outcome,ids);result=decorate_native(outcome,base,ids)
         measured=time.perf_counter();recorder=R.finish();results['_recorders'][name]=recorder
         results[name]=(cfg,data,outcome,base,result,ids)
@@ -44,7 +45,10 @@ def test_actual_native_tables_and_exports_preserve_values_and_withhold_item_infe
     pd.testing.assert_frame_equal(result["tables"]["Boundaries"],native_boundaries(outcome["fit"]))
     assert result["metadata"]["Inferential_status"]=="WITHHELD"
     assert result["metadata"]["Item_parameter_SE"]==result["metadata"]["Item_parameter_CI"]=="WITHHELD"
-    assert "universal" in result["metadata"]["Threshold_parameterization"]
+    description=result["metadata"]["Threshold_parameterization"]
+    assert "universal" in description
+    if cfg["model"]=="NRM":assert "nominal" in description and "no ordered thresholds" in description
+    elif cfg["model"] in ("2PL","Rasch"):assert "direct intercept" in description
     if not outcome["fit"].converged:
         assert not {"EAP","MAP","PosteriorCovariance","Curves"}&result["tables"].keys()
     else:
@@ -161,3 +165,13 @@ def test_every_registered_preset_sets_exact_spec_without_fitting(profile,tmp_pat
     assert at.number_input(key="md_profile_tol").value==1e-7
     assert any(b.key=="md_run" for b in at.button)
     assert view.KEY not in at.session_state
+
+def test_native_ml_fit_statistics_use_actual_free_parameter_count(actual):
+    for name in ("2PL_2D","GRM_2D","GPCM_3D","PCM_2D","Rasch_2D","NRM_2D"):
+        cfg,data,outcome,_,result,_=actual[name]
+        f=outcome["fit"]
+        item_count=sum(int(np.count_nonzero(v)) for v in f.model.free_parameter_masks.values())
+        correlations=cfg["q"]*(cfg["q"]-1)//2 if cfg["correlated"]=="full" else int(bool(cfg["correlated"]))
+        assert f.n_parameters==item_count+correlations
+        np.testing.assert_allclose(f.aic,-2*f.log_likelihood+2*f.n_parameters,atol=1e-10,rtol=0)
+        np.testing.assert_allclose(f.bic,-2*f.log_likelihood+np.log(len(data))*f.n_parameters,atol=1e-10,rtol=0)

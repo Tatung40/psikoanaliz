@@ -28,10 +28,6 @@ on:
       - '.github/workflows/mirt-stage1.yml'
   workflow_dispatch:
     inputs:
-      core_nrm_cold:
-        description: 'Execute exactly one preregistered bounded cold NRM reference pair'
-        type: boolean
-        default: false
       run_advanced_calibrations:
         description: 'Explicit separate advanced-model campaigns; not part of core PR audit'
         type: boolean
@@ -80,9 +76,15 @@ jobs:
         run: python -m validation.mirt_core_production.audit --output validation-output/mirt-core/audit.json
       - name: Targeted core numerical identities, scoped status, real UI and exports
         run: python -m pytest -q -rP tests/test_mirt_core_policy.py tests/test_mirt_core_diagnostics.py tests/test_mirt_core_exports.py tests/test_mirt_core_integrity.py
-      - name: One preregistered optional cold NRM pair (no retries; 300s per engine)
-        if: (github.event_name == 'workflow_dispatch' && inputs.core_nrm_cold) || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, 'CORE_NRM_COLD_C1_ONCE'))
-        run: python -m validation.mirt_core_production.nrm_cold --output validation-output/nrm-cold
+      - name: Download canonical C1 raw evidence (no refit fallback)
+        uses: actions/download-artifact@v4
+        with:
+          name: mirt-stage1-8f1848afc92febd5f2140bae743dcaf081f33877-45960533214
+          run-id: 45960533214
+          github-token: ${{ github.token }}
+          path: canonical-c1
+      - name: Archive original cold coefficients and verify source/data hashes (ZERO fits)
+        run: python -m validation.mirt_core_production.archive --root canonical-c1/nrm-cold
       - name: Actual native software fixtures, UI, Word and content-bound export cache
         run: python -m pytest -q -rP tests/test_mirt_core_production.py
       - name: Installed independent R reference version (no calibration)

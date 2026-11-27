@@ -15,12 +15,16 @@ ROOT = Path(__file__).resolve().parents[1]
 PINNED = {
     "validation/mirt_stage1/criteria.json": "dc13c876887e56ca932890bb08118c0d058bb30e",
     "validation/mirt_stage1/expansion_original_evidence.json": "493ad69808d88846e83740ad41d58c8d03899f00",
-    "validation/mirt_stage1/phase1_evidence.json": "a2d4d4e4c89f07f7418b05a6d56813a5b5bc472d"
+    "validation/mirt_stage1/phase1_evidence.json": "a2d4d4e4c89f07f7418b05a6d56813a5b5bc472d",
+    "validation/mirt_core_production/NRM_COLD_REFERENCE.json": "82642212d8260a875053a948cde5d9e441305c16"
 }
-OWNED = ("2PL_2D", "2PL_3D", "GRM_2D", "GRM_3D", "GPCM_3D", "Rasch_2D", "PCM_2D")
+OWNED = ("2PL_2D", "2PL_3D", "GRM_2D", "GRM_3D", "GPCM_3D", "Rasch_2D", "PCM_2D", "NRM_2D_COLD_C1")
 NUMERICAL = "NUMERICALLY CERTIFIED / SCOPED"
 EXPERIMENTAL = "EXPERIMENTAL / NOT CERTIFIED"
 WITHHELD = "WITHHELD"
+COLD_PATH = "validation/mirt_core_production/NRM_COLD_REFERENCE.json"
+COLD_PROTOCOL = "af024e73e4be99d0db1a2a0df400039f98ab6095"
+COLD_INITIALIZATION = "NATIVE COLD / nominal_start + zero intercepts + identity covariance"
 CHECKS = {
     "slopes": "calibration_parameters", "intercepts": "calibration_parameters",
     "covariance": "calibration_covariance", "probabilities": "calibration_probability",
@@ -79,9 +83,16 @@ def _records():
     try:
         documents = {}
         for path, expected in PINNED.items():
-            raw = (ROOT / path).read_bytes()
+            try:
+                raw = (ROOT / path).read_bytes()
+            except OSError:
+                if path == COLD_PATH:
+                    continue
+                return {}
             actual = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
             if actual != expected:
+                if path == COLD_PATH:
+                    continue
                 return {}
             documents[path] = json.loads(raw)
         criteria = documents["validation/mirt_stage1/criteria.json"]
@@ -108,9 +119,56 @@ def _records():
                         not _passes(report["preflight"], PREFLIGHT, criteria)):
                     continue
                 records[name] = dict(settings=cfg, run=document["run"])
+        cold = _cold_record(documents.get(COLD_PATH), criteria, digest)
+        if cold is not None:
+            records["NRM_2D_COLD_C1"] = cold
         return records
     except (OSError, ValueError, KeyError, TypeError):
         return {}
+
+
+
+def _cold_record(document, criteria, digest):
+    """Only the actual prospective cold pair can support the cold NRM profile."""
+    try:
+        proof, report = document["provenance"], document["report"]
+        cfg, py, ref = report["settings"], report["Python"], report["R"]
+        pa, ra = py["admissibility"], report["R_admissibility"]
+        if (proof["run_id"] != 45960533214 or proof["job_id"] != 140377033939 or
+                proof["source_head"] != "1ae9d8321f8a392bbcf49e3cee25bb7dda1aee55" or
+                proof["actual_checkout"] != "8f1848afc92febd5f2140bae743dcaf081f33877" or
+                proof["protocol_commit"] != COLD_PROTOCOL or
+                report["protocol"]["commit"] != COLD_PROTOCOL or
+                report["protocol"]["sha256"] != "016abb32bada448a70cde66ed2397e550db9c5d33307cdc4b7936036e639e336" or
+                report["calibration_attempts"] != {"Python": 1, "R": 1} or
+                report["profile"] != "NRM_2D_COLD_C1" or cfg["name"] != "NRM_2D" or
+                cfg["model"] != "NRM" or cfg["q"] != 2 or cfg["k"] != 10 or cfg["N"] != 400 or
+                cfg["correlated"] != "full" or cfg["n_quadpts"] != 15 or
+                cfg["max_iter"] != 3000 or cfg["tol"] != 1e-9 or
+                cfg["protocol_commit"] != COLD_PROTOCOL or cfg["criteria_sha256"] != digest or
+                cfg["data_sha256"] != "e43e687f10bf1231ba1c386a4d68bba4fc5dd22f81d31f92690e5e550e742454" or
+                report["status"] != "NUMERICALLY VALIDATED / NOT CERTIFIED" or
+                report["R_execution"] != "CALIBRATION EXECUTED" or report["Python_execution"] != "EXECUTED" or
+                py["engine"] != "Python mirt 1.2.0" or ref["version"] != "1.48" or
+                py["converged"] is not True or ref["converged"] is not True or
+                ref["constraints_valid"] is not True or ref["logPrior"] != 0 or
+                pa["valid"] is not True or pa["reference_and_structural_zeros"] is not True or
+                pa["inside_native_boxes"] is not True or pa["identified_latent_metric"] is not True or
+                pa["at_bound"] or pa["actual_native_bounds"] != {"slopes": [-5, 5], "intercepts": [-6, 6]} or
+                ra["valid"] is not True or ra["inside_native_boxes"] is not True or ra["at_bound"] or
+                ra["free_parameters"] != 67 or py["n_parameters"] != 67 or
+                not _passes(report["comparison"], CHECKS, criteria) or
+                not _passes(report["preflight"], PREFLIGHT, criteria)):
+            return None
+        for name in ("Python_runtime", "R_runtime", "R_preflight_runtime"):
+            worker = report["worker_runtime"][name]
+            if worker["timed_out"] is not False or worker["returncode"] != 0 or worker["elapsed_seconds"] > 300:
+                return None
+        settings = copy.deepcopy(cfg)
+        settings["name"] = "NRM_2D_COLD_C1"  # alias only; frozen report remains byte-identical
+        return dict(settings=settings, run=proof["run_url"])
+    except (KeyError, TypeError, ValueError):
+        return None
 
 
 def profiles(model=None):
@@ -127,12 +185,32 @@ def _admissible(outcome):
     if not bool(fit.converged) or not np.isfinite(fit.log_likelihood):
         return False
     parameters, masks = fit.model.parameters, fit.model.free_parameter_masks
-    key = "slopes" if outcome["model"] in ("2PL", "Rasch") else "discrimination"
-    a = np.asarray(parameters[key], float)
-    if a.shape != pattern.shape or np.any(a[~pattern] != 0) or np.any(a[pattern] <= 0):
-        return False
-    if outcome["model"] in ("Rasch", "PCM") and not np.array_equal(a, pattern.astype(float)):
-        return False
+    if outcome["model"] == "NRM":
+        a = np.asarray(parameters["slopes"], float)
+        d = np.asarray(parameters["intercepts"], float)
+        categories = len(outcome["labels"])
+        expected = np.broadcast_to(pattern[:, None, :], (len(pattern), categories, pattern.shape[1])).copy()
+        expected[:, 0, :] = False
+        intercept_mask = np.ones((len(pattern), categories), bool)
+        intercept_mask[:, 0] = False
+        if (a.shape != expected.shape or d.shape != intercept_mask.shape or
+                np.any(a[~expected] != 0) or np.any(d[:, 0] != 0) or
+                not np.array_equal(masks["slopes"], expected) or
+                not np.array_equal(masks["intercepts"], intercept_mask)):
+            return False
+        for j in range(pattern.shape[1]):
+            anchors = np.flatnonzero(pattern[:, j] & (pattern.sum(1) == 1))
+            if not len(anchors) or a[anchors[0], 1, j] <= np.sqrt(np.finfo(float).eps):
+                return False
+        if outcome.get("initialization") != COLD_INITIALIZATION:
+            return False  # upstream stamps this only when its actual call has no supplied starts
+    else:
+        key = "slopes" if outcome["model"] in ("2PL", "Rasch") else "discrimination"
+        a = np.asarray(parameters[key], float)
+        if a.shape != pattern.shape or np.any(a[~pattern] != 0) or np.any(a[pattern] <= 0):
+            return False
+        if outcome["model"] in ("Rasch", "PCM") and not np.array_equal(a, pattern.astype(float)):
+            return False
     covariance = np.asarray(outcome["covariance"], float)
     q = pattern.shape[1]
     if (covariance.shape != (q, q) or not np.isfinite(covariance).all() or
@@ -170,6 +248,9 @@ def numerical_scope(outcome):
     """Metadata only; never fits, scores, estimates uncertainty or changes a result."""
     metadata = dict(
         Status=EXPERIMENTAL, Numerical_status=EXPERIMENTAL, Inferential_status=WITHHELD,
+        Certification_layer="NUMERICAL IMPLEMENTATION PROFILE, not independent certification of the current data/calibration",
+        Current_data_independent_R_fit="NOT EXECUTED BY APPLICATION; Evidence_run identifies the historical reference fixture",
+        Reference_DGP="Archived fixed generator: unit latent variances; zero means; true free factor correlations .25, others0. Native item/category truth is fixed by the unchanged original generator, not estimated/verified from user data.",
         Item_parameter_SE=WITHHELD, Item_parameter_CI=WITHHELD, Inferential_p=WITHHELD,
         Global_fit_inference=WITHHELD, Item_fit_inference=WITHHELD, Formal_model_comparison=WITHHELD,
         Posterior_uncertainty="CONDITIONAL POSTERIOR ONLY; not item SE or frequentist CI",
@@ -207,7 +288,10 @@ def numerical_scope(outcome):
                                 "N": cfg["N"], "J": cfg["k"], "categories": expected_categories,
                                 "pattern": cfg["pattern"], "correlated": cfg["correlated"],
                                 "settings": settings, "estimation": "ML, no priors",
-                                "identification": "zero means; unit variances; positive CFA structural masks",
+                                "identification": ("zero means; unit variances; category0 reference; canonical pure-anchor signs"
+                                                   if cfg["model"] == "NRM" else "zero means; unit variances; positive CFA structural masks"),
+                                "initialization": cfg.get("initialization", "registered cold CFA starts"),
+                                "reference_seed": cfg["seed"], "reference_data_sha256": cfg["data_sha256"],
                                 "scope": "finite-grid implementation profile; not certification of the user's DGP"
                             }, ensure_ascii=False, sort_keys=True))
             return metadata

@@ -10,7 +10,7 @@ from core import irt_multidim_factorized as factorized
 from core import irt_multidim_rsm_stack as rsm
 from core import irt_multidim_general_report as general
 from reports.irt_multidim_report import downloads,figure,export_fingerprint
-from core.irt_mirt_policy import profiles,evidence_fingerprint
+from core.irt_mirt_policy import profiles,evidence_fingerprint,COLD_INITIALIZATION
 from core.irt_mirt_production import decorate_native,refresh_policy
 from time import perf_counter
 
@@ -37,7 +37,7 @@ def render(data=None,item_cols=(),id_col=None):
  choices=[c for c in data if c!=person]
  items=st.multiselect('Maddeler',choices,default=[c for c in item_cols if c in choices] or choices,key='md_items')
  model=st.selectbox('MIRT modeli',MODELS+factorized.MODELS+rsm.MODELS+general.MODELS,index=MODELS.index('2PL'),key='md_model')
- current_profiles=profiles(model) if model in ('2PL','GRM','GPCM','PCM','Rasch') else {}
+ current_profiles=profiles(model) if model in ('2PL','GRM','GPCM','PCM','Rasch','NRM') else {}
  # Preserve declarative input specs on evidence withdrawal; only the certificate is refreshed, never the fit.
  known=st.session_state.setdefault('md_profile_specs',{})
  known.update(current_profiles)
@@ -73,6 +73,8 @@ def render(data=None,item_cols=(),id_col=None):
  labels=None
  if model=='NRM':
   observed=list(dict.fromkeys(str(v).strip().upper() for v in data[items].to_numpy().ravel())) if items else []
+  # Canonical numeric codes keep their explicit 0..3 reference order; this is not an achievement ordering.
+  if set(observed)=={'0','1','2','3'}:observed=['0','1','2','3']
   labels=tuple(v.strip().upper() for v in st.text_input('Nominal etiketler: kod sırası, başarı sırası değil',','.join(observed),key='md_labels').split(','))
  nodes=st.selectbox('Eksen başına GH düğümü',[cfg['n_quadpts']] if cfg else [21,41,61] if restricted or stacked else {2:[9,15,21],3:[5,9,15],4:[5,7],5:[5]}[dims],index=({2:1,3:2}[dims] if advanced else 0),key=f'md_general_quad_{dims}' if advanced else f'md_quad_{dims}')
  iterations=st.number_input('Maksimum iterasyon',min_value=1,max_value=3000,value=cfg['max_iter'] if cfg else 2000 if advanced else 1000,step=100,key='md_profile_iter' if cfg else 'md_general_iter' if advanced else 'md_iter',disabled=bool(cfg))
@@ -105,6 +107,8 @@ def render(data=None,item_cols=(),id_col=None):
     elif stacked:result=rsm.report(rsm.fit(data[items],model,chosen,correlated=correlated,exploratory=efa,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance),ids)
     else:
      outcome=fit(data[items],model,chosen,correlated=correlated,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance,labels=labels,exploratory=efa)
+     # Only this actual native call omitted start_values; never infer cold provenance from a model label.
+     if model=='NRM':outcome=dict(outcome,initialization=COLD_INITIALIZATION)
      fitted_at=perf_counter();base_result=report(outcome,ids)
      result=decorate_native(outcome,base_result,ids,extra_metadata=dict(Input_fingerprint=key,ID_column=person,
                               Calibration_seconds=fitted_at-started,Base_reporting_seconds=perf_counter()-fitted_at))

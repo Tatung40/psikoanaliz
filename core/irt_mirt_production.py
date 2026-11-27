@@ -17,13 +17,33 @@ def refresh_policy(outcome,result):
           "IRT ayırıcılık vektörleri standartlaştırılmış FA yükleri değildir; genel skaler çok boyutlu güçlük yoktur.")
     meta["Limitations"]=str(meta.get("Limitations",""))+" "+note
     meta["Production_status"]="SCOPED NUMERICAL PRODUCTION" if meta.get("Numerical_status","").startswith("NUMERICALLY CERTIFIED") else "EXPERIMENTAL / NOT CERTIFIED"
-    meta["Threshold_parameterization"]="Native b/steps; transformed d=-sum(a)*b. Not universal multidimensional difficulty."
+    model=outcome.get("model")
+    if model=="NRM":
+        parameterization="Native nominal category-specific slope vectors/intercepts, category0 zero reference; no ordered thresholds or universal multidimensional difficulty."
+        parameter_evidence="Native nominal category coefficients; cold equivalence only within recorded C1 scope. Warm evidence alone is not cold certification."
+    elif model in ("2PL","Rasch","1PL (a=1)"):
+        parameterization="Native binary slope vector and direct intercept d; no universal multidimensional scalar difficulty."
+        parameter_evidence="Direct native slopes/intercepts within the archived binary profile; no item SE/CI."
+    else:
+        parameterization="Native thresholds/steps b; transformed d=-sum(a)*b. Not universal multidimensional difficulty."
+        parameter_evidence="GRM/GPCM/PCM transformed category intercept mapping; not raw-threshold equivalence."
+    meta["Threshold_parameterization"]=parameterization
+    definitions={
+      "2PL":"P(X=1|theta)=logistic(a' theta+d); D=1.",
+      "Rasch":"P(X=1|theta)=logistic(sum(active theta)+d); active loadings fixed1, structural zeros fixed0; zero means/unit latent variances, not a free-SD Rasch model.",
+      "1PL (a=1)":"Fixed-unit-vector Rasch-type alias; no free common discrimination.",
+      "GRM":"P(X>=k|theta)=logistic(a' theta-sum(a)*b_k); ordered native thresholds; category probabilities are adjacent differences.",
+      "GPCM":"P(X=k|theta) proportional exp(k*a' theta-sum(a)*sum(native steps_1..k)); reference category0.",
+      "PCM":"Same native GPCM category equation, with every declared active loading fixed1; step intercepts remain item-specific.",
+      "NRM":"P(X=k|theta) proportional exp(a_k' theta+d_k); category0 a,d fixed0; signed category-specific vectors, no ordinal scoring."
+    }
+    meta["Model_definition"]=definitions.get(model,"See engine specification")
     meta["Model_comparisons"]="ML logLik/AIC/BIC descriptive only; identical data/categories/likelihood/grid; no Wilks LRT"
     status=meta.get("Status","EXPERIMENTAL / NOT CERTIFIED")
     conditions=str(meta.get("Applicable_conditions","Exact archived profile only"))
     rows=[]
     for output,qualification in (
-        ("Item slopes and transformed intercepts","Independent R physical mapping; no item SE/CI"),
+        ("Item parameters in native model-specific coordinates",parameter_evidence),
         ("Latent covariance/correlation","Zero means/unit variances; declared free correlations only"),
         ("Category probabilities","R comparison on [-2,0,2]^q; other sections are calculation extrapolations"),
         ("Item information matrices","Independent R matrices on registered grid; no universal scalar"),
