@@ -1,36 +1,34 @@
-# DIF method × output certification matrix (audit phase 1, 2026-11-27)
+# DIF method × output certification matrix — Policy D (hybrid), final 2026-11-27
 
-Levels: **NV** numerical agreement with an independent reference · **MC-size** preregistered Monte Carlo size evidence (not certification unless gates + precision met) · **NOT CERTIFIED**. No DIF output is inferentially CERTIFIED (Type I/FWER/power) today.
+Levels: **NUMERICALLY CERTIFIED** (pre-registered agreement with an external R package) · **INFERENTIALLY CERTIFIED — SCOPED** (pre-registered size/FWER/power gates passed in a stated domain) · **VALIDATED WITH LIMITATIONS** (numerical agreement + documented inferential limitation; screening use) · **EXPERIMENTAL** · **WITHHELD** (not displayed/closed).
+No DIF output is INFERENTIALLY CERTIFIED today.
 
-| Method (module) | Statistic / effect | p / adjusted p | Type I / FWER | Power | Independent reference |
-|---|---|---|---|---|---|
-| Mantel–Haenszel binary (`dif_classical.mantel_haenszel`) | χ²_MH (cc .5), α_MH, ETS Δ: **NUMERICALLY CERTIFIED** vs difR 6.1.0 on 2 complete fixtures (≤2.8e−13), incl. difR-purified χ² (≤1.4e−13); lnOR CI vs own R code | **NUMERICALLY CERTIFIED** (raw and BH ≤5.7e−15) | MC-size R=100: Type I .036–.050, FWER_BH .01–.06 — *not certified* (item-pooled CIs, no cluster MCSE) | not reported | difR::difMH |
-| Logistic regression binary (`logistic_dif`) | LR omnibus and uniform, Nagelkerke ΔR²: **NUMERICALLY CERTIFIED** vs difR (≤9.0e−13; ΔR² ≤3.9e−16); non-uniform/Jodoin–Gierl vs own R code | **NUMERICALLY CERTIFIED** (≤2.2e−13) | **inflated under impact** μ_F=−.5: Type I .073 (N1000), FWER_BH .07 — NOT CERTIFIED | not reported | difR::difLogistic |
-| Mantel ordinal (`mantel_ordinal`) | Mantel χ², SMD: **NV** (own R code) | **NV** | impact μ_F=−.5: Type I .062–.074, FWER_BH .09–.24 — NOT CERTIFIED | not reported | difR has no ordinal Mantel; `DescTools::MantelHaenszelTest`/manual |
-| Ordinal logistic (`logistic_dif(ordinal)`) | LR, ΔR²: **NV** (MASS::polr) | **NV** | impact: Type I .074–.080 — NOT CERTIFIED | not reported | lordif (ordinal LR) |
-| IRT LR 2PL (`irt_dif`) | LR, contrasts: NV vs mirt (DIF_VALIDATION) | NV | MC-size R=40: Type I .045–.054, FWER_BH .00–.13 — *not certified* (R=40) | not reported | mirt::DIF / multipleGroup |
-| Lord χ² / Wald 2PL (`dif_lord`) | χ², parameters, covariance: **NV** vs R/mirt (3 registered designs) | NV | NOT CERTIFIED | — | mirt::multipleGroup (Wald) |
-| Lord 1PL fixed-SD | descriptive only (equal latent variance not verified) | **closed** | NOT CERTIFIED | — | — |
-| Lord Rasch free-SD (`dif_lord_rasch`) | gated numerical PASS | conditional, gated | NOT FWER CERTIFIED | — | mirt |
-| 3PL/4PL parametric-bootstrap LR (`irt_dif34_bootstrap`) | bootstrap LR | bootstrap p | MC-size (warp-speed) 3PL null .045 [.027,.071] — *not certified* (single design) | DIF-M1 rejection .95 | none |
-| GRM / polytomous IRT DIF (`grm_dif`, `polytomous_dif`) | contrasts, curves: **NV — 30 paired seeds** | NV | FWER NOT CERTIFIED | — | mirt (multipleGroup), lordif |
-| SIBTEST / crossing, Raju area (`dif_center`) | SIBTEST β, χ²: **NUMERICALLY CERTIFIED** vs R mirt 1.48 SIBTEST (fixture anchors; ≤1.3e−14). Crossing β, Raju: analytic NV only | SIBTEST p **NUMERICALLY CERTIFIED** (≤1.5e−16) | NOT CERTIFIED; difRaju NOT EXECUTED | — | mirt::SIBTEST, difR::difRaju |
-| python-mirt DIF (`python_mirt_dif`) | fit statistics: NV (PYTHON_MIRT_DIF.md) | gated | NOT CERTIFIED | — | mirt |
+| Method | Output | Level | Evidence |
+|---|---|---|---|
+| Binary MH | χ²_MH (cc .5), α_MH, ETS Δ, p, BH p, purified χ² | NUMERICALLY CERTIFIED | difR 6.1.0, 2 complete fixtures, ≤2.8e−13 (A) |
+| Binary MH | lnOR 95% CI | VALIDATED WITH LIMITATIONS | own R formula only (C) |
+| Binary MH | p for DIF decisions | VALIDATED WITH LIMITATIONS — screening only | archived MC R=100 (B) |
+| Binary logistic | LR omnibus, LR uniform, p, Nagelkerke ΔR² | NUMERICALLY CERTIFIED | difR difLogistic ≤9.0e−13 (A) |
+| Binary logistic | LR non-uniform, Jodoin–Gierl class | VALIDATED WITH LIMITATIONS | own R code (C) |
+| Binary logistic | p for DIF decisions | VALIDATED WITH LIMITATIONS — screening only | Type I .073 under impact (B); .062–.067 2PL+impact (E) |
+| Ordinal Mantel | χ², SMD | VALIDATED WITH LIMITATIONS | own R code (C); difR has no ordinal Mantel |
+| Ordinal logistic | LR, ΔR² | VALIDATED WITH LIMITATIONS | MASS::polr (C); **no difR ordinal LR exists** (difR is dichotomous); lordif uses IRT matching → not comparable — gap |
+| Ordinal Mantel / LR | p for DIF decisions | VALIDATED WITH LIMITATIONS — screening only | null Type I .062–.074 under impact (B) |
+| SIBTEST (original) | β, χ², p | NUMERICALLY CERTIFIED as Python mirt = R mirt 1.48 | same algorithm, two implementations — not an independent algorithm (A) |
+| SIBTEST crossing, Raju areas | β_cross, signed/unsigned area | EXPERIMENTAL | analytic checks only; no R comparison |
+| IRT-LR 2PL, Lord χ²/Wald 2PL | statistics, contrasts, covariance | NUMERICALLY CERTIFIED vs mirt (prior PRs) | DIF_CENTER.md, DIF_WALD_LORD_REFERENCE.json |
+| IRT-LR / Lord / Wald | p for DIF decisions | VALIDATED WITH LIMITATIONS — screening only | MC R=40, no cluster MCSE (B) |
+| Lord 1PL fixed-SD | p / inference | WITHHELD (descriptive only) | DIF_CENTER.md |
+| Rasch free-SD Lord | statistics | VALIDATED WITH LIMITATIONS (gated) | DIF_CENTER.md |
+| 3PL/4PL bootstrap LR | bootstrap p | EXPERIMENTAL | one design; null 3PL .045 [.027,.071] (B) |
+| GRM / polytomous DIF | contrasts, curves | VALIDATED WITH LIMITATIONS (30 paired seeds) | DIF_CENTER.md; FWER not certified |
 
-## Prioritised gaps
-1. **Type I inflation under impact** for observed-score LR and ordinal Mantel/LR (μ_F=−.5): a real validity issue; requires either purification/anchor policy evaluation or labelling as impact-sensitive. Highest priority.
-2. **No dataset-cluster MCSE / adequate R** in existing DIF MC studies (R=40–100; item-pooled CIs) — any certification needs a preregistered rerun.
-3. **Power** never evaluated against a registered criterion for any method.
-4. SIBTEST/Raju R references (mirt::SIBTEST, difR::difRaju) not executed.
-5. Bootstrap 3PL/4PL DIF: single design; no FWER.
+## Evidence classes and corrections
+- **(A) Archived CI evidence** `evidence/dif_difr/COMPARISON_v2.json`: **23 substantive comparisons passed + 3 empty SIBTEST comparisons** (`dif2pl_none` has every item as anchor, no suspect item) — not 26 substantive passes. `dif1pl_uniform` excluded (1174 missing responses; observed-score DIF refuses missing data).
+- **(B) Archived MC** `evidence/p2_dif/dif_validation_study.json`: R=40–100 datasets, item-pooled CIs, no dataset-cluster MCSE → cannot certify. The **FWER .24** figure is exactly: ordinal MH, *DIF* condition (FWER among truly null items), N 500/500, μ_F=−.5, BH (`summary` row "ordinal MH DIF −0.5"); null-condition ordinal MH FWER_BH is .09 (μ_F=−.5) and .07 (μ_F=0).
+- **(C)** own R re-implementation (`validation/dif_classical_r`), independent code but not an external package.
+- **(E) Exploratory only** `evidence/dif_impact_explore/EXPLORE.json` (R=100/cell, seed 20261127041, cluster MCSE .005–.008); diagnostic, not confirmatory.
+- Confirmatory 36×500 campaign: **not launched** (Policy D); design draft retained, unregistered.
 
-## Impact inflation diagnosis (exploratory, R=100/cell, seed 20261127041; not confirmatory)
-
-| Generator, μ_F | MH | MH purified | LR | LR purified |
-|---|---|---|---|---|
-| Rasch, 0 | .050 | .049 | .061 | .052 |
-| Rasch, −.5 | .042 | .042 | .047 | .048 |
-| 2PL, 0 | .053 | .052 | .048 | .043 |
-| 2PL, −.5 | .045 | .047 | .062 | .067 |
-
-Cluster MCSE .005–.008. Under Rasch, impact does not inflate MH/LR; under unequal discrimination LR rises to .062–.067 and purification does not remove it. Together with exact difR agreement this indicates a known methodological limitation of total-score matching (score not sufficient for θ under 2PL), not an implementation defect. Confirmatory design drafted (validation/dif_impact_explore/CONFIRMATORY_DESIGN_DRAFT.json), not run.
+## Production safeguards
+`core.dif_classical.OBSERVED_SCORE_NOTICE` on the observed-score page and in the XLSX Meta sheet; `SCREENING_STATUS` column on every DIF row (screen → DOCX capture, CSV, XLSX); SIBTEST limitation in `core.dif_center.LIMITATIONS` (regression-corrected anchor matching, Python=R mirt, screening p). Existing suppression (purification failure, missing data, fixed-SD Lord p) unchanged. No effect-size cutoff added.
