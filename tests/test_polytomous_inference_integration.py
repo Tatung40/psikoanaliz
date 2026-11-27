@@ -26,14 +26,16 @@ def test_seven_blocks_certified_in_scope_and_nrm_oakes_recorded(fits):
         t, reason = parameter_table(o, ITEMS); assert reason is None
         assert t["Bilimsel durum (GA)"].str.startswith("SCOPED CERTIFIED").all(), m
         blocks |= {(m, b) for b in t["Parametre"].unique()}
-    assert fits["NRM"].se_method == "oakes" and fits["GRM"].se_method == "library_default"
+    assert fits["NRM"].fit.se_method == "oakes"   # library-recorded metadata
     assert blocks == {("GRM", "discrimination"), ("GRM", "thresholds"), ("PCM", "steps"), ("GPCM", "discrimination"),
                       ("GPCM", "steps"), ("NRM", "slopes"), ("NRM", "intercepts")}
 
 
 def test_fail_closed_outside_scope(fits):
     import dataclasses
-    for change in ({"n_persons": 500}, {"se_method": None}, {"solver_settings": {"max_iter": 500, "tol": 1e-4, "n_quadpts": 61}},
+    import copy
+    nose = copy.copy(fits["NRM"].fit); nose.se_method = None
+    for change in ({"n_persons": 500}, {"fit": nose}, {"solver_settings": {"max_iter": 500, "tol": 1e-4, "n_quadpts": 61}},
                    {"estimation": "MAP"}, {"n_items": 12}):
         o = dataclasses.replace(fits["NRM"], **change)
         assert (parameter_table(o, ITEMS + ["x", "y"])[0]["Bilimsel durum (GA)"] == "NOT CERTIFIED").all(), change

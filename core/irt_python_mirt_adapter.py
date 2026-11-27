@@ -23,7 +23,6 @@ class PythonMirtResult:
     scientific_status: str = "EXPERIMENTAL_NOT_INDEPENDENTLY_VALIDATED"
     estimation: str = "ML"
     solver_settings: dict = field(default_factory=dict)
-    se_method: str | None = None   # SE method actually requested from the library (None = not recorded)
 
 ESTIMATIONS = ("ML", "MAP")
 
@@ -139,5 +138,4 @@ def fit_python_mirt(responses, *, model, n_categories=None, estimation="ML", com
     if start_values is not None:kwargs["start_values"]=start_values
     if accelerate!="none":kwargs["accelerate"]=accelerate
     result=mirt.fit_mirt(x.astype(int),**kwargs)
-    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings,
-                            se_method=kwargs.get("se_method","library_default"))
+    return PythonMirtResult("python_mirt",model,x.shape[0],x.shape[1],cats,result,estimation=estimation,solver_settings=settings)

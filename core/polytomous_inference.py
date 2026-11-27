@@ -32,7 +32,7 @@ def parameter_table(outcome, item_names):
             continue
         s = se.get(block, np.full(ev.shape, np.nan))
         status = ci_status(model, block, outcome.n_persons, getattr(outcome, "estimation", None), getattr(outcome, "solver_settings", None),
-                           getattr(outcome, "se_method", None), outcome.n_items, outcome.n_categories)
+                           getattr(fit, "se_method", None), outcome.n_items, outcome.n_categories)
         e2, s2 = (ev, s) if ev.ndim == 2 else (ev[:, None], s[:, None])
         start = 1 if model == "NRM" else 0
         for j in range(e2.shape[0]):
@@ -41,7 +41,7 @@ def parameter_table(outcome, item_names):
                 rows.append({"Madde": str(item_names[j]), "Parametre": block, "İndeks": c, "Kestirim": float(e2[j, c]),
                              "SH": sv if ok else np.nan, "%95 GA alt": float(e2[j, c] - 1.96 * sv) if ok else np.nan,
                              "%95 GA üst": float(e2[j, c] + 1.96 * sv) if ok else np.nan,
-                             "SH yöntemi": getattr(outcome, "se_method", None) or "kayıtsız", "Bilimsel durum (GA)": status if ok else "NOT CERTIFIED"})
+                             "SH yöntemi": getattr(fit, "se_method", None) or "kayıtsız", "Bilimsel durum (GA)": status if ok else "NOT CERTIFIED"})
     return pd.DataFrame(rows), None
 
 
