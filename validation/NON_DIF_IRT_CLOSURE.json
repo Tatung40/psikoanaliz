@@ -1,0 +1,786 @@
+{
+  "version": 1,
+  "baseline_main": "1f4460e6a89e997c18e235382699437a0413772c",
+  "columns": [
+    "Item estimates",
+    "Parameter SE",
+    "Parameter CI",
+    "Person point",
+    "Person uncertainty",
+    "Probability/information",
+    "Descriptive fit",
+    "Inferential fit",
+    "Model comparison",
+    "Residual/LD"
+  ],
+  "definitions": {
+    "CERTIFIED": "Only the named scoped claim, including calculation identities where explicitly stated; never model-wide certification.",
+    "PARTIAL": "Measured/numerically referenced or incompletely validated; no inferential certificate.",
+    "NOT CERTIFIED": "Unsupported inference; fail closed. A withheld output is not certified."
+  },
+  "rows": [
+    {
+      "model": "Local Rasch (free sigma)",
+      "scope": "a=1, mu=0, sigma free; local core.rasch",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "PARTIAL",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "core/rasch.py",
+        "validation/evidence/p6_binary_se/coverage.json"
+      ],
+      "notes": "Separate from fixed-latent-variance library 1PL. Numerical/recovery evidence does not establish every uncertainty scope."
+    },
+    {
+      "model": "Native Rasch / fixed-a 1PL",
+      "scope": "Registered binary fixtures/design corners N1000/10000, J12/30; fixed latent scale",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "PARTIAL",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/binary_certification/CERTIFICATION.json",
+        "validation/evidence/p6_binary_se/coverage.json"
+      ],
+      "notes": "C calculation identities are not person frequentist coverage. Native ML M2 R agreement is numerical/asymptotic evidence, not a generic fit calibration certificate."
+    },
+    {
+      "model": "Common-a 1PL",
+      "scope": "Registered binary fixtures/design corners N1000/10000, J12/30; fixed latent scale",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "PARTIAL",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/binary_certification/CERTIFICATION.json",
+        "validation/evidence/p6_binary_se/coverage.json"
+      ],
+      "notes": "C calculation identities are not person frequentist coverage. Native ML M2 R agreement is numerical/asymptotic evidence, not a generic fit calibration certificate."
+    },
+    {
+      "model": "2PL ML",
+      "scope": "Registered binary fixtures/design corners N1000/10000, J12/30; fixed latent scale",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "PARTIAL",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/binary_certification/CERTIFICATION.json",
+        "validation/evidence/p6_binary_se/coverage.json"
+      ],
+      "notes": "C calculation identities are not person frequentist coverage. Native ML M2 R agreement is numerical/asymptotic evidence, not a generic fit calibration certificate."
+    },
+    {
+      "model": "3PL ML",
+      "scope": "Matched single reference fixture; ordinary uncertainty withheld",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/binary_certification/CERTIFICATION.json",
+        "validation/FOUR_PL_ML_DECISION.md"
+      ],
+      "notes": "ML point agreement is not MAP uncertainty validation; b coverage failure retained."
+    },
+    {
+      "model": "3PL MAP",
+      "scope": "P1/P2/P3/global separately registered reference N3000/J12, normal theta; point/IRF separate binary design",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "CERTIFIED",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/binary_certification/CERTIFICATION.json",
+        "validation/evidence/p1p3_analytic/P1_CERTIFICATION.json",
+        "validation/evidence/irt_closure/P2_CERTIFICATION.json",
+        "validation/evidence/p3_empirical/CERTIFICATION.json",
+        "validation/evidence/binary_global_fit/CERTIFICATION.json"
+      ],
+      "notes": "P1 SE/CI belong to explicitly labelled one-step estimator, not native MAP. Person Bayesian marginal and exact inversion are distinct. Global reference certifies LD/second-factor only."
+    },
+    {
+      "model": "4PL ML",
+      "scope": "Saved M12 matched ML fixture; nonconvergence/weak identification",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/FOUR_PL_ML_DECISION.md"
+      ],
+      "notes": "No structural nonidentifiability or global-optimisation claim; ordinary Wald/Wilks unsupported."
+    },
+    {
+      "model": "4PL MAP",
+      "scope": "Binary D4 point profile differs from P1/P2/P3/global N3000/J12 reference profile",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "CERTIFIED",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/binary_certification/CERTIFICATION.json",
+        "validation/evidence/p1p3_analytic/P1_CERTIFICATION.json",
+        "validation/evidence/irt_closure/P2_CERTIFICATION.json",
+        "validation/evidence/p3_4pl_closure/CERTIFICATION.json",
+        "validation/evidence/binary_global_fit/CERTIFICATION.json"
+      ],
+      "notes": "a/b one-step CI; c/d separate C(alpha) confidence sets ONLY. Old c/d Wald withdrawn. Global nonlinear reference detects registered LD, not second-factor/nonmonotone. Ordinary S-X2 chi-square withheld."
+    },
+    {
+      "model": "GRM",
+      "scope": "P4-C1 registered generator N2000/J10/C4, native ML/GH21/max500/tol1e-4; NRM explicit Oakes",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/p4_confirm/REPORT.json",
+        "validation/evidence/r_polytomous.json"
+      ],
+      "notes": "SE/CI only seven registered parameter blocks. Point/probability/information and EAP are calculation/recovery claims, not universal inferential calibration. Nominal category codes are not ordered scores."
+    },
+    {
+      "model": "PCM",
+      "scope": "P4-C1 registered generator N2000/J10/C4, native ML/GH21/max500/tol1e-4; NRM explicit Oakes",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/p4_confirm/REPORT.json",
+        "validation/evidence/r_polytomous.json"
+      ],
+      "notes": "SE/CI only seven registered parameter blocks. Point/probability/information and EAP are calculation/recovery claims, not universal inferential calibration. Nominal category codes are not ordered scores."
+    },
+    {
+      "model": "GPCM",
+      "scope": "P4-C1 registered generator N2000/J10/C4, native ML/GH21/max500/tol1e-4; NRM explicit Oakes",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/p4_confirm/REPORT.json",
+        "validation/evidence/r_polytomous.json"
+      ],
+      "notes": "SE/CI only seven registered parameter blocks. Point/probability/information and EAP are calculation/recovery claims, not universal inferential calibration. Nominal category codes are not ordered scores."
+    },
+    {
+      "model": "NRM",
+      "scope": "P4-C1 registered generator N2000/J10/C4, native ML/GH21/max500/tol1e-4; NRM explicit Oakes",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "CERTIFIED",
+        "Parameter CI": "CERTIFIED",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/evidence/p4_confirm/REPORT.json",
+        "validation/evidence/r_polytomous.json"
+      ],
+      "notes": "SE/CI only seven registered parameter blocks. Point/probability/information and EAP are calculation/recovery claims, not universal inferential calibration. Nominal category codes are not ordered scores."
+    },
+    {
+      "model": "RSM",
+      "scope": "Local shared-step MML; native Python mirt RSM unavailable",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "PARTIAL",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/RSM_VALIDATION.md",
+        "validation/evidence/r_rsm.json"
+      ],
+      "notes": "Numerical R/library agreement; R100/cell coverage precision and LR null uncertainty do not establish broad inference."
+    },
+    {
+      "model": "MIRT Rasch/unit-a",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT 2PL",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT GRM",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT PCM",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT GPCM",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT NRM",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT bifactor",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT fixed-c 3PL",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT fixed-c/u 4PL",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT free-c 3PL",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT free-c/u 4PL",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MIRT shared-step RSM",
+      "scope": "Only enabled identified factor/dimension/loading/constraint profiles; numerical reference fixtures",
+      "cells": {
+        "Item estimates": "PARTIAL",
+        "Parameter SE": "NOT CERTIFIED",
+        "Parameter CI": "NOT CERTIFIED",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "NOT CERTIFIED",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "PARTIAL",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mirt_stage1/README.md",
+        "validation/mirt_phase2/README.md",
+        "validation/mirt_phase3/README.md"
+      ],
+      "notes": "Numerical R agreement/factorisation is not uncertainty certification. Bifactor N500 recovery fails. Free-asymptote multidimensional support restricted; nonconvergence suppresses downstream results."
+    },
+    {
+      "model": "MFRM TAM",
+      "scope": "Native output identities in archived TAM fixture; not sampling certification",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "PARTIAL",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "PARTIAL",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/mfrm/evidence.json"
+      ],
+      "notes": "C means independently matched native fixture quantities. Interaction LR/estimation SE/ZSTD/four facets remain unsupported."
+    },
+    {
+      "model": "RaschPy global",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy items",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy thresholds",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy bivector",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy matrix",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy centrality",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy pseudo_halo",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    },
+    {
+      "model": "RaschPy bistretch",
+      "scope": "Archived model-specific API/reference/recovery profiles",
+      "cells": {
+        "Item estimates": "CERTIFIED",
+        "Parameter SE": "PARTIAL",
+        "Parameter CI": "PARTIAL",
+        "Person point": "CERTIFIED",
+        "Person uncertainty": "PARTIAL",
+        "Probability/information": "CERTIFIED",
+        "Descriptive fit": "CERTIFIED",
+        "Inferential fit": "NOT CERTIFIED",
+        "Model comparison": "NOT CERTIFIED",
+        "Residual/LD": "PARTIAL"
+      },
+      "evidence": [
+        "validation/raschpy_mfrm/evidence.json"
+      ],
+      "notes": "Supported calculations/recovery only; RCL is not ML AIC/BIC. No bootstrap or person coverage extrapolation. DIF/DRF explicitly excluded."
+    }
+  ],
+  "cell_counts": {
+    "CERTIFIED": 87,
+    "PARTIAL": 161,
+    "NOT CERTIFIED": 92
+  },
+  "scoped_inference_groups": {
+    "before": 29,
+    "after": 31,
+    "P1": 14,
+    "P2": 6,
+    "P3": 2,
+    "P4_C1": 7,
+    "new_global": 2
+  },
+  "full_certification": false,
+  "technical_contracts": {
+    "plots": "Derived quantities; Wright map only where a meaningful difficulty scale exists; nominal/unsupported maps remain disabled.",
+    "exports": "Same gated tables feed CSV/XLSX/ZIP/DOCX. Technical parity is not uncertainty evidence.",
+    "browser": "Existing B14 GRM/PCM/GPCM/NRM Chromium numerical comparisons; current CI required.",
+    "auxiliary_routes": "B14 and legacy aliases reuse underlying engines; assumptions and local-fit screens are diagnostics, not new estimator certificates."
+  },
+  "remaining": [
+    "User-DGP extrapolation outside registered scopes",
+    "Generic MIRT/RSM/MFRM uncertainty and fit calibration",
+    "Native MAP parameter Wald intervals, especially old 4PL c/d",
+    "Frequentist conditional Bayesian person-tail coverage, in-sample/J30 extrapolation",
+    "Ordinary MAP chi-square M2/S-X2, RMSEA confidence intervals, boundary Wilks LRT",
+    "Global M2 nonmonotone sensitivity both models and 4PL second-factor sensitivity"
+  ],
+  "no_new_numerical_campaign": true,
+  "cell_counts_before": {
+    "CERTIFIED": 87,
+    "PARTIAL": 161,
+    "NOT CERTIFIED": 92
+  },
+  "cell_counts_after": {
+    "CERTIFIED": 87,
+    "PARTIAL": 161,
+    "NOT CERTIFIED": 92
+  },
+  "cell_count_note": "No category promotion: both binary model inferential-fit cells already had scoped P3 item-fit claims. This PR expands their explicitly separate global-fit claims by two. PARTIAL is not CERTIFIED."
+}

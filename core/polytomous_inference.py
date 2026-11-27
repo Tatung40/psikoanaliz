@@ -37,11 +37,12 @@ def parameter_table(outcome, item_names):
         start = 1 if model == "NRM" else 0
         for j in range(e2.shape[0]):
             for c in range(start, e2.shape[1]):
-                sv = float(s2[j, c]); ok = np.isfinite(sv) and sv > 0
+                sv = float(s2[j, c]); ok = (status.startswith('SCOPED CERTIFIED') and np.isfinite(e2[j,c]) and np.isfinite(sv) and sv > 0)
                 rows.append({"Madde": str(item_names[j]), "Parametre": block, "İndeks": c, "Kestirim": float(e2[j, c]),
                              "SH": sv if ok else np.nan, "%95 GA alt": float(e2[j, c] - 1.96 * sv) if ok else np.nan,
                              "%95 GA üst": float(e2[j, c] + 1.96 * sv) if ok else np.nan,
-                             "SH yöntemi": getattr(fit, "se_method", None) or "kayıtsız", "Bilimsel durum (GA)": status if ok else "NOT CERTIFIED"})
+                             "SH yöntemi": getattr(fit, "se_method", None) or "kayıtsız", "Bilimsel durum (GA)": status if ok else "NOT CERTIFIED",
+                             "Sınırlılık": "" if ok else "P4-C1 kanıtı/çözücü/kapsam/SH doğrulanmadı; SH ve GA raporlanmaz."})
     return pd.DataFrame(rows), None
 
 
@@ -57,5 +58,21 @@ def export_bundle(table, report=None):
     with zipfile.ZipFile(zb, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("Parametre_SH_GA.csv", table.to_csv(index=False)); z.writestr("Parametre_SH_GA.xlsx", xb.getvalue())
         z.writestr("KAPSAM.txt", "SCOPED CERTIFIED only within P4-C1 (validation/p4_confirm/PROTOCOL.json): N=2000, 10 items, 4 categories, "
-                                 "ML, 21 nodes, max_iter 500, tol 1e-4, NRM Oakes SE. Row labels say NOT CERTIFIED otherwise.\n")
+                                 "ML, 21 nodes, max_iter 500, tol 1e-4, NRM Oakes SE. Outside scope both SE/CI are withheld (NA), point estimates remain.\n")
     return xb.getvalue(), zb.getvalue()
+
+def _cache_key(outcome,item_names):
+    """Content-bound cache key, including actual SEs and evidence; never fits a model."""
+    import hashlib,json
+    from core.polytomous_certification import _evidence_fingerprint
+    h=hashlib.sha256(_evidence_fingerprint().encode())
+    fit=outcome.fit
+    for group in (fit.model.parameters,fit.standard_errors or {}):
+        for name,value in sorted(group.items()):
+            a=np.asarray(value,float)
+            h.update(name.encode());h.update(str(a.shape).encode());h.update(a.tobytes())
+    meta=[outcome.model,outcome.n_persons,outcome.n_items,outcome.n_categories,
+          getattr(outcome,"estimation",None),getattr(outcome,"solver_settings",None),
+          getattr(fit,"se_method",None),bool(getattr(fit,"converged",False)),list(item_names)]
+    h.update(json.dumps(meta,sort_keys=True,default=str).encode())
+    return h.hexdigest()

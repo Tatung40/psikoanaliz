@@ -422,6 +422,18 @@ def _runtime_assets(calls):
                          'validation/evidence/p3_4pl_closure/CERTIFICATION.json'):
             asset=ROOT/relative
             if asset.is_file() and asset not in assets:assets.append(asset)
+    if any(c.get('module')=='core.irt_global_fit' for c in calls):
+        global_proof=ROOT/'validation/evidence/binary_global_fit/CERTIFICATION.json'
+        frozen=tuple(json.loads(global_proof.read_text()).get('scientific_source_blobs',{})) if global_proof.is_file() else ()
+        for relative in frozen+('validation/binary_global_fit/kernel.py','validation/binary_global_fit/analysis.py',
+                         'validation/p3_empirical/constrained.py','validation/p3_empirical/kernel.py',
+                         'validation/p3_sx2_analytic/kernel.py','validation/evidence/binary_global_fit/CERTIFICATION.json'):
+            asset=ROOT/relative
+            if asset.is_file() and asset not in assets:assets.append(asset)
+    if any(c.get('module') in ('core.polytomous_inference','core.polytomous_certification') for c in calls):
+        for relative in ('validation/evidence/p4_confirm/REPORT.json','validation/p4_confirm/PROTOCOL.json','validation/p4_confirm/RUN.json'):
+            asset=ROOT/relative
+            if asset.is_file() and asset not in assets:assets.append(asset)
     return assets
 
 

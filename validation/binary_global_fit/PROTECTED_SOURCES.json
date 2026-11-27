@@ -1,0 +1,15 @@
+{
+  "core/irt_binary_inference.py": "672848a9e55bd06e42aac4b35f60fa0d05e7954e",
+  "core/irt_binary_persons.py": "525b28013c0be09a673080edb294466d63be5317",
+  "core/irt_binary_patterns.py": "024903abe089c4f2f94f3e0c4a1be4bb885f16c3",
+  "core/irt_binary_onestep.py": "8ef3792c188bb2c34509535a8feee8d8267d364e",
+  "core/irt_4pl_score_sets.py": "72916d9032ac2ab841c1cdb292befaaa5ed011bf",
+  "core/irt_sx2_scoped.py": "0c8a4886106701b4999e051d520ffc7177a87902",
+  "core/irt_4pl_itemfit.py": "f159d4f18c56fe6fb8f63d06f814ef7cde143769",
+  "core/irt_python_mirt_adapter.py": "c71a422a7768ddf91544669aad87af30f686baf8",
+  "validation/evidence/binary_certification/CERTIFICATION.json": "49b5aa914c8ea99ec319ded58bf09ac6b85a4de2",
+  "validation/evidence/irt_closure/P2_CERTIFICATION.json": "50d3eaeb6e8d5ae16210a6df9966465351ee5025",
+  "validation/evidence/p1p3_analytic/P1_CERTIFICATION.json": "c66568efc60d40a113fe8e7060bfe8c0edcf4cc3",
+  "validation/evidence/p3_empirical/CERTIFICATION.json": "0ab74cb9f9dddb836307c8640f1dccb175d912ea",
+  "validation/evidence/p3_4pl_closure/CERTIFICATION.json": "2967f79457e1fa0229e58aadf9f0d865de7877f5"
+}

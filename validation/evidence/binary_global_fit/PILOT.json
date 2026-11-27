@@ -1,0 +1,422 @@
+{
+  "3PL": {
+    "p_chi": {
+      "model": "3PL",
+      "method": "p_chi",
+      "null_R": 100,
+      "TypeI": 0.04,
+      "upper": 0.09925715671265992,
+      "lower": 0.011004493986188198,
+      "MCSE": 0.019595917942265423,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 1,
+          "power": 0.01,
+          "lower": 0.00004175284243061751,
+          "upper": 0.07388209864067811,
+          "MCSE": 0.0099498743710662,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 94,
+          "power": 0.94,
+          "lower": 0.8483742723600354,
+          "upper": 0.9849424572330656,
+          "MCSE": 0.023748684174075843,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 27,
+          "power": 0.27,
+          "lower": 0.1618945265909968,
+          "upper": 0.4016901389693226,
+          "MCSE": 0.044395945760846225,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": false,
+        "nontrivial": false,
+        "MCSE": false,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.17227916849999758,
+      "runtime_P95": 0.2588306830500059,
+      "native_identity_max": 4.891603566647973e-9,
+      "errors": {}
+    },
+    "p_linear": {
+      "model": "3PL",
+      "method": "p_linear",
+      "null_R": 100,
+      "TypeI": 0.03,
+      "upper": 0.08517605297428003,
+      "lower": 0.006229971538306395,
+      "MCSE": 0.01705872210923198,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 1,
+          "power": 0.01,
+          "lower": 0.00004175284243061751,
+          "upper": 0.07388209864067811,
+          "MCSE": 0.0099498743710662,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 93,
+          "power": 0.93,
+          "lower": 0.8346702505030608,
+          "upper": 0.9799054314167945,
+          "MCSE": 0.02551470164434614,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 27,
+          "power": 0.27,
+          "lower": 0.1618945265909968,
+          "upper": 0.4016901389693226,
+          "MCSE": 0.044395945760846225,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": false,
+        "nontrivial": false,
+        "MCSE": false,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.17227916849999758,
+      "runtime_P95": 0.2588306830500059,
+      "native_identity_max": 4.891603566647973e-9,
+      "errors": {}
+    },
+    "p_nonlinear": {
+      "model": "3PL",
+      "method": "p_nonlinear",
+      "null_R": 100,
+      "TypeI": 0.03,
+      "upper": 0.08517605297428003,
+      "lower": 0.006229971538306395,
+      "MCSE": 0.01705872210923198,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 1,
+          "power": 0.01,
+          "lower": 0.00004175284243061751,
+          "upper": 0.07388209864067811,
+          "MCSE": 0.0099498743710662,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 93,
+          "power": 0.93,
+          "lower": 0.8346702505030608,
+          "upper": 0.9799054314167945,
+          "MCSE": 0.02551470164434614,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 27,
+          "power": 0.27,
+          "lower": 0.1618945265909968,
+          "upper": 0.4016901389693226,
+          "MCSE": 0.044395945760846225,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": false,
+        "nontrivial": false,
+        "MCSE": false,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.17227916849999758,
+      "runtime_P95": 0.2588306830500059,
+      "native_identity_max": 4.891603566647973e-9,
+      "errors": {}
+    },
+    "p_QLI": {
+      "model": "3PL",
+      "method": "p_QLI",
+      "null_R": 100,
+      "TypeI": 0,
+      "upper": 0.03621669264517642,
+      "lower": 0,
+      "MCSE": 0,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 0,
+          "power": 0,
+          "lower": 0,
+          "upper": 0.05333158459076037,
+          "MCSE": 0,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 96,
+          "power": 0.96,
+          "lower": 0.8770767569922968,
+          "upper": 0.9935435740727744,
+          "MCSE": 0.019595917942265433,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 13,
+          "power": 0.13,
+          "lower": 0.05644421172933939,
+          "upper": 0.24202630670688016,
+          "MCSE": 0.03363034344160047,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": true,
+        "nontrivial": false,
+        "MCSE": true,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.17227916849999758,
+      "runtime_P95": 0.2588306830500059,
+      "native_identity_max": 4.891603566647973e-9,
+      "errors": {}
+    }
+  },
+  "4PL": {
+    "p_chi": {
+      "model": "4PL",
+      "method": "p_chi",
+      "null_R": 100,
+      "TypeI": 0.06,
+      "upper": 0.12602993458082296,
+      "lower": 0.022334886071316368,
+      "MCSE": 0.023748684174075833,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 5,
+          "power": 0.05,
+          "lower": 0.01047204164587414,
+          "upper": 0.13752345830157756,
+          "MCSE": 0.021794494717703367,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 27,
+          "power": 0.27,
+          "lower": 0.1618945265909968,
+          "upper": 0.4016901389693226,
+          "MCSE": 0.044395945760846225,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 8,
+          "power": 0.08,
+          "lower": 0.02550120710639924,
+          "upper": 0.1787043823201494,
+          "MCSE": 0.027129319932501072,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": false,
+        "nontrivial": false,
+        "MCSE": false,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.19415185300000815,
+      "runtime_P95": 0.31876428679999763,
+      "native_identity_max": 2.0765405395195558e-7,
+      "errors": {}
+    },
+    "p_linear": {
+      "model": "4PL",
+      "method": "p_linear",
+      "null_R": 100,
+      "TypeI": 0.06,
+      "upper": 0.12602993458082296,
+      "lower": 0.022334886071316368,
+      "MCSE": 0.023748684174075833,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 5,
+          "power": 0.05,
+          "lower": 0.01047204164587414,
+          "upper": 0.13752345830157756,
+          "MCSE": 0.021794494717703367,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 27,
+          "power": 0.27,
+          "lower": 0.1618945265909968,
+          "upper": 0.4016901389693226,
+          "MCSE": 0.044395945760846225,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 8,
+          "power": 0.08,
+          "lower": 0.02550120710639924,
+          "upper": 0.1787043823201494,
+          "MCSE": 0.027129319932501072,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": false,
+        "nontrivial": false,
+        "MCSE": false,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.19415185300000815,
+      "runtime_P95": 0.31876428679999763,
+      "native_identity_max": 2.0765405395195558e-7,
+      "errors": {}
+    },
+    "p_nonlinear": {
+      "model": "4PL",
+      "method": "p_nonlinear",
+      "null_R": 100,
+      "TypeI": 0.06,
+      "upper": 0.12602993458082296,
+      "lower": 0.022334886071316368,
+      "MCSE": 0.023748684174075833,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 5,
+          "power": 0.05,
+          "lower": 0.01047204164587414,
+          "upper": 0.13752345830157756,
+          "MCSE": 0.021794494717703367,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 27,
+          "power": 0.27,
+          "lower": 0.1618945265909968,
+          "upper": 0.4016901389693226,
+          "MCSE": 0.044395945760846225,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 8,
+          "power": 0.08,
+          "lower": 0.02550120710639924,
+          "upper": 0.1787043823201494,
+          "MCSE": 0.027129319932501072,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": false,
+        "nontrivial": false,
+        "MCSE": false,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.19415185300000815,
+      "runtime_P95": 0.31876428679999763,
+      "native_identity_max": 2.0765405395195558e-7,
+      "errors": {}
+    },
+    "p_QLI": {
+      "model": "4PL",
+      "method": "p_QLI",
+      "null_R": 100,
+      "TypeI": 0,
+      "upper": 0.03621669264517642,
+      "lower": 0,
+      "MCSE": 0,
+      "refusal": 0,
+      "power": {
+        "nonmonotone": {
+          "R": 100,
+          "k": 2,
+          "power": 0.02,
+          "lower": 0.0009461666456312335,
+          "upper": 0.0915010448643915,
+          "MCSE": 0.014,
+          "refusal": 0
+        },
+        "local_dependence": {
+          "R": 100,
+          "k": 44,
+          "power": 0.44,
+          "lower": 0.3098898502979997,
+          "upper": 0.5762325689198937,
+          "MCSE": 0.04963869458396343,
+          "refusal": 0
+        },
+        "second_factor": {
+          "R": 100,
+          "k": 0,
+          "power": 0,
+          "lower": 0,
+          "upper": 0.05333158459076037,
+          "MCSE": 0,
+          "refusal": 0
+        }
+      },
+      "gates": {
+        "size": true,
+        "nontrivial": false,
+        "MCSE": true,
+        "refusal": true,
+        "convergence": true,
+        "complete": false
+      },
+      "certified_claims": [],
+      "runtime_median": 0.19415185300000815,
+      "runtime_P95": 0.31876428679999763,
+      "native_identity_max": 2.0765405395195558e-7,
+      "errors": {}
+    }
+  }
+}

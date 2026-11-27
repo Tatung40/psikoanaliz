@@ -1,0 +1,111 @@
+{
+  "3PL": {
+    "model": "3PL",
+    "method": "p_linear",
+    "null_R": 6000,
+    "TypeI": 0.045,
+    "upper": 0.050554404278755447,
+    "lower": 0.039893628277066294,
+    "MCSE": 0.002676284738214527,
+    "refusal": 0,
+    "power": {
+      "nonmonotone": {
+        "R": 600,
+        "k": 29,
+        "power": 0.04833333333333333,
+        "lower": 0.028218975315814944,
+        "upper": 0.07625692386187234,
+        "MCSE": 0.008755685983236096,
+        "refusal": 0
+      },
+      "local_dependence": {
+        "R": 600,
+        "k": 561,
+        "power": 0.935,
+        "lower": 0.9038321170933298,
+        "upper": 0.9586872720921427,
+        "MCSE": 0.010064376119097825,
+        "refusal": 0
+      },
+      "second_factor": {
+        "R": 600,
+        "k": 155,
+        "power": 0.25833333333333336,
+        "lower": 0.2125375119775061,
+        "upper": 0.30821611989113457,
+        "MCSE": 0.017869770667350595,
+        "refusal": 0
+      }
+    },
+    "gates": {
+      "size": true,
+      "nontrivial": true,
+      "MCSE": true,
+      "refusal": true,
+      "convergence": true,
+      "complete": true
+    },
+    "certified_claims": [
+      "local_dependence",
+      "second_factor"
+    ],
+    "runtime_median": 0.1659703330000184,
+    "runtime_P95": 0.22002028759997358,
+    "native_identity_max": 2.4995912895064976e-8,
+    "errors": {}
+  },
+  "4PL": {
+    "model": "4PL",
+    "method": "p_nonlinear",
+    "null_R": 6000,
+    "TypeI": 0.043333333333333335,
+    "upper": 0.04879516543913344,
+    "lower": 0.03832134032521275,
+    "MCSE": 0.002628546986313781,
+    "refusal": 0,
+    "power": {
+      "nonmonotone": {
+        "R": 600,
+        "k": 26,
+        "power": 0.043333333333333335,
+        "lower": 0.02442394011500495,
+        "upper": 0.07015551023768933,
+        "MCSE": 0.008312195413522988,
+        "refusal": 0
+      },
+      "local_dependence": {
+        "R": 600,
+        "k": 159,
+        "power": 0.265,
+        "lower": 0.21876084526889353,
+        "upper": 0.3152126442393138,
+        "MCSE": 0.01801735274672725,
+        "refusal": 0
+      },
+      "second_factor": {
+        "R": 600,
+        "k": 25,
+        "power": 0.041666666666666664,
+        "lower": 0.023175883985233826,
+        "upper": 0.06810547262196463,
+        "MCSE": 0.008157875086438006,
+        "refusal": 0
+      }
+    },
+    "gates": {
+      "size": true,
+      "nontrivial": true,
+      "MCSE": true,
+      "refusal": true,
+      "convergence": true,
+      "complete": true
+    },
+    "certified_claims": [
+      "local_dependence"
+    ],
+    "runtime_median": 0.1913753845000059,
+    "runtime_P95": 0.28531890505001484,
+    "native_identity_max": 4.182177946177035e-7,
+    "errors": {}
+  }
+}

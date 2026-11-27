@@ -1,0 +1,9 @@
+{
+  "id": "O-A2 reference comparability diagnostic",
+  "before_any_pilot_data": true,
+  "failed_head": "2198204d85958b68c7d5d7dd7d47d498b754fa89",
+  "issue": "Initial no-fit comparisons failed for2PL CFI/TLI and3PLM2. Full R/Python means/Xi/physicalFD Jacobians already agree<=1e-10; native Python M2 agrees independent R projected M2 to<=6e-8.",
+  "policy": "No tolerance change. Inspect/reconstruct actual R dP and QR to prove any algorithmic obstruction; markNOTCOMPARABLE only after reproduction. Native R wrong/unstable conventions not absolute groundtruth.",
+  "baseline": "Compare CFI/TLI under analytically identical independence margins. R computeNullModel EM baseline differs slightly from exact observed-marginal baseline; retain both old native numbers and exact-no-fit-null comparison. No silently altereddata or thresholds.",
+  "safety": "R references must still pass full covariance/Jacobian and independent projected M2 at unchanged thresholds. Unknown native-R mismatch remainsblocking. Pilot has runZERO calibrations."
+}

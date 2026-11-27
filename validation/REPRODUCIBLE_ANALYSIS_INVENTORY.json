@@ -205,6 +205,10 @@
       "core.irt_binary_persons.SCORING_VERSION",
       "core.irt_binary_persons.binary_person_abilities",
       "core.irt_binary_usage_policy.evidence_note",
+      "core.irt_global_fit.cache_fingerprint",
+      "core.irt_global_fit.comparison_context",
+      "core.irt_global_fit.global_fit",
+      "core.irt_global_fit.nested_lrt",
       "core.irt_library_diagnostics.library_fit_diagnostics",
       "core.irt_library_diagnostics.library_itemfit",
       "core.irt_person_abilities.person_abilities",
@@ -216,6 +220,7 @@
       "core.irt_rasch_wright.wright_exports",
       "core.irt_rasch_wright.wright_figure",
       "core.irt_sx2_scoped.cache_fingerprint",
+      "core.polytomous_inference._cache_key",
       "core.polytomous_inference.export_bundle",
       "core.polytomous_inference.parameter_table"
     ],

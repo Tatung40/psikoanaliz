@@ -21,6 +21,7 @@ class LibraryReport:
     information: pd.DataFrame=field(default_factory=pd.DataFrame)
     warnings: list=field(default_factory=list)
     errors: list=field(default_factory=list)
+    global_fit: dict=field(default_factory=dict)
 
 
 def binary_evidence_label(outcome, *, common_discrimination=False, converged=None):
@@ -75,7 +76,7 @@ def parameter_table(fit,model,items,labels):
     return table
 
 
-def build_report(outcome, *, model, items, labels=(), theta=None):
+def build_report(outcome, *, model, items, labels=(), theta=None, global_diagnostics=None):
     if model not in MODELS:raise ValueError("Desteklenmeyen rapor modeli")
     items=list(map(str,items));theta=np.linspace(-4,4,161) if theta is None else np.asarray(theta,float)
     if outcome.n_items!=len(items):raise ValueError("Madde sayısı sonuç nesnesiyle uyuşmuyor")
@@ -137,4 +138,8 @@ def build_report(outcome, *, model, items, labels=(), theta=None):
             report.curves=fitted_category_curves(result,theta)
             report.information=information_table(result,theta)
     except (ValueError,TypeError,AttributeError,KeyError) as e:report.errors.append(f"Eğri/bilgi API'si: {e}")
+    if global_diagnostics:
+        report.global_fit=global_diagnostics
+        for key,value in global_diagnostics["table"].iloc[0].items():
+            report.metadata["Global · "+str(key)]=value
     return report

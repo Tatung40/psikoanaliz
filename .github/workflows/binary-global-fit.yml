@@ -1,0 +1,42 @@
+name: Binary global fit validation
+on:
+  pull_request:
+    paths: ['validation/binary_global_fit/**','validation/evidence/binary_global_fit/**','tests/test_binary_global_fit*.py','core/polytomous_inference.py','core/polytomous_certification.py','tests/test_polytomous_certification.py','tests/test_polytomous_inference_integration.py','tests/test_non_dif_irt_closure.py','validation/NON_DIF_IRT*','core/irt_global_fit.py','core/irt_python_mirt_report.py','ui/irt_python_library_view.py','reports/irt_binary_report.py','.github/workflows/binary-global-fit.yml']
+permissions: {contents: read}
+jobs:
+  production-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env: {PYTHONPATH: .,OPENBLAS_NUM_THREADS: '1',OMP_NUM_THREADS: '1',MKL_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: Frozen independent confirmation sources; no new scientific fits
+        run: |
+          python - <<'PY'
+          import subprocess,pathlib
+          source="1d166c5310c34136df51f8e58fb09630206512e9"
+          for path in ("validation/binary_global_fit/kernel.py","validation/binary_global_fit/analysis.py","validation/binary_global_fit/dgp.py","validation/binary_global_fit/runner.py","validation/binary_global_fit/statistics.py","validation/binary_global_fit/PROTOCOL.json","validation/binary_global_fit/SELECTION.json","validation/p3_empirical/kernel.py","validation/p3_empirical/constrained.py","validation/p3_sx2_analytic/kernel.py"):
+              assert subprocess.check_output(["git","show",source+":"+path])==pathlib.Path(path).read_bytes(),path
+          print("Frozen confirmation estimand/sources verified; numerical campaign NOT rerun")
+          PY
+      - name: Scoped polytomous gates, real fixture exports and Word no-refit parity
+        run: python -m pytest -q tests/test_polytomous_certification.py tests/test_polytomous_inference_integration.py tests/test_non_dif_irt_closure.py
+      - name: Actual unchanged-graphic Word cache regression; no assertion weakening
+        run: python -m pytest -q tests/test_universal_academic_capture.py::test_graphic_selection_updates_word_without_refitting
+      - name: Affected mathematical, refusal, cache and export contracts
+        run: python -m pytest -q -rP tests/test_binary_global_fit.py tests/test_binary_global_fit_production.py tests/test_irt_2pl_academic_docx.py
+      - name: Real 3PL/4PL user-flow regressions (software fixtures only)
+        run: python -m pytest -q 'tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[3PL]' 'tests/test_python_mirt_nine_results.py::test_actual_streamlit_tables_plots_downloads_and_invalidation[4PL]'
+      - name: Static reproducibility inventory
+        run: |
+          python tools/inventory_reproducible.py
+          git diff --exit-code -- validation/REPRODUCIBLE_ANALYSIS_INVENTORY.json
+      - name: Archived independent evidence and exact saved-estimate audit; ZERO numerical refits
+        run: python -m validation.binary_global_fit.audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: global-production-software-benchmark,path: /tmp/global-production/}

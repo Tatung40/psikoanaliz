@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from core.academic_result_adapters import irt_report_to_result
+from core.academic_result_adapters import irt_report_to_result, _clean
 from core.irt_python_mirt_report import build_report
 from reports.academic_docx import build_academic_docx, standardize_document
 
@@ -26,10 +26,15 @@ def _png(fig):
     return buffer
 
 
-def export_2pl_docx(outcome, items):
+def export_2pl_docx(outcome, items, *, global_diagnostics=None):
     """Produce DOCX bytes only for a converged, complete 2PL fit."""
-    report = build_report(outcome, model="2PL", items=items)
+    report = build_report(outcome, model="2PL", items=items, **({"global_diagnostics":global_diagnostics} if global_diagnostics else {}))
     result = irt_report_to_result(report)
+    if global_diagnostics:
+        result["tables"]["global_fit"]=_clean(global_diagnostics["table"])
+        if "comparisons" in global_diagnostics:result["tables"]["nested_ml_lrt"]=_clean(global_diagnostics["comparisons"])
+        result["tables"]["global_correlation_residuals"]=_clean(global_diagnostics["residuals"].rename_axis("Madde").reset_index())
+        result["warnings"].append(str(global_diagnostics["table"].iloc[0]["Sınırlılık"]))
     # The generic manifest cannot distinguish item/category series: suppress its
     # plotting and use explicitly grouped ICC and item-information plots below.
     document_source = deepcopy(result)

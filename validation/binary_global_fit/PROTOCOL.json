@@ -1,0 +1,69 @@
+{
+  "id": "O binary global fit closure",
+  "created_utc": "2026-11-26T15:23:18Z",
+  "deadline_utc": "2026-11-26T17:23:18Z",
+  "base": "69be9aa4f11590662a49f122198db75dbeced7dc",
+  "preserve": "All22 relevant P1/P2/P3 scoped groups incl4PL C-alpha and separately named Q; no old experiment rerun; no polytomous/CTT/DIF/MFRM estimator changes.",
+  "scope": "New numerical diagnostics for native Python mirt binary outcomes. Local core.rasch sigma-free is distinct and remains unchanged. Rasch/fixed-a1PL vs common-free-a1PL identification must follow actual fit structure, not model label.",
+  "moments": "First-order and distinct pair Bernoulli moments. Xi is full model covariance up tofourth-order union moments. Full physical Jacobian follows actual free/equality-constrained parameters; latent N(0,1) fixed. GLS orthogonal M2, effective rank/df, explicit independence model, R-mirt RMSEA/CFI/TLI conventions verified before production.",
+  "references": "Installed Python mirt1.2.0 API/source preflight; actualR mirt1.48 fixed-parameter M2 and native probability/Jacobian checks, same linear61[-6,6] grid for numerical matching only; independent GH61/121 and finite differences1e-5/5e-6. R is supporting evidence not unqualified truth. No R calibrations/timeouts for alreadyvalidated point estimates.",
+  "MAP_candidates": [
+    "Classical projected M2 chi-square is a diagnostic comparator only until confirmation.",
+    "Unchanged projected M2 statistic with full joint score/moment constrained-Gaussian MAP reference.",
+    "Same projected M2 with nonlinear moment re-evaluation at constrained Gaussian MAP perturbations (fixed fitted projection); approximation is explicitly not a full-refit bootstrap.",
+    "Separately named covariance-standardized full limited-moment residual Q using the same joint reference, retaining prior drift/curvature, means, nuisance dependence and nullspace."
+  ],
+  "method_rules": "No estimator/prior/bound/default changes. Select independently per3PL/4PL after bounded pilot and before fresh confirmation. All approximations require independent finite-sample evidence, never assume MAP chi-square/Wilks.",
+  "design": {
+    "N": 3000,
+    "J": 12,
+    "models": [
+      "3PL",
+      "4PL"
+    ],
+    "truth": "validation.binary_certification.common.truth(model,12)",
+    "latent": "N(0,1)",
+    "estimation": "native cold default MAP/GH61/max500/tol1e-4/default priors",
+    "null": "locally independent",
+    "alternatives": {
+      "nonmonotone": "Only item1: c1+(d1-c1)expit(a1(theta-b1)-.25(theta-b1)^2); no post-pilot effect strengthening.",
+      "local_dependence": "Only item1 component logit +=1.0*(X2-p2(theta)), item2 generatedfirst. Lambda is not the observed Bernoulli logOR.",
+      "second_factor": "Independent Z~N(0,1), component logits of items1..3 +=.7Z; remaining items unchanged. No posterior choice of affected items/effect."
+    },
+    "claims": "Three prospectively separate global-misfit sensitivity classes/model. Report every class; a successfulclass never certifiesfailedclasses. No per-item causal attribution/FWER/FDR/global uniform validity."
+  },
+  "pilot": {
+    "null_R": 100,
+    "power_R_each": 100,
+    "null_root": 202611265101,
+    "power_root": 202611265102,
+    "noise_root": 202611265103,
+    "shards": 8,
+    "workers": 2,
+    "policy": "One native fit per new dataset, share checkpoints acrosscandidate diagnostics. Evaluate math validity, refusal, size and minimum class power; select before confirmation; no pilot certificates."
+  },
+  "confirmation": {
+    "null_R": 6000,
+    "power_R_each": 600,
+    "null_root": 202611265201,
+    "power_root": 202611265202,
+    "noise_root": 202611265203,
+    "shards": 24,
+    "workers": 2,
+    "seed": "[root,model3or4,r,condition0..3]. Disjoint from all prior seeds.",
+    "fixed_final": true
+  },
+  "gates": {
+    "size": "Eachmodel global null one-sided CP upper alpha=.05/2 <=.07; no pooling independentmodels. Lower95% CP alpha=.025 >=.03 to excludeuninformative conservatism.",
+    "precision": "Dataset-level Bernoulli MCSE<=.004/model; R6000 has MCSE .00281 at p.05 and .00329 at p.07. Exact CP design power/pass-probability calculated before confirmation.",
+    "power": "Each predeclared class CP lower alpha=.025/(2models*3classes) >.10, R600/class; prospective separate claims only. No easier replacement.",
+    "refusal": "Native nonconvergence/nonfinite/rank/numerical/constraint failure retained: null=reject, power=nondetection. <=.01 refusal in each null/class; native convergence>=.99.",
+    "rank": "Scale-normalized Jacobian singular values; effective rank at relative1e-10, audit1e-9/1e-11; unstable rank blocks ordinary inference. Xi positive definite/condition<=1e10, no pseudoinverse artificial uncertainty. Q covariance eigenvalue/mean/nullspace checks; KKT<=1e-7.",
+    "reference": "Fixed-point R_mirt M2/SRMSR/RMSEA/CFI/TLI relative<=1e-6 or absolute1e-7; Jacobian FD relative<=1e-5+absolute1e-7, union covariance absolute1e-10; algorithmic mismatch unresolved=>NOTCOMPARABLE, no tolerance relaxation.",
+    "runtime": "Targetactual post-fit P95<1s; numericalvalidity overrides speed."
+  },
+  "LRT": "Only compatible same-cohort, same-grid, fixed latent scale ML interior identifiable nested fixed/common-a1PL vs2PL may use regular asymptoticchi-square. MAP, 2PL→3PL and3PL→4PL boundaries: no ordinary Wilks p. Raw negative likelihood differences not silently clipped. Pairs require actual parameter restrictions, data and objective checks.",
+  "RMSEA": "M2-based RMSEA/CFI/TLI descriptive for MAP unless specifically inferentially calibrated; never substitute Q for M2 in those formulas. RMSEA noncentralchiCI withheld for uncertifiedMAP; conventional max(...,0) explicit. Independencebaseline denominator/rank failure refused, not imputed.",
+  "futility": "No interim acceptance; technical/deadline stop only or finalimpossibility bounds. Do not stop merely becauseinterim upper>finalgate. Pilot may stop infeasible/no meaningfulpower mechanisms. Final incomplete=>NOTCERTIFIED.",
+  "archive": "Perattempt seed/datahash/coefficients/counts/status/pvalues/rank/bounds/versions/timing, checkpoints and sourceSHAs. Preserve allfailedpreflights. FinalCI archival-only plus lightweight regression; no refitting missing evidence."
+}
