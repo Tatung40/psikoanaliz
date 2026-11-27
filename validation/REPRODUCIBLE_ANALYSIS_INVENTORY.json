@@ -178,6 +178,11 @@
   {
     "screen": "ui/irt_multidim_view.py",
     "core_imports": [
+      "core.irt_mirt_policy.COLD_INITIALIZATION",
+      "core.irt_mirt_policy.evidence_fingerprint",
+      "core.irt_mirt_policy.profiles",
+      "core.irt_mirt_production.decorate_native",
+      "core.irt_mirt_production.refresh_policy",
       "core.irt_multidim.BIFACTOR_RECOVERY",
       "core.irt_multidim.LIMITATION",
       "core.irt_multidim.MODELS",

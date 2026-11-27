@@ -1,0 +1,294 @@
+{
+  "provenance": {
+    "run_id": 45960533214,
+    "job_id": 140377033939,
+    "run_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/45960533214",
+    "source_head": "1ae9d8321f8a392bbcf49e3cee25bb7dda1aee55",
+    "actual_checkout": "8f1848afc92febd5f2140bae743dcaf081f33877",
+    "protocol_commit": "af024e73e4be99d0db1a2a0df400039f98ab6095",
+    "artifact_id": 15180697845,
+    "artifact_name": "mirt-stage1-8f1848afc92febd5f2140bae743dcaf081f33877-45960533214",
+    "artifact_digest": "sha256:1d26f342b43f3025b1f179020a357208910760262644c907762e577c57cf2c97",
+    "note": "Actual cold Python/R fits executed once each; overall job later failed only an unrelated software-fixture nominal-label setup. That failure is preserved; scientific profile PASS is not whole-workflow PASS."
+  },
+  "report": {
+    "profile": "NRM_2D_COLD_C1",
+    "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+    "R_execution": "CALIBRATION EXECUTED",
+    "Python_execution": "EXECUTED",
+    "protocol": {
+      "commit": "af024e73e4be99d0db1a2a0df400039f98ab6095",
+      "path": "validation/mirt_core_production/PROTOCOL.md",
+      "sha256": "016abb32bada448a70cde66ed2397e550db9c5d33307cdc4b7936036e639e336"
+    },
+    "timing_seconds": {
+      "R_preflight": 3.1719292889999906,
+      "Python": 2.2698459700000058,
+      "R": 269.717172138
+    },
+    "calibration_attempts": {
+      "Python": 1,
+      "R": 1
+    },
+    "provenance": "Exactly one prospective cold pair; no warm estimates, retries or continuations",
+    "limitations": "Finite registered fixture only; no population inference, global optimum or quadrature-accuracy claim.",
+    "settings": {
+      "name": "NRM_2D",
+      "model": "NRM",
+      "q": 2,
+      "k": 10,
+      "pattern": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "correlated": "full",
+      "covariance_mode": "full",
+      "exploratory": false,
+      "groups": null,
+      "syntax": "F1 = 1,2,3,4,9,10\nF2 = 5,6,7,8,9,10\nCOV = F1*F2",
+      "N": 400,
+      "seed": 20261132,
+      "n_quadpts": 15,
+      "max_iter": 3000,
+      "tol": 1e-9,
+      "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+      "data_sha256": "e43e687f10bf1231ba1c386a4d68bba4fc5dd22f81d31f92690e5e550e742454",
+      "initialization": "Cold native nominal_start; zero category intercepts; identity latent covariance in BOTH engines",
+      "protocol_commit": "af024e73e4be99d0db1a2a0df400039f98ab6095"
+    },
+    "preflight": {
+      "probabilities": {
+        "status": "PASS",
+        "max_absolute": 4.996003610813204e-16,
+        "mean_absolute": 1.0044048925905713e-16,
+        "max_relative": 3.2202775936126386e-15,
+        "tolerance": 1e-10,
+        "reason": ""
+      },
+      "information": {
+        "status": "PASS",
+        "max_absolute": 1.0440204256667585e-11,
+        "mean_absolute": 4.894467740052594e-13,
+        "max_relative": 5.860485469137468e-11,
+        "tolerance": 1e-8,
+        "reason": ""
+      },
+      "prior": {
+        "status": "PASS",
+        "max_absolute": 4.163336342344337e-16,
+        "mean_absolute": 4.618696589333736e-18,
+        "max_relative": 2.105422082779696e-14,
+        "tolerance": 1e-12,
+        "reason": ""
+      }
+    },
+    "Python": {
+      "engine": "Python mirt 1.2.0",
+      "python": "3.11.18",
+      "converged": true,
+      "logLik": -5323.200267834136,
+      "AIC": 10780.400535668272,
+      "BIC": 11047.828660324507,
+      "n_parameters": 67,
+      "iterations": 107,
+      "admissibility": {
+        "valid": true,
+        "reference_and_structural_zeros": true,
+        "inside_native_boxes": true,
+        "identified_latent_metric": true,
+        "at_bound": [],
+        "actual_native_bounds": {
+          "slopes": [
+            -5,
+            5
+          ],
+          "intercepts": [
+            -6,
+            6
+          ]
+        }
+      }
+    },
+    "R": {
+      "version": "1.48",
+      "R": "R version 4.6.1 (2026-06-24)",
+      "model": "NRM",
+      "dimensions": 2,
+      "execution": "CALIBRATION",
+      "source_free_parameters": "NA",
+      "converged": true,
+      "logLik": -5323.2002678255,
+      "AIC": 10780.400535651,
+      "BIC": 11047.8286603072,
+      "iterations": 138,
+      "logPrior": 0,
+      "covariance": [
+        [
+          1,
+          0.344652713737506
+        ],
+        [
+          0.344652713737506,
+          1
+        ]
+      ],
+      "orientation": [
+        1,
+        1
+      ],
+      "constraints_valid": true,
+      "optimizer": "R nloptr BOBYQA: native matrix score derivatives are absent in mirt 1.48",
+      "information_reference": "R native gpcm_mats probabilities + checked two-step numerical Fisher"
+    },
+    "comparison": {
+      "slopes": {
+        "status": "PASS",
+        "max_absolute": 0.00003839754612311452,
+        "mean_absolute": 0.0000035727999127924646,
+        "max_relative": 0.00011616384840151552,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "intercepts": {
+        "status": "PASS",
+        "max_absolute": 0.000017764861952818123,
+        "mean_absolute": 0.0000023002583431465867,
+        "max_relative": 0.004174518631932281,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "covariance": {
+        "status": "PASS",
+        "max_absolute": 0.0000058147601048053055,
+        "mean_absolute": 0.0000029073800524026527,
+        "max_relative": 0.000016871360279594188,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "probabilities": {
+        "status": "PASS",
+        "max_absolute": 0.000009018154012108148,
+        "mean_absolute": 8.026049045700023e-7,
+        "max_relative": 0.0001123068077185902,
+        "tolerance": 0.0001,
+        "reason": ""
+      },
+      "information": {
+        "status": "PASS",
+        "max_absolute": 0.000014686829104770815,
+        "mean_absolute": 8.626697451397903e-7,
+        "max_relative": 0.00009191635812042096,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "EAP": {
+        "status": "PASS",
+        "max_absolute": 0.000013623485876468333,
+        "mean_absolute": 0.00000436231790099887,
+        "max_relative": 0.000389224751583189,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "posterior_SD": {
+        "status": "PASS",
+        "max_absolute": 0.0000021308988544799234,
+        "mean_absolute": 7.828397104170381e-7,
+        "max_relative": 0.0000031853114231524522,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "common_logLik": {
+        "status": "PASS",
+        "max_absolute": 8.632923709228635e-9,
+        "mean_absolute": 8.632923709228635e-9,
+        "max_relative": 1.6217544474878708e-12,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "Python_native_LL": {
+        "status": "PASS",
+        "max_absolute": 0,
+        "mean_absolute": 0,
+        "max_relative": 0,
+        "tolerance": 0.000001,
+        "reason": ""
+      },
+      "R_native_LL": {
+        "status": "PASS",
+        "max_absolute": 2.7284841053187847e-12,
+        "mean_absolute": 2.7284841053187847e-12,
+        "max_relative": 5.125646167795514e-16,
+        "tolerance": 0.000001,
+        "reason": ""
+      }
+    },
+    "common_grid_logLik": {
+      "Python": -5323.200267834136,
+      "R": -5323.200267825503
+    },
+    "R_admissibility": {
+      "valid": true,
+      "free_parameters": 67,
+      "inside_native_boxes": true,
+      "at_bound": []
+    },
+    "worker_runtime": {
+      "Python_runtime": {
+        "elapsed_seconds": 2.269877687000019,
+        "limit_seconds": 300,
+        "timed_out": false,
+        "returncode": 0
+      },
+      "R_preflight_runtime": {
+        "elapsed_seconds": 3.1719623939999906,
+        "limit_seconds": 300,
+        "timed_out": false,
+        "returncode": 0
+      },
+      "R_runtime": {
+        "elapsed_seconds": 269.717202348,
+        "limit_seconds": 300,
+        "timed_out": false,
+        "returncode": 0
+      }
+    }
+  }
+}

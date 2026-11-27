@@ -176,3 +176,22 @@ See [P3_4PL_CLOSURE_N.md](P3_4PL_CLOSURE_N.md); raw ledger, all failures, old ev
 
 Kapsam: kayıtlı üreteç, N=2000. N500, RSM, UI/dışa aktarma etiketleri henüz güncellenmedi.
 Üretim: core/polytomous_inference.parameter_table (tek paylaşılan tablo) ekran, CSV, XLSX ve ZIP için kullanılır; satır etiketi ci_status ile (N=2000, 10 madde, 4 kategori, ML, 21 düğüm, max_iter 500, tol 1e-4, NRM kaydedilmiş Oakes SH). DOCX bağlantısı doğrulanmadı.
+
+
+## Policy D — native confirmatory MIRT numerical production (2026-11-27)
+
+This is an output/estimator-scope addition, not a rewrite of historical P/N counts or a new inferential certificate. Existing scoped unidimensional/DIF certificates and negative evidence remain unchanged.
+
+Accepted cold finite-grid profiles: **2PL_2D/3D, GRM_2D/3D, GPCM_3D, Rasch_2D, PCM_2D**. Existing independent R mirt1.48 runs40383677441/40394398251, native Python mirt1.2.0 ML, N400/J10or14/C2or4/GH15/max1000/tol1e-7, exact positive-CFA masks/unit latent variances and registered correlation constraints. Status **NUMERICALLY CERTIFIED / SCOPED** concerns only the implementation-level outputs/finite conditions actually compared; it does not certify the user's latent DGP. Observable applicability/evidence/convergence/boundary gates fail closed to EXPERIMENTAL outside this scope.
+
+Discrimination and transformed category intercepts, latent covariance, probabilities and IIF have independent numerical evidence. EAP/posteriorSD reference covers first16 fixture persons only. Full posterior covariance/directional information are separately labelled conditional mathematical identities. Item SE/CI, frequentist uncertainty coverage, global/item-fit p and Wilks tests remain **WITHHELD**. ML AIC/BIC are descriptive. No arbitrary multidimensional scalar difficulty or standardized FA loading is invented.
+
+MNRM historical corrected native gpcm_mats/BOBYQA warm-reference acceptance is retained separately; it does not certify automatic cold calibration. Optional prospectively registered C1 cold comparison must independently pass unchanged criteria before any new cold release. EFA/bifactor/3PL/4PL and optional R-backend work remain separate and unchanged.
+
+Details, exact errors, ownership, missing-raw-artifact limitation, current software verification and handover: [core MIRT report](mirt_core_production/REPORT.md), [protocol](mirt_core_production/PROTOCOL.md). Runtime status derives from the existing original evidence files, not a competing registry.
+
+### Prospective C1 cold NRM — implementation-only numerical scope
+
+Actual run45960533214/job140377033939, protocolaf024e73e4be99d0db1a2a0df400039f98ab6095: one cold Python/R pair, both converged, unchanged original numerical gates allPASS. **NRM_2D_COLD_C1**: N400/J10/C4, exact 4pure/factor+2crossloading pattern, full correlation, zero means/unit variances/category0 reference, GH15/max3000/tol1e-9, nominal_start/zero intercepts/covarianceI. R full category-by-factor gpcm_mats/BOBYQA, not rank-one nominal. ΔP9.01815e-6; ΔI1.46868e-5; ΔLL8.63292e-9.
+
+This supersedes the pending cold-comparison state only for this prospectively defined profile. Original warm-only acceptance, initial derivative failure and unrelated later software-fixture failure remain recorded. Status **NUMERICALLY CERTIFIED / SCOPED**, never inferential certification. All item SE/CI/p/global-fit/Wilks outputs remain WITHHELD. Unknown/warm initialization, changed settings, missing/withdrawn proof or other dimensions are EXPERIMENTAL. Existing seven core profiles and all unidimensional/DIF inference certificates remain unchanged.
