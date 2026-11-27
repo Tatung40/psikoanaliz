@@ -22,8 +22,10 @@ Iteration-1 results are added below once CI completes; they are not edited after
 |---|-----------|------------|------------|----------|
 | 0 | Python graded bifactor API | `bfactor(model="graded")` / `GradedBifactorModel` exist | installed source + PyPI 1.2.0 wheel inspected | **API ABSENT**: `bfactor` has no `model` argument and rejects any response > 1 in `BifactorEMEstimator.fit` (`MirtDataError: requires dichotomous 0/1 responses`); no such class exists |
 | 1 | GRM/GPCM bifactor | expressible as confirmatory orthogonal MGRM/MGPCM | `core.mirt_advanced` vs native R mirt, common GH7 grid, predeclared seeds | GPCM **PASS**; GRM FAIL (probabilities only, 4.0e-4) |
-| 2 | GRM bifactor probabilities | same GRM M-step precision mechanism as GRM EFA | explicit high-precision continuation, same fixture and criteria | see the run recorded below |
+| 2 | GRM bifactor probabilities | same GRM M-step precision mechanism as GRM EFA | explicit high-precision continuation, same fixture and criteria (run 45945188758) | **PASS**: max ΔP 1.2e-6, ΔLL 9.8e-11 |
 | 1 | M3PL/M4PL fixed through the R backend | backend = verified phase3 R specification | 6 archived cases | **PASS** (fidelity and independence) |
 | 1 | GRM EFA 2D profile | explicit continuation passes | `fit_grm_high_precision` vs fresh R | **PASS**; ΔLL 3.3e-6 vs max ΔP 3.5e-4, so a log-likelihood trigger is unreliable → no adaptive trigger |
 | 1 | Binary bifactor 4D | full-grid iteration cap | R and Python bfactor DR, quadpts 21, 1000 iterations | still at the cap in both; loadings differ by up to 1.30 → **BLOCKED** (no correctable defect) |
 | 0 | Dockerfile | builds | docker job | the existing TAM check compared "4.3-25" with `as.character(packageVersion())` = "4.3.25" and could never pass; fixed to "4.3.25" |
+| 1 | Docker mirt install | install_version works on bookworm | docker job (run 45945188758) | FAIL: RcppParallel needs cmake; fs needs libuv; Deriv 4.3.0 needs R >= 4.5 (bookworm ships R 4.2.2) |
+| 2 | Docker mirt install | system libraries + Deriv 4.2.0 pre-pin | docker job | see the next run |

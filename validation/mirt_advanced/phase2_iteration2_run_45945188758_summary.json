@@ -1,0 +1,43 @@
+{
+ "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+ "engine": [
+  true,
+  "R mirt 1.48"
+ ],
+ "F_grm_bifactor_high_precision": {
+  "GRM_Bifactor_4D": {
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+   "blocker": null,
+   "seconds": 193.746207442,
+   "Python": {
+    "engine": "Python mirt 1.2.0",
+    "python": "3.11.18",
+    "converged": true,
+    "logLik": -6551.517462177602,
+    "AIC": 13193.034924355205,
+    "BIC": 13390.896758839932,
+    "n_parameters": 45,
+    "iterations": 148
+   },
+   "R": {
+    "converged": true,
+    "iterations": 318,
+    "logLik": -6551.5174621775
+   },
+   "failed": [],
+   "max_abs": {
+    "slopes": 2.1446612410436217e-06,
+    "intercepts": 4.5074948351597754e-07,
+    "covariance": 0.0,
+    "probabilities": 1.2478325064346762e-06,
+    "information": 1.0786625393999216e-06,
+    "EAP": 2.3027083301263573e-06,
+    "posterior_SD": 4.907994465286336e-07,
+    "common_logLik": 9.822542779147625e-11,
+    "Python_native_LL": 0.0,
+    "R_native_LL": 3.637978807091713e-12
+   },
+   "high_precision": true
+  }
+ }
+}

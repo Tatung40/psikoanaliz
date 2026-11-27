@@ -30,8 +30,8 @@
     "GRM_bifactor": {
       "decision": "PARTIAL",
       "level": "EXPERIMENTAL",
-      "evidence": "Python adapter core.mirt_advanced.fit_polytomous_bifactor (confirmatory orthogonal MGRM, full GH7 grid, 4D). Default settings: probability gate FAIL (4.0e-4 > 1e-4); every other check PASS. Iteration 2 (high-precision continuation) is recorded in LEDGER.md",
-      "limits": "One 4D fixture (3 specific factors x 3 items); binary bifactor evidence not transferred"
+      "evidence": "Python adapter core.mirt_advanced.fit_polytomous_bifactor (confirmatory orthogonal MGRM, full GH7 grid, 4D). Default settings: probability gate FAIL (4.0e-4 > 1e-4; run 45943641718). Iteration 2, high_precision=True: every unchanged stage-1 check PASS, max |dP| 1.2e-6, |dLL| 9.8e-11 (run 45945188758)",
+      "limits": "One 4D fixture; high-precision profile required; numerical only; binary bifactor evidence not transferred"
     },
     "GPCM_bifactor": {
       "decision": "PARTIAL",
