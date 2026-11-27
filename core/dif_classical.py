@@ -28,15 +28,6 @@ ETS_B, ETS_C = 1.0, 1.5
 JG_B, JG_C = .035, .070
 
 
-OBSERVED_SCORE_NOTICE = (
-    "Gözlenen puan DIF (MH/Mantel, lojistik ve sıralı lojistik regresyon): gruplar arasında yetenek farkı (impact) ve "
-    "maddelerin ayırt ediciliği farklı olduğunda toplam puan eşleştirmesi yetersiz kalabilir ve I. tip hata şişebilir; "
-    "saflaştırma bu eşleştirme yetersizliğini ortadan kaldırmak zorunda değildir. Sayısal doğrulama (difR ile uyum) "
-    "çıkarımsal geçerlik kanıtı değildir. p ve düzeltilmiş p değerleri yalnız TARAMA amaçlıdır; I. tip hata/FWER/güç "
-    "sertifikası yoktur.")
-SCREENING_STATUS = "TARAMA — çıkarımsal olarak sertifikalı değil (sayısal: difR ile uyumlu)"
-
-
 def adjust_pvalues(p, method="BH"):
     """Family-wise / false-discovery adjustment; NaN entries are excluded and kept NaN."""
     if method not in ADJUST_METHODS:

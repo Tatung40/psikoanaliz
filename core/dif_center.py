@@ -12,9 +12,7 @@ METHODS = BASE_METHODS+('Wald DIF','Lord χ²')
 LIMITATIONS = ('NOT CERTIFIED / FWER NOT CERTIFIED. Yöntemler farklı koşullu sıfır hipotezlerini test eder. '
     'Çapalar önceden seçilmiş ve DIF’siz varsayılır; otomatik madde silinmez. Düzeltme her yöntem için '
     'seçilen tek hipotezin incelenen madde ailesinde yapılır; yöntemler arasında ortak hata garantisi yoktur. '
-    'Impact ve çapa seçimi çıkarımı etkiler. Aynı yönde sonuç yöntem üstünlüğü veya yanlılık kanıtı değildir. '
-    'SIBTEST ham toplam puanla değil, çapa puanına gerçek-puan regresyon düzeltmesiyle eşleştirir; Python mirt sonucu R mirt ile '
-    'sayısal olarak uyumludur (aynı algoritmanın iki uygulaması, bağımsız algoritma değildir). p değerleri yalnız TARAMA amaçlıdır.')
+    'Impact ve çapa seçimi çıkarımı etkiler. Aynı yönde sonuç yöntem üstünlüğü veya yanlılık kanıtı değildir.')
 
 
 def support_matrix():

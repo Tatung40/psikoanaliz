@@ -31,4 +31,4 @@ No DIF output is INFERENTIALLY CERTIFIED today.
 - Confirmatory 36×500 campaign: **not launched** (Policy D); design draft retained, unregistered.
 
 ## Production safeguards
-`core.dif_classical.OBSERVED_SCORE_NOTICE` on the observed-score page and in the XLSX Meta sheet; `SCREENING_STATUS` column on every DIF row (screen → DOCX capture, CSV, XLSX); SIBTEST limitation in `core.dif_center.LIMITATIONS` (regression-corrected anchor matching, Python=R mirt, screening p). Existing suppression (purification failure, missing data, fixed-SD Lord p) unchanged. No effect-size cutoff added.
+Texts: `core/dif_policy.py` (OBSERVED_SCORE_NOTICE, SCREENING_STATUS, SIBTEST_NOTE). **Not wired into the screens**: `core/dif_classical.py`, `core/dif_center.py`, `ui/dif_classical_view.py`, `ui/dif_center_view.py` are protected/frozen sources (NON_DIF_IRT_PROTECTED_SOURCES.json; ordinal_dif_impact_zero metadata); wiring needs a declared source amendment. Existing on-screen impact warnings and all output suppression (incl. closed 3PL/4PL bootstrap p) are unchanged.
