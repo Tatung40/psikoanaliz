@@ -94,7 +94,8 @@ def test_polytomous_word_numeric_parity_cache_and_withdrawal(fits,model,monkeypa
     from core.reproducible import recorded
     idx=("GRM","PCM","GPCM","NRM").index(model)
     x,_=S.simulate(model,2000,777000+idx)
-    frame=pd.DataFrame(x,columns=ITEMS);out=fits[model];calls=[]
+    frame=pd.DataFrame(x,columns=ITEMS);scored=frame%2;out=fits[model];calls=[]
+    if model=="NRM":frame=frame.replace({0:"A",1:"B",2:"C",3:"D"})
     @wraps(recorded(view.fit_python_mirt),updated=())
     def fitted(data,**kwargs):
         np.testing.assert_array_equal(data,x)
@@ -103,7 +104,7 @@ def test_polytomous_word_numeric_parity_cache_and_withdrawal(fits,model,monkeypa
     monkeypatch.setattr(view,"fit_python_mirt",fitted)
     page="MTK: Python mirt "+model
     at=AppTest.from_file(str(Path(__file__).resolve().parents[1]/"app.py"),default_timeout=180)
-    for key,value in dict(raw_df=frame,scored_df=frame%2,item_cols=ITEMS,id_col=None,group_col=None,is_dichotomous=False,nav_page=page).items():at.session_state[key]=value
+    for key,value in dict(raw_df=frame,scored_df=scored,item_cols=ITEMS,id_col=None,group_col=None,is_dichotomous=False,nav_page=page).items():at.session_state[key]=value
     at.run();at.button(key="python_mirt_start_"+model).click().run();assert not at.exception
     expected,_=parameter_table(out,ITEMS)
     result=at.session_state["_academic_history"][page]

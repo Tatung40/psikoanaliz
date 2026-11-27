@@ -11,7 +11,7 @@ def test_scope_enforced():
 
 
 def test_unknown_metadata_fails_closed():
-    assert ci_status("GRM", "discrimination", 2000, "ML", S).startswith("SCOPED CERTIFIED")
+    assert ci_status("GRM", "discrimination", 2000, "ML", S) == "NOT CERTIFIED"
     assert ci_status("NRM", "slopes", 2000, "ML", S, None, 10, 4) == "NOT CERTIFIED"
     assert ci_status("GRM", "discrimination", 2000, "ML", S, n_items=12, n_categories=4) == "NOT CERTIFIED"
 
