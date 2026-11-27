@@ -11,3 +11,8 @@ No thresholds were relaxed, no simulation sizes were increased, and no failed ex
 | 1 | GRM_EFA_2D probability gap, Bifactor_4D | Python EM stopped before stationarity | one fresh R+Python calibration, then the existing stage-1 precision continuation (tol 1e-11) | all stage-1 checks PASS | see `summary.json` artifact of `mirt-advanced-reference` |
 
 Iteration-1 results are added below once CI completes; they are not edited afterwards.
+
+## Iteration 1 result — run 45938013141 (criteria SHA 5b666c89…, unchanged)
+- GRM_EFA_2D: baseline NUMERICAL DISAGREEMENT (probabilities). Precision continuation: all checks PASS. Decision: **PASS** (numerical, 2D, precision settings only). The hypothesis is supported.
+- Bifactor_4D: baseline NOT CONVERGED, because both engines hit the iteration cap. The continuation precondition (converged fits) was not met. Decision: **BLOCKED**. No iteration 2 was run, because raising iteration budgets requires changing the shared stage-1 settings (Codex-owned).
+- The workflow is now manual-only (workflow_dispatch), so the experiment is not repeated.

@@ -1,9 +1,6 @@
 name: mirt-advanced-reference
 on:
   workflow_dispatch:
-  push:
-    branches: [development/mirt-advanced-production]
-    paths: ['validation/mirt_advanced/**', '.github/workflows/mirt-advanced-reference.yml']
 permissions:
   contents: read
 jobs:
