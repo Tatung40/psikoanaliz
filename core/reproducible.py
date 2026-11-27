@@ -434,6 +434,11 @@ def _runtime_assets(calls):
         for relative in ('validation/evidence/p4_confirm/REPORT.json','validation/p4_confirm/PROTOCOL.json','validation/p4_confirm/RUN.json'):
             asset=ROOT/relative
             if asset.is_file() and asset not in assets:assets.append(asset)
+    if any(str(c.get('module','')).startswith('core.irt_mirt_') for c in calls):
+        for relative in ('validation/mirt_stage1/criteria.json','validation/mirt_stage1/phase1_evidence.json',
+                         'validation/mirt_stage1/expansion_original_evidence.json','validation/SCIENTIFIC_CERTIFICATION_POLICY.md'):
+            asset=ROOT/relative
+            if asset.is_file() and asset not in assets:assets.append(asset)
     return assets
 
 

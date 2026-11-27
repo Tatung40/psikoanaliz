@@ -18,7 +18,8 @@ AUXILIARY={
  '11. Formüller ve Yöntemler':'Başvuru/yöntem metni; veri üzerinde analiz üretmez.',
  '12. Kullanım Kılavuzu':'Kullanım yardımı; veri üzerinde analiz üretmez.',
 }
-POSTPROCESS=('core.polytomous_certification','core.polytomous_inference','core.irt_global_fit',  # derived diagnostics/cache checks never represent a new calibration
+POSTPROCESS=('core.irt_mirt_policy','core.irt_mirt_production','core.irt_mirt_diagnostics',  # derived scopes/moments never mark a new calibration
+ 'core.polytomous_certification','core.polytomous_inference','core.irt_global_fit',  # derived diagnostics/cache checks never represent a new calibration
  'core.irt_python_mirt_report','core.irt_library','core.irt_binary_inference',
  'core.irt_python_mirt_parameters','core.irt_person_abilities','core.irt_b14_persons_info',
  'core.irt_b14_model_curves','core.irt_b14_diagnostics','core.academic_',

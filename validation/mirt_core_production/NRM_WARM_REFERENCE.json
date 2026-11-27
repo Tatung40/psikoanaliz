@@ -1,0 +1,255 @@
+{
+  "schema": "historical-native-R-MNRM-warm-reference-v1",
+  "provenance": {
+    "repository": "Tatung40/psikoanaliz",
+    "run_id": 40399106868,
+    "run_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/40399106868",
+    "job_id": 121839893457,
+    "job_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/40399106868/job/121839893457",
+    "source": "Complete MIRT_REPORT= JSON line from actual job stdout; semantically lossless JSON parse, no new numerical execution",
+    "workflow": ".github/workflows/mirt-stage1.yml",
+    "workflow_head_sha": "da6b8080d5da00a8540afcda0d228a92622bff7a",
+    "actual_checkout_merge_sha": "e1981fef3cd6d68e5f1dfbc3b095f1ee68c98e0e",
+    "run_created_at": "2026-10-26T20:49:50Z",
+    "run_completed_at": "2026-10-26T21:04:33Z",
+    "run_conclusion": "failure",
+    "run_conclusion_note": "Whole workflow failed other profiles; this NRM report actually passed all unchanged numerical criteria and both engines converged.",
+    "artifact_id": 12687774365,
+    "artifact_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/40399106868/artifacts/12687774365",
+    "initial_failed_evidence": "validation/mirt_stage1/expansion_original_evidence.json",
+    "initial_failure_diagnostic": "validation/mirt_stage1/nrm_original_score_diagnostic.json",
+    "initial_run": 40394398251,
+    "original_evidence_modified": false
+  },
+  "scope": {
+    "classification": "WARM-START NUMERICAL AGREEMENT / NOT COLD-START VALIDATION",
+    "independent_R_execution": "HISTORICAL ACTUAL R mirt 1.48 CALIBRATION",
+    "new_fits": 0,
+    "initialization": "Complete saved Python item solution initializes BOTH engines; latent covariance reset to identity in both.",
+    "solver": "ML/GH15, max_iter=3000, tol=1e-9; R native gpcm_mats with supported BOBYQA because R1.48 analytic category-score gradients are absent.",
+    "claims": "Only the reported finite-grid warm-start numerical comparison. Not cold-start production reliability, global optimality, quadrature accuracy, item SE/CI, population recovery or inferential coverage. MNRM remains experimental.",
+    "criteria": "Unchanged preregistered validation/mirt_stage1/criteria.json; exact criterion/data/start SHA256 values preserved in report.settings."
+  },
+  "report": {
+    "profile": "NRM_2D",
+    "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+    "R_execution": "CALIBRATION EXECUTED",
+    "Python_execution": "EXECUTED",
+    "settings": {
+      "name": "NRM_2D",
+      "model": "NRM",
+      "q": 2,
+      "k": 10,
+      "pattern": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "correlated": "full",
+      "covariance_mode": "full",
+      "exploratory": false,
+      "groups": null,
+      "syntax": "F1 = 1,2,3,4,9,10\nF2 = 5,6,7,8,9,10\nCOV = F1*F2",
+      "N": 400,
+      "seed": 20261132,
+      "n_quadpts": 15,
+      "max_iter": 3000,
+      "tol": 1e-9,
+      "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+      "data_sha256": "e43e687f10bf1231ba1c386a4d68bba4fc5dd22f81d31f92690e5e550e742454",
+      "initialization": "Saved complete Python item solution; latent covariance reset to identity in BOTH engines",
+      "source_run": 40394398251,
+      "start_sha256": "68e0c7917900da0dee4e88b75546f52fe42291490e1631ab8729b715e7cdd207"
+    },
+    "preflight": {
+      "probabilities": {
+        "status": "PASS",
+        "max_absolute": 5.551115123125783e-16,
+        "mean_absolute": 1.8958479654989584e-16,
+        "max_relative": 3.937971796454018e-15,
+        "tolerance": 1e-10,
+        "reason": ""
+      },
+      "information": {
+        "status": "PASS",
+        "max_absolute": 4.8090642579268206e-11,
+        "mean_absolute": 1.7468157851909435e-12,
+        "max_relative": 1.4677561999933142e-10,
+        "tolerance": 1e-8,
+        "reason": ""
+      },
+      "prior": {
+        "status": "PASS",
+        "max_absolute": 4.3021142204224816e-16,
+        "mean_absolute": 4.6803758815442855e-18,
+        "max_relative": 2.105422082779696e-14,
+        "tolerance": 1e-12,
+        "reason": ""
+      }
+    },
+    "Python": {
+      "engine": "Python mirt 1.2.0",
+      "python": "3.11.17",
+      "converged": true,
+      "logLik": -5323.200267833653,
+      "AIC": 10780.400535667306,
+      "BIC": 11047.828660323541,
+      "n_parameters": 67,
+      "iterations": 108
+    },
+    "R": {
+      "version": "1.48",
+      "R": "R version 4.6.1 (2026-06-24)",
+      "model": "NRM",
+      "dimensions": 2,
+      "execution": "CALIBRATION",
+      "source_free_parameters": "NA",
+      "converged": true,
+      "logLik": -5323.20026782552,
+      "AIC": 10780.400535651,
+      "BIC": 11047.8286603073,
+      "iterations": 124,
+      "logPrior": 0,
+      "covariance": [
+        [
+          1,
+          0.344652501762429
+        ],
+        [
+          0.344652501762429,
+          1
+        ]
+      ],
+      "orientation": [
+        1,
+        1
+      ],
+      "constraints_valid": true,
+      "optimizer": "R nloptr BOBYQA: native matrix score derivatives are absent in mirt 1.48",
+      "information_reference": "R native gpcm_mats probabilities + checked two-step numerical Fisher"
+    },
+    "comparison": {
+      "slopes": {
+        "status": "PASS",
+        "max_absolute": 0.00004252295821771668,
+        "mean_absolute": 0.000003168810611727663,
+        "max_relative": 0.00008951125270019552,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "intercepts": {
+        "status": "PASS",
+        "max_absolute": 0.000019694881921772378,
+        "mean_absolute": 0.000002174708453199048,
+        "max_relative": 0.0032023032757779865,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "covariance": {
+        "status": "PASS",
+        "max_absolute": 0.000004485129807663135,
+        "mean_absolute": 0.0000022425649038315676,
+        "max_relative": 0.000013013483972197485,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "probabilities": {
+        "status": "PASS",
+        "max_absolute": 0.000007778569242722355,
+        "mean_absolute": 6.965321029328878e-7,
+        "max_relative": 0.0000932293316958768,
+        "tolerance": 0.0001,
+        "reason": ""
+      },
+      "information": {
+        "status": "PASS",
+        "max_absolute": 0.0000163024867483319,
+        "mean_absolute": 7.297028150598176e-7,
+        "max_relative": 0.00007795297672617252,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "EAP": {
+        "status": "PASS",
+        "max_absolute": 0.000011804552533078994,
+        "mean_absolute": 0.000004096846246217723,
+        "max_relative": 0.00032735210579452114,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "posterior_SD": {
+        "status": "PASS",
+        "max_absolute": 0.0000025801583168894027,
+        "mean_absolute": 8.38186511913086e-7,
+        "max_relative": 0.000003856873740988768,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "common_logLik": {
+        "status": "PASS",
+        "max_absolute": 8.132701623253524e-9,
+        "mean_absolute": 8.132701623253524e-9,
+        "max_relative": 1.527784267745244e-12,
+        "tolerance": 0.001,
+        "reason": ""
+      },
+      "Python_native_LL": {
+        "status": "PASS",
+        "max_absolute": 0,
+        "mean_absolute": 0,
+        "max_relative": 0,
+        "tolerance": 0.000001,
+        "reason": ""
+      },
+      "R_native_LL": {
+        "status": "PASS",
+        "max_absolute": 0,
+        "mean_absolute": 0,
+        "max_relative": 0,
+        "tolerance": 0.000001,
+        "reason": ""
+      }
+    },
+    "common_grid_logLik": {
+      "Python": -5323.200267833653,
+      "R": -5323.20026782552
+    }
+  }
+}
