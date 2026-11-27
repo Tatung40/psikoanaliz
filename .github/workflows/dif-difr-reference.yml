@@ -1,0 +1,23 @@
+name: DIF difR reference (DIF-only)
+on:
+  pull_request:
+    paths: ['validation/dif_difr/**', '.github/workflows/dif-difr-reference.yml']
+permissions: {contents: read}
+jobs:
+  difr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env: {PYTHONPATH: .}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - uses: r-lib/actions/setup-r@v2
+        with: {r-version: release, use-public-rspm: true}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with: {packages: "any::difR\nany::jsonlite", cache-version: 1}
+      - run: pip install -r requirements.txt
+      - run: |
+          python validation/dif_difr/python_values.py py.json
+          Rscript validation/dif_difr/r_values.R py.json r.json
+          python validation/dif_difr/compare.py py.json r.json

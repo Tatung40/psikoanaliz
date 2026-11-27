@@ -1,0 +1,6 @@
+{"purpose": "Independent difR (CRAN) reference for binary MH and logistic-regression DIF statistics; numerical agreement only (NOT Type I/power certification).",
+ "registered_before_comparison": true,
+ "fixture": "tests/fixtures/irt_b10/data_dif2pl_mixed.csv (group Grup, reference R, focal F)",
+ "python": "core.dif_classical.dif_screen(method='MH'|'LR', purify=False, adjust='none')",
+ "r": "difR::difMH(correct=TRUE, purify=FALSE, match='score') and difR::difLogistic(type='both', criterion='LRT', purify=FALSE)",
+ "tolerances": {"MH chi2": 1e-8, "alpha_MH": 1e-8, "MH p": 1e-10, "LR omnibus (2 df)": 1e-6, "LR p": 1e-8}}
