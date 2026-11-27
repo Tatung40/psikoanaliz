@@ -41,6 +41,8 @@ def render(data, item_cols=(), id_col=None, group_col=None):
     st.caption("İkili maddeler: MH (Holland–Thayer; ETS A/B/C) ve lojistik regresyon (tek biçimli / tek biçimli "
                "olmayan; Jodoin–Gierl ΔR²). Sıralı maddeler: Mantel testi + SMD ve sıralı lojistik regresyon. "
                "Eşleştirme: toplam puan (incelenen madde dahil); isteğe bağlı saflaştırma.")
+    from core.dif_policy import OBSERVED_SCORE_NOTICE, SCREENING_STATUS  # Policy D presentation amendment
+    st.warning(OBSERVED_SCORE_NOTICE)
     st.warning("Bu yöntemler MTK olabilirlik DIF'i değildir. Gruplar arasında yetenek farkı (impact) varken "
                "I. tip hata şişebilir (özellikle sıralı maddelerde); MH tek biçimli olmayan DIF'e duyarsızdır "
                "(önceden tanımlı simülasyonda güç %18–41). Ayrıntı: validation/DIF_VALIDATION.md.")
@@ -113,7 +115,9 @@ def render(data, item_cols=(), id_col=None, group_col=None):
         fig.update_layout(title="Lojistik regresyon DIF etki büyüklüğü (Jodoin–Gierl sınırları .035 / .070)",
                           xaxis_title="Madde", yaxis_title="ΔR²", template="plotly_white")
         st.plotly_chart(fig, use_container_width=True)
-    meta_frame = pd.DataFrame([(k, str(v)) for k, v in meta.items()], columns=["Alan", "Değer"])
+    frame = frame.assign(**{"Bilimsel durum (p)": SCREENING_STATUS})   # Policy D: label on CSV/XLSX rows
+    meta_frame = pd.DataFrame([(k, str(v)) for k, v in meta.items()] + [("Bilimsel uyarı", OBSERVED_SCORE_NOTICE)],
+                              columns=["Alan", "Değer"])
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine="openpyxl") as w:
         _safe(frame).to_excel(w, sheet_name="DIF", index=False)
