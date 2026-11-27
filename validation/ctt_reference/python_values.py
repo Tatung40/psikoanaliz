@@ -19,6 +19,8 @@ if __name__ == "__main__":
         x.to_csv(f"{sys.argv[1]}/{name}.csv", index=False)
         rel = compute_reliability_indices(x, list(x), is_dichotomous=name == "binary")
         S = np.cov(x.to_numpy(float), rowvar=False); Rm = np.corrcoef(x.to_numpy(float), rowvar=False)
-        out[name] = {"alpha": rel["cronbach_alpha"], "omega_std_ml": rel["mcdonald_omega"], "kr20": rel.get("kr20"),
+        out[name] = {"alpha": rel["cronbach_alpha"], "omega_std_ml": rel["mcdonald_omega"], "omega_raw_ml": rel["mcdonald_omega_raw"],
+                     "kr20": rel.get("kr20"), "kr21": rel.get("kr21"), "sb_odd_even": rel.get("spearman_brown_odd_even"),
+                     "guttman_l4_odd_even": rel.get("guttman_lambda4"),
                      "cov": RX.reliability_family(S), "cor": RX.reliability_family(Rm)}
     json.dump(out, open(f"{sys.argv[1]}/python.json", "w"), indent=1, default=float)

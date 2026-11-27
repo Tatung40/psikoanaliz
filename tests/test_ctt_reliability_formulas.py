@@ -45,3 +45,13 @@ def test_guttman_and_feldt_family_against_loops():
     e2 = [np.var(x[:, j] - np.c_[np.ones(300), np.delete(x, j, 1)] @ np.linalg.lstsq(np.c_[np.ones(300), np.delete(x, j, 1)], x[:, j], rcond=None)[0], ddof=1) for j in range(k)]
     assert abs(out["lambda6"] - (1 - sum(e2) / V)) < 1e-10
     sx = S.sum(1); assert abs(out["feldt_brennan"] - V * (V - np.trace(S)) / (V ** 2 - (sx ** 2).sum())) < 1e-12
+
+
+def test_raw_omega_separate_estimand_exact_congeneric():
+    lam = np.array([.4, .5, .6, .7, .8, .55]); sd = np.array([1., 2., .5, 1.5, 1., 3.])
+    R = np.outer(lam, lam); np.fill_diagonal(R, 1)
+    x = exact_data(R) * sd
+    rel = compute_reliability_indices(x, list(x), is_dichotomous=False)
+    lr, pr = lam * sd, (1 - lam ** 2) * sd ** 2
+    assert abs(rel["mcdonald_omega_raw"] - lr.sum() ** 2 / (lr.sum() ** 2 + pr.sum())) <= 1e-4
+    assert abs(rel["mcdonald_omega"] - lam.sum() ** 2 / (lam.sum() ** 2 + (1 - lam ** 2).sum())) <= 1e-4
