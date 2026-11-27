@@ -131,33 +131,13 @@ def render(data=None,item_cols=(),id_col=None):
    import plotly.graph_objects as go
    t=tables['LoadingMatrix'];names=t.Item.astype(str)
    if 'Category' in t:names=names+' / '+t.Category.astype(str)
-   m=t.filter(regex='^a[1-5]
- with tabs[4]:
-  if 'Curves' in tables:
-   item=st.selectbox('Eğri maddesi',items,key='md_plot_item');category=st.selectbox('Kategori',list(result['metadata']['Labels']),key='md_plot_cat')
-   if 'Directional_Curves' in tables:
-    import plotly.graph_objects as go
-    trace=tables['Directional_Curves']
-    direction=st.selectbox('Tepki eğrisi yönü',trace.Direction.unique().tolist(),key='md_plot_direction')
-    p=trace[(trace.Item==item)&(trace.Direction==direction)]
-    g=go.Figure()
-    for name,part in p.groupby('Category'):g.add_scatter(x=part.Theta,y=part.Probability,name=str(name))
-    st.plotly_chart(g.update_layout(title=f'{item}: θ=t e doğrultusunda kategori olasılıkları',xaxis_title='t',yaxis_title='Olasılık'),key='md_directional_response',use_container_width=True)
-   fig=figure(result,item,category);st.pyplot(fig)
-   import matplotlib.pyplot as plt
-   plt.close(fig)
- with tabs[5]:
-  bundle_key=export_fingerprint(result,item,category)
-  if saved.get('bundle_key')!=bundle_key:saved['bundle']=downloads(result,item,category);saved['bundle_key']=bundle_key
-  for ext,mime in [('csv','text/csv'),('xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),('png','image/png'),('zip','application/zip'),('report','text/markdown')]:
-   if saved['bundle'][ext] is not None:st.download_button('MIRT — '+ext.upper(),saved['bundle'][ext],'mirt_results.'+('md' if ext=='report' else ext),mime,key='md_download_'+ext)
-)
+   m=t.filter(regex='^a[1-5]$')
    st.plotly_chart(go.Figure(go.Heatmap(z=m.to_numpy(),x=m.columns,y=names)).update_layout(title='IRT ayırıcılık vektörleri — standartlaştırılmış FA yükleri değildir'),key='md_loading_heatmap',use_container_width=True)
  with tabs[2]:
   if 'EAP' in tables and {'F1','F2'}<=set(tables['EAP']):
    import plotly.graph_objects as go
    t=tables['EAP']
-   st.plotly_chart(go.Figure(go.Scattergl(x=t.F1,y=t.F2,mode='markers',text=t.ID.astype(str))).update_layout(title='Koşullu EAP kişi puanları',xaxis_title='F1',yaxis_title='F2'),key='md_person_scatter',use_container_width=True)
+   st.plotly_chart(go.Figure(go.Scattergl(x=t.F1,y=t.F2,mode='markers',text=t.ID.astype(str))).update_layout(title='Koşullu EAP kişi puanları — F1/F2 görünümü',xaxis_title='F1',yaxis_title='F2'),key='md_person_scatter',use_container_width=True)
  with tabs[3]:
   if 'Directional_TIF' in tables:
    import plotly.graph_objects as go
@@ -170,6 +150,14 @@ def render(data=None,item_cols=(),id_col=None):
  with tabs[4]:
   if 'Curves' in tables:
    item=st.selectbox('Eğri maddesi',items,key='md_plot_item');category=st.selectbox('Kategori',list(result['metadata']['Labels']),key='md_plot_cat')
+   if 'Directional_Curves' in tables:
+    import plotly.graph_objects as go
+    trace=tables['Directional_Curves']
+    direction=st.selectbox('Tepki eğrisi yönü',trace.Direction.unique().tolist(),key='md_plot_direction')
+    p=trace[(trace.Item==item)&(trace.Direction==direction)]
+    g=go.Figure()
+    for name,part in p.groupby('Category'):g.add_scatter(x=part.Theta,y=part.Probability,name=str(name))
+    st.plotly_chart(g.update_layout(title=f'{item}: θ=t e doğrultusunda kategori olasılıkları',xaxis_title='t',yaxis_title='Olasılık'),key='md_directional_response',use_container_width=True)
    fig=figure(result,item,category);st.pyplot(fig)
    import matplotlib.pyplot as plt
    plt.close(fig)

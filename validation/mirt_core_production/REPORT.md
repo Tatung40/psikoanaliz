@@ -25,7 +25,7 @@ Cold accepted scopes are N400, J10(2D)/14(3D), C2 binary or C4 categorical, GH15
 | PCM_2D | 400/10/2 | 0.0000e+0 | 4.5832e-5 | 1.2079e-5 | 5.4779e-6 | 1.6979e-5 | 1.3044e-6 | 1.3203e-7 |
 | GPCM_3D | 400/14/3 | 1.7713e-4 | 1.7629e-4 | 2.6220e-5 | 2.1908e-4 | 5.6042e-5 | 1.0580e-5 | 2.1734e-7 |
 
-Threshold/step comparisons are via d=-sum(a)*b/step; those errors are not direct raw-threshold errors. All seven original independent pairs converged and passed the unchanged prospectively registered criteria. EAP/SD R comparison only first16 fixture persons; P/I evaluated on [-2,0,2]^q. Finite-grid identity is not quadrature accuracy or global optimality.
+Threshold/step comparisons are via d=-sum(a)*b/step; those errors are not direct raw-threshold errors. The expansion workflow retained failed other profiles; a passing named profile is not a claim that the whole historical workflow passed. All seven original independent pairs converged and passed the unchanged prospectively registered criteria. EAP/SD R comparison only first16 fixture persons; P/I evaluated on [-2,0,2]^q. Finite-grid identity is not quadrature accuracy or global optimality.
 
 ## Output-level decision
 

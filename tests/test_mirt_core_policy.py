@@ -91,9 +91,17 @@ def test_observable_mismatches_invalid_results_and_bounds_fail_closed(change):
     else:
         from mirt.estimation.base import _parameter_bounds
         a = out["fit"].model.parameters["slopes"].copy()
-        if change == "boundary": a[0, 0] = _parameter_bounds(out["fit"].model, "slopes")[1]
-        else: a[0, 1] = .1
-        out["fit"].model.set_parameters(slopes=a)
+        if change == "boundary":
+            a[0, 0] = _parameter_bounds(out["fit"].model, "slopes")[1]
+            out["fit"].model.set_parameters(slopes=a)
+        else:
+            # The real setter canonicalizes structural zeros. Simulate a corrupted
+            # returned result explicitly, so this test actually exercises refusal.
+            native = out["fit"].model
+            a[0, 1] = .1
+            out["fit"].model = SimpleNamespace(parameters=dict(native.parameters, slopes=a),
+                free_parameter_masks=native.free_parameter_masks, model_name=native.model_name)
+            assert out["fit"].model.parameters["slopes"][0, 1] == .1
     assert P.numerical_scope(out)["Status"] == P.EXPERIMENTAL
 
 

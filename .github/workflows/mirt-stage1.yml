@@ -72,6 +72,10 @@ jobs:
           cache-version: 2
       - name: Python dependencies (existing environment specification)
         run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Compile changed MIRT production sources before any numerical work
+        run: python -m compileall -q core/irt_mirt_policy.py core/irt_mirt_diagnostics.py core/irt_mirt_production.py ui/irt_multidim_view.py reports/irt_multidim_report.py validation/mirt_core_production tests/test_mirt_core_policy.py tests/test_mirt_core_production.py
+      - name: Reproduce exact structural-zero refusal regression first (no fitting)
+        run: python -m pytest -q 'tests/test_mirt_core_policy.py::test_observable_mismatches_invalid_results_and_bounds_fail_closed[structural_zero]'
       - name: Frozen core-source and retained independent evidence audit (ZERO calibration)
         run: python -m validation.mirt_core_production.audit --output validation-output/mirt-core/audit.json
       - name: Targeted core numerical identities, scoped status, real UI and exports

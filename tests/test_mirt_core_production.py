@@ -140,3 +140,24 @@ def test_actual_shared_docx_for_each_native_family(actual,name):
     text="\n".join([p.text for p in parsed.paragraphs]+[c.text for table in parsed.tables for row in table.rows for c in row.cells])
     assert parsed.tables and "WITHHELD" in text and "Item" in text
     (OUT/name/"actual_academic.docx").write_bytes(payload)
+
+@pytest.mark.parametrize("profile",["2PL_2D","2PL_3D","GRM_2D","GRM_3D","GPCM_3D","PCM_2D","Rasch_2D"])
+def test_every_registered_preset_sets_exact_spec_without_fitting(profile,tmp_path,monkeypatch):
+    from streamlit.testing.v1 import AppTest
+    import ui.irt_multidim_view as view
+    cfg,data,_,_=inputs(profile,tmp_path/profile)
+    def forbidden(*args,**kwargs):raise AssertionError("Preset selection must not fit")
+    monkeypatch.setattr(view,"fit",forbidden)
+    at=AppTest.from_file(str(ROOT/"app.py"),default_timeout=120)
+    for k,v in dict(raw_df=data,scored_df=None,item_cols=list(data.columns),id_col=None,
+                    nav_page="Çok Boyutlu MTK (MIRT)").items():at.session_state[k]=v
+    at.run();assert not at.exception
+    at.selectbox(key="md_model").select(cfg["model"]).run();assert not at.exception
+    at.selectbox(key="md_profile").select(profile).run();assert not at.exception
+    assert at.selectbox(key="md_dims").value==cfg["q"]
+    assert at.selectbox(key="md_corr").value=={False:"Ortogonal",True:"Yalnız F1–F2","full":"Tümü"}[cfg["correlated"]]
+    assert at.selectbox(key=f"md_quad_{cfg['q']}").value==15
+    assert at.number_input(key="md_profile_iter").value==1000
+    assert at.number_input(key="md_profile_tol").value==1e-7
+    assert any(b.key=="md_run" for b in at.button)
+    assert view.KEY not in at.session_state
