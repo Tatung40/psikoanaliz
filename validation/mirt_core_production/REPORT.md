@@ -54,6 +54,9 @@ Threshold/step comparisons are via d=-sum(a)*b/step; those errors are not direct
 | Shared CSV/XLSX/PNG | warnings did not reliably travel with detached exports | authoritative metadata/scope in all bundles; preserve original numerical columns |
 | Scoring/reporting | full covariance and directional definitions must use actual APIs | public ability_posterior moment identity, bounded memory, no calibration; explicit WITHHELD on unsupported API |
 | Freshness | data/settings/evidence/selection must not leave stale reports or refit on display changes | session-local content hashes and derived-only freshness; verify actual Word and ZIP cache |
+| Actual Word cached recipe | report was misclassified as calibration; imported missing outcome became None and changed method text | classify only core.irt_multidim.report as postprocess; native fit remains primary; retain exact DOCX identity and changed-output invalidation assertions |
+| DOCX fixture API | metrics must be a mapping, not a list | correct fixture to the unchanged actual API; preserve table sequence and real DOCX parsing |
+| Evidence durability | 30-day Actions retention cannot be permanent evidence storage | commit actual cold raw payload; offline byte/source/coefficient audit, never regenerate missing reference fits |
 
 ## Evidence and source integrity
 
@@ -81,4 +84,4 @@ The raw original report retains NUMERICALLY VALIDATED / NOT CERTIFIED (its origi
 
 Whole canonical job later failed an unrelated nominal-label SOFTWARE FIXTURE after the scientific pair passed; that failure is preserved, not presented as whole-workflow PASS. The fixture's numeric codes were incompatible with its default A..E labels. Fix the fixture's explicit label declaration, never the observed data or statistical gates. Initial cold step in earlier run45940610844 was SKIPPED after a no-fit test failure: ZERO calibrations there. Do not repeat the successful pair.
 
-NRM_COLD_REFERENCE.json freezes actual report/provenance. Original complete raw artifacts15180697845 and original warm/negative evidence are retained; archival CI downloads the canonical raw files, verifies source/data hashes, and exports native coefficients without a new fit. Parameterization notices are now model-specific: binary directd, GRM/GPCM transformed thresholds/steps, NRM nominal coefficient vectors only.
+NRM_COLD_REFERENCE.json freezes actual report/provenance. Original complete raw artifacts15180697845 and original warm/negative evidence are retained; NRM_COLD_RAW.json permanently stores canonical data/starts/native coefficients and original R tables. Archival CI verifies its frozen payload, source/data hashes and original numerical report without a download dependency or new fit. Parameterization notices are now model-specific: binary directd, GRM/GPCM transformed thresholds/steps, NRM nominal coefficient vectors only.

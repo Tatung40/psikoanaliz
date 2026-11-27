@@ -437,7 +437,7 @@ def _runtime_assets(calls):
     if any(str(c.get('module','')).startswith('core.irt_mirt_') for c in calls):
         for relative in ('validation/mirt_stage1/criteria.json','validation/mirt_stage1/phase1_evidence.json',
                          'validation/mirt_stage1/expansion_original_evidence.json','validation/SCIENTIFIC_CERTIFICATION_POLICY.md',
-                         'validation/mirt_core_production/NRM_COLD_REFERENCE.json'):
+                         'validation/mirt_core_production/NRM_COLD_REFERENCE.json','validation/mirt_core_production/NRM_COLD_RAW.json'):
             asset=ROOT/relative
             if asset.is_file() and asset not in assets:assets.append(asset)
     return assets

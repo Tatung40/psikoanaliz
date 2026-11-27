@@ -75,16 +75,9 @@ jobs:
       - name: Frozen core-source and retained independent evidence audit (ZERO calibration)
         run: python -m validation.mirt_core_production.audit --output validation-output/mirt-core/audit.json
       - name: Targeted core numerical identities, scoped status, real UI and exports
-        run: python -m pytest -q -rP tests/test_mirt_core_policy.py tests/test_mirt_core_diagnostics.py tests/test_mirt_core_exports.py tests/test_mirt_core_integrity.py
-      - name: Download canonical C1 raw evidence (no refit fallback)
-        uses: actions/download-artifact@v4
-        with:
-          name: mirt-stage1-8f1848afc92febd5f2140bae743dcaf081f33877-45960533214
-          run-id: 45960533214
-          github-token: ${{ github.token }}
-          path: canonical-c1
-      - name: Archive original cold coefficients and verify source/data hashes (ZERO fits)
-        run: python -m validation.mirt_core_production.archive --root canonical-c1/nrm-cold
+        run: python -m pytest -q -rP tests/test_mirt_core_policy.py tests/test_mirt_core_diagnostics.py tests/test_mirt_core_exports.py tests/test_mirt_core_integrity.py tests/test_mirt_core_word_cache.py tests/test_mirt_core_archive.py
+      - name: Verify permanently archived canonical C1 raw evidence (ZERO fits; no expiring artifact dependency)
+        run: python -m validation.mirt_core_production.archive
       - name: Actual native software fixtures, UI, Word and content-bound export cache
         run: python -m pytest -q -rP tests/test_mirt_core_production.py
       - name: Installed independent R reference version (no calibration)

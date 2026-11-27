@@ -41,6 +41,7 @@ def domain(page):
 def primary(call):
     return (call['function'] not in R.PREFLIGHT_ONLY and
             (call['module'],call['function'])!=('core.ctt_dual_engine','item_guidance') and
+            (call['module'],call['function'])!=('core.irt_multidim','report') and  # derived tables, never a new calibration
             not call['module'].startswith(POSTPROCESS))
 
 
