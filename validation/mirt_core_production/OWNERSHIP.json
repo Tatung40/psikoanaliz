@@ -1,0 +1,498 @@
+{
+  "baseline_main": "b5b5ab095d00f1ff19d316a2381efcd551ac03d8",
+  "policy": "validation/SCIENTIFIC_CERTIFICATION_POLICY.md",
+  "branch": "development/mirt-core-production",
+  "owner_core": [
+    "core/irt_mirt_policy.py",
+    "core/irt_mirt_diagnostics.py",
+    "core/irt_mirt_production.py",
+    "ui/irt_multidim_view.py",
+    "reports/irt_multidim_report.py",
+    ".github/workflows/mirt-stage1.yml",
+    "validation/mirt_core_production/",
+    "tests/test_mirt_core_"
+  ],
+  "claude_exclusive": [
+    "Exploratory MIRT",
+    "Binary/polytomous bifactor",
+    "Optional native R backend",
+    "Multidimensional 3PL/4PL"
+  ],
+  "preserve_unchanged": [
+    {
+      "path": "core/dif_center.py",
+      "git_blob": "4444dc3ac18882b86b82e6b89ef1860df97f7d08"
+    },
+    {
+      "path": "core/dif_classical.py",
+      "git_blob": "33b88e528f09dd6616662406acb967eee29d5602"
+    },
+    {
+      "path": "core/dif_lord.py",
+      "git_blob": "981b5f26d9d1fcee4f5a444a6b312316ad7d58b0"
+    },
+    {
+      "path": "core/dif_lord_policy.py",
+      "git_blob": "6063cc93a13df3b23c2849818b0ff77545b58b0a"
+    },
+    {
+      "path": "core/dif_lord_rasch.py",
+      "git_blob": "38b8fa5006763869b06c1f8eb4e1dc8f1005887a"
+    },
+    {
+      "path": "core/dif_policy.py",
+      "git_blob": "9918a12517c0f8e68e1e6ac245641062256b93c2"
+    },
+    {
+      "path": "core/grm_dif.py",
+      "git_blob": "2e33a37092c3a4eb4298aff095d116e8b422e5f4"
+    },
+    {
+      "path": "core/irt_binary_inference.py",
+      "git_blob": "672848a9e55bd06e42aac4b35f60fa0d05e7954e"
+    },
+    {
+      "path": "core/irt_binary_multistart.py",
+      "git_blob": "f499deac34949fe140f17d9e48fb4506ecc7ab08"
+    },
+    {
+      "path": "core/irt_binary_onestep.py",
+      "git_blob": "8ef3792c188bb2c34509535a8feee8d8267d364e"
+    },
+    {
+      "path": "core/irt_binary_patterns.py",
+      "git_blob": "024903abe089c4f2f94f3e0c4a1be4bb885f16c3"
+    },
+    {
+      "path": "core/irt_binary_persons.py",
+      "git_blob": "525b28013c0be09a673080edb294466d63be5317"
+    },
+    {
+      "path": "core/irt_binary_usage_policy.py",
+      "git_blob": "daf2599ea42a5a02e6b958983fb8c1421bd9d120"
+    },
+    {
+      "path": "core/irt_dif.py",
+      "git_blob": "50f05ae11a2ca8aa999cf23822b685cf4760bcf8"
+    },
+    {
+      "path": "core/irt_dif34_bootstrap.py",
+      "git_blob": "82deeec397f0be75333e5139bacb0ddfb3c9ac5f"
+    },
+    {
+      "path": "core/irt_dif_multimodel_screen.py",
+      "git_blob": "f584fb111c6e39fe54a76c570871d642b564d7dc"
+    },
+    {
+      "path": "core/irt_multidim.py",
+      "git_blob": "52be05ee838db5468e68ee3f0d00562ce63caa83"
+    },
+    {
+      "path": "core/irt_multidim_factorized.py",
+      "git_blob": "9eb039e05c9e825b4764044e6aa8209939679763"
+    },
+    {
+      "path": "core/irt_multidim_general.py",
+      "git_blob": "8a506ce0650f4891ad7425f8e63f0035d6eeab99"
+    },
+    {
+      "path": "core/irt_multidim_general_report.py",
+      "git_blob": "473199961e7e781fcfd9e1efb96a6671a67d2b0a"
+    },
+    {
+      "path": "core/irt_multidim_rsm_stack.py",
+      "git_blob": "3c58fcdf2ce48a7bcebaaa394b05efcd2eedf845"
+    },
+    {
+      "path": "core/irt_python_mirt_adapter.py",
+      "git_blob": "c71a422a7768ddf91544669aad87af30f686baf8"
+    },
+    {
+      "path": "core/polytomous_dif.py",
+      "git_blob": "5af90052596182feba09e216670f79ea8f3a73a2"
+    },
+    {
+      "path": "core/python_mirt_dif.py",
+      "git_blob": "e5a6634fe6353e0221b19b429463ba75b256b012"
+    },
+    {
+      "path": "core/rasch_dif.py",
+      "git_blob": "dcaeb82e70734179bae121cadae396dc00815e17"
+    },
+    {
+      "path": "reports/dif_academic_docx.py",
+      "git_blob": "b70defbd91b3c99e9808d3503da38fc96639ed00"
+    },
+    {
+      "path": "reports/dif_center_report.py",
+      "git_blob": "e9f6af3c0d801701ffbaa472626feac4f7689a4c"
+    },
+    {
+      "path": "reports/grm_dif_report.py",
+      "git_blob": "bb3c4b5d564fefe94b88a04db5fecb56d1394292"
+    },
+    {
+      "path": "reports/polytomous_dif_report.py",
+      "git_blob": "428eef3f0c82be597d379f52428743bc134e8834"
+    },
+    {
+      "path": "reports/python_mirt_dif_report.py",
+      "git_blob": "a7f6f2afe844ffbd632343c5ef28f4b478f55342"
+    },
+    {
+      "path": "ui/dif34_bootstrap_view.py",
+      "git_blob": "0e7f48a6d47f2cfce29357818bad58d8bb8f5018"
+    },
+    {
+      "path": "ui/dif_center_view.py",
+      "git_blob": "42425f18f21cdcc4d667badaeff38c5f8725de3e"
+    },
+    {
+      "path": "ui/dif_classical_view.py",
+      "git_blob": "3e65ac4e0e53b99e785ba7f4d9b21fe257b11bcf"
+    },
+    {
+      "path": "ui/grm_dif_view.py",
+      "git_blob": "fefa1cff066a50df723ff0e823326c25d9778065"
+    },
+    {
+      "path": "ui/irt_dif_multimodel_view.py",
+      "git_blob": "87ca33e56a3de96be124e0ceeb380c01f0b871a6"
+    },
+    {
+      "path": "ui/polytomous_dif_view.py",
+      "git_blob": "5b61f3e7eeb9a6fd21b9c3e675b88b265ec737f5"
+    },
+    {
+      "path": "ui/python_mirt_dif_view.py",
+      "git_blob": "75258f40c46896788e8d7438af4298368a4f9cec"
+    },
+    {
+      "path": "validation/NON_DIF_IRT_PROTECTED_SOURCES.json",
+      "git_blob": "67aa19c36c75723bf2e3ab1befd8cb0a54859f2a"
+    },
+    {
+      "path": "validation/PRESENTATION_AMENDMENTS.json",
+      "git_blob": "a4a8ec3aad1ff5284d7c9ad2ca1316c09204192f"
+    },
+    {
+      "path": "validation/evidence/irt_closure/MANIFEST.json",
+      "git_blob": "ea3d1322c7b8620cd8ebe7ce23afcdc6988c9d1e"
+    },
+    {
+      "path": "validation/evidence/irt_closure/P2_CERTIFICATION.json",
+      "git_blob": "50d3eaeb6e8d5ae16210a6df9966465351ee5025"
+    },
+    {
+      "path": "validation/evidence/irt_closure/REPORT.json",
+      "git_blob": "4eec488415ee84f6b3d96d42f4492e9b8ee1f905"
+    },
+    {
+      "path": "validation/evidence/irt_closure/WARM_BENCHMARK.json",
+      "git_blob": "8e36d318e3964def5dbe85b69076576062f8a1bf"
+    },
+    {
+      "path": "validation/evidence/p1p3_analytic/AUDIT_closureJ.json",
+      "git_blob": "3ad1720b0290d45b92f3e9763c569047074e7b9d"
+    },
+    {
+      "path": "validation/evidence/p1p3_analytic/P1_CERTIFICATION.json",
+      "git_blob": "c66568efc60d40a113fe8e7060bfe8c0edcf4cc3"
+    },
+    {
+      "path": "validation/evidence/p1p3_analytic/REPORT_J.json",
+      "git_blob": "f8a3ba01801449a3a4fe52d8cb26a7e244ddf520"
+    },
+    {
+      "path": "validation/evidence/p1p3_analytic/REPORT_J_FINAL.json",
+      "git_blob": "7e39c5d0c582b70b22d001f71a1c2867185ca131"
+    },
+    {
+      "path": "validation/evidence/p1p3_analytic/SHA256SUMS_J.txt",
+      "git_blob": "c48bda0404df637a7712c97131b79da3d89da173"
+    },
+    {
+      "path": "validation/evidence/p1p3_analytic/SHA256SUMS_J_FINAL.txt",
+      "git_blob": "c77a424c49b4409fdff6d8a102d59d71722ee0aa"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/AUDIT.json",
+      "git_blob": "508c95cba0b62ca4207fd028ebfeedcf15ebb23e"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/CERTIFICATION.json",
+      "git_blob": "2967f79457e1fa0229e58aadf9f0d865de7877f5"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/CONFIRMATION.jsonl.gz",
+      "git_blob": "2e40fa8fdc4647655aceb99b6977ed7a92063290"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/CONFIRMATION_REPORT.json",
+      "git_blob": "5c7bcd635d61f1f561bb2fc6f447d6e2b49bf918"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/DIAGNOSTICS.json",
+      "git_blob": "270eab93c49e38a3947fe49a83352af5c553ccf5"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/PILOT.json",
+      "git_blob": "7137dc5515fa24d53664f1be3f018b75dd14a787"
+    },
+    {
+      "path": "validation/evidence/p3_4pl_closure/WITNESS.json",
+      "git_blob": "b4ee2f1aa40db38d61fd03d8708e6c8e4277b210"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/ABSORPTION.json",
+      "git_blob": "595cd03ecf0bd8ca872ebf882acb29eb7806a84b"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/AUDIT.json",
+      "git_blob": "d3f2b65170d443df40c12d0bfccf9b70a8759643"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/CERTIFICATION.json",
+      "git_blob": "0ab74cb9f9dddb836307c8640f1dccb175d912ea"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/CONFIRMATION.jsonl.gz",
+      "git_blob": "3c88c17eaddc7adad0e9ccc9a085cb07d0ad8943"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/CONFIRMATION_REPORT.json",
+      "git_blob": "81a5cc45c9a2b56f9f7ad0e0283f0e141f975a50"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/M1_PILOT.json",
+      "git_blob": "1464ca4589a6220b2b2c9026bcdbef805a051027"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/M2_PILOT.json",
+      "git_blob": "e647063cb9c6d470993ab4582b44354d58ad3f6d"
+    },
+    {
+      "path": "validation/evidence/p3_empirical/POPULATION_MAP_ORIGINAL.json",
+      "git_blob": "ac5a1b9b2dfbe0f2891d34164467cb20db2254b8"
+    },
+    {
+      "path": "validation/evidence/p4_confirm/REPORT.json",
+      "git_blob": "3954d1987e19c7432847b0664329f6f4a548d0af"
+    },
+    {
+      "path": "validation/evidence/p8_bifactor/recovery.json",
+      "git_blob": "0e97e925dd12ecfce1ef643788f915da2ae41d0c"
+    },
+    {
+      "path": "validation/mirt_phase2/3PL_evidence.json",
+      "git_blob": "125e43b40b7af43ab6ea8c809bc02ac4a5349922"
+    },
+    {
+      "path": "validation/mirt_phase2/4PL_F2_score_diagnostic.json",
+      "git_blob": "43f39d9569164d7e6598e78bc732351011c29e78"
+    },
+    {
+      "path": "validation/mirt_phase2/4PL_evidence.json",
+      "git_blob": "f92751796b82f553ca4113c113f93d1fb08c9364"
+    },
+    {
+      "path": "validation/mirt_phase2/README.md",
+      "git_blob": "aa41affd95e7ff2ca8b4cb4ac9e394e4554ff0c7"
+    },
+    {
+      "path": "validation/mirt_phase2/RSM_evidence.json",
+      "git_blob": "2cd0c6396feceb06bc99398c28cd5de98928608e"
+    },
+    {
+      "path": "validation/mirt_phase2/capability_audit.json",
+      "git_blob": "826afc87da66d553c6c822ad81dec460ced67ee1"
+    },
+    {
+      "path": "validation/mirt_phase2/capability_audit.py",
+      "git_blob": "e2aa8f8c7a6cb6e8e13d489c9a725fd935400d25"
+    },
+    {
+      "path": "validation/mirt_phase2/factorized_comparison.py",
+      "git_blob": "2bd6614d75a4c13772630e101f485685216c6f92"
+    },
+    {
+      "path": "validation/mirt_phase2/reference.R",
+      "git_blob": "4e9c0d14cf394b4566f141a332db86651d66795c"
+    },
+    {
+      "path": "validation/mirt_phase2/requested_family.txt",
+      "git_blob": "621e94f0ec951431443029088dba63eb586edbc8"
+    },
+    {
+      "path": "validation/mirt_phase2/rsm_comparison.py",
+      "git_blob": "ffeb260ee3e7890034b5a669e46239385aa22807"
+    },
+    {
+      "path": "validation/mirt_phase2/rsm_reference.R",
+      "git_blob": "5a792f1c0d9c63189effa1c412b84fd3ae97f359"
+    },
+    {
+      "path": "validation/mirt_phase3/README.md",
+      "git_blob": "a2e936ff33f202594e9f04565e98789d148bc52d"
+    },
+    {
+      "path": "validation/mirt_phase3/compare.py",
+      "git_blob": "92a80b66968456545aa500df74bde0fc8d9ee925"
+    },
+    {
+      "path": "validation/mirt_phase3/engine.py",
+      "git_blob": "e46918f77709431b51399d93558b09f6332f337d"
+    },
+    {
+      "path": "validation/mirt_phase3/expansion_evidence.json",
+      "git_blob": "c63f93e69a7e095ede1154c7b446b3e4327c15cd"
+    },
+    {
+      "path": "validation/mirt_phase3/fixed_3PL_initial_evidence.json",
+      "git_blob": "aae8b420218ec5a5bf18dee020e7650f5e56f0c6"
+    },
+    {
+      "path": "validation/mirt_phase3/fixtures/2PL_2D.csv",
+      "git_blob": "4784f80ad45fa905363c3550ace8219fcd8657c2"
+    },
+    {
+      "path": "validation/mirt_phase3/fixtures/2PL_3D.csv",
+      "git_blob": "4740c4939a3f791fec88eeb86915f4b6decdbdd1"
+    },
+    {
+      "path": "validation/mirt_phase3/free4_boundary_diagnostic.json",
+      "git_blob": "b0ecc84d8b3ef4e06ae0847f190fa1b8f5d3f077"
+    },
+    {
+      "path": "validation/mirt_phase3/free4_native_convergence.json",
+      "git_blob": "497289816ac87350a1d1121e47805faecba0a7e6"
+    },
+    {
+      "path": "validation/mirt_phase3/free4_original_evidence.json",
+      "git_blob": "387a135dfbfa63a83d419b9a8ff0b56313ce92ef"
+    },
+    {
+      "path": "validation/mirt_phase3/free4_precision_evidence.json",
+      "git_blob": "c7fed7a73f5d00f5741a53c20f57e032867f25d3"
+    },
+    {
+      "path": "validation/mirt_phase3/reference.R",
+      "git_blob": "5154074500f3a96d7fbf06cf7bcc533475c600b9"
+    },
+    {
+      "path": "validation/mirt_phase3/request.json",
+      "git_blob": "ddd46bc147a3c9952e8c2ef95bb78cbfad21367e"
+    },
+    {
+      "path": "validation/mirt_phase3/runtime_contract.R",
+      "git_blob": "ee666ffc13157053623e8efec9a98743bf1144fe"
+    },
+    {
+      "path": "validation/mirt_phase3/stage_A_evidence.json",
+      "git_blob": "6d319f03f895bc1940aba2aae6d00acf77489a8a"
+    },
+    {
+      "path": "validation/mirt_stage1/README.md",
+      "git_blob": "828e997ebf43d3f0631f1132f9441f120ef07995"
+    },
+    {
+      "path": "validation/mirt_stage1/compare.py",
+      "git_blob": "a00ff73ea7ada39d53ea4b66ff8606ca56f181b8"
+    },
+    {
+      "path": "validation/mirt_stage1/criteria.json",
+      "git_blob": "dc13c876887e56ca932890bb08118c0d058bb30e"
+    },
+    {
+      "path": "validation/mirt_stage1/expansion_original_evidence.json",
+      "git_blob": "493ad69808d88846e83740ad41d58c8d03899f00"
+    },
+    {
+      "path": "validation/mirt_stage1/initial_reports.json",
+      "git_blob": "45764028ccba004290017e5e934dda79fcf5ef41"
+    },
+    {
+      "path": "validation/mirt_stage1/nrm_original_score_diagnostic.json",
+      "git_blob": "d820b8a3c16f3bac24a7f9d2b9cfe159c794cd9a"
+    },
+    {
+      "path": "validation/mirt_stage1/phase1_evidence.json",
+      "git_blob": "a2d4d4e4c89f07f7418b05a6d56813a5b5bc472d"
+    },
+    {
+      "path": "validation/mirt_stage1/reference.R",
+      "git_blob": "1f5786e04bf0c5d8345ba9f3cbd5611cebdf5a39"
+    },
+    {
+      "path": "validation/mirt_stage1/remaining_score_diagnostic.json",
+      "git_blob": "161e8f80ca7a51fe219498323512449d52ca4746"
+    },
+    {
+      "path": "validation/q1_q3/PROFILE_NUMERICAL_AMENDMENT.json",
+      "git_blob": "e6e7dd82d2818343e18672513853be5f2d959134"
+    },
+    {
+      "path": "validation/q1_q3/PROFILE_POLISH_PROTOCOL.json",
+      "git_blob": "488920c91b602c77994a32d6ab727ca523011a52"
+    },
+    {
+      "path": "validation/q1_q3/PROFILE_PROTOCOL.json",
+      "git_blob": "4c7395a42496dd37cc7733952721c98d24cfc06f"
+    },
+    {
+      "path": "validation/q1_q3/REPORT.md",
+      "git_blob": "1ef63e1a992973db5255e713f093bbbdf227dc94"
+    },
+    {
+      "path": "validation/q1_q3/archive.py",
+      "git_blob": "28db7794f6e310719d45b36b8f7cae597afad324"
+    },
+    {
+      "path": "validation/q1_q3/ci_mode.py",
+      "git_blob": "424afc26f1d649d1d3820e000e5d59294037630a"
+    },
+    {
+      "path": "validation/q1_q3/manifest.json",
+      "git_blob": "c0a5c5e6d412b809baaa8fccdd594f95813f8597"
+    },
+    {
+      "path": "validation/q1_q3/polish.py",
+      "git_blob": "c8b68f4d0b18bb62591c9375052bd999b591df49"
+    },
+    {
+      "path": "validation/q1_q3/preregistration.json",
+      "git_blob": "17666c632b86d275f2b7ab6bb5d9e134dcf5641a"
+    },
+    {
+      "path": "validation/q1_q3/profile.py",
+      "git_blob": "9613a47eb92b5eb7e068df7e06c118ec8497577e"
+    },
+    {
+      "path": "validation/q1_q3/profile_centered.json",
+      "git_blob": "2d2f96b329309eba900f85f3790e299dd9c0938f"
+    },
+    {
+      "path": "validation/q1_q3/profile_polished.json",
+      "git_blob": "cf5baf8ed7f41d569d7c8883a10e029f7e6cf56c"
+    },
+    {
+      "path": "validation/q1_q3/profile_uncentered.json",
+      "git_blob": "41b344a458a56b01693d3d324f0211eed8fd12cb"
+    },
+    {
+      "path": "validation/q1_q3/reference_sources.json",
+      "git_blob": "a548d5da046ea3b9d9aedc90fe23d688a4c5ad36"
+    }
+  ],
+  "shared_contract": {
+    "result": "{metadata: dict, tables: dict[str, pandas.DataFrame]}",
+    "extension": "Core CFA wrapper only for owned native confirmatory models; other engines keep their existing paths/status.",
+    "inference": "No item SE/CI/p or new inferential certificate. Posterior covariance is conditional quadrature postprocessing, not a frequentist uncertainty claim."
+  },
+  "canonical_source": {
+    "commit": "452db8fc6dde0028964c998064020f6713d20c24",
+    "core_blob": "19d058894b7e752ab7dd29ab380c01e6e63d67c8",
+    "baseline_core_blob": "52be05ee838db5468e68ee3f0d00562ce63caa83",
+    "note": "All native functions and compare.py/reference.R/criteria.json verified unchanged; only bifactor warning added. Full historical saved-fit artifact is unavailable; no fresh saved-fit reevaluation claimed."
+  }
+}
