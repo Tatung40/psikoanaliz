@@ -90,7 +90,7 @@ st.set_page_config(
     page_title="PsikoAnaliz — Psikometrik Analiz Platformu",
     page_icon="📐",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 
@@ -160,46 +160,47 @@ if "distractor_data" not in st.session_state:
 # =============================================================================
 # YAN MENÜ (SIDEBAR NAVIGATION)
 # =============================================================================
-with st.sidebar:
-    st.markdown("""
-    <div class="psiko-sidebar-brand">
-        <div class="psiko-sidebar-brand-name">PsikoAnaliz</div>
-        <div class="psiko-sidebar-brand-sub">PSİKOMETRİK ANALİZ PLATFORMU</div>
-        <div class="psiko-sidebar-brand-author">Doç. Dr. Mehmet Taha Eser</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Kategori bazlı gezinme: seçili sayfa oturum boyunca korunur.
+if "nav_page" not in st.session_state:
+    # A new server session (reconnect, idle timeout or app restart) restores the page
+    # from the URL instead of silently jumping to the home page. Data are never stored there.
+    _restored_page = st.query_params.get("sayfa")
+    st.session_state.nav_page = _restored_page or "1. Ana Sayfa"
+    st.session_state["_session_restored"] = bool(_restored_page and _restored_page != "1. Ana Sayfa")
 
-    # Kategori bazlı gezinme: seçili sayfa oturum boyunca korunur.
-    if "nav_page" not in st.session_state:
-        # A new server session (reconnect, idle timeout or app restart) restores the page
-        # from the URL instead of silently jumping to the home page. Data are never stored there.
-        _restored_page = st.query_params.get("sayfa")
-        st.session_state.nav_page = _restored_page or "1. Ana Sayfa"
-        st.session_state["_session_restored"] = bool(_restored_page and _restored_page != "1. Ana Sayfa")
+def navigate_to(page):
+    st.session_state.nav_page = page
 
-    def navigate_to(page):
-        st.session_state.nav_page = page
+st.markdown("""
+<div style="background:#164877;color:white;padding:0.65rem 1rem;border-radius:8px;font-size:1.15rem;font-weight:700;">
+EserPsychometrics · PsikoAnaliz
+</div>
+""", unsafe_allow_html=True)
+# Native Streamlit widgets keep callbacks, session state and keyboard navigation.
+# Horizontal flex wraps on narrow screens instead of hiding analysis routes.
+import inspect as _nav_inspect
+if "horizontal" in _nav_inspect.signature(st.container).parameters:
+    _ribbon = st.container(horizontal=True, gap="small")
+else:
+    _ribbon = st.container()
+with _ribbon:
+    with st.popover("📁 Veri"):
+        st.button("🏠 Ana Sayfa", use_container_width=True,
+                  on_click=navigate_to, args=("1. Ana Sayfa",))
+        st.button("📁 Veri Yükleme", use_container_width=True,
+                  on_click=navigate_to, args=("2. Veri Yükleme",))
+        st.button("⚙️ Puanlama ve Veri Hazırlama", use_container_width=True,
+                  on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
 
-    st.markdown("### Genel")
-    st.button("🏠 Ana Sayfa", use_container_width=True,
-              on_click=navigate_to, args=("1. Ana Sayfa",))
-    st.button("📁 Veri Yükleme", use_container_width=True,
-              on_click=navigate_to, args=("2. Veri Yükleme",))
-    st.button("⚙️ Puanlama ve Veri Hazırlama", use_container_width=True,
-              on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
-
-    st.button("📋 Betimsel İstatistikler", use_container_width=True,
-              on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
-    st.button("❓ Kayıp Veri Atama", use_container_width=True,
-              on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
-    st.button("🧭 Boyutluluk ve Faktör Analizi", key="nav_dimensionality", use_container_width=True,
-              on_click=navigate_to, args=("Boyutluluk ve Faktör Analizi",))
-    st.button("🔗 Yerel Bağımsızlık ve Madde Uyumu", key="nav_local_fit", use_container_width=True,
-              on_click=navigate_to, args=("Yerel Bağımsızlık ve Madde Uyumu",))
-
-    st.markdown("---")
-    st.markdown("### I. Klasik Test Kuramı (KTK)")
-    with st.expander("🧮 KTK Analizleri", expanded=True):
+        st.button("📋 Betimsel İstatistikler", use_container_width=True,
+                  on_click=navigate_to, args=("3B. Betimsel İstatistikler",))
+        st.button("❓ Kayıp Veri Atama", use_container_width=True,
+                  on_click=navigate_to, args=("3. Puanlama & Veri Hazırlama",))
+        st.button("🧭 Boyutluluk ve Faktör Analizi", key="nav_dimensionality", use_container_width=True,
+                  on_click=navigate_to, args=("Boyutluluk ve Faktör Analizi",))
+        st.button("🔗 Yerel Bağımsızlık ve Madde Uyumu", key="nav_local_fit", use_container_width=True,
+                  on_click=navigate_to, args=("Yerel Bağımsızlık ve Madde Uyumu",))
+    with st.popover("🧮 KTK"):
         for label, page in [
             ("📊 Test İstatistikleri", "4. Test İstatistikleri"),
             ("🔍 Madde Analizi", "5. Madde Analizi"),
@@ -213,10 +214,7 @@ with st.sidebar:
         st.button("📄 Alfa ve Madde Karşılaştırması (Pingouin)",
                   key="nav_ctt_dual",use_container_width=True,
                   on_click=navigate_to,args=("KTK: Çift Motor Rapor",))
-
-    st.markdown("---")
-    st.markdown("### II. Madde Tepki Kuramı (MTK)")
-    with st.expander("📐 MTK Modelleri ve Analizler", expanded=True):
+    with st.popover("📐 MTK"):
         st.caption("Python mirt: gelişmiş analiz ayarları, parametreler, grafikler ve indirmeler.")
         for m in ("Rasch","1PL","2PL","3PL","4PL"):
             st.button(f"📐 {m} Modeli",key=f"irt_nav_{m}",
@@ -256,47 +254,40 @@ with st.sidebar:
                   key="nav_irt_b14",use_container_width=True,
                   on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
         st.caption("RSM ayrı model sayfasındadır; Python mirt fit_mirt API'sinde yoktur.")
-    st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
-              on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
-    st.markdown("---")
-    st.markdown("### III. Genellenebilirlik Kuramı")
-    with st.expander("📐 Genellenebilirlik Kuramı Analizleri", expanded=True):
+    with st.popover("🧬 MIRT"):
+        st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
+                  on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
+    with st.popover("📊 G Kuramı"):
         st.button("📊 G ve D Çalışmaları", key="nav_generalizability", use_container_width=True,
                   on_click=navigate_to, args=("Genellenebilirlik Kuramı (G ve D Çalışmaları)",))
-    st.markdown("---")
-    st.markdown("### IV. Puanlayıcı Güvenirliği")
-    with st.expander("🧑‍⚖️ Puanlayıcılar Arası Uyum", expanded=True):
+    with st.popover("🤝 Puanlayıcı"):
         st.button("🤝 Puanlayıcı Güvenirliği ve Uyum", key="nav_rater_reliability", use_container_width=True,
                   on_click=navigate_to, args=("Puanlayıcı Güvenirliği ve Uyum",))
-    st.markdown("---")
-    st.markdown("### Ortak Araçlar")
-    for label, page in [
-        ("📄 Raporlama", "10. Raporlama"),
-        ("📚 Formüller ve Yöntemler", "11. Formüller ve Yöntemler"),
-        ("❔ Kullanım Kılavuzu", "12. Kullanım Kılavuzu"),
-    ]:
-        st.button(label, key=f"nav_{page}", use_container_width=True,
-                  on_click=navigate_to, args=(page,))
+    with st.popover("📄 Raporlar"):
+        for label, page in [
+            ("📄 Raporlama", "10. Raporlama"),
+            ("📚 Formüller ve Yöntemler", "11. Formüller ve Yöntemler"),
+            ("❔ Kullanım Kılavuzu", "12. Kullanım Kılavuzu"),
+        ]:
+            st.button(label, key=f"nav_{page}", use_container_width=True,
+                      on_click=navigate_to, args=(page,))
+    with st.popover("🔐 Oturum"):
+        st.caption(PRIVACY_DISCLOSURE)
+        if st.button("🗑️ Oturum Verilerini Temizle", key="clear_privacy_session", use_container_width=True):
+            clear_active_analysis_session()
+            st.rerun()
+        st.markdown("### 📊 Mevcut Veri Durumu")
+        if st.session_state.scored_df is not None:
+            n_rows = len(st.session_state.scored_df)
+            k_items = len(st.session_state.item_cols)
+            st.success(f"Aktif Veri: N={n_rows}, k={k_items}")
+            st.caption(f"Veri Tipi: {'İkili (0/1)' if st.session_state.is_dichotomous else 'Çok Kategorili (Likert/Rubrik)'}")
+        else:
+            st.info("Henüz analiz için veri yüklenmedi.")
 
-    selected_page = st.session_state.nav_page
-    if st.query_params.get("sayfa") != selected_page:
-        st.query_params["sayfa"] = selected_page
-
-    st.markdown("---")
-    st.markdown("### 🔐 Veri Gizliliği")
-    st.caption(PRIVACY_DISCLOSURE)
-    if st.button("🗑️ Oturum Verilerini Temizle", key="clear_privacy_session", use_container_width=True):
-        clear_active_analysis_session()
-        st.rerun()
-    st.markdown("### 📊 Mevcut Veri Durumu")
-    if st.session_state.scored_df is not None:
-        n_rows = len(st.session_state.scored_df)
-        k_items = len(st.session_state.item_cols)
-        st.success(f"Aktif Veri: N={n_rows}, k={k_items}")
-        st.caption(f"Veri Tipi: {'İkili (0/1)' if st.session_state.is_dichotomous else 'Çok Kategorili (Likert/Rubrik)'}")
-    else:
-        st.info("Henüz analiz için veri yüklenmedi.")
-
+selected_page = st.session_state.nav_page
+if st.query_params.get("sayfa") != selected_page:
+    st.query_params["sayfa"] = selected_page
 
 # =============================================================================
 # SAYFA 1: ANA SAYFA
