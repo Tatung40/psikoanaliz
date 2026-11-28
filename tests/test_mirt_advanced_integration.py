@@ -106,3 +106,29 @@ def test_actual_ui_gpcm_bifactor_flow():
     at.button(key='md_run').click().run(); assert not at.exception
     assert any('EXPERIMENTAL / NOT CERTIFIED' in i.value for i in at.info)
     assert at.get('download_button')
+
+
+def test_grm_bifactor_default_profile_never_claims_agreement_and_actual_docx(monkeypatch):
+    """Actual academic DOCX through the UI path; GRM bifactor with high precision disabled."""
+    import io
+    from docx import Document
+    x, g = poly('GRM'); x.insert(0, 'ID', [f'P{i}' for i in range(len(x))]); items = list(x.columns[1:])
+    page = 'Çok Boyutlu MTK (MIRT)'
+    at = AppTest.from_file(str(Path('app.py').resolve()), default_timeout=600)
+    for k, v in dict(raw_df=x, scored_df=None, item_cols=items, id_col='ID', nav_page=page).items():
+        at.session_state[k] = v
+    at.run(); at.selectbox(key='md_model').set_value(list(advr.BIFACTOR_MODELS)[0]).run()
+    at.text_input(key='md_groups_4').set_value(','.join(map(str, g))).run()
+    at.checkbox(key='md_bf_hp').set_value(False).run()
+    at.button(key='md_run').click().run(); assert not at.exception
+    raw = at.session_state['_academic_history'][page]['docx']; doc = Document(io.BytesIO(raw))
+    text = '\n'.join([p.text for p in doc.paragraphs] + [c.text for t in doc.tables for r in t.rows for c in r.cells])
+    OUT.mkdir(parents=True, exist_ok=True); (OUT / 'grm_bifactor_default_academic.docx').write_bytes(raw)
+    for needed in ('EXPERIMENTAL / NOT CERTIFIED', 'WITHHELD', 'Item SE/CI', 'core.mirt_advanced.fit_polytomous_bifactor', 'PCM bifactor WITHHELD', 'NOT VALIDATED'):
+        assert needed in text, needed
+    assert 'single-fixture R agreement' not in text
+
+
+def test_native_r_metadata_reaches_report_tables(monkeypatch):
+    src = Path('core/mirt_advanced_report.py').read_text()
+    assert 'Backend="NATIVE_R_MIRT"' in src and 'Validation_scope=' in src and '"Summary"' in src

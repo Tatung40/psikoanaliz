@@ -68,6 +68,8 @@ Existing advanced functionality is retained with its restrictions. No EFA/bifact
 
 Focused API/mathematical/scope/refusal tests, actual native software fixtures, actual CSV/XLSX/ZIP/PNG/DOCX files, real Streamlit no-refit/staleness flow and offline runtime-assets checks are required. Software fixtures are not independent calibration campaigns and do not establish new scientific inference. Actual runtime measurements distinguish calibration and reporting and are single-fixture observations, not unsupported P95/speed claims. Final software verification remains PENDING until actual current-head Actions completion; raw logs/artifacts are uploaded even on failure.
 
+Software verification addendum (2026-11-28): the original wording above is kept for the record. Verified CI shows the PENDING state is resolved. PR #211 merged as cb84fc5 with every main check passing, and full pytest passed. After #210, main 683a3ef passed pytest (1948 passed, 38 skipped), reference, Native R and studies-quick-and-browser. This addendum is software verification only; it adds no scientific evidence and changes no scope.
+
 ## Claude integration handover
 
 Shared contract remains result={metadata:dict,tables:dict[str,DataFrame]}. Metadata Status/Numerical_status/Inferential_status and Limitations/Applicable_conditions/Unverifiable_assumptions are authoritative. Reports preserve unknown advanced tables and all original numbers; extra metadata does not grant an advanced certificate. New core helpers apply only owned native CFA; EFA/bifactor/3PL/4PL paths remain as before.

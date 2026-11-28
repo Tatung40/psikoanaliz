@@ -1,0 +1,239 @@
+{
+ "schema": "historical-native-R-M2PL-EFA-continuation-reference-v1",
+ "provenance": {
+  "repository": "Tatung40/psikoanaliz",
+  "run_id": 40399106868,
+  "job_id": 121839893457,
+  "job_url": "https://github.com/Tatung40/psikoanaliz/actions/runs/40399106868/job/121839893457",
+  "workflow": ".github/workflows/mirt-stage1.yml",
+  "workflow_head_sha": "da6b8080d5da00a8540afcda0d228a92622bff7a",
+  "run_created_at": "2026-10-26T20:49:50Z",
+  "run_conclusion": "failure",
+  "run_conclusion_note": "Whole workflow failed on other profiles; this 2PL_EFA_2D report passed all unchanged stage-1 criteria",
+  "source": "Complete MIRT_REPORT= JSON line from actual job stdout (retrieved 2026-11-28); lossless JSON parse, no new numerical execution",
+  "report_line_sha256": "e8be693d397dec25dee1aea4d3956f8e28e9073282a7a1535d2a5551447941a8"
+ },
+ "scientific_status": "NUMERICALLY VALIDATED / NOT CERTIFIED (2D triangular exploratory identification, recorded fixture only); production remains EXPERIMENTAL",
+ "report": {
+  "profile": "2PL_EFA_2D",
+  "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+  "R_execution": "CALIBRATION EXECUTED",
+  "Python_execution": "EXECUTED",
+  "settings": {
+   "name": "2PL_EFA_2D",
+   "model": "2PL",
+   "q": 2,
+   "k": 10,
+   "pattern": [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "correlated": false,
+   "covariance_mode": "pair",
+   "exploratory": true,
+   "groups": null,
+   "syntax": "F1 = 1,2,3,4,5,6,7,8,9,10\nF2 = 2,3,4,5,6,7,8,9,10",
+   "N": 400,
+   "seed": 20261134,
+   "n_quadpts": 15,
+   "max_iter": 3000,
+   "tol": 1e-09,
+   "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+   "data_sha256": "12f576c597c77570c4b82ed6fc387e7a7a4571a18ee1b4de2a7d1d1167b6e45a",
+   "initialization": "Saved complete Python item solution; latent covariance reset to identity in BOTH engines",
+   "source_run": 40394398251,
+   "start_sha256": "34d005d89194e47b3dbbd5b5ef71c336e89aa769bc9235143972c29e3e2455ea"
+  },
+  "preflight": {
+   "probabilities": {
+    "status": "PASS",
+    "max_absolute": 4.996003610813204e-16,
+    "mean_absolute": 1.839825394597103e-16,
+    "max_relative": 4.164688445537372e-15,
+    "tolerance": 1e-10,
+    "reason": ""
+   },
+   "information": {
+    "status": "PASS",
+    "max_absolute": 8.881784197001252e-16,
+    "mean_absolute": 1.2504111184457075e-16,
+    "max_relative": 8.431602701453689e-14,
+    "tolerance": 1e-08,
+    "reason": ""
+   },
+   "prior": {
+    "status": "PASS",
+    "max_absolute": 3.469446951953614e-16,
+    "mean_absolute": 3.932216825829856e-18,
+    "max_relative": 8.613972866408965e-15,
+    "tolerance": 1e-12,
+    "reason": ""
+   }
+  },
+  "Python": {
+   "engine": "Python mirt 1.2.0",
+   "python": "3.11.17",
+   "converged": true,
+   "logLik": -2428.6251140486456,
+   "AIC": 4915.250228097291,
+   "BIC": 5031.002699963423,
+   "n_parameters": 29,
+   "iterations": 13
+  },
+  "R": {
+   "version": "1.48",
+   "R": "R version 4.6.1 (2026-06-24)",
+   "model": "2PL",
+   "dimensions": 2,
+   "execution": "CALIBRATION",
+   "source_free_parameters": "NA",
+   "converged": true,
+   "logLik": -2428.6251140467,
+   "AIC": 4915.25022809341,
+   "BIC": 5031.00269995954,
+   "iterations": 36,
+   "logPrior": 0,
+   "covariance": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "orientation": [
+    1,
+    1
+   ],
+   "constraints_valid": true,
+   "optimizer": "R nloptr SLSQP",
+   "information_reference": "R mirt iteminfo matrix"
+  },
+  "comparison": {
+   "slopes": {
+    "status": "PASS",
+    "max_absolute": 6.6542323611251675e-06,
+    "mean_absolute": 3.4169455858351626e-06,
+    "max_relative": 1.3448192760449384e-05,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "intercepts": {
+    "status": "PASS",
+    "max_absolute": 3.569879122089503e-06,
+    "mean_absolute": 7.094953975189666e-07,
+    "max_relative": 1.1157543675929565e-05,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "covariance": {
+    "status": "PASS",
+    "max_absolute": 0.0,
+    "mean_absolute": 0.0,
+    "max_relative": 0.0,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "probabilities": {
+    "status": "PASS",
+    "max_absolute": 4.646413557685136e-06,
+    "mean_absolute": 9.500472523747906e-07,
+    "max_relative": 1.9430829306527806e-05,
+    "tolerance": 0.0001,
+    "reason": ""
+   },
+   "information": {
+    "status": "PASS",
+    "max_absolute": 7.122318423480323e-06,
+    "mean_absolute": 8.249074651595435e-07,
+    "max_relative": 3.7659804091269595e-05,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "EAP": {
+    "status": "PASS",
+    "max_absolute": 3.4772064202992503e-06,
+    "mean_absolute": 1.6620958973464182e-06,
+    "max_relative": 2.3827792206440575e-05,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "posterior_SD": {
+    "status": "PASS",
+    "max_absolute": 1.9439156332401453e-06,
+    "mean_absolute": 8.730446029656114e-07,
+    "max_relative": 3.194953781806459e-06,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "common_logLik": {
+    "status": "PASS",
+    "max_absolute": 1.9422259356360883e-09,
+    "mean_absolute": 1.9422259356360883e-09,
+    "max_relative": 7.997224126527686e-13,
+    "tolerance": 0.001,
+    "reason": ""
+   },
+   "Python_native_LL": {
+    "status": "PASS",
+    "max_absolute": 0.0,
+    "mean_absolute": 0.0,
+    "max_relative": 0.0,
+    "tolerance": 1e-06,
+    "reason": ""
+   },
+   "R_native_LL": {
+    "status": "PASS",
+    "max_absolute": 3.183231456205249e-12,
+    "mean_absolute": 3.183231456205249e-12,
+    "max_relative": 1.3107133899728067e-15,
+    "tolerance": 1e-06,
+    "reason": ""
+   }
+  },
+  "common_grid_logLik": {
+   "Python": -2428.6251140486456,
+   "R": -2428.6251140467034
+  }
+ }
+}

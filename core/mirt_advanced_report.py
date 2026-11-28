@@ -53,8 +53,13 @@ def bifactor_report(data, groups, label, *, high_precision=False, n_quadpts=7, m
     meta.update(Model=label, Advanced_route="core.mirt_advanced.fit_polytomous_bifactor", Bifactor_groups=list(map(int, groups)),
                 High_precision=bool(high_precision), Calibration_default_seconds=outcome.get("default_seconds"),
                 Continuation_seconds=outcome.get("continuation_seconds"))
-    numerical = ("EXPERIMENTAL (single-fixture R agreement: GRM requires the high-precision profile)" if model == "GRM"
-                 else "EXPERIMENTAL (single-fixture R agreement)")
+    if model == "GRM" and not high_precision:
+        numerical = ("NOT VALIDATED: the default GRM bifactor profile FAILED the independent R probability gate; "
+                     "R agreement exists only with the high-precision profile, which is disabled for this fit")
+    elif model == "GRM":
+        numerical = "EXPERIMENTAL (single-fixture R agreement with the high-precision profile)"
+    else:
+        numerical = "EXPERIMENTAL (single-fixture R agreement)"
     return _scope(meta, tables, BIFACTOR_LIMITATION, numerical)
 
 

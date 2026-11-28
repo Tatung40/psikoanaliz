@@ -6,7 +6,7 @@
     "exploratory_M2PL": {
       "decision": "PARTIAL",
       "level": "EXPERIMENTAL",
-      "evidence": "2PL_EFA_2D numerically agreed with R mirt 1.48 (stage-1 continuation, triangular identification, 2D only)",
+      "evidence": "2PL_EFA_2D numerically agreed with R mirt 1.48 (run 40399106868, triangular identification): all stage-1 checks PASS, max |dP| 4.6e-6, common |dLL| 1.9e-9; archived in M2PL_EFA_CONTINUATION_REFERENCE.json",
       "limits": "2D only; numerical agreement is not inferential certification; no SE"
     },
     "exploratory_MGRM": {
