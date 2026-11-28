@@ -182,9 +182,15 @@ def render(data=None,item_cols=(),id_col=None):
     g=go.Figure()
     for name,part in p.groupby('Category'):g.add_scatter(x=part.Theta,y=part.Probability,name=str(name))
     st.plotly_chart(g.update_layout(title=f'{item}: θ=t e doğrultusunda kategori olasılıkları',xaxis_title='t',yaxis_title='Olasılık'),key='md_directional_response',use_container_width=True)
-   fig=figure(result,item,category);st.pyplot(fig)
-   import matplotlib.pyplot as plt
-   plt.close(fig)
+   # The export bundle already renders this exact figure (same figure() call); reuse its PNG instead of
+   # rebuilding the matplotlib figure on every rerun. Rebuilt only when result/item/category change.
+   bundle_key=export_fingerprint(result,item,category)
+   if saved.get('bundle_key')!=bundle_key:saved['bundle']=downloads(result,item,category);saved['bundle_key']=bundle_key
+   if saved['bundle']['png'] is not None:st.image(saved['bundle']['png'],use_container_width=True)
+   else:
+    fig=figure(result,item,category);st.pyplot(fig)
+    import matplotlib.pyplot as plt
+    plt.close(fig)
  with tabs[5]:
   bundle_key=export_fingerprint(result,item,category)
   if saved.get('bundle_key')!=bundle_key:saved['bundle']=downloads(result,item,category);saved['bundle_key']=bundle_key

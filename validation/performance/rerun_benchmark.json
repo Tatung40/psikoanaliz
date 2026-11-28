@@ -1,0 +1,51 @@
+{
+ "baseline_main": "4820519f879f450ecc7911eccb43152014d7437e",
+ "environment": "local container, Python 3.13, AppTest, identical fixtures (tests/test_reproducible_page_reruns.CASES), same harness",
+ "method": "cold = analysis button run; warm = median of 5 unchanged reruns; peak = tracemalloc during cold run; calls = counted wrappers",
+ "before": {
+  "MTK: Rasch": {
+   "cold": 6.078,
+   "warm_median": 0.894,
+   "peak_MB": 14.8,
+   "cold_calls": {
+    "report_bundle": 1
+   },
+   "calls_in_5_reruns": {
+    "report_bundle": 5
+   }
+  },
+  "Çok Boyutlu MTK (MIRT)": {
+   "cold": 37.97,
+   "warm_median": 2.266,
+   "peak_MB": 120.8,
+   "cold_calls": {
+    "figure": 2,
+    "downloads": 1
+   },
+   "calls_in_5_reruns": {
+    "figure": 5
+   }
+  }
+ },
+ "after": {
+  "MTK: Rasch": {
+   "cold": 5.883,
+   "warm_median": 0.801,
+   "peak_MB": 14.8,
+   "cold_calls": {
+    "report_bundle": 1
+   },
+   "calls_in_5_reruns": {}
+  },
+  "Çok Boyutlu MTK (MIRT)": {
+   "cold": 32.768,
+   "warm_median": 1.362,
+   "peak_MB": 115.8,
+   "cold_calls": {
+    "downloads": 1,
+    "figure": 1
+   },
+   "calls_in_5_reruns": {}
+  }
+ }
+}
