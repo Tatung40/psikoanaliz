@@ -1562,7 +1562,14 @@ elif selected_page == "MTK: Rasch":
                 current = {name: (st.session_state.get(f"rasch_{name}") or {}) for name in ("gf", "q3", "dif")}
                 current = {name: v.get("result") if v.get("key") == b8_key else None for name, v in current.items()}
                 from ui.rasch_view import report_bundle as rasch_report_bundle
-                bundle_sheets, bundle_xlsx, bundle_zip = rasch_report_bundle(rr, current["gf"], current["q3"], current["dif"])
+                # Rebuild the XLSX/ZIP only when one of its exact source result objects changes (identity check;
+                # the cache holds references, so ids cannot be recycled). Session-scoped, never shared.
+                _src = (rr, current["gf"], current["q3"], current["dif"])
+                _cached = st.session_state.get("_rasch_report_bundle")
+                if not (_cached and len(_cached["src"]) == 4 and all(a is b for a, b in zip(_cached["src"], _src))):
+                    _cached = {"src": _src, "out": rasch_report_bundle(*_src)}
+                    st.session_state["_rasch_report_bundle"] = _cached
+                bundle_sheets, bundle_xlsx, bundle_zip = _cached["out"]
                 st.caption("İçerik: " + ", ".join(bundle_sheets) + ". Model uyumu, Q3 ve DIF yalnız ilgili sekmede "
                            "hesaplandıysa eklenir.")
                 pk1, pk2 = st.columns(2)
