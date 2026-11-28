@@ -52,14 +52,35 @@ class Server:
 
 def upload(page, port, csv):
     page.goto(f"http://127.0.0.1:{port}")
-    page.get_by_role("button", name="📁 Veri Yükleme").click()
+    nav(page, "📁 Veri Yükleme")
     page.locator("input[type=file]").first.set_input_files(str(csv))
     page.get_by_text("başarıyla yüklendi").wait_for(timeout=60_000)
 
 
 def nav(page, label):
-    page.get_by_role("button", name=label).first.click()
+    """Navigate through the visible ribbon, as a real user would."""
+    groups = {
+        "📁 Veri Yükleme": "📁 Veri",
+        "🧬 B14 Python mirt Çok Kategorili Rapor": "📐 MTK",
+        "📏 RSM — Derecelendirme Ölçeği Modeli": "📐 MTK",
+        "⚖️ Gözlenen Puan DIF (MH / Lojistik)": "⚖️ DIF",
+    }
+    for model in ("Rasch", "1PL", "2PL", "3PL", "4PL", "GRM", "PCM", "GPCM", "NRM"):
+        groups[f"📐 {model} Modeli"] = "📐 MTK"
+    groups.update({
+        "🏠 Ana Sayfa": "📁 Veri",
+        "⚙️ Puanlama ve Veri Hazırlama": "📁 Veri",
+        "❓ Kayıp Veri Atama": "📁 Veri",
+        "📋 Betimsel İstatistikler": "📁 Veri",
+        "🧬 Çok Boyutlu MTK (MIRT)": "🧬 MIRT",
+        "⚖️ DIF Analiz Merkezi": "⚖️ DIF",
+        "📊 Model Karşılaştırması": "📐 MTK",
+        "📄 Raporlama": "📄 Raporlar",
+    })
+    page.get_by_role("button", name=groups[label], exact=True).click()
+    page.get_by_role("button", name=label, exact=True).click()
     page.wait_for_timeout(800)
+    wait_idle(page)
 
 
 def wait_idle(page, timeout=180_000):
