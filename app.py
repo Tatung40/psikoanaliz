@@ -158,7 +158,7 @@ if "distractor_data" not in st.session_state:
 
 
 # =============================================================================
-# YAN MENÜ (SIDEBAR NAVIGATION)
+# ÜST MENÜ (TOP RIBBON NAVIGATION)
 # =============================================================================
 # Kategori bazlı gezinme: seçili sayfa oturum boyunca korunur.
 if "nav_page" not in st.session_state:
@@ -222,10 +222,27 @@ with _ribbon:
         for label,page in [
             ("📊 Model Karşılaştırması","MTK: Karşılaştırma"),
             ("🔍 MTK Varsayım Denetimi","MTK: Varsayım Denetimi"),
-            ("⚖️ MTK DIF Ön Taraması","MTK: Çok Modelli DIF Taraması"),
         ]:
             st.button(label,key=f"irt_nav_{page}",use_container_width=True,
                       on_click=navigate_to,args=(page,))
+        st.button("📏 RSM — Derecelendirme Ölçeği Modeli",key="nav_irt_rsm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
+        st.button("🧩 Çok Yüzeyli Rasch (MFRM)",key="nav_mfrm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: Çok Yüzeyli Rasch (MFRM)",))
+        st.button("🧪 RaschPy MFRM (Deneysel)",key="nav_raschpy_mfrm",
+                  use_container_width=True,on_click=navigate_to,args=("MTK: RaschPy MFRM (Deneysel)",))
+        st.caption("Çok kategorili MTK modelleri")
+        for m in ("GRM","PCM","GPCM","NRM"):
+            st.button(f"📐 {m} Modeli",key=f"python_irt_{m}",
+                      use_container_width=True,on_click=navigate_to,
+                      args=(f"MTK: Python mirt {m}",))
+        st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
+                  key="nav_irt_b14",use_container_width=True,
+                  on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
+        st.caption("RSM ayrı model sayfasındadır; Python mirt fit_mirt API'sinde yoktur.")
+    with st.popover("⚖️ DIF"):
+        st.button("⚖️ MTK DIF Ön Taraması", key="irt_nav_MTK: Çok Modelli DIF Taraması",
+                  use_container_width=True, on_click=navigate_to, args=("MTK: Çok Modelli DIF Taraması",))
         st.caption("Formel DIF sayfalarında doğrulama durumu ayrıca belirtilir.")
         st.button("⚖️ DIF Analiz Merkezi",key="nav_dif_center",
                   use_container_width=True,on_click=navigate_to,args=("MTK: DIF Analiz Merkezi",))
@@ -233,27 +250,12 @@ with _ribbon:
                   use_container_width=True,on_click=navigate_to,args=("MTK: GRM Formel DIF",))
         st.button("⚖️ PCM/GPCM/RSM/NRM DIF (Deneysel)",key="nav_poly_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Çok Kategorili Formel DIF",))
-        st.button("📏 RSM — Derecelendirme Ölçeği Modeli",key="nav_irt_rsm",
-                  use_container_width=True,on_click=navigate_to,args=("MTK: RSM",))
-        st.button("🧩 Çok Yüzeyli Rasch (MFRM)",key="nav_mfrm",
-                  use_container_width=True,on_click=navigate_to,args=("MTK: Çok Yüzeyli Rasch (MFRM)",))
-        st.button("🧪 RaschPy MFRM (Deneysel)",key="nav_raschpy_mfrm",
-                  use_container_width=True,on_click=navigate_to,args=("MTK: RaschPy MFRM (Deneysel)",))
         st.button("⚖️ Gözlenen Puan DIF (MH / Lojistik)",key="nav_classical_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Gözlenen Puan DIF",))
         st.button("⚖️ 3PL/4PL DIF — Bootstrap LR",key="nav_dif34_boot",
                   use_container_width=True,on_click=navigate_to,args=("MTK: 3PL/4PL Bootstrap DIF",))
-        st.caption("Çok kategorili MTK modelleri")
-        for m in ("GRM","PCM","GPCM","NRM"):
-            st.button(f"📐 {m} Modeli",key=f"python_irt_{m}",
-                      use_container_width=True,on_click=navigate_to,
-                      args=(f"MTK: Python mirt {m}",))
         st.button("⚖️ Python mirt — DIF Analizleri",key="nav_python_mirt_dif",
                   use_container_width=True,on_click=navigate_to,args=("MTK: Python mirt DIF",))
-        st.button("🧬 B14 Python mirt Çok Kategorili Rapor",
-                  key="nav_irt_b14",use_container_width=True,
-                  on_click=navigate_to,args=("MTK: Çok Kategorili B14",))
-        st.caption("RSM ayrı model sayfasındadır; Python mirt fit_mirt API'sinde yoktur.")
     with st.popover("🧬 MIRT"):
         st.button("🧬 Çok Boyutlu MTK (MIRT)", key="nav_multidim", use_container_width=True,
                   on_click=navigate_to, args=("Çok Boyutlu MTK (MIRT)",))
