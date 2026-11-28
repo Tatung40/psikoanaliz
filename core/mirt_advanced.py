@@ -3,7 +3,7 @@
 1. Polytomous bifactor (GRM / GPCM). Python mirt 1.2.0 ``bfactor`` is binary-only and has no
    ``model="graded"`` argument or ``GradedBifactorModel``. A graded or generalized-partial-credit
    bifactor model is mathematically a confirmatory multidimensional GRM/GPCM. In it every item
-   loads on the general factor and on exactly one specific factor, and the factors are orthogonal
+   loads on the general factor and on exactly one of three specific factors, and the factors are orthogonal
    with unit variance. This adapter fits that model through the existing full-grid confirmatory
    engine ``core.irt_multidim.fit``. Loadings are sign-identified as positive. PCM bifactor is
    WITHHELD: fixing all slopes to one with unit factor variances is not the intended Rasch-testlet
@@ -37,8 +37,9 @@ def bifactor_pattern(groups) -> np.ndarray:
     if g.ndim != 1 or not np.issubdtype(g.dtype, np.integer) or (g < 0).any():
         raise ValueError("One non-negative integer specific-factor code per item required")
     uniq = np.unique(g)
-    if len(uniq) not in (2, 3) or any(np.count_nonzero(g == k) < 3 for k in uniq):
-        raise ValueError("Polytomous bifactor: 2-3 specific factors with >=3 items each (full-grid budget)")
+    if len(uniq) != 3 or any(np.count_nonzero(g == k) < 3 for k in uniq):
+        # Evidence covers G + exactly 3 specific factors; two-specific designs did not converge in integration checks (weak identification).
+        raise ValueError("Polytomous bifactor: exactly 3 specific factors with >=3 items each (validated 4D scope)")
     return np.column_stack((np.ones(len(g), int), (g[:, None] == uniq).astype(int)))
 
 
@@ -68,7 +69,9 @@ def fit_polytomous_bifactor(data, groups, model="GRM", *, n_quadpts=7, max_iter=
     start = start_values if start_values is not None else {"discrimination": pattern * 1.2, key: np.tile(np.linspace(-1, 1, len(labels) - 1), (k, 1))}
     t0 = time.perf_counter()
     result = mirt.EMEstimator(**settings, compute_standard_errors=False, accelerate="none").fit(engine, x.to_numpy(), start=start)
-    out = dict(fit=result, covariance=np.eye(q), labels=labels, model=model, settings=settings, default_seconds=time.perf_counter() - t0)
+    syntax = "\n".join(f"F{j+1} = " + ",".join(str(i + 1) for i in np.flatnonzero(pattern[:, j])) for j in range(q))
+    out = dict(fit=result, raw_fit=result, coded=x, covariance=np.eye(q), labels=labels, pattern=pattern, model=model, syntax=syntax,
+               status=STATUS, settings=settings, correlated=False, orientation=[1] * q, exploratory=False, default_seconds=time.perf_counter() - t0)
     if high_precision:
         t1 = time.perf_counter()
         hp = mirt.EMEstimator(n_quadpts=n_quadpts, max_iter=HIGH_PRECISION["max_iter"], tol=HIGH_PRECISION["tol"],
@@ -77,7 +80,7 @@ def fit_polytomous_bifactor(data, groups, model="GRM", *, n_quadpts=7, max_iter=
         engine2 = (GradedResponseModel if model == "GRM" else GeneralizedPartialCredit)(k, n_categories=len(labels), n_factors=q, item_names=list(x.columns))
         engine2.set_free_parameter_masks({"discrimination": pattern.astype(bool), key: np.ones((k, len(labels) - 1), bool)})
         cont = hp.fit(engine2, x.to_numpy(), start=dict(result.model.parameters))
-        out.update(fit=cont, default_fit=result, profile=dict(HIGH_PRECISION), continuation_seconds=time.perf_counter() - t1,
+        out.update(fit=cont, raw_fit=cont, default_fit=result, profile=dict(HIGH_PRECISION), continuation_seconds=time.perf_counter() - t1,
                    logLik_improvement=float(cont.log_likelihood - result.log_likelihood))
     a = np.asarray(out["fit"].model.parameters["discrimination"])
     if np.any(a[pattern == 0] != 0) or np.any(a[pattern == 1] <= 0):
@@ -135,4 +138,5 @@ def fit_grm_high_precision(data, pattern, *, exploratory=False, correlated=False
                        max_probability_change=float(np.max(abs(p1 - p0))),
                        default_iterations=int(f0.n_iterations), continuation_iterations=int(f1.n_iterations), converged=bool(f1.converged),
                        note="Descriptive internal diagnostics only; NOT validated as an automatic trigger or as equivalent to R agreement")
-    return dict(fit=f1, default=base, covariance=np.eye(q), status=STATUS, profile=dict(HIGH_PRECISION), diagnostics=diagnostics)
+    outcome = dict(base, fit=f1, raw_fit=f1, orientation=[1] * q, status=STATUS)
+    return dict(outcome, default=base, profile=dict(HIGH_PRECISION), diagnostics=diagnostics)

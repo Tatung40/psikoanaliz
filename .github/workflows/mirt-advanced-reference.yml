@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [development/mirt-advanced-production]
-    paths: ['validation/mirt_advanced/phase2.py', 'core/mirt_r_backend.*', 'core/mirt_advanced.py', 'Dockerfile', '.github/workflows/mirt-advanced-reference.yml']
+    paths: ['validation/mirt_advanced/phase2.py', 'core/mirt_r_backend.*', 'core/mirt_advanced.py', 'core/mirt_advanced_report.py', 'tests/test_mirt_advanced_integration.py', 'ui/irt_multidim_view.py', 'Dockerfile', '.github/workflows/mirt-advanced-reference.yml']
 permissions:
   contents: read
 jobs:
@@ -32,6 +32,29 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: mirt-advanced-phase2, path: out/phase2/summary.json, retention-days: 90}
+  integration-r:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1', PYTHONPATH: ., MIRT_ADV_ARTIFACTS: out/artifacts}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - uses: r-lib/actions/setup-r@v2
+        with: {r-version: '4.6.1', use-public-rspm: true}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::nloptr
+            any::jsonlite
+          cache-version: 2
+      - run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Actual integrated routes, UI and exports with native R present (software fixtures, no new campaign)
+        run: python -m pytest -q -rs tests/test_mirt_advanced_integration.py tests/test_mirt_r_backend.py tests/test_mirt_advanced_adapters.py tests/test_mirt_advanced_scope.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: mirt-advanced-integration-artifacts, path: out/artifacts, retention-days: 90}
   docker:
     runs-on: ubuntu-latest
     timeout-minutes: 90

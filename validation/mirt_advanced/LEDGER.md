@@ -29,3 +29,8 @@ Iteration-1 results are added below once CI completes; they are not edited after
 | 0 | Dockerfile | builds | docker job | the existing TAM check compared "4.3-25" with `as.character(packageVersion())` = "4.3.25" and could never pass; fixed to "4.3.25" |
 | 1 | Docker mirt install | install_version works on bookworm | docker job (run 45945188758) | FAIL: RcppParallel needs cmake; fs needs libuv; Deriv 4.3.0 needs R >= 4.5 (bookworm ships R 4.2.2) |
 | 2 | Docker mirt install | system libraries + Deriv 4.2.0 pre-pin | docker job (run 45946079172) | **PASS**: image builds; backend ready at build time; offline fit logLik matches archived direct R to about 1e-11 |
+
+## Final integration (main cb84fc5 + #210)
+| # | Defect | Diagnosis | Correction | Decision |
+|---|--------|-----------|------------|----------|
+| 1 | Polytomous bifactor allowed 2 specific factors | Software fixtures with 2 specifics did not converge (GPCM at 1000, GRM-HP at 3000 iterations, N=800); 3x3 fixtures converge (161 and 70 iterations). Evidence covers 3 specifics only | Restrict the adapter and UI to G + exactly 3 specific factors | PASS (scope matches evidence) |

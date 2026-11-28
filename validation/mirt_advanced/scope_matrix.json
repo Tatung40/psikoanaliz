@@ -31,13 +31,13 @@
       "decision": "PARTIAL",
       "level": "EXPERIMENTAL",
       "evidence": "Python adapter core.mirt_advanced.fit_polytomous_bifactor (confirmatory orthogonal MGRM, full GH7 grid, 4D). Default settings: probability gate FAIL (4.0e-4 > 1e-4; run 45943641718). Iteration 2, high_precision=True: every unchanged stage-1 check PASS, max |dP| 1.2e-6, |dLL| 9.8e-11 (run 45945188758)",
-      "limits": "One 4D fixture; high-precision profile required; numerical only; binary bifactor evidence not transferred"
+      "limits": "One 4D fixture; high-precision profile required; numerical only; binary bifactor evidence not transferred; production restricted to G + exactly 3 specific factors (2-specific designs did not converge in integration checks)"
     },
     "GPCM_bifactor": {
       "decision": "PARTIAL",
       "level": "EXPERIMENTAL",
       "evidence": "Python adapter vs native R mirt on a common GH7 grid: all unchanged stage-1 checks PASS (max |dP| 9.8e-5, |dLL| 1.3e-6) (phase2_run_45943641718_summary.json)",
-      "limits": "One 4D fixture; numerical only; no SE"
+      "limits": "One 4D fixture; numerical only; no SE; production restricted to G + exactly 3 specific factors (2-specific designs did not converge in integration checks)"
     },
     "PCM_bifactor": {
       "decision": "NO",
