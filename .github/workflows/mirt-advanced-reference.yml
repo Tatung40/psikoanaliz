@@ -1,0 +1,74 @@
+name: mirt-advanced-reference
+on:
+  workflow_dispatch:
+  push:
+    branches: [development/mirt-advanced-production]
+    paths: ['validation/mirt_advanced/phase2.py', 'core/mirt_r_backend.*', 'core/mirt_advanced.py', 'core/mirt_advanced_report.py', 'tests/test_mirt_advanced_integration.py', 'ui/irt_multidim_view.py', 'Dockerfile', '.github/workflows/mirt-advanced-reference.yml']
+permissions:
+  contents: read
+jobs:
+  phase2:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1', PYTHONPATH: .}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - uses: r-lib/actions/setup-r@v2
+        with: {r-version: '4.6.1', use-public-rspm: true}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::nloptr
+            any::jsonlite
+          cache-version: 2
+      - run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - run: python -m pytest -q tests/test_mirt_advanced_scope.py tests/test_mirt_r_backend.py tests/test_mirt_advanced_adapters.py -rs
+      - run: python validation/mirt_advanced/phase2.py --output out/phase2 --only F_grm_bifactor_high_precision
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: mirt-advanced-phase2, path: out/phase2/summary.json, retention-days: 90}
+  integration-r:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1', PYTHONPATH: ., MIRT_ADV_ARTIFACTS: out/artifacts}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - uses: r-lib/actions/setup-r@v2
+        with: {r-version: '4.6.1', use-public-rspm: true}
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::mirt@1.48
+            any::nloptr
+            any::jsonlite
+          cache-version: 2
+      - run: python -m pip install -r requirements.txt 'mirt==1.2.0'
+      - name: Actual integrated routes, UI and exports with native R present (software fixtures, no new campaign)
+        run: python -m pytest -q -rs tests/test_mirt_advanced_integration.py tests/test_mirt_r_backend.py tests/test_mirt_advanced_adapters.py tests/test_mirt_advanced_scope.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: mirt-advanced-integration-artifacts, path: out/artifacts, retention-days: 90}
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production image (R + TAM + pinned R mirt 1.48)
+        run: docker build -t eser-mirt .
+      - name: Native R backend inside the image (actual fit, no installation at runtime)
+        run: |
+          docker run --rm --network none eser-mirt python -c "
+          import numpy as np, pandas as pd
+          from core import mirt_r_backend as RB
+          d=pd.read_csv('validation/mirt_phase3/fixtures/2PL_2D.csv'); q=2; J=d.shape[1]
+          P=np.zeros((J,q),int); P[0:4,0]=1; P[4:8,1]=1; P[8:,0]=1
+          r=RB.fit(d,'M4PL_fixed',pattern=P,c=.2,u=.95,n_quadpts=15,max_iter=3000,tol=1e-8)
+          print('DOCKER BACKEND', r['mirt_version'], r['converged'], r['iterations'], repr(r['logLik']), round(r['wall_seconds'],2))
+          assert r['converged'] and r['mirt_version']=='1.48'"

@@ -1,0 +1,91 @@
+{
+  "policy": "Policy D (validation/SCIENTIFIC_CERTIFICATION_POLICY.md)",
+  "owner": "Claude (advanced MIRT); shared production code is Codex-owned and unchanged",
+  "production_status_label": "EXPERIMENTAL / NOT CERTIFIED (core/irt_multidim.STATUS, unchanged)",
+  "scopes": {
+    "exploratory_M2PL": {
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "2PL_EFA_2D numerically agreed with R mirt 1.48 (stage-1 continuation, triangular identification, 2D only)",
+      "limits": "2D only; numerical agreement is not inferential certification; no SE"
+    },
+    "exploratory_MGRM": {
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "Default tol 1e-7 fails the probability gate again (fresh R fit, phase2_run_45943641718_summary.json). The explicit high-precision profile core.mirt_advanced.fit_grm_high_precision passes every unchanged stage-1 check: max |dP| 6.7e-7, |dLL| 5.4e-11. Runtime: default 8.4 s, plus 4.0 s for the continuation.",
+      "limits": "2D recorded fixture only; explicit profile, no validated automatic trigger; numerical only"
+    },
+    "exploratory_MGPCM": {
+      "decision": "NO",
+      "level": "EXPERIMENTAL",
+      "evidence": "no R comparison exists",
+      "limits": "production permits the fit but has no reference evidence; integration item for Codex-owned UI/status"
+    },
+    "binary_bifactor": {
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "Bifactor_4D: both engines hit 1000 iterations, all comparisons pass at |dLL|=3e-9; P8 recovery NOT MET (N500 convergence 91/100; N1000 specific RMSE .42 > .30); iteration 1 (run 45938013141): baseline NOT CONVERGED again (iteration cap), so the precision continuation was BLOCKED; Phase II DR diagnostic (quadpts 21, same 1000-iteration budget): R and Python both stop at 1000 iterations; sign-aligned loadings differ by up to 1.30, consistent with a weakly identified, flat ridge. No correctable defect found.",
+      "limits": "historical NOT MET preserved; no new campaign"
+    },
+    "GRM_bifactor": {
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "Python adapter core.mirt_advanced.fit_polytomous_bifactor (confirmatory orthogonal MGRM, full GH7 grid, 4D). Default settings: probability gate FAIL (4.0e-4 > 1e-4; run 45943641718). Iteration 2, high_precision=True: every unchanged stage-1 check PASS, max |dP| 1.2e-6, |dLL| 9.8e-11 (run 45945188758)",
+      "limits": "One 4D fixture; high-precision profile required; numerical only; binary bifactor evidence not transferred; production restricted to G + exactly 3 specific factors (2-specific designs did not converge in integration checks)"
+    },
+    "GPCM_bifactor": {
+      "decision": "PARTIAL",
+      "level": "EXPERIMENTAL",
+      "evidence": "Python adapter vs native R mirt on a common GH7 grid: all unchanged stage-1 checks PASS (max |dP| 9.8e-5, |dLL| 1.3e-6) (phase2_run_45943641718_summary.json)",
+      "limits": "One 4D fixture; numerical only; no SE; production restricted to G + exactly 3 specific factors (2-specific designs did not converge in integration checks)"
+    },
+    "PCM_bifactor": {
+      "decision": "NO",
+      "level": "WITHHELD",
+      "evidence": "WITHHELD: slope=1 with unit variances is not the Rasch-testlet PCM, which needs free specific variances; no validated specification",
+      "limits": "binary bifactor evidence not transferred"
+    },
+    "R_backend": {
+      "implemented": "YES",
+      "executed_in_CI": "YES (R 4.6.1, mirt 1.48)",
+      "executable_in_docker": "YES. Run 45946079172: the image builds in about 13 min with TAM 4.3.25 and R mirt 1.48. An actual M4PL fit with --network none gives logLik -2536.18391098392, against -2536.18391098393 archived for direct R",
+      "available_in_live_deployment": "NO",
+      "available_to_users": "NO",
+      "blocker": "Live hosting is Streamlit Community Cloud, which does not build the Dockerfile; packages.txt (apt) cannot pin R mirt 1.48. The backend therefore refuses explicitly there and Python-only operation is preserved",
+      "licensing": "R mirt is GPL (>= 3); Python mirt 1.2.0 is MIT. Distributing a Docker image that bundles GPL R packages may carry source-availability obligations. Unresolved; not assessed legally"
+    },
+    "M3PL_fixed_asymptote": {
+      "decision": "YES (numerical scope)",
+      "level": "EXPERIMENTAL",
+      "evidence": "Production SciPy route (core.irt_multidim_general_report) already offers it. The native R backend reproduces the archived direct R fits (|dLL| <= 1e-11), and the two independent engines (R backend vs SciPy) agree on every stage-1 check for 2D within and 3D between cases (phase2_run_45943641718_summary.json)",
+      "limits": "2D/3D, positive CFA, >=3 pure anchors per dimension, c known; no item SE/CI/p"
+    },
+    "M3PL_free_asymptote": {
+      "decision": "NO",
+      "level": "WITHHELD",
+      "evidence": "phase3 B_free_c FAIL / BLOCKED",
+      "limits": "free-c not enabled because R returns estimates"
+    },
+    "M4PL_fixed_asymptotes": {
+      "decision": "YES (numerical scope)",
+      "level": "EXPERIMENTAL",
+      "evidence": "4 cases (2D/3D, within/between): adapter fidelity |dLL| <= 2e-11 vs archived direct R; independent R vs SciPy all PASS, max |dP| 9.7e-6 (phase2_run_45943641718_summary.json)",
+      "limits": "as M3PL fixed; no asymptote CI"
+    },
+    "M4PL_mixed_asymptotes": {
+      "decision": "NO",
+      "level": "WITHHELD",
+      "evidence": "no predeclared mixed-asymptote comparison",
+      "limits": "not tested"
+    },
+    "M4PL_free_asymptotes": {
+      "decision": "NO",
+      "level": "WITHHELD",
+      "evidence": "phase3 C_free BLOCKED; free4 precision agreement in a subset is numerical only",
+      "limits": "no inferential claim"
+    }
+  },
+  "iteration_1_run": 45938013141,
+  "phase2_run": 45943641718,
+  "correction_phase1": "Phase I wrongly stated M3PL/M4PL fixed were absent from production; the SciPy route core.irt_multidim_general_report exists (Codex-owned)."
+}

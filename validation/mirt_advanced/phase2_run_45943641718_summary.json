@@ -1,0 +1,813 @@
+{
+ "criteria_sha256": "5b666c899ee9cc53e3683b99fe6d192816fdcc0731ca0a32b61607f612910d44",
+ "engine": [
+  true,
+  "R mirt 1.48"
+ ],
+ "A_fixed_asymptote": [
+  {
+   "family": "3PL",
+   "q": 2,
+   "within": true,
+   "c": 0.2,
+   "u": 1,
+   "adapter_fidelity": {
+    "logLik_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 0.0,
+     "mean_absolute": 0.0,
+     "max_relative": 0.0,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "covariance_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 3.843915005741216e-09,
+     "mean_absolute": 1.921957502870608e-09,
+     "max_relative": 3.702026921135378e-08,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "iterations": {
+     "backend": 75,
+     "archived": 76
+    }
+   },
+   "independent_vs_SciPy": {
+    "parameters": {
+     "status": "PASS",
+     "max_absolute": 0.00011346129798850413,
+     "mean_absolute": 1.1606955187081962e-05,
+     "max_relative": 3.3364530708431534e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "covariance": {
+     "status": "PASS",
+     "max_absolute": 1.0124521544474518e-06,
+     "mean_absolute": 5.062260772237259e-07,
+     "max_relative": 9.750801270391864e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "probabilities": {
+     "status": "PASS",
+     "max_absolute": 6.859635769629335e-06,
+     "mean_absolute": 3.6583421664099227e-07,
+     "max_relative": 1.6642775260251253e-05,
+     "tolerance": 0.0001,
+     "reason": ""
+    },
+    "information": {
+     "status": "PASS",
+     "max_absolute": 0.00012382626627838178,
+     "mean_absolute": 6.472602608769857e-07,
+     "max_relative": 0.0007915967177246049,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "common_logLik": {
+     "status": "PASS",
+     "max_absolute": 3.5256562114227563e-09,
+     "mean_absolute": 3.5256562114227563e-09,
+     "max_relative": 1.3897496640078216e-12,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "R_native_vs_common_grid": {
+     "status": "PASS",
+     "max_absolute": 9.094947017729282e-13,
+     "mean_absolute": 9.094947017729282e-13,
+     "max_relative": 3.585062979516968e-16,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "EAP": {
+     "status": "PASS",
+     "max_absolute": 9.696488668664571e-06,
+     "mean_absolute": 1.3203390482318268e-06,
+     "max_relative": 0.00016415273225093454,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "posterior_SD": {
+     "status": "PASS",
+     "max_absolute": 6.180399442945461e-06,
+     "mean_absolute": 6.612787584196755e-07,
+     "max_relative": 1.3701189928809738e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    }
+   },
+   "fixed_asymptotes_exact": true,
+   "n_parameters": {
+    "R": 23,
+    "SciPy": 23,
+    "equal": true
+   },
+   "converged": {
+    "R": true,
+    "SciPy": true
+   },
+   "seconds": {
+    "R_backend_wall": 6.861837289000022,
+    "SciPy": 0.34914669299999446
+   },
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED"
+  },
+  {
+   "family": "3PL",
+   "q": 3,
+   "within": false,
+   "c": 0.2,
+   "u": 1,
+   "adapter_fidelity": {
+    "logLik_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 1.000444171950221e-11,
+     "mean_absolute": 1.000444171950221e-11,
+     "max_relative": 2.7604518170616136e-15,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "covariance_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 7.977426697003409e-08,
+     "mean_absolute": 2.9414769552192787e-08,
+     "max_relative": 2.6370954780054537e-07,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "iterations": {
+     "backend": 147,
+     "archived": 149
+    }
+   },
+   "independent_vs_SciPy": {
+    "parameters": {
+     "status": "PASS",
+     "max_absolute": 2.5945197521082264e-05,
+     "mean_absolute": 4.014280802662753e-06,
+     "max_relative": 7.571420288498602e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "covariance": {
+     "status": "PASS",
+     "max_absolute": 1.6478913701378772e-06,
+     "mean_absolute": 6.183338642341674e-07,
+     "max_relative": 5.44743084641073e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "probabilities": {
+     "status": "PASS",
+     "max_absolute": 1.7506437599568159e-06,
+     "mean_absolute": 2.445022915989428e-07,
+     "max_relative": 4.808850272501474e-06,
+     "tolerance": 0.0001,
+     "reason": ""
+    },
+    "information": {
+     "status": "PASS",
+     "max_absolute": 2.7444308714263954e-05,
+     "mean_absolute": 9.743071734927408e-08,
+     "max_relative": 0.0001620524411316824,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "common_logLik": {
+     "status": "PASS",
+     "max_absolute": 1.1987140169367194e-09,
+     "mean_absolute": 1.1987140169367194e-09,
+     "max_relative": 3.3075231771690953e-13,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "R_native_vs_common_grid": {
+     "status": "PASS",
+     "max_absolute": 1.3642420526593924e-12,
+     "mean_absolute": 1.3642420526593924e-12,
+     "max_relative": 3.7642524778112917e-16,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "EAP": {
+     "status": "PASS",
+     "max_absolute": 4.066952617121089e-06,
+     "mean_absolute": 9.110579090228503e-07,
+     "max_relative": 0.002680477625466652,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "posterior_SD": {
+     "status": "PASS",
+     "max_absolute": 1.6595740165437078e-06,
+     "mean_absolute": 3.516046917612092e-07,
+     "max_relative": 2.4578745722771444e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    }
+   },
+   "fixed_asymptotes_exact": true,
+   "n_parameters": {
+    "R": 31,
+    "SciPy": 31,
+    "equal": true
+   },
+   "converged": {
+    "R": true,
+    "SciPy": true
+   },
+   "seconds": {
+    "R_backend_wall": 131.68695431599997,
+    "SciPy": 5.504143940999995
+   },
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED"
+  },
+  {
+   "family": "4PL",
+   "q": 2,
+   "within": false,
+   "c": 0.2,
+   "u": 0.95,
+   "adapter_fidelity": {
+    "logLik_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 2.000888343900442e-11,
+     "mean_absolute": 2.000888343900442e-11,
+     "max_relative": 7.88936612693905e-15,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "covariance_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 1.705954300046386e-08,
+     "mean_absolute": 8.52977150023193e-09,
+     "max_relative": 1.3067025136723802e-07,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "iterations": {
+     "backend": 78,
+     "archived": 74
+    }
+   },
+   "independent_vs_SciPy": {
+    "parameters": {
+     "status": "PASS",
+     "max_absolute": 0.00022792628054357778,
+     "mean_absolute": 1.8574574447949565e-05,
+     "max_relative": 4.702195393069068e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "covariance": {
+     "status": "PASS",
+     "max_absolute": 1.7055652874464755e-06,
+     "mean_absolute": 8.527826437232378e-07,
+     "max_relative": 1.3064047140644441e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "probabilities": {
+     "status": "PASS",
+     "max_absolute": 9.717611669901594e-06,
+     "mean_absolute": 3.903662818900391e-07,
+     "max_relative": 2.820954698861465e-05,
+     "tolerance": 0.0001,
+     "reason": ""
+    },
+    "information": {
+     "status": "PASS",
+     "max_absolute": 0.00029938541378315975,
+     "mean_absolute": 1.485114346070935e-06,
+     "max_relative": 0.001290955028634869,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "common_logLik": {
+     "status": "PASS",
+     "max_absolute": 2.4429027689620852e-09,
+     "mean_absolute": 2.4429027689620852e-09,
+     "max_relative": 9.632198825880922e-13,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "R_native_vs_common_grid": {
+     "status": "PASS",
+     "max_absolute": 1.8189894035458565e-12,
+     "mean_absolute": 1.8189894035458565e-12,
+     "max_relative": 7.1721510244900965e-16,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "EAP": {
+     "status": "PASS",
+     "max_absolute": 7.052530486384434e-06,
+     "mean_absolute": 1.3382155212037947e-06,
+     "max_relative": 0.00041992269453532756,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "posterior_SD": {
+     "status": "PASS",
+     "max_absolute": 4.903310361070723e-06,
+     "mean_absolute": 6.784776133369336e-07,
+     "max_relative": 5.843092276907354e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    }
+   },
+   "fixed_asymptotes_exact": true,
+   "n_parameters": {
+    "R": 21,
+    "SciPy": 21,
+    "equal": true
+   },
+   "converged": {
+    "R": true,
+    "SciPy": true
+   },
+   "seconds": {
+    "R_backend_wall": 7.0527004470000065,
+    "SciPy": 0.35579064299997754
+   },
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED"
+  },
+  {
+   "family": "4PL",
+   "q": 2,
+   "within": true,
+   "c": 0.2,
+   "u": 0.95,
+   "adapter_fidelity": {
+    "logLik_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 2.000888343900442e-11,
+     "mean_absolute": 2.000888343900442e-11,
+     "max_relative": 7.888715260280144e-15,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "covariance_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 8.154732999976488e-09,
+     "mean_absolute": 4.077366499988244e-09,
+     "max_relative": 6.99030959074161e-08,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "iterations": {
+     "backend": 76,
+     "archived": 82
+    }
+   },
+   "independent_vs_SciPy": {
+    "parameters": {
+     "status": "PASS",
+     "max_absolute": 0.00016187348484564268,
+     "mean_absolute": 1.7754068025327782e-05,
+     "max_relative": 3.344800521133382e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "covariance": {
+     "status": "PASS",
+     "max_absolute": 1.2138032180752933e-07,
+     "mean_absolute": 6.069016090376467e-08,
+     "max_relative": 1.0404829771529318e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "probabilities": {
+     "status": "PASS",
+     "max_absolute": 5.489242427492158e-06,
+     "mean_absolute": 3.1023424124111224e-07,
+     "max_relative": 1.7997734075434042e-05,
+     "tolerance": 0.0001,
+     "reason": ""
+    },
+    "information": {
+     "status": "PASS",
+     "max_absolute": 0.0002280569497421503,
+     "mean_absolute": 8.644904177508061e-07,
+     "max_relative": 0.0011548324484105619,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "common_logLik": {
+     "status": "PASS",
+     "max_absolute": 8.694769348949194e-10,
+     "mean_absolute": 8.694769348949194e-10,
+     "max_relative": 3.4280053585569244e-13,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "R_native_vs_common_grid": {
+     "status": "PASS",
+     "max_absolute": 4.547473508864641e-13,
+     "mean_absolute": 4.547473508864641e-13,
+     "max_relative": 1.792889831881851e-16,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "EAP": {
+     "status": "PASS",
+     "max_absolute": 4.192273441450123e-06,
+     "mean_absolute": 9.275694157099071e-07,
+     "max_relative": 0.000306163375244507,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "posterior_SD": {
+     "status": "PASS",
+     "max_absolute": 2.5151564496672663e-06,
+     "mean_absolute": 5.135224266890337e-07,
+     "max_relative": 3.2395204516766686e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    }
+   },
+   "fixed_asymptotes_exact": true,
+   "n_parameters": {
+    "R": 23,
+    "SciPy": 23,
+    "equal": true
+   },
+   "converged": {
+    "R": true,
+    "SciPy": true
+   },
+   "seconds": {
+    "R_backend_wall": 7.082555111000033,
+    "SciPy": 0.42330468500000507
+   },
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED"
+  },
+  {
+   "family": "4PL",
+   "q": 3,
+   "within": false,
+   "c": 0.2,
+   "u": 0.95,
+   "adapter_fidelity": {
+    "logLik_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 1.000444171950221e-11,
+     "mean_absolute": 1.000444171950221e-11,
+     "max_relative": 2.763111661140567e-15,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "covariance_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 5.8922001999750506e-08,
+     "mean_absolute": 2.2053719998342085e-08,
+     "max_relative": 1.5507061981660723e-07,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "iterations": {
+     "backend": 139,
+     "archived": 140
+    }
+   },
+   "independent_vs_SciPy": {
+    "parameters": {
+     "status": "PASS",
+     "max_absolute": 7.56348051105249e-05,
+     "mean_absolute": 1.080648643438624e-05,
+     "max_relative": 8.27628740287869e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "covariance": {
+     "status": "PASS",
+     "max_absolute": 1.507377048959313e-06,
+     "mean_absolute": 5.799637115678891e-07,
+     "max_relative": 5.387358049541132e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "probabilities": {
+     "status": "PASS",
+     "max_absolute": 4.081392406263262e-06,
+     "mean_absolute": 4.328809563119003e-07,
+     "max_relative": 1.097487532432633e-05,
+     "tolerance": 0.0001,
+     "reason": ""
+    },
+    "information": {
+     "status": "PASS",
+     "max_absolute": 7.964170594165765e-05,
+     "mean_absolute": 3.1005365033189944e-07,
+     "max_relative": 0.0004693420782503279,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "common_logLik": {
+     "status": "PASS",
+     "max_absolute": 2.0158950064796954e-09,
+     "mean_absolute": 2.0158950064796954e-09,
+     "max_relative": 5.567669997195148e-13,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "R_native_vs_common_grid": {
+     "status": "PASS",
+     "max_absolute": 3.183231456205249e-12,
+     "mean_absolute": 3.183231456205249e-12,
+     "max_relative": 8.791718921810896e-16,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "EAP": {
+     "status": "PASS",
+     "max_absolute": 7.487561086427785e-06,
+     "mean_absolute": 1.4784008731149553e-06,
+     "max_relative": 0.009129559548567406,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "posterior_SD": {
+     "status": "PASS",
+     "max_absolute": 3.1340902347798405e-06,
+     "mean_absolute": 7.046332258835626e-07,
+     "max_relative": 4.5146821242089335e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    }
+   },
+   "fixed_asymptotes_exact": true,
+   "n_parameters": {
+    "R": 31,
+    "SciPy": 31,
+    "equal": true
+   },
+   "converged": {
+    "R": true,
+    "SciPy": true
+   },
+   "seconds": {
+    "R_backend_wall": 131.54681260800004,
+    "SciPy": 8.653131350999956
+   },
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED"
+  },
+  {
+   "family": "4PL",
+   "q": 3,
+   "within": true,
+   "c": 0.2,
+   "u": 0.95,
+   "adapter_fidelity": {
+    "logLik_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 1.000444171950221e-11,
+     "mean_absolute": 1.000444171950221e-11,
+     "max_relative": 2.790810314859951e-15,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "covariance_vs_archived_direct_R": {
+     "status": "PASS",
+     "max_absolute": 1.437241009816237e-07,
+     "mean_absolute": 3.4108770997446726e-08,
+     "max_relative": 1.1475481169781186e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "iterations": {
+     "backend": 67,
+     "archived": 70
+    }
+   },
+   "independent_vs_SciPy": {
+    "parameters": {
+     "status": "PASS",
+     "max_absolute": 5.3586007606742925e-05,
+     "mean_absolute": 6.937629842634907e-06,
+     "max_relative": 0.00010539030783461467,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "covariance": {
+     "status": "PASS",
+     "max_absolute": 1.8221579409158362e-06,
+     "mean_absolute": 6.597218822577503e-07,
+     "max_relative": 4.989756475452922e-05,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "probabilities": {
+     "status": "PASS",
+     "max_absolute": 2.893720470242833e-06,
+     "mean_absolute": 2.914521380310226e-07,
+     "max_relative": 8.725323267678292e-06,
+     "tolerance": 0.0001,
+     "reason": ""
+    },
+    "information": {
+     "status": "PASS",
+     "max_absolute": 5.766845729571202e-05,
+     "mean_absolute": 2.9164840976255787e-07,
+     "max_relative": 0.0003564149490530217,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "common_logLik": {
+     "status": "PASS",
+     "max_absolute": 1.944044925039634e-09,
+     "mean_absolute": 1.944044925039634e-09,
+     "max_relative": 5.423051861827201e-13,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "R_native_vs_common_grid": {
+     "status": "PASS",
+     "max_absolute": 3.637978807091713e-12,
+     "mean_absolute": 3.637978807091713e-12,
+     "max_relative": 1.0148401144945296e-15,
+     "tolerance": 1e-06,
+     "reason": ""
+    },
+    "EAP": {
+     "status": "PASS",
+     "max_absolute": 5.430862540550113e-06,
+     "mean_absolute": 1.0579019928910072e-06,
+     "max_relative": 0.013774424674249133,
+     "tolerance": 0.001,
+     "reason": ""
+    },
+    "posterior_SD": {
+     "status": "PASS",
+     "max_absolute": 1.9870184431169946e-06,
+     "mean_absolute": 3.760650355003984e-07,
+     "max_relative": 2.5183581906639113e-06,
+     "tolerance": 0.001,
+     "reason": ""
+    }
+   },
+   "fixed_asymptotes_exact": true,
+   "n_parameters": {
+    "R": 35,
+    "SciPy": 35,
+    "equal": true
+   },
+   "converged": {
+    "R": true,
+    "SciPy": true
+   },
+   "seconds": {
+    "R_backend_wall": 67.880372008,
+    "SciPy": 8.101857445000064
+   },
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED"
+  }
+ ],
+ "B_poly_bifactor": {
+  "GRM_Bifactor_4D": {
+   "status": "NUMERICAL DISAGREEMENT / NOT CERTIFIED",
+   "blocker": null,
+   "seconds": 170.39946247299997,
+   "Python": {
+    "engine": "Python mirt 1.2.0",
+    "python": "3.11.18",
+    "converged": true,
+    "logLik": -6551.517465973142,
+    "AIC": 13193.034931946284,
+    "BIC": 13390.896766431011,
+    "n_parameters": 45,
+    "iterations": 254
+   },
+   "R": {
+    "converged": true,
+    "iterations": 318,
+    "logLik": -6551.5174621775
+   },
+   "failed": [
+    "probabilities"
+   ],
+   "max_abs": {
+    "slopes": 0.0007042848104226174,
+    "intercepts": 0.000251508704829817,
+    "covariance": 0.0,
+    "probabilities": 0.00039517976951453093,
+    "information": 0.00035388894810686744,
+    "EAP": 0.0007911825376210047,
+    "posterior_SD": 0.00014889855339883518,
+    "common_logLik": 3.7956369851599447e-06,
+    "Python_native_LL": 9.094947017729282e-13,
+    "R_native_LL": 3.637978807091713e-12
+   }
+  },
+  "GPCM_Bifactor_4D": {
+   "status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+   "blocker": null,
+   "seconds": 114.72204165100004,
+   "Python": {
+    "engine": "Python mirt 1.2.0",
+    "python": "3.11.18",
+    "converged": true,
+    "logLik": -6025.473443586095,
+    "AIC": 12140.94688717219,
+    "BIC": 12338.808721656917,
+    "n_parameters": 45,
+    "iterations": 120
+   },
+   "R": {
+    "converged": true,
+    "iterations": 111,
+    "logLik": -6025.47344226468
+   },
+   "failed": [],
+   "max_abs": {
+    "slopes": 0.00038409123637084264,
+    "intercepts": 0.0004599359562145189,
+    "covariance": 0.0,
+    "probabilities": 9.774227986469874e-05,
+    "information": 0.0002876371019033819,
+    "EAP": 0.00018233683627477681,
+    "posterior_SD": 1.7483565410980617e-05,
+    "common_logLik": 1.3214357750257477e-06,
+    "Python_native_LL": 1.8189894035458565e-11,
+    "R_native_LL": 2.7284841053187847e-12
+   }
+  }
+ },
+ "C_grm_high_precision": {
+  "baseline_status": "NUMERICAL DISAGREEMENT / NOT CERTIFIED",
+  "baseline_failed": [
+   "probabilities"
+  ],
+  "high_precision_status": "NUMERICALLY VALIDATED / NOT CERTIFIED",
+  "failed": [],
+  "max_abs": {
+   "slopes": 1.2773949100708393e-06,
+   "intercepts": 4.1992261090584293e-07,
+   "covariance": 0.0,
+   "probabilities": 6.708276758526921e-07,
+   "information": 1.0502196975403777e-06,
+   "EAP": 8.266644326848649e-07,
+   "posterior_SD": 2.3603548815476216e-07,
+   "common_logLik": 5.3660187404602766e-11,
+   "Python_native_LL": 0.0,
+   "R_native_LL": 0.0
+  },
+  "diagnostics": {
+   "default_seconds": 8.40605266199998,
+   "continuation_seconds": 3.964213776999941,
+   "default_logLik": -4814.053729707533,
+   "high_precision_logLik": -4814.053726403404,
+   "logLik_improvement": 3.3041296774172224e-06,
+   "max_parameter_change": 0.0005745027309481121,
+   "max_probability_change": 0.0003479866653229857,
+   "default_iterations": 470,
+   "continuation_iterations": 134,
+   "converged": true,
+   "note": "Descriptive internal diagnostics only; NOT validated as an automatic trigger or as equivalent to R agreement"
+  }
+ },
+ "D_binary_bifactor_DR": {
+  "settings": {
+   "quadpts": 21,
+   "max_iter": 1000,
+   "tol": 1e-07,
+   "N": 600,
+   "integration": "dimension reduction (both engines)"
+  },
+  "R": {
+   "converged": false,
+   "iterations": 1000,
+   "logLik": -3490.77513181119,
+   "seconds": 9.481
+  },
+  "Python": {
+   "converged": false,
+   "iterations": 1000,
+   "logLik": -3490.750953799112,
+   "seconds": 4.549529560999986
+  },
+  "loadings_max_abs_diff_sign_aligned": 1.300633899425244,
+  "loading_structure_valid": true,
+  "logLik_abs_diff_note": "Different quadrature rules (R equally spaced vs Python GH): informational, no gate",
+  "logLik_abs_diff": 0.024178012078209576
+ },
+ "E_R_poly_bfactor_DR": {
+  "GRM_Bifactor_4D": {
+   "converged": true,
+   "iterations": 85,
+   "logLik": -6551.36656784351,
+   "seconds": 2.433,
+   "n_parameters": 45
+  },
+  "GPCM_Bifactor_4D": {
+   "converged": true,
+   "iterations": 226,
+   "logLik": -6025.28746620256,
+   "seconds": 5.024,
+   "n_parameters": 45
+  }
+ }
+}

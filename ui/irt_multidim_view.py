@@ -13,6 +13,8 @@ from reports.irt_multidim_report import downloads,figure,export_fingerprint
 from core.irt_mirt_policy import profiles,evidence_fingerprint,COLD_INITIALIZATION
 from core.irt_mirt_production import decorate_native,refresh_policy
 from time import perf_counter
+from core import mirt_advanced_report as advr
+from core.mirt_r_backend import engine_available
 
 KEY='mirt_multidim_result'
 
@@ -36,7 +38,7 @@ def render(data=None,item_cols=(),id_col=None):
  person=st.selectbox('Kişi kimliği',id_options,index=id_options.index(id_col) if id_col in data else 0,key='md_id')
  choices=[c for c in data if c!=person]
  items=st.multiselect('Maddeler',choices,default=[c for c in item_cols if c in choices] or choices,key='md_items')
- model=st.selectbox('MIRT modeli',MODELS+factorized.MODELS+rsm.MODELS+general.MODELS,index=MODELS.index('2PL'),key='md_model')
+ model=st.selectbox('MIRT modeli',MODELS+factorized.MODELS+rsm.MODELS+general.MODELS+tuple(advr.BIFACTOR_MODELS),index=MODELS.index('2PL'),key='md_model')
  current_profiles=profiles(model) if model in ('2PL','GRM','GPCM','PCM','Rasch','NRM') else {}
  # Preserve declarative input specs on evidence withdrawal; only the certificate is refreshed, never the fit.
  known=st.session_state.setdefault('md_profile_specs',{})
@@ -46,16 +48,23 @@ def render(data=None,item_cols=(),id_col=None):
  cfg=available.get(preset)
  if cfg:st.info('Profil yalnız gözlenebilir yapı/ayarları uygular. Gizli dağılım varsayımları kullanıcı verisinden doğrulanamaz.')
  restricted=model in factorized.MODELS;stacked=model in rsm.MODELS;advanced=model in general.MODELS;c=.2;u=1.
- st.warning(general.LIMITATION if advanced else LIMITATION)
+ polybf=model in advr.BIFACTOR_MODELS;engine_choice=advr.ENGINES[0];high_precision=False
+ st.warning(advr.BIFACTOR_LIMITATION if polybf else general.LIMITATION if advanced else LIMITATION)
  if stacked:st.warning(rsm.LIMITATION)
  if restricted or advanced:
   if restricted:st.warning(factorized.LIMITATION)
   c=st.number_input('Başlangıç alt asimptot c (kestirilir)' if advanced and general.CONFIG[model][1] else 'Sabit alt asimptot c (kestirilmez)',min_value=0.,max_value=.5,value=.2,step=.01,key='md_fixed_c')
   if model.startswith('4PL'):u=st.number_input('Başlangıç üst asimptot d (kestirilir)' if advanced and general.CONFIG[model][2] else 'Sabit üst asimptot d (kestirilmez)',min_value=.5,max_value=1.,value=.95,step=.01,key='md_fixed_u')
- dims=st.selectbox('Boyut sayısı',[cfg['q']] if cfg else general.allowed_dimensions(model) if advanced else [2,3,4,5],key='md_dims')
- mode=st.selectbox('Yapı',['Doğrulayıcı'] if cfg else ['Doğrulayıcı','Keşfedici (pozitif, üçgen)'],key='md_mode')
+ if advanced and not general.CONFIG[model][1] and not general.CONFIG[model][2]:
+  engine_choice=st.selectbox('Kestirim motoru (açık seçim; otomatik geçiş yok)',advr.ENGINES,key='md_engine')
+  if engine_choice!=advr.ENGINES[0]:
+   st.warning(advr.R_LIMITATION)
+   ok_r,why_r=engine_available()
+   (st.info if ok_r else st.error)(why_r)
+ dims=st.selectbox('Boyut sayısı',[cfg['q']] if cfg else general.allowed_dimensions(model) if advanced else [4] if polybf else [2,3,4,5],key='md_dims')
+ mode=st.selectbox('Yapı',['Doğrulayıcı'] if cfg or polybf else ['Doğrulayıcı','Keşfedici (pozitif, üçgen)'],key='md_mode')
  efa=mode.startswith('Keşfedici')
- corr_options=[{'full':'Tümü',True:'Yalnız F1–F2',False:'Ortogonal'}[cfg['correlated']]] if cfg else ['Tümü'] if advanced else ['Ortogonal','Yalnız F1–F2','Tümü']
+ corr_options=[{'full':'Tümü',True:'Yalnız F1–F2',False:'Ortogonal'}[cfg['correlated']]] if cfg else ['Tümü'] if advanced else ['Ortogonal'] if polybf else ['Ortogonal','Yalnız F1–F2','Tümü']
  corr=st.selectbox('Boyut korelasyonları',corr_options,key='md_corr')
  correlated={'Ortogonal':False,'Yalnız F1–F2':True,'Tümü':'full'}[corr]
  pattern=np.zeros((len(items),dims),int)
@@ -63,23 +72,27 @@ def render(data=None,item_cols=(),id_col=None):
  if cfg and len(items)==cfg['k']:pattern=np.asarray(cfg['pattern'],int)
  if efa:
   pattern[:,:]=1;pattern[:min(dims,len(items)),:]=np.tril(np.ones((dims,dims),int))[:len(items),:]
- if model=='Bifactor':
+ if model=='Bifactor' or polybf:
   groups=st.text_input('Özgül gruplar (madde sırasıyla 0,1,2…)',','.join(str(i*max(dims-1,1)//max(len(items),1)) for i in range(len(items))),key=f'md_groups_{dims}')
   chosen=groups
-  st.caption(BIFACTOR_RECOVERY)
+  st.caption(advr.BIFACTOR_LIMITATION if polybf else BIFACTOR_RECOVERY)
+  if polybf:high_precision=st.checkbox('Yüksek hassasiyet profili (GRM bifactor için R uyumu yalnız bununla)',value=advr.BIFACTOR_MODELS[model]=='GRM',key='md_bf_hp')
  else:
   matrix=st.data_editor(pd.DataFrame(pattern,index=items,columns=[f'F{j+1}' for j in range(dims)]),key=f'md_profile_pattern_{preset}' if cfg else f'md_pattern_{len(items)}_{dims}_{efa}',num_rows='fixed',disabled=bool(cfg))
   chosen=matrix.to_numpy().tolist()
+ if model=='GRM' and not cfg and correlated is False:
+  high_precision=st.checkbox('Yüksek hassasiyet profili (açık seçim; tol 1e-11, ftol 1e-14)',value=False,key='md_grm_hp')
+  if high_precision:st.caption(advr.HP_LIMITATION)
  labels=None
  if model=='NRM':
   observed=list(dict.fromkeys(str(v).strip().upper() for v in data[items].to_numpy().ravel())) if items else []
   # Canonical numeric codes keep their explicit 0..3 reference order; this is not an achievement ordering.
   if set(observed)=={'0','1','2','3'}:observed=['0','1','2','3']
   labels=tuple(v.strip().upper() for v in st.text_input('Nominal etiketler: kod sırası, başarı sırası değil',','.join(observed),key='md_labels').split(','))
- nodes=st.selectbox('Eksen başına GH düğümü',[cfg['n_quadpts']] if cfg else [21,41,61] if restricted or stacked else {2:[9,15,21],3:[5,9,15],4:[5,7],5:[5]}[dims],index=({2:1,3:2}[dims] if advanced else 0),key=f'md_general_quad_{dims}' if advanced else f'md_quad_{dims}')
+ nodes=st.selectbox('Eksen başına GH düğümü',[cfg['n_quadpts']] if cfg else [21,41,61] if restricted or stacked else [5,7] if polybf else {2:[9,15,21],3:[5,9,15],4:[5,7],5:[5]}[dims],index=({2:1,3:2}[dims] if advanced else 1 if polybf else 0),key=f'md_general_quad_{dims}' if advanced else f'md_quad_{dims}')
  iterations=st.number_input('Maksimum iterasyon',min_value=1,max_value=3000,value=cfg['max_iter'] if cfg else 2000 if advanced else 1000,step=100,key='md_profile_iter' if cfg else 'md_general_iter' if advanced else 'md_iter',disabled=bool(cfg))
  tolerance=st.number_input('Göreli amaç toleransı (SciPy)' if advanced else 'EM toleransı',min_value=1e-15 if advanced else 1e-10,max_value=1e-3,value=cfg['tol'] if cfg else 1e-13 if advanced else 1e-7,format='%.10g',key='md_profile_tol' if cfg else 'md_general_tol' if advanced else 'md_tol',disabled=bool(cfg))
- settings=dict(c=c,u=u,items=items,person=person,model=model,dims=dims,efa=efa,correlated=correlated,pattern=chosen,labels=labels,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance)
+ settings=dict(engine=engine_choice,high_precision=high_precision,c=c,u=u,items=items,person=person,model=model,dims=dims,efa=efa,correlated=correlated,pattern=chosen,labels=labels,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance)
  key=fingerprint(data,settings);saved=st.session_state.get(KEY)
  if saved and saved['key']!=key:st.session_state.pop(KEY,None);saved=None
  try:
@@ -87,7 +100,11 @@ def render(data=None,item_cols=(),id_col=None):
   if cfg and len(items)!=cfg['k']:raise ValueError(f"Kayıtlı profil {cfg['k']} madde gerektirir; özel yapı deneysel olarak kullanılabilir.")
   ids=data.index.tolist() if person==id_options[0] else data[person].tolist()
   if pd.Series(ids).isna().any() or not pd.Index(ids).is_unique:raise ValueError('Kimlikler eksiksiz ve benzersiz olmalı')
-  if model=='Bifactor':
+  if polybf:
+   chosen=[int(v.strip()) for v in chosen.split(',')]
+   if len(chosen)!=len(items) or len(set(chosen))+1!=dims:raise ValueError('Bifactor: boyut=özgül grup+1; grup başına ≥3 madde')
+   advr.adv.bifactor_pattern(np.asarray(chosen))
+  elif model=='Bifactor':
    chosen=[int(v.strip()) for v in chosen.split(',')]
    if len(chosen)!=len(items) or len(set(chosen))+1!=dims or efa or correlated:raise ValueError('Bifactor: ortogonal, boyut=özgül grup+1; grup başına ≥3 madde')
   elif restricted:factorized.validate(data[items],chosen,correlated,efa,c,u)
@@ -102,7 +119,10 @@ def render(data=None,item_cols=(),id_col=None):
   try:
    started=perf_counter();outcome=None
    with st.spinner('Deneysel SciPy genel CFA marjinal ML kestirimi' if advanced else 'Gerçek Python mirt marjinal ML kestirimi'):
-    if restricted:result=factorized.report(factorized.fit(data[items],model,chosen,correlated=correlated,exploratory=efa,c=c,u=u,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance),ids)
+    if polybf:result=advr.bifactor_report(data[items],chosen,model,high_precision=high_precision,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance,person_ids=ids)
+    elif advanced and engine_choice!=advr.ENGINES[0]:result=advr.native_r_report(data[items],model,chosen,c=c,u=u,n_quadpts=nodes,max_iter=int(iterations),tol=max(tolerance,1e-12),person_ids=ids)
+    elif model=='GRM' and high_precision:result=advr.grm_high_precision_report(data[items],chosen,exploratory=efa,n_quadpts=nodes,person_ids=ids)
+    elif restricted:result=factorized.report(factorized.fit(data[items],model,chosen,correlated=correlated,exploratory=efa,c=c,u=u,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance),ids)
     elif advanced:result=general.fit_report(data[items],model,chosen,correlated=correlated,exploratory=efa,c=c,u=u,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance,person_ids=ids)
     elif stacked:result=rsm.report(rsm.fit(data[items],model,chosen,correlated=correlated,exploratory=efa,n_quadpts=nodes,max_iter=int(iterations),tol=tolerance),ids)
     else:

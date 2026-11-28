@@ -193,6 +193,8 @@
       "core.irt_multidim_factorized",
       "core.irt_multidim_general_report",
       "core.irt_multidim_rsm_stack",
+      "core.mirt_advanced_report",
+      "core.mirt_r_backend.engine_available",
       "core.python_mirt_dif.fingerprint"
     ],
     "python": "Runtime capture; GENERATED / UNVERIFIED only for faithfully serializable actual calls; otherwise UNSUPPORTED"
